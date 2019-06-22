@@ -28,7 +28,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Connect to the IFTTT Maker Channel. https://ifttt.com/maker"
+        "Connect to the [IFTTT Maker Channel](https://ifttt.com/maker)"
       end
 
       def self.details

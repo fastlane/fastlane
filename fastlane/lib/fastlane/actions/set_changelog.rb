@@ -165,7 +165,7 @@ module Fastlane
       end
 
       def self.category
-        :beta
+        :app_store_connect
       end
     end
   end

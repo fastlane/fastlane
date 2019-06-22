@@ -55,7 +55,21 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 
 # Generating Screenshots with Screengrab
 - Then, before running `fastlane screengrab` you'll need a debug and test apk
-  - You can create your APKs with `./gradlew assembleDebug assembleAndroidTest`
+  - You can create your APKs manually with `./gradlew assembleDebug assembleAndroidTest`
+  - You can also create a lane and use `build_android_app`:
+    ```ruby
+    desc "Build debug and test APK for screenshots"
+    lane :build_for_screengrab do
+      build_android_app(
+        task: 'assemble',
+        build_type: 'Debug'
+      )
+      build_android_app(
+        task: 'assemble',
+        build_type: 'AndroidTest'
+      )
+    end
+    ```
 - Once complete run `fastlane screengrab` in your app project directory to generate screenshots
   - You will be prompted to provide any required parameters which are not in your **Screengrabfile** or provided as command line arguments
 - Your screenshots will be saved to `fastlane/metadata/android` in the directory where you ran _screengrab_
@@ -156,3 +170,90 @@ If you're having trouble getting your device unlocked and the screen activated t
 ## Clean Status Bar
 
 You can use [QuickDemo](https://github.com/PSPDFKit-labs/QuickDemo) to clean up the status bar for your screenshots.
+
+# Advanced _screengrab_
+
+<details>
+<summary>Launch Arguments</summary>
+
+You can provide additional arguments to your testcases on launch. These strings will be available in your tests through `InstrumentationRegistry.getArguments()`.
+
+```ruby
+screengrab(
+  launch_arguments: [
+    "username hjanuschka",
+    "build_number 201"
+  ]
+)
+```
+
+```java
+Bundle extras = InstrumentationRegistry.getArguments();
+String peerID = null;
+if (extras != null) {
+  if (extras.containsKey("username")) {
+    username = extras.getString("username");
+    System.out.println("Username: " + username);
+  } else {
+    System.out.println("No username in extras");
+  }
+} else {
+  System.out.println("No extras");
+}
+```
+</details>
+
+<details>
+<summary>Detecting screengrab at runtime</summary>
+
+For some apps, it is helpful to know when _screengrab_ is running so that you can display specific data for your screenshots. For iOS fastlane users, this is much like "FASTLANE_SNAPSHOT". In order to do this, you'll need to have at least two product flavors of your app.
+
+Add two product flavors to the app-level build.gradle file:
+```
+android {
+...
+    flavorDimensions "mode"
+    productFlavors {
+        screengrab {
+            dimension "mode"
+        }
+        regular {
+            dimension "mode"
+        }
+    }
+...
+}
+```
+
+Check for the existence of that flavor (i.e screengrab) in your app code as follows in order to use mock data or customize data for screenshots:
+```
+if (BuildConfig.FLAVOR == "screengrab") {
+    System.out.println("screengrab is running!");
+}
+```
+
+When running _screengrab_, do the following to build the flavor you want as well as the test apk. Note that you use "assembleFlavor_name" where Flavor_name is the flavor name, capitalized (i.e. Screengrab).
+```
+./gradlew assembleScreengrab assembleAndroidTest
+```
+
+Run _screengrab_:
+```
+fastlane screengrab
+```
+_screengrab_ will ask you to select the debug and test apps (which you can then add to your Screengrabfile to skip this step later).
+
+The debug apk should be somewhere like this:
+
+`app/build/outputs/apk/screengrab/debug/app-screengrab-debug.apk`
+
+The test apk should be somewhere like this:
+
+`app/build/outputs/apk/androidTest/screengrab/debug/app-screengrab-debug-androidTest.apk`
+
+Sit back and enjoy your new screenshots!
+
+Note: while this could also be done by creating a new build variant (i.e. debug, release and creating a new one called screengrab), [Android only allows one build type to be tested](http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Testing) which defaults to debug. That's why we use product flavors.
+
+</details>
+

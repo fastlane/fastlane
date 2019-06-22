@@ -1,4 +1,5 @@
 describe Spaceship::Tunes::IAP do
+  before { TunesStubbing.itc_stub_iap }
   before { Spaceship::Tunes.login }
   let(:client) { Spaceship::Tunes.client }
   let(:app) { Spaceship::Application.all.first }
@@ -92,6 +93,47 @@ describe Spaceship::Tunes::IAP do
           cleared_for_sale: true,
           review_notes: "Some Review Notes here bla bla bla",
           pricing_intervals: pricing_intervals
+        )
+      end
+
+      it "create auto renewable subscription with subscription price target" do
+        subscription_price_target = {
+          currency: "EUR",
+          tier: 1
+        }
+
+        price_goal = TunesStubbing.itc_read_fixture_file('iap_price_goal_calc.json')
+        transformed_pricing_intervals = JSON.parse(price_goal)["data"].map do |language_code, value|
+          {
+            "value" => {
+              "tierStem" => value["tierStem"],
+              "priceTierEffectiveDate" => value["priceTierEffectiveDate"],
+              "priceTierEndDate" => value["priceTierEndDate"],
+              "country" => language_code,
+              "grandfathered" => { "value" => "FUTURE_NONE" }
+            }
+          }
+        end
+        expect(client).to receive(:update_recurring_iap_pricing!).with(app_id: '898536088',
+          purchase_id: "1195137657", pricing_intervals: transformed_pricing_intervals)
+
+        app.in_app_purchases.create!(
+          type: Spaceship::Tunes::IAPType::RECURRING,
+          versions: {
+            'en-US' => {
+              name: "test name2",
+              description: "Description has at least 10 characters"
+            },
+            'de-DE' => {
+              name: "test name german2",
+              description: "German has at least 10 characters"
+            }
+          },
+          reference_name: "localizeddemo",
+          product_id: "x.a.a.b.b.c.d.x.y.z",
+          cleared_for_sale: true,
+          review_notes: "Some Review Notes here bla bla bla",
+          subscription_price_target: subscription_price_target
         )
       end
     end

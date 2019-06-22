@@ -25,7 +25,7 @@ module Spaceship
       #   "Spaceship App"
       attr_accessor :name
 
-      # @return (String) The Vendor ID provided by App Store Connect
+      # @return (String) The SKU (Stock keeping unit) you provided for this app for internal tracking
       # @example
       #   "1435592086"
       attr_accessor :vendor_id
@@ -102,6 +102,10 @@ module Spaceship
                                     platform: platform,
                                     itunes_connect_users: itunes_connect_users)
         end
+
+        def available_bundle_ids(platform: nil)
+          client.get_available_bundle_ids(platform: platform)
+        end
       end
 
       #####################################################
@@ -134,7 +138,7 @@ module Spaceship
 
       # @return (String) An URL to this specific resource. You can enter this URL into your browser
       def url
-        "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.apple_id}"
+        "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{self.apple_id}"
       end
 
       def analytics
@@ -353,13 +357,13 @@ module Spaceship
       # @!group Submit for Review
       #####################################################
 
-      def create_submission
-        version = self.latest_version
+      def create_submission(platform: nil)
+        version = self.latest_version(platform: platform)
         if version.nil?
           raise "Could not find a valid version to submit for review"
         end
 
-        Spaceship::Tunes::AppSubmission.create(self, version)
+        Spaceship::Tunes::AppSubmission.create(self, version, platform: platform)
       end
 
       # Cancels all ongoing TestFlight beta submission for this application
@@ -384,6 +388,18 @@ module Spaceship
           raise "Could not find a valid version to release"
         end
         version.release!
+      end
+
+      #####################################################
+      # @!group release to all users
+      #####################################################
+
+      def release_to_all_users!
+        version = self.live_version
+        if version.nil?
+          raise "Could not find a valid version to release"
+        end
+        version.release_to_all_users!
       end
 
       #####################################################

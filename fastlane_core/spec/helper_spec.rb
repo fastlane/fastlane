@@ -61,6 +61,11 @@ describe FastlaneCore do
         stub_const('ENV', { 'XCS' => true })
         expect(FastlaneCore::Helper.ci?).to be(true)
       end
+
+      it "returns true when building in Azure DevOps (VSTS) " do
+        stub_const('ENV', { 'TF_BUILD' => true })
+        expect(FastlaneCore::Helper.ci?).to be(true)
+      end
     end
 
     describe "#keychain_path" do

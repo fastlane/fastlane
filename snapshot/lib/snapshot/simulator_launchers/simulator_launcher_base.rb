@@ -95,15 +95,10 @@ module Snapshot
     end
 
     def uninstall_app(device_type)
-      UI.verbose("Uninstalling app '#{launcher_config.app_identifier}' from #{device_type}...")
       launcher_config.app_identifier ||= UI.input("App Identifier: ")
       device_udid = TestCommandGenerator.device_udid(device_type)
 
-      UI.message("Launch Simulator #{device_type}")
-      Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
-
-      UI.message("Uninstall application #{launcher_config.app_identifier}")
-      Helper.backticks("xcrun simctl uninstall #{device_udid} #{launcher_config.app_identifier} &> /dev/null")
+      FastlaneCore::Simulator.uninstall_app(launcher_config.app_identifier, device_type, device_udid)
     end
 
     def erase_simulator(device_type)

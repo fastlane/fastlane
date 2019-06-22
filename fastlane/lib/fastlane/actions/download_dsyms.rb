@@ -3,7 +3,6 @@ module Fastlane
     module SharedValues
       DSYM_PATHS = :DSYM_PATHS
     end
-
     class DownloadDsymsAction < Action
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
@@ -26,6 +25,7 @@ module Fastlane
         build_number = params[:build_number]
         platform = params[:platform]
         output_directory = params[:output_directory]
+        min_version = Gem::Version.new(params[:min_version]) if params[:min_version]
 
         # Set version if it is latest
         if version == 'latest'
@@ -35,8 +35,15 @@ module Fastlane
 
           UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.version.nil?
 
-          version = latest_version.version
-          build_number = latest_version.build_version
+          latest_candidate_build = latest_version.candidate_builds.max_by(&:upload_date)
+          if latest_candidate_build.nil?
+            version = latest_version.version
+            build_number = latest_version.build_version
+          else
+            # The build_version of a candidate build does not always match the one in latest_version so get the version and build number from the same place.
+            version = latest_candidate_build.train_version
+            build_number = latest_candidate_build.build_version
+          end
         end
 
         # Make sure output_directory has a slash on the end
@@ -46,27 +53,41 @@ module Fastlane
 
         # Write a nice message
         message = []
-        message << "Looking for dSYM files for #{params[:app_identifier]}"
+        message << "Looking for dSYM files for '#{params[:app_identifier]}' on platform #{platform}"
         message << "v#{version}" if version
         message << "(#{build_number})" if build_number
         UI.message(message.join(" "))
 
         app.tunes_all_build_trains(platform: platform).each do |train|
-          UI.verbose("Found train: #{train.version_string}, comparing to supplied version: #{version}")
+          message = []
+          message << "Found train (version): #{train.version_string}"
+          message << ", comparing to supplied version: #{version}" if version
+          UI.verbose(message.join(" "))
+
           if version && version != train.version_string
             UI.verbose("Version #{version} doesn't match: #{train.version_string}")
             next
           end
+
+          if min_version && min_version > Gem::Version.new(train.version_string)
+            UI.verbose("Min version #{min_version} not reached: #{train.version_string}")
+            next
+          end
+
           app.tunes_all_builds_for_train(train: train.version_string, platform: platform).each do |build|
-            UI.verbose("Found build version: #{build.build_version}, comparing to supplied build_number: #{build_number}")
+            message = []
+            message << "Found build version: #{build.build_version}"
+            message << ", comparing to supplied build_number: #{build_number}" if build_number
+            UI.verbose(message.join(" "))
+
             if build_number && build.build_version != build_number
               UI.verbose("build_version: #{build.build_version} doesn't match: #{build_number}")
               next
             end
 
             begin
-              # need to call reload here or dsym_url is nil
-              UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url")
+              UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url") if build_number
+
               build_details = app.tunes_build_details(train: train.version_string, build_number: build.build_version, platform: platform)
               download_url = build_details.dsym_url
               UI.verbose("dsym_url: #{download_url}")
@@ -120,7 +141,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Download dSYM files from Apple App Store Connect for Bitcode apps"
+        "Download dSYM files from App Store Connect for Bitcode apps"
       end
 
       def self.details
@@ -135,7 +156,7 @@ module Fastlane
         SAMPLE
 
         [
-          "This action downloads dSYM files from Apple App Store Connect after the ipa gets re-compiled by Apple. Useful if you have Bitcode enabled.".markdown_preserve_newlines,
+          "This action downloads dSYM files from App Store Connect after the ipa gets re-compiled by Apple. Useful if you have Bitcode enabled.".markdown_preserve_newlines,
           sample
         ].join("\n")
       end
@@ -198,6 +219,11 @@ module Fastlane
                                        env_name: "DOWNLOAD_DSYMS_BUILD_NUMBER",
                                        description: "The app build_number for dSYMs you wish to download",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :min_version,
+                                       short_option: "-m",
+                                       env_name: "DOWNLOAD_DSYMS_MIN_VERSION",
+                                       description: "The minimum app version for dSYMs you wish to download",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :output_directory,
                                        short_option: "-s",
                                        env_name: "DOWNLOAD_DSYMS_OUTPUT_DIRECTORY",
@@ -227,12 +253,13 @@ module Fastlane
       def self.example_code
         [
           'download_dsyms',
-          'download_dsyms(version: "1.0.0", build_number: "345")'
+          'download_dsyms(version: "1.0.0", build_number: "345")',
+          'download_dsyms(min_version: "1.2.3")'
         ]
       end
 
       def self.category
-        :misc
+        :app_store_connect
       end
     end
   end

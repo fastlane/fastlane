@@ -2,9 +2,6 @@ require 'plist'
 
 module Fastlane
   module Actions
-    module SharedValues
-      VERIFY_BUILD_CUSTOM_VALUE = :VERIFY_BUILD_CUSTOM_VALUE
-    end
     class VerifyBuildAction < Action
       def self.run(params)
         Dir.mktmpdir do |dir|
@@ -52,6 +49,10 @@ module Fastlane
           if part =~ /\AAuthority=i(Phone|OS)/
             type = part.split('=')[1].split(':')[0]
             values['provisioning_type'] = type.downcase =~ /distribution/i ? "distribution" : "development"
+          end
+          if part.start_with?("Authority")
+            values['authority'] ||= []
+            values['authority'] << part.split('=')[1]
           end
           if part.start_with?("TeamIdentifier")
             values['team_identifier'] = part.split('=')[1]

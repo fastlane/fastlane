@@ -14,26 +14,27 @@ File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
-  spec.authors       = ["Maksym Grebenets",
-                        "Helmut Januschka",
-                        "Jan Piotrowski",
-                        "Josh Holtz",
-                        "Fumiya Nakamura",
-                        "Jimmy Dee",
-                        "Kohki Miki",
-                        "Aaron Brager",
-                        "Matthew Ellis",
-                        "Iulian Onofrei",
-                        "Jérôme Lacoste",
-                        "Joshua Liebowitz",
+  # list of authors is regenerated and resorted on each release
+  spec.authors       = ["Joshua Liebowitz",
+                        "Stefan Natchev",
+                        "Andrew McBurney",
                         "Felix Krause",
-                        "Danielle Tomlinson",
                         "Jorge Revuelta H",
                         "Manu Wallner",
+                        "Josh Holtz",
+                        "Matthew Ellis",
                         "Luka Mirosevic",
-                        "Olivier Halligon",
-                        "Stefan Natchev",
-                        "Andrew McBurney"]
+                        "Iulian Onofrei",
+                        "Jimmy Dee",
+                        "Danielle Tomlinson",
+                        "Kohki Miki",
+                        "Maksym Grebenets",
+                        "Jan Piotrowski",
+                        "Aaron Brager",
+                        "Fumiya Nakamura",
+                        "Jérôme Lacoste",
+                        "Helmut Januschka",
+                        "Olivier Halligon"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -54,9 +55,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = Dir["*/lib"]
 
   spec.add_dependency('slack-notifier', '>= 2.0.0', '< 3.0.0') # Slack notifications
-  spec.add_dependency('xcodeproj', '>= 1.5.7', '< 2.0.0') # Needed for commit_version_bump action and gym code_signing_mapping
-  spec.add_dependency('xcpretty', '~> 0.2.8') # prettify xcodebuild output
-  spec.add_dependency('terminal-notifier', '>= 1.6.2', '< 2.0.0') # macOS notifications
+  spec.add_dependency('xcodeproj', '>= 1.8.1', '< 2.0.0') # Modify Xcode projects
+  spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output
+  spec.add_dependency('terminal-notifier', '>= 2.0.0', '< 3.0.0') # macOS notifications
   spec.add_dependency('terminal-table', '>= 1.4.5', '< 2.0.0') # Actions documentation
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
@@ -80,22 +81,23 @@ Gem::Specification.new do |spec|
   spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
   spec.add_dependency('mini_magick', '~> 4.5.1') # To open, edit and export PSD files
-  spec.add_dependency('multi_json') # Because sometimes it's just not installed
   spec.add_dependency('multi_xml', '~> 0.5')
-  spec.add_dependency('rubyzip', '>= 1.2.1', '< 2.0.0') # fix swift/ipa in gym
+  spec.add_dependency('rubyzip', '>= 1.2.2', '< 2.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
-  spec.add_dependency('bundler', '>= 1.12.0', '< 2.0.0') # Used for fastlane plugins
+  spec.add_dependency('bundler', '>= 1.12.0', '< 3.0.0') # Used for fastlane plugins
   spec.add_dependency('faraday', '~> 0.9') # Used for deploygate, hockey and testfairy actions
   spec.add_dependency('faraday_middleware', '~> 0.9') # same as faraday
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
+  spec.add_dependency('jwt', '~> 2.1.0') # Used for generating authentication tokens for AppStore connect api
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
-  spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.22.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.24.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-cloud-storage', '>= 1.15.0', '< 2.0.0') # Access Google Cloud Storage for match
 
-  spec.add_dependency('emoji_regex', '~> 0.1') # Used to scan for Emoji in the changelog
+  spec.add_dependency('emoji_regex', '>= 0.1', '< 2.0') # Used to scan for Emoji in the changelog
 
   # Development only
   spec.add_development_dependency('rake', '< 12')
@@ -115,4 +117,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('fakefs', '~> 0.8.1')
   spec.add_development_dependency('sinatra', '~> 1.4.8')
   spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
+  spec.add_development_dependency('climate_control', '~> 0.2.0')
 end

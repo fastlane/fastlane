@@ -22,7 +22,7 @@ _pilot_ uses [spaceship.airforce](https://spaceship.airforce) to interact with A
 
 -------
 
-<h5 align="center"><code>pilot</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
+<h5 align="center"><em>pilot</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Usage
 
@@ -173,7 +173,11 @@ fastlane pilot export
 
 ### Import testers
 
-Add external testers from a CSV file. Sample CSV file available [here](https://itunesconnect.apple.com/itc/docs/tester_import.csv).
+Add external testers from a CSV file. Create a file (ex: `testers.csv`) and fill it with the following format:
+
+```no-highlight
+John,Appleseed,appleseed_john@mac.com,group-1;group-2
+```
 
 ```no-highlight
 fastlane pilot import
@@ -218,3 +222,10 @@ If your password contains special characters, _pilot_ may throw a confusing erro
 ## How is my password stored?
 
 _pilot_ uses the [CredentialsManager](https://github.com/fastlane/fastlane/tree/master/credentials_manager) from _fastlane_.
+
+## Provider Short Name
+If you are on multiple App Store Connect teams, iTunes Transporter may need a provider short name to know where to upload your binary. _pilot_ will try to use the long name of the selected team to detect the provider short name. To override the detected value with an explicit one, use the `itc_provider` option.
+
+## Use an Application Specific Password to upload
+
+_pilot_/`upload_to_testflight` can use an [Application Specific Password via the `FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD` envirionment variable](https://docs.fastlane.tools/best-practices/continuous-integration/#application-specific-passwords) to upload a binary if both the `skip_waiting_for_build_processing` and `apple_id` options are set. (If any of those are not set, it will use the normal Apple login process that might require 2FA authentication.)

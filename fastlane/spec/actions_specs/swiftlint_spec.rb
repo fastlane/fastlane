@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "SwiftLint" do
-      let(:swiftlint_gem_version) { Gem::Version.new('0.9.2') }
+      let(:swiftlint_gem_version) { Gem::Version.new('0.11.0') }
       let(:output_file) { "swiftlint.result.json" }
       let(:config_file) { ".swiftlint-ci.yml" }
 
@@ -28,6 +28,18 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq("swiftlint lint --strict")
+        end
+
+        it "omits strict option if swiftlint does not support it" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.9.1'))
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              strict: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint")
         end
 
         it "adds strict option for custom executable" do
@@ -218,24 +230,27 @@ describe Fastlane do
 
       context "when file paths contain spaces" do
         it "escapes spaces in output and config file paths" do
+          output_file = "output path with spaces.txt"
+          config_file = ".config file with spaces.yml"
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
-              output_file: 'output path with spaces.txt',
-              config_file: '.config file with spaces.yml'
+              output_file: '#{output_file}',
+              config_file: '#{config_file}'
             )
           end").runner.execute(:test)
 
-          expect(result).to eq("swiftlint lint --config .config\\ file\\ with\\ spaces.yml > output\\ path\\ with\\ spaces.txt")
+          expect(result).to eq("swiftlint lint --config #{config_file.shellescape} > #{output_file.shellescape}")
         end
 
         it "escapes spaces in list of files to process" do
+          file = "path/to/my project/source code/AppDelegate.swift"
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
-                files: ['path/to/my project/source code/AppDelegate.swift']
+                files: ['#{file}']
             )
           end").runner.execute(:test)
 
-          expect(result).to eq("SCRIPT_INPUT_FILE_COUNT=1 SCRIPT_INPUT_FILE_0=path/to/my\\ project/source\\ code/AppDelegate.swift swiftlint lint --use-script-input-files")
+          expect(result).to eq("SCRIPT_INPUT_FILE_COUNT=1 SCRIPT_INPUT_FILE_0=#{file.shellescape} swiftlint lint --use-script-input-files")
         end
       end
 
@@ -262,7 +277,7 @@ describe Fastlane do
           expect(result).to eq("swiftlint lint --quiet")
         end
 
-        it "omits the switch if swiftlint version is too low" do
+        it "omits quiet option if swiftlint does not support it" do
           allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.8.0'))
 
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -284,6 +299,57 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq("swiftlint lint")
+        end
+      end
+
+      context "when specify format option" do
+        it "adds format option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :autocorrect,
+              format: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint autocorrect --format")
+        end
+
+        it "omits format option if mode is :lint" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :lint,
+              format: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint")
+        end
+
+        it "omits format option if swiftlint does not support it" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.10.0'))
+          expect(FastlaneCore::UI).to receive(:important).with(/Your version of swiftlint \(0.10.0\) does not support/)
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :autocorrect,
+              format: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint autocorrect")
+        end
+      end
+
+      context "when specify false for format option" do
+        it "doesn't add format option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :autocorrect,
+              format: false
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint autocorrect")
         end
       end
     end

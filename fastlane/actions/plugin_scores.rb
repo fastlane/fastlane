@@ -8,7 +8,7 @@ module Fastlane
         plugins = fetch_plugins(params[:cache_path]).sort_by { |v| v.data[:overall_score] }.reverse
 
         result = "<!--\nAuto generated, please only modify https://github.com/fastlane/fastlane/blob/master/fastlane/actions/plugin_scores.rb\n-->\n"
-        result += "{!docs/setup-fastlane-header.md!}\n"
+        result += "{!docs/includes/setup-fastlane-header.md!}\n"
         result += "# Available Plugins\n\n\n"
         result += plugins.collect do |current_plugin|
           @plugin = current_plugin

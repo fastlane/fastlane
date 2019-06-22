@@ -28,6 +28,7 @@ protocol SnapshotfileProtocol: class {
   var numberOfRetries: Int { get }
   var stopAfterFirstError: Bool { get }
   var derivedDataPath: String? { get }
+  var resultBundle: Bool { get }
   var testTargetName: String? { get }
   var namespaceLogFiles: String? { get }
   var concurrentSimulators: Bool { get }
@@ -63,6 +64,7 @@ extension SnapshotfileProtocol {
   var numberOfRetries: Int { return 1 }
   var stopAfterFirstError: Bool { return false }
   var derivedDataPath: String? { return nil }
+  var resultBundle: Bool { return false }
   var testTargetName: String? { return nil }
   var namespaceLogFiles: String? { return nil }
   var concurrentSimulators: Bool { return true }
@@ -70,4 +72,4 @@ extension SnapshotfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.3]
+// FastlaneRunnerAPIVersion [0.9.4]

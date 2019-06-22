@@ -6,7 +6,7 @@
 
 <hr />
 <h4 align="center">
-  Check out the new <a href="https://docs.fastlane.tools/getting-started/ios/screenshots">fastlane documentation</a> on how to generate screenshots
+  Check out the new <a href="https://docs.fastlane.tools/getting-started/ios/screenshots/">fastlane documentation</a> on how to generate screenshots
 </h4>
 <hr />
 
@@ -303,7 +303,7 @@ Radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152) has be
 
 <hr />
 <h4 align="center">
-  Check out the new <a href="https://docs.fastlane.tools/getting-started/ios/screenshots">fastlane documentation</a> on how to generate screenshots
+  Check out the new <a href="https://docs.fastlane.tools/getting-started/ios/screenshots/">fastlane documentation</a> on how to generate screenshots
 </h4>
 <hr />
 
@@ -336,3 +336,28 @@ When the app dies directly after the application is launched there might be 2 pr
 ## Determine language
 
 To detect the currently used localization in your tests, access the `deviceLanguage` variable from `SnapshotHelper.swift`.
+
+## Speed up snapshots
+
+A lot of time in UI tests is spent waiting for animations.
+
+You can disable `UIView` animations in your app to make the tests faster:
+
+```swift
+if ProcessInfo().arguments.contains("SKIP_ANIMATIONS") {
+    UIView.setAnimationsEnabled(false)
+}
+```
+
+This requires you to pass the launch argument like so:
+
+```ruby
+snapshot(launch_arguments: ["SKIP_ANIMATIONS"])
+```
+
+By default, _snapshot_ will wait for a short time for the animations to finish.
+If you're skipping the animations, this is wait time is unnecessary and can be skipped:
+
+```swift
+setupSnapshot(app, waitForAnimations: false)
+```

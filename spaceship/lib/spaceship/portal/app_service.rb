@@ -40,7 +40,7 @@ module Spaceship
         return m
       end
 
-      AccessWiFi = AppService.new_service("AWEQ28MY3E")
+      AccessWifi = AppService.new_service("AWEQ28MY3E")
       AppGroup = AppService.new_service("APG3427HIY")
       ApplePay = AppService.new_service("OM633U5T5G")
       AssociatedDomains = AppService.new_service("SKC3T5S89Y")
@@ -63,7 +63,7 @@ module Spaceship
       PushNotification = AppService.new_service("push")
       SiriKit = AppService.new_service("SI015DKUHP")
       VPNConfiguration = AppService.new_service("V66P55NK2I")
-      Wallet = AppService.new_service("passbook")
+      Wallet = AppService.new_service("pass")
       WirelessAccessory = AppService.new_service("WC421J6T7P")
 
       constants.each do |c|

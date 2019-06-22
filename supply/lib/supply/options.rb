@@ -69,8 +69,8 @@ module Supply
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
                                      default_value_dynamic: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
                                        UI.user_error!("Could not find service account json file at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
+                                       UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
                                      end),
         FastlaneCore::ConfigItem.new(key: :json_key_data,
                                      env_name: "SUPPLY_JSON_KEY_DATA",
@@ -92,7 +92,7 @@ module Supply
                                      env_name: "SUPPLY_APK",
                                      description: "Path to the APK file to upload",
                                      short_option: "-b",
-                                     conflicting_options: [:apk_paths, :aab],
+                                     conflicting_options: [:apk_paths, :aab, :aab_paths],
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
                                      default_value_dynamic: true,
@@ -103,7 +103,7 @@ module Supply
                                      end),
         FastlaneCore::ConfigItem.new(key: :apk_paths,
                                      env_name: "SUPPLY_APK_PATHS",
-                                     conflicting_options: [:apk, :aab],
+                                     conflicting_options: [:apk, :aab, :aab_paths],
                                      optional: true,
                                      type: Array,
                                      description: "An array of paths to APK files to upload",
@@ -119,7 +119,7 @@ module Supply
                                      env_name: "SUPPLY_AAB",
                                      description: "Path to the AAB file to upload",
                                      short_option: "-f",
-                                     conflicting_options: [:apk_path, :apk_paths],
+                                     conflicting_options: [:apk, :apk_paths, :aab_paths],
                                      code_gen_sensitive: true,
                                      default_value: Dir["*.aab"].last || Dir[File.join("app", "build", "outputs", "bundle", "release", "bundle.aab")].last,
                                      default_value_dynamic: true,
@@ -127,6 +127,20 @@ module Supply
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not find aab file at path '#{value}'") unless File.exist?(value)
                                        UI.user_error!("aab file is not an aab") unless value.end_with?('.aab')
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :aab_paths,
+                                     env_name: "SUPPLY_AAB_PATHS",
+                                     conflicting_options: [:apk, :apk_paths, :aab],
+                                     optional: true,
+                                     type: Array,
+                                     description: "An array of paths to AAB files to upload",
+                                     short_option: "-z",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
+                                       value.each do |path|
+                                         UI.user_error!("Could not find aab file at path '#{path}'") unless File.exist?(path)
+                                         UI.user_error!("file at path '#{path}' is not an aab") unless path.end_with?('.aab')
+                                       end
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_upload_apk,
                                      env_name: "SUPPLY_SKIP_UPLOAD_APK",
@@ -202,8 +216,49 @@ module Supply
                                      optional: true,
                                      description: "Check the other tracks for superseded versions and disable them",
                                      is_string: false,
-                                     default_value: false)
-
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :timeout,
+                                     env_name: "SUPPLY_TIMEOUT",
+                                     optional: true,
+                                     description: "Timeout for read, open, and send (in seconds)",
+                                     type: Integer,
+                                     default_value: 300),
+        FastlaneCore::ConfigItem.new(key: :deactivate_on_promote,
+                                     env_name: "SUPPLY_DEACTIVATE_ON_PROMOTE",
+                                     optional: true,
+                                     description: "When promoting to a new track, deactivate the binary in the origin track",
+                                     is_string: false,
+                                     default_value: true),
+        FastlaneCore::ConfigItem.new(key: :version_codes_to_retain,
+                                     optional: true,
+                                     type: Array,
+                                     description: "An array of version codes to retain when publishing a new APK",
+                                     verify_block: proc do |version_codes|
+                                       UI.user_error!("Could not evaluate array from '#{version_codes}'") unless version_codes.kind_of?(Array)
+                                       version_codes.each do |version_code|
+                                         UI.user_error!("Version code '#{version_code}' is not an integer") unless version_code.kind_of?(Integer)
+                                       end
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :obb_main_references_version,
+                                     env_name: "SUPPLY_OBB_MAIN_REFERENCES_VERSION",
+                                     description: "References version of 'main' expansion file",
+                                     optional: true,
+                                     type: Numeric),
+        FastlaneCore::ConfigItem.new(key: :obb_main_file_size,
+                                     env_name: "SUPPLY_OBB_MAIN_FILE SIZE",
+                                     description: "Size of 'main' expansion file in bytes",
+                                     optional: true,
+                                     type: Numeric),
+        FastlaneCore::ConfigItem.new(key: :obb_patch_references_version,
+                                     env_name: "SUPPLY_OBB_PATCH_REFERENCES_VERSION",
+                                     description: "References version of 'patch' expansion file",
+                                     optional: true,
+                                     type: Numeric),
+        FastlaneCore::ConfigItem.new(key: :obb_patch_file_size,
+                                     env_name: "SUPPLY_OBB_PATCH_FILE SIZE",
+                                     description: "Size of 'patch' expansion file in bytes",
+                                     optional: true,
+                                     type: Numeric)
       ]
     end
     # rubocop:enable Metrics/PerceivedComplexity

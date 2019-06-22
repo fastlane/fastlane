@@ -1,6 +1,7 @@
 require 'plist'
 
 require_relative 'client_stubbing'
+require_relative 'connect_api/connect_api_stubbing'
 require_relative 'portal/portal_stubbing'
 require_relative 'tunes/tunes_stubbing'
 require_relative 'du/du_stubbing'
@@ -58,11 +59,26 @@ def before_each_spaceship
   TunesStubbing.itc_stub_candiate_builds
   TunesStubbing.itc_stub_pricing_tiers
   TunesStubbing.itc_stub_release_to_store
+  TunesStubbing.itc_stub_release_to_all_users
   TunesStubbing.itc_stub_promocodes
   TunesStubbing.itc_stub_generate_promocodes
   TunesStubbing.itc_stub_promocodes_history
   TunesStubbing.itc_stub_supported_countries
-  TunesStubbing.itc_stub_iap
+
+  ConnectAPIStubbing.stub_apps
+  ConnectAPIStubbing.stub_beta_app_localizations
+  ConnectAPIStubbing.stub_beta_app_review_details
+  ConnectAPIStubbing.stub_beta_app_review_submissions
+  ConnectAPIStubbing.stub_beta_build_localizations
+  ConnectAPIStubbing.stub_beta_build_metrics
+  ConnectAPIStubbing.stub_beta_groups
+  ConnectAPIStubbing.stub_beta_testers
+  ConnectAPIStubbing.stub_beta_tester_metrics
+  ConnectAPIStubbing.stub_build_beta_details
+  ConnectAPIStubbing.stub_build_deliveries
+  ConnectAPIStubbing.stub_builds
+  ConnectAPIStubbing.stub_pre_release_versions
+  ConnectAPIStubbing.stub_users
 end
 
 def after_each_spaceship

@@ -30,7 +30,7 @@ describe Spaceship::TunesClient do
 
       expect do
         Spaceship::Tunes.login(username, password)
-      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://itunesconnect.apple.com) to acknowledge the statement.")
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement.")
     end
 
     it 'has authType of hsa' do
@@ -41,7 +41,7 @@ describe Spaceship::TunesClient do
 
       expect do
         Spaceship::Tunes.login(username, password)
-      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://itunesconnect.apple.com) to acknowledge the statement.")
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement.")
     end
 
     it 'has authType of non-sa' do
@@ -52,7 +52,7 @@ describe Spaceship::TunesClient do
 
       expect do
         Spaceship::Tunes.login(username, password)
-      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://itunesconnect.apple.com) to acknowledge the statement.")
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement.")
     end
 
     it 'has authType of hsa2' do
@@ -63,7 +63,7 @@ describe Spaceship::TunesClient do
 
       expect do
         Spaceship::Tunes.login(username, password)
-      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://itunesconnect.apple.com) to acknowledge the statement.")
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement.")
     end
   end
 
@@ -81,7 +81,7 @@ describe Spaceship::TunesClient do
     end
 
     it "#hostname" do
-      expect(subject.class.hostname).to eq('https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/')
+      expect(subject.class.hostname).to eq('https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/')
     end
 
     describe "#handle_itc_response" do
@@ -122,6 +122,32 @@ describe Spaceship::TunesClient do
         stub_const('ENV', { 'FASTLANE_ITC_TEAM_NAME' => 'Harry' })
         allow(subject).to receive(:teams).and_return(associated_teams)
         expect(subject.select_team).to eq('5678')
+      end
+    end
+
+    describe "in-app-purchase methods" do
+      before do
+        stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/123/iaps/abc/submission")
+          .and_return(status: 200, body: TunesStubbing.itc_read_fixture_file("iap_submission.json"), headers: { "Content-Type" => "application/json" })
+      end
+
+      it "submits an in-app-purchase for review" do
+        response = subject.submit_iap!(app_id: "123", purchase_id: "abc")
+        # the response does not include any data when it is successful.
+        expect(response).to eq(nil)
+      end
+    end
+
+    describe "iOS app bundle methods" do
+      before do
+        stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/appbundles/metadetail/1234567890")
+          .and_return(status: 200, body: TunesStubbing.itc_read_fixture_file("bundle_details.json"), headers: { "Content-Type" => "application/json" })
+      end
+
+      it "requests iOS app bundle details" do
+        response = subject.bundle_details(1_234_567_890)
+        expect(response["adamId"]).to eq(1_234_567_890)
+        expect(response["details"][0]["name"]).to eq("Fancy Bundle")
       end
     end
   end

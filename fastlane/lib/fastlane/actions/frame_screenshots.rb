@@ -32,7 +32,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FRAMEIT_SCREENSHOTS_PATH",
                                        description: "The path to the directory containing the screenshots",
-                                        default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] || FastlaneCore::FastlaneFolder.path,
+                                       default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] || FastlaneCore::FastlaneFolder.path,
                                        default_value_dynamic: true)
         ]
       end

@@ -15,6 +15,7 @@ module Fastlane
       :production,
       :source_control,
       :notifications,
+      :app_store_connect,
       :misc,
       :deprecated # This should be the last item
     ]
@@ -185,5 +186,13 @@ class String
     first_line_indent = self.match(/^\s*/)[0]
 
     self.gsub!(/^#{first_line_indent}/, "")
+  end
+
+  def remove_markdown
+    string = self.gsub(/^>/, "") # remove Markdown quotes
+    string = string.gsub(/\[http[^\]]+\]\(([^)]+)\)/, '\1 🔗') # remove Markdown links
+    string = string.gsub(/\[([^\]]+)\]\(([^\)]+)\)/, '"\1" (\2 🔗)') # remove Markdown links with custom text
+    string = string.gsub("|", "") # remove new line preserve markers
+    return string
   end
 end

@@ -89,7 +89,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload a file to Sonatype Nexus platform"
+        "Upload a file to [Sonatype Nexus platform](https://www.sonatype.com)"
       end
 
       def self.available_options

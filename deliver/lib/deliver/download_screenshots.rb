@@ -1,4 +1,5 @@
 require_relative 'module'
+require 'open-uri'
 
 module Deliver
   class DownloadScreenshots
@@ -12,7 +13,7 @@ module Deliver
     end
 
     def self.download(options, folder_path)
-      v = options[:use_live_version] ? options[:app].live_version : options[:app].latest_version
+      v = options[:use_live_version] ? options[:app].live_version(platform: options[:platform]) : options[:app].latest_version(platform: options[:platform])
 
       v.screenshots.each do |language, screenshots|
         screenshots.each do |screenshot|
@@ -40,7 +41,7 @@ module Deliver
             # if it's already there
           end
           path = File.join(containing_folder, file_name)
-          File.write(path, open(screenshot.url).read)
+          File.binwrite(path, open(screenshot.url).read)
         end
       end
     end

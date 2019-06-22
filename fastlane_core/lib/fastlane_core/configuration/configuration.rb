@@ -211,7 +211,7 @@ module FastlaneCore
     # if 'ask' is true and the value is not present, the user will be prompted to provide a value
     # rubocop:disable Metrics/PerceivedComplexity
     def fetch(key, ask: true)
-      UI.user_error!("Key '#{key}' must be a symbol. Example :app_id.") unless key.kind_of?(Symbol)
+      UI.crash!("Key '#{key}' must be a symbol. Example :app_id.") unless key.kind_of?(Symbol)
 
       option = verify_options_key!(key)
 
@@ -219,7 +219,8 @@ module FastlaneCore
       value = if @values.key?(key) && !@values[key].nil?
                 @values[key]
               elsif option.env_name && !ENV[option.env_name].nil?
-                ENV[option.env_name].dup
+                # verify! before using (see https://github.com/fastlane/fastlane/issues/14449)
+                ENV[option.env_name].dup if option.verify!(option.auto_convert_value(ENV[option.env_name]))
               elsif self.config_file_options.key?(key)
                 self.config_file_options[key]
               else
@@ -263,7 +264,7 @@ module FastlaneCore
     # Overwrites or sets a new value for a given key
     # @param key [Symbol] Must be a symbol
     def set(key, value)
-      UI.user_error!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of?(Symbol)
+      UI.crash!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of?(Symbol)
       option = option_for_key(key)
 
       unless option

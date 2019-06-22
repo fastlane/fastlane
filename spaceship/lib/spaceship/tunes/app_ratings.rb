@@ -2,7 +2,7 @@ require_relative 'app_review'
 
 module Spaceship
   module Tunes
-    # Represents app ratings from iTunesConnect
+    # Represents app ratings from App Store Connect
     class AppRatings < TunesBase
       # @return (Spaceship::Tunes::Application) A reference to the application
       #   this version is for
@@ -46,8 +46,8 @@ module Spaceship
       end
 
       # @return (Array) of Review Objects
-      def reviews(store_front = '', version_id = '')
-        raw_reviews = client.get_reviews(application.apple_id, application.platform, store_front, version_id)
+      def reviews(store_front = '', version_id = '', upto_date = nil)
+        raw_reviews = client.get_reviews(application.apple_id, application.platform, store_front, version_id, upto_date)
         raw_reviews.map do |review|
           review["value"]["application"] = self.application
           AppReview.factory(review["value"])

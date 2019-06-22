@@ -14,18 +14,27 @@ module Sigh
                                      description: "Setting this flag will generate AdHoc profiles instead of App Store Profiles",
                                      is_string: false,
                                      default_value: false,
-                                     conflicting_options: [:development],
-                                     conflict_block: proc do |value|
-                                       UI.user_error!("You can't enable both :development and :adhoc")
+                                     conflicting_options: [:developer_id, :development],
+                                     conflict_block: proc do |option|
+                                       UI.user_error!("You can't enable both :#{option.key} and :adhoc")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :developer_id,
+                                     env_name: "SIGH_DEVELOPER_ID",
+                                     description: "Setting this flag will generate Developer ID profiles instead of App Store Profiles",
+                                     is_string: false,
+                                     default_value: false,
+                                     conflicting_options: [:adhoc, :development],
+                                     conflict_block: proc do |option|
+                                       UI.user_error!("You can't enable both :#{option.key} and :developer_id")
                                      end),
         FastlaneCore::ConfigItem.new(key: :development,
                                      env_name: "SIGH_DEVELOPMENT",
                                      description: "Renew the development certificate instead of the production one",
                                      is_string: false,
                                      default_value: false,
-                                     conflicting_options: [:adhoc],
-                                     conflict_block: proc do |value|
-                                       UI.user_error!("You can't enable both :development and :adhoc")
+                                     conflicting_options: [:adhoc, :developer_id],
+                                     conflict_block: proc do |option|
+                                       UI.user_error!("You can't enable both :#{option.key} and :development")
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_install,
                                      env_name: "SIGH_SKIP_INSTALL",

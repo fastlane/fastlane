@@ -32,6 +32,7 @@ module Fastlane
     # Print a table as summary of the executed actions
     def self.print_table(actions)
       return if actions.count == 0
+      return if FastlaneCore::Env.truthy?('FASTLANE_SKIP_ACTION_SUMMARY') # User disabled table output
 
       require 'terminal-table'
 

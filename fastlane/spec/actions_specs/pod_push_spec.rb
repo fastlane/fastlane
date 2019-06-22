@@ -31,7 +31,7 @@ describe Fastlane do
 
       it "generates the correct pod push command with a repo parameter with the swift version flag" do
         result = Fastlane::FastFile.new.parse("lane :test do
-          pod_push(path: './fastlane/spec/fixtures/podspecs/test.podspec', repo: 'MyRepo', swift_version: 4.0)
+          pod_push(path: './fastlane/spec/fixtures/podspecs/test.podspec', repo: 'MyRepo', swift_version: '4.0')
         end").runner.execute(:test)
 
         expect(result).to eq("pod repo push MyRepo './fastlane/spec/fixtures/podspecs/test.podspec' --swift-version=4.0")
@@ -43,6 +43,14 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("pod repo push MyRepo './fastlane/spec/fixtures/podspecs/test.podspec' --allow-warnings --use-libraries")
+      end
+
+      it "generates the correct pod push command with a repo parameter with the skip import validation and skip tests flags" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_push(path: './fastlane/spec/fixtures/podspecs/test.podspec', repo: 'MyRepo', skip_import_validation: true, skip_tests: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod repo push MyRepo './fastlane/spec/fixtures/podspecs/test.podspec' --skip-import-validation --skip-tests")
       end
 
       it "generates the correct pod push command with a json file" do

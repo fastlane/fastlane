@@ -43,7 +43,7 @@ module FastlaneCore
 
       begin
         # rubocop:disable Security/Eval
-        puts(eval(content)) # this is okay in this case
+        eval(content) # this is okay in this case
         # rubocop:enable Security/Eval
 
         print_resulting_config_values unless skip_printing_values # only on success

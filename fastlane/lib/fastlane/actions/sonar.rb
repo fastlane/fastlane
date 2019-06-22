@@ -19,6 +19,8 @@ module Fastlane
         sonar_scanner_args << "-Dsonar.language=\"#{params[:project_language]}\"" if params[:project_language]
         sonar_scanner_args << "-Dsonar.sourceEncoding=\"#{params[:source_encoding]}\"" if params[:source_encoding]
         sonar_scanner_args << "-Dsonar.login=\"#{params[:sonar_login]}\"" if params[:sonar_login]
+        sonar_scanner_args << "-Dsonar.host.url=\"#{params[:sonar_url]}\"" if params[:sonar_url]
+        sonar_scanner_args << "-Dsonar.branch.name=\"#{params[:branch_name]}\"" if params[:branch_name]
         sonar_scanner_args << params[:sonar_runner_args] if params[:sonar_runner_args]
 
         command = [
@@ -91,7 +93,17 @@ module Fastlane
                                        description: "Pass the Sonar Login token (e.g: xxxxxxprivate_token_XXXXbXX7e)",
                                        optional: true,
                                        is_string: true,
-                                       sensitive: true)
+                                       sensitive: true),
+          FastlaneCore::ConfigItem.new(key: :sonar_url,
+                                       env_name: "FL_SONAR_URL",
+                                       description: "Pass the url of the Sonar server",
+                                       optional: true,
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :branch_name,
+                                       env_name: "FL_SONAR_RUNNER_BRANCH_NAME",
+                                       description: "Pass the branch name which is getting scanned",
+                                       optional: true,
+                                       is_string: true)
         ]
       end
 

@@ -36,7 +36,7 @@ module Produce
     end
 
     def valid_services_for(options)
-      allowed_keys = [:app_group, :apple_pay, :associated_domains, :data_protection, :game_center, :healthkit, :homekit,
+      allowed_keys = [:access_wifi, :app_group, :apple_pay, :associated_domains, :auto_fill_credential, :data_protection, :game_center, :healthkit, :homekit,
                       :hotspot, :icloud, :in_app_purchase, :inter_app_audio, :multipath, :network_extension,
                       :nfc_tag_reading, :personal_vpn, :passbook, :push_notification, :sirikit, :vpn_conf,
                       :wallet, :wireless_conf]
@@ -46,6 +46,15 @@ module Produce
     # rubocop:disable Metrics/PerceivedComplexity
     def update(on, app, options)
       updated = valid_services_for(options).count
+
+      if options.access_wifi
+        UI.message("\tAccess WiFi")
+        if on
+          app.update_service(Spaceship.app_service.access_wifi.on)
+        else
+          app.update_service(Spaceship.app_service.access_wifi.off)
+        end
+      end
 
       if options.app_group
         UI.message("\tApp Groups")
@@ -74,6 +83,16 @@ module Produce
           app.update_service(Spaceship.app_service.associated_domains.on)
         else
           app.update_service(Spaceship.app_service.associated_domains.off)
+        end
+      end
+
+      if options.auto_fill_credential
+        UI.message("\tAutoFill Credential")
+
+        if on
+          app.update_service(Spaceship.app_service.auto_fill_credential.on)
+        else
+          app.update_service(Spaceship.app_service.auto_fill_credential.off)
         end
       end
 

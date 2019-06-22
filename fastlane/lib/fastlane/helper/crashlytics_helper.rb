@@ -4,21 +4,43 @@ module Fastlane
   module Helper
     class CrashlyticsHelper
       class << self
-        def discover_default_crashlytics_path
-          path = Dir["./Pods/iOS/Crashlytics/Crashlytics.framework"].last || Dir["./**/Crashlytics.framework"].last
-          unless path
-            UI.user_error!("Couldn't find Crashlytics.framework in current directory. Make sure to add the 'Crashlytics' pod to your 'Podfile' and run `pod update`")
+        def discover_crashlytics_path(params)
+          path = params[:crashlytics_path]
+
+          # Finding submit binary inside of given Crashlytics path (for backwards compatability)
+          if path
+            if File.basename(path) != "submit"
+              path = Dir[File.join(path, '**', 'submit')].last
+              UI.verbose(":crashlytics_path passed through parameters did not point to a submit binary. Using this submit binary on that path instead: '#{path}'")
+            else
+              UI.verbose("Using :crashlytics_path passed in through parameters: '#{path}'")
+            end
           end
+
+          # Check for submit binary outside of Crashlytics.framework (for Crashlytics 3.4.1 and over)
+          path ||= Dir["./Pods/Crashlytics/submit"].first
+
+          # Check for submit binary in Crashlytics.framework (for Crashlytics 3.4.1 and under)
+          path ||= Dir["./Pods/iOS/Crashlytics/Crashlytics.framework/submit"].last
+          path ||= Dir["./**/Crashlytics.framework/submit"].last
+
+          downcase_path = path ? path.downcase : nil
+          if downcase_path && downcase_path.include?("pods") && downcase_path.include?("crashlytics.framework")
+            UI.deprecated("Crashlytics has moved the submit binary outside of Crashlytics.framework directory as of 3.4.1. Please change :crashlytics_path to `<PODS_ROOT>/Crashlytics/submit`")
+          end
+
           return path
         end
 
         def generate_ios_command(params)
-          params[:crashlytics_path] ||= discover_default_crashlytics_path
-
-          UI.user_error!("No value found for 'crashlytics_path'") unless params[:crashlytics_path]
-          submit_binary = Dir[File.join(params[:crashlytics_path], '**', 'submit')].last
-          submit_binary ||= "Crashlytics.framework/submit" if Helper.test?
-          UI.user_error!("Could not find submit binary in crashlytics bundle at path '#{params[:crashlytics_path]}'") unless submit_binary
+          submit_binary = discover_crashlytics_path(params)
+          unless submit_binary
+            UI.user_error!("Couldn't find Crashlytics' submit binary in current directory. Make sure to add the 'Crashlytics' pod to your 'Podfile' and run `pod update`")
+          end
+          if File.basename(submit_binary) != "submit"
+            UI.user_error!("Invalid crashlytics path was detected with '#{submit_binary}'. Path must point to the `submit` binary (example: './Pods/Crashlytics/submit')")
+          end
+          submit_binary = "Crashlytics.framework/submit" if Helper.test?
 
           command = []
           command << submit_binary.shellescape
@@ -34,13 +56,7 @@ module Fastlane
           return command
         end
 
-        def generate_android_command(params)
-          # We have to generate an empty XML file to make the crashlytics CLI happy :)
-          require 'tempfile'
-          xml = Tempfile.new('xml')
-          xml.write('<?xml version="1.0" encoding="utf-8"?><manifest></manifest>')
-          xml.close
-
+        def generate_android_command(params, android_manifest_path)
           params[:crashlytics_path] = download_android_tools unless params[:crashlytics_path]
 
           UI.user_error!("The `crashlytics_path` must be a jar file for Android") unless params[:crashlytics_path].end_with?(".jar") || Helper.test?
@@ -48,19 +64,19 @@ module Fastlane
           if ENV['JAVA_HOME'].nil?
             command = ["java"]
           else
-            command = [Shellwords.escape(File.join(ENV['JAVA_HOME'], "/bin/java"))]
+            command = [File.join(ENV['JAVA_HOME'], "/bin/java").shellescape]
           end
           command << "-jar #{File.expand_path(params[:crashlytics_path])}"
           command << "-androidRes ."
           command << "-apiKey #{params[:api_token]}"
           command << "-apiSecret #{params[:build_secret]}"
-          command << "-uploadDist '#{File.expand_path(params[:apk_path])}'"
-          command << "-androidManifest '#{xml.path}'"
+          command << "-uploadDist #{File.expand_path(params[:apk_path]).shellescape}"
+          command << "-androidManifest #{File.expand_path(android_manifest_path).shellescape}"
 
           # Optional
-          command << "-betaDistributionEmails '#{params[:emails]}'" if params[:emails]
-          command << "-betaDistributionReleaseNotesFilePath '#{File.expand_path(params[:notes_path])}'" if params[:notes_path]
-          command << "-betaDistributionGroupAliases '#{params[:groups]}'" if params[:groups]
+          command << "-betaDistributionEmails #{params[:emails].shellescape}" if params[:emails]
+          command << "-betaDistributionReleaseNotesFilePath #{File.expand_path(params[:notes_path]).shellescape}" if params[:notes_path]
+          command << "-betaDistributionGroupAliases #{params[:groups].shellescape}" if params[:groups]
           command << "-betaDistributionNotifications #{(params[:notifications] ? 'true' : 'false')}"
 
           return command
@@ -100,6 +116,11 @@ module Fastlane
           end
 
           return jar_path
+        end
+
+        def generate_android_manifest_tempfile
+          # We have to generate an empty XML file to make the crashlytics CLI happy :)
+          write_to_tempfile('<?xml version="1.0" encoding="utf-8"?><manifest></manifest>', 'xml')
         end
 
         def write_to_tempfile(value, tempfilename)

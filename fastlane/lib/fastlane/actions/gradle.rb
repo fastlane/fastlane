@@ -107,7 +107,7 @@ module Fastlane
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :flavor,
                                        env_name: 'FL_GRADLE_FLAVOR',
-                                       description: 'The flavor that you want the task for, e.g. `MyFlavor`. If you are running the `assemble` task in a multi-flavor project, and you rely on Actions.lane_context[Actions.SharedValues::GRADLE_APK_OUTPUT_PATH] then you must specify a flavor here or else this value will be undefined',
+                                       description: 'The flavor that you want the task for, e.g. `MyFlavor`. If you are running the `assemble` task in a multi-flavor project, and you rely on Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] then you must specify a flavor here or else this value will be undefined',
                                        optional: true,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :build_type,
@@ -163,7 +163,9 @@ module Fastlane
           ['GRADLE_APK_OUTPUT_PATH', 'The path to the newly generated apk file. Undefined in a multi-variant assemble scenario'],
           ['GRADLE_ALL_APK_OUTPUT_PATHS', 'When running a multi-variant `assemble`, the array of signed apk\'s that were generated'],
           ['GRADLE_FLAVOR', 'The flavor, e.g. `MyFlavor`'],
-          ['GRADLE_BUILD_TYPE', 'The build type, e.g. `Release`']
+          ['GRADLE_BUILD_TYPE', 'The build type, e.g. `Release`'],
+          ['GRADLE_AAB_OUTPUT_PATH', 'The path to the most recent Android app bundle'],
+          ['GRADLE_ALL_AAB_OUTPUT_PATHS', 'The paths to the most recent Android app bundles']
         ]
       end
 
@@ -231,6 +233,10 @@ module Fastlane
             # ...
 
             flags: "--exitcode --xml file.xml"
+          )',
+          '# Delete the build directory and generated APKs
+          gradle(
+            task: "clean"
           )'
         ]
       end

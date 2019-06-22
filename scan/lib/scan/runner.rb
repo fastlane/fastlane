@@ -23,12 +23,30 @@ module Scan
     end
 
     def test_app
+      force_quit_simulator_processes if Scan.config[:force_quit_simulator]
+
+      if Scan.config[:reset_simulator]
+        Scan.devices.each do |device|
+          FastlaneCore::Simulator.reset(udid: device.udid)
+        end
+      end
+
       # We call this method, to be sure that all other simulators are killed
       # And a correct one is freshly launched. Switching between multiple simulator
       # in case the user specified multiple targets works with no issues
       # This way it's okay to just call it for the first simulator we're using for
       # the first test run
-      open_simulator_for_device(Scan.devices.first) if Scan.devices
+      FastlaneCore::Simulator.launch(Scan.devices.first) if Scan.devices && Scan.config[:prelaunch_simulator]
+
+      if Scan.config[:reinstall_app]
+        app_identifier = Scan.config[:app_identifier]
+        app_identifier ||= UI.input("App Identifier: ")
+
+        Scan.devices.each do |device|
+          FastlaneCore::Simulator.uninstall_app(app_identifier, device.name, device.udid)
+        end
+      end
+
       command = @test_command_generator.generate
       prefix_hash = [
         {
@@ -39,11 +57,13 @@ module Scan
         }
       ]
       exit_status = 0
+
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: true,
                                              prefix: prefix_hash,
                                             loading: "Loading...",
+                                    suppress_output: Scan.config[:suppress_xcode_output],
                                               error: proc do |error_output|
                                                 begin
                                                   exit_status = $?.exitstatus
@@ -78,8 +98,11 @@ module Scan
       puts("")
 
       copy_simulator_logs
+      zip_build_products
 
       if result[:failures] > 0
+        open_report
+
         UI.test_failure!("Tests have failed")
       end
 
@@ -87,8 +110,10 @@ module Scan
         UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
       end
 
-      zip_build_products
+      open_report
+    end
 
+    def open_report
       if !Helper.ci? && Scan.cache[:open_html_report_path]
         `open --hide '#{Scan.cache[:open_html_report_path]}'`
       end
@@ -105,9 +130,12 @@ module Scan
       output_directory = File.absolute_path(Scan.config[:output_directory])
       output_path = File.join(output_directory, "build_products.zip")
 
+      # Caching path for action to put into lane_context
+      Scan.cache[:zip_build_products_path] = output_path
+
       # Zips build products and moves it to output directory
       UI.message("Zipping build products")
-      FastlaneCore::Helper.zip_directory(path, output_path, contents_only: true, print: false)
+      FastlaneCore::Helper.zip_directory(path, output_path, contents_only: true, overwrite: true, print: false)
       UI.message("Succesfully zipped build products: #{output_path}")
     end
 
@@ -119,9 +147,10 @@ module Scan
       # We'll have to regenerate from the xcodebuild log, like we did before version 2.34.0.
       UI.message("Generating test results. This may take a while for large projects.")
 
-      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false)
+      reporter_options_generator = XCPrettyReporterOptionsGenerator.new(false, [], [], "", false, nil)
       reporter_options = reporter_options_generator.generate_reporter_options
-      cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} &> /dev/null"
+      xcpretty_args_options = reporter_options_generator.generate_xcpretty_args_options
+      cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} #{xcpretty_args_options} &> /dev/null"
       system(cmd)
       File.read(Scan.cache[:temp_junit_report])
     end
@@ -136,13 +165,9 @@ module Scan
       end
     end
 
-    def open_simulator_for_device(device)
-      return unless FastlaneCore::Env.truthy?('FASTLANE_EXPLICIT_OPEN_SIMULATOR')
-
-      UI.message("Killing all running simulators")
-      `killall Simulator &> /dev/null`
-
-      FastlaneCore::Simulator.launch(device)
+    def force_quit_simulator_processes
+      # Silently execute and kill, verbose flags will show this command occurring
+      Fastlane::Actions.sh("killall Simulator &> /dev/null || true", log: false)
     end
   end
 end

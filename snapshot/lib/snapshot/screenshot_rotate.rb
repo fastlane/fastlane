@@ -25,16 +25,11 @@ module Snapshot
           command = "sips -r 180 '#{file}'"
         end
 
+        # Only rotate if we need to
         next unless command
 
-        # Only rotate if we need to
-        FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
-          command_stdout.sync
-          command_stdout.each do |line|
-            # We need to read this otherwise things hang
-          end
-          ::Process.wait(pid)
-        end
+        # Rotate
+        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: false)
       end
     end
   end

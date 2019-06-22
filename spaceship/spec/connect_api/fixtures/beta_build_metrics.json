@@ -1,0 +1,38 @@
+{
+    "data" : [ {
+      "type" : "betaBuildMetrics",
+      "id" : "123456789",
+      "attributes" : {
+        "installCount" : 1,
+        "crashCount" : 2,
+        "inviteCount" : 3,
+        "sevenDayTesterCount" : 4
+      },
+      "relationships" : {
+        "build" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaBuildMetrics/123456789/relationships/build",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaBuildMetrics/123456789/build"
+          }
+        },
+        "betaGroup" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaBuildMetrics/123456789/relationships/betaGroup",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaBuildMetrics/123456789/betaGroup"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/betaBuildMetrics/123456789"
+      }
+    } ],
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/betaBuildMetrics?filter%5Bbuild%5D=123456789"
+    },
+    "meta" : {
+      "paging" : {
+        "total" : 1,
+        "limit" : 50
+      }
+    }
+  }

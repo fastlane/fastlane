@@ -32,7 +32,7 @@ module Fastlane
       end
 
       def self.description
-        "Send a success/error message to ChatWork"
+        "Send a success/error message to [ChatWork](https://go.chatwork.com/)"
       end
 
       def self.available_options

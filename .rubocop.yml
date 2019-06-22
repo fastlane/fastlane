@@ -1,6 +1,7 @@
 require:
   - rubocop/require_tools
   - ./rubocop/fork_usage.rb
+  - ./rubocop/missing_keys_on_shared_area.rb
 
 Style/MultipleComparison:
   Enabled: false
@@ -249,6 +250,8 @@ AllCops:
     - '**/lib/assets/custom_action_template.rb'
     - './vendor/**/*'
     - '**/lib/assets/DefaultFastfileTemplate'
+    - '**/lib/assets/MatchfileTemplate'
+    - '**/spec/fixtures/broken_files/broken_file.rb'
 
 # They have not to be snake_case
 Style/FileName:
@@ -294,6 +297,7 @@ Style/MethodCallWithArgsParentheses:
   IgnoredMethods:
     - 'require'
     - 'require_relative'
+    - 'fastlane_require'
     - 'gem'
     - 'program'
     - 'command'

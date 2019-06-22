@@ -5,7 +5,7 @@ module Fastlane
       def self.run(params)
         validate(params)
 
-        cmd = ["carthage"]
+        cmd = [params[:executable]]
         command_name = params[:command]
         cmd << command_name
 
@@ -167,7 +167,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :log_path,
                                        env_name: "FL_CARTHAGE_LOG_PATH",
                                        description: "Path to the xcode build output",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :executable,
+                                       env_name: "FL_CARTHAGE_EXECUTABLE",
+                                       description: "Path to the `carthage` executable on your machine",
+                                       default_value: 'carthage')
         ]
       end
 

@@ -12,9 +12,11 @@ module Produce
     SERVICE_CLOUDKIT = "cloudkit"
 
     ALLOWED_SERVICES = {
+      access_wifi: [SERVICE_ON, SERVICE_OFF],
       app_group: [SERVICE_ON, SERVICE_OFF],
       apple_pay: [SERVICE_ON, SERVICE_OFF],
       associated_domains: [SERVICE_ON, SERVICE_OFF],
+      auto_fill_credential: [SERVICE_ON, SERVICE_OFF],
       data_protection: [
         SERVICE_COMPLETE,
         SERVICE_UNLESS_OPEN,
@@ -81,8 +83,8 @@ module Produce
       app_service = Spaceship.app_service
       enabled_clean_options = {}
 
-      # "enable_services" was deprecated in favor of "enable_services"
-      config_enabled_services = Produce.config[:enable_services] || Produce.config[:enable_services]
+      # "enabled_features" was deprecated in favor of "enable_services"
+      config_enabled_services = Produce.config[:enable_services] || Produce.config[:enabled_features]
 
       config_enabled_services.each do |k, v|
         if k.to_sym == :data_protection

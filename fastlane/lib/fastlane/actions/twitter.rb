@@ -19,7 +19,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Post a tweet on Twitter.com"
+        "Post a tweet on [Twitter.com](https://twitter.com)"
       end
 
       def self.details

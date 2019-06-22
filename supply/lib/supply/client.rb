@@ -1,14 +1,103 @@
 require 'googleauth'
 require 'google/apis/androidpublisher_v2'
 Androidpublisher = Google::Apis::AndroidpublisherV2
-CredentialsLoader = Google::Auth::CredentialsLoader
 
 require 'net/http'
 
 module Supply
-  class Client
+  class AbstractGoogleServiceClient
+    SCOPE = nil
+    SERVICE = nil
+
     # Connecting with Google
-    attr_accessor :android_publisher
+    attr_accessor :client
+
+    def self.make_from_config(params: nil)
+      params ||= Supply.config
+      service_account_data = self.service_account_authentication(params: params)
+      return self.new(service_account_json: service_account_data, params: params)
+    end
+
+    # Supply authentication file
+    def self.service_account_authentication(params: nil)
+      unless params[:json_key] || params[:json_key_data]
+        if UI.interactive?
+          UI.important("To not be asked about this value, you can specify it using 'json_key'")
+          json_key_path = UI.input("The service account json file used to authenticate with Google: ")
+          json_key_path = File.expand_path(json_key_path)
+
+          UI.user_error!("Could not find service account json file at path '#{json_key_path}'") unless File.exist?(json_key_path)
+          params[:json_key] = json_key_path
+        else
+          UI.user_error!("Could not load Google authentication. Make sure it has been added as an environment variable in 'json_key' or 'json_key_data'")
+        end
+      end
+
+      if params[:json_key]
+        service_account_json = File.open(File.expand_path(params[:json_key]))
+      elsif params[:json_key_data]
+        service_account_json = StringIO.new(params[:json_key_data])
+      end
+
+      service_account_json
+    end
+
+    # Initializes the service and its auth_client using the specified information
+    # @param service_account_json: The raw service account Json data
+    def initialize(service_account_json: nil, params: nil)
+      auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+
+      UI.verbose("Fetching a new access token from Google...")
+
+      auth_client.fetch_access_token!
+
+      if FastlaneCore::Env.truthy?("DEBUG")
+        Google::Apis.logger.level = Logger::DEBUG
+      end
+
+      Google::Apis::ClientOptions.default.application_name = "fastlane (supply client)"
+      Google::Apis::ClientOptions.default.application_version = Fastlane::VERSION
+      Google::Apis::ClientOptions.default.read_timeout_sec = params[:timeout]
+      Google::Apis::ClientOptions.default.open_timeout_sec = params[:timeout]
+      Google::Apis::ClientOptions.default.send_timeout_sec = params[:timeout]
+      Google::Apis::RequestOptions.default.retries = 5
+
+      service = self.class::SERVICE.new
+      service.authorization = auth_client
+
+      if params[:root_url]
+        # Google's client expects the root_url string to end with "/".
+        params[:root_url] << '/' unless params[:root_url].end_with?('/')
+        service.root_url = params[:root_url]
+      end
+
+      self.client = service
+    end
+
+    private
+
+    def call_google_api
+      yield if block_given?
+    rescue Google::Apis::Error => e
+      error = begin
+                JSON.parse(e.body)
+              rescue
+                nil
+              end
+
+      if error
+        message = error["error"] && error["error"]["message"]
+      else
+        message = e.body
+      end
+
+      UI.user_error!("Google Api Error: #{e.message} - #{message}")
+    end
+  end
+
+  class Client < AbstractGoogleServiceClient
+    SERVICE = Androidpublisher::AndroidPublisherService
+    SCOPE = Androidpublisher::AUTH_ANDROIDPUBLISHER
 
     # Editing something
     # Reference to the entry we're currently editing. Might be nil if don't have one open
@@ -20,65 +109,21 @@ module Supply
     # @!group Login
     #####################################################
 
-    # instantiate a client given the supplied configuration
-    def self.make_from_config
-      unless Supply.config[:json_key] || Supply.config[:json_key_data] || (Supply.config[:key] && Supply.config[:issuer])
-        UI.important("To not be asked about this value, you can specify it using 'json_key'")
-        Supply.config[:json_key] = UI.input("The service account json file used to authenticate with Google: ")
-      end
-
-      if Supply.config[:json_key]
-        service_account_json = File.open(File.expand_path(Supply.config[:json_key]))
-      elsif Supply.config[:json_key_data]
-        service_account_json = StringIO.new(Supply.config[:json_key_data])
-      end
-
-      return Client.new(path_to_key: Supply.config[:key],
-                        issuer: Supply.config[:issuer], service_account_json: service_account_json)
-    end
-
-    # Initializes the android_publisher and its auth_client using the specified information
-    # @param service_account_json: The raw service account Json data
-    # @param path_to_key: The path to your p12 file (@deprecated)
-    # @param issuer: Email address for oauth (@deprecated)
-    def initialize(path_to_key: nil, issuer: nil, service_account_json: nil)
-      scope = Androidpublisher::AUTH_ANDROIDPUBLISHER
-
-      if service_account_json
-        key_io = service_account_json
-      else
+    def self.service_account_authentication(params: nil)
+      if params[:json_key] || params[:json_key_data]
+        super(params: params)
+      elsif params[:key] && params[:issuer]
         require 'google/api_client/auth/key_utils'
-        key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(path_to_key), 'notasecret')
+        UI.important("This type of authentication is deprecated. Please consider using JSON authentication instead")
+        key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(params[:key]), 'notasecret')
         cred_json = {
           private_key: key.to_s,
-          client_email: issuer
+          client_email: params[:issuer]
         }
-        key_io = StringIO.new(MultiJson.dump(cred_json))
-      end
-
-      auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: key_io, scope: scope)
-
-      UI.verbose("Fetching a new access token from Google...")
-
-      auth_client.fetch_access_token!
-
-      if FastlaneCore::Env.truthy?("DEBUG")
-        Google::Apis.logger.level = Logger::DEBUG
-      end
-
-      Google::Apis::ClientOptions.default.application_name = "fastlane - supply"
-      Google::Apis::ClientOptions.default.application_version = Fastlane::VERSION
-      Google::Apis::ClientOptions.default.read_timeout_sec = 300
-      Google::Apis::ClientOptions.default.open_timeout_sec = 300
-      Google::Apis::ClientOptions.default.send_timeout_sec = 300
-      Google::Apis::RequestOptions.default.retries = 5
-
-      self.android_publisher = Androidpublisher::AndroidPublisherService.new
-      self.android_publisher.authorization = auth_client
-      if Supply.config[:root_url]
-        # Google's client expects the root_url string to end with "/".
-        Supply.config[:root_url] << '/' unless Supply.config[:root_url].end_with?('/')
-        self.android_publisher.root_url = Supply.config[:root_url]
+        service_account_json = StringIO.new(JSON.dump(cred_json))
+        service_account_json
+      else
+        UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
       end
     end
 
@@ -90,7 +135,7 @@ module Supply
     def begin_edit(package_name: nil)
       UI.user_error!("You currently have an active edit") if @current_edit
 
-      self.current_edit = call_google_api { android_publisher.insert_edit(package_name) }
+      self.current_edit = call_google_api { client.insert_edit(package_name) }
 
       self.current_package_name = package_name
     end
@@ -99,7 +144,7 @@ module Supply
     def abort_current_edit
       ensure_active_edit!
 
-      call_google_api { android_publisher.delete_edit(current_package_name, current_edit.id) }
+      call_google_api { client.delete_edit(current_package_name, current_edit.id) }
 
       self.current_edit = nil
       self.current_package_name = nil
@@ -109,14 +154,14 @@ module Supply
     def validate_current_edit!
       ensure_active_edit!
 
-      call_google_api { android_publisher.validate_edit(current_package_name, current_edit.id) }
+      call_google_api { client.validate_edit(current_package_name, current_edit.id) }
     end
 
     # Commits the current edit saving all pending changes on Google Play
     def commit_current_edit!
       ensure_active_edit!
 
-      call_google_api { android_publisher.commit_edit(current_package_name, current_edit.id) }
+      call_google_api { client.commit_edit(current_package_name, current_edit.id) }
 
       self.current_edit = nil
       self.current_package_name = nil
@@ -131,7 +176,7 @@ module Supply
     def listings
       ensure_active_edit!
 
-      result = call_google_api { android_publisher.list_listings(current_package_name, current_edit.id) }
+      result = call_google_api { client.list_listings(current_package_name, current_edit.id) }
 
       return result.listings.map do |row|
         Listing.new(self, row.language, row)
@@ -143,7 +188,7 @@ module Supply
       ensure_active_edit!
 
       begin
-        result = android_publisher.get_listing(
+        result = client.get_listing(
           current_package_name,
           current_edit.id,
           language
@@ -156,13 +201,22 @@ module Supply
       end
     end
 
-    # Get a list of all apks verion codes - returns the list of version codes
+    # Get a list of all APK version codes - returns the list of version codes
     def apks_version_codes
       ensure_active_edit!
 
-      result = call_google_api { android_publisher.list_apks(current_package_name, current_edit.id) }
+      result = call_google_api { client.list_apks(current_package_name, current_edit.id) }
 
       return Array(result.apks).map(&:version_code)
+    end
+
+    # Get a list of all AAB version codes - returns the list of version codes
+    def aab_version_codes
+      ensure_active_edit!
+
+      result = call_google_api { client.list_edit_bundles(current_package_name, current_edit.id) }
+
+      return Array(result.bundles).map(&:version_code)
     end
 
     # Get a list of all apk listings (changelogs) - returns the list
@@ -170,7 +224,7 @@ module Supply
       ensure_active_edit!
 
       result = call_google_api do
-        android_publisher.list_apk_listings(
+        client.list_apk_listings(
           current_package_name,
           current_edit.id,
           apk_version_code
@@ -199,7 +253,7 @@ module Supply
       })
 
       call_google_api do
-        android_publisher.update_listing(
+        client.update_listing(
           current_package_name,
           current_edit.id,
           language,
@@ -212,7 +266,7 @@ module Supply
       ensure_active_edit!
 
       result_upload = call_google_api do
-        android_publisher.upload_apk(
+        client.upload_apk(
           current_package_name,
           current_edit.id,
           upload_source: path_to_apk
@@ -226,7 +280,7 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        android_publisher.upload_edit_deobfuscationfile(
+        client.upload_edit_deobfuscationfile(
           current_package_name,
           current_edit.id,
           apk_version_code,
@@ -241,7 +295,7 @@ module Supply
       ensure_active_edit!
 
       result_upload = call_google_api do
-        android_publisher.upload_edit_bundle(
+        client.upload_edit_bundle(
           current_package_name,
           self.current_edit.id,
           upload_source: path_to_aab,
@@ -270,7 +324,7 @@ module Supply
       })
 
       call_google_api do
-        android_publisher.update_track(
+        client.update_track(
           current_package_name,
           current_edit.id,
           track,
@@ -284,12 +338,12 @@ module Supply
       ensure_active_edit!
 
       begin
-        result = android_publisher.get_track(
+        result = client.get_track(
           current_package_name,
           current_edit.id,
           track
         )
-        return result.version_codes
+        return result.version_codes || []
       rescue Google::Apis::ClientError => e
         return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
         raise
@@ -305,12 +359,29 @@ module Supply
       })
 
       call_google_api do
-        android_publisher.update_apk_listing(
+        client.update_apk_listing(
           current_package_name,
           current_edit.id,
           apk_listing.apk_version_code,
           apk_listing.language,
           apk_listing_object
+        )
+      end
+    end
+
+    def update_obb(apk_version_code, expansion_file_type, references_version, file_size)
+      ensure_active_edit!
+
+      call_google_api do
+        client.update_expansion_file(
+          current_package_name,
+          current_edit.id,
+          apk_version_code,
+          expansion_file_type,
+          Google::Apis::AndroidpublisherV2::ExpansionFile.new(
+            references_version: references_version,
+            file_size: file_size
+          )
         )
       end
     end
@@ -323,7 +394,7 @@ module Supply
       ensure_active_edit!
 
       result = call_google_api do
-        android_publisher.list_images(
+        client.list_images(
           current_package_name,
           current_edit.id,
           language,
@@ -339,7 +410,7 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        android_publisher.upload_image(
+        client.upload_image(
           current_package_name,
           current_edit.id,
           language,
@@ -354,7 +425,7 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        android_publisher.delete_all_images(
+        client.delete_all_images(
           current_package_name,
           current_edit.id,
           language,
@@ -367,7 +438,7 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        android_publisher.upload_expansion_file(
+        client.upload_expansion_file(
           current_package_name,
           current_edit.id,
           apk_version_code,
@@ -382,12 +453,6 @@ module Supply
 
     def ensure_active_edit!
       UI.user_error!("You need to have an active edit, make sure to call `begin_edit`") unless @current_edit
-    end
-
-    def call_google_api
-      yield if block_given?
-    rescue Google::Apis::ClientError => e
-      UI.user_error!("Google Api Error: #{e.message}")
     end
   end
 end

@@ -33,7 +33,7 @@ Each _fastlane_ tool has a specific purpose and should be kept focused on the fu
 * [_pilot_](https://github.com/fastlane/fastlane/tree/master/pilot): The best way to manage your TestFlight testers and builds from your terminal
 * [boarding](https://github.com/fastlane/boarding): The easiest way to invite your TestFlight beta testers
 * [_gym_](https://github.com/fastlane/fastlane/tree/master/gym): Building your iOS apps has never been easier
-* [_match_](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team using Git
+* [_match_](https://github.com/fastlane/fastlane/tree/master/match): Easily sync your certificates and profiles across your team
 * [_scan_](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
 * [_precheck_](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 

@@ -61,7 +61,9 @@ module Fastlane
       end
 
       def self.output
-        ['APP_GROUP_IDENTIFIERS', 'The new App Group Identifiers']
+        [
+          ['APP_GROUP_IDENTIFIERS', 'The new App Group Identifiers']
+        ]
       end
 
       def self.authors

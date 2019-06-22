@@ -1,23 +1,5 @@
-require 'fastlane_core/tool_collector'
-
 module Fastlane
-  class ActionCollector < FastlaneCore::ToolCollector
-    # Is this an official fastlane action, that is bundled with fastlane?
-    def is_official?(name)
-      return true if name == :lane_switch
-      Actions.get_all_official_actions.include?(name)
-    end
-
-    def name_to_track(name)
-      return name if is_official?(name)
-
-      Fastlane.plugin_manager.plugin_references.each do |plugin_name, value|
-        return "#{plugin_name}/#{name}" if value[:actions].include?(name)
-      end
-
-      return nil
-    end
-
+  class ActionCollector
     def show_message
       UI.message("Sending Crash/Success information. Learn more at https://docs.fastlane.tools/#metrics")
       UI.message("No personal/sensitive data is sent. Only sharing the following:")
@@ -36,9 +18,6 @@ module Fastlane
     #   :xcversion
     #   "fastlane-plugin-my_plugin/xcversion"
     def self.determine_version(name)
-      result = super(name)
-      return result if result
-
       if name.to_s.include?(PluginManager.plugin_prefix)
         # That's an action from a plugin, we need to fetch its version number
         begin
