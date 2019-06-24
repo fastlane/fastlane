@@ -51,6 +51,7 @@ protocol ScanfileProtocol: class {
   var slackOnlyOnFailure: Bool { get }
   var destination: String? { get }
   var customReportFileName: String? { get }
+  var xcodebuildCommand: String { get }
   var failBuild: Bool { get }
 }
 
@@ -107,9 +108,10 @@ extension ScanfileProtocol {
   var slackOnlyOnFailure: Bool { return false }
   var destination: String? { return nil }
   var customReportFileName: String? { return nil }
+  var xcodebuildCommand: String { return "env NSUnbufferedIO=YES xcodebuild" }
   var failBuild: Bool { return true }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.10]
+// FastlaneRunnerAPIVersion [0.9.11]
