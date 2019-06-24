@@ -59,25 +59,25 @@ describe "Build Manager" do
     let(:fake_build_manager) { Pilot::BuildManager.new }
 
     let(:app) do
-      Spaceship::ConnectAPI::TestFlight::App.new("123-123-123-123", {
+      Spaceship::ConnectAPI::App.new("123-123-123-123", {
         name: "Mock App"
       })
     end
     let(:pre_release_version) do
-      Spaceship::ConnectAPI::TestFlight::PreReleaseVersion.new("123-123-123-123", {
+      Spaceship::ConnectAPI::PreReleaseVersion.new("123-123-123-123", {
         version: "1.0"
       })
     end
     let(:app_localizations) do
       [
-        Spaceship::ConnectAPI::TestFlight::BetaAppLocalization.new("234", {
+        Spaceship::ConnectAPI::BetaAppLocalization.new("234", {
           feedbackEmail: 'email@email.com',
           marketingUrl: 'https://url.com',
           privacyPolicyUrl: 'https://url.com',
           description: 'desc desc desc',
           locale: 'en-us'
         }),
-        Spaceship::ConnectAPI::TestFlight::BetaAppLocalization.new("432", {
+        Spaceship::ConnectAPI::BetaAppLocalization.new("432", {
           feedbackEmail: 'email@email.com',
           marketingUrl: 'https://url.com',
           privacyPolicyUrl: 'https://url.com',
@@ -88,36 +88,36 @@ describe "Build Manager" do
     end
     let(:build_localizations) do
       [
-        Spaceship::ConnectAPI::TestFlight::BetaBuildLocalization.new("234", {
+        Spaceship::ConnectAPI::BetaBuildLocalization.new("234", {
           whatsNew: 'some more words',
           locale: 'en-us'
         }),
-        Spaceship::ConnectAPI::TestFlight::BetaBuildLocalization.new("432", {
+        Spaceship::ConnectAPI::BetaBuildLocalization.new("432", {
           whatsNew: 'some words',
           locale: 'en-gb'
         })
       ]
     end
     let(:build_beta_detail) do
-      Spaceship::ConnectAPI::TestFlight::BuildBetaDetail.new("321", {
-        external_build_state: Spaceship::ConnectAPI::TestFlight::BuildBetaDetail::ExternalState::READY_FOR_BETA_SUBMISSION
+      Spaceship::ConnectAPI::BuildBetaDetail.new("321", {
+        external_build_state: Spaceship::ConnectAPI::BuildBetaDetail::ExternalState::READY_FOR_BETA_SUBMISSION
       })
     end
     let(:beta_groups) do
       [
-        Spaceship::ConnectAPI::TestFlight::BetaGroup.new("987", {
+        Spaceship::ConnectAPI::BetaGroup.new("987", {
           name: "Blue Man Group"
         }),
-        Spaceship::ConnectAPI::TestFlight::BetaGroup.new("654", {
+        Spaceship::ConnectAPI::BetaGroup.new("654", {
           name: "Green Eggs and Ham"
         })
       ]
     end
     let(:ready_to_submit_mock_build) do
-      Spaceship::ConnectAPI::TestFlight::Build.new("123", {
+      Spaceship::ConnectAPI::Build.new("123", {
         version: '',
         uploadedDate: '',
-        processingState: Spaceship::ConnectAPI::TestFlight::Build::ProcessingState::VALID,
+        processingState: Spaceship::ConnectAPI::Build::ProcessingState::VALID,
         usesNonExemptEncryption: nil
       })
     end
@@ -171,8 +171,8 @@ describe "Build Manager" do
         allow(fake_build_manager).to receive(:login)
         allow(mock_base_client).to receive(:team_id).and_return('')
 
-        allow(mock_base_client).to receive(:post_beta_app_review_submissions) # pretend it worked.
-        allow(Spaceship::ConnectAPI::TestFlight::Base).to receive(:client).and_return(mock_base_client)
+        allow(Spaceship::ConnectAPI).to receive(:post_beta_app_review_submissions) # pretend it worked.
+        allow(Spaceship::ConnectAPI::TestFlight).to receive(:instance).and_return(mock_base_client)
 
         # Allow build to return app, buidl_beta_detail, and pre_release_version
         # These are models that are expected to usually be included in the build passed into distribute
@@ -185,16 +185,16 @@ describe "Build Manager" do
         options = distribute_options_non_localized
 
         # Expect App.find to be called from within Pilot::Manager
-        expect(Spaceship::ConnectAPI::TestFlight::App).to receive(:get).and_return(app)
+        expect(Spaceship::ConnectAPI::App).to receive(:get).and_return(app)
 
         # Expect a beta app review detail to be patched
-        expect(mock_base_client).to receive(:patch_beta_app_review_detail).with({
+        expect(Spaceship::ConnectAPI).to receive(:patch_beta_app_review_detail).with({
           app_id: ready_to_submit_mock_build.app_id,
           attributes: { demoAccountRequired: options[:demo_account_required] }
         })
 
         # Expect beta app localizations to be fetched
-        expect(mock_base_client).to receive(:get_beta_app_localizations).with({
+        expect(Spaceship::ConnectAPI).to receive(:get_beta_app_localizations).with({
           filter: { app: ready_to_submit_mock_build.app.id },
           includes: nil,
           limit: nil,
@@ -207,7 +207,7 @@ describe "Build Manager" do
 
         # Expect beta app localizations to be patched with a UI.success after
         mock_api_client_beta_app_localizations.each do |localization|
-          expect(mock_base_client).to receive(:patch_beta_app_localizations).with({
+          expect(Spaceship::ConnectAPI).to receive(:patch_beta_app_localizations).with({
             localization_id: localization['id'],
             attributes: {
               feedbackEmail: options[:beta_app_feedback_email],
@@ -218,7 +218,7 @@ describe "Build Manager" do
         expect(FastlaneCore::UI).to receive(:success).with("Successfully set the beta_app_feedback_email and/or beta_app_description")
 
         # Expect beta build localizations to be fetched
-        expect(mock_base_client).to receive(:get_beta_build_localizations).with({
+        expect(Spaceship::ConnectAPI).to receive(:get_beta_build_localizations).with({
           filter: { build: ready_to_submit_mock_build.id },
           includes: nil,
           limit: nil,
@@ -231,7 +231,7 @@ describe "Build Manager" do
 
         # Expect beta build localizations to be patched with a UI.success after
         mock_api_client_beta_build_localizations.each do |localization|
-          expect(mock_base_client).to receive(:patch_beta_build_localizations).with({
+          expect(Spaceship::ConnectAPI).to receive(:patch_beta_build_localizations).with({
             localization_id: localization['id'],
             attributes: {
               whatsNew: options[:changelog]
@@ -241,14 +241,14 @@ describe "Build Manager" do
         expect(FastlaneCore::UI).to receive(:success).with("Successfully set the changelog for build")
 
         # Expect build beta details to be patched
-        expect(mock_base_client).to receive(:patch_build_beta_details).with({
+        expect(Spaceship::ConnectAPI).to receive(:patch_build_beta_details).with({
           build_beta_details_id: build_beta_detail.id,
           attributes: { autoNotifyEnabled: options[:notify_external_testers] }
         })
 
         # A build will go back into a processing state after a patch
         # Expect wait_for_build_processing_to_be_complete to be called after patching
-        expect(mock_base_client).to receive(:patch_builds).with({
+        expect(Spaceship::ConnectAPI).to receive(:patch_builds).with({
           build_id: ready_to_submit_mock_build.id, attributes: { usesNonExemptEncryption: false }
         })
         expect(fake_build_manager).to receive(:wait_for_build_processing_to_be_complete)
@@ -256,7 +256,7 @@ describe "Build Manager" do
         # Expect beta groups fetched from app. This tests:
         # 1. app.get_beta_groups is called
         # 2. client.get_beta_groups is called inside of app.beta_groups
-        expect(mock_base_client).to receive(:get_beta_groups).with({
+        expect(Spaceship::ConnectAPI).to receive(:get_beta_groups).with({
           filter: { app: ready_to_submit_mock_build.app.id },
           includes: nil,
           limit: nil,
@@ -270,7 +270,7 @@ describe "Build Manager" do
         # Expect beta groups to be added to a builds. This tests:
         # 1. build.add_beta_groups is called
         # 2. client.add_beta_groups_to_build is called inside of build.add_beta_groups
-        expect(mock_base_client).to receive(:add_beta_groups_to_build).with({
+        expect(Spaceship::ConnectAPI).to receive(:add_beta_groups_to_build).with({
           build_id: ready_to_submit_mock_build.id,
           beta_group_ids: [beta_groups[0].id]
         }).and_return(Spaceship::ConnectAPI::Response.new)
