@@ -268,6 +268,7 @@ func appstore(username: String,
               secondarySecondSubCategory: String? = nil,
               tradeRepresentativeContactInformation: [String : Any]? = nil,
               appReviewInformation: [String : Any]? = nil,
+              appReviewAttachmentFile: String? = nil,
               description: String? = nil,
               name: String? = nil,
               subtitle: [String : Any]? = nil,
@@ -327,6 +328,7 @@ func appstore(username: String,
                                                                                           RubyCommand.Argument(name: "secondary_second_sub_category", value: secondarySecondSubCategory),
                                                                                           RubyCommand.Argument(name: "trade_representative_contact_information", value: tradeRepresentativeContactInformation),
                                                                                           RubyCommand.Argument(name: "app_review_information", value: appReviewInformation),
+                                                                                          RubyCommand.Argument(name: "app_review_attachment_file", value: appReviewAttachmentFile),
                                                                                           RubyCommand.Argument(name: "description", value: description),
                                                                                           RubyCommand.Argument(name: "name", value: name),
                                                                                           RubyCommand.Argument(name: "subtitle", value: subtitle),
@@ -1278,6 +1280,7 @@ func deliver(username: String = deliverfile.username,
              secondarySecondSubCategory: String? = deliverfile.secondarySecondSubCategory,
              tradeRepresentativeContactInformation: [String : Any]? = deliverfile.tradeRepresentativeContactInformation,
              appReviewInformation: [String : Any]? = deliverfile.appReviewInformation,
+             appReviewAttachmentFile: String? = deliverfile.appReviewAttachmentFile,
              description: String? = deliverfile.description,
              name: String? = deliverfile.name,
              subtitle: [String : Any]? = deliverfile.subtitle,
@@ -1337,6 +1340,7 @@ func deliver(username: String = deliverfile.username,
                                                                                          RubyCommand.Argument(name: "secondary_second_sub_category", value: secondarySecondSubCategory),
                                                                                          RubyCommand.Argument(name: "trade_representative_contact_information", value: tradeRepresentativeContactInformation),
                                                                                          RubyCommand.Argument(name: "app_review_information", value: appReviewInformation),
+                                                                                         RubyCommand.Argument(name: "app_review_attachment_file", value: appReviewAttachmentFile),
                                                                                          RubyCommand.Argument(name: "description", value: description),
                                                                                          RubyCommand.Argument(name: "name", value: name),
                                                                                          RubyCommand.Argument(name: "subtitle", value: subtitle),
@@ -2330,7 +2334,8 @@ func oclint(oclintPath: String = "oclint",
             maxPriority3: String? = nil,
             enableClangStaticAnalyzer: Bool = false,
             enableGlobalAnalysis: Bool = false,
-            allowDuplicatedViolations: Bool = false) {
+            allowDuplicatedViolations: Bool = false,
+            extraArg: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "oclint", className: nil, args: [RubyCommand.Argument(name: "oclint_path", value: oclintPath),
                                                                                         RubyCommand.Argument(name: "compile_commands", value: compileCommands),
                                                                                         RubyCommand.Argument(name: "select_reqex", value: selectReqex),
@@ -2348,7 +2353,8 @@ func oclint(oclintPath: String = "oclint",
                                                                                         RubyCommand.Argument(name: "max_priority_3", value: maxPriority3),
                                                                                         RubyCommand.Argument(name: "enable_clang_static_analyzer", value: enableClangStaticAnalyzer),
                                                                                         RubyCommand.Argument(name: "enable_global_analysis", value: enableGlobalAnalysis),
-                                                                                        RubyCommand.Argument(name: "allow_duplicated_violations", value: allowDuplicatedViolations)])
+                                                                                        RubyCommand.Argument(name: "allow_duplicated_violations", value: allowDuplicatedViolations),
+                                                                                        RubyCommand.Argument(name: "extra_arg", value: extraArg)])
   _ = runner.executeCommand(command)
 }
 func onesignal(authToken: String,
@@ -2699,8 +2705,10 @@ func resetGitRepo(files: String? = nil,
                                                                                                 RubyCommand.Argument(name: "exclude", value: exclude)])
   _ = runner.executeCommand(command)
 }
-func resetSimulatorContents(ios: [String]? = nil) {
-  let command = RubyCommand(commandID: "", methodName: "reset_simulator_contents", className: nil, args: [RubyCommand.Argument(name: "ios", value: ios)])
+func resetSimulatorContents(ios: [String]? = nil,
+                            osVersions: [String]? = nil) {
+  let command = RubyCommand(commandID: "", methodName: "reset_simulator_contents", className: nil, args: [RubyCommand.Argument(name: "ios", value: ios),
+                                                                                                          RubyCommand.Argument(name: "os_versions", value: osVersions)])
   _ = runner.executeCommand(command)
 }
 func resign(ipa: String,
@@ -2807,6 +2815,7 @@ func runTests(workspace: String? = nil,
               slackOnlyOnFailure: Bool = false,
               destination: String? = nil,
               customReportFileName: String? = nil,
+              xcodebuildCommand: String = "env NSUnbufferedIO=YES xcodebuild",
               failBuild: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "run_tests", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                            RubyCommand.Argument(name: "project", value: project),
@@ -2860,6 +2869,7 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "slack_only_on_failure", value: slackOnlyOnFailure),
                                                                                            RubyCommand.Argument(name: "destination", value: destination),
                                                                                            RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
+                                                                                           RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand),
                                                                                            RubyCommand.Argument(name: "fail_build", value: failBuild)])
   _ = runner.executeCommand(command)
 }
@@ -2955,6 +2965,7 @@ func scan(workspace: String? = scanfile.workspace,
           slackOnlyOnFailure: Bool = scanfile.slackOnlyOnFailure,
           destination: String? = scanfile.destination,
           customReportFileName: String? = scanfile.customReportFileName,
+          xcodebuildCommand: String = scanfile.xcodebuildCommand,
           failBuild: Bool = scanfile.failBuild) {
   let command = RubyCommand(commandID: "", methodName: "scan", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -3008,6 +3019,7 @@ func scan(workspace: String? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "slack_only_on_failure", value: slackOnlyOnFailure),
                                                                                       RubyCommand.Argument(name: "destination", value: destination),
                                                                                       RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
+                                                                                      RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand),
                                                                                       RubyCommand.Argument(name: "fail_build", value: failBuild)])
   _ = runner.executeCommand(command)
 }
@@ -3940,6 +3952,7 @@ func uploadToAppStore(username: String,
                       secondarySecondSubCategory: String? = nil,
                       tradeRepresentativeContactInformation: [String : Any]? = nil,
                       appReviewInformation: [String : Any]? = nil,
+                      appReviewAttachmentFile: String? = nil,
                       description: String? = nil,
                       name: String? = nil,
                       subtitle: [String : Any]? = nil,
@@ -3999,6 +4012,7 @@ func uploadToAppStore(username: String,
                                                                                                      RubyCommand.Argument(name: "secondary_second_sub_category", value: secondarySecondSubCategory),
                                                                                                      RubyCommand.Argument(name: "trade_representative_contact_information", value: tradeRepresentativeContactInformation),
                                                                                                      RubyCommand.Argument(name: "app_review_information", value: appReviewInformation),
+                                                                                                     RubyCommand.Argument(name: "app_review_attachment_file", value: appReviewAttachmentFile),
                                                                                                      RubyCommand.Argument(name: "description", value: description),
                                                                                                      RubyCommand.Argument(name: "name", value: name),
                                                                                                      RubyCommand.Argument(name: "subtitle", value: subtitle),
@@ -4379,4 +4393,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.50]
+// FastlaneRunnerAPIVersion [0.9.51]
