@@ -46,9 +46,7 @@ module Fastlane
                                        description: "Which OS versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators",
                                        is_string: false,
                                        optional: true,
-                                       type: Array,
-                                       default_value: ENV["FASTLANE_RESET_SIMULATOR_OS_VERSIONS"],
-                                       default_value_dynamic: true),
+                                       type: Array),
           FastlaneCore::ConfigItem.new(key: :os_versions,
                                        short_option: "-v",
                                        env_name: "FASTLANE_RESET_SIMULATOR_OS_VERSIONS",
@@ -81,7 +79,8 @@ module Fastlane
 
       def self.example_code
         [
-          'reset_simulator_contents'
+          'reset_simulator_contents',
+          'reset_simulator_contents(os_versions: ["10.3.1","12.2"])'
         ]
       end
 
