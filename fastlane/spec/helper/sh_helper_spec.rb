@@ -91,6 +91,33 @@ describe Fastlane::Actions do
         expect(return_value).to eq(42)
       end
     end
+
+    context "with named parameters" do
+      it "passes a string as a string" do
+        expect_command("git commit")
+        Fastlane::Actions.sh(command: "git commit")
+      end
+
+      it "allows a single array to be passed to support older Fastlane syntax" do
+        expect_command("ls -la /tmp")
+        Fastlane::Actions.sh(command: ["ls -la", "/tmp"])
+      end
+
+      it "yields the status, result and command" do
+        expect_command("ls -la")
+        Fastlane::Actions.sh(command: ["ls", "-la"]) do |status, result, command|
+          expect(status.exitstatus).to eq(0)
+          expect(result).to be_empty
+          expect(command).to eq("ls -la")
+        end
+      end
+
+      it "raises error if no :command keyboard" do
+        expect do
+          Fastlane::Actions.sh(log: true)
+        end.to raise_error(ArgumentError)
+      end
+    end
   end
 
   describe "shell_command_from_args" do

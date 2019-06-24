@@ -2,10 +2,19 @@ require "open3"
 
 module Fastlane
   module Actions
+    # Execute a shell command
+    # This method will output the string and execute it
+    # Just an alias for sh_no_action with logic for supporting keyword arguments to match sh action options
+    # When running this in tests, it will return the actual command instead of executing it
+    # @param log [Boolean] should fastlane print out the executed command
+    # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
     def self.sh(*args, &b)
       if args.count == 1 && args.first.kind_of?(Hash)
         hash = args.first
         command = hash.delete(:command)
+
+        raise ArgumentError, "sh requires :command keyword in argument" if command.nil?
+
         new_args = [command, hash]
         sh_no_action(*new_args, &b)
       else
@@ -13,12 +22,6 @@ module Fastlane
       end
     end
 
-    # Execute a shell command
-    # This method will output the string and execute it
-    # Just an alias for sh_no_action
-    # When running this in tests, it will return the actual command instead of executing it
-    # @param log [Boolean] should fastlane print out the executed command
-    # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
     def self.sh_no_action(*command, log: true, error_callback: nil, &b)
       sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, &b)
     end
