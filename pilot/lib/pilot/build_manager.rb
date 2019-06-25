@@ -100,7 +100,7 @@ module Pilot
       end
 
       # Get latest uploaded build if no build specified
-      build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, sort: "-uploadedDate", limit: 1).first
+      build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, sort: "-uploadedDate", platform: fetch_app_platform, limit: 1).first
 
       # Verify the build has all the includes that we need
       # and fetch a new build if not
