@@ -375,7 +375,13 @@ module Scan
                                      deprecated: "Use `--output_files` instead",
                                      conflicting_options: [:output_files],
                                      optional: true,
-                                     is_string: true)
+                                     is_string: true),
+        FastlaneCore::ConfigItem.new(key: :xcodebuild_command,
+                                    env_name: "GYM_XCODE_BUILD_COMMAND",
+                                    description: "Allows for override of the default `xcodebuild` command",
+                                    type: String,
+                                    optional: true,
+                                    default_value: "env NSUnbufferedIO=YES xcodebuild")
 
       ]
     end
