@@ -17,7 +17,7 @@ module Spaceship::TestFlight
       connect_builds = resps.map(&:to_models).flatten
 
       if platform
-        connect_builds.select!{ |b| b.app_platform == platform }
+        connect_builds.select! { |b| b.app_platform == platform }
       end
 
       trains = {}
