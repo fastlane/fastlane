@@ -30,6 +30,8 @@ module Spaceship
       # @return (Bool) Cleared for sale flag
       attr_accessor :cleared_for_sale
 
+      attr_accessor :merch
+
       attr_accessor :review_screenshot
 
       # @return (String) the notes for the review team
@@ -142,6 +144,12 @@ module Spaceship
         Tunes::IAPStatus.get_from_string(raw_data["versions"].first["status"])
       end
 
+      # @return (Hash) Hash containing existing promotional image data
+      def merch
+        return nil unless raw_data && raw_data["versions"] && raw_data["versions"].first && raw_data["versions"].first["merch"] && raw_data['versions'].first["merch"]["value"]
+        raw_data['versions'].first['merch']['value']
+      end
+
       # @return (Hash) Hash containing existing review screenshot data
       def review_screenshot
         return nil unless raw_data && raw_data["versions"] && raw_data["versions"].first && raw_data["versions"].first["reviewScreenshot"] && raw_data['versions'].first["reviewScreenshot"]["value"]
@@ -171,6 +179,13 @@ module Spaceship
                                                     subscription_price_target)
         raw_data.set(["pricingIntervals"], raw_pricing_intervals)
         @raw_pricing_data["subscriptions"] = raw_pricing_intervals if @raw_pricing_data
+
+        if @merch
+          # Upload App Store Promotional image (Optional)
+          upload_file = UploadFile.from_path(@merch)
+          merch_data = client.upload_purchase_merch(application.apple_id, upload_file)
+          raw_data["versions"][0]["merch"] = merch_data
+        end
 
         if @review_screenshot
           # Upload Screenshot
