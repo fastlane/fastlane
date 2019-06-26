@@ -43,7 +43,7 @@ describe Pilot::TesterManager do
 
     let(:default_add_tester_options) do
       FastlaneCore::Configuration.create(Pilot::Options.available_options, {
-        apple_id: 'ABCD9089AC.com.bundle.identifier',
+        apple_id: '123456789',
         email: fake_tester.email,
         first_name: fake_tester.first_name,
         last_name: fake_tester.last_name
@@ -52,7 +52,7 @@ describe Pilot::TesterManager do
 
     let(:remove_tester_options) do
       FastlaneCore::Configuration.create(Pilot::Options.available_options, {
-        apple_id: 'ABCD9089AC.com.bundle.identifier',
+        apple_id: '123456789',
         email: fake_tester.email,
         first_name: fake_tester.first_name,
         last_name: fake_tester.last_name
@@ -61,7 +61,7 @@ describe Pilot::TesterManager do
 
     let(:default_add_tester_options_with_group) do
       FastlaneCore::Configuration.create(Pilot::Options.available_options, {
-        apple_id: 'ABCD9089AC.com.bundle.identifier',
+        apple_id: '123456789',
         email: fake_tester.email,
         first_name: fake_tester.first_name,
         last_name: fake_tester.last_name,
@@ -75,7 +75,7 @@ describe Pilot::TesterManager do
     let(:fake_client) { "fake client" }
 
     before(:each) do
-      allow(fake_app).to receive(:apple_id).and_return("ABCD9089AC.com.bundle.identifier")
+      allow(fake_app).to receive(:apple_id).and_return("123456789")
       allow(fake_app).to receive(:name).and_return(fake_app_name)
       allow(Spaceship::ConnectAPI::TestFlight::App).to receive(:get).and_return(fake_app)
       allow(Spaceship::ConnectAPI::TestFlight::App).to receive(:find).and_return(fake_app)

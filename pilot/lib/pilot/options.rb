@@ -45,19 +45,13 @@ module Pilot
                                      default_value_dynamic: true,
                                      type: String,
                                      verify_block: proc do |value|
-                                       error_message = "`apple_id` value is incorrect. App ID consists of a Team ID and a bundle ID search string, with a period (.) separating the two parts. You can find your Team ID here: https://developer.apple.com/account/#/membership and your bundle ID in Xcode settings."
+                                       error_message = "`apple_id` value is incorrect. The correct value should be taken from Apple ID property in the App Information section in App Store Connect."
 
-                                       # App ID = TeamID.bundleID
-                                       values = value.split('.')
-                                       UI.user_error!(error_message) if values.size < 2
+                                       # Validate if the value is not an email address
+                                       UI.user_error!(error_message) if value =~ /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
 
-                                       # Team ID validation
-                                       team_id = values[0]
-                                       UI.user_error!(error_message) unless team_id =~ /[A-Z0-9]{10}/
-
-                                       # Bundle ID validation
-                                       bundle_id = values.drop(1).join('.')
-                                       UI.user_error!(error_message) unless bundle_id =~ /^[a-zA-Z0-9\-.]+$/
+                                       # Validate if the value is not a bundle identifier
+                                       UI.user_error!(error_message) if value =~ /^[A-Za-x]{2,6}((?!-)\.[A-Za-z0-9-]{1,63}(?<!-))+$/i
                                      end),
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
