@@ -204,7 +204,8 @@ module FastlaneCore
       if self.mac?
         [
           "../Applications/Application Loader.app/Contents/MacOS/itms",
-          "../Applications/Application Loader.app/Contents/itms"
+          "../Applications/Application Loader.app/Contents/itms",
+          "../SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms" # For Xcode 11
         ].each do |path|
           result = File.expand_path(File.join(self.xcode_path, path))
           return result if File.exist?(result)
