@@ -1,10 +1,9 @@
 describe Spaceship::ConnectAPI::User do
   before { Spaceship::Tunes.login }
-  let(:client) { Spaceship::ConnectAPI::Base.client }
 
-  describe '#client' do
+  describe '#Spaceship::ConnectAPI' do
     it '#get_users' do
-      response = client.get_users
+      response = Spaceship::ConnectAPI.get_users
       expect(response).to be_an_instance_of(Spaceship::ConnectAPI::Response)
 
       expect(response.count).to eq(2)

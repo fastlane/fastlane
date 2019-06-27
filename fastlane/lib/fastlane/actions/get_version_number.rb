@@ -1,5 +1,9 @@
 module Fastlane
   module Actions
+    module SharedValues
+      VERSION_NUMBER ||= :VERSION_NUMBER # originally defined in IncrementVersionNumberAction
+    end
+
     class GetVersionNumberAction < Action
       require 'shellwords'
 

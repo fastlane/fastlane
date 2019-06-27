@@ -264,8 +264,14 @@ lane :release do
     )
 
     # Actual release of the gem
+    # Using IO.popen because `gem push` will prompt for 2FA if enabled
     #
-    sh("gem push ../pkg/fastlane-#{version}.gem")
+    command = "gem push ../pkg/fastlane-#{version}.gem"
+    IO.popen(command) do |io|
+      io.each do |line|
+        puts(line)
+      end
+    end
 
     release_url = github_release['html_url']
 

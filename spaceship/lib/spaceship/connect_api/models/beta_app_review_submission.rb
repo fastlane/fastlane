@@ -1,6 +1,6 @@
-require_relative './model'
+require_relative '../model'
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class BetaAppReviewSubmission
       include Spaceship::ConnectAPI::Model
 
@@ -19,7 +19,7 @@ module Spaceship
       #
 
       def delete!
-        return client.delete_beta_app_review_submission(beta_app_review_submission_id: id)
+        return Spaceship::ConnectAPI.delete_beta_app_review_submission(beta_app_review_submission_id: id)
       end
     end
   end

@@ -1,5 +1,11 @@
 [
     {
+        "locale": "ar-SA",
+        "name": "Arabic",
+        "game-center": false,
+        "itc_locale": "ar-SA"        
+    },
+    {
         "locale": "ca-ES",
         "name": "Catalan",
         "game-center": false,
@@ -118,6 +124,12 @@
             "el"
         ],
         "itc_locale": "el"
+    },
+    {
+        "locale": "he",
+        "name": "Hebrew",
+        "game-center": false,
+        "itc_locale": "he"        
     },
     {
         "locale": "hi-IN",

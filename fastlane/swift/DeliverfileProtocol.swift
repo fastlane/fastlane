@@ -44,6 +44,7 @@ protocol DeliverfileProtocol: class {
   var secondarySecondSubCategory: String? { get }
   var tradeRepresentativeContactInformation: [String : Any]? { get }
   var appReviewInformation: [String : Any]? { get }
+  var appReviewAttachmentFile: String? { get }
   var description: String? { get }
   var name: String? { get }
   var subtitle: [String : Any]? { get }
@@ -106,6 +107,7 @@ extension DeliverfileProtocol {
   var secondarySecondSubCategory: String? { return nil }
   var tradeRepresentativeContactInformation: [String : Any]? { return nil }
   var appReviewInformation: [String : Any]? { return nil }
+  var appReviewAttachmentFile: String? { return nil }
   var description: String? { return nil }
   var name: String? { return nil }
   var subtitle: [String : Any]? { return nil }
@@ -124,4 +126,4 @@ extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.7]
+// FastlaneRunnerAPIVersion [0.9.8]

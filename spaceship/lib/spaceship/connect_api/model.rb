@@ -1,19 +1,10 @@
-require_relative '../base'
-
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     module Model
       def self.included(base)
         Spaceship::ConnectAPI::Models.types ||= []
         Spaceship::ConnectAPI::Models.types << base
         base.extend(Spaceship::ConnectAPI::Model)
-        base.extend(Spaceship::ConnectAPI::Model::ClassMethods)
-      end
-
-      module ClassMethods
-        def client
-          return Spaceship::ConnectAPI::Base.client
-        end
       end
 
       attr_accessor :id
@@ -28,10 +19,6 @@ module Spaceship
           method = "#{key}=".to_sym
           self.send(method, value) if self.respond_to?(method)
         end
-      end
-
-      def client
-        return Spaceship::ConnectAPI::Base.client
       end
 
       #

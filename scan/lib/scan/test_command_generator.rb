@@ -5,7 +5,7 @@ module Scan
   class TestCommandGenerator
     def generate
       parts = prefix
-      parts << "env NSUnbufferedIO=YES xcodebuild"
+      parts << Scan.config[:xcodebuild_command]
       parts += options
       parts += actions
       parts += suffix

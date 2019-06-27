@@ -1,7 +1,7 @@
-require_relative './model'
+require_relative '../model'
 require 'spaceship/test_flight/build'
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class Build
       include Spaceship::ConnectAPI::Model
 
@@ -97,7 +97,7 @@ module Spaceship
       #
 
       def self.all(app_id: nil, version: nil, build_number: nil, includes: ESSENTIAL_INCLUDES, sort: "-uploadedDate", limit: 30)
-        resps = client.get_builds(
+        resps = Spaceship::ConnectAPI.get_builds(
           filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number },
           includes: includes,
           sort: sort,
@@ -107,17 +107,17 @@ module Spaceship
       end
 
       def self.get(build_id: nil, includes: ESSENTIAL_INCLUDES)
-        return client.get_build(build_id: build_id, includes: includes).first
+        return Spaceship::ConnectAPI.get_build(build_id: build_id, includes: includes).first
       end
 
       def add_beta_groups(beta_groups: nil)
         beta_groups ||= []
         beta_group_ids = beta_groups.map(&:id)
-        return client.add_beta_groups_to_build(build_id: id, beta_group_ids: beta_group_ids)
+        return Spaceship::ConnectAPI.add_beta_groups_to_build(build_id: id, beta_group_ids: beta_group_ids)
       end
 
       def get_beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
-        resps = client.get_beta_build_localizations(
+        resps = Spaceship::ConnectAPI.get_beta_build_localizations(
           filter: { build: id },
           includes: includes,
           sort: sort,
@@ -127,7 +127,7 @@ module Spaceship
       end
 
       def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil)
-        resps = client.get_build_beta_details(
+        resps = Spaceship::ConnectAPI.get_build_beta_details(
           filter: { build: id },
           includes: includes,
           sort: sort,
@@ -137,7 +137,7 @@ module Spaceship
       end
 
       def post_beta_app_review_submission
-        return client.post_beta_app_review_submissions(build_id: id)
+        return Spaceship::ConnectAPI.post_beta_app_review_submissions(build_id: id)
       end
     end
   end

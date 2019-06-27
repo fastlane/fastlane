@@ -1,6 +1,6 @@
-require_relative './model'
+require_relative '../model'
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class BetaTester
       include Spaceship::ConnectAPI::Model
 
@@ -35,7 +35,7 @@ module Spaceship
       #
 
       def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
-        return client.get_beta_testers(filter: filter, includes: includes)
+        return Spaceship::ConnectAPI.get_beta_testers(filter: filter, includes: includes)
       end
 
       def self.find(email: nil, includes: nil)
@@ -44,12 +44,12 @@ module Spaceship
 
       def delete_from_apps(apps: nil)
         app_ids = apps.map(&:id)
-        return client.delete_beta_tester_from_apps(beta_tester_id: id, app_ids: app_ids)
+        return Spaceship::ConnectAPI.delete_beta_tester_from_apps(beta_tester_id: id, app_ids: app_ids)
       end
 
       def delete_from_beta_groups(beta_groups: nil)
         beta_group_ids = beta_groups.map(&:id)
-        return client.delete_beta_tester_from_beta_groups(beta_tester_id: id, beta_group_ids: beta_group_ids)
+        return Spaceship::ConnectAPI.delete_beta_tester_from_beta_groups(beta_tester_id: id, beta_group_ids: beta_group_ids)
       end
     end
   end

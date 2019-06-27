@@ -2,37 +2,35 @@ module Fastlane
   module Actions
     class ResetSimulatorContentsAction < Action
       def self.run(params)
-        ios_versions = params[:ios]
+        os_versions = params[:os_versions] || params[:ios]
 
-        if Helper.xcode_at_least?("9")
-          reset_xcode9_and_higher(ios_versions)
-        else
-          reset_up_to_xcode8(ios_versions)
-        end
+        reset_simulators(os_versions)
       end
 
-      def self.reset_xcode9_and_higher(ios_versions)
-        UI.verbose("Resetting simulator contents for Xcode 9 and later")
-        simulators = FastlaneCore::DeviceManager.simulators('iOS')
-        if ios_versions
-          simulators.select! { |s| ios_versions.include?(s.os_version) }
-        end
-        simulators.each do |simulator|
-          FastlaneCore::Simulator.reset(udid: simulator.udid)
-        end
-        UI.success('Simulators reset')
-      end
+      def self.reset_simulators(os_versions)
+        UI.verbose("Resetting simulator contents")
 
-      def self.reset_up_to_xcode8(ios_versions)
-        UI.verbose("Resetting simulator contents for Xcode 8 and earlier")
-        if ios_versions
-          ios_versions.each do |os_version|
-            FastlaneCore::Simulator.reset_all_by_version(os_version: os_version)
+        if os_versions
+          os_versions.each do |os_version|
+            reset_all_by_version(os_version)
           end
         else
-          FastlaneCore::Simulator.reset_all
+          reset_all
         end
-        UI.success('Simulators reset')
+
+        UI.success('Simulators reset done')
+      end
+
+      def self.reset_all_by_version(os_version)
+        FastlaneCore::Simulator.reset_all_by_version(os_version: os_version)
+        FastlaneCore::SimulatorTV.reset_all_by_version(os_version: os_version)
+        FastlaneCore::SimulatorWatch.reset_all_by_version(os_version: os_version)
+      end
+
+      def self.reset_all
+        FastlaneCore::Simulator.reset_all
+        FastlaneCore::SimulatorTV.reset_all
+        FastlaneCore::SimulatorWatch.reset_all
       end
 
       def self.description
@@ -42,9 +40,17 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :ios,
+                                       deprecated: "Use `:os_versions` instead",
                                        short_option: "-i",
                                        env_name: "FASTLANE_RESET_SIMULATOR_VERSIONS",
-                                       description: "Which versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators",
+                                       description: "Which OS versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators",
+                                       is_string: false,
+                                       optional: true,
+                                       type: Array),
+          FastlaneCore::ConfigItem.new(key: :os_versions,
+                                       short_option: "-v",
+                                       env_name: "FASTLANE_RESET_SIMULATOR_OS_VERSIONS",
+                                       description: "Which OS versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators",
                                        is_string: false,
                                        optional: true,
                                        type: Array)
@@ -68,12 +74,13 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :tvos, :watchos].include?(platform)
       end
 
       def self.example_code
         [
-          'reset_simulator_contents'
+          'reset_simulator_contents',
+          'reset_simulator_contents(os_versions: ["10.3.1","12.2"])'
         ]
       end
 

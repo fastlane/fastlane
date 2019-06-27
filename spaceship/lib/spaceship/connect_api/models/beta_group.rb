@@ -1,6 +1,6 @@
-require_relative './model'
+require_relative '../model'
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class BetaGroup
       include Spaceship::ConnectAPI::Model
 
@@ -34,7 +34,7 @@ module Spaceship
 
       # beta_testers - [{email: "", firstName: "", lastName: ""}]
       def post_bulk_beta_tester_assignments(beta_testers: nil)
-        return client.post_bulk_beta_tester_assignments(beta_group_id: id, beta_testers: beta_testers)
+        return Spaceship::ConnectAPI.post_bulk_beta_tester_assignments(beta_group_id: id, beta_testers: beta_testers)
       end
     end
   end

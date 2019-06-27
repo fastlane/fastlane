@@ -1,6 +1,6 @@
-require_relative './model'
+require_relative '../model'
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class BuildDelivery
       include Spaceship::ConnectAPI::Model
 
@@ -25,7 +25,7 @@ module Spaceship
       #
 
       def self.all(app_id: nil, version: nil, build_number: nil)
-        resps = client.get_build_deliveries(
+        resps = Spaceship::ConnectAPI.get_build_deliveries(
           filter: { app: app_id, cfBundleShortVersionString: version, cfBundleVersion: build_number },
           limit: 1
         ).all_pages

@@ -1,10 +1,9 @@
 describe Spaceship::ConnectAPI::App do
   before { Spaceship::Tunes.login }
-  let(:client) { Spaceship::ConnectAPI::Base.client }
 
-  describe '#client' do
+  describe '#Spaceship::ConnectAPI' do
     it '#get_apps' do
-      response = client.get_apps
+      response = Spaceship::ConnectAPI.get_apps
       expect(response).to be_an_instance_of(Spaceship::ConnectAPI::Response)
 
       expect(response.count).to eq(2)
@@ -23,7 +22,7 @@ describe Spaceship::ConnectAPI::App do
     end
 
     it 'gets by app id' do
-      response = client.get_app(app_id: "123456789")
+      response = Spaceship::ConnectAPI.get_app(app_id: "123456789")
       expect(response).to be_an_instance_of(Spaceship::ConnectAPI::Response)
 
       expect(response.count).to eq(1)

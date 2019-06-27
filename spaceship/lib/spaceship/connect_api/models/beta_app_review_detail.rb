@@ -1,6 +1,6 @@
-require_relative './model'
+require_relative '../model'
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class BetaAppReviewDetail
       include Spaceship::ConnectAPI::Model
 
