@@ -6,7 +6,7 @@ require_relative 'export_compliance'
 require_relative 'beta_review_info'
 require_relative 'build_trains'
 
-require_relative '../connect_api/base'
+require_relative '../connect_api'
 
 module Spaceship
   module TestFlight
@@ -218,7 +218,7 @@ module Spaceship
         return if approved?
 
         build = find_app_store_connect_build
-        Spaceship::ConnectAPI::Base.client.post_beta_app_review_submissions(build_id: build["id"])
+        Spaceship::ConnectAPI.post_beta_app_review_submissions(build_id: build["id"])
       end
 
       def expire!
@@ -231,7 +231,7 @@ module Spaceship
 
       # Bridges the TestFlight::Build to the App Store Connect API build
       def find_app_store_connect_build
-        resp = Spaceship::ConnectAPI::Base.client.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: self.build_version, "preReleaseVersion.version" => self.train_version, app: app_id })
+        resp = Spaceship::ConnectAPI.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: self.build_version, "preReleaseVersion.version" => self.train_version, app: app_id })
         resp.first
       end
     end

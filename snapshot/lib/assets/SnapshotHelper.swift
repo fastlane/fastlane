@@ -175,12 +175,18 @@ open class Snapshot: NSObject {
 
             let window = app.windows.firstMatch
             let screenshot = window.screenshot()
-            guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
-            let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
+            guard var simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
+            
             do {
+                // The simulator name contains "Clone X of " inside the screenshot file when running parallelized UI Tests on concurrent devices
+                let regex = try NSRegularExpression(pattern: "Clone [0-1]+ of ")
+                let range = NSMakeRange(0, simulator.count)
+                simulator = regex.stringByReplacingMatches(in: simulator, range: range, withTemplate: "")
+
+                let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
                 try screenshot.pngRepresentation.write(to: path)
             } catch let error {
-                NSLog("Problem writing screenshot: \(name) to \(path)")
+                NSLog("Problem writing screenshot: \(name) to \(screenshotsDir)/\(simulator)-\(name).png")
                 NSLog(error.localizedDescription)
             }
         #endif
@@ -295,4 +301,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.16]
+// SnapshotHelperVersion [1.17]
