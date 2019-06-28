@@ -18,7 +18,7 @@ module Snapshot
         Dir[File.join(language_folder, '*.png')].sort.each do |screenshot|
           file_name = File.basename(screenshot)
           available_devices.each do |key_name, output_name|
-            next unless file_name.include?(key_name)
+            next unless file_name.downcase.include?(key_name.downcase)
             # This screenshot is from this device
 
             @data_by_language[language] ||= {}
