@@ -174,7 +174,7 @@ open class Snapshot: NSObject {
             }
 
             let screenshot = XCUIScreen.main.screenshot()
-            guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
+            guard var simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
             
             do {
                 // The simulator name contains "Clone X of " inside the screenshot file when running parallelized UI Tests on concurrent devices
@@ -300,4 +300,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.17]
+// SnapshotHelperVersion [1.18]
