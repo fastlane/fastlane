@@ -80,6 +80,7 @@ module Snapshot
         'iPhone XS Max' => "iPhone XS Max",
         'iPhone XS' => "iPhone XS",
         'iPhone XR' => "iPhone XR",
+        'iPhone Xʀ' => "iPhone XR",
         'iPhone 8 Plus' => "iPhone 8 Plus",
         'iPhone 8' => "iPhone 8",
         'iPhone X' => "iPhone X",
