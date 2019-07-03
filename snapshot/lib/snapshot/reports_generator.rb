@@ -79,8 +79,8 @@ module Snapshot
         # which includes spaces
         'iPhone XS Max' => "iPhone XS Max",
         'iPhone XS' => "iPhone XS",
-        'iPhone XR' => "iPhone XR", # <iOS 12.2 simulators named 'iPhone XR'
-        'iPhone Xʀ' => "iPhone XR", # iOS 12.2+ simulators named 'iPhone Xʀ'
+        'iPhone XR' => "iPhone XR", # <iOS 12.2 simulators
+        'iPhone Xʀ' => "iPhone XR", # iOS 12.2+ simulators
         'iPhone 8 Plus' => "iPhone 8 Plus",
         'iPhone 8' => "iPhone 8",
         'iPhone X' => "iPhone X",
