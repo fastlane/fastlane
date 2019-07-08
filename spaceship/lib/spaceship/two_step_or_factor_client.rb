@@ -212,7 +212,7 @@ module Spaceship
 
         maskings_count = number_with_dialcode_masked.count('•') # => 9 or 8
         pattern = /^([0-9+]{2,4})([•]{#{maskings_count}})([0-9]{2})$/
-        # following regex: range from maskings_count-2 because sometimes the masked number has 1 or 2 `•` more than the actual number
+        # following regex: range from maskings_count-2 because sometimes the masked number has 1 or 2 dots more than the actual number
         # e.g. https://github.com/fastlane/fastlane/issues/14969
         replacement = "\\1([0-9]{#{maskings_count - 2},#{maskings_count}})\\3" 
         number_with_dialcode_regex_part = number_with_dialcode_masked.gsub(pattern, replacement)
