@@ -44,7 +44,7 @@ describe Spaceship::Client do
       "+4912341234581" => 2,
       "+1-123-456-7866" => 3,
       "+39 123 456 7871" => 4,
-      "+353123456743" => 5.
+      "+353123456743" => 5,
       "+375 00 000-00-59" => 6
     }.each do |number_to_test, expected_phone_id|
       it "selects correct phone id #{expected_phone_id} for provided phone number #{number_to_test}" do
