@@ -251,7 +251,7 @@ describe "Build Manager" do
         expect(Spaceship::ConnectAPI).to receive(:patch_builds).with({
           build_id: ready_to_submit_mock_build.id, attributes: { usesNonExemptEncryption: false }
         })
-        expect(fake_build_manager).to receive(:wait_for_build_processing_to_be_complete)
+        expect(fake_build_manager).to receive(:wait_for_build_processing_to_be_complete).and_return(ready_to_submit_mock_build)
 
         # Expect beta groups fetched from app. This tests:
         # 1. app.get_beta_groups is called

@@ -230,8 +230,12 @@ module Spaceship
 
       # Bridges the TestFlight::Build to the App Store Connect API build
       def find_app_store_connect_build
-        resp = Spaceship::ConnectAPI.get_builds(filter: { expired: false, processingState: "PROCESSING,VALID", version: self.build_version, "preReleaseVersion.version" => self.train_version, app: app_id })
-        resp.find { |r| r.build_id == id }
+        builds = Spaceship::ConnectAPI::Build.all(
+          app_id: app_id,
+          version: self.train_version,
+          build_number: self.build_version
+        )
+        return builds.find { |build| build.id == id }
       end
     end
   end

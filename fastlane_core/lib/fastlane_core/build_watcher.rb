@@ -19,9 +19,9 @@ module FastlaneCore
         end
 
         loop do
-          matched_build, build_delivery = matching_build(watched_app_version: app_version, watched_build_version: build_version, app_id: app_id)
+          matched_build = matching_build(watched_app_version: app_version, watched_build_version: build_version, app_id: app_id, platform: platform)
 
-          report_status(build: matched_build, build_delivery: build_delivery)
+          report_status(build: matched_build)
 
           if matched_build && matched_build.processed?
             if return_spaceship_testflight_build
@@ -47,32 +47,40 @@ module FastlaneCore
         watched_app_version = remove_version_leading_zeros(version: watched_app_version)
         watched_build_version = remove_version_leading_zeros(version: watched_build_version)
 
-        build_deliveries = Spaceship::ConnectAPI::BuildDelivery.all(app_id: app_id, version: watched_app_version, build_number: watched_build_version)
-        build_delivery = build_deliveries.first
-
-        # Get processed builds when no longer in build deliveries
-        if build_delivery.nil?
-          matched_builds = Spaceship::ConnectAPI::Build.all(
-            app_id: app_id,
-            version: watched_app_version,
-            build_number: watched_build_version,
-            includes: "app,preReleaseVersion"
-          )
-          matched_build = matched_builds.first
+        if platform
+          case platform.to_sym
+          when :appletvos
+            filter_platform = Spaceship::ConnectAPI::Platform::TV_OS
+          when :osx
+            filter_platform = Spaceship::ConnectAPI::Platform::MAC_OS
+          else
+            filter_platform = Spaceship::ConnectAPI::Platform::IOS
+          end
         end
 
-        return matched_build, build_delivery
+        matched_builds = Spaceship::ConnectAPI::Build.all(
+          app_id: app_id,
+          version: watched_app_version,
+          build_number: watched_build_version,
+          platform: filter_platform
+        )
+
+        if matched_builds.size > 1
+          raise "FastlaneCore::BuildWatcher found more than 1 matching build"
+        end
+
+        matched_build = matched_builds.first
+
+        return matched_build
       end
 
-      def report_status(build: nil, build_delivery: nil)
-        if build_delivery
-          UI.message("Waiting for App Store Connect to finish processing the new build (#{build_delivery.cf_build_short_version_string} - #{build_delivery.cf_build_version})")
-        elsif build && !build.processed?
-          UI.message("Waiting for App Store Connect to finish processing the new build (#{build.app_version} - #{build.version})")
+      def report_status(build: nil)
+        if build && !build.processed?
+          UI.message("Waiting for App Store Connect to finish processing the new build (#{build.app_version} - #{build.version}) for #{build.platform}")
         elsif build && build.processed?
-          UI.success("Successfully finished processing the build #{build.app_version} - #{build.version}")
+          UI.success("Successfully finished processing the build #{build.app_version} - #{build.version} for #{build.platform}")
         else
-          UI.message("Build doesn't show up in the build list anymore, waiting for it to appear again (check your email for processing issues if this continues)")
+          UI.message("Waiting for the build to show up in the build list - this may take a few minutes (check your email for processing issues if this continues)")
         end
       end
     end

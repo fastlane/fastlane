@@ -84,7 +84,7 @@ module Pilot
       platform = fetch_app_platform
       app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
       app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], return_spaceship_testflight_build: false)
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.id, platform: platform, app_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], return_spaceship_testflight_build: false)
 
       unless latest_build.app_version == app_version && latest_build.version == app_build
         UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.app_version} - #{latest_build.version}.")
@@ -293,7 +293,7 @@ module Pilot
       UI.message("Distributing new build to testers: #{uploaded_build.app_version} - #{uploaded_build.version}")
 
       # This is where we could add a check to see if encryption is required and has been updated
-      set_export_compliance_if_needed(uploaded_build, options)
+      uploaded_build = set_export_compliance_if_needed(uploaded_build, options)
 
       if options[:groups] || options[:distribute_external]
         if uploaded_build.ready_for_beta_submission?
@@ -332,7 +332,9 @@ module Pilot
 
         UI.important("Export compliance has been set to '#{uses_non_exempt_encryption}'. Need to wait for build to finishing processing again...")
         UI.important("Set 'ITSAppUsesNonExemptEncryption' in the 'Info.plist' to skip this step and speed up the submission")
-        wait_for_build_processing_to_be_complete
+        return wait_for_build_processing_to_be_complete
+      else
+        return uploaded_build
       end
     end
 

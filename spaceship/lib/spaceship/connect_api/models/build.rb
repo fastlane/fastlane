@@ -5,7 +5,6 @@ module Spaceship
     class Build
       include Spaceship::ConnectAPI::Model
 
-      attr_accessor :build_id
       attr_accessor :version
       attr_accessor :uploaded_date
       attr_accessor :expiration_date
@@ -22,7 +21,6 @@ module Spaceship
       attr_accessor :pre_release_version
 
       attr_mapping({
-        "id" => "build_id",
         "version" => "version",
         "uploadedDate" => "uploaded_date",
         "expirationDate" => "expiration_date",
@@ -61,18 +59,6 @@ module Spaceship
         return pre_release_version.version
       end
 
-      def app_platform
-        raise "No pre_release_version included" unless pre_release_version
-        case pre_release_version.platform
-        when "TV_OS"
-          "appletvos"
-        when "IOS"
-          "ios"
-        else
-          pre_release_version.platform
-        end
-      end
-
       def app_id
         raise "No app included" unless app
         return app.id
@@ -81,6 +67,11 @@ module Spaceship
       def bundle_id
         raise "No app included" unless app
         return app.bundle_id
+      end
+
+      def platform
+        raise "No pre_release_version included" unless pre_release_version
+        return pre_release_version.platform
       end
 
       def processed?
@@ -95,13 +86,12 @@ module Spaceship
       # This is here temporarily until the removal of Spaceship::TestFlight
       def to_testflight_build
         h = {
-          'id' => build_id,
+          'id' => id,
           'buildVersion' => version,
           'uploadDate' => uploaded_date,
           'externalState' => processed? ? Spaceship::TestFlight::Build::BUILD_STATES[:active] : Spaceship::TestFlight::Build::BUILD_STATES[:processing],
           'appAdamId' => app_id,
           'bundleId' => bundle_id,
-          'platform' => app_platform,
           'trainVersion' => app_version
         }
 
@@ -112,14 +102,22 @@ module Spaceship
       # API
       #
 
-      def self.all(app_id: nil, version: nil, build_number: nil, includes: ESSENTIAL_INCLUDES, sort: "-uploadedDate", limit: 30)
+      def self.all(app_id: nil, version: nil, build_number: nil, platform: nil, includes: ESSENTIAL_INCLUDES, sort: "-uploadedDate", limit: 30)
         resps = Spaceship::ConnectAPI.get_builds(
-          filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number },
+          filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number, processingState: "PROCESSING,FAILED,INVALID,VALID" },
           includes: includes,
           sort: sort,
           limit: limit
         ).all_pages
-        return resps.map(&:to_models).flatten
+        models = resps.map(&:to_models).flatten
+
+        if platform
+          models = models.select do |build|
+            build.pre_release_version && build.pre_release_version.platform == platform
+          end
+        end
+
+        return models
       end
 
       def self.get(build_id: nil, includes: ESSENTIAL_INCLUDES)

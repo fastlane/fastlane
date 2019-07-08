@@ -43,5 +43,12 @@ module Spaceship
     class << self
       attr_reader :token
     end
+
+    module Platform
+      IOS = "IOS"
+      MAC_OS = "MAC_OS"
+      TV_OS = "TV_OS"
+      WATCH_OS = "WATCH_OS"
+    end
   end
 end
