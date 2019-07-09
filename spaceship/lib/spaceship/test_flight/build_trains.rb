@@ -13,17 +13,7 @@ module Spaceship::TestFlight
     # See `Spaceship::TestFlight::Build#reload`
 
     def self.all(app_id: nil, platform: nil, retry_count: 3)
-      if platform
-        case platform.to_sym
-        when :appletvos
-          filter_platform = Spaceship::ConnectAPI::Platform::TV_OS
-        when :osx
-          filter_platform = Spaceship::ConnectAPI::Platform::MAC_OS
-        else
-          filter_platform = Spaceship::ConnectAPI::Platform::IOS
-        end
-      end
-
+      filter_platform = Spaceship::ConnectAPI::Platform.map(platform) if platform
       connect_builds = Spaceship::ConnectAPI::Build.all(
         app_id: app_id,
         sort: "uploadedDate",

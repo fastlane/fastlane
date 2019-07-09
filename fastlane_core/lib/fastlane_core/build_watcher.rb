@@ -47,17 +47,7 @@ module FastlaneCore
         watched_app_version = remove_version_leading_zeros(version: watched_app_version)
         watched_build_version = remove_version_leading_zeros(version: watched_build_version)
 
-        if platform
-          case platform.to_sym
-          when :appletvos
-            filter_platform = Spaceship::ConnectAPI::Platform::TV_OS
-          when :osx
-            filter_platform = Spaceship::ConnectAPI::Platform::MAC_OS
-          else
-            filter_platform = Spaceship::ConnectAPI::Platform::IOS
-          end
-        end
-
+        filter_platform = Spaceship::ConnectAPI::Platform.map(platform) if platform
         matched_builds = Spaceship::ConnectAPI::Build.all(
           app_id: app_id,
           version: watched_app_version,

@@ -49,6 +49,24 @@ module Spaceship
       MAC_OS = "MAC_OS"
       TV_OS = "TV_OS"
       WATCH_OS = "WATCH_OS"
+
+      ALL = [IOS, MAC_OS, TV_OS, WATCH_OS]
+
+      def self.map(platform)
+        return platform if ALL.include?(platform)
+
+        # Map from fastlane input and Spaceship::TestFlight platform values
+        case platform.to_sym
+        when :appletvos
+          return Spaceship::ConnectAPI::Platform::TV_OS
+        when :osx
+          return Spaceship::ConnectAPI::Platform::MAC_OS
+        when :ios
+          return Spaceship::ConnectAPI::Platform::IOS
+        else
+          raise "Cannot find a matching platform for '#{platform}' - valid values are #{ALL.join(', ')}"
+        end
+      end
     end
   end
 end
