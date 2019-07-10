@@ -11,15 +11,6 @@ describe Spaceship::ConnectAPI::Users::Client do
   context 'sends api request' do
     before(:each) do
       allow(client).to receive(:handle_response)
-      module Spaceship
-        class ConnectAPI
-          module Users
-            class Client
-              include Spaceship::ConnectAPI::Users
-            end
-          end
-        end
-      end
     end
 
     def test_request_params(url, params)
@@ -55,7 +46,7 @@ describe Spaceship::ConnectAPI::Users::Client do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
-          client.get_users
+          Spaceship::ConnectAPI.get_users
         end
       end
     end
