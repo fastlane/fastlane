@@ -44,6 +44,10 @@ module Spaceship
       attr_reader :token
     end
 
+    # Defined in the App Store Connect API docs:
+    # https://developer.apple.com/documentation/appstoreconnectapi/platform
+    #
+    # Used for query param filters
     module Platform
       IOS = "IOS"
       MAC_OS = "MAC_OS"

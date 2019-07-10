@@ -18,8 +18,14 @@ module FastlaneCore
           UI.deprecated(":strict_build_watch is no longer a used argument on FastlaneCore::BuildWatcher.")
         end
 
+        showed_info = false
         loop do
           matched_build = matching_build(watched_app_version: app_version, watched_build_version: build_version, app_id: app_id, platform: platform)
+
+          if matched_build.nil? && !showed_info
+            UI.important("Read more information on why this build isn't showing up yet - https://github.com/fastlane/fastlane/issues/14997")
+            showed_info = true
+          end
 
           report_status(build: matched_build)
 

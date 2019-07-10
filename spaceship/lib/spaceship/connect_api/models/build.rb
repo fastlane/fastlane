@@ -111,6 +111,7 @@ module Spaceship
         ).all_pages
         models = resps.map(&:to_models).flatten
 
+        # Filtering after models are fetched since there is no way to do this in a query param filter
         if platform
           models = models.select do |build|
             build.pre_release_version && build.pre_release_version.platform == platform
