@@ -11,15 +11,6 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
   context 'sends api request' do
     before(:each) do
       allow(client).to receive(:handle_response)
-      module Spaceship
-        class ConnectAPI
-          module Provisioning
-            class Client
-              include Spaceship::ConnectAPI::Provisioning
-            end
-          end
-        end
-      end
     end
 
     def test_request_params(url, params)
@@ -62,7 +53,7 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
           params = {}
           req_mock = test_request_body(path, params)
           expect(client).to receive(:request).with(:post).and_yield(req_mock)
-          client.get_bundle_ids
+          Spaceship::ConnectAPI.get_bundle_ids
         end
       end
     end
@@ -75,7 +66,7 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
           params = {}
           req_mock = test_request_body(path, params)
           expect(client).to receive(:request).with(:post).and_yield(req_mock)
-          client.get_certificates
+          Spaceship::ConnectAPI.get_certificates
         end
       end
     end
@@ -88,7 +79,7 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
           params = {}
           req_mock = test_request_body(path, params)
           expect(client).to receive(:request).with(:post).and_yield(req_mock)
-          client.get_devices
+          Spaceship::ConnectAPI.get_devices
         end
       end
     end
@@ -101,7 +92,7 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
           params = {}
           req_mock = test_request_body(path, params)
           expect(client).to receive(:request).with(:post).and_yield(req_mock)
-          client.get_profiles
+          Spaceship::ConnectAPI.get_profiles
         end
       end
     end
