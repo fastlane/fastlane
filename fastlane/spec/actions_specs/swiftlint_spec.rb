@@ -352,6 +352,33 @@ describe Fastlane do
           expect(result).to eq("swiftlint autocorrect")
         end
       end
+
+      context "when using analyzer mode" do
+        it "adds compiler-log-path option" do
+          path = "./spec/fixtures"
+          result = Fastlane::FastFile.new.parse("
+            lane :test do
+              swiftlint(
+                compiler_log_path: '#{path}',
+                mode: :analyze
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint analyze --compiler-log-path #{path}")
+        end
+
+        it "adds invalid path option" do
+          path = "./non/existent/path"
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              swiftlint(
+                compiler_log_path: '#{path}',
+                mode: :analyze
+              )
+            end").runner.execute(:test)
+          end.to raise_error(/Couldn't find compiler_log_path '.*#{path}'/)
+        end
+      end
     end
   end
 end
