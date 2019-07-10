@@ -69,6 +69,11 @@ module Spaceship
         return app.bundle_id
       end
 
+      def platform
+        raise "No pre_release_version included" unless pre_release_version
+        return pre_release_version.platform
+      end
+
       def processed?
         return processing_state != ProcessingState::PROCESSING
       end
@@ -81,6 +86,7 @@ module Spaceship
       # This is here temporarily until the removal of Spaceship::TestFlight
       def to_testflight_build
         h = {
+          'id' => id,
           'buildVersion' => version,
           'uploadDate' => uploaded_date,
           'externalState' => processed? ? Spaceship::TestFlight::Build::BUILD_STATES[:active] : Spaceship::TestFlight::Build::BUILD_STATES[:processing],
@@ -96,14 +102,23 @@ module Spaceship
       # API
       #
 
-      def self.all(app_id: nil, version: nil, build_number: nil, includes: ESSENTIAL_INCLUDES, sort: "-uploadedDate", limit: 30)
+      def self.all(app_id: nil, version: nil, build_number: nil, platform: nil, includes: ESSENTIAL_INCLUDES, sort: "-uploadedDate", limit: 30)
         resps = Spaceship::ConnectAPI.get_builds(
-          filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number },
+          filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number, processingState: "PROCESSING,FAILED,INVALID,VALID" },
           includes: includes,
           sort: sort,
           limit: limit
         ).all_pages
-        return resps.map(&:to_models).flatten
+        models = resps.map(&:to_models).flatten
+
+        # Filtering after models are fetched since there is no way to do this in a query param filter
+        if platform
+          models = models.select do |build|
+            build.pre_release_version && build.pre_release_version.platform == platform
+          end
+        end
+
+        return models
       end
 
       def self.get(build_id: nil, includes: ESSENTIAL_INCLUDES)
