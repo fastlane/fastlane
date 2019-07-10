@@ -228,7 +228,7 @@ module Spaceship
           end
         }
 
-        delete("betaTesters/#{beta_tester_id}/relationships/apps", nil, body)
+        Client.instance.delete("betaTesters/#{beta_tester_id}/relationships/apps", nil, body)
       end
 
       def delete_beta_tester_from_beta_groups(beta_tester_id: nil, beta_group_ids: [])
@@ -241,7 +241,7 @@ module Spaceship
           end
         }
 
-        delete("betaTesters/#{beta_tester_id}/relationships/betaGroups", nil, body)
+        Client.instance.delete("betaTesters/#{beta_tester_id}/relationships/betaGroups", nil, body)
       end
 
       #
