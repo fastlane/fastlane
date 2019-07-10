@@ -161,7 +161,7 @@ module Pilot
         [
           build.app_version,
           build.version,
-          build.beta_build_metrics.map(&:install_count).reduce(:+)
+          (build.beta_build_metrics || []).map(&:install_count).reduce(:+)
         ]
       end
 
