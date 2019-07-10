@@ -31,7 +31,6 @@ describe Spaceship::Client do
         { "id" : 3, "numberWithDialCode" : "+1 (•••) •••-••66", "obfuscatedNumber" : "(•••) •••-••66", "pushMode" : "sms" },
         { "id" : 4, "numberWithDialCode" : "+39 ••• ••• ••71", "obfuscatedNumber" : "••• ••• ••71", "pushMode" : "sms" },
         { "id" : 5, "numberWithDialCode" : "+353 •• ••• ••43", "obfuscatedNumber" : "••• ••• •43", "pushMode" : "sms" },
-        { "id" : 5, "numberWithDialCode" : "+353 •• ••• ••43", "obfuscatedNumber" : "••• ••• •43", "pushMode" : "sms" },
         { "id" : 6, "numberWithDialCode" : "+375 • ••• •••-••-59", "obfuscatedNumber" : "• ••• •••-••-59", "pushMode" : "sms" }
       ]
     '
