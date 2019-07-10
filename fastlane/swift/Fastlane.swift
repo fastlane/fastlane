@@ -3567,7 +3567,8 @@ func swiftlint(mode: String = "lint",
                reporter: String? = nil,
                quiet: Bool = false,
                executable: String? = nil,
-               format: Bool = false) {
+               format: Bool = false,
+               compilerLogPath: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "swiftlint", className: nil, args: [RubyCommand.Argument(name: "mode", value: mode),
                                                                                            RubyCommand.Argument(name: "path", value: path),
                                                                                            RubyCommand.Argument(name: "output_file", value: outputFile),
@@ -3578,7 +3579,8 @@ func swiftlint(mode: String = "lint",
                                                                                            RubyCommand.Argument(name: "reporter", value: reporter),
                                                                                            RubyCommand.Argument(name: "quiet", value: quiet),
                                                                                            RubyCommand.Argument(name: "executable", value: executable),
-                                                                                           RubyCommand.Argument(name: "format", value: format)])
+                                                                                           RubyCommand.Argument(name: "format", value: format),
+                                                                                           RubyCommand.Argument(name: "compiler_log_path", value: compilerLogPath)])
   _ = runner.executeCommand(command)
 }
 func syncCodeSigning(type: String = "development",
@@ -4393,4 +4395,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.51]
+// FastlaneRunnerAPIVersion [0.9.52]
