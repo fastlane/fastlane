@@ -102,9 +102,9 @@ module Spaceship
       # API
       #
 
-      def self.all(app_id: nil, version: nil, build_number: nil, platform: nil, includes: ESSENTIAL_INCLUDES, sort: "-uploadedDate", limit: 30)
+      def self.all(app_id: nil, version: nil, build_number: nil, platform: nil, processing_states: "PROCESSING,FAILED,INVALID,VALID", includes: ESSENTIAL_INCLUDES, sort: "-uploadedDate", limit: 30)
         resps = Spaceship::ConnectAPI.get_builds(
-          filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number, processingState: "PROCESSING,FAILED,INVALID,VALID" },
+          filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number, processingState: processing_states },
           includes: includes,
           sort: sort,
           limit: limit
