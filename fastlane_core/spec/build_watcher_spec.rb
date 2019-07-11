@@ -4,62 +4,11 @@ describe FastlaneCore::BuildWatcher do
   context '.wait_for_build_processing_to_be_complete' do
     let(:processing_build) do
       double(
-        'Processing Build',
-        processed?: false,
-        active?: false,
-        ready_to_submit?: false,
-        export_compliance_missing?: false,
-        review_rejected?: false,
-        train_version: '1.0',
-        build_version: '1',
-        upload_date: 1
-      )
-    end
-    let(:old_processing_build) do
-      double(
-        'Old Processing Build',
-        processed?: false,
-        active?: false,
-        ready_to_submit?: false,
-        export_compliance_missing?: false,
-        review_rejected?: false,
-        train_version: '1.0',
-        build_version: '0',
-        upload_date: 0
-      )
-    end
-    let(:active_build) do
-      double(
-        'Active Build',
-        processed?: true,
-        active?: true,
-        ready_to_submit?: false,
-        export_compliance_missing?: false,
-        review_rejected?: false,
-        train_version: '1.0',
-        build_version: '1',
-        upload_date: 1
-      )
-    end
-    let(:testflight_ready_build) do
-      double(
-        'Ready Build',
-        processed?: true,
-        active?: false,
-        ready_to_submit?: true,
-        export_compliance_missing?: false,
-        review_rejected?: false,
-        train_version: '1.0',
-        build_version: '1',
-        upload_date: 1
-      )
-    end
-    let(:processing_build) do
-      double(
         app_version: "1.0",
         version: "1",
         processed?: false,
-        platform: 'IOS'
+        platform: 'IOS',
+        processing_state: 'PROCESSING'
       )
     end
     let(:ready_build) do
@@ -67,46 +16,8 @@ describe FastlaneCore::BuildWatcher do
         app_version: "1.0",
         version: "1",
         processed?: true,
-        platform: 'IOS'
-      )
-    end
-    let(:old_ready_build) do
-      double(
-        'Ready Build',
-        processed?: true,
-        active?: false,
-        ready_to_submit?: true,
-        export_compliance_missing?: false,
-        review_rejected?: false,
-        train_version: '1.0',
-        build_version: '0',
-        upload_date: 1
-      )
-    end
-    let(:export_compliance_required_build) do
-      double(
-        'Export Compliance Required Build',
-        processed?: true,
-        active?: false,
-        ready_to_submit?: false,
-        export_compliance_missing?: true,
-        review_rejected?: false,
-        train_version: '1.0',
-        build_version: '1',
-        upload_date: 1
-      )
-    end
-    let(:review_rejected_build) do
-      double(
-        'Review Rejected Build',
-        processed?: true,
-        active?: false,
-        ready_to_submit?: false,
-        export_compliance_missing?: false,
-        review_rejected?: true,
-        train_version: '1.0',
-        build_version: '1',
-        upload_date: 1
+        platform: 'IOS',
+        processing_state: 'VALID'
       )
     end
 
@@ -141,6 +52,7 @@ describe FastlaneCore::BuildWatcher do
       expect(FastlaneCore::BuildWatcher).to receive(:sleep)
       expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([ready_build])
 
+      expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: #{ready_build.app_version}, build_version: #{ready_build.version}, platform: #{ready_build.platform}")
       expect(UI).to receive(:message).with("Waiting for App Store Connect to finish processing the new build (1.0 - 1) for #{ready_build.platform}")
       expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version} for #{ready_build.platform}")
       found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false)
@@ -153,6 +65,7 @@ describe FastlaneCore::BuildWatcher do
       expect(FastlaneCore::BuildWatcher).to receive(:sleep)
       expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([ready_build])
 
+      expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: #{ready_build.app_version}, build_version: #{ready_build.version}, platform: #{ready_build.platform}")
       expect(UI).to receive(:message).with("Waiting for the build to show up in the build list - this may take a few minutes (check your email for processing issues if this continues)")
       expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version} for #{ready_build.platform}")
       found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false)
@@ -167,6 +80,23 @@ describe FastlaneCore::BuildWatcher do
       found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false)
 
       expect(found_build).to eq(ready_build)
+    end
+
+    it 'raises error when multiple builds found' do
+      builds = [ready_build, ready_build]
+
+      expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([])
+      expect(FastlaneCore::BuildWatcher).to receive(:sleep)
+      expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return(builds)
+
+      expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: #{ready_build.app_version}, build_version: #{ready_build.version}, platform: #{ready_build.platform}")
+      expect(UI).to receive(:message).with("Waiting for the build to show up in the build list - this may take a few minutes (check your email for processing issues if this continues)")
+
+      error_builds = builds.map { |b| "#{b.app_version}(#{b.version}) for #{b.platform} - #{b.processing_state}" }.join("\n")
+
+      expect do
+        FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false)
+      end.to raise_error("FastlaneCore::BuildWatcher found more than 1 matching build: \n#{error_builds}")
     end
 
     it 'sleeps 10 seconds by default' do
