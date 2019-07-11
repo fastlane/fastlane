@@ -10,13 +10,16 @@ module FastlaneCore
         # Warn about train_version being removed in the future
         if train_version
           UI.deprecated(":train_version is no longer a used argument on FastlaneCore::BuildWatcher. Please use :app_version instead.")
+          app_version = train_version
         end
-        app_version = train_version
 
         # Warn about strict_build_watch being removed in the future
         if strict_build_watch
           UI.deprecated(":strict_build_watch is no longer a used argument on FastlaneCore::BuildWatcher.")
         end
+
+        platform = Spaceship::ConnectAPI::Platform.map(platform) if platform
+        UI.message("Waiting for processing on... app_id: #{app_id}, app_version: #{app_version}, build_version: #{build_version}, platform: #{platform}")
 
         showed_info = false
         loop do
@@ -53,16 +56,21 @@ module FastlaneCore
         watched_app_version = remove_version_leading_zeros(version: watched_app_version)
         watched_build_version = remove_version_leading_zeros(version: watched_build_version)
 
-        filter_platform = Spaceship::ConnectAPI::Platform.map(platform) if platform
         matched_builds = Spaceship::ConnectAPI::Build.all(
           app_id: app_id,
           version: watched_app_version,
           build_number: watched_build_version,
-          platform: filter_platform
+          platform: platform
         )
 
+        # Raise error if more than 1 build is returned
+        # This should never happen but need to inform the user if it does
         if matched_builds.size > 1
-          raise "FastlaneCore::BuildWatcher found more than 1 matching build"
+          error_builds = matched_builds.map do |build|
+            "#{build.app_version}(#{build.version}) for #{build.platform} - #{build.processing_state}"
+          end.join("\n")
+          error_message = "FastlaneCore::BuildWatcher found more than 1 matching build: \n#{error_builds}"
+          UI.crash!(error_message)
         end
 
         matched_build = matched_builds.first
