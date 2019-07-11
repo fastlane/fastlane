@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      VERSION_NUMBER = :VERSION_NUMBER
+      VERSION_NUMBER ||= :VERSION_NUMBER
     end
 
     class IncrementVersionNumberAction < Action
