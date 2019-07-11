@@ -1,8 +1,8 @@
 module Fastlane
   module Actions
     module SharedValues
-      IPA_OUTPUT_PATH = :IPA_OUTPUT_PATH
-      DSYM_OUTPUT_PATH = :DSYM_OUTPUT_PATH
+      IPA_OUTPUT_PATH ||= :IPA_OUTPUT_PATH
+      DSYM_OUTPUT_PATH ||= :DSYM_OUTPUT_PATH
       XCODEBUILD_ARCHIVE ||= :XCODEBUILD_ARCHIVE # originally defined in XcodebuildAction
     end
 
