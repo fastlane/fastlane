@@ -59,7 +59,7 @@ module Match
         app_identifier: app_identifier,
         output_path: File.join(working_directory, "profiles", prov_type.to_s),
         username: params[:username],
-        force: true,
+        force: params[:force],
         cert_id: certificate_id,
         provisioning_name: profile_name,
         ignore_profiles_with_different_name: true,
