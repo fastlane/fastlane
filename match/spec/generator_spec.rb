@@ -72,7 +72,7 @@ describe Match::Generator do
         platform: :ios,
         template_name: 'template_name'
       }
-      Match::Generator.generate_provisioning_profile(params: params, prov_type: :development, certificate_id: 'fake_cert_id', app_identifier: params[:app_identifier], working_directory: "workspace")
+      Match::Generator.generate_provisioning_profile(params: params, prov_type: :development, certificate_id: 'fake_cert_id', app_identifier: params[:app_identifier], force: false, working_directory: "workspace")
     end
   end
 end

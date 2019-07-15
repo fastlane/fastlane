@@ -204,10 +204,11 @@ module Match
 
       # Install the provisioning profiles
       profile = profiles.last
+      force = params[:force]
 
       if params[:force_for_new_devices] && !params[:readonly]
         if prov_type != :appstore
-          params[:force] = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym) unless params[:force]
+          force = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym) unless params[:force]
         else
           # App Store provisioning profiles don't contain device identifiers and
           # thus shouldn't be renewed if the device count has changed.
@@ -228,10 +229,12 @@ module Match
           UI.error("If you are certain that a profile should exist, double-check the recent changes to your match repository")
           UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information.")
         end
+
         profile = Generator.generate_provisioning_profile(params: params,
                                                        prov_type: prov_type,
                                                   certificate_id: certificate_id,
                                                   app_identifier: app_identifier,
+                                                           force: force,
                                                working_directory: prefixed_working_directory)
         self.files_to_commit << profile
       end

@@ -54,6 +54,7 @@ describe Match do
                                                                             prov_type: :appstore,
                                                                        certificate_id: "something",
                                                                        app_identifier: values[:app_identifier],
+                                                                                force: false,
                                                                    working_directory: fake_storage.working_directory).and_return(profile_path)
       expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path, keychain_path).and_return(destination)
       expect(fake_storage).to receive(:save_changes!).with(
