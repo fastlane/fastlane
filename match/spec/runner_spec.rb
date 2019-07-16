@@ -7,6 +7,7 @@ describe Match do
       allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_NAME').and_return(keychain)
       allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_PASSWORD').and_return(nil)
 
+      # There is another test
       ENV.delete('FASTLANE_TEAM_ID')
       ENV.delete('FASTLANE_TEAM_NAME')
     end
@@ -44,7 +45,7 @@ describe Match do
         google_cloud_project_id: "",
         readonly: false,
         username: values[:username],
-        team_id: "team_id",
+        team_id: nil,
         team_name: nil
       ).and_return(fake_storage)
 
@@ -118,7 +119,7 @@ describe Match do
         google_cloud_project_id: "",
         readonly: false,
         username: values[:username],
-        team_id: "team_id",
+        team_id: nil,
         team_name: nil
       ).and_return(fake_storage)
 
@@ -191,7 +192,7 @@ describe Match do
         google_cloud_project_id: "",
         readonly: false,
         username: values[:username],
-        team_id: "team_id",
+        team_id: nil,
         team_name: nil
       ).and_return(fake_storage)
 
