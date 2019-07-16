@@ -6,6 +6,9 @@ describe Match do
       allow(ENV).to receive(:[]).and_call_original
       allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_NAME').and_return(keychain)
       allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_PASSWORD').and_return(nil)
+
+      ENV.delete('FASTLANE_TEAM_ID')
+      ENV.delete('FASTLANE_TEAM_NAME')
     end
 
     it "creates a new profile and certificate if it doesn't exist yet", requires_security: true do
