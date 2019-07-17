@@ -2,6 +2,10 @@ module Fastlane
   module Actions
     GIT_MERGE_COMMIT_FILTERING_OPTIONS = [:include_merges, :exclude_merges, :only_include_merges].freeze
 
+    module SharedValues
+      GIT_BRANCH_ENV_VARS = %w(GIT_BRANCH BRANCH_NAME TRAVIS_BRANCH BITRISE_GIT_BRANCH CI_BUILD_REF_NAME CI_COMMIT_REF_NAME WERCKER_GIT_BRANCH BUILDKITE_BRANCH).freeze
+    end
+
     def self.git_log_between(pretty_format, from, to, merge_commit_filtering, date_format = nil, ancestry_path)
       command = %w(git log)
       command << "--pretty=#{pretty_format}"
@@ -112,10 +116,8 @@ module Fastlane
 
     # Returns the current git branch - can be replaced using the environment variable `GIT_BRANCH`
     def self.git_branch
-      return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
-      s = Actions.sh("git rev-parse --abbrev-ref HEAD", log: false).chomp
-      return s.to_s.strip if s.to_s.length > 0
-      nil
+      env_name = SharedValues::GIT_BRANCH_ENV_VARS.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
+      return ENV.fetch(env_name.to_s) { `git symbolic-ref HEAD --short 2>/dev/null`.strip }
     rescue
       nil
     end
