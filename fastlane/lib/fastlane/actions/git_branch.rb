@@ -1,6 +1,5 @@
 module Fastlane
   module Actions
-
     class GitBranchAction < Action
       def self.run(params)
         Actions.git_branch
@@ -29,7 +28,7 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx","arri-cc"]
+        ["KrauseFx", "arri-cc"]
       end
 
       def self.is_supported?(platform)
