@@ -1,6 +1,6 @@
 require 'googleauth'
-require 'google/apis/androidpublisher_v2'
-Androidpublisher = Google::Apis::AndroidpublisherV2
+require 'google/apis/androidpublisher_v3'
+Androidpublisher = Google::Apis::AndroidpublisherV3
 
 require 'net/http'
 
@@ -217,6 +217,13 @@ module Supply
       result = call_google_api { client.list_edit_bundles(current_package_name, current_edit.id) }
 
       return Array(result.bundles).map(&:version_code)
+    end
+
+    def aab_listings
+      ensure_active_edit!
+
+      UI.message("Testing gemfile with git repo")
+
     end
 
     # Get a list of all apk listings (changelogs) - returns the list
