@@ -168,7 +168,7 @@ open class Snapshot: NSObject {
             app.typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
 
-            guard let app = self.app else {
+            guard self.app != nil else {
                 NSLog("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
                 return
             }
