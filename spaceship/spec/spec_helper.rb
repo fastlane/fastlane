@@ -1,6 +1,9 @@
 require 'plist'
 
 require_relative 'client_stubbing'
+require_relative 'connect_api/provisioning/provisioning_stubbing'
+require_relative 'connect_api/testflight/testflight_stubbing'
+require_relative 'connect_api/users/users_stubbing'
 require_relative 'portal/portal_stubbing'
 require_relative 'tunes/tunes_stubbing'
 require_relative 'du/du_stubbing'
@@ -63,6 +66,28 @@ def before_each_spaceship
   TunesStubbing.itc_stub_generate_promocodes
   TunesStubbing.itc_stub_promocodes_history
   TunesStubbing.itc_stub_supported_countries
+
+  ConnectAPIStubbing::Provisioning.stub_bundle_ids
+  ConnectAPIStubbing::Provisioning.stub_bundle_id
+  ConnectAPIStubbing::Provisioning.stub_certificates
+  ConnectAPIStubbing::Provisioning.stub_devices
+  ConnectAPIStubbing::Provisioning.stub_profiles
+
+  ConnectAPIStubbing::TestFlight.stub_apps
+  ConnectAPIStubbing::TestFlight.stub_beta_app_localizations
+  ConnectAPIStubbing::TestFlight.stub_beta_app_review_details
+  ConnectAPIStubbing::TestFlight.stub_beta_app_review_submissions
+  ConnectAPIStubbing::TestFlight.stub_beta_build_localizations
+  ConnectAPIStubbing::TestFlight.stub_beta_build_metrics
+  ConnectAPIStubbing::TestFlight.stub_beta_groups
+  ConnectAPIStubbing::TestFlight.stub_beta_testers
+  ConnectAPIStubbing::TestFlight.stub_beta_tester_metrics
+  ConnectAPIStubbing::TestFlight.stub_build_beta_details
+  ConnectAPIStubbing::TestFlight.stub_build_deliveries
+  ConnectAPIStubbing::TestFlight.stub_builds
+  ConnectAPIStubbing::TestFlight.stub_pre_release_versions
+
+  ConnectAPIStubbing::Users.stub_users
 end
 
 def after_each_spaceship

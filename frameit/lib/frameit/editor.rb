@@ -72,7 +72,7 @@ module Frameit
     private
 
     def store_result
-      output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
+      output_path = screenshot.output_path
       image.format("png")
       image.write(output_path)
       Helper.hide_loading_indicator

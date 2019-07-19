@@ -15,26 +15,26 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Helmut Januschka",
-                        "Olivier Halligon",
-                        "Danielle Tomlinson",
-                        "Joshua Liebowitz",
-                        "Andrew McBurney",
+  spec.authors       = ["Jan Piotrowski",
                         "Stefan Natchev",
-                        "Jérôme Lacoste",
-                        "Felix Krause",
-                        "Fumiya Nakamura",
-                        "Aaron Brager",
-                        "Jan Piotrowski",
-                        "Iulian Onofrei",
                         "Manu Wallner",
-                        "Matthew Ellis",
-                        "Maksym Grebenets",
+                        "Iulian Onofrei",
+                        "Helmut Januschka",
                         "Jorge Revuelta H",
-                        "Luka Mirosevic",
+                        "Jérôme Lacoste",
+                        "Aaron Brager",
+                        "Olivier Halligon",
+                        "Andrew McBurney",
+                        "Felix Krause",
                         "Kohki Miki",
+                        "Fumiya Nakamura",
+                        "Maksym Grebenets",
+                        "Danielle Tomlinson",
+                        "Jimmy Dee",
+                        "Matthew Ellis",
                         "Josh Holtz",
-                        "Jimmy Dee"]
+                        "Luka Mirosevic",
+                        "Joshua Liebowitz"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -80,8 +80,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
-  spec.add_dependency('mini_magick', '~> 4.5.1') # To open, edit and export PSD files
-  spec.add_dependency('multi_json') # Because sometimes it's just not installed
+  spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
   spec.add_dependency('multi_xml', '~> 0.5')
   spec.add_dependency('rubyzip', '>= 1.2.2', '< 2.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
@@ -91,6 +90,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('faraday', '~> 0.9') # Used for deploygate, hockey and testfairy actions
   spec.add_dependency('faraday_middleware', '~> 0.9') # same as faraday
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
+  spec.add_dependency('jwt', '~> 2.1.0') # Used for generating authentication tokens for AppStore connect api
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.

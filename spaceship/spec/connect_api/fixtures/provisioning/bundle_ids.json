@@ -1,0 +1,96 @@
+{
+    "data" : [ {
+      "type" : "bundleIds",
+      "id" : "123456789",
+      "attributes" : {
+        "identifier" : "com.joshholtz.FastlaneApp",
+        "bundleIdCapabilitiesSettingOption" : null,
+        "seedId" : "972KS36P2U",
+        "name" : "Fastlane App",
+        "platformName" : "iOS",
+        "platform" : "IOS",
+        "responseId" : "706db527-c071-4b16-bdd3-8be43a375c27",
+        "wildcard" : false
+      },
+      "relationships" : {
+        "bundleIdCapabilities" : {
+          "meta" : {
+            "paging" : {
+              "total" : 0,
+              "limit" : 2147483647
+            }
+          },
+          "links" : {
+            "self" : "https://developer.apple.com:443/services-account/v1/bundleIds/123456789/relationships/bundleIdCapabilities",
+            "related" : "https://developer.apple.com:443/services-account/v1/bundleIds/123456789/bundleIdCapabilities"
+          }
+        },
+        "profiles" : {
+          "meta" : {
+            "paging" : {
+              "total" : 0,
+              "limit" : 2147483647
+            }
+          },
+          "links" : {
+            "self" : "https://developer.apple.com:443/services-account/v1/bundleIds/123456789/relationships/profiles",
+            "related" : "https://developer.apple.com:443/services-account/v1/bundleIds/123456789/profiles"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://developer.apple.com:443/services-account/v1/bundleIds/123456789"
+      }
+    }, {
+      "type" : "bundleIds",
+      "id" : "5F346WCNLN",
+      "attributes" : {
+        "identifier" : "com.joshholtz.circle.Example",
+        "bundleIdCapabilitiesSettingOption" : null,
+        "seedId" : "972KS36P2U",
+        "name" : "Fastlane Circle App",
+        "platformName" : "iOS",
+        "platform" : "IOS",
+        "responseId" : "706db527-c071-4b16-bdd3-8be43a375c27",
+        "wildcard" : false
+      },
+      "relationships" : {
+        "bundleIdCapabilities" : {
+          "meta" : {
+            "paging" : {
+              "total" : 0,
+              "limit" : 2147483647
+            }
+          },
+          "links" : {
+            "self" : "https://developer.apple.com:443/services-account/v1/bundleIds/5F346WCNLN/relationships/bundleIdCapabilities",
+            "related" : "https://developer.apple.com:443/services-account/v1/bundleIds/5F346WCNLN/bundleIdCapabilities"
+          }
+        },
+        "profiles" : {
+          "meta" : {
+            "paging" : {
+              "total" : 0,
+              "limit" : 2147483647
+            }
+          },
+          "links" : {
+            "self" : "https://developer.apple.com:443/services-account/v1/bundleIds/5F346WCNLN/relationships/profiles",
+            "related" : "https://developer.apple.com:443/services-account/v1/bundleIds/5F346WCNLN/profiles"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://developer.apple.com:443/services-account/v1/bundleIds/5F346WCNLN"
+      }
+    } ],
+    "links" : {
+      "self" : "https://developer.apple.com:443/services-account/v1/bundleIds?filter%5Bplatform%5D=IOS%2CMACOS&sort=name&limit=1000"
+    },
+    "meta" : {
+      "paging" : {
+        "total" : 2,
+        "limit" : 1000
+      }
+    }
+  }

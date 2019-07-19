@@ -38,8 +38,8 @@ module Spaceship
             'ipad' => [1024, 768],
             'ipad105' => [2224, 1668],
             'ipadPro' => [2732, 2048],
-            'iPadPro11' => [2388, 1668],
-            'iPadPro129' => [2732, 2048]
+            'ipadPro11' => [2388, 1668],
+            'ipadPro129' => [2732, 2048]
         }
 
         r = resolutions[device]
@@ -871,6 +871,21 @@ module Spaceship
       raise "device is required" unless device
 
       du_client.upload_trailer_preview(app_version, upload_trailer_preview, content_provider_id, sso_token_for_image, device)
+    end
+
+    #####################################################
+    # @!review attachment file
+    #####################################################
+    # Uploads a attachment file
+    # @param app_version (AppVersion): The version of your app(must be edit version)
+    # @param upload_attachment_file (file): File to upload
+    # @return [JSON] the response
+    def upload_app_review_attachment(app_version, upload_attachment_file)
+      raise "app_version is required" unless app_version
+      raise "app_version must be live version" if app_version.is_live?
+      raise "upload_attachment_file is required" unless upload_attachment_file
+
+      du_client.upload_app_review_attachment(app_version, upload_attachment_file, content_provider_id, sso_token_for_image)
     end
 
     # Fetches the App Version Reference information from ITC

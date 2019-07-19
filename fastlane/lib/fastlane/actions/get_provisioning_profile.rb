@@ -6,7 +6,7 @@ module Fastlane
       SIGH_UDID = :SIGH_UDID # deprecated
       SIGH_UUID = :SIGH_UUID
       SIGH_NAME = :SIGH_NAME
-      SIGH_PROFILE_TYPE = :SIGH_PROFILE_TYPE
+      SIGH_PROFILE_TYPE ||= :SIGH_PROFILE_TYPE
     end
 
     class GetProvisioningProfileAction < Action

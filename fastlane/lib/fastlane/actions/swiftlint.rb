@@ -19,6 +19,7 @@ module Fastlane
         command << " --reporter #{params[:reporter]}" if params[:reporter]
         command << supported_option_switch(params, :quiet, "0.9.0", true)
         command << supported_option_switch(params, :format, "0.11.0", true) if params[:mode] == :autocorrect
+        command << " --compiler-log-path #{params[:compiler_log_path].shellescape}" if params[:compiler_log_path]
 
         if params[:files]
           if version < Gem::Version.new('0.5.1')
@@ -71,7 +72,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :mode,
-                                       description: "SwiftLint mode: :lint or :autocorrect",
+                                       description: "SwiftLint mode: :lint, :autocorrect or :analyze",
                                        is_string: false,
                                        default_value: :lint,
                                        optional: true),
@@ -124,7 +125,14 @@ module Fastlane
                                        default_value: false,
                                        is_string: false,
                                        type: Boolean,
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :compiler_log_path,
+                                       description: "Compiler log path when mode is :analyze",
+                                       is_string: true,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find compiler_log_path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                       end)
         ]
       end
 

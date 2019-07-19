@@ -38,11 +38,21 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :apple_id,
                                      short_option: "-p",
                                      env_name: "PILOT_APPLE_ID",
-                                     description: "The unique App ID provided by App Store Connect",
+                                     description: "Apple ID property in the App Information section in App Store Connect",
                                      optional: true,
                                      code_gen_sensitive: true,
                                      default_value: ENV["TESTFLIGHT_APPLE_ID"],
-                                     default_value_dynamic: true),
+                                     default_value_dynamic: true,
+                                     type: String,
+                                     verify_block: proc do |value|
+                                       error_message = "`apple_id` value is incorrect. The correct value should be taken from Apple ID property in the App Information section in App Store Connect."
+
+                                       # Validate if the value is not an email address
+                                       UI.user_error!(error_message) if value =~ /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
+
+                                       # Validate if the value is not a bundle identifier
+                                       UI.user_error!(error_message) if value =~ /^[A-Za-x]{2,6}((?!-)\.[A-Za-z0-9-]{1,63}(?<!-))+$/i
+                                     end),
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
                                      optional: true,

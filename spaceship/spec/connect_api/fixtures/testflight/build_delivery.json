@@ -1,0 +1,26 @@
+{
+    "data" : {
+      "type" : "buildDeliveries",
+      "id" : "123456789",
+      "attributes" : {
+        "cfBundleVersion" : "225",
+        "cfBundleShortVersionString" : "1.1",
+        "platform" : "IOS",
+        "uploadedDate" : "2019-05-06T20:14:37-07:00"
+      },
+      "relationships" : {
+        "app" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/buildDeliveries/123456789/relationships/app",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/buildDeliveries/123456789/app"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/buildDeliveries/123456789"
+      }
+    },
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/buildDeliveries/123456789"
+    }
+  }
