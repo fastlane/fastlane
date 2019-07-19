@@ -85,22 +85,35 @@ module Fastlane
               next
             end
 
-            begin
-              UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url") if build_number
+            UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url") if build_number
 
-              build_details = app.tunes_build_details(train: train.version_string, build_number: build.build_version, platform: platform)
-              download_url = build_details.dsym_url
-              UI.verbose("dsym_url: #{download_url}")
-            rescue Spaceship::TunesClient::ITunesConnectError => ex
-              UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
+            start = Time.now
+            download_url = nil
+
+            loop do
+              begin
+                build_details = app.tunes_build_details(train: train.version_string, build_number: build.build_version, platform: platform)
+                download_url = build_details.dsym_url
+                UI.verbose("dsym_url: #{download_url}")
+              rescue Spaceship::TunesClient::ITunesConnectError => ex
+                UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
+              end
+
+              unless download_url
+                UI.message("Waiting for dSYM file to appear...")
+                if (Time.now - start) > (60 * 5)
+                  UI.error("Could not find any dSYM for #{build.build_version} (#{train.version_string})")
+                else
+                  sleep(30)
+                  next
+                end
+              end
+
+              break
             end
 
-            if download_url
-              self.download(download_url, app.bundle_id, train.version_string, build.build_version, output_directory)
-              break if build_number
-            else
-              UI.message("No dSYM URL for #{build.build_version} (#{train.version_string})")
-            end
+            self.download(download_url, app.bundle_id, train.version_string, build.build_version, output_directory)
+            break if build_number
           end
         end
 
