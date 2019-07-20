@@ -79,7 +79,7 @@ module Spaceship
       end
 
       def ready_for_beta_submission?
-        raise "No build_beat_detail included" unless build_beta_detail
+        raise "No build_beta_detail included" unless build_beta_detail
         return build_beta_detail.ready_for_beta_submission?
       end
 
