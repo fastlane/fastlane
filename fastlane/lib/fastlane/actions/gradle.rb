@@ -228,7 +228,7 @@ module Fastlane
             }
           )
           ```
-          
+
           If you need to pass sensitive information through the `gradle` action, and don\'t want the generated command to be printed before it is run, you can suppress that:
           ```ruby
           gradle(
