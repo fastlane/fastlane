@@ -53,6 +53,10 @@ module Match
         self.platform = platform if platform
       end
 
+      def prefixed_working_directory
+        return working_directory
+      end
+
       def download
         # Check if we already have a functional working_directory
         return if @working_directory
