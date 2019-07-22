@@ -3419,7 +3419,10 @@ func sonar(projectConfigurationPath: String? = nil,
            sonarRunnerArgs: String? = nil,
            sonarLogin: String? = nil,
            sonarUrl: String? = nil,
-           branchName: String? = nil) {
+           branchName: String? = nil,
+           pullRequestBranchName: String? = nil,
+           pullRequestBase: String? = nil,
+           pullRequestKey: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "sonar", className: nil, args: [RubyCommand.Argument(name: "project_configuration_path", value: projectConfigurationPath),
                                                                                        RubyCommand.Argument(name: "project_key", value: projectKey),
                                                                                        RubyCommand.Argument(name: "project_name", value: projectName),
@@ -3430,7 +3433,10 @@ func sonar(projectConfigurationPath: String? = nil,
                                                                                        RubyCommand.Argument(name: "sonar_runner_args", value: sonarRunnerArgs),
                                                                                        RubyCommand.Argument(name: "sonar_login", value: sonarLogin),
                                                                                        RubyCommand.Argument(name: "sonar_url", value: sonarUrl),
-                                                                                       RubyCommand.Argument(name: "branch_name", value: branchName)])
+                                                                                       RubyCommand.Argument(name: "branch_name", value: branchName),
+                                                                                       RubyCommand.Argument(name: "pull_request_branch", value: pullRequestBranchName),
+                                                                                       RubyCommand.Argument(name: "pull_request_base", value: pullRequestBase),
+                                                                                       RubyCommand.Argument(name: "pull_request_key", value: pullRequestKey)])
   _ = runner.executeCommand(command)
 }
 func spaceshipLogs(latest: Bool = true,
