@@ -7,7 +7,7 @@ module Fastlane
         def discover_crashlytics_path(params)
           path = params[:crashlytics_path]
 
-          # Finding submit binary inside of given Crashlytics path (for backwards compatability)
+          # Finding submit binary inside of given Crashlytics path (for backwards compatibility)
           if path
             if File.basename(path) != "submit"
               path = Dir[File.join(path, '**', 'submit')].last

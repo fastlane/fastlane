@@ -30,7 +30,7 @@ module Fastlane
         Action.sh(command)
       end
 
-      def device_avalaible?(serial)
+      def device_available?(serial)
         load_all_devices
         return devices.map(&:serial).include?(serial)
       end
