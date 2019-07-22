@@ -25,6 +25,7 @@ module Fastlane
         build_number = params[:build_number]
         platform = params[:platform]
         output_directory = params[:output_directory]
+        wait_for_dsym_processing = params[:wait_for_dsym_processing]
         min_version = Gem::Version.new(params[:min_version]) if params[:min_version]
 
         # Set version if it is latest
@@ -100,10 +101,10 @@ module Fastlane
               end
 
               unless download_url
-                UI.message("Waiting for dSYM file to appear...")
-                if (Time.now - start) > (60 * 5)
+                if !wait_for_dsym_processing || (Time.now - start) > (60 * 5)
                   UI.error("Could not find any dSYM for #{build.build_version} (#{train.version_string})")
                 else
+                  UI.message("Waiting for dSYM file to appear...")
                   sleep(30)
                   next
                 end
@@ -241,7 +242,14 @@ module Fastlane
                                        short_option: "-s",
                                        env_name: "DOWNLOAD_DSYMS_OUTPUT_DIRECTORY",
                                        description: "Where to save the download dSYMs, defaults to the current path",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :wait_for_dsym_processing,
+                                       short_option: "-w",
+                                       env_name: "DOWNLOAD_DSYMS_WAIT_FOR_DSYM_PROCESSING",
+                                       description: "Wait for dSYMs to process",
+                                       optional: true,
+                                       default_value: false,
+                                       type: Boolean)
         ]
       end
 
