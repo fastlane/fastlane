@@ -409,7 +409,7 @@ You'll be asked for the new password on all your machines on the next run.
 
 ### Import
 
-To import and encrypt a certificate (`.cer`) and the private key (`.p12`) into the _match_repo run:
+To import and encrypt a certificate (`.cer`) and the private key (`.p12`) into the _match_ repo run:
 
 ```no-highlight
 fastlane match import
