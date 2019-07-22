@@ -78,11 +78,11 @@ module Match
       FileUtils.mkdir_p(output_dir)
       dest_cert_path = File.join(output_dir, "#{matching_cert.id}.cer")
       dest_p12_path = File.join(output_dir, "#{matching_cert.id}.p12")
-      files_to_commit = [dest_cert_path, dest_p12_path]
 
       # Copy files
       IO.copy_stream(cert_path, dest_cert_path)
       IO.copy_stream(p12_path, dest_p12_path)
+      files_to_commit = [dest_cert_path, dest_p12_path]
 
       # Encrypt and commit
       encryption.encrypt_files if encryption

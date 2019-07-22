@@ -31,8 +31,6 @@ describe Match do
 
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
       repo_dir = Dir.mktmpdir
-      keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
-      destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
       fake_storage = "fake_storage"
       expect(Match::Storage::GitStorage).to receive(:configure).with(

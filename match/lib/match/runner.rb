@@ -207,8 +207,8 @@ module Match
       force = params[:force]
 
       if params[:force_for_new_devices] && !params[:readonly]
-        if prov_type != :appstore
-          force = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym) unless params[:force]
+        if prov_type != :appstore && !params[:force]
+          force = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym)
         else
           # App Store provisioning profiles don't contain device identifiers and
           # thus shouldn't be renewed if the device count has changed.
