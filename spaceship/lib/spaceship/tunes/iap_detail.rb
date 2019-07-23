@@ -30,7 +30,7 @@ module Spaceship
       # @return (Bool) Cleared for sale flag
       attr_accessor :cleared_for_sale
 
-      # @return (Hash) app store promotion image (optional) 
+      # @return (Hash) app store promotion image (optional)
       attr_accessor :merch_screenshot
 
       # @return (Hash) app review screenshot (required)
