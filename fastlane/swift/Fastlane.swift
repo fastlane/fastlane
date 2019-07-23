@@ -1406,7 +1406,7 @@ func downloadDsyms(username: String,
   _ = runner.executeCommand(command)
 }
 func downloadFromPlayStore(packageName: String,
-                           metadataPath: String? = nil,
+                           metadataPath: String = "./metadata",
                            key: String? = nil,
                            issuer: String? = nil,
                            jsonKey: String? = nil,
@@ -3498,7 +3498,7 @@ func ssh(username: String,
 func supply(packageName: String,
             track: String = "production",
             rollout: String? = nil,
-            metadataPath: String? = nil,
+            metadataPath: String = "./metadata",
             key: String? = nil,
             issuer: String? = nil,
             jsonKey: String? = nil,
@@ -4034,7 +4034,7 @@ func uploadToAppStore(username: String,
 func uploadToPlayStore(packageName: String,
                        track: String = "production",
                        rollout: String? = nil,
-                       metadataPath: String? = nil,
+                       metadataPath: String = "./metadata",
                        key: String? = nil,
                        issuer: String? = nil,
                        jsonKey: String? = nil,
@@ -4285,7 +4285,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode10.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-10.2.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -4395,4 +4395,4 @@ let screengrabfile: Screengrabfile = Screengrabfile()
 let snapshotfile: Snapshotfile = Snapshotfile()
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.53]
+// FastlaneRunnerAPIVersion [0.9.54]
