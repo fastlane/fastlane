@@ -794,8 +794,8 @@ module Spaceship
     # Uploads an In-App-Purchase Promotional image
     # @param upload_image (UploadFile): The icon to upload
     # @return [JSON] the image data, ready to be added to an In-App-Purchase
-    def upload_purchase_merch(app_id, upload_image)
-      data = du_client.upload_purchase_merch(app_id, upload_image, content_provider_id, sso_token_for_image)
+    def upload_purchase_merch_screenshot(app_id, upload_image)
+      data = du_client.upload_purchase_merch_screenshot(app_id, upload_image, content_provider_id, sso_token_for_image)
       {
         "images" => [
           {
@@ -1333,7 +1333,7 @@ module Spaceship
     end
 
     # Creates an In-App-Purchases
-    def create_iap!(app_id: nil, type: nil, versions: nil, reference_name: nil, product_id: nil, cleared_for_sale: true, merch: nil, review_notes: nil, review_screenshot: nil, pricing_intervals: nil, family_id: nil, subscription_duration: nil, subscription_free_trial: nil)
+    def create_iap!(app_id: nil, type: nil, versions: nil, reference_name: nil, product_id: nil, cleared_for_sale: true, merch_screenshot: nil, review_notes: nil, review_screenshot: nil, pricing_intervals: nil, family_id: nil, subscription_duration: nil, subscription_free_trial: nil)
       # Load IAP Template based on Type
       type ||= "consumable"
       r = request(:get, "ra/apps/#{app_id}/iaps/#{type}/template")
@@ -1377,10 +1377,10 @@ module Spaceship
       data["versions"][0]["details"]["value"] = versions_array
       data['versions'][0]["reviewNotes"] = { value: review_notes }
 
-      if merch
+      if merch_screenshot
         # Upload App Store Promotional image (Optional)
-        upload_file = UploadFile.from_path(merch)
-        merch_data = upload_purchase_merch(app_id, upload_file)
+        upload_file = UploadFile.from_path(merch_screenshot)
+        merch_data = upload_purchase_merch_screenshot(app_id, upload_file)
         data["versions"][0]["merch"] = merch_data
       end
 

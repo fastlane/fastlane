@@ -22,7 +22,7 @@ module Spaceship
       upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: screenshot_picture_type(device, is_messages))
     end
 
-    def upload_purchase_merch(app_id, upload_file, content_provider_id, sso_token_for_image)
+    def upload_purchase_merch_screenshot(app_id, upload_file, content_provider_id, sso_token_for_image)
       upload_file(app_id: app_id, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: 'MZPFT.MerchandisingIAPIcon')
     end
 
