@@ -43,7 +43,7 @@ module Match
         google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
         google_cloud_project_id: params[:google_cloud_project_id].to_s,
         readonly: params[:readonly],
-        username: params[:username],
+        username: params[:readonly] ? nil : params[:username], # only pass username if not readonly
         team_id: params[:team_id],
         team_name: params[:team_name]
       })
