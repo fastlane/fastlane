@@ -72,7 +72,6 @@ task(:generate_device_frames) do
 
   image_assets = []
   devices = Hash.new { |h, k| h[k] = [] }
-  # According to mac_editor.rb, Mac screenshots do not need frames - do we need to process the Computers folder?
   (Dir["raw/Phones/*/Device/*.png"] + Dir["raw/Computers/Apple*/Device/*.png"] + Dir["raw/Tablets/*/Device/*.png"]).each do |current_raw|
     basename = File.basename(current_raw)
     next if should_skip_device?(basename)
@@ -138,6 +137,9 @@ def confirm
 end
 
 def sanitize_filename(filename)
+  # Facebook's device naming is inconsistent:
+  # some Apple devices have "Grey" instead of "Gray" color -> unify
+  # Google Pixel device names are separated from their colors by a dash -> remove
   filename.gsub('Grey', 'Gray').gsub(' - ', ' ')
 end
 
