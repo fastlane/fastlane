@@ -12,7 +12,9 @@ module Sigh
       Spaceship.select_team
       UI.message("Successfully logged in")
 
-      Spaceship.provisioning_profile.all(xcode: download_xcode_profiles).each do |profile|
+      # all ios profiles (including or excluding Xcode Managed Profiles) and mac profiles
+      profiles = Spaceship.provisioning_profile.all(xcode: download_xcode_profiles) + Spaceship.provisioning_profile.all(mac: true)
+      profiles.each do |profile|
         if profile.valid?
           UI.message("Downloading profile '#{profile.name}'...")
           download_profile(profile)
