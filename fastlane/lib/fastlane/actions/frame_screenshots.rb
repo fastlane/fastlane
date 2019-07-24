@@ -45,6 +45,7 @@ module Fastlane
         [
           'frame_screenshots',
           'frameit # alias for "frame_screenshots"',
+          'frame_screenshots(use_platform: "ANDROID")',
           'frame_screenshots(silver: true)',
           'frame_screenshots(path: "/screenshots")',
           'frame_screenshots(rose_gold: true)'

@@ -1,4 +1,4 @@
-require_relative 'module'
+require_relative 'device_types'
 
 module Frameit
   class ConfigParser
@@ -103,12 +103,32 @@ module Frameit
       when 'font_scale_factor'
         UI.user_error!("font_scale_factor must be numeric") unless value.kind_of?(Numeric)
       when 'frame'
-        UI.user_error!("device must be BLACK, WHITE, GOLD, ROSE_GOLD") unless ["BLACK", "WHITE", "GOLD", "ROSE_GOLD"].include?(value)
+        check_frame(value)
+      when 'use_platform'
+        Platform.check_platform(value)
+      when 'force_device_type'
+        Device.check_device(value)
       end
     end
 
     def integer_or_percentage(value)
       value.kind_of?(Integer) || (value.end_with?('%') && value.to_f > 0)
+    end
+
+    def check_frame(value)
+      unless value.nil?
+        color_found = false
+        color_keys = []
+        Color.constants.each do |c|
+          constant = Color.const_get(c).upcase.gsub(' ', '_')
+          if value == constant
+            color_found = true
+            break
+          end
+          color_keys << constant
+        end
+        UI.user_error!("Device must be " + color_keys.join(', ')) unless color_found
+      end
     end
   end
 end

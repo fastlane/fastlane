@@ -18,8 +18,9 @@ module Frameit
     attr_accessor :image # the current image used for editing
     attr_accessor :space_to_device
 
-    def initialize(screenshot, debug_mode = false)
+    def initialize(screenshot, config, debug_mode = false)
       @screenshot = screenshot
+      @config = config
       self.debug_mode = debug_mode
     end
 
@@ -488,16 +489,9 @@ module Frameit
       results
     end
 
-    # Loads the config (colors, background, texts, etc.)
     # Don't use this method to access the actual text and use `fetch_texts` instead
     def fetch_config
-      return @config if @config
-
-      config_path = File.join(File.expand_path("..", screenshot.path), "Framefile.json")
-      config_path = File.join(File.expand_path("../..", screenshot.path), "Framefile.json") unless File.exist?(config_path)
-      file = ConfigParser.new.load(config_path)
-      return {} unless file # no config file at all
-      @config = file.fetch_value(screenshot.path)
+      @config
     end
 
     # Fetches the title + keyword for this particular screenshot
@@ -521,14 +515,13 @@ module Frameit
 
     def fetch_frame_color
       color = fetch_config['frame']
-      if color == "BLACK"
-        return Frameit::Color::BLACK
-      elsif color == "WHITE"
-        return Frameit::Color::SILVER
-      elsif color == "GOLD"
-        return Frameit::Color::GOLD
-      elsif color == "ROSE_GOLD"
-        return Frameit::Color::ROSE_GOLD
+      unless color.nil?
+        Frameit::Color.constants.each do |c|
+          constant = Frameit::Color.const_get(c)
+          if color == constant.upcase.gsub(' ', '_')
+            return constant
+          end
+        end
       end
 
       return nil
