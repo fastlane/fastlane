@@ -86,7 +86,6 @@ module Fastlane
           containing = File.join(File.expand_path("~/Library"), "CrashlyticsAndroid")
           zip_path = File.join(containing, "crashlytics-devtools.zip")
           jar_path = File.join(containing, "crashlytics-devtools.jar")
-          return jar_path if File.exist?(jar_path)
 
           url = "https://ssl-download-crashlytics-com.s3.amazonaws.com/android/ant/crashlytics.zip"
           require 'net/http'
@@ -94,19 +93,26 @@ module Fastlane
           FileUtils.mkdir_p(containing)
 
           begin
-            UI.important("Downloading Crashlytics Support Library - this might take a minute...")
-
             # Work around ruby defect, where HTTP#get_response and HTTP#post_form don't use ENV proxy settings
             # https://bugs.ruby-lang.org/issues/12724
             uri = URI(url)
             http_conn = Net::HTTP.new(uri.host, uri.port)
             http_conn.use_ssl = true
+            result = http_conn.request_head(uri.path)
+
+            # ETag is returned with quotes, which net/http does not handle. Clean that up
+            etag = result['ETag'] && result['ETag'].tr('"', '')
+
+            # This is a no-op if the current version on disk matches the file on S3
+            return jar_path if File.exist?(zip_path) && etag == Digest::MD5.file(zip_path).hexdigest
+
+            UI.important("Downloading Crashlytics Support Library - this might take a minute...")
             result = http_conn.request_get(uri.path)
             UI.error!("#{result.message} (#{result.code})") unless result.kind_of?(Net::HTTPSuccess)
             File.write(zip_path, result.body)
 
             # Now unzip the file
-            Action.sh("unzip '#{zip_path}' -d '#{containing}'")
+            Action.sh("unzip -o '#{zip_path}' -d '#{containing}'")
 
             UI.user_error!("Couldn't find 'crashlytics-devtools.jar'") unless File.exist?(jar_path)
 
