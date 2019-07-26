@@ -96,7 +96,7 @@ module Frameit
     # iPad Pro (12.9-inch) (3rd generation) is not in frameit-frames repo, but must be included so that we are backward compatible with PR #14787
     # priority must be lower than IPAD_PRO so that users who didn't copy the frame to their frameit frames folder will not get an error
     # ID and formatted name must be exactly as specified so that device.detect_device() will select this device if the filename includes them
-    IPAD_PRO_12_9 = Frameit::Device.new("ipadPro129", "iPad Pro (12.9-inch) (3rd generation)", 2, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO_12_9)
+    IPAD_PRO_12_9 = Frameit::Device.new("ipadPro129", "Apple iPad Pro (12.9-inch) (3rd generation)", 2, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO_12_9)
     MAC = Frameit::Device.new("mac", "Apple MacBook", 0, [[1280, 800], [1440, 900], [2560, 1600], [2880, 1800]], nil, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::MAC)
   end
 end

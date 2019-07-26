@@ -52,7 +52,7 @@ module Frameit
         device = Devices.const_get(c)
         next unless device.resolutions.include?(size)
         # assign to filename_device if the filename contains the formatted name / id and its priority is higher than the current filename_device
-        filename_device = device if (filename.include?(device.formatted_name) || filename.include?(device.id)) && (filename_device.nil? || filename_device.priority < device.priority)
+        filename_device = device if (filename.include?(device.formatted_name_without_apple) || filename.include?(device.id)) && (filename_device.nil? || filename_device.priority < device.priority)
         next unless device.is_chosen_platform?(platform) && (found_device.nil? || device.priority > found_device.priority)
         found_device = device
       end
