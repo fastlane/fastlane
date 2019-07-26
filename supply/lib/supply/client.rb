@@ -1,6 +1,6 @@
 require 'googleauth'
 require 'google/apis/androidpublisher_v3'
-Androidpublisher = Google::Apis::AndroidpublisherV3
+AndroidPublisher = Google::Apis::AndroidpublisherV3
 
 require 'net/http'
 
@@ -96,8 +96,8 @@ module Supply
   end
 
   class Client < AbstractGoogleServiceClient
-    SERVICE = Androidpublisher::AndroidPublisherService
-    SCOPE = Androidpublisher::AUTH_ANDROIDPUBLISHER
+    SERVICE = AndroidPublisher::AndroidPublisherService
+    SCOPE = AndroidPublisher::AUTH_ANDROIDPUBLISHER
 
     # Editing something
     # Reference to the entry we're currently editing. Might be nil if don't have one open
@@ -219,13 +219,6 @@ module Supply
       return Array(result.bundles).map(&:version_code)
     end
 
-    def aab_listings
-      ensure_active_edit!
-
-      UI.message("Testing gemfile with git repo")
-
-    end
-
     # Get a list of all apk listings (changelogs) - returns the list
     def apk_listings(apk_version_code)
       ensure_active_edit!
@@ -251,7 +244,7 @@ module Supply
     def update_listing_for_language(language: nil, title: nil, short_description: nil, full_description: nil, video: nil)
       ensure_active_edit!
 
-      listing = Androidpublisher::Listing.new({
+      listing = AndroidPublisher::Listing.new({
         language: language,
         title: title,
         full_description: full_description,
@@ -313,6 +306,20 @@ module Supply
       return result_upload.version_code
     end
 
+    # Get a list of all tracks - returns the list
+    # Available values for tracknames = ["production", "rollout", "beta", "alpha", "internal"]
+    def tracks(*tracknames)
+      ensure_active_edit!
+
+      all_tracks = call_google_api { client.list_edit_tracks(current_package_name, current_edit.id) }.tracks
+      
+      if tracknames.length > 1
+        all_tracks = all_tracks.select { |track| tracknames.include?(track.track) }
+      end
+
+      return all_tracks
+    end
+
     # Updates the track for the provided version code(s)
     def update_track(track, rollout, apk_version_code)
       ensure_active_edit!
@@ -324,7 +331,7 @@ module Supply
       # https://github.com/fastlane/fastlane/issues/12372
       rollout = nil unless track == "rollout"
 
-      track_body = Androidpublisher::Track.new({
+      track_body = AndroidPublisher::Track.new({
         track: track,
         user_fraction: rollout,
         version_codes: track_version_codes
@@ -360,7 +367,7 @@ module Supply
     def update_apk_listing_for_language(apk_listing)
       ensure_active_edit!
 
-      apk_listing_object = Androidpublisher::ApkListing.new({
+      apk_listing_object = AndroidPublisher::ApkListing.new({
         language: apk_listing.language,
         recent_changes: apk_listing.recent_changes
       })
