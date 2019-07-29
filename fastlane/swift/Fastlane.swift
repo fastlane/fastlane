@@ -913,7 +913,7 @@ func cert(development: Bool = false,
                                                                                       RubyCommand.Argument(name: "platform", value: platform)])
   _ = runner.executeCommand(command)
 }
-@discardableResult func changelogFromGitCommits(between: String? = nil,
+@discardableResult func changelogFromGitCommits(between: [String]? = nil,
                                                 commitsCount: Int? = nil,
                                                 path: String = "./",
                                                 pretty: String = "%B",
