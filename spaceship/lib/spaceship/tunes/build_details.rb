@@ -135,7 +135,7 @@ module Spaceship
       attr_accessor :uses_location_background_mode
 
       # @return (String) Link to the dSYM file (not always available)
-      #
+      # @example build/***.****.*****.*****-1.0.0-2647.dSYM.zip
       attr_accessor :dsym_url
 
       # @return (Boolean) Watch-Only App
