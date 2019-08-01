@@ -11,7 +11,7 @@ module Frameit
       return nil if screenshot.mac?
 
       filename = create_file_name(screenshot.device_name, screenshot.color.nil? ? screenshot.default_color : screenshot.color)
-      templates = Dir["#{FrameDownloader.templates_path}/#{filename}.{png,jpg}"] # ~/.frameit_android folder
+      templates = Dir["#{FrameDownloader.templates_path}/#{filename}.{png,jpg}"] # ~/.frameit folder
 
       UI.verbose("Looking for #{filename} and found #{templates.count} template(s)")
 
@@ -19,7 +19,7 @@ module Frameit
       if templates.count == 0 && !screenshot.color.nil? && screenshot.color != screenshot.default_color
         filename = create_file_name(screenshot.device_name, screenshot.default_color)
         UI.important("Unfortunately device type '#{screenshot.device_name}' is not available in #{screenshot.color}, falling back to " + (screenshot.default_color.nil? ? "default" : screenshot.default_color) + "...")
-        templates = Dir["#{FrameDownloader.templates_path}/#{filename}.{png,jpg}"] # ~/.frameit_android folder
+        templates = Dir["#{FrameDownloader.templates_path}/#{filename}.{png,jpg}"] # ~/.frameit folder
         UI.verbose("Looking for #{filename} and found #{templates.count} template(s)")
       end
 
