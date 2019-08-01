@@ -103,11 +103,11 @@ module Frameit
       when 'font_scale_factor'
         UI.user_error!("font_scale_factor must be numeric") unless value.kind_of?(Numeric)
       when 'frame'
-        UI.user_error!("Device color must be one of " + Color.all_colors.join(', ')) unless supported_color?(value)
+        UI.user_error!("Invalid frame color '#{value}'. Frame color must be one of " + Color.all_colors.join(', ')) unless ConfigParser.supported_color?(value)
       when 'use_platform'
-        Platform.check_platform(value)
+        UI.user_error!("Invalid platform type '#{value}'. Available values are " + Platform.all_platforms.join(', ') + ".") unless ConfigParser.supported_platform?(value)
       when 'force_device_type'
-        Device.check_device(value)
+        UI.user_error!("Invalid device type '#{value}'. Available values: " + Devices.all_device_names_without_apple.join(', ')) unless ConfigParser.supported_device?(value)
       end
     end
 
@@ -115,9 +115,18 @@ module Frameit
       value.kind_of?(Integer) || (value.end_with?('%') && value.to_f > 0)
     end
 
-    def supported_color?(value)
+    def self.supported_color?(value)
       return false if value.nil?
       Color.all_colors.any? { |c| c == value }
+    end
+
+    def self.supported_platform?(value)
+      return false if value.nil?
+      Platform.all_platforms.any? { |c| c == value }
+    end
+
+    def self.supported_device?(value)
+      return !Device.find_device_by_id_or_name(value).nil?
     end
   end
 end

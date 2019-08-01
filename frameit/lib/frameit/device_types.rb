@@ -31,7 +31,7 @@ module Frameit
     GREEN = "Green"
     PINK = "Pink"
 
-    def all_colors
+    def self.all_colors
       Color.constants.map { |c| Color.const_get(c).upcase.gsub(' ', '_') }
     end
   end
@@ -46,18 +46,8 @@ module Frameit
     IOS = "IOS"
     ANY = "ANY"
 
-    def self.check_platform(value)
-      platform_found = false
-      Platform.constants.each do |c|
-        if Platform.const_get(c) == value
-          platform_found = true
-          break
-        end
-      end
-
-      unless platform_found
-        UI.user_error!("Invalid platform type '#{value}'. Available values are IOS, ANDROID or ANY.")
-      end
+    def self.all_platforms
+      Platform.constants.map { |c| Platform.const_get(c) }
     end
   end
 
@@ -102,5 +92,9 @@ module Frameit
     # ID and formatted name must be exactly as specified so that device.detect_device() will select this device if the filename includes them
     IPAD_PRO_12_9 = Frameit::Device.new("ipadPro129", "Apple iPad Pro (12.9-inch) (3rd generation)", 2, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO_12_9)
     MAC = Frameit::Device.new("mac", "Apple MacBook", 0, [[1280, 800], [1440, 900], [2560, 1600], [2880, 1800]], nil, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::MAC)
+
+    def self.all_device_names_without_apple
+      Devices.constants.map { |c| Devices.const_get(c).formatted_name_without_apple }
+    end
   end
 end

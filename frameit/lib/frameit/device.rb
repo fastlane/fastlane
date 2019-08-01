@@ -86,16 +86,5 @@ module Frameit
       end
       return found_device
     end
-
-    def self.check_device(value)
-      if Device.find_device_by_id_or_name(value).nil?
-        available = []
-        Devices.constants.each do |c|
-          device = Devices.const_get(c)
-          available << device.formatted_name_without_apple
-        end
-        UI.user_error!("Invalid device type '#{value}'. Available values: " + available.join(', '))
-      end
-    end
   end
 end

@@ -1,6 +1,8 @@
 require 'fastlane_core/configuration/config_item'
 
 require_relative 'module'
+require_relative 'config_parser'
+require_relative 'device_types'
 
 module Frameit
   class Options
@@ -32,7 +34,7 @@ module Frameit
                                        description: "Forces a given device type, useful for Mac screenshots, as their sizes vary",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         Device.check_device(value)
+                                         UI.user_error!("Invalid device type '#{value}'. Available values: " + Devices.all_device_names_without_apple.join(', ')) unless ConfigParser.supported_device?(value)
                                        end),
         FastlaneCore::ConfigItem.new(key: :use_legacy_iphone5s,
                                        env_name: "FRAMEIT_USE_LEGACY_IPHONE_5_S",
@@ -84,7 +86,7 @@ module Frameit
                                        optional: true,
                                        default_value: Platform::IOS,
                                        verify_block: proc do |value|
-                                         Platform.check_platform(value)
+                                         UI.user_error!("Invalid platform type '#{value}'. Available values are " + Platform.all_platforms.join(', ') + ".") unless ConfigParser.supported_platform?(value)
                                        end)
       ]
     end
