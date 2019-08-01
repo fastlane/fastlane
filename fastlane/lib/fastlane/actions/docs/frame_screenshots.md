@@ -26,7 +26,7 @@ _frameit_ allows you to put a gorgeous device frame around your iOS, macOS and A
 Put a gorgeous device frame around your iOS, macOS and Android screenshots just by running one simple command. Support for:
 
 - iPhone, iPad and Mac
-- Select Android devices
+- Set of Android devices
 - Portrait and Landscape modes
 - Several device frame colors
 
