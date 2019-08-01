@@ -3,6 +3,8 @@ require_relative 'module'
 
 module Frameit
   class Device
+    REQUIRED_PRIORITY = 999
+
     attr_reader :id
     attr_reader :deliver_screen_id
     attr_reader :formatted_name
@@ -13,6 +15,7 @@ module Frameit
     attr_reader :priority_config_key
 
     def initialize(id, formatted_name, priority, resolutions, density_ppi, default_color, platform = Platform::IOS, deliver_screen_id = nil, priority_config_key = nil)
+      Raise "Priority mustn't be higher than #{REQUIRED_PRIORITY}" if priority > REQUIRED_PRIORITY
       @id = id
       @deliver_screen_id = deliver_screen_id
       @formatted_name = formatted_name
@@ -26,7 +29,7 @@ module Frameit
 
     def priority
       if !priority_config_key.nil? && Frameit.config[priority_config_key]
-        999
+        REQUIRED_PRIORITY
       else
         @priority
       end
