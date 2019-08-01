@@ -61,14 +61,10 @@ module Frameit
       end
 
       # prefer filename
-      unless filename_device.nil?
-        return filename_device
-      end
+      return filename_device if filename_device
 
       # return found_device which was detected according to platform & priority & settings if found
-      unless found_device.nil?
-        return found_device
-      end
+      return found_device if found_device
 
       # no device detected - show error and return nil
       UI.user_error!("Unsupported screen size #{size} for path '#{path}'")
