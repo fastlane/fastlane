@@ -30,6 +30,10 @@ module Frameit
     YELLOW = "Yellow"
     GREEN = "Green"
     PINK = "Pink"
+
+    def all_colors
+      Color.constants.map { |c| Color.const_get(c).upcase.gsub(' ', '_') }
+    end
   end
 
   module Orientation
