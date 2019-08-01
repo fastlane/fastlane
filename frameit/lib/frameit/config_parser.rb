@@ -79,13 +79,7 @@ module Frameit
       when 'font'
         UI.user_error!("Could not find font at path '#{File.expand_path(value)}'") unless File.exist?(value)
       when 'fonts'
-        UI.user_error!("`fonts` must be an array") unless value.kind_of?(Array)
-
-        value.each do |current|
-          UI.user_error!("You must specify a font path") if current.fetch('font', '').length == 0
-          UI.user_error!("Could not find font at path '#{File.expand_path(current.fetch('font'))}'") unless File.exist?(current.fetch('font'))
-          UI.user_error!("`supported` must be an array") unless current.fetch('supported', []).kind_of?(Array)
-        end
+        check_fonts(value)
       when 'background'
         UI.user_error!("Could not find background image at path '#{File.expand_path(value)}'") unless File.exist?(value)
       when 'color'
@@ -108,6 +102,16 @@ module Frameit
         UI.user_error!("Invalid platform type '#{value}'. Available values are " + Platform.all_platforms.join(', ') + ".") unless ConfigParser.supported_platform?(value)
       when 'force_device_type'
         UI.user_error!("Invalid device type '#{value}'. Available values: " + Devices.all_device_names_without_apple.join(', ')) unless ConfigParser.supported_device?(value)
+      end
+    end
+
+    def check_fonts(value)
+      UI.user_error!("`fonts` must be an array") unless value.kind_of?(Array)
+
+      value.each do |current|
+        UI.user_error!("You must specify a font path") if current.fetch('font', '').length == 0
+        UI.user_error!("Could not find font at path '#{File.expand_path(current.fetch('font'))}'") unless File.exist?(current.fetch('font'))
+        UI.user_error!("`supported` must be an array") unless current.fetch('supported', []).kind_of?(Array)
       end
     end
 
