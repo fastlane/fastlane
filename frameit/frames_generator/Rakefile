@@ -91,6 +91,7 @@ task(:generate_device_frames) do
 
   raise "Could not find any images, make sure to copy all extracted files into ./raw" if image_assets.count < 10
 
+  image_assets = image_assets.sort
   File.write(File.join(output, "files.json"), image_assets.to_json)
   puts("Wrote names of available files to files.json")
 
@@ -102,6 +103,7 @@ task(:generate_device_frames) do
   devices.each do |device, models|
     offsets[device] = { offset: "+#{models[0][:x]}+#{models[0][:y]}", width: models[0][:width] }
   end
+  offsets = offsets.sort
   File.write(File.join(output, "offsets.json"), JSON.pretty_generate({ 'portrait' => offsets }))
   puts("Wrote the slot offsets to offsets.json")
 
