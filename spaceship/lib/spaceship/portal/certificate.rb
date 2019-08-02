@@ -89,6 +89,9 @@ module Spaceship
       # Certs are not associated with apps
       #####################################################
 
+      # An Apple development code signing certificate used for development environment
+      class AppleDevelopment < Certificate; end
+
       # A development code signing certificate used for development environment
       class Development < Certificate; end
 
@@ -152,6 +155,10 @@ module Spaceship
       # A Mac push notification certificate for production environment
       class MacProductionPush < PushCertificate; end
 
+      APPLE_CERTIFICATE_TYPE_IDS = {
+        "83Q87W3TGH" => AppleDevelopment
+      }
+
       IOS_CERTIFICATE_TYPE_IDS = {
         "5QPB9NHCEI" => Development,
         "R58UK2EWSO" => Production,
@@ -187,7 +194,9 @@ module Spaceship
         "DIVN2GW3XT" => DeveloperIdApplication
       }
 
-      CERTIFICATE_TYPE_IDS = IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)
+      CERTIFICATE_TYPE_IDS = APPLE_CERTIFICATE_TYPE_IDS
+                             .merge(IOS_CERTIFICATE_TYPE_IDS)
+                             .merge(MAC_CERTIFICATE_TYPE_IDS)
 
       # Class methods
       class << self
@@ -258,7 +267,7 @@ module Spaceship
         #  only include certificates matching the current type.
         def all(mac: false)
           if self == Certificate # are we the base-class?
-            type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
+            type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : APPLE_CERTIFICATE_TYPE_IDS.merge(IOS_CERTIFICATE_TYPE_IDS)
             types = type_ids.keys
             types += OLDER_IOS_CERTIFICATE_TYPES unless mac
           else
