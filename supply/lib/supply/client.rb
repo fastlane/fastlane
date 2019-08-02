@@ -176,7 +176,7 @@ module Supply
     def listings
       ensure_active_edit!
 
-      result = call_google_api { client.list_listings(current_package_name, current_edit.id) }
+      result = call_google_api { client.list_edit_listings(current_package_name, current_edit.id) }
 
       return result.listings.map do |row|
         Listing.new(self, row.language, row)
@@ -408,7 +408,7 @@ module Supply
       ensure_active_edit!
 
       result = call_google_api do
-        client.list_images(
+        client.list_edit_images(
           current_package_name,
           current_edit.id,
           language,
