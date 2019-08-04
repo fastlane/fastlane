@@ -274,6 +274,10 @@ module Supply
       end
     end
 
+    def latest_version
+      return tracks.select { |t| t.track == 'production' }.map(&:releases).flatten.max_by { |r| r.name }
+    end
+
     #####################################################
     # @!group Modifying data
     #####################################################

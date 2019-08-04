@@ -17,6 +17,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :version_name,
                                      env_name: "SUPPLY_VERSION",
                                      short_option: "-n",
+                                     optional: true,
                                      description: "Version name",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:version_name),

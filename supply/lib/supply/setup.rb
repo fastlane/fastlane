@@ -15,6 +15,10 @@ module Supply
         download_images(listing)
       end
 
+      if Supply.config[:version_name].nil?
+        Supply.config[:version_name] = client.latest_version.name
+      end
+      
       client.release_listings(Supply.config[:version_name]).each do |release_listing|
         store_release_listing(release_listing)
       end
