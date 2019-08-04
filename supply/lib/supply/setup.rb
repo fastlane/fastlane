@@ -100,7 +100,6 @@ module Supply
       end
 
       path = File.join(containing, "#{release_listing.version}.txt")
-      path = File.join(containing, "<version_number>.txt")
       UI.message("Writing to #{path}...")
       File.write(path, release_listing.release_notes)
     end
