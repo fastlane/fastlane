@@ -66,16 +66,6 @@ module Supply
 
           image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
           urls.each do |url|
-            url_params = url.match("=.*")
-            if !url_params.nil? && url_params.length == 1
-              UI.verbose("Initial URL received: '#{url}'")
-              url = url.gsub(url_params.to_s, "") # Remove everything after '=' (if present). This ensures webp is converted to png/jpg (https://www.howtogeek.com/325864/how-to-save-googles-webp-images-as-jpeg-or-png/)
-              UI.verbose("Removed params ('#{url_params}') from the URL")
-              UI.verbose("URL after removing params: '#{url}'")
-            end
-
-            url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
-
             if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
               file_path = "#{path}.#{FastImage.type(url)}"
             else # SCREENSHOT_TYPES go under their respective folders.
