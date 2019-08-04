@@ -5,6 +5,7 @@
   | :----      |:------------ |
   | Issue      | https://github.com/fastlane/fastlane/issues/14573  |
   | V3 API Documentation        | https://developers.google.com/android-publisher/api-ref/edits   |
+  | Local path        | ~/.rbenv/versions/2.5.1/lib/ruby/gems/2.5.0/gems/google-api-client-0.23.7/generated/google/apis/androidpublisher_v3/   |
 
 <br> 
 
