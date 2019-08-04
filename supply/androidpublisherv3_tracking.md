@@ -19,4 +19,4 @@
   | Merged latest from master branch | https://tinyurl.com/yxjaof7e  | Aug 3, 2019 |
   | Part 1: Fetching release listings for given version number | https://tinyurl.com/yxps9cpm  | Aug 4, 2019 |
   | Part 1.1: Added track to ReleaseListing | https://tinyurl.com/y3wmubup  | Aug 4, 2019 |
-  | Part 1.2: Properly setting version  number | https://tinyurl.com/yx9gy27m | Aug 4, 2019 |
+  | Part 1.2: Properly setting version  number | https://tinyurl.com/y5whn2es | Aug 4, 2019 |
