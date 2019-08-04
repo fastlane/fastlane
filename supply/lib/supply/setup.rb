@@ -20,7 +20,7 @@ module Supply
       end
 
       client.abort_current_edit
-binding.pry
+      
       UI.success("✅  Successfully stored metadata in '#{metadata_path}'")
     end
 
