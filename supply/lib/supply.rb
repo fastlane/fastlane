@@ -3,6 +3,7 @@ require 'supply/options'
 require 'supply/client'
 require 'supply/listing'
 require 'supply/apk_listing'
+require 'supply/release_listing'
 require 'supply/uploader'
 require 'supply/languages'
 
