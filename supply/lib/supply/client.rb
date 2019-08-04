@@ -259,7 +259,7 @@ module Supply
       end
 
       return filtered_release.release_notes.map do |row|
-        Supply::ReleaseListing.new(filtered_track, filtered_release, filtered_release.version_codes, row.language, row.text)
+        Supply::ReleaseListing.new(filtered_track, filtered_release.name, filtered_release.version_codes, row.language, row.text)
       end
     end
 
