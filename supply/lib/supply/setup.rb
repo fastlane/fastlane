@@ -12,14 +12,11 @@ module Supply
 
       client.listings.each do |listing|
         store_metadata(listing)
-        binding.pry
         download_images(listing)
       end
-binding.pry
-      client.apks_version_codes.each do |apk_version_code|
-        client.apk_listings(apk_version_code).each do |apk_listing|
-          store_apk_listing(apk_listing)
-        end
+
+      client.release_listings(Supply.config[:version]).each do |release_listing|
+        store_listing(release_listing)
       end
 
       client.abort_current_edit
@@ -94,17 +91,18 @@ binding.pry
       end
     end
 
-    def store_apk_listing(apk_listing)
-      UI.message("🔨  Downloading changelogs (#{apk_listing.language}, #{apk_listing.apk_version_code})")
+    def store_listing(release_listing)
+      UI.message("🔨  Downloading changelogs (#{release_listing.language}, #{release_listing.version})")
 
-      containing = File.join(metadata_path, apk_listing.language, CHANGELOGS_FOLDER_NAME)
+      containing = File.join(metadata_path, release_listing.language, CHANGELOGS_FOLDER_NAME)
       unless File.exist?(containing)
         FileUtils.mkdir_p(containing)
       end
 
-      path = File.join(containing, "#{apk_listing.apk_version_code}.txt")
+      path = File.join(containing, "#{release_listing.version}.txt")
+      path = File.join(containing, "<version_number>.txt")
       UI.message("Writing to #{path}...")
-      File.write(path, apk_listing.recent_changes)
+      File.write(path, release_listing.release_notes)
     end
 
     private
