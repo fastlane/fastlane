@@ -13,7 +13,6 @@ module Supply
       client.listings.each do |listing|
         store_metadata(listing)
         binding.pry
-        create_screenshots_folder(listing)
         download_images(listing)
       end
 binding.pry
@@ -44,43 +43,55 @@ binding.pry
     def download_images(listing)
       UI.message("🖼️  Downloading images (#{listing.language})")
 
-      # We cannot download existing screenshots as they are compressed
-      # But we can at least download the images
       require 'net/http'
 
-      IMAGES_TYPES.each do |image_type|
-        if ['featureGraphic'].include?(image_type)
-          # we don't get all files in full resolution :(
-          UI.message("📵  Due to a limitation of the Google Play API, there is no way for `supply` to download your existing feature graphic. Please copy your feature graphic to `metadata/android/#{listing.language}/images/featureGraphic.png`")
-          next
-        end
+      allowed_imagetypes = [Supply::IMAGES_TYPES, Supply::SCREENSHOT_TYPES].flatten
 
+      allowed_imagetypes.each do |image_type|
         begin
+          path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type)
+
+          p = Pathname.new(path)
+          if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
+            FileUtils.mkdir_p(p.dirname.to_s)
+          else # SCREENSHOT_TYPES go under their respective folders.
+            FileUtils.mkdir_p(p.to_s)
+          end
+
           UI.message("Downloading `#{image_type}` for #{listing.language}...")
 
-          url = client.fetch_images(image_type: image_type, language: listing.language).last
-          next unless url
+          urls = client.fetch_images(image_type: image_type, language: listing.language)
+          next if urls.nil? || urls.empty?
 
-          path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.png")
-          File.write(path, Net::HTTP.get(URI.parse(url)))
+          image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
+          urls.each do |url|
+            url_params = url.match("=.*")
+            if !url_params.nil? && url_params.length == 1
+              UI.verbose("Initial URL received: '#{url}'")
+              url = url.gsub(url_params.to_s, "") # Remove everything after '=' (if present). This ensures webp is converted to png/jpg (https://www.howtogeek.com/325864/how-to-save-googles-webp-images-as-jpeg-or-png/)
+              UI.verbose("Removed params ('#{url_params}') from the URL")
+              UI.verbose("URL after removing params: '#{url}'")
+            end
+
+            url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
+
+            if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
+              file_path = "#{path}.#{FastImage.type(url)}"
+            else # SCREENSHOT_TYPES go under their respective folders.
+              file_path = "#{path}/#{image_counter}_#{listing.language}.#{FastImage.type(url)}"
+            end
+
+            File.binwrite(file_path, Net::HTTP.get(URI.parse(url)))
+
+            UI.message("\tDownloaded - #{file_path}")
+
+            image_counter += 1
+          end
         rescue => ex
           UI.error(ex.to_s)
           UI.error("Error downloading '#{image_type}' for #{listing.language}...")
         end
       end
-    end
-
-    def create_screenshots_folder(listing)
-      UI.message("📱  Downloading screenshots (#{listing.language})")
-
-      containing = File.join(metadata_path, listing.language)
-
-      FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME))
-      Supply::SCREENSHOT_TYPES.each do |screenshot_type|
-        FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME, screenshot_type))
-      end
-
-      UI.message("📵  Due to a limitation of the Google Play API, there is no way for `supply` to download your existing screenshots. Please copy your screenshots into `metadata/android/#{listing.language}/images/`")
     end
 
     def store_apk_listing(apk_listing)
