@@ -1,5 +1,9 @@
 # Fastlane - AndroidPublisher V3 Migration
 
+* [Links](#links)
+* [History](#history)
+* [Notes](#notes)
+
 ## Links
   | Key    | Value        |
   | :----      |:------------ |
@@ -23,3 +27,13 @@
   | Part 2: Supply/setup/store_metadata downloading successfully | https://tinyurl.com/y42zkgk9 | Aug 4, 2019 |
   | Part 2.1: Downloading full size screenshots | https://tinyurl.com/yxoqg9nn | Aug 4, 2019 |
   | Part 2.2: Writing changelogs | https://tinyurl.com/y33ky4us | Aug 4, 2019 |
+
+<br>
+
+## Notes
+
+  * Have to pass version flag when running `supply init`
+    * https://github.com/scorpion35/fastlane/commit/b873f8bedbf53f9002b2a696bbe16dcf56bc61e2#commitcomment-34563014
+    * https://github.com/scorpion35/fastlane/blob/69522c83403095877d5f45d0b413dc44783b7e5a/supply/lib/supply/setup.rb#L18
+  
+  
