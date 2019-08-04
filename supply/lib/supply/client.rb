@@ -1,3 +1,4 @@
+require 'pry'
 require 'googleauth'
 require 'google/apis/androidpublisher_v3'
 AndroidPublisher = Google::Apis::AndroidpublisherV3
@@ -238,28 +239,38 @@ module Supply
 
     def release_listings(version)
       ensure_active_edit!
-  
-      filtered_track = nil
-      filtered_release = nil
 
-      tracks.each do |track|
-        next if track.releases.nil? # 'rollout' track returned by AndroidPublisherV3 doesn't have 'releases'.
-        track.releases.each do |release|
-          if release.name == version
-            filtered_track = track.track
-            filtered_release = release
-            break
-          end
+      # 'rollout' track returned by AndroidPublisherV3 doesn't have 'releases'.
+      filtered_tracks = tracks.select { |t| !t.releases.nil? && t.releases.any? { |r| r.name == Supply.config[:version_name] } }
+      
+      if filtered_tracks.length > 1
+        # Production track takes precedence if version is present in multiple tracks
+        # E.g.: A release might've been promoted from Alpha/Beta track. This means the release will be present in two or more tracks
+        if filtered_tracks.any? { |t| t.track == 'production' }
+          filtered_tracks = filtered_tracks.select { |t| t.track == 'production' }
+        else
+          # E.g.: A release might be in both Alpha & Beta (not sure if this is possible, just catching if it ever happens), giving Beta precedence.
+          filtered_tracks = filtered_tracks.select { |t| t.track == 'beta' }
         end
       end
-  
-      if filtered_release.nil?
-        UI.user_error!("Unable to find version '#{version}' for '#{current_package_name}'. Please double check the version number.")
+
+      if filtered_tracks.length == 0
+        UI.user_error!("Unable to find version '#{version}' for '#{current_package_name}' in all tracks. Please double check the version number.")
+        return nil
+      else
+        UI.message("Found '#{version}' in '#{filtered_tracks[0].track}' track.")
+      end
+
+      filtered_release = filtered_tracks.map(&:releases).flatten.select { |r| r.name == version }[0]
+
+      # Since we can release on Alpha/Beta without release notes.
+      if filtered_release.release_notes.nil?
+        UI.user_error!("Version '#{version}' for '#{current_package_name}' does not seem to have any release notes. Nothing to download.")
         return nil
       end
 
       return filtered_release.release_notes.map do |row|
-        Supply::ReleaseListing.new(filtered_track, filtered_release.name, filtered_release.version_codes, row.language, row.text)
+        Supply::ReleaseListing.new(filtered_tracks[0], filtered_release.name, filtered_release.version_codes, row.language, row.text)
       end
     end
 

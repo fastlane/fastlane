@@ -15,12 +15,12 @@ module Supply
         download_images(listing)
       end
 
-      client.release_listings(Supply.config[:version]).each do |release_listing|
+      client.release_listings(Supply.config[:version_name]).each do |release_listing|
         store_release_listing(release_listing)
       end
 
       client.abort_current_edit
-      
+
       UI.success("✅  Successfully stored metadata in '#{metadata_path}'")
     end
 
