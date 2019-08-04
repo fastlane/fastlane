@@ -1,7 +1,7 @@
 module Supply
   class Setup
     def perform_download
-      UI.message("🕗  Downloading metadata, images, screenshots...")
+      UI.message("🕗  Downloading metadata, images, screenshots ...")
 
       if File.exist?(metadata_path)
         UI.important("Metadata already exists at path '#{metadata_path}'")
@@ -12,10 +12,11 @@ module Supply
 
       client.listings.each do |listing|
         store_metadata(listing)
+        binding.pry
         create_screenshots_folder(listing)
         download_images(listing)
       end
-
+binding.pry
       client.apks_version_codes.each do |apk_version_code|
         client.apk_listings(apk_version_code).each do |apk_listing|
           store_apk_listing(apk_listing)
