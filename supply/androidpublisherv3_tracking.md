@@ -17,4 +17,4 @@
   | Minor bug fix | https://tinyurl.com/y2nvf44a  | Aug 2, 2019 |
   | Updated methods for listing and images | https://tinyurl.com/yxjaof7e  | Aug 2, 2019 |
   | Merged latest from master branch | https://tinyurl.com/yxjaof7e  | Aug 3, 2019 |
-
+  | Part 1: Fetching release listings for given version number | https://tinyurl.com/yxps9cpm  | Aug 4, 2019 |
