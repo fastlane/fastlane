@@ -16,11 +16,11 @@ module Supply
       end
 
       client.release_listings(Supply.config[:version]).each do |release_listing|
-        store_listing(release_listing)
+        store_release_listing(release_listing)
       end
 
       client.abort_current_edit
-
+binding.pry
       UI.success("✅  Successfully stored metadata in '#{metadata_path}'")
     end
 
@@ -91,7 +91,7 @@ module Supply
       end
     end
 
-    def store_listing(release_listing)
+    def store_release_listing(release_listing)
       UI.message("🔨  Downloading changelogs (#{release_listing.language}, #{release_listing.version})")
 
       containing = File.join(metadata_path, release_listing.language, CHANGELOGS_FOLDER_NAME)
