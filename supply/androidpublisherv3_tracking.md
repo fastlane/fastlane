@@ -27,7 +27,7 @@
   | Part 2: Supply/setup/store_metadata downloading successfully | https://tinyurl.com/y42zkgk9 | Aug 4, 2019 |
   | Part 2.1: Downloading full size screenshots | https://tinyurl.com/yxoqg9nn | Aug 4, 2019 |
   | Part 2.2: Writing changelogs | https://tinyurl.com/y33ky4us | Aug 4, 2019 |
-  | Part 3: Added new flag (-n) to specify version number when running fastlane supply init | <ul><li>https://tinyurl.com/y53tmlct</li><li>https://github.com/scorpion35/fastlane/commit/657329cb84e0ea1968503ff2bf20dba7d14c0a5e</li></ul> | Aug 4, 2019 |
+  | Part 3: Added new flag (-n) to specify version number when running fastlane supply init | <ul><li>https://tinyurl.com/y53tmlct</li><li>https://tinyurl.com/y5sjbmme</li></ul> | Aug 4, 2019 |
   | Part 3.1: Setting track precedence if version is found in more than one track | https://tinyurl.com/y57eo3jh | Aug 4, 2019 |
 
 <br>
