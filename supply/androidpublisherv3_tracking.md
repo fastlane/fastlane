@@ -29,6 +29,7 @@
   | Part 2.2: Writing changelogs | https://tinyurl.com/y33ky4us | Aug 4, 2019 |
   | Part 3: Added new flag (-n) to specify version number when running fastlane supply init | <ul><li>https://tinyurl.com/y53tmlct</li><li>https://tinyurl.com/y5sjbmme</li></ul> | Aug 4, 2019 |
   | Part 3.1: Setting track precedence if version is found in more than one track | https://tinyurl.com/y57eo3jh | Aug 4, 2019 |
+  | Part 3.2: Made version optional and finding it automatically | https://tinyurl.com/y5h34ejr | Aug 4, 2019 |
 
 <br>
 
