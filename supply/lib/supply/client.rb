@@ -239,33 +239,27 @@ module Supply
     def release_listings(version)
       ensure_active_edit!
   
-      filtered_release = []
+      filtered_track = nil
+      filtered_release = nil
 
-      # 'rollout' track returned by AndroidPublisherV3 doesn't have 'releases'.
-      filtered_release = tracks.select { |t| !t.releases.nil? }.map(&:releases).flatten.select { |r| r.name == version }
-      
-      # TODO:  Same as line above, but more verbose. Can remove the above line or below code before going into production!
-      # tracks.each do |track|
-      #   next if track.releases.nil? # 'rollout' track returned by AndroidPublisherV3 doesn't have 'releases'.
-      #   track.releases.each do |release|
-      #     if release.name == version
-      #       filtered_release << release
-      #       break
-      #     end
-      #   end
-      # end
+      tracks.each do |track|
+        next if track.releases.nil? # 'rollout' track returned by AndroidPublisherV3 doesn't have 'releases'.
+        track.releases.each do |release|
+          if release.name == version
+            filtered_track = track.track
+            filtered_release = release
+            break
+          end
+        end
+      end
   
-      if filtered_release.length == 0
+      if filtered_release.nil?
         UI.user_error!("Unable to find version '#{version}' for '#{current_package_name}'. Please double check the version number.")
         return nil
-      elsif filtered_release.length > 1
-        # TODO: Can make `filtered_release = nil` and refactor a little bit,
-        # TODO: to avoid having this condition. TBD before going into production.
-        UI.error("More than one matching release found for version '#{version}' for '#{current_package_name}'. There should be only one?")
       end
 
-      return filtered_release[0].release_notes.map do |row|
-        Supply::ReleaseListing.new(filtered_release.name, filtered_release.version_codes, row.language, row.text)
+      return filtered_release.release_notes.map do |row|
+        Supply::ReleaseListing.new(filtered_track, filtered_release, filtered_release.version_codes, row.language, row.text)
       end
     end
 
