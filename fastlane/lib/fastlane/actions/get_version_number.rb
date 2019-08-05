@@ -17,7 +17,7 @@ module Fastlane
         target = get_target!(project, target_name)
         plist_file = get_plist!(folder, target, configuration)
         version_number = get_version_number_from_plist!(plist_file)
-        
+
         if version_number =~ /\$\(([\w\-]+)\)/
           version_number = get_version_number_from_build_settings!(target, $1, configuration)
         end
@@ -68,16 +68,16 @@ module Fastlane
 
         target
       end
-      
+
       def self.get_version_number_from_build_settings!(target, variable, configuration = nil)
         value = nil
-        
+
         target.build_configurations.each do |config|
-          if configuration.nil? or config.name == configuration
+          if configuration.nil? || config.name == configuration
             value = config.build_settings[variable]
           end
         end
-        
+
         if value
           return value
         else
