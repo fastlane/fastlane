@@ -226,7 +226,8 @@ workflows:
   version: 2
   build:
     jobs:
-      - "Execute tests on macOS"
+      - "Execute tests on macOS (Xcode 9.0.1)"
+      - "Execute tests on macOS (Xcode 11.0.0)"
       - "Execute tests on Ubuntu"
       - "Validate Documentation"
       - "Lint Source Code"
