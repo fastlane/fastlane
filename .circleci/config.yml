@@ -81,7 +81,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            echo "2.3" > .ruby-version
+            echo "2.3.7" > .ruby-version
             gem update --system
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
