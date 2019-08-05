@@ -59,7 +59,8 @@ jobs:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
-"Execute tests on macOS (Xcode 11.0.0)":
+
+  "Execute tests on macOS (Xcode 11.0.0)":
     macos:
       xcode: "11.0.0"
     environment:
@@ -117,6 +118,7 @@ jobs:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
+
   "Execute tests on Ubuntu":
     environment:
       CIRCLE_TEST_REPORTS: ~/test-reports
