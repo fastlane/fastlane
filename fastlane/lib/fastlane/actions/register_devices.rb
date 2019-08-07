@@ -31,12 +31,12 @@ module Fastlane
           require 'csv'
 
           devices_file = CSV.read(File.expand_path(File.join(devices_file)), col_sep: "\t")
-          UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)") unless devices_file.first == ['Device ID', 'Device Name']
+          UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)") unless devices_file.first == ['Device ID', 'Device Name']
 
           device_objs = devices_file.drop(1).map do |device|
             next if existing_devices.map(&:udid).include?(device[0])
 
-            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)") unless device.count == 2
+            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)") unless device.count == 2
 
             try_create_device(name: device[1], udid: device[0], mac: mac)
           end
