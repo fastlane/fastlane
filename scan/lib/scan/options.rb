@@ -213,7 +213,7 @@ module Scan
                                      env_name: "SCAN_SUPPRESS_XCODE_OUTPUT",
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
-                                     is_string: false),
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :formatter,
                                      short_option: "-n",
                                      env_name: "SCAN_FORMATTER",
