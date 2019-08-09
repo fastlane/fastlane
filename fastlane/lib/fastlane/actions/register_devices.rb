@@ -67,6 +67,10 @@ module Fastlane
         UI.crash!("Failed to register new device (name: #{name}, UDID: #{udid})")
       end
 
+      #####################################################
+      # @!group Documentation
+      #####################################################
+
       def self.description
         "Registers new devices to the Apple Dev Portal"
       end
