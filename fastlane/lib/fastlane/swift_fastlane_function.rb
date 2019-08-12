@@ -98,7 +98,7 @@ module Fastlane
         type = determine_type_from_override(type_override: param_type_override)
       end
 
-      # defaulting type to Any if is_string is false so users area llowed to input all allowed types
+      # defaulting type to Any if is_string is false so users are allowed to input all allowed types
       type ||= is_string ? "String" : "Any"
 
       optional_specifier = ""
