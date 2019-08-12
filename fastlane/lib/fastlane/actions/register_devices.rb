@@ -3,7 +3,6 @@ require 'credentials_manager'
 module Fastlane
   module Actions
     class RegisterDevicesAction < Action
-
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform.to_sym)
       end
@@ -13,7 +12,6 @@ module Fastlane
       end
 
       def self.run(params)
-
         if params[:devices]
           new_devices = params[:devices].map do |name, udid|
             [udid, name]
@@ -25,7 +23,7 @@ module Fastlane
           UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)") unless devices_file.first == file_column_headers.first(2) || devices_file.first == file_column_headers
 
           new_devices = devices_file.drop(1).map do |row|
-            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)") unless (2..3).include? row.count
+            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)") unless (2..3).cover?(row.count)
             row
           end
         else
