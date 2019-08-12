@@ -13,7 +13,7 @@ module Fastlane
           cmd.concat(params[:frameworks])
         elsif ["update", "build", "bootstrap"].include?(command_name)
           if params[:dependencies].count > 0
-             cmd.concat(params[:dependencies])
+            cmd.concat(params[:dependencies])
           end
           if params[:derived_data]
             cmd << "--derived-data #{params[:derived_data].shellescape}"
