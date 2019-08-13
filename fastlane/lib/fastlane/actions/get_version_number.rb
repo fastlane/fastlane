@@ -18,6 +18,7 @@ module Fastlane
         plist_file = get_plist!(folder, target, configuration)
         version_number = get_version_number_from_plist!(plist_file)
 
+        # Get from build settings if needed (ex: $(MARKETING_VERSION) is default in Xcode 11)
         if version_number =~ /\$\(([\w\-]+)\)/
           version_number = get_version_number_from_build_settings!(target, $1, configuration)
         end
@@ -70,19 +71,14 @@ module Fastlane
       end
 
       def self.get_version_number_from_build_settings!(target, variable, configuration = nil)
-        value = nil
-
         target.build_configurations.each do |config|
           if configuration.nil? || config.name == configuration
             value = config.build_settings[variable]
+            return value if value
           end
         end
 
-        if value
-          return value
-        else
-          UI.user_error!("Unable to find Xcode build setting: #{variable}")
-        end
+        UI.user_error!("Unable to find Xcode build setting: #{variable}")
       end
 
       def self.get_plist!(folder, target, configuration = nil)
