@@ -337,6 +337,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       key_default_values = []
       key_optionality_values = []
       key_type_overrides = []
+      key_is_strings = []
 
       if options.kind_of?(Array)
         options.each do |current|
@@ -350,6 +351,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
           key_default_values << current.code_gen_default_value
           key_optionality_values << current.optional
           key_type_overrides << current.data_type
+          key_is_strings << current.is_string
         end
       end
       action_return_type = action.return_type
@@ -362,6 +364,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
           key_default_values: key_default_values,
           key_optionality_values: key_optionality_values,
           key_type_overrides: key_type_overrides,
+          key_is_strings: key_is_strings,
           return_type: action_return_type
         )
         generated_protocol_file_path = generate_tool_protocol(tool_swift_function: tool_swift_function)
@@ -375,6 +378,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
           key_default_values: key_default_values,
           key_optionality_values: key_optionality_values,
           key_type_overrides: key_type_overrides,
+          key_is_strings: key_is_strings,
           return_type: action_return_type
         )
       end
