@@ -17,7 +17,7 @@ module Fastlane
             cmd.concat(params[:dependencies]) if params[:dependencies].count > 0
           end
           if params[:derived_data]
-            cmd << "--derived-data #{params[:derived_data].shellescape}"
+            cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
           end
         end
 
