@@ -12,6 +12,13 @@ describe Fastlane do
         expect(result).to eq("4.3.2")
       end
 
+      it "gets the correct version number for 'TargetVariableAsBundleVersion'", requires_xcodeproj: true do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          get_version_number(xcodeproj: '#{path}', target: 'TargetVariableAsBundleVersion')
+        end").runner.execute(:test)
+        expect(result).to eq("4.3.2")
+      end
+
       it "gets the correct version number for 'TargetATests'", requires_xcodeproj: true do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetATests')
