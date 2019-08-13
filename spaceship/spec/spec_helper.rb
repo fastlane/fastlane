@@ -58,7 +58,7 @@ def before_each_spaceship
   TunesStubbing.itc_stub_sandbox_testers
   TunesStubbing.itc_stub_create_sandbox_tester
   TunesStubbing.itc_stub_delete_sandbox_tester
-  TunesStubbing.itc_stub_candiate_builds
+  TunesStubbing.itc_stub_candidate_builds
   TunesStubbing.itc_stub_pricing_tiers
   TunesStubbing.itc_stub_release_to_store
   TunesStubbing.itc_stub_release_to_all_users

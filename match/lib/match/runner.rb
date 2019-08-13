@@ -156,7 +156,7 @@ module Match
           UI.message("Installing certificate...")
 
           # Only looking for cert in "custom" (non login.keychain) keychain
-          # Doing this for backwards compatability
+          # Doing this for backwards compatibility
           keychain_name = params[:keychain_name] == "login.keychain" ? nil : params[:keychain_name]
 
           if FastlaneCore::CertChecker.installed?(cert_path, in_keychain: keychain_name)

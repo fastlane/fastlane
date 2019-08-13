@@ -43,7 +43,7 @@ module Fastlane
       Fastlane::PluginUpdateManager.show_update_status
       if FastlaneCore::Globals.capture_output?
         if $stdout.respond_to?(:string)
-          # Sometimes you can get NoMethodError: undefined method `string' for #<IO:<STDOUT>> when runing with FastlaneRunner (swift)
+          # Sometimes you can get NoMethodError: undefined method `string' for #<IO:<STDOUT>> when running with FastlaneRunner (swift)
           FastlaneCore::Globals.captured_output = Helper.strip_ansi_colors($stdout.string)
         end
         $stdout = STDOUT

@@ -31,6 +31,11 @@ module Fastlane
       end
 
       def device_avalaible?(serial)
+        UI.deprecated("Please use `device_available?` instead... This will be removed in a future version of fastlane")
+        device_available?(serial)
+      end
+
+      def device_available?(serial)
         load_all_devices
         return devices.map(&:serial).include?(serial)
       end
