@@ -5,56 +5,56 @@ describe Fastlane do
 
       path = File.absolute_path("./fastlane/spec/fixtures/actions/get_version_number/get_version_number/")
 
-      it "gets the correct version number for 'TargetA'", requires_xcodeproj: true do
+      it "gets the correct version number for 'TargetA'" do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetA')
         end").runner.execute(:test)
         expect(result).to eq("4.3.2")
       end
 
-      it "gets the correct version number for 'TargetATests'", requires_xcodeproj: true do
+      it "gets the correct version number for 'TargetATests'" do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetATests')
         end").runner.execute(:test)
         expect(result).to eq("4.3.2")
       end
 
-      it "gets the correct version number for 'TargetB'", requires_xcodeproj: true do
+      it "gets the correct version number for 'TargetB'" do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetB')
         end").runner.execute(:test)
         expect(result).to eq("5.4.3")
       end
 
-      it "gets the correct version number for 'TargetBTests'", requires_xcodeproj: true do
+      it "gets the correct version number for 'TargetBTests'" do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetBTests')
         end").runner.execute(:test)
         expect(result).to eq("5.4.3")
       end
 
-      it "gets the correct version number for 'TargetC_internal'", requires_xcodeproj: true do
+      it "gets the correct version number for 'TargetC_internal'" do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetC_internal')
         end").runner.execute(:test)
         expect(result).to eq("7.5.2")
       end
 
-      it "gets the correct version number for 'TargetC_production'", requires_xcodeproj: true do
+      it "gets the correct version number for 'TargetC_production'" do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetC_production')
         end").runner.execute(:test)
         expect(result).to eq("6.4.9")
       end
 
-      it "gets the correct version number for 'SampleProject_tests'", requires_xcodeproj: true do
+      it "gets the correct version number for 'SampleProject_tests'" do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'SampleProject_tests')
         end").runner.execute(:test)
         expect(result).to eq("1.0")
       end
 
-      it "gets the correct version number with no target specified (and one target)", requires_xcodeproj: true do
+      it "gets the correct version number with no target specified (and one target)" do
         allow_any_instance_of(Xcodeproj::Project).to receive(:targets).and_wrap_original do |m, *args|
           [m.call(*args).first]
         end
@@ -65,7 +65,7 @@ describe Fastlane do
         expect(result).to eq("4.3.2")
       end
 
-      it "gets the correct version number with no target specified (and one target and multiple test targets)", requires_xcodeproj: true do
+      it "gets the correct version number with no target specified (and one target and multiple test targets)" do
         allow_any_instance_of(Xcodeproj::Project).to receive(:targets).and_wrap_original do |m, *args|
           targets = m.call(*args)
           targets.select do |target|
@@ -79,14 +79,14 @@ describe Fastlane do
         expect(result).to eq("4.3.2")
       end
 
-      it "gets the correct version with $(SRCROOT)", requires_xcodeproj: true do
+      it "gets the correct version with $(SRCROOT)" do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetSRC')
         end").runner.execute(:test)
         expect(result).to eq("1.5.9")
       end
 
-      it "raises if one target and specified wrong target name", requires_xcodeproj: true do
+      it "raises if one target and specified wrong target name" do
         allow_any_instance_of(Xcodeproj::Project).to receive(:targets).and_wrap_original do |m, *args|
           [m.call(*args).first]
         end
@@ -98,7 +98,7 @@ describe Fastlane do
         end.to raise_error(FastlaneCore::Interface::FastlaneError, "Cannot find target named 'ThisIsNotATarget'")
       end
 
-      it "raises if in non-interactive mode with no target", requires_xcodeproj: true do
+      it "raises if in non-interactive mode with no target" do
         expect do
           result = Fastlane::FastFile.new.parse("lane :test do
             get_version_number(xcodeproj: '#{path}')
@@ -106,7 +106,7 @@ describe Fastlane do
         end.to raise_error(FastlaneCore::Interface::FastlaneCrash, /non-interactive mode/)
       end
 
-      it "raises if in non-interactive mode if cannot infer configuration", requires_xcodeproj: true do
+      it "raises if in non-interactive mode if cannot infer configuration" do
         expect do
           result = Fastlane::FastFile.new.parse("lane :test do
             get_version_number(xcodeproj: '#{path}', target: 'TargetDifferentConfigurations')
@@ -114,7 +114,7 @@ describe Fastlane do
         end.to raise_error(FastlaneCore::Interface::FastlaneCrash, /non-interactive mode/)
       end
 
-      it "gets correct version for different configurations", requires_xcodeproj: true do
+      it "gets correct version for different configurations" do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetDifferentConfigurations', configuration: 'Debug')
         end").runner.execute(:test)

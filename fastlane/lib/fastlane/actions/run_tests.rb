@@ -83,6 +83,10 @@ module Fastlane
         [:ios, :mac].include?(platform)
       end
 
+      def self.is_incompatible?(operating_system)
+        operating_system != "macOS"
+      end
+
       private_class_method
 
       def self.test_summary_filenames(derived_data_path)

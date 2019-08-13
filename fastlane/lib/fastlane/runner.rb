@@ -122,12 +122,7 @@ module Fastlane
       nil
     end
 
-    # This is being called from `method_missing` from the Fastfile
-    # It's also used when an action is called from another action
-    # @param from_action Indicates if this action is being trigged by another action.
-    #                    If so, it won't show up in summary.
-    def trigger_action_by_name(method_sym, custom_dir, from_action, *arguments)
-      # First, check if there is a predefined method in the actions folder
+    def get_class_ref(method_sym, *arguments)
       class_ref = class_reference_from_action_name(method_sym)
       unless class_ref
         class_ref = class_reference_from_action_alias(method_sym)
@@ -138,6 +133,16 @@ module Fastlane
           class_ref.alias_used(orig_action, arguments.first)
         end
       end
+      return class_ref, arguments
+    end
+
+    # This is being called from `method_missing` from the Fastfile
+    # It's also used when an action is called from another action
+    # @param from_action Indicates if this action is being trigged by another action.
+    #                    If so, it won't show up in summary.
+    def trigger_action_by_name(method_sym, custom_dir, from_action, *arguments)
+      # First, check if there is a predefined method in the actions folder
+      class_ref,arguments = get_class_ref(method_sym, *arguments)
 
       # It's important to *not* have this code inside the rescue block
       # otherwise all NameErrors will be caught and the error message is
@@ -221,7 +226,8 @@ module Fastlane
         custom_dir ||= ".."
       end
 
-      verify_supported_os(method_sym, class_ref)
+      verify_supported_platform(method_sym, class_ref)
+      verify_compatible_os(method_sym, class_ref)
 
       begin
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
@@ -285,13 +291,32 @@ module Fastlane
       block[nil].call(lane, parameters) if block[nil]
     end
 
-    def verify_supported_os(name, class_ref)
+    def verify_supported_platform(name, class_ref)
       if class_ref.respond_to?(:is_supported?)
         # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
         platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
         if platform
           unless class_ref.is_supported?(platform)
             UI.important("Action '#{name}' isn't known to support operating system '#{platform}'.")
+          end
+        end
+      end
+    end
+
+    def verify_compatible_os(name, class_ref)
+      if class_ref.respond_to?(:is_incompatible?)
+        operating_system = Helper.operating_system
+        incompat = class_ref.is_incompatible?(operating_system)
+        if incompat
+          incompat_message = "Action '#{name}' is not compatible with operating system '#{operating_system}'. For information how to handle this check out: TODO"
+          incompat_env_var = 'FASTLANE_IGNORE_OS_INCOMPAT'
+          unless ENV[incompat_env_var] || Helper.test? # also disable throwing exception during tests to not mess with other, existing tests
+            UI.user_error!(incompat_message)
+          else
+            UI.error("------------------------------------------------")
+            UI.error(incompat_message)
+            UI.error("Continuing anyway as `#{incompat_env_var}` environment variable is set.")
+            UI.error("------------------------------------------------")
           end
         end
       end

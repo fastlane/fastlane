@@ -32,5 +32,57 @@ describe Fastlane do
         end
       end
     end
+
+    describe "#verify_compatible_os" do
+      before do
+        @ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
+        @action = 'scan' # TODO Somehow mock action instead of reusing scan
+        @class_ref, arguments_unused = @ff.runner.get_class_ref(@action)
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false) # fake not being in test so exception logic actually triggers
+      end
+
+      it "does not raise an expcetion for action scan on OS macOS" do
+        allow(FastlaneCore::Helper).to receive(:operating_system).and_return('macOS')
+        expect do
+          @ff.runner.verify_compatible_os(@action, @class_ref)
+        end.not_to raise_error
+      end
+
+      it "does raise an exception for action scan on OS Windows " do
+        allow(FastlaneCore::Helper).to receive(:operating_system).and_return('Windows')
+        expect do
+          @ff.runner.verify_compatible_os(@action, @class_ref)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
+     
+      it "does raise an exception for action scan on OS Linux" do
+        allow(FastlaneCore::Helper).to receive(:operating_system).and_return('Linux')
+        expect do
+          @ff.runner.verify_compatible_os(@action, @class_ref)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
+
+      it "does not raise an exception but output a message for action scan on OS Windows " do
+        allow(FastlaneCore::Helper).to receive(:operating_system).and_return('Windows')
+        with_env_values('FASTLANE_IGNORE_OS_INCOMPAT' => 1) do
+          expectation = expect do
+            @ff.runner.verify_compatible_os(@action, @class_ref)
+          end
+          expectation.not_to raise_error
+          expectation.to output("Continuing anyway").to_stdout # TODO does not work yet
+        end
+      end
+     
+      it "does not raise an exception but output a message for action scan on OS Linux" do
+        allow(FastlaneCore::Helper).to receive(:operating_system).and_return('Linux')
+        with_env_values('FASTLANE_IGNORE_OS_INCOMPAT' => 1) do
+          expectation = expect do
+            @ff.runner.verify_compatible_os(@action, @class_ref)
+          end
+          expectation.not_to raise_error
+          expectation.to output("Continuing anyway").to_stdout # TODO does not work yet
+        end
+      end
+    end
   end
 end
