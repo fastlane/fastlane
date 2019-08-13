@@ -11,6 +11,7 @@ module Fastlane
 
         if command_name == "archive" && params[:frameworks].count > 0
           cmd.concat(params[:frameworks])
+        # "update", "build" and "bootstrap" are the only commands that support "--derived-data" parameter
         elsif ["update", "build", "bootstrap"].include?(command_name)
           if params[:dependencies].count > 0
             cmd.concat(params[:dependencies])
