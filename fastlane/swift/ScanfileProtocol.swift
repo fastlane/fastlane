@@ -25,7 +25,7 @@ protocol ScanfileProtocol: class {
   var outputFiles: String? { get }
   var buildlogPath: String { get }
   var includeSimulatorLogs: Bool { get }
-  var suppressXcodeOutput: String? { get }
+  var suppressXcodeOutput: Bool? { get }
   var formatter: String? { get }
   var xcprettyArgs: String? { get }
   var derivedDataPath: String? { get }
@@ -82,7 +82,7 @@ extension ScanfileProtocol {
   var outputFiles: String? { return nil }
   var buildlogPath: String { return "~/Library/Logs/scan" }
   var includeSimulatorLogs: Bool { return false }
-  var suppressXcodeOutput: String? { return nil }
+  var suppressXcodeOutput: Bool? { return nil }
   var formatter: String? { return nil }
   var xcprettyArgs: String? { return nil }
   var derivedDataPath: String? { return nil }
@@ -114,4 +114,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.11]
+// FastlaneRunnerAPIVersion [0.9.12]
