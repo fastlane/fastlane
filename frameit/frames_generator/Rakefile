@@ -140,7 +140,7 @@ def measure_slot(path)
 
   sh("rm #{tmp_output}", verbose: false)
 
-  # The example of the command ouput:
+  # The example of the command output:
   #
   # Objects (id: bounding-box centroid area mean-color):
   #   494: 640x1136+67+239 386.5,806.5 727040 srgb(255,255,255)

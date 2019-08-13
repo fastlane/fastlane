@@ -50,7 +50,7 @@ module Fastlane
             end
           }
         }) do |result|
-          UI.success("Successfully commited file to GitHub")
+          UI.success("Successfully committed file to GitHub")
           json = result[:json]
           html_url = json['commit']['html_url']
           download_url = json['content']['download_url']
