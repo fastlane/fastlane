@@ -13,12 +13,8 @@ module Fastlane
           cmd.concat(params[:frameworks])
         # "update", "build" and "bootstrap" are the only commands that support "--derived-data" parameter
         elsif ["update", "build", "bootstrap"].include?(command_name)
-          if params[:dependencies].count > 0
-            cmd.concat(params[:dependencies]) if params[:dependencies].count > 0
-          end
-          if params[:derived_data]
-            cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
-          end
+          cmd.concat(params[:dependencies]) if params[:dependencies].count > 0
+          cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
         end
 
         cmd << "--output #{params[:output]}" if params[:output]
