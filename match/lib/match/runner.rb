@@ -217,7 +217,7 @@ module Match
         end
       end
 
-      if profile.nil? || params[:force]
+      if profile.nil? || force
         if params[:readonly]
           UI.error("No matching provisioning profiles found for '#{profile_name}'")
           UI.error("A new one cannot be created because you enabled `readonly`")
