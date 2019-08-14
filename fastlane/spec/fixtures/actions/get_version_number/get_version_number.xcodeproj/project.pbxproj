@@ -91,6 +91,21 @@
 		03CFC576206409ED00CD6CB1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 03AB82EB2056A51B00BAAFD1 /* Assets.xcassets */; };
 		03CFC577206409ED00CD6CB1 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03AB83062056A5D600BAAFD1 /* Info.plist */; };
 		03CFC578206409ED00CD6CB1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03AB82E82056A51B00BAAFD1 /* Main.storyboard */; };
+		4AA286EA2300242500067244 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AB82E62056A51B00BAAFD1 /* ViewController.swift */; };
+		4AA286EB2300242500067244 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AB82E42056A51B00BAAFD1 /* AppDelegate.swift */; };
+		4AA286EE2300242500067244 /* TargetDifferentConfigurations-Debug.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03AB83AD2057215F00BAAFD1 /* TargetDifferentConfigurations-Debug.plist */; };
+		4AA286EF2300242500067244 /* TargetC_production-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03AB83482056AEC500BAAFD1 /* TargetC_production-Info.plist */; };
+		4AA286F02300242500067244 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03AB82ED2056A51B00BAAFD1 /* LaunchScreen.storyboard */; };
+		4AA286F12300242500067244 /* TargetA-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03AB83042056A5D000BAAFD1 /* TargetA-Info.plist */; };
+		4AA286F22300242500067244 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 03AB82EB2056A51B00BAAFD1 /* Assets.xcassets */; };
+		4AA286F32300242500067244 /* Plist-For-D-Target.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03AB83992056B2CD00BAAFD1 /* Plist-For-D-Target.plist */; };
+		4AA286F42300242500067244 /* SampleProject-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03AB83972056B29A00BAAFD1 /* SampleProject-Info.plist */; };
+		4AA286F52300242500067244 /* TargetDifferentConfigurations-Release.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03AB83AE2057215F00BAAFD1 /* TargetDifferentConfigurations-Release.plist */; };
+		4AA286F62300242500067244 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03AB83062056A5D600BAAFD1 /* Info.plist */; };
+		4AA286F72300242500067244 /* TargetB-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03AB83242056AAD200BAAFD1 /* TargetB-Info.plist */; };
+		4AA286F82300242500067244 /* TargetC_internal-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03AB83492056AEC500BAAFD1 /* TargetC_internal-Info.plist */; };
+		4AA286F92300242500067244 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03AB82E82056A51B00BAAFD1 /* Main.storyboard */; };
+		4AA286FA2300242500067244 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03AB83262056AADB00BAAFD1 /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -146,6 +161,8 @@
 		03AB83AE2057215F00BAAFD1 /* TargetDifferentConfigurations-Release.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "TargetDifferentConfigurations-Release.plist"; sourceTree = "<group>"; };
 		03CFC57C206409ED00CD6CB1 /* TargetSRC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TargetSRC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		03CFC57D206409ED00CD6CB1 /* TargetSRC.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = TargetSRC.plist; path = /Users/josh/Projects/fastlane/fastlane/fastlane/spec/fixtures/actions/get_version_number/TargetSRC.plist; sourceTree = "<absolute>"; };
+		4AA286FE2300242500067244 /* TargetVariableAsBundleVersion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TargetVariableAsBundleVersion.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4AA286FF2300242600067244 /* TargetVariableAsBundleVersion-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TargetVariableAsBundleVersion-Info.plist"; path = "/Users/florent/ruby_projects/fastlane/fastlane/spec/fixtures/actions/get_version_number/TargetVariableAsBundleVersion-Info.plist"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -226,6 +243,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4AA286EC2300242500067244 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -241,6 +265,7 @@
 				03AB83482056AEC500BAAFD1 /* TargetC_production-Info.plist */,
 				03AB83262056AADB00BAAFD1 /* Info.plist */,
 				03AB83242056AAD200BAAFD1 /* TargetB-Info.plist */,
+				4AA286FF2300242600067244 /* TargetVariableAsBundleVersion-Info.plist */,
 				03AB82E32056A51B00BAAFD1 /* get_version_number */,
 				03AB82F82056A51B00BAAFD1 /* get_version_numberTests */,
 				03AB82E22056A51B00BAAFD1 /* Products */,
@@ -261,6 +286,7 @@
 				03AB83952056B27800BAAFD1 /* SampleProject.app */,
 				03AB83AB2057212800BAAFD1 /* TargetDifferentConfigurations.app */,
 				03CFC57C206409ED00CD6CB1 /* TargetSRC.app */,
+				4AA286FE2300242500067244 /* TargetVariableAsBundleVersion.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -480,6 +506,23 @@
 			productReference = 03CFC57C206409ED00CD6CB1 /* TargetSRC.app */;
 			productType = "com.apple.product-type.application";
 		};
+		4AA286E82300242500067244 /* TargetVariableAsBundleVersion */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4AA286FB2300242500067244 /* Build configuration list for PBXNativeTarget "TargetVariableAsBundleVersion" */;
+			buildPhases = (
+				4AA286E92300242500067244 /* Sources */,
+				4AA286EC2300242500067244 /* Frameworks */,
+				4AA286ED2300242500067244 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TargetVariableAsBundleVersion;
+			productName = get_version_number;
+			productReference = 4AA286FE2300242500067244 /* TargetVariableAsBundleVersion.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -530,6 +573,9 @@
 					03CFC56E206409ED00CD6CB1 = {
 						ProvisioningStyle = Automatic;
 					};
+					4AA286E82300242500067244 = {
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 03AB82DC2056A51B00BAAFD1 /* Build configuration list for PBXProject "get_version_number" */;
@@ -557,6 +603,7 @@
 				03AB839D2057212800BAAFD1 /* TargetDifferentConfigurations */,
 				03CFC56E206409ED00CD6CB1 /* TargetSRC */,
 				03B8E43E20729336001D1742 /* AggTarget */,
+				4AA286E82300242500067244 /* TargetVariableAsBundleVersion */,
 			);
 		};
 /* End PBXProject section */
@@ -691,6 +738,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4AA286ED2300242500067244 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4AA286EE2300242500067244 /* TargetDifferentConfigurations-Debug.plist in Resources */,
+				4AA286EF2300242500067244 /* TargetC_production-Info.plist in Resources */,
+				4AA286F02300242500067244 /* LaunchScreen.storyboard in Resources */,
+				4AA286F12300242500067244 /* TargetA-Info.plist in Resources */,
+				4AA286F22300242500067244 /* Assets.xcassets in Resources */,
+				4AA286F32300242500067244 /* Plist-For-D-Target.plist in Resources */,
+				4AA286F42300242500067244 /* SampleProject-Info.plist in Resources */,
+				4AA286F52300242500067244 /* TargetDifferentConfigurations-Release.plist in Resources */,
+				4AA286F62300242500067244 /* Info.plist in Resources */,
+				4AA286F72300242500067244 /* TargetB-Info.plist in Resources */,
+				4AA286F82300242500067244 /* TargetC_internal-Info.plist in Resources */,
+				4AA286F92300242500067244 /* Main.storyboard in Resources */,
+				4AA286FA2300242500067244 /* Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -787,6 +854,15 @@
 			files = (
 				03CFC570206409ED00CD6CB1 /* ViewController.swift in Sources */,
 				03CFC571206409ED00CD6CB1 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4AA286E92300242500067244 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4AA286EA2300242500067244 /* ViewController.swift in Sources */,
+				4AA286EB2300242500067244 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1319,6 +1395,40 @@
 			};
 			name = Release;
 		};
+		4AA286FC2300242500067244 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4.3.2;
+				INFOPLIST_FILE = "$(SRCROOT)/TargetVariableAsBundleVersion-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 4.3.2;
+				PRODUCT_BUNDLE_IDENTIFIER = "tools.fastlane.get-version-number";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		4AA286FD2300242500067244 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4.3.2;
+				INFOPLIST_FILE = "$(SRCROOT)/TargetVariableAsBundleVersion-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 4.3.2;
+				PRODUCT_BUNDLE_IDENTIFIER = "tools.fastlane.get-version-number";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1435,6 +1545,15 @@
 			buildConfigurations = (
 				03CFC57A206409ED00CD6CB1 /* Debug */,
 				03CFC57B206409ED00CD6CB1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4AA286FB2300242500067244 /* Build configuration list for PBXNativeTarget "TargetVariableAsBundleVersion" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4AA286FC2300242500067244 /* Debug */,
+				4AA286FD2300242500067244 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
