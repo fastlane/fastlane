@@ -4,7 +4,7 @@ module Fastlane
   module Actions
     class RegisterDevicesAction < Action
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform.to_sym)
+        [:ios, :mac].include?(platform)
       end
 
       def self.file_column_headers
@@ -41,14 +41,14 @@ module Fastlane
           next if device[2].nil?
           all_platforms.add(device[2])
         end
-        supported_platforms = all_platforms.select { |platform| self.is_supported?(platform) }
+        supported_platforms = all_platforms.select { |platform| self.is_supported?(platform.to_sym) }
 
         existing_devices = supported_platforms.map { |platform| Spaceship::Device.all(mac: platform == "mac") }.flatten
 
         device_objs = new_devices.map do |device|
           next if existing_devices.map(&:udid).include?(device[0])
 
-          device_platform_supported = !device[2].nil? && is_supported?(device[2])
+          device_platform_supported = !device[2].nil? && self.is_supported?(device[2].to_sym)
           mac = (device_platform_supported ? device[2] : params[:platform]) == "mac"
 
           try_create_device(name: device[1], udid: device[0], mac: mac)
