@@ -139,6 +139,12 @@ module Gym
                                      is_string: false,
                                      type: Boolean,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_codesign,
+                                     env_name: "GYM_SKIP_CODESIGN",
+                                     description: "Build without codesigning",
+                                     is_string: false,
+                                     type: Boolean,
+                                     optional: true),
         # Very optional
         FastlaneCore::ConfigItem.new(key: :build_path,
                                      env_name: "GYM_BUILD_PATH",
