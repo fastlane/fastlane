@@ -7,6 +7,7 @@ module Supply
 
       verify_config!
 
+      track_edit = AndroidPublisher::Track.new()
       if metadata_path
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
@@ -19,10 +20,11 @@ module Supply
           upload_metadata(language, listing) unless Supply.config[:skip_upload_metadata]
           upload_images(language) unless Supply.config[:skip_upload_images]
           upload_screenshots(language) unless Supply.config[:skip_upload_screenshots]
-          upload_changelogs(language) unless Supply.config[:skip_upload_metadata]
         end
-      end
 
+        track_edit = client.upload_changelogs(all_languages) unless Supply.config[:skip_upload_metadata]
+      end
+binding.pry
       apk_version_codes = []
       apk_version_codes.concat(upload_apks) unless Supply.config[:skip_upload_apk]
       apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
@@ -70,7 +72,7 @@ module Supply
       client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout] || 0.1, version_codes)
     end
 
-    def upload_changelogs(language)
+    def upload_changelogs_DEPRECATED(language)
       client.apks_version_codes.each do |apk_version_code|
         upload_changelog(language, apk_version_code)
       end
@@ -79,7 +81,7 @@ module Supply
       end
     end
 
-    def upload_changelog(language, version_code)
+    def upload_changelog_DEPRECATED(language, version_code)
       path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{version_code}.txt")
       if File.exist?(path)
         UI.message("Updating changelog for code version '#{version_code}' and language '#{language}'...")
@@ -188,6 +190,7 @@ module Supply
     # @return [Integer] The apk version code returned after uploading, or nil if there was a problem
     def upload_binary_data(apk_path)
       apk_version_code = nil
+      binding.pry
       if apk_path
         UI.message("Preparing apk at path '#{apk_path}' for upload...")
         apk_version_code = client.upload_apk(apk_path)
@@ -248,7 +251,7 @@ module Supply
       max_apk_version_code = apk_version_codes.max
       max_tracks_version_code = nil
 
-      tracks = ["production", "rollout", "beta", "alpha", "internal"]
+      tracks = Supply::AVAILABLE_TRACKS
       config_track_index = tracks.index(Supply.config[:track])
 
       # Custom "closed" tracks are now allowed (https://support.google.com/googleplay/android-developer/answer/3131213)

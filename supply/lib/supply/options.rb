@@ -22,6 +22,17 @@ module Supply
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:version_name),
                                      default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :release_status,
+                                     env_name: "RELEASE_STATUS",
+                                     short_option: "-e",
+                                     optional: true,
+                                     description: "Release status",
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:version_name),
+                                     default_value_dynamic: true,
+                                     verify_block: proc do |value|
+                                      UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::RELEASE_STATUS.include?(value)
+                                    end),
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
