@@ -62,6 +62,10 @@ binding.pry
       if could_upload_apk && could_upload_aab
         UI.user_error!("Cannot provide both apk(s) and aab - use `skip_upload_apk`, `skip_upload_aab`, or  make sure to remove any existing .apk or .aab files that are no longer needed")
       end
+
+      if Supply.config[:release_status] == 'draft' && Supply.config[:rollout]
+        UI.user_error!(%(Cannot specify rollout percentage when the release status is set to 'draft'))
+      end
     end
 
     def promote_track

@@ -5,7 +5,6 @@ module Supply
   class Options
     # rubocop:disable Metrics/PerceivedComplexity
     def self.available_options
-      default_tracks = %w(production beta alpha internal rollout)
       @options ||= [
         FastlaneCore::ConfigItem.new(key: :package_name,
                                      env_name: "SUPPLY_PACKAGE_NAME",
@@ -28,7 +27,7 @@ module Supply
                                      optional: true,
                                      description: "Release status",
                                      code_gen_sensitive: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:version_name),
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:release_status),
                                      default_value_dynamic: true,
                                      verify_block: proc do |value|
                                       UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::RELEASE_STATUS.include?(value)
@@ -36,8 +35,11 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
-                                     description: "The track of the application to use. The default available tracks are: #{default_tracks.join(', ')}",
-                                     default_value: DEFAULT_TRACK),
+                                     description: "The track of the application to use. The default available tracks are: #{Supply::AVAILABLE_TRACKS.join(', ')}",
+                                     default_value: DEFAULT_TRACK,
+                                     verify_block: proc do |value|
+                                      UI.user_error!("Value must be one of '#{Supply::AVAILABLE_TRACKS}'") unless Supply::AVAILABLE_TRACKS.include?(value)
+                                    end),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
                                      description: "The percentage of the user fraction when uploading to the rollout track",
@@ -194,7 +196,10 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track_promote_to,
                                      env_name: "SUPPLY_TRACK_PROMOTE_TO",
                                      optional: true,
-                                     description: "The track to promote to. The default available tracks are: #{default_tracks.join(', ')}"),
+                                     description: "The track to promote to. The default available tracks are: #{Supply::AVAILABLE_TRACKS.join(', ')}",
+                                     verify_block: proc do |value|
+                                      UI.user_error!("Value must be one of '#{Supply::AVAILABLE_TRACKS}'") unless Supply::AVAILABLE_TRACKS.include?(value)
+                                    end),
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,
