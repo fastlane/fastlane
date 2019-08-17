@@ -275,7 +275,16 @@ module Supply
     end
 
     def latest_version
-      return tracks.select { |t| t.track == 'production' }.map(&:releases).flatten.max_by { |r| r.name }
+      latest_version = tracks.select { |t| t.track == DEFAULT_TRACK }.map(&:releases).flatten.max_by { |r| r.name }
+
+      # Check if user specified '--track' option if version information from 'production' track is nil
+      if (latest_version.nil? && Supply.config.available_options.any?{ |k| k.key == 'track' })
+        latest_version = tracks.select { |t| t.track == Supply.config[:track] }.map(&:releases).flatten.max_by { |r| r.name }
+      else
+        UI.user_error!(%(Unable to find latest version information from "#{DEFAULT_TRACK}" track. Please specify track information by using '--track' option.))
+      end
+
+      return latest_version
     end
 
     #####################################################
