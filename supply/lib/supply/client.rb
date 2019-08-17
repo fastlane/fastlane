@@ -246,8 +246,8 @@ module Supply
       if filtered_tracks.length > 1
         # Production track takes precedence if version is present in multiple tracks
         # E.g.: A release might've been promoted from Alpha/Beta track. This means the release will be present in two or more tracks
-        if filtered_tracks.any? { |t| t.track == 'production' }
-          filtered_tracks = filtered_tracks.select { |t| t.track == 'production' }
+        if filtered_tracks.any? { |t| t.track == DEFAULT_TRACK }
+          filtered_tracks = filtered_tracks.select { |t| t.track == DEFAULT_TRACK }
         else
           # E.g.: A release might be in both Alpha & Beta (not sure if this is possible, just catching if it ever happens), giving Beta precedence.
           filtered_tracks = filtered_tracks.select { |t| t.track == 'beta' }
@@ -278,7 +278,7 @@ module Supply
       latest_version = tracks.select { |t| t.track == DEFAULT_TRACK }.map(&:releases).flatten.max_by { |r| r.name }
 
       # Check if user specified '--track' option if version information from 'production' track is nil
-      if latest_version.nil? && Supply.config[:track].nil?
+      if latest_version.nil? && Supply.config[:track] == DEFAULT_TRACK
         UI.user_error!(%(Unable to find latest version information from "#{DEFAULT_TRACK}" track. Please specify track information by using the '--track' option.))
       else
         latest_version = tracks.select { |t| t.track == Supply.config[:track] }.map(&:releases).flatten.max_by { |r| r.name }
