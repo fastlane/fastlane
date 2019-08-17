@@ -31,6 +31,7 @@
   | Part 3.1: Setting track precedence if version is found in more than one track | https://tinyurl.com/y57eo3jh | Aug 4, 2019 |
   | Part 3.2: Made version optional and finding it automatically | https://tinyurl.com/y5h34ejr | Aug 4, 2019 |
   | Returning full resolution screenshots/images from a single source | https://tinyurl.com/y6y53tqj | Aug 4, 2019 |
+  | Checking in other tracks if specified, when production track doesn't have any version | https://tinyurl.com/yxkse6rq | Aug 17, 2019 |
 
 <br>
 
@@ -39,5 +40,3 @@
   * Have to pass version flag when running `supply init`
     * https://github.com/scorpion35/fastlane/commit/b873f8bedbf53f9002b2a696bbe16dcf56bc61e2#commitcomment-34563014
     * https://github.com/scorpion35/fastlane/blob/69522c83403095877d5f45d0b413dc44783b7e5a/supply/lib/supply/setup.rb#L18
-  
-  

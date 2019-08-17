@@ -281,7 +281,7 @@ module Supply
       if (latest_version.nil? && Supply.config.available_options.any?{ |k| k.key == 'track' })
         latest_version = tracks.select { |t| t.track == Supply.config[:track] }.map(&:releases).flatten.max_by { |r| r.name }
       else
-        UI.user_error!(%(Unable to find latest version information from "#{DEFAULT_TRACK}" track. Please specify track information by using '--track' option.))
+        UI.user_error!(%(Unable to find latest version information from "#{DEFAULT_TRACK}" track. Please specify track information by using the '--track' option.))
       end
 
       return latest_version
