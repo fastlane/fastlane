@@ -25,7 +25,7 @@ module Supply
   CHANGELOGS_FOLDER_NAME = "changelogs"
 
   # https://developers.google.com/android-publisher/#publishing
-  AVAILABLE_TRACKS = %w(production, rollout, beta, alpha, internal)
+  AVAILABLE_TRACKS = %w(production rollout beta alpha internal)
   DEFAULT_TRACK = AVAILABLE_TRACKS[0]
 
   # https://developers.google.com/android-publisher/api-ref/edits/tracks
