@@ -16,13 +16,13 @@ module Supply
           UI.message("Preparing to upload for language '#{language}'...")
 
           listing = client.listing_for_language(language)
-
+          
           upload_metadata(language, listing) unless Supply.config[:skip_upload_metadata]
           upload_images(language) unless Supply.config[:skip_upload_images]
           upload_screenshots(language) unless Supply.config[:skip_upload_screenshots]
         end
 
-        track_edit = client.upload_changelogs(all_languages) unless Supply.config[:skip_upload_metadata]
+        track_edit = client.upload_changelogs(all_languages) unless Supply.config[:skip_upload_changelogs]
       end
 binding.pry
       apk_version_codes = []

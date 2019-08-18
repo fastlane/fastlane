@@ -317,7 +317,7 @@ module Supply
       ensure_active_edit!
 
       result_upload = call_google_api do
-        client.upload_apk(
+        client.upload_edit_apk(
           current_package_name,
           current_edit.id,
           upload_source: path_to_apk
