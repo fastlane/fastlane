@@ -11,6 +11,7 @@ module Supply
       if metadata_path
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
+        release_notes = []
         all_languages.each do |language|
           next if language.start_with?('.') # e.g. . or .. or hidden folders
           UI.message("Preparing to upload for language '#{language}'...")
@@ -20,11 +21,13 @@ module Supply
           upload_metadata(language, listing) unless Supply.config[:skip_upload_metadata]
           upload_images(language) unless Supply.config[:skip_upload_images]
           upload_screenshots(language) unless Supply.config[:skip_upload_screenshots]
+          release_notes << upload_changelog(language) unless Supply.config[:skip_upload_changelogs]
         end
 
-        track_edit = client.upload_changelogs(all_languages) unless Supply.config[:skip_upload_changelogs]
+        upload_changelogs(release_notes) unless Supply.config[:skip_upload_changelogs]
       end
-binding.pry
+      binding.pry
+      
       apk_version_codes = []
       apk_version_codes.concat(upload_apks) unless Supply.config[:skip_upload_apk]
       apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
@@ -74,6 +77,36 @@ binding.pry
       # but it has to be between 0.0 and 1.0 to pass the validity check. So we are passing the default value 0.1
       client.update_track(Supply.config[:track], 0.1, nil) if Supply.config[:deactivate_on_promote]
       client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout] || 0.1, version_codes)
+    end
+
+    def upload_changelog(language)
+      path = File.join(Supply.config[:metadata_path], language, Supply::CHANGELOGS_FOLDER_NAME, "#{Supply.config[:version_name]}.txt")
+      changelog_text = ''
+      if File.exist?(path)
+        changelog_text = File.read(path, encoding: 'UTF-8')
+      else
+        UI.user_error!(%(Cannot update changelog for '#{language}', as the path '#{path}' does not exist.))
+      end
+
+      AndroidPublisher::LocalizedText.new({
+        language: language,
+        text: changelog_text
+      })
+    end
+
+    def upload_changelogs(release_notes)
+      track_release = AndroidPublisher::TrackRelease.new({
+        name: Supply.config[:version_name],
+        release_notes: release_notes,
+        status: Supply.config[:release_status]
+      })
+
+      track = AndroidPublisher::Track.new({
+        track: Supply.config[:track],
+        releases: [track_release]
+      })
+
+      client.upload_changelogs(track)
     end
 
     def upload_changelogs_DEPRECATED(language)
