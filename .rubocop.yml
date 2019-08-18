@@ -25,7 +25,7 @@ Performance/RegexpMatch:
   Enabled: false
 
 # This suggests use of `tr` instead of `gsub`. While this might be more performant,
-# these methods are not at all interchangable, and behave very differently. This can
+# these methods are not at all interchangeable, and behave very differently. This can
 # lead to people making the substitution without considering the differences.
 Performance/StringReplacement:
   Enabled: false

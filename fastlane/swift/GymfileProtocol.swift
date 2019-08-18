@@ -28,7 +28,7 @@ protocol GymfileProtocol: class {
   var exportTeamId: String? { get }
   var xcargs: String? { get }
   var xcconfig: String? { get }
-  var suppressXcodeOutput: String? { get }
+  var suppressXcodeOutput: Bool? { get }
   var disableXcpretty: String? { get }
   var xcprettyTestFormat: String? { get }
   var xcprettyFormatter: String? { get }
@@ -70,7 +70,7 @@ extension GymfileProtocol {
   var exportTeamId: String? { return nil }
   var xcargs: String? { return nil }
   var xcconfig: String? { return nil }
-  var suppressXcodeOutput: String? { return nil }
+  var suppressXcodeOutput: Bool? { return nil }
   var disableXcpretty: String? { return nil }
   var xcprettyTestFormat: String? { return nil }
   var xcprettyFormatter: String? { return nil }
@@ -84,4 +84,4 @@ extension GymfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.3]
+// FastlaneRunnerAPIVersion [0.9.4]
