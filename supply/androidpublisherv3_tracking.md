@@ -35,3 +35,11 @@
   | Checking in other tracks if specified, when production track doesn't have any version | <ul><li>https://tinyurl.com/yxkse6rq</li><li>https://tinyurl.com/y4fbebnb</li></ul> | Aug 17, 2019 |
   | <h2>`supply run`</h2> |  |  |
   | **Part 1: Uploading changelogs**<ul><li>Added a couple of global variables to avoid hard coding</li><li>Added new option (-e) to specify release status</li></ul> | https://tinyurl.com/y3ldr9jt | Aug 17, 2019 |
+  | Validation - Cannot specify rollout percentage when release status is 'draft'  | https://tinyurl.com/y3ldr9jt | Aug 17, 2019 |
+  | Fixed lines removed by mistake from previous commit | https://tinyurl.com/y3htwgae | Aug 17, 2019 |
+
+<br>
+**Notes:**
+  - [TODO] Enable update checker after all fixes.
+    - https://github.com/scorpion35/fastlane/blob/androidpublisherv3/fastlane_core/lib/fastlane_core/update_checker/update_checker.rb#L42
+  
