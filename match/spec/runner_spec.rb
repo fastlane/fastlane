@@ -1,4 +1,4 @@
-  describe Match do
+describe Match do
   describe Match::Runner do
     let(:keychain) { 'login.keychain' }
 
