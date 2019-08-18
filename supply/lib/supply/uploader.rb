@@ -105,6 +105,8 @@ module Supply
         status: Supply.config[:release_status]
       })
 
+      track_release.version_codes = Supply.config[:version_codes_to_retain] unless Supply.config[:version_codes_to_retain].nil?
+
       track = AndroidPublisher::Track.new({
         track: Supply.config[:track],
         releases: [track_release]
