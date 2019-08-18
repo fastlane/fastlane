@@ -84,7 +84,7 @@ module Pilot
       platform = fetch_app_platform
       app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
       app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.id, platform: platform, train_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], return_spaceship_testflight_build: false)
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.id, platform: platform, app_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], return_spaceship_testflight_build: false)
 
       unless latest_build.app_version == app_version && latest_build.version == app_build
         UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.app_version} - #{latest_build.version}.")
@@ -100,7 +100,11 @@ module Pilot
       end
 
       # Get latest uploaded build if no build specified
-      build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, sort: "-uploadedDate", limit: 1).first
+      if build.nil?
+        UI.important("No build specified - fetching latest build")
+        platform = Spaceship::ConnectAPI::Platform.map(fetch_app_platform)
+        build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, sort: "-uploadedDate", platform: platform, limit: 1).first
+      end
 
       # Verify the build has all the includes that we need
       # and fetch a new build if not
@@ -157,7 +161,7 @@ module Pilot
         [
           build.app_version,
           build.version,
-          build.beta_build_metrics.map(&:install_count).reduce(:+)
+          (build.beta_build_metrics || []).map(&:install_count).reduce(:+)
         ]
       end
 
@@ -293,7 +297,7 @@ module Pilot
       UI.message("Distributing new build to testers: #{uploaded_build.app_version} - #{uploaded_build.version}")
 
       # This is where we could add a check to see if encryption is required and has been updated
-      set_export_compliance_if_needed(uploaded_build, options)
+      uploaded_build = set_export_compliance_if_needed(uploaded_build, options)
 
       if options[:groups] || options[:distribute_external]
         if uploaded_build.ready_for_beta_submission?
@@ -328,12 +332,13 @@ module Pilot
         uses_non_exempt_encryption = options[:uses_non_exempt_encryption]
         attributes = { usesNonExemptEncryption: uses_non_exempt_encryption }
 
-        client = Spaceship::ConnectAPI::Base.client
-        client.patch_builds(build_id: uploaded_build.id, attributes: attributes)
+        Spaceship::ConnectAPI.patch_builds(build_id: uploaded_build.id, attributes: attributes)
 
         UI.important("Export compliance has been set to '#{uses_non_exempt_encryption}'. Need to wait for build to finishing processing again...")
         UI.important("Set 'ITSAppUsesNonExemptEncryption' in the 'Info.plist' to skip this step and speed up the submission")
-        wait_for_build_processing_to_be_complete
+        return wait_for_build_processing_to_be_complete
+      else
+        return uploaded_build
       end
     end
 
@@ -350,8 +355,7 @@ module Pilot
       attributes[:demoAccountRequired] = info[:demo_account_required] if info.key?(:demo_account_required)
       attributes[:notes] = info[:notes] if info.key?(:notes)
 
-      client = Spaceship::ConnectAPI::Base.client
-      client.patch_beta_app_review_detail(app_id: build.app.id, attributes: attributes)
+      Spaceship::ConnectAPI.patch_beta_app_review_detail(app_id: build.app.id, attributes: attributes)
     end
 
     def update_localized_app_review(build, info_by_lang, default_info: nil)
@@ -392,12 +396,11 @@ module Pilot
       attributes[:tvOsPrivacyPolicy] = info[:tv_os_privacy_policy_url] if info.key?(:tv_os_privacy_policy_url)
       attributes[:description] = info[:description] if info.key?(:description)
 
-      client = Spaceship::ConnectAPI::Base.client
       if localization
-        client.patch_beta_app_localizations(localization_id: localization.id, attributes: attributes)
+        Spaceship::ConnectAPI.patch_beta_app_localizations(localization_id: localization.id, attributes: attributes)
       else
         attributes[:locale] = locale if locale
-        client.post_beta_app_localizations(app_id: app.id, attributes: attributes)
+        Spaceship::ConnectAPI.post_beta_app_localizations(app_id: app.id, attributes: attributes)
       end
     end
 
@@ -435,12 +438,11 @@ module Pilot
       attributes = {}
       attributes[:whatsNew] = self.class.sanitize_changelog(info[:whats_new]) if info.key?(:whats_new)
 
-      client = Spaceship::ConnectAPI::Base.client
       if localization
-        client.patch_beta_build_localizations(localization_id: localization.id, attributes: attributes)
+        Spaceship::ConnectAPI.patch_beta_build_localizations(localization_id: localization.id, attributes: attributes)
       else
         attributes[:locale] = locale if locale
-        client.post_beta_build_localizations(build_id: build.id, attributes: attributes)
+        Spaceship::ConnectAPI.post_beta_build_localizations(build_id: build.id, attributes: attributes)
       end
     end
 
@@ -450,8 +452,7 @@ module Pilot
       attributes = {}
       attributes[:autoNotifyEnabled] = info[:auto_notify_enabled] if info.key?(:auto_notify_enabled)
 
-      client = Spaceship::ConnectAPI::Base.client
-      client.patch_build_beta_details(build_beta_details_id: build_beta_detail.id, attributes: attributes)
+      Spaceship::ConnectAPI.patch_build_beta_details(build_beta_details_id: build_beta_detail.id, attributes: attributes)
     end
   end
   # rubocop:enable Metrics/ClassLength

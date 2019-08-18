@@ -46,7 +46,7 @@ describe Fastlane do
           CUSTOM_EXECUTABLE_NAME = "custom_executable"
 
           # Override the already overridden swiftlint_version method to check
-          # that the correct exectuable is being passed in as a parameter.
+          # that the correct executable is being passed in as a parameter.
           allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version) { |params|
             expect(params[:executable]).to eq(CUSTOM_EXECUTABLE_NAME)
             swiftlint_gem_version
@@ -350,6 +350,33 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq("swiftlint autocorrect")
+        end
+      end
+
+      context "when using analyzer mode" do
+        it "adds compiler-log-path option" do
+          path = "./spec/fixtures"
+          result = Fastlane::FastFile.new.parse("
+            lane :test do
+              swiftlint(
+                compiler_log_path: '#{path}',
+                mode: :analyze
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint analyze --compiler-log-path #{path}")
+        end
+
+        it "adds invalid path option" do
+          path = "./non/existent/path"
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              swiftlint(
+                compiler_log_path: '#{path}',
+                mode: :analyze
+              )
+            end").runner.execute(:test)
+          end.to raise_error(/Couldn't find compiler_log_path '.*#{path}'/)
         end
       end
     end

@@ -1,6 +1,6 @@
-require_relative './model'
+require_relative '../model'
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class User
       include Spaceship::ConnectAPI::Model
 
@@ -39,7 +39,7 @@ module Spaceship
       #
 
       def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
-        return client.get_users(filter: filter, includes: includes)
+        return Spaceship::ConnectAPI.get_users(filter: filter, includes: includes)
       end
 
       def self.find(email: nil, includes: nil)

@@ -136,7 +136,7 @@ module Scan
       # Zips build products and moves it to output directory
       UI.message("Zipping build products")
       FastlaneCore::Helper.zip_directory(path, output_path, contents_only: true, overwrite: true, print: false)
-      UI.message("Succesfully zipped build products: #{output_path}")
+      UI.message("Successfully zipped build products: #{output_path}")
     end
 
     def test_results

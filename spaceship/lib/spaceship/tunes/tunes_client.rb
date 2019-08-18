@@ -791,6 +791,35 @@ module Spaceship
       du_client.upload_watch_icon(app_version, upload_image, content_provider_id, sso_token_for_image)
     end
 
+    # Uploads an In-App-Purchase Promotional image
+    # @param upload_image (UploadFile): The icon to upload
+    # @return [JSON] the image data, ready to be added to an In-App-Purchase
+    def upload_purchase_merch_screenshot(app_id, upload_image)
+      data = du_client.upload_purchase_merch_screenshot(app_id, upload_image, content_provider_id, sso_token_for_image)
+      {
+        "images" => [
+          {
+            "id" => nil,
+            "image" => {
+              "value" => {
+                "assetToken" => data["token"],
+                "originalFileName" => upload_image.file_name,
+                "height" => data["height"],
+                "width" => data["width"],
+                "checksum" => data["md5"]
+              },
+              "isEditable" => true,
+              "isREquired" => false,
+              "errorKeys" => nil
+            },
+            "status" => "proposed"
+          }
+        ],
+        "showByDefault" => true,
+        "isActive" => false
+      }
+    end
+
     # Uploads an In-App-Purchase Review screenshot
     # @param app_id (AppId): The id of the app
     # @param upload_image (UploadFile): The icon to upload
@@ -871,6 +900,21 @@ module Spaceship
       raise "device is required" unless device
 
       du_client.upload_trailer_preview(app_version, upload_trailer_preview, content_provider_id, sso_token_for_image, device)
+    end
+
+    #####################################################
+    # @!review attachment file
+    #####################################################
+    # Uploads a attachment file
+    # @param app_version (AppVersion): The version of your app(must be edit version)
+    # @param upload_attachment_file (file): File to upload
+    # @return [JSON] the response
+    def upload_app_review_attachment(app_version, upload_attachment_file)
+      raise "app_version is required" unless app_version
+      raise "app_version must be live version" if app_version.is_live?
+      raise "upload_attachment_file is required" unless upload_attachment_file
+
+      du_client.upload_app_review_attachment(app_version, upload_attachment_file, content_provider_id, sso_token_for_image)
     end
 
     # Fetches the App Version Reference information from ITC
@@ -1289,7 +1333,7 @@ module Spaceship
     end
 
     # Creates an In-App-Purchases
-    def create_iap!(app_id: nil, type: nil, versions: nil, reference_name: nil, product_id: nil, cleared_for_sale: true, review_notes: nil, review_screenshot: nil, pricing_intervals: nil, family_id: nil, subscription_duration: nil, subscription_free_trial: nil)
+    def create_iap!(app_id: nil, type: nil, versions: nil, reference_name: nil, product_id: nil, cleared_for_sale: true, merch_screenshot: nil, review_notes: nil, review_screenshot: nil, pricing_intervals: nil, family_id: nil, subscription_duration: nil, subscription_free_trial: nil)
       # Load IAP Template based on Type
       type ||= "consumable"
       r = request(:get, "ra/apps/#{app_id}/iaps/#{type}/template")
@@ -1332,6 +1376,13 @@ module Spaceship
       end
       data["versions"][0]["details"]["value"] = versions_array
       data['versions'][0]["reviewNotes"] = { value: review_notes }
+
+      if merch_screenshot
+        # Upload App Store Promotional image (Optional)
+        upload_file = UploadFile.from_path(merch_screenshot)
+        merch_data = upload_purchase_merch_screenshot(app_id, upload_file)
+        data["versions"][0]["merch"] = merch_data
+      end
 
       if review_screenshot
         # Upload Screenshot:

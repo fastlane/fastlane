@@ -1,5 +1,4 @@
-require 'spaceship/connect_api/models/build'
-require 'spaceship/connect_api/models/build_delivery'
+require 'spaceship/connect_api'
 
 require_relative 'ui/ui'
 
@@ -11,18 +10,27 @@ module FastlaneCore
         # Warn about train_version being removed in the future
         if train_version
           UI.deprecated(":train_version is no longer a used argument on FastlaneCore::BuildWatcher. Please use :app_version instead.")
+          app_version = train_version
         end
-        app_version = train_version
 
         # Warn about strict_build_watch being removed in the future
         if strict_build_watch
           UI.deprecated(":strict_build_watch is no longer a used argument on FastlaneCore::BuildWatcher.")
         end
 
-        loop do
-          matched_build, build_delivery = matching_build(watched_app_version: app_version, watched_build_version: build_version, app_id: app_id)
+        platform = Spaceship::ConnectAPI::Platform.map(platform) if platform
+        UI.message("Waiting for processing on... app_id: #{app_id}, app_version: #{app_version}, build_version: #{build_version}, platform: #{platform}")
 
-          report_status(build: matched_build, build_delivery: build_delivery)
+        showed_info = false
+        loop do
+          matched_build = matching_build(watched_app_version: app_version, watched_build_version: build_version, app_id: app_id, platform: platform)
+
+          if matched_build.nil? && !showed_info
+            UI.important("Read more information on why this build isn't showing up yet - https://github.com/fastlane/fastlane/issues/14997")
+            showed_info = true
+          end
+
+          report_status(build: matched_build)
 
           if matched_build && matched_build.processed?
             if return_spaceship_testflight_build
@@ -48,32 +56,35 @@ module FastlaneCore
         watched_app_version = remove_version_leading_zeros(version: watched_app_version)
         watched_build_version = remove_version_leading_zeros(version: watched_build_version)
 
-        build_deliveries = Spaceship::ConnectAPI::BuildDelivery.all(app_id: app_id, version: watched_app_version, build_number: watched_build_version)
-        build_delivery = build_deliveries.first
+        matched_builds = Spaceship::ConnectAPI::Build.all(
+          app_id: app_id,
+          version: watched_app_version,
+          build_number: watched_build_version,
+          platform: platform
+        )
 
-        # Get processed builds when no longer in build deliveries
-        if build_delivery.nil?
-          matched_builds = Spaceship::ConnectAPI::Build.all(
-            app_id: app_id,
-            version: watched_app_version,
-            build_number: watched_build_version,
-            includes: "app,preReleaseVersion"
-          )
-          matched_build = matched_builds.first
+        # Raise error if more than 1 build is returned
+        # This should never happen but need to inform the user if it does
+        if matched_builds.size > 1
+          error_builds = matched_builds.map do |build|
+            "#{build.app_version}(#{build.version}) for #{build.platform} - #{build.processing_state}"
+          end.join("\n")
+          error_message = "FastlaneCore::BuildWatcher found more than 1 matching build: \n#{error_builds}"
+          UI.crash!(error_message)
         end
 
-        return matched_build, build_delivery
+        matched_build = matched_builds.first
+
+        return matched_build
       end
 
-      def report_status(build: nil, build_delivery: nil)
-        if build_delivery
-          UI.message("Waiting for App Store Connect to finish processing the new build (#{build_delivery.cf_build_short_version_string} - #{build_delivery.cf_build_version})")
-        elsif build && !build.processed?
-          UI.message("Waiting for App Store Connect to finish processing the new build (#{build.app_version} - #{build.version})")
+      def report_status(build: nil)
+        if build && !build.processed?
+          UI.message("Waiting for App Store Connect to finish processing the new build (#{build.app_version} - #{build.version}) for #{build.platform}")
         elsif build && build.processed?
-          UI.success("Successfully finished processing the build #{build.app_version} - #{build.version}")
+          UI.success("Successfully finished processing the build #{build.app_version} - #{build.version} for #{build.platform}")
         else
-          UI.message("Build doesn't show up in the build list anymore, waiting for it to appear again (check your email for processing issues if this continues)")
+          UI.message("Waiting for the build to show up in the build list - this may take a few minutes (check your email for processing issues if this continues)")
         end
       end
     end

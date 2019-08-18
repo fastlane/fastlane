@@ -330,7 +330,7 @@ module Frameit
         background = put_title_into_background_stacked(background, title, keyword)
         return background
       end
-      # sum_width: the width of both labels together including the space inbetween
+      # sum_width: the width of both labels together including the space in-between
       #   is used to calculate the ratio
       sum_width = title.width
       sum_width += keyword.width + keyword_padding if keyword

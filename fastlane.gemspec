@@ -15,26 +15,26 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Joshua Liebowitz",
-                        "Stefan Natchev",
-                        "Andrew McBurney",
-                        "Felix Krause",
-                        "Jorge Revuelta H",
-                        "Manu Wallner",
-                        "Josh Holtz",
-                        "Matthew Ellis",
-                        "Luka Mirosevic",
-                        "Iulian Onofrei",
-                        "Jimmy Dee",
-                        "Danielle Tomlinson",
-                        "Kohki Miki",
-                        "Maksym Grebenets",
-                        "Jan Piotrowski",
+  spec.authors       = ["Jorge Revuelta H",
+                        "Olivier Halligon",
                         "Aaron Brager",
+                        "Joshua Liebowitz",
                         "Fumiya Nakamura",
+                        "Kohki Miki",
+                        "Jan Piotrowski",
+                        "Jimmy Dee",
+                        "Andrew McBurney",
+                        "Maksym Grebenets",
+                        "Stefan Natchev",
+                        "Matthew Ellis",
                         "Jérôme Lacoste",
+                        "Iulian Onofrei",
+                        "Danielle Tomlinson",
+                        "Manu Wallner",
+                        "Felix Krause",
+                        "Luka Mirosevic",
                         "Helmut Januschka",
-                        "Olivier Halligon"]
+                        "Josh Holtz"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -80,7 +80,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
-  spec.add_dependency('mini_magick', '~> 4.5.1') # To open, edit and export PSD files
+  spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
   spec.add_dependency('multi_xml', '~> 0.5')
   spec.add_dependency('rubyzip', '>= 1.2.2', '< 2.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected

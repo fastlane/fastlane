@@ -202,9 +202,15 @@ module FastlaneCore
       return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
 
       if self.mac?
+        # First check for manually install iTMSTransporter
+        user_local_itms_path = "/usr/local/itms"
+        return user_local_itms_path if File.exist?(user_local_itms_path)
+
+        # Then check for iTMSTransporter in the Xcode path
         [
           "../Applications/Application Loader.app/Contents/MacOS/itms",
-          "../Applications/Application Loader.app/Contents/itms"
+          "../Applications/Application Loader.app/Contents/itms",
+          "../SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms" # For Xcode 11
         ].each do |path|
           result = File.expand_path(File.join(self.xcode_path, path))
           return result if File.exist?(result)

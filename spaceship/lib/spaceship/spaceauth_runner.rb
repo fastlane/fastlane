@@ -25,7 +25,7 @@ module Spaceship
         puts("Please try unsetting the FASTLANE_SESSION environment variable".yellow)
         puts("(if it is set) and re-run `fastlane spaceauth`".yellow)
         puts("")
-        puts("Execption type: #{ex.class}")
+        puts("Exception type: #{ex.class}")
         raise ex
       end
 

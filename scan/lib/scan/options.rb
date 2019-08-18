@@ -213,7 +213,7 @@ module Scan
                                      env_name: "SCAN_SUPPRESS_XCODE_OUTPUT",
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
-                                     is_string: false),
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :formatter,
                                      short_option: "-n",
                                      env_name: "SCAN_FORMATTER",
@@ -375,7 +375,13 @@ module Scan
                                      deprecated: "Use `--output_files` instead",
                                      conflicting_options: [:output_files],
                                      optional: true,
-                                     is_string: true)
+                                     is_string: true),
+        FastlaneCore::ConfigItem.new(key: :xcodebuild_command,
+                                    env_name: "GYM_XCODE_BUILD_COMMAND",
+                                    description: "Allows for override of the default `xcodebuild` command",
+                                    type: String,
+                                    optional: true,
+                                    default_value: "env NSUnbufferedIO=YES xcodebuild")
 
       ]
     end

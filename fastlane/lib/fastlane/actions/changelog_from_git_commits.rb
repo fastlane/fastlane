@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      FL_CHANGELOG = :FL_CHANGELOG
+      FL_CHANGELOG ||= :FL_CHANGELOG
     end
 
     class ChangelogFromGitCommitsAction < Action

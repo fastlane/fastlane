@@ -1,6 +1,6 @@
-require_relative './model'
+require_relative '../model'
 module Spaceship
-  module ConnectAPI
+  class ConnectAPI
     class BetaTesterMetric
       include Spaceship::ConnectAPI::Model
 
@@ -24,6 +24,7 @@ module Spaceship
 
       module BetaTesterState
         INSTALLED = "INSTALLED"
+        INVITED = "INVITED"
         NO_BUILDS = "NO_BUILDS"
       end
 
