@@ -34,9 +34,10 @@
   | Returning full resolution screenshots/images from a single source | https://tinyurl.com/y6y53tqj | Aug 4, 2019 |
   | Checking in other tracks if specified, when production track doesn't have any version | <ul><li>https://tinyurl.com/yxkse6rq</li><li>https://tinyurl.com/y4fbebnb</li></ul> | Aug 17, 2019 |
   | <h2>`supply run`</h2> |  |  |
-  | **Part 1: Uploading changelogs**<ul><li>Added a couple of global variables to avoid hard coding</li><li>Added new option (-e) to specify release status</li></ul> | https://tinyurl.com/y3ldr9jt | Aug 17, 2019 |
+  | Uploading changelogs<ul><li>Added a couple of global variables to avoid hard coding</li><li>Added new option (-e) to specify release status</li></ul> | https://tinyurl.com/y3ldr9jt | Aug 17, 2019 |
   | Validation - Cannot specify rollout percentage when release status is 'draft'  | https://tinyurl.com/y4lsbun4 | Aug 17, 2019 |
   | Fixed lines removed by mistake from previous commit | https://tinyurl.com/y3htwgae | Aug 17, 2019 |
+  | Added new option to just upload changelogs (i.e. without touching storefront metadata)<ul><li>`--skip_upload_metadata` only uploads metadata (i.e. without modifying/updating changelogs)</li><li>`--skip_upload_changelogs` only uploads changelogs (i.e. without modifying/updating storefront metadata) </li></ul> | https://tinyurl.com/y6pxy9gw | Aug 18, 2019 |
 
 <br>
 

@@ -415,37 +415,10 @@ module Supply
       end
     end
 
-    def upload_changelogs(all_languages)
+    def upload_changelogs(track)
       ensure_active_edit!
-      
-      release_notes = []
-      all_languages.each do |language|
-        path = File.join(Supply.config[:metadata_path], language, Supply::CHANGELOGS_FOLDER_NAME, "#{Supply.config[:version_name]}.txt")
-        changelog_text = ''
-        if File.exist?(path)
-          changelog_text = File.read(path, encoding: 'UTF-8')
-        else
-          UI.user_error!(%(Cannot update changelog for '#{language}', as the path '#{path}' does not exist.))
-        end
 
-        release_notes << AndroidPublisher::LocalizedText.new({
-          language: language,
-          text: changelog_text
-        })
-      end
-
-      track_release = AndroidPublisher::TrackRelease.new({
-        name: Supply.config[:version_name], 
-        release_notes: release_notes,
-        status: Supply.config[:release_status]
-      })
-
-      track = AndroidPublisher::Track.new({
-        track: Supply.config[:track],
-        releases: [track_release]
-      })
-
-      call_google_api do
+      result = call_google_api do
         client.update_edit_track(
           current_package_name,
           self.current_edit.id,
