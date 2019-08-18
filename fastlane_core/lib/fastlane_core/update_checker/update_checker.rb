@@ -39,7 +39,7 @@ module FastlaneCore
 
     def self.show_update_status(gem_name, current_version)
       if update_available?(gem_name, current_version)
-        show_update_message(gem_name, current_version)
+        # show_update_message(gem_name, current_version)
       end
     end
 

@@ -304,7 +304,7 @@ module Supply
       })
 
       call_google_api do
-        client.update_listing(
+        client.update_edit_listing(
           current_package_name,
           current_edit.id,
           language,
@@ -436,7 +436,8 @@ module Supply
 
       track_release = AndroidPublisher::TrackRelease.new({
         name: Supply.config[:version_name], 
-        release_notes: release_notes
+        release_notes: release_notes,
+        status: Supply.config[:release_status]
       })
 
       track = AndroidPublisher::Track.new({
@@ -530,7 +531,7 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        client.upload_image(
+        client.upload_edit_image(
           current_package_name,
           current_edit.id,
           language,
@@ -545,7 +546,7 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        client.delete_all_images(
+        client.deleteall_edit_image(
           current_package_name,
           current_edit.id,
           language,
