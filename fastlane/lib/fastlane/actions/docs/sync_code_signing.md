@@ -73,7 +73,7 @@ fastlane match init
 
 <img src="/img/actions/match_init.gif" width="550" />
 
-You'll be asked if you want to store your code signing identities inside a **Git repo**, **Google Cloud** or **S3**.
+You'll be asked if you want to store your code signing identities inside a **Git repo**, **Google Cloud** or **Amazon S3**.
 
 #### Git Storage
 
@@ -142,9 +142,9 @@ Example content (for more advanced setups check out the [fastlane section](#fast
 google_cloud_bucket_name("major-key-certificates")
 ```
 
-#### S3
+#### Amazon S3
 
-Use [S3](https://aws.amazon.com/s3/) for a fully hosted solution for your code signing identities. Certificates are stored on S3, inside a storage bucket you provide. You can also directly access the files using the web console.
+Use [Amazon S3](https://aws.amazon.com/s3/) for a fully hosted solution for your code signing identities. Certificates are stored on S3, inside a storage bucket you provide. You can also directly access the files using the web console.
 
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder).
 
@@ -167,10 +167,9 @@ match(git_branch: "team1", username: "user@team1.com")
 match(git_branch: "team2", username: "user@team2.com")
 ```
 
-#### Google Cloud or S3 Storage
+#### Google Cloud or Amazon S3 Storage
 
-If you use Google Cloud Storage, you don't need to do anything manually for multiple teams. Just use Google Cloud Storage, and the top level folder will be the team ID.
-If you use Google Cloud or S3 Storage, you don't need to do anything manually. Just use Google Cloud or S3 Storage, and the top level folder will be the team ID.
+If you use Google Cloud or Amazon S3 Storage, you don't need to do anything manually. Just use Google Cloud or Amazon S3 Storage, and the top level folder will be the team ID.
 
 ### Run
 
@@ -207,7 +206,7 @@ fastlane action match
 
 #### Handle multiple targets
 
-_match_ can use the same one Git repository, Google Cloud, or S3 Storage for all bundle identifiers.
+_match_ can use the same one Git repository, Google Cloud, or Amazon S3 Storage for all bundle identifiers.
 
 If you have several targets with different bundle identifiers, supply them as a comma-separated list:
 
@@ -432,9 +431,9 @@ Once you've decided which approach to take, all that's left to do is to set your
 
 Accessing Google Cloud Storage from your CI system requires you to provide the `gc_keys.json` file as part of your build. How you implement this is your decision. You can inject that file during build time.
 
-#### S3 Storage access
+#### Amazon S3 Storage access
 
-Accessing S3 Storage from your CI system requires you to provide the `s3_region`, `s3_access_key`, `s3_secret_access_key` and `s3_bucket` options (or environment variables), with keys that has read access to the bucket.
+Accessing Amazon S3 Storage from your CI system requires you to provide the `s3_region`, `s3_access_key`, `s3_secret_access_key` and `s3_bucket` options (or environment variables), with keys that has read access to the bucket.
 
 ### Nuke
 
