@@ -40,6 +40,7 @@
   | Added new option to just upload changelogs (i.e. without touching storefront metadata)<ul><li>`--skip_upload_metadata` only uploads metadata (i.e. without modifying/updating changelogs)</li><li>`--skip_upload_changelogs` only uploads changelogs (i.e. without modifying/updating storefront metadata) </li></ul> | https://tinyurl.com/y6pxy9gw | Aug 18, 2019 |
   | Refactor: Moved upload_changelogs to uploader.rb to just have client methods in client.rb | https://tinyurl.com/yxjpovrr | Aug 18, 2019 |
   | Converting --version_codes_to_retain to numbers | https://tinyurl.com/y2yly5l6 | Aug 18, 2019 |
+  | Can now specify version codes to be added to release | https://tinyurl.com/y27gxa4z | Aug 18, 2019 |
 
 <br>
 
