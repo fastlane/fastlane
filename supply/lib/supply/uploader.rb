@@ -69,6 +69,10 @@ module Supply
       if Supply.config[:release_status] == 'draft' && Supply.config[:rollout]
         UI.user_error!(%(Cannot specify rollout percentage when the release status is set to 'draft'))
       end
+
+      unless Supply.config[:version_codes_to_retain].nil?
+        Supply.config[:version_codes_to_retain] = Supply.config[:version_codes_to_retain].map(&:to_i)
+      end
     end
 
     def promote_track

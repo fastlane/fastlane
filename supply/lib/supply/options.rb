@@ -264,9 +264,10 @@ module Supply
                                      type: Array,
                                      description: "An array of version codes to retain when publishing a new APK",
                                      verify_block: proc do |version_codes|
+                                      version_codes = version_codes.map(&:to_i)
                                        UI.user_error!("Could not evaluate array from '#{version_codes}'") unless version_codes.kind_of?(Array)
                                        version_codes.each do |version_code|
-                                         UI.user_error!("Version code '#{version_code}' is not an integer") unless version_code.kind_of?(Integer)
+                                         UI.user_error!("Version code '#{version_code}' is not an integer") if version_code == 0
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :obb_main_references_version,
