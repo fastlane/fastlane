@@ -14,6 +14,9 @@ module Match
           },
           "google_cloud" => lambda { |params|
             return nil
+          },
+          "s3" => lambda { |params|
+            return nil
           }
         }
       end

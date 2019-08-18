@@ -159,6 +159,28 @@ module Match
                                      description: "ID of the Google Cloud project to use for authentication",
                                      optional: true),
 
+        # Storage: S3
+        FastlaneCore::ConfigItem.new(key: :s3_region,
+                                     env_name: "MATCH_S3_REGION",
+                                     description: "Name of the S3 region",
+                                     is_string: false,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :s3_access_key,
+                                     env_name: "MATCH_S3_ACCESS_KEY",
+                                     description: "S3 access key",
+                                     is_string: false,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :s3_secret_access_key,
+                                     env_name: "MATCH_S3_SECRET_ACCESS_KEY",
+                                     description: "S3 secret secret access key",
+                                     is_string: false,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :s3_bucket,
+                                     env_name: "MATCH_S3_BUCKET",
+                                     description: "Name of the S3 bucket",
+                                     is_string: false,
+                                     optional: true),
+
         # Keychain
         FastlaneCore::ConfigItem.new(key: :keychain_name,
                                      short_option: "-s",

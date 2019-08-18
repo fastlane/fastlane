@@ -1,4 +1,5 @@
 require 'fastlane/erb_template_helper'
+require 'fastlane/helper/s3_client_helper'
 require 'ostruct'
 require 'uri'
 require 'cgi'
@@ -26,8 +27,6 @@ module Fastlane
       source: '--source-dir',
       path: '-P'
     }
-
-    # rubocop:disable Metrics/ClassLength
     class S3Action < Action
       def self.run(config)
         # Calling fetch on config so that default values will be used
@@ -71,8 +70,8 @@ module Fastlane
         version_template_path = params[:version_template_path]
         version_file_name = params[:version_file_name]
 
-        s3_client = self.s3_client(s3_access_key, s3_secret_access_key, s3_region)
-        bucket = s3_client.buckets[s3_bucket]
+        s3_client = Fastlane::Helper::S3ClientHelper.new(s3_access_key, s3_secret_access_key, s3_region)
+        bucket = s3_client.bucket(s3_bucket)
 
         url_part = self.expand_path_with_substitutions_from_ipa_plist(ipa_file, s3_path)
 
@@ -80,7 +79,7 @@ module Fastlane
         ipa_file_name = "#{url_part}#{ipa_file_basename}"
         ipa_file_data = File.open(ipa_file, 'rb')
 
-        ipa_url = self.upload_file(bucket, ipa_file_name, ipa_file_data, acl)
+        ipa_url = s3_client.upload_file(bucket, ipa_file_name, ipa_file_data, acl)
 
         # Setting action and environment variables
         Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH] = ipa_url
@@ -91,7 +90,7 @@ module Fastlane
           dsym_file_name = "#{url_part}#{dsym_file_basename}"
           dsym_file_data = File.open(dsym_file, 'rb')
 
-          dsym_url = self.upload_file(bucket, dsym_file_name, dsym_file_data, acl)
+          dsym_url = s3_client.upload_file(bucket, dsym_file_name, dsym_file_data, acl)
 
           # Setting action and environment variables
           Actions.lane_context[SharedValues::S3_DSYM_OUTPUT_PATH] = dsym_url
@@ -185,9 +184,9 @@ module Fastlane
         #
         #####################################
 
-        plist_url = self.upload_file(bucket, plist_file_name, plist_render, acl)
-        html_url = self.upload_file(bucket, html_file_name, html_render, acl)
-        version_url = self.upload_file(bucket, version_file_name, version_render, acl)
+        plist_url = s3_client.upload_file(bucket, plist_file_name, plist_render, acl)
+        html_url = s3_client.upload_file(bucket, html_file_name, html_render, acl)
+        version_url = s3_client.upload_file(bucket, version_file_name, version_render, acl)
 
         # Setting action and environment variables
         Actions.lane_context[SharedValues::S3_PLIST_OUTPUT_PATH] = plist_url
@@ -202,86 +201,6 @@ module Fastlane
         UI.success("Successfully uploaded ipa file to '#{Actions.lane_context[SharedValues::S3_IPA_OUTPUT_PATH]}'")
 
         return true
-      end
-
-      # @return true if loading the AWS SDK from the 'aws-sdk' gem yields the expected v1 API, or false otherwise
-      def self.load_from_original_gem_name
-        begin
-          # We don't use `Actions.verify_gem!` here, because we want to silently be OK with this gem not being
-          # present, in case the user has already migrated to 'aws-sdk-v1' (see #load_from_v1_gem_name)
-          Gem::Specification.find_by_name('aws-sdk')
-          require 'aws-sdk'
-        rescue Gem::LoadError
-          UI.verbose("The 'aws-sdk' gem is not present")
-          return false
-        end
-
-        UI.verbose("The 'aws-sdk' gem is present")
-        true
-      end
-
-      def self.load_from_v1_gem_name
-        Actions.verify_gem!('aws-sdk-v1')
-        require 'aws-sdk-v1'
-      end
-
-      def self.v1_sdk_module_present?
-        begin
-          # Here we'll make sure that the `AWS` module is defined. If it is, the gem is the v1.x API.
-          Object.const_get("AWS")
-        rescue NameError
-          UI.verbose("Couldn't find the needed `AWS` module in the 'aws-sdk' gem")
-          return false
-        end
-
-        UI.verbose("Found the needed `AWS` module in the 'aws-sdk' gem")
-        true
-      end
-
-      def self.s3_client(s3_access_key, s3_secret_access_key, s3_region)
-        # The AWS SDK API changed completely in v2.x. The most stable way to keep using the V1 API is to
-        # require the 'aws-sdk-v1' gem directly. However, for those customers who are using the 'aws-sdk'
-        # gem at v1.x, we don't want to break their setup which currently works.
-        #
-        # Therefore, we will attempt to load the v1 API from the original gem name, but go on to load
-        # from the aws-sdk-v1 gem name if necessary
-        loaded_original_gem = load_from_original_gem_name
-
-        if !loaded_original_gem || !v1_sdk_module_present?
-          load_from_v1_gem_name
-          UI.verbose("Loaded AWS SDK v1.x from the `aws-sdk-v1` gem")
-        else
-          UI.verbose("Loaded AWS SDK v1.x from the `aws-sdk` gem")
-        end
-
-        if s3_region
-          s3_client = AWS::S3.new(
-            access_key_id: s3_access_key,
-            secret_access_key: s3_secret_access_key,
-            region: s3_region
-          )
-        else
-          s3_client = AWS::S3.new(
-            access_key_id: s3_access_key,
-            secret_access_key: s3_secret_access_key
-          )
-        end
-        s3_client
-      end
-
-      def self.upload_file(bucket, file_name, file_data, acl)
-        obj = bucket.objects.create(file_name, file_data, acl: acl)
-
-        # When you enable versioning on a S3 bucket,
-        # writing to an object will create an object version
-        # instead of replacing the existing object.
-        # http://docs.aws.amazon.com/AWSRubySDK/latest/AWS/S3/ObjectVersion.html
-        if obj.kind_of?(AWS::S3::ObjectVersion)
-          obj = obj.object
-        end
-
-        # Return public url
-        obj.public_url.to_s
       end
 
       #
