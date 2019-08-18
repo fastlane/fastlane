@@ -38,6 +38,7 @@
   | Validation - Cannot specify rollout percentage when release status is 'draft'  | https://tinyurl.com/y4lsbun4 | Aug 17, 2019 |
   | Fixed lines removed by mistake from previous commit | https://tinyurl.com/y3htwgae | Aug 17, 2019 |
   | Added new option to just upload changelogs (i.e. without touching storefront metadata)<ul><li>`--skip_upload_metadata` only uploads metadata (i.e. without modifying/updating changelogs)</li><li>`--skip_upload_changelogs` only uploads changelogs (i.e. without modifying/updating storefront metadata) </li></ul> | https://tinyurl.com/y6pxy9gw | Aug 18, 2019 |
+  | Refactor: Moved upload_changelogs to uploader.rb to just have client methods in client.rb | https://tinyurl.com/yxjpovrr | Aug 18, 2019 |
 
 <br>
 
@@ -46,4 +47,3 @@
   - [TODO] Enable update checker after all fixes.
     - File: https://github.com/scorpion35/fastlane/blob/androidpublisherv3/fastlane_core/lib/fastlane_core/update_checker/update_checker.rb#L42
     - Commit disabled in: https://github.com/scorpion35/fastlane/commit/4fed441658a68b31665f1b2003047476b919385a
-  
