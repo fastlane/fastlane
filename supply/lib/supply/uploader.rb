@@ -7,6 +7,13 @@ module Supply
 
       verify_config!
 
+      apk_version_codes = []
+      apk_version_codes.concat(upload_apks) unless Supply.config[:skip_upload_apk]
+      apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
+      upload_mapping(apk_version_codes)
+
+      apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
+      binding.pry
       track_edit = AndroidPublisher::Track.new()
       if metadata_path
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
@@ -24,16 +31,9 @@ module Supply
           release_notes << upload_changelog(language) unless Supply.config[:skip_upload_changelogs]
         end
 
-        upload_changelogs(release_notes) unless Supply.config[:skip_upload_changelogs]
+        upload_changelogs(release_notes, apk_version_codes) unless Supply.config[:skip_upload_changelogs]
       end
       binding.pry
-      
-      apk_version_codes = []
-      apk_version_codes.concat(upload_apks) unless Supply.config[:skip_upload_apk]
-      apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
-      upload_mapping(apk_version_codes)
-
-      apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
 
       # Only update tracks if we have version codes
       # Updating a track with empty version codes can completely clear out a track
@@ -98,14 +98,14 @@ module Supply
       })
     end
 
-    def upload_changelogs(release_notes)
+    def upload_changelogs(release_notes, version_codes = [])
       track_release = AndroidPublisher::TrackRelease.new({
         name: Supply.config[:version_name],
         release_notes: release_notes,
         status: Supply.config[:release_status]
       })
 
-      track_release.version_codes = Supply.config[:version_codes_to_retain] unless Supply.config[:version_codes_to_retain].nil?
+      track_release.version_codes = version_codes if version_codes.length > 0
 
       track = AndroidPublisher::Track.new({
         track: Supply.config[:track],
@@ -209,12 +209,12 @@ module Supply
         UI.message("Preparing aab at path '#{aab_path}' for upload...")
         bundle_version_code = client.upload_bundle(aab_path)
 
-        if metadata_path
-          all_languages.each do |language|
-            next if language.start_with?('.') # e.g. . or .. or hidden folders
-            upload_changelog(language, bundle_version_code)
-          end
-        end
+        # if metadata_path
+        #   all_languages.each do |language|
+        #     next if language.start_with?('.') # e.g. . or .. or hidden folders
+        #     upload_changelog(language, bundle_version_code)
+        #   end
+        # end
 
         aab_version_codes.push(bundle_version_code)
       end
@@ -233,7 +233,7 @@ module Supply
     # @return [Integer] The apk version code returned after uploading, or nil if there was a problem
     def upload_binary_data(apk_path)
       apk_version_code = nil
-      binding.pry
+
       if apk_path
         UI.message("Preparing apk at path '#{apk_path}' for upload...")
         apk_version_code = client.upload_apk(apk_path)
@@ -255,15 +255,17 @@ module Supply
 
         upload_obbs(apk_path, apk_version_code)
 
-        if metadata_path
-          all_languages.each do |language|
-            next if language.start_with?('.') # e.g. . or .. or hidden folders
-            upload_changelog(language, apk_version_code)
-          end
-        end
+        # if metadata_path
+        #   all_languages.each do |language|
+        #     next if language.start_with?('.') # e.g. . or .. or hidden folders
+        #     upload_changelog(language, apk_version_code)
+        #   end
+        # end
       else
         UI.message("No apk file found, you can pass the path to your apk using the `apk` option")
       end
+
+      UI.message("\tVersion Code: #{apk_version_code}")
       apk_version_code
     end
 
