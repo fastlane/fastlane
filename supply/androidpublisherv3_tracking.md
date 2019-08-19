@@ -41,6 +41,7 @@
   | Refactor: Moved upload_changelogs to uploader.rb to just have client methods in client.rb | https://tinyurl.com/yxjpovrr | Aug 18, 2019 |
   | Converting --version_codes_to_retain to numbers | https://tinyurl.com/y2yly5l6 | Aug 18, 2019 |
   | Can now specify version codes to be added to release | https://tinyurl.com/y27gxa4z | Aug 18, 2019 |
+  | Uploading apk's first if specified | https://tinyurl.com/y65998b9 | Aug 19, 2019 |
 
 <br>
 
