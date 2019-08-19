@@ -41,10 +41,13 @@ module Fastlane
       }
     end
 
-    def extend_content(file_content)
+    def extend_content(file_content, tool_details)
       file_content << "" # newline because we're adding an extension
       file_content << "// These are all the parsing functions needed to transform our data into the expected types"
       file_content << generate_lanefile_parsing_functions
+
+      tool_objects = generate_lanefile_tool_objects(classes: tool_details.map(&:swift_class))
+      file_content << tool_objects
 
       old_file_content = File.read(fastlane_swift_api_path)
       new_file_content = file_content.join("\n")
@@ -54,7 +57,7 @@ module Fastlane
       old_api_version = find_api_version_string(content: old_file_content)
 
       # if there is a change, we need to write out the new file
-      puts "#{api_version} vs #{old_api_version}"
+      puts("#{api_version} vs #{old_api_version}")
       if api_version != old_api_version
         file_content << autogen_version_warning_text(api_version: api_version)
       else
@@ -133,7 +136,7 @@ module Fastlane
       @fastlane_swift_api_path = File.join(@target_output_path, @target_filename)
     end
 
-    def extend_content(content)
+    def extend_content(content, tool_details)
       return content
     end
 
@@ -161,10 +164,7 @@ module Fastlane
         file_content << swift_function.swift_code
       end
 
-      tool_objects = generate_lanefile_tool_objects(classes: tool_details.map(&:swift_class))
-      file_content << tool_objects
-
-      file_content = extend_content(file_content)
+      file_content = extend_content(file_content, tool_details)
 
       if file_content
         new_file_content = file_content.join("\n")
