@@ -77,7 +77,7 @@ module Fastlane
       super()
 
       # Excludes all actions that aren't external actions (including plugins)
-      available_external_actions = Fastlane.external_actions
+      available_external_actions = Fastlane.external_actions || []
       available_actions = []
       ActionsList.all_actions do |action|
         available_actions << action.action_name unless available_external_actions.include?(action)
