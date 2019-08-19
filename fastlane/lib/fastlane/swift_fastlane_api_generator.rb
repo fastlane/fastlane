@@ -18,21 +18,13 @@ module Fastlane
 
   class SwiftFastlaneAPIGenerator < SwiftAPIGenerator
     def initialize(target_output_path: "swift")
-      @is_fastlane_swift = true
       @target_filename = "Fastlane.swift"
       @target_output_path = File.expand_path(target_output_path)
       @generated_paths = []
-      require 'fastlane'
-      require 'fastlane/documentation/actions_list'
-      Fastlane.load_actions
-      # Tools that can be used with <Toolname>file, like Deliverfile, Screengrabfile
-      # this is important because we need to generate the proper api for these by creating a protocol
-      # with default implementation we can use in the Fastlane.swift API if people want to use
-      # <Toolname>file.swift files.
-      self.tools_option_files = TOOL_CONFIG_FILES.map { |config_file| config_file.downcase.chomp("file") }.to_set
+
+      super()
 
       self.actions_not_supported = ["import", "import_from_git"].to_set
-
       self.action_options_to_ignore = {
 
         "precheck" => [
@@ -48,63 +40,71 @@ module Fastlane
         ].to_set
       }
     end
+
+    def extend_content(file_content)
+      file_content << "" # newline because we're adding an extension
+      file_content << "// These are all the parsing functions needed to transform our data into the expected types"
+      file_content << generate_lanefile_parsing_functions
+
+      old_file_content = File.read(fastlane_swift_api_path)
+      new_file_content = file_content.join("\n")
+
+      # compare old file content to potential new file content
+      api_version = determine_api_version(new_file_content: new_file_content, old_file_content: old_file_content)
+      old_api_version = find_api_version_string(content: old_file_content)
+
+      # if there is a change, we need to write out the new file
+      puts "#{api_version} vs #{old_api_version}"
+      if api_version != old_api_version
+        file_content << autogen_version_warning_text(api_version: api_version)
+      else
+        file_content = nil
+      end
+
+      return file_content
+    end
   end
 
   class SwiftActionsAPIGenerator < SwiftAPIGenerator
     def initialize(target_output_path: "swift")
-      @is_fastlane_swift = false
       @target_filename = "Actions.swift"
       @target_output_path = File.expand_path(target_output_path)
       @generated_paths = []
-      require 'fastlane'
-      require 'fastlane/documentation/actions_list'
-      Fastlane.load_actions
-      # Tools that can be used with <Toolname>file, like Deliverfile, Screengrabfile
-      # this is important because we need to generate the proper api for these by creating a protocol
-      # with default implementation we can use in the Fastlane.swift API if people want to use
-      # <Toolname>file.swift files.
-      self.tools_option_files = TOOL_CONFIG_FILES.map { |config_file| config_file.downcase.chomp("file") }.to_set
 
+      super()
+
+      # Excludes all actions that aren't external actions (including plugins)
       available_external_actions = Fastlane.external_actions
-
       available_actions = []
       ActionsList.all_actions do |action|
         available_actions << action.action_name unless available_external_actions.include?(action)
       end
 
       self.actions_not_supported = (["import", "import_from_git"] + available_actions).to_set
-
       self.action_options_to_ignore = {}
     end
   end
 
   class SwiftPluginsAPIGenerator < SwiftAPIGenerator
     def initialize(target_output_path: "swift")
-      @is_fastlane_swift = false
       @target_filename = "Plugins.swift"
       @target_output_path = File.expand_path(target_output_path)
       @generated_paths = []
-      require 'fastlane'
-      require 'fastlane/documentation/actions_list'
-      Fastlane.load_actions
-      # Tools that can be used with <Toolname>file, like Deliverfile, Screengrabfile
-      # this is important because we need to generate the proper api for these by creating a protocol
-      # with default implementation we can use in the Fastlane.swift API if people want to use
-      # <Toolname>file.swift files.
-      self.tools_option_files = TOOL_CONFIG_FILES.map { |config_file| config_file.downcase.chomp("file") }.to_set
+
+      super()
 
       available_plugins = Fastlane::PluginManager.new.available_plugins.map do |plugin|
         plugin_action = plugin.gsub(Fastlane::PluginManager.plugin_prefix, '')
         Fastlane::Runner.new.class_reference_from_action_name(plugin_action)
       end
 
+      # Excludes all actions that aren't pluign actions (including external actions)
       available_actions = []
       ActionsList.all_actions do |action|
         available_actions << action.action_name unless available_plugins.include?(action)
       end
 
       self.actions_not_supported = (["import", "import_from_git"] + available_actions).to_set
-
       self.action_options_to_ignore = {}
     end
   end
@@ -118,7 +118,24 @@ module Fastlane
     attr_accessor :target_filename
     attr_accessor :generated_paths # stores all file names of generated files (as they are generated)
 
-    attr_accessor :is_fastlane_swift
+    attr_accessor :fastlane_swift_api_path
+
+    def initialize
+      require 'fastlane'
+      require 'fastlane/documentation/actions_list'
+      Fastlane.load_actions
+      # Tools that can be used with <Toolname>file, like Deliverfile, Screengrabfile
+      # this is important because we need to generate the proper api for these by creating a protocol
+      # with default implementation we can use in the Fastlane.swift API if people want to use
+      # <Toolname>file.swift files.
+      self.tools_option_files = TOOL_CONFIG_FILES.map { |config_file| config_file.downcase.chomp("file") }.to_set
+
+      @fastlane_swift_api_path = File.join(@target_output_path, @target_filename)
+    end
+
+    def extend_content(content)
+      return content
+    end
 
     def generate_swift
       self.generated_paths = [] # reset generated paths in case we're called multiple times
@@ -144,33 +161,14 @@ module Fastlane
         file_content << swift_function.swift_code
       end
 
-      fastlane_swift_api_path = File.join(@target_output_path, @target_filename)
-
       tool_objects = generate_lanefile_tool_objects(classes: tool_details.map(&:swift_class))
       file_content << tool_objects
 
-      write_contents = true
-      if @is_fastlane_swift
-        file_content << "" # newline because we're adding an extension
-        file_content << "// These are all the parsing functions needed to transform our data into the expected types"
-        file_content << generate_lanefile_parsing_functions
+      file_content = extend_content(file_content)
 
-        old_file_content = File.read(fastlane_swift_api_path)
+      if file_content
+        new_file_content = file_content.join("\n")
 
-        # compare old file content to potential new file content
-        api_version = determine_api_version(new_file_content: new_file_content, old_file_content: old_file_content)
-        old_api_version = find_api_version_string(content: old_file_content)
-
-        # if there is a change, we need to write out the new file
-        if api_version != old_api_version
-          new_file_content.concat(autogen_version_warning_text(api_version: api_version))
-          write_contents = false
-        end
-      end
-
-      new_file_content = file_content.join("\n")
-
-      if write_contents
         File.write(fastlane_swift_api_path, new_file_content)
         UI.success(fastlane_swift_api_path)
         self.generated_paths << fastlane_swift_api_path
