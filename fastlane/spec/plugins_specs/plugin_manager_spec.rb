@@ -77,7 +77,7 @@ describe Fastlane do
     describe "#install_dependencies!" do
       it "execs out the correct command" do
         expect(plugin_manager).to receive(:ensure_plugins_attached!)
-        expect(plugin_manager).to receive(:exec).with("bundle install --quiet && bundle exec fastlane generate_swift && echo 'Successfully installed plugins'")
+        expect(plugin_manager).to receive(:exec).with("bundle install --quiet && echo 'Successfully installed plugins'")
         plugin_manager.install_dependencies!
       end
     end
@@ -89,7 +89,7 @@ describe Fastlane do
 
       it "execs out the correct command" do
         expect(plugin_manager).to receive(:ensure_plugins_attached!)
-        expect(plugin_manager).to receive(:exec).with("bundle update fastlane-plugin-xcversion --quiet && bundle exec fastlane generate_swift && echo 'Successfully updated plugins'")
+        expect(plugin_manager).to receive(:exec).with("bundle update fastlane-plugin-xcversion --quiet && echo 'Successfully updated plugins'")
         plugin_manager.update_dependencies!
       end
     end
