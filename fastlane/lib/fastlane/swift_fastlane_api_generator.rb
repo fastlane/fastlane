@@ -96,8 +96,13 @@ module Fastlane
 
       super()
 
-      available_plugins = Fastlane::PluginManager.new.available_plugins.map do |plugin|
-        plugin_action = plugin.gsub(Fastlane::PluginManager.plugin_prefix, '')
+      # Gets list of plugin actions
+      plugin_actions = Fastlane.plugin_manager.plugin_references.values.flat_map do |info|
+        info[:actions]
+      end
+
+      # Action references from plugins
+      available_plugins = plugin_actions.map do |plugin_action|
         Fastlane::Runner.new.class_reference_from_action_name(plugin_action)
       end
 
