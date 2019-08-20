@@ -336,7 +336,7 @@ module Fastlane
       if FastlaneCore::FastlaneFolder.swift?
         command :generate_swift do |c|
           c.syntax = 'fastlane generate_swift'
-          c.description = 'Generates additional Swift APIs for local plugins and actions'
+          c.description = 'Generates additional Swift APIs for plugins and local actions'
 
           c.action do |args, options|
             SwiftActionsAPIGenerator.new(target_output_path: FastlaneCore::FastlaneFolder.swift_folder_path).generate_swift
