@@ -42,6 +42,7 @@
   | Converting --version_codes_to_retain to numbers | https://tinyurl.com/y2yly5l6 | Aug 18, 2019 |
   | Can now specify version codes to be added to release | https://tinyurl.com/y27gxa4z | Aug 18, 2019 |
   | Uploading apk's first if specified | https://tinyurl.com/y65998b9 | Aug 19, 2019 |
+  | Adding rollout percentage to release | https://tinyurl.com/y459rxgs | Aug 20, 2019 |
 
 <br>
 
