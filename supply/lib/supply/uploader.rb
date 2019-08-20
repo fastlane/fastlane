@@ -13,7 +13,7 @@ module Supply
       upload_mapping(apk_version_codes)
 
       apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
-      binding.pry
+
       track_edit = AndroidPublisher::Track.new()
       if metadata_path
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
@@ -106,6 +106,7 @@ module Supply
       })
 
       track_release.version_codes = version_codes if version_codes.length > 0
+      track_release.user_fraction = Supply.config[:rollout] unless Supply.config[:rollout].nil? && Supply.config[:track] == "inProgress"
 
       track = AndroidPublisher::Track.new({
         track: Supply.config[:track],
