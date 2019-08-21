@@ -325,7 +325,12 @@ module Fastlane
               end
             when :in_method
               if (string_statement = string_statement_from_line(line))
-                last_string_statement = string_statement
+                # Multiline support for `description` method
+                if last_method_name == 'description'
+                  last_string_statement.concat(string_statement) unless last_string_statement.nil?
+                else 
+                  last_string_statement = string_statement
+                end
               end
               if is_block?(line)
                 self.state << :in_block
