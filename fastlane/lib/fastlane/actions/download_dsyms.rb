@@ -25,6 +25,7 @@ module Fastlane
         build_number = params[:build_number]
         platform = params[:platform]
         output_directory = params[:output_directory]
+        wait_for_dsym_processing = params[:wait_for_dsym_processing]
         min_version = Gem::Version.new(params[:min_version]) if params[:min_version]
 
         # Set version if it is latest
@@ -85,22 +86,35 @@ module Fastlane
               next
             end
 
-            begin
-              UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url") if build_number
+            UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url") if build_number
 
-              build_details = app.tunes_build_details(train: train.version_string, build_number: build.build_version, platform: platform)
-              download_url = build_details.dsym_url
-              UI.verbose("dsym_url: #{download_url}")
-            rescue Spaceship::TunesClient::ITunesConnectError => ex
-              UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
+            start = Time.now
+            download_url = nil
+
+            loop do
+              begin
+                build_details = app.tunes_build_details(train: train.version_string, build_number: build.build_version, platform: platform)
+                download_url = build_details.dsym_url
+                UI.verbose("dsym_url: #{download_url}")
+              rescue Spaceship::TunesClient::ITunesConnectError => ex
+                UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
+              end
+
+              unless download_url
+                if !wait_for_dsym_processing || (Time.now - start) > (60 * 5)
+                  UI.error("Could not find any dSYM for #{build.build_version} (#{train.version_string})")
+                else
+                  UI.message("Waiting for dSYM file to appear...")
+                  sleep(30)
+                  next
+                end
+              end
+
+              break
             end
 
-            if download_url
-              self.download(download_url, app.bundle_id, train.version_string, build.build_version, output_directory)
-              break if build_number
-            else
-              UI.message("No dSYM URL for #{build.build_version} (#{train.version_string})")
-            end
+            self.download(download_url, app.bundle_id, train.version_string, build.build_version, output_directory)
+            break if build_number
           end
         end
 
@@ -228,7 +242,14 @@ module Fastlane
                                        short_option: "-s",
                                        env_name: "DOWNLOAD_DSYMS_OUTPUT_DIRECTORY",
                                        description: "Where to save the download dSYMs, defaults to the current path",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :wait_for_dsym_processing,
+                                       short_option: "-w",
+                                       env_name: "DOWNLOAD_DSYMS_WAIT_FOR_DSYM_PROCESSING",
+                                       description: "Wait for dSYMs to process",
+                                       optional: true,
+                                       default_value: false,
+                                       type: Boolean)
         ]
       end
 

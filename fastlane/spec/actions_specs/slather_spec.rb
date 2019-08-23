@@ -189,7 +189,7 @@ describe Fastlane do
         expect(result).to eq(expected)
       end
 
-      it "works with when binary_file is set to true or false" do
+      it "works with binary_file set to true or false" do
         possible_values = ["true", "false"]
         expected = "slather coverage foo.xcodeproj".gsub(/\s+/, ' ')
 
@@ -203,6 +203,34 @@ describe Fastlane do
 
           expect(result).to eq(expected)
         end
+      end
+
+      it "works with binary_file as string" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            binary_file: 'bar',
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("slather coverage --binary-file bar foo.xcodeproj")
+      end
+
+      it "works with binary_file as array" do
+        binary_file = ['other', 'stuff']
+        expected = "slather coverage
+                    --binary-file #{binary_file[0]}
+                    --binary-file #{binary_file[1]}
+                    foo.xcodeproj".gsub(/\s+/, ' ')
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            binary_file: #{binary_file},
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq(expected)
       end
 
       it "works with multiple ignore patterns" do

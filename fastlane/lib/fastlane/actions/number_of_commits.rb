@@ -63,7 +63,7 @@ module Fastlane
         [
           'increment_build_number(build_number: number_of_commits)',
           'build_number = number_of_commits(all: true)
-          increment_build_number(build_number: number_of_commits)'
+          increment_build_number(build_number: build_number)'
         ]
       end
 

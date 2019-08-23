@@ -648,6 +648,7 @@ module Spaceship
         r.params = {
           teamId: team_id,
           includeInactiveProfiles: true,
+          includeExpiredProfiles: true,
           onlyCountLists: true
         }
       end

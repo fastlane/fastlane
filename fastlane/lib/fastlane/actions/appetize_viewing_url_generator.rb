@@ -115,7 +115,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :params,
                                        env_name: "APPETIZE_VIEWING_URL_GENERATOR_PARAMS",
-                                       description: "Specifiy params value to be passed to Appetize",
+                                       description: "Specify params value to be passed to Appetize",
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy,
