@@ -43,6 +43,7 @@
   | Can now specify version codes to be added to release | https://tinyurl.com/y27gxa4z | Aug 18, 2019 |
   | Uploading apk's first if specified | https://tinyurl.com/y65998b9 | Aug 19, 2019 |
   | Adding rollout percentage to release | https://tinyurl.com/y459rxgs | Aug 20, 2019 |
+  | [In progress] Updating rollout for a release | https://tinyurl.com/y6mcnvw7 | Aug 23, 2019 |
 
 <br>
 
