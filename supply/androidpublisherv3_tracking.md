@@ -52,8 +52,6 @@
   - [TODO] Enable update checker after all fixes.
     - File: https://github.com/scorpion35/fastlane/blob/androidpublisherv3/fastlane_core/lib/fastlane_core/update_checker/update_checker.rb#L42
     - Commit disabled in: https://github.com/scorpion35/fastlane/commit/4fed441658a68b31665f1b2003047476b919385a
-  - `Supply::AVAILABLE_TRACKS` (`supply.rb`) => `rollout` track can be removed as it has no real use?
-    - https://github.com/scorpion35/fastlane/commit/49d8f3f03b61828bcd3a731275262acb371429f1#commitcomment-34562545
   
   
   
