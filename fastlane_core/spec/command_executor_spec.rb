@@ -36,6 +36,38 @@ describe FastlaneCore do
         # have crashed the test
         expect(result).to eq('a_filename')
       end
+
+      it 'chomps but does not strip output lines', requires_pty: true do
+        fake_std_in = [
+          "Shopping list:\n",
+          "  - Milk\n",
+          "  - Bread\n",
+          "  - Muffins\n"
+        ]
+
+        expect(PTY).to receive(:spawn) do |command, &block|
+          expect(command).to eq('echo foo')
+
+          # PTY uses "$?" to get exitcode, which is filled in by Process.wait(),
+          # so we have to spawn a real process unless we want to mock methods
+          # on nil.
+          child_process_id = Process.spawn('echo foo', out: File::NULL)
+          expect(Process).to receive(:wait).with(child_process_id)
+
+          block.yield(fake_std_in, 'not_really_std_out', child_process_id)
+        end
+
+        result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
+
+        # We are implicitly also checking that the error was not rethrown because that would
+        # have crashed the test
+        expect(result).to eq(<<-LIST.chomp)
+Shopping list:
+  - Milk
+  - Bread
+  - Muffins
+        LIST
+      end
     end
 
     describe "which" do
