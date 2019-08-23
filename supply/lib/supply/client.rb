@@ -371,8 +371,21 @@ module Supply
       return all_tracks
     end
 
+    def update_track(track_name, track_object)
+      ensure_active_edit!
+
+      call_google_api do
+        client.update_edit_track(
+          current_package_name,
+          current_edit.id,
+          track_name,
+          track_object
+        )
+      end
+    end
+
     # Updates the track for the provided version code(s)
-    def update_track(track, rollout, apk_version_code)
+    def update_track_DEPRECATED(track, rollout, apk_version_code)
       ensure_active_edit!
 
       track_version_codes = apk_version_code.kind_of?(Array) ? apk_version_code : [apk_version_code]

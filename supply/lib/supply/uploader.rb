@@ -15,7 +15,8 @@ module Supply
       apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
 
       track_edit = AndroidPublisher::Track.new()
-      if metadata_path
+
+      if ((!Supply.config[:skip_upload_metadata] || !Supply.config[:skip_upload_changelogs] || !Supply.config[:skip_upload_screenshots]) && metadata_path)
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
         release_notes = []
@@ -33,11 +34,14 @@ module Supply
 
         upload_changelogs(release_notes, apk_version_codes) unless Supply.config[:skip_upload_changelogs]
       end
-      binding.pry
 
       # Only update tracks if we have version codes
       # Updating a track with empty version codes can completely clear out a track
-      update_track(apk_version_codes) unless apk_version_codes.empty?
+      update_track() unless apk_version_codes.empty?
+
+      unless Supply.config[:rollout].nil? && Supply.config[:version_name].nil? && Supply.config[:track].nil?
+        update_rollout
+      end
 
       promote_track if Supply.config[:track_promote_to]
 
@@ -50,6 +54,29 @@ module Supply
         client.commit_current_edit!
         UI.success("Successfully finished the upload to Google Play")
       end
+    end
+
+    def update_rollout()
+      UI.message("Updating #{Supply.config[:version_name]}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
+
+      track = @client.tracks(Supply.config[:track])
+      UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") if track.length == 0
+
+      if track[0].releases.any? { |r| r.name == Supply.config[:version_name] }
+        track[0].send("track=", 'rollout')
+        track[0].releases.select { |r| r.name == Supply.config[:version_name]}[0].send("user_fraction=", Supply.config[:rollout])
+        # track[0].releases.delete_if { |r| r.name != Supply.config[:version_name] }
+
+        track[0].releases.select { |r| r.name == Supply.config[:version_name]}[0].send("status=", 'completed') if Supply.config[:rollout] == 1
+      else
+        UI.user_error!("Unable to find version '#{Supply.config[:version_name]}' in track '#{Supply.config[:track]}'")
+      end
+binding.pry
+      client.update_track('rollout', track)
+
+      binding.pry
+      p 123
+      
     end
 
     def verify_config!
