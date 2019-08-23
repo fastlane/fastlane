@@ -59,7 +59,7 @@ module Snapshot
         c.option('--force', 'Disables confirmation prompts')
         c.action do |args, options|
           require 'snapshot/update'
-          Snapshot::Update.new.update(options.force)
+          Snapshot::Update.new.update(force: options.force)
         end
       end
 
