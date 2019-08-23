@@ -1,7 +1,7 @@
 version: 2
 
 jobs:
-  "Execute tests on macOS":
+  "Execute tests on macOS (Xcode 9.0.1, Ruby 2.3)":
     macos:
       xcode: "9.0.1"
     environment:
@@ -59,6 +59,66 @@ jobs:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
+
+  "Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)":
+    macos:
+      xcode: "11.0.0"
+    environment:
+      CIRCLE_TEST_REPORTS: ~/test-reports
+      LC_ALL: en_US.UTF-8
+      LANG: en_US.UTF-8
+    shell: /bin/bash --login -eo pipefail
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+      - restore_cache:
+          keys:
+            - v3-homebrew-{{ epoch }}
+            - v3-homebrew
+      - run:
+          name: Setup Build
+          command: |
+            mkdir -p ~/test-reports
+            echo "2.5" > .ruby-version
+            gem update --system
+            brew install shellcheck
+            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+
+      - save_cache:
+          key: v3-homebrew-{{ epoch }}
+          paths:
+            - /usr/local/Homebrew
+      - save_cache:
+          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+          paths:
+            - .bundle
+
+      - run:
+          name: Check PR Metadata
+          command: bundle exec danger || echo "danger failed"
+
+      - restore_cache:
+          key: v1-{{ arch }}-rubocop
+
+      - run: bundle exec fastlane execute_tests
+
+      - save_cache:
+          key: v1-{{ arch }}-rubocop
+          paths:
+            - ~/.cache/rubocop_cache
+      - store_test_results:
+          path: ~/test-reports
+      - store_artifacts:
+          path: ~/test-reports/rspec
+          destination: test-reports
+
+      - run:
+          name: Post Test Results to GitHub
+          command: bundle exec danger || echo "danger failed"
+          when: always # Run this even when tests fail
+
   "Execute tests on Ubuntu":
     environment:
       CIRCLE_TEST_REPORTS: ~/test-reports
@@ -166,7 +226,8 @@ workflows:
   version: 2
   build:
     jobs:
-      - "Execute tests on macOS"
+      - "Execute tests on macOS (Xcode 9.0.1, Ruby 2.3)"
+      - "Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)"
       - "Execute tests on Ubuntu"
       - "Validate Documentation"
       - "Lint Source Code"
