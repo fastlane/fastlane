@@ -217,5 +217,64 @@ describe Match do
         Match::Runner.new.run(config)
       end.to raise_error("Your certificate 'E7P4EE896K.cer' is not valid, please check end date and renew it if necessary")
     end
+
+    it "skips provisioning profiles when skip_provisioning_profile set to true", requires_security: true do
+      git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+      values = {
+        app_identifier: "tools.fastlane.app",
+        type: "appstore",
+        git_url: git_url,
+        shallow_clone: true,
+        username: "flapple@something.com",
+        skip_provisioning_profile: true
+      }
+
+      config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+      repo_dir = Dir.mktmpdir
+      cert_path = File.join(repo_dir, "something.cer")
+      profile_path = "./match/spec/fixtures/test.mobileprovision"
+      keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
+      destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
+
+      fake_storage = "fake_storage"
+      expect(Match::Storage::GitStorage).to receive(:configure).with(
+        git_url: git_url,
+        shallow_clone: true,
+        skip_docs: false,
+        git_branch: "master",
+        git_full_name: nil,
+        git_user_email: nil,
+        clone_branch_directly: false,
+        type: config[:type],
+        platform: config[:platform],
+        google_cloud_bucket_name: "",
+        google_cloud_keys_file: "",
+        google_cloud_project_id: "",
+        readonly: false,
+        username: values[:username],
+        team_id: nil,
+        team_name: nil
+      ).and_return(fake_storage)
+
+      expect(Match::Generator).to_not receive(:generate_provisioning_profile)
+      expect(FastlaneCore::ProvisioningProfile).to_not receive(:install)
+      expect(fake_storage).to receive(:save_changes!).with(
+        files_to_commit: [
+          File.join(repo_dir, "something.cer"),
+          File.join(repo_dir, "something.p12"), # this is important, as a cert consists out of 2 files
+        ]
+      )
+
+      spaceship = "spaceship"
+      allow(spaceship).to receive(:team_id).and_return("")
+      expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
+      expect(spaceship).to_not receive(:profile_exists)
+
+      Match::Runner.new.run(config)
+
+      # profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision')
+      # expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
+      #                                                                type: "appstore")]).to eql(profile_path)
+    end
   end
 end
