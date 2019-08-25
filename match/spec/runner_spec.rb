@@ -260,8 +260,8 @@ describe Match do
       allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
       allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
       expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory).and_return(cert_path)
-      expect(Match::Generator).to_not receive(:generate_provisioning_profile)
-      expect(FastlaneCore::ProvisioningProfile).to_not receive(:install)
+      expect(Match::Generator).to_not(receive(:generate_provisioning_profile))
+      expect(FastlaneCore::ProvisioningProfile).to_not(receive(:install))
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
           File.join(repo_dir, "something.cer"),
@@ -273,7 +273,7 @@ describe Match do
       allow(spaceship).to receive(:team_id).and_return("")
       expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
       expect(spaceship).to receive(:certificate_exists).and_return(true)
-      expect(spaceship).to_not receive(:profile_exists)
+      expect(spaceship).to_not(receive(:profile_exists))
       expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 
       Match::Runner.new.run(config)
