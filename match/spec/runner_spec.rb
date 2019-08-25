@@ -232,7 +232,6 @@ describe Match do
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
       repo_dir = Dir.mktmpdir
       cert_path = File.join(repo_dir, "something.cer")
-      profile_path = "./match/spec/fixtures/test.mobileprovision"
       keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
       destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
@@ -256,25 +255,29 @@ describe Match do
         team_name: nil
       ).and_return(fake_storage)
 
+      expect(fake_storage).to receive(:download).and_return(nil)
+      expect(fake_storage).to receive(:clear_changes).and_return(nil)
+      allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
+      allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
+      expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory).and_return(cert_path)
       expect(Match::Generator).to_not receive(:generate_provisioning_profile)
       expect(FastlaneCore::ProvisioningProfile).to_not receive(:install)
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
           File.join(repo_dir, "something.cer"),
-          File.join(repo_dir, "something.p12"), # this is important, as a cert consists out of 2 files
+          File.join(repo_dir, "something.p12") # this is important, as a cert consists out of 2 files
         ]
       )
 
       spaceship = "spaceship"
       allow(spaceship).to receive(:team_id).and_return("")
       expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
+      expect(spaceship).to receive(:certificate_exists).and_return(true)
       expect(spaceship).to_not receive(:profile_exists)
+      expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 
       Match::Runner.new.run(config)
-
-      # profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision')
-      # expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
-      #                                                                type: "appstore")]).to eql(profile_path)
+      # Nothing to check after the run
     end
   end
 end
