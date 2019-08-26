@@ -134,6 +134,12 @@ module Gym
                                      description: "After building, don't archive, effectively not including -archivePath param",
                                      type: Boolean,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_codesigning,
+                                     env_name: "GYM_SKIP_CODESIGNING",
+                                     description: "Build without codesigning",
+                                     is_string: false,
+                                     type: Boolean,
+                                     optional: true),
         # Very optional
         FastlaneCore::ConfigItem.new(key: :build_path,
                                      env_name: "GYM_BUILD_PATH",
