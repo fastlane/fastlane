@@ -58,7 +58,7 @@ module Gym
 
       def setting
         setting = []
-        if Gym.config[:skip_codesign]
+        if Gym.config[:skip_codesigning]
           setting << "CODE_SIGN_IDENTITY='' CODE_SIGNING_REQUIRED=NO CODE_SIGN_ENTITLEMENTS='' CODE_SIGNING_ALLOWED=NO"
         elsif Gym.config[:codesigning_identity]
           setting << "CODE_SIGN_IDENTITY=#{Gym.config[:codesigning_identity].shellescape}"
