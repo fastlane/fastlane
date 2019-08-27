@@ -1,0 +1,14 @@
+name: 'Fastlane env'
+description: 'An action for adding a comment to include `fastlane env`'
+author: 'fastlane'
+inputs:
+  repo-token:
+    description: 'Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}'
+    required: true
+  issue-message:
+    description: 'Comment to post on an issue to remind about including `fastlane env`'
+    default: "It seems like you have not included the output of `fastlane env`\n
+              To make it easier for us help you resolve this issue, please update the issue to include the output of `fastlane env` :+1:"
+runs:
+  using: 'node12'
+  main: 'lib/main.js'

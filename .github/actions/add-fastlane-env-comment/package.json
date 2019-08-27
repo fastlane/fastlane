@@ -1,0 +1,31 @@
+{
+  "name": "add-fastlane-env-comment-action",
+  "version": "0.0.0",
+  "private": true,
+  "description": "An action for adding a comment to include `fastlane env` in an issue description",
+  "main": "lib/main.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "keywords": [
+    "actions",
+    "fastlane"
+  ],
+  "author": "fastlane",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.0.0",
+    "@actions/github": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.13",
+    "@types/node": "^12.0.4",
+    "husky": "^3.0.4",
+    "jest": "^24.8.0",
+    "jest-circus": "^24.7.1",
+    "nock": "^10.0.6",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.5.1"
+  }
+}

@@ -1,0 +1,7 @@
+{
+    "pull_request": {
+        "number": 10,
+        "body": "This is a pr description."
+    }, 
+    "action": "opened"
+}
