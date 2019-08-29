@@ -150,11 +150,20 @@ module Gym
       if Dir.exist?(bcsymbolmaps_directory)
         UI.message("Mapping dSYM(s) using generated BCSymbolMaps") unless Gym.config[:silent]
         available_dsyms.each do |dsym|
-          command = []
-          command << "dsymutil"
-          command << "--symbol-map #{bcsymbolmaps_directory.shellescape}"
-          command << dsym.shellescape
-          Helper.backticks(command.join(" "), print: !Gym.config[:silent])
+          dwarfdump_command = []
+          dwarfdump_command << "dwarfdump"
+          dwarfdump_command << "--uuid #{dsym.shellescape}"
+
+          dwarfdump_result = Helper.backticks(dwarfdump_command.join(" "), print: false)
+          architecture_uuids = dwarfdump_result.split("\n").map { |info| info.split(" ")[1] }
+
+          architecture_uuids.each do |uuid|
+            command = []
+            command << "dsymutil"
+            command << "--symbol-map #{bcsymbolmaps_directory.shellescape}/#{uuid}.bcsymbolmap"
+            command << dsym.shellescape
+            Helper.backticks(command.join(" "), print: !Gym.config[:silent])
+          end
         end
       end
 
