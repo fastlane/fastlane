@@ -618,79 +618,83 @@ function resign {
         log "\nApp entitlements for ${APP_PATH}:"
         if [ -s "$APP_ENTITLEMENTS" ]; then
             log "$(cat "$APP_ENTITLEMENTS")"
+        else
+            log "App entitlements are empty"
+        fi
 
-            log "Patching profile entitlements with values from app entitlements"
-            PATCHED_ENTITLEMENTS="$TEMP_DIR/patchedEntitlements"
-            # Start with using what comes in provisioning profile entitlements before patching
-            cp -f "$PROFILE_ENTITLEMENTS" "$PATCHED_ENTITLEMENTS"
+        log "Patching profile entitlements with values from app entitlements"
+        PATCHED_ENTITLEMENTS="$TEMP_DIR/patchedEntitlements"
+        # Start with using what comes in provisioning profile entitlements before patching
+        cp -f "$PROFILE_ENTITLEMENTS" "$PATCHED_ENTITLEMENTS"
 
-            log "Removing blacklisted keys from patched profile"
-            # See https://github.com/facebook/buck/issues/798 and https://github.com/facebook/buck/pull/802/files
+        log "Removing blacklisted keys from patched profile"
+        # See https://github.com/facebook/buck/issues/798 and https://github.com/facebook/buck/pull/802/files
 
-            # Update in https://github.com/facebook/buck/commit/99c0fbc3ab5ecf04d186913374f660683deccdef
-            # Update in https://github.com/facebook/buck/commit/36db188da9f6acbb9df419dc1904315ab00c4e19
+        # Update in https://github.com/facebook/buck/commit/99c0fbc3ab5ecf04d186913374f660683deccdef
+        # Update in https://github.com/facebook/buck/commit/36db188da9f6acbb9df419dc1904315ab00c4e19
 
-            # Buck changes referenced above are not self-explanatory and do not seem exhaustive or up-to-date
-            # Comments below explain the rules applied to each key in order to make realignment with future Xcode export logic easier
-            BLACKLISTED_KEYS=(\
-                # PP list identifiers inconsistent with app-defined ones and this key does not seem to appear in IPA entitlements, so ignore it
-                "com.apple.developer.icloud-container-development-container-identifiers" \
-                # This key has an invalid generic value in PP (actual value is set by Xcode during export), see dedicated processing a few blocks below
-                "com.apple.developer.icloud-container-environment" \
-                # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
-                "com.apple.developer.icloud-container-identifiers" \
-                # PP enable all available services and not app-defined ones, must use App entitlements value
-                "com.apple.developer.icloud-services" \
-                # Was already blacklisted in previous version, but has someone ever seen this key in a PP?
-                "com.apple.developer.restricted-resource-mode" \
-                # If actually used by the App, this value will be set in its entitlements
-                "com.apple.developer.nfc.readersession.formats" \
-                # PP list a single TeamID.* identifier and not app-defined ones, must use App entitlements value
-                "com.apple.developer.pass-type-identifiers" \
-                # If actually used by the App, this value will be set in its entitlements
-                "com.apple.developer.siri" \
-                # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
-                "com.apple.developer.ubiquity-container-identifiers" \
-                # PP define a generic TeamID.* identifier and not the app-defined one, must use App entitlements value
-                "com.apple.developer.ubiquity-kvstore-identifier" \
-                # If actually used by the App, this value will be set in its entitlements
-                "inter-app-audio" \
-                # PP define a generic TeamID.* identifier and not the app-defined one, must use App entitlements value
-                "keychain-access-groups" \
-                # If actually used by the App, this value will be set in its entitlements
-                "com.apple.developer.homekit" \
-                # If actually used by the App, this value will be set in its entitlements
-                "com.apple.developer.healthkit" \
-                # If actually used by the App, this value will be set in its entitlements
-                "com.apple.developer.healthkit.access" \
-                # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
-                "com.apple.developer.in-app-payments" \
-                # If actually used by the App, this value will be set in its entitlements
-                "com.apple.developer.networking.vpn.api" \
-                # If actually used by the App, this value will be set in its entitlements
-                "com.apple.developer.networking.HotspotConfiguration" \
-                # PP list all available extensions and not app-defined ones, must use App entitlements value
-                "com.apple.developer.networking.networkextension" \
-                # If actually used by the App, this value will be set in its entitlements
-                "com.apple.developer.networking.multipath" \
-                # PP enable all domains via a non-AppStore-compliant '*' value, must use App entitlements value
-                "com.apple.developer.associated-domains" \
-                # If actually used by the App, this value will be set in its entitlements
-                "com.apple.developer.default-data-protection" \
-                # PP seem to list the same groups as the App, but use App entitlements value to be sure
-                "com.apple.security.application-groups" \
-                # Was already blacklisted in previous version, seems to be an artifact from an old Xcode release
-                "com.apple.developer.maps" \
-                # If actually used by the App, this value will be set in its entitlements
-                "com.apple.external-accessory.wireless-configuration"
-            )
+        # Buck changes referenced above are not self-explanatory and do not seem exhaustive or up-to-date
+        # Comments below explain the rules applied to each key in order to make realignment with future Xcode export logic easier
+        BLACKLISTED_KEYS=(\
+            # PP list identifiers inconsistent with app-defined ones and this key does not seem to appear in IPA entitlements, so ignore it
+            "com.apple.developer.icloud-container-development-container-identifiers" \
+            # This key has an invalid generic value in PP (actual value is set by Xcode during export), see dedicated processing a few blocks below
+            "com.apple.developer.icloud-container-environment" \
+            # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
+            "com.apple.developer.icloud-container-identifiers" \
+            # PP enable all available services and not app-defined ones, must use App entitlements value
+            "com.apple.developer.icloud-services" \
+            # Was already blacklisted in previous version, but has someone ever seen this key in a PP?
+            "com.apple.developer.restricted-resource-mode" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.nfc.readersession.formats" \
+            # PP list a single TeamID.* identifier and not app-defined ones, must use App entitlements value
+            "com.apple.developer.pass-type-identifiers" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.siri" \
+            # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
+            "com.apple.developer.ubiquity-container-identifiers" \
+            # PP define a generic TeamID.* identifier and not the app-defined one, must use App entitlements value
+            "com.apple.developer.ubiquity-kvstore-identifier" \
+            # If actually used by the App, this value will be set in its entitlements
+            "inter-app-audio" \
+            # PP define a generic TeamID.* identifier and not the app-defined one, must use App entitlements value
+            "keychain-access-groups" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.homekit" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.healthkit" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.healthkit.access" \
+            # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
+            "com.apple.developer.in-app-payments" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.networking.vpn.api" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.networking.HotspotConfiguration" \
+            # PP list all available extensions and not app-defined ones, must use App entitlements value
+            "com.apple.developer.networking.networkextension" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.networking.multipath" \
+            # PP enable all domains via a non-AppStore-compliant '*' value, must use App entitlements value
+            "com.apple.developer.associated-domains" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.default-data-protection" \
+            # PP seem to list the same groups as the App, but use App entitlements value to be sure
+            "com.apple.security.application-groups" \
+            # Was already blacklisted in previous version, seems to be an artifact from an old Xcode release
+            "com.apple.developer.maps" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.external-accessory.wireless-configuration"
+        )
 
-            # Blacklisted keys must not be included into new profile, so remove them from patched profile
-            for KEY in "${BLACKLISTED_KEYS[@]}"; do
-                log "Removing blacklisted key: $KEY"
-                PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
-            done
+        # Blacklisted keys must not be included into new profile, so remove them from patched profile
+        for KEY in "${BLACKLISTED_KEYS[@]}"; do
+            log "Removing blacklisted key: $KEY"
+            PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
+        done
 
+        if [ -s "$APP_ENTITLEMENTS" ]; then
             # Get the old and new app identifier (prefix)
             APP_ID_KEY="application-identifier"
             # Extract just the identifier from the value
@@ -741,6 +745,7 @@ function resign {
                 "inter-app-audio" \
                 "keychain-access-groups|APP_ID")
 
+        
             # Loop over all the entitlement keys that need to be transferred from app entitlements
             for RULE in "${ENTITLEMENTS_TRANSFER_RULES[@]}"; do
                 KEY=$(echo "$RULE" | cut -d'|' -f1)
@@ -809,32 +814,30 @@ function resign {
                     continue
                 fi
             done
-
-            # Replace old bundle ID with new bundle ID in patched entitlements
-            # Read old bundle ID from the old Info.plist which was saved for this purpose
-            OLD_BUNDLE_ID="$(PlistBuddy -c "Print :CFBundleIdentifier" "$TEMP_DIR/oldInfo.plist")"
-            NEW_BUNDLE_ID="$(bundle_id_for_provison "$NEW_PROVISION")"
-            log "Replacing old bundle ID '$OLD_BUNDLE_ID' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
-            # Note: ideally we'd match against the opening <string> tag too, but this isn't possible
-            # because $OLD_BUNDLE_ID and $NEW_BUNDLE_ID do not include the team ID prefix which is
-            # present in the entitlements file.
-            # e.g. <string>AB1GP98Q19.com.example.foo</string>
-            #         vs
-            #      com.example.foo
-            sed -i .bak "s!${OLD_BUNDLE_ID}</string>!${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
-
-            log "Resigning application using certificate: '$CERTIFICATE'"
-            log "and patched entitlements:"
-            log "$(cat "$PATCHED_ENTITLEMENTS")"
-            if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
-                log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
-                cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
-            fi
-            /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
-            checkStatus
-        else
-            log "Empty app entitlements. Will skip those."
         fi
+
+        # Replace old bundle ID with new bundle ID in patched entitlements
+        # Read old bundle ID from the old Info.plist which was saved for this purpose
+        OLD_BUNDLE_ID="$(PlistBuddy -c "Print :CFBundleIdentifier" "$TEMP_DIR/oldInfo.plist")"
+        NEW_BUNDLE_ID="$(bundle_id_for_provison "$NEW_PROVISION")"
+        log "Replacing old bundle ID '$OLD_BUNDLE_ID' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
+        # Note: ideally we'd match against the opening <string> tag too, but this isn't possible
+        # because $OLD_BUNDLE_ID and $NEW_BUNDLE_ID do not include the team ID prefix which is
+        # present in the entitlements file.
+        # e.g. <string>AB1GP98Q19.com.example.foo</string>
+        #         vs
+        #      com.example.foo
+        sed -i .bak "s!${OLD_BUNDLE_ID}</string>!${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
+
+        log "Resigning application using certificate: '$CERTIFICATE'"
+        log "and patched entitlements:"
+        log "$(cat "$PATCHED_ENTITLEMENTS")"
+        if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
+            log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
+            cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
+        fi
+        /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
+        checkStatus
     else
         log "Extracting entitlements from provisioning profile"
         PlistBuddy -x -c "Print Entitlements" "$TEMP_DIR/profile.plist" > "$TEMP_DIR/newEntitlements"
