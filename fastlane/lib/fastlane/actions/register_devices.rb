@@ -20,7 +20,9 @@ module Fastlane
           require 'csv'
 
           devices_file = CSV.read(File.expand_path(File.join(params[:devices_file])), col_sep: "\t")
-          UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)") unless devices_file.first == file_column_headers.first(2) || devices_file.first == file_column_headers
+          unless devices_file.first == file_column_headers.first(2) || devices_file.first == file_column_headers
+            UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)")
+          end
 
           new_devices = devices_file.drop(1).map do |row|
             UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)") unless (2..3).cover?(row.count)
