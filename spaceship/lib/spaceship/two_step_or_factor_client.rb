@@ -142,7 +142,36 @@ module Spaceship
         puts("(Read more at: https://github.com/fastlane/fastlane/blob/master/spaceship/docs/Authentication.md#auto-select-sms-via-spaceship-2fa-sms-default-phone-number)")
         puts("")
         code_type = 'trusteddevice'
-        code = ask_for_2fa_code("Please enter the #{code_length} digit code:")
+        # code = ask_for_2fa_code("Please enter the #{code_length} digit code:")
+
+        uri = URI.parse("https://internalapi.errivers.com/api/developerAccount/login/code/get")
+        tryn = 0
+        while tryn < 3
+          res = Faraday.post(uri, {"key"=> "X+j1thaz0mAOqiIG", "account"=> self.user}.to_json, {'Content-Type' => 'application/json'})
+          begin
+            puts res.body
+            resBody = JSON.parse(res.body)
+            if resBody["success"] == true
+              code = resBody["obj"]
+              break
+            else
+              tryn+=1
+              sleep 2
+            end
+          rescue => ex
+            puts("get code ex #{ex}")
+            if tryn<3
+              tryn+=1
+              puts("try again for code, tryn #{tryn}")
+              sleep 2
+              redo
+            end
+            raise ex
+          end
+        end
+
+        puts "code #{code}"
+
         body = { "securityCode" => { "code" => code.to_s } }.to_json
 
         # User exited by entering `sms` and wants to choose phone number for SMS

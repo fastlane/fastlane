@@ -36,7 +36,7 @@ module FastlaneCore
       # See https://openradar.appspot.com/28524119
       if Helper.backticks('security -h | grep set-key-partition-list', print: false).length > 0
         command = "security set-key-partition-list"
-        command << " -S apple-tool:,apple:"
+        command << " -S apple-tool:,apple:,codesign:"
         command << " -k #{keychain_password.to_s.shellescape}"
         command << " #{keychain_path.shellescape}"
         command << " 1> /dev/null" # always disable stdout. This can be very verbose, and leak potentially sensitive info
