@@ -113,8 +113,12 @@ module Fastlane
               break
             end
 
-            self.download(download_url, app.bundle_id, train.version_string, build.build_version, output_directory)
-            break if build_number
+            if download_url
+              self.download(download_url, app.bundle_id, train.version_string, build.build_version, output_directory)
+              break if build_number
+            else
+              UI.message("No dSYM URL for #{build.build_version} (#{train.version_string})")
+            end
           end
         end
 
