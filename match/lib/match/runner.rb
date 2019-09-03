@@ -85,7 +85,7 @@ module Match
       spaceship.certificate_exists(username: params[:username], certificate_id: cert_id) if spaceship
 
       # Provisioning Profiles
-      unless params[:skip_provisioning_profile]
+      unless params[:skip_provisioning_profiles]
         app_identifiers.each do |app_identifier|
           loop do
             break if fetch_provisioning_profile(params: params,
