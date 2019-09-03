@@ -32,6 +32,11 @@ module Match
                                      description: "Only fetch existing certificates and profiles, don't generate new ones",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_provisioning_profiles,
+                                     env_name: "MATCH_SKIP_PROVISIONING_PROFILES",
+                                     description: "Skip syncing provisioning profiles",
+                                     is_string: false,
+                                     default_value: false),
 
         # app
         FastlaneCore::ConfigItem.new(key: :app_identifier,
