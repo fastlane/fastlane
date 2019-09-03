@@ -218,7 +218,7 @@ describe Match do
       end.to raise_error("Your certificate 'E7P4EE896K.cer' is not valid, please check end date and renew it if necessary")
     end
 
-    it "skips provisioning profiles when skip_provisioning_profile set to true", requires_security: true do
+    it "skips provisioning profiles when skip_provisioning_profiles set to true", requires_security: true do
       git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
       values = {
         app_identifier: "tools.fastlane.app",
@@ -226,7 +226,7 @@ describe Match do
         git_url: git_url,
         shallow_clone: true,
         username: "flapple@something.com",
-        skip_provisioning_profile: true
+        skip_provisioning_profiles: true
       }
 
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
