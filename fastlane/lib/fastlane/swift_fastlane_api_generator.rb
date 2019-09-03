@@ -57,7 +57,6 @@ module Fastlane
       old_api_version = find_api_version_string(content: old_file_content)
 
       # if there is a change, we need to write out the new file
-      puts("#{api_version} vs #{old_api_version}")
       if api_version != old_api_version
         file_content << autogen_version_warning_text(api_version: api_version)
       else
