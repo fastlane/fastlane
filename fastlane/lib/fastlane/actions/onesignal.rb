@@ -68,21 +68,21 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :auth_token,
-                                      env_name: "ONE_SIGNAL_AUTH_KEY",
-                                      sensitive: true,
-                                      description: "OneSignal Authorization Key",
-                                      verify_block: proc do |value|
-                                        unless value.to_s.length > 0
-                                          UI.error("Please add 'ENV[\"ONE_SIGNAL_AUTH_KEY\"] = \"your token\"' to your Fastfile's `before_all` section.")
-                                          UI.user_error!("No ONE_SIGNAL_AUTH_KEY given.")
-                                        end
-                                      end),
+                                       env_name: "ONE_SIGNAL_AUTH_KEY",
+                                       sensitive: true,
+                                       description: "OneSignal Authorization Key",
+                                       verify_block: proc do |value|
+                                         if value.to_s.empty?
+                                           UI.error("Please add 'ENV[\"ONE_SIGNAL_AUTH_KEY\"] = \"your token\"' to your Fastfile's `before_all` section.")
+                                           UI.user_error!("No ONE_SIGNAL_AUTH_KEY given.")
+                                         end
+                                       end),
 
           FastlaneCore::ConfigItem.new(key: :app_name,
                                        env_name: "ONE_SIGNAL_APP_NAME",
                                        description: "OneSignal App Name",
                                        verify_block: proc do |value|
-                                         unless value.to_s.length > 0
+                                         if value.to_s.empty?
                                            UI.error("Please add 'ENV[\"ONE_SIGNAL_APP_NAME\"] = \"Your app name\"' to your Fastfile's `before_all` section.")
                                            UI.user_error!("No ONE_SIGNAL_APP_NAME given.")
                                          end
@@ -121,8 +121,8 @@ module Fastlane
 
       def self.output
         [
-          ['ONE_SIGNAL_APP_ID', 'The OneSignal app ID of the newly created app'],
-          ['ONE_SIGNAL_APP_AUTH_KEY', 'The auth token for the newly created OneSignal app']
+          ['ONE_SIGNAL_APP_ID', 'The app ID of the newly created app'],
+          ['ONE_SIGNAL_APP_AUTH_KEY', 'The auth token for the newly created app']
         ]
       end
 
