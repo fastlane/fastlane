@@ -142,6 +142,12 @@ module Spaceship
         puts("(Read more at: https://github.com/fastlane/fastlane/blob/master/spaceship/docs/Authentication.md#auto-select-sms-via-spaceship-2fa-sms-default-phone-number)")
         puts("")
         code_type = 'trusteddevice'
+
+        home_path = File::expand_path('~')
+        if !File::exist?("#{home_path}/#{self.user}_lock.err")
+          raise "code lock while initing"
+        end
+
         code = ask_for_2fa_code("Please enter the #{code_length} digit code:")
 
         # uri = URI.parse("https://internalapi.errivers.com/api/developerAccount/login/code/get")
