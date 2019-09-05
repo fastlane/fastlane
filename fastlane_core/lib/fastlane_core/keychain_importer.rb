@@ -41,6 +41,7 @@ module FastlaneCore
         command << " #{keychain_path.shellescape}"
         command << " 1> /dev/null" # always disable stdout. This can be very verbose, and leak potentially sensitive info
 
+        puts "command #{command}"
         # Showing loading indicator as this can take some time if a lot of keys installed
         Helper.show_loading_indicator("Setting key partition list... (this can take a minute if there are a lot of keys installed)")
 

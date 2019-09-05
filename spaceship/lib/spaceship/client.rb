@@ -491,10 +491,10 @@ module Spaceship
         return response
       when 409
         # 2 step/factor is enabled for this account, first handle that
-        raise "CODE NEEDED, RETURN:#{user}"
-        # handle_two_step_or_factor(response)
+        # raise "CODE NEEDED, RETURN:#{user}"
+        handle_two_step_or_factor(response)
         # and then get the olympus session
-        # fetch_olympus_session
+        fetch_olympus_session
         return true
       else
         if (response.body || "").include?('invalid="true"')
