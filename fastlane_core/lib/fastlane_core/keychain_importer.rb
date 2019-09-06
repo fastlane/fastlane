@@ -14,26 +14,6 @@ module FastlaneCore
 
       puts "keychain pwd: #{keychain_password}"
 
-      begin
-        home_path = File::expand_path('~')
-        conf = File.open("#{home_path}/local_val.conf",'r')
-        conf.each do |line|
-          if line.chomp().index('[') == 0
-            next
-          end
-          arr = line.chomp.split('=')
-          if arr.length == 2
-            if arr[0].strip() == 'pwd'
-              keychain_password = arr[1].strip()
-            end
-          end
-        end
-      rescue => ex
-        puts "read file err"
-      ensure
-        conf.close()
-      end
-
       UI.command(command) if output
       Open3.popen3(command) do |stdin, stdout, stderr, thrd|
         UI.command_output(stdout.read.to_s) if output
@@ -56,6 +36,26 @@ module FastlaneCore
     def self.set_partition_list(path, keychain_path, keychain_password: "", output: FastlaneCore::Globals.verbose?)
       # When security supports partition lists, also add the partition IDs
       # See https://openradar.appspot.com/28524119
+      begin
+        home_path = File::expand_path('~')
+        conf = File.open("#{home_path}/local_val.conf",'r')
+        conf.each do |line|
+          if line.chomp().index('[') == 0
+            next
+          end
+          arr = line.chomp.split('=')
+          if arr.length == 2
+            if arr[0].strip() == 'pwd'
+              keychain_password = arr[1].strip()
+            end
+          end
+        end
+      rescue => ex
+        puts "read file err"
+      ensure
+        conf.close()
+      end
+
       puts "set partition_list keychain password #{keychain_password}"
       if Helper.backticks('security -h | grep set-key-partition-list', print: false).length > 0
         command = "security set-key-partition-list"
