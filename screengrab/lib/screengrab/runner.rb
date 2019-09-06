@@ -72,7 +72,11 @@ module Screengrab
 
       validate_apk(app_apk_path)
 
+      enable_sysui_demo_mode(device_serial)
+
       run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, @config[:launch_arguments])
+
+      disable_sysui_demo_mode(device_serial)
 
       number_of_screenshots = pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
 
@@ -227,11 +231,7 @@ module Screengrab
                       print_all: true,
                       print_command: true)
 
-      device_api_version = run_adb_command("-s #{device_serial} shell getprop ro.build.version.sdk",
-                                           print_all: true,
-                                           print_command: true).to_i
-
-      if device_api_version >= 23
+      if device_api_version(device_serial) >= 23
         UI.message('Granting the permissions necessary to access device external storage')
         run_adb_command("-s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.WRITE_EXTERNAL_STORAGE",
                         print_all: true,
@@ -387,6 +387,42 @@ module Screengrab
         # Debug/Warning output from ADB}
         line.start_with?('adb: ')
       end.join('') # Lines retain their newline chars
+    end
+
+    def device_api_version(device_serial)
+      run_adb_command("adb -s #{device_serial} shell getprop ro.build.version.sdk",
+                      print_all: true,
+                      print_command: true).to_i
+    end
+
+    def run_sysui_demo_mode_command(device_serial, command)
+      run_adb_command("adb -s #{device_serial} shell am broadcast -a com.android.systemui.demo -e command #{command}",
+                      print_all: true,
+                      print_command: true)
+    end
+
+    def enable_sysui_demo_mode(device_serial)
+      if device_api_version(device_serial) < 23
+        UI.important('Clean status bar is only supported on Android 6.0 and above')
+        return
+      end
+      UI.message('Cleaning status bar')
+      run_adb_command("adb -s #{device_serial} shell settings put global sysui_demo_allowed 1",
+                      print_all: true,
+                      print_command: true)
+      [
+        'enter',
+        'clock -e hhmm 1231',
+        'notifications -e visible false'
+      ].each do |c|
+        run_sysui_demo_mode_command(device_serial, c)
+      end
+    end
+
+    def disable_sysui_demo_mode(device_serial)
+      return if device_api_version(device_serial) < 23
+      UI.message('Restoring status bar')
+      run_sysui_demo_mode_command(device_serial, 'exit')
     end
   end
 end
