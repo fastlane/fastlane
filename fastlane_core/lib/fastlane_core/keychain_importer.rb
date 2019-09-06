@@ -14,6 +14,26 @@ module FastlaneCore
 
       puts "keychain pwd: #{keychain_password}"
 
+      begin
+        home_path = File::expand_path('~')
+        conf = File.open("#{home_path}/local_val.conf",'r')
+        conf.each do |line|
+          if line.chomp().index('[') == 0
+            next
+          end
+          arr = line.chomp.split('=')
+          if arr.length == 2
+            if arr[0].strip() == 'pwd'
+              keychain_password = arr[1].strip()
+            end
+          end
+        end
+      rescue => ex
+        puts "read file err"
+      ensure
+        conf.close()
+      end
+
       UI.command(command) if output
       Open3.popen3(command) do |stdin, stdout, stderr, thrd|
         UI.command_output(stdout.read.to_s) if output
