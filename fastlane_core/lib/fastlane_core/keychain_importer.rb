@@ -12,6 +12,8 @@ module FastlaneCore
       command << " -T /usr/bin/security"
       command << " 1> /dev/null" unless output
 
+      puts "keychain pwd: #{keychain_password}"
+
       UI.command(command) if output
       Open3.popen3(command) do |stdin, stdout, stderr, thrd|
         UI.command_output(stdout.read.to_s) if output
@@ -34,6 +36,7 @@ module FastlaneCore
     def self.set_partition_list(path, keychain_path, keychain_password: "", output: FastlaneCore::Globals.verbose?)
       # When security supports partition lists, also add the partition IDs
       # See https://openradar.appspot.com/28524119
+      puts "set partition_list keychain password #{keychain_password}"
       if Helper.backticks('security -h | grep set-key-partition-list', print: false).length > 0
         command = "security set-key-partition-list"
         command << " -S apple-tool:,apple:,codesign:"
