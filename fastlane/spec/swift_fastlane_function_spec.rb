@@ -126,4 +126,41 @@ describe Fastlane do
       end
     end
   end
+
+  describe Fastlane::ToolSwiftFunction do
+    describe 'swift_vars' do
+      it 'generates empty array for protocols without parameters' do
+        swift_function = Fastlane::ToolSwiftFunction.new
+        result = swift_function.swift_vars
+
+        expect(result).to be_empty
+      end
+
+      it 'generates var without documentation' do
+        swift_function = Fastlane::ToolSwiftFunction.new(
+          keys: ['param_one'],
+          key_default_values: [''],
+          key_descriptions: [],
+          key_optionality_values: [],
+          key_type_overrides: []
+        )
+        result = swift_function.swift_vars
+
+        expect(result).to eq(["\n  var paramOne: String { get }"])
+      end
+
+      it 'generates var with documentation' do
+        swift_function = Fastlane::ToolSwiftFunction.new(
+          keys: ['param_one'],
+          key_default_values: [''],
+          key_descriptions: ['key description'],
+          key_optionality_values: [],
+          key_type_overrides: []
+        )
+        result = swift_function.swift_vars
+
+        expect(result).to eq(["\n  /// key description\n  var paramOne: String { get }"])
+      end
+    end
+  end
 end
