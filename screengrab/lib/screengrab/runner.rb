@@ -402,6 +402,7 @@ module Screengrab
     end
 
     def enable_sysui_demo_mode(device_serial)
+      return unless @config[:clean_status_bar]
       if device_api_version(device_serial) < 23
         UI.important('Clean status bar is only supported on Android 6.0 and above')
         return
@@ -410,16 +411,70 @@ module Screengrab
       run_adb_command("adb -s #{device_serial} shell settings put global sysui_demo_allowed 1",
                       print_all: true,
                       print_command: true)
-      [
-        'enter',
-        'clock -e hhmm 1231',
-        'notifications -e visible false'
-      ].each do |c|
+
+      battery_level = @config[:clean_status_bar_config][:battery_level] || '100'
+      battery_plugged = @config[:clean_status_bar_config][:battery_plugged] || 'false'
+      battery_power_save = @config[:clean_status_bar_config][:battery_power_save] || 'false'
+      network_airplane = @config[:clean_status_bar_config][:network_airplane] || 'hide'
+      network_fully = @config[:clean_status_bar_config][:network_fully] || 'true'
+      network_wifi = @config[:clean_status_bar_config][:network_wifi] || 'show'
+      network_wifi_level = @config[:clean_status_bar_config][:network_wifi_level] || '4'
+      network_mobile = @config[:clean_status_bar_config][:network_mobile] || 'show'
+      network_mobile_datatype = @config[:clean_status_bar_config][:network_mobile_datatype] || 'hide'
+      network_mobile_level = @config[:clean_status_bar_config][:network_mobile_level] || '4'
+      network_carrier_network_change = @config[:clean_status_bar_config][:network_carrier_network_change] || 'hide'
+      network_sims = @config[:clean_status_bar_config][:network_sims] || '1'
+      network_no_sim = @config[:clean_status_bar_config][:network_no_sim] || 'false'
+      bars_mode = @config[:clean_status_bar_config][:bars_mode] || 'transparent'
+      status_volume = @config[:clean_status_bar_config][:status_volume] || 'hide'
+      status_bluetooth = @config[:clean_status_bar_config][:status_bluetooth] || 'hide'
+      status_location = @config[:clean_status_bar_config][:status_location] || 'hide'
+      status_alarm = @config[:clean_status_bar_config][:status_alarm] || 'hide'
+      status_sync = @config[:clean_status_bar_config][:status_sync] || 'hide'
+      status_tty = @config[:clean_status_bar_config][:status_tty] || 'hide'
+      status_eri = @config[:clean_status_bar_config][:status_eri] || 'hide'
+      status_mute = @config[:clean_status_bar_config][:status_mute] || 'hide'
+      status_speakerphone = @config[:clean_status_bar_config][:status_speakerphone] || 'hide'
+      notifications_visible = @config[:clean_status_bar_config][:notifications_visible] || 'false'
+      clock = @config[:clean_status_bar_config][:clock] || '1230'
+
+      commands = [
+        "battery -e level #{battery_level} -e plugged #{battery_plugged} -e powersave #{battery_power_save}",
+        "network -e wifi #{network_wifi} -e level #{network_wifi_level}",
+        "network -e nosim #{network_no_sim}",
+        "network -e airplane #{network_airplane}",
+        "bars -e mode #{bars_mode}",
+        "status -e volume #{status_volume}",
+        "status -e bluetooth #{status_bluetooth}",
+        "status -e location #{status_location}",
+        "status -e alarm #{status_alarm}",
+        "status -e sync #{status_sync}",
+        "status -e tty #{status_tty}",
+        "status -e eri #{status_eri}",
+        "status -e mute #{status_mute}",
+        "status -e speakerphone #{status_speakerphone}",
+        "notifications -e visible #{notifications_visible}",
+        "clock -e hhmm #{clock}"
+      ]
+
+      # Some network commands conflict...
+      if network_airplane == 'hide'
+        commands << "network -e sims #{network_sims}" \
+                 << "network -e carriernetworkchange #{network_carrier_network_change}"
+        if network_carrier_network_change == 'hide'
+          commands << "network -e mobile #{network_mobile} -e level #{network_mobile_level} -e datatype #{network_mobile_datatype}"
+        end
+      end
+      # For some reason this needs to run after all the other network commands
+      commands << "network -e fully #{network_fully}"
+
+      commands.each do |c|
         run_sysui_demo_mode_command(device_serial, c)
       end
     end
 
     def disable_sysui_demo_mode(device_serial)
+      return unless @config[:clean_status_bar]
       return if device_api_version(device_serial) < 23
       UI.message('Restoring status bar')
       run_sysui_demo_mode_command(device_serial, 'exit')
