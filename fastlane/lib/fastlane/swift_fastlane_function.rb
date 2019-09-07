@@ -311,12 +311,18 @@ module Fastlane
       unless @param_names
         return []
       end
-      swift_vars = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
+      swift_vars = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides, param_descriptions).map do |param, default_value, optional, param_type_override, param_description|
         type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
 
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
         static_var_for_parameter_name = param
+
+        if param_description
+          documentation = "  /// #{param_description}\n"
+        end
+
+        "\n#{documentation}"\
         "  var #{static_var_for_parameter_name}: #{type} { get }"
       end
 
