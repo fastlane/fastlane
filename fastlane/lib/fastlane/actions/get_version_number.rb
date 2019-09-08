@@ -21,6 +21,8 @@ module Fastlane
         # Get from build settings if needed (ex: $(MARKETING_VERSION) is default in Xcode 11)
         if version_number =~ /\$\(([\w\-]+)\)/
           version_number = get_version_number_from_build_settings!(target, $1, configuration)
+        elsif version_number =~ /\$\{([\w\-]+)\}/
+          version_number = get_version_number_from_build_settings!(target, $1, configuration)
         end
 
         # Store the number in the shared hash
