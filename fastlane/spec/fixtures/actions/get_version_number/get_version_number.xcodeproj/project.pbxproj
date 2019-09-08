@@ -161,8 +161,8 @@
 		03AB83AE2057215F00BAAFD1 /* TargetDifferentConfigurations-Release.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "TargetDifferentConfigurations-Release.plist"; sourceTree = "<group>"; };
 		03CFC57C206409ED00CD6CB1 /* TargetSRC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TargetSRC.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		03CFC57D206409ED00CD6CB1 /* TargetSRC.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = TargetSRC.plist; path = /Users/josh/Projects/fastlane/fastlane/fastlane/spec/fixtures/actions/get_version_number/TargetSRC.plist; sourceTree = "<absolute>"; };
-		4AA286FE2300242500067244 /* TargetVariableAsBundleVersion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TargetVariableAsBundleVersion.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4AA286FF2300242600067244 /* TargetVariableAsBundleVersion-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TargetVariableAsBundleVersion-Info.plist"; path = "/Users/florent/ruby_projects/fastlane/fastlane/spec/fixtures/actions/get_version_number/TargetVariableAsBundleVersion-Info.plist"; sourceTree = "<absolute>"; };
+		4AA286FE2300242500067244 /* TargetVariableParentheses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TargetVariableParentheses.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4AA286FF2300242600067244 /* TargetVariableParentheses-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TargetVariableParentheses-Info.plist"; path = "/Users/florentmorin/Development/Ruby/fastlane/fastlane/spec/fixtures/actions/get_version_number/TargetVariableParentheses-Info.plist"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -265,7 +265,7 @@
 				03AB83482056AEC500BAAFD1 /* TargetC_production-Info.plist */,
 				03AB83262056AADB00BAAFD1 /* Info.plist */,
 				03AB83242056AAD200BAAFD1 /* TargetB-Info.plist */,
-				4AA286FF2300242600067244 /* TargetVariableAsBundleVersion-Info.plist */,
+				4AA286FF2300242600067244 /* TargetVariableParentheses-Info.plist */,
 				03AB82E32056A51B00BAAFD1 /* get_version_number */,
 				03AB82F82056A51B00BAAFD1 /* get_version_numberTests */,
 				03AB82E22056A51B00BAAFD1 /* Products */,
@@ -286,7 +286,7 @@
 				03AB83952056B27800BAAFD1 /* SampleProject.app */,
 				03AB83AB2057212800BAAFD1 /* TargetDifferentConfigurations.app */,
 				03CFC57C206409ED00CD6CB1 /* TargetSRC.app */,
-				4AA286FE2300242500067244 /* TargetVariableAsBundleVersion.app */,
+				4AA286FE2300242500067244 /* TargetVariableParentheses.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -506,9 +506,9 @@
 			productReference = 03CFC57C206409ED00CD6CB1 /* TargetSRC.app */;
 			productType = "com.apple.product-type.application";
 		};
-		4AA286E82300242500067244 /* TargetVariableAsBundleVersion */ = {
+		4AA286E82300242500067244 /* TargetVariableParentheses */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4AA286FB2300242500067244 /* Build configuration list for PBXNativeTarget "TargetVariableAsBundleVersion" */;
+			buildConfigurationList = 4AA286FB2300242500067244 /* Build configuration list for PBXNativeTarget "TargetVariableParentheses" */;
 			buildPhases = (
 				4AA286E92300242500067244 /* Sources */,
 				4AA286EC2300242500067244 /* Frameworks */,
@@ -518,9 +518,9 @@
 			);
 			dependencies = (
 			);
-			name = TargetVariableAsBundleVersion;
+			name = TargetVariableParentheses;
 			productName = get_version_number;
-			productReference = 4AA286FE2300242500067244 /* TargetVariableAsBundleVersion.app */;
+			productReference = 4AA286FE2300242500067244 /* TargetVariableParentheses.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -603,7 +603,7 @@
 				03AB839D2057212800BAAFD1 /* TargetDifferentConfigurations */,
 				03CFC56E206409ED00CD6CB1 /* TargetSRC */,
 				03B8E43E20729336001D1742 /* AggTarget */,
-				4AA286E82300242500067244 /* TargetVariableAsBundleVersion */,
+				4AA286E82300242500067244 /* TargetVariableParentheses */,
 			);
 		};
 /* End PBXProject section */
@@ -1401,7 +1401,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4.3.2;
-				INFOPLIST_FILE = "$(SRCROOT)/TargetVariableAsBundleVersion-Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/TargetVariableParentheses-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 4.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "tools.fastlane.get-version-number";
@@ -1418,7 +1418,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 4.3.2;
-				INFOPLIST_FILE = "$(SRCROOT)/TargetVariableAsBundleVersion-Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/TargetVariableParentheses-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 4.3.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "tools.fastlane.get-version-number";
@@ -1549,7 +1549,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4AA286FB2300242500067244 /* Build configuration list for PBXNativeTarget "TargetVariableAsBundleVersion" */ = {
+		4AA286FB2300242500067244 /* Build configuration list for PBXNativeTarget "TargetVariableParentheses" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4AA286FC2300242500067244 /* Debug */,
