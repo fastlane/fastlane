@@ -72,11 +72,9 @@ module Screengrab
 
       validate_apk(app_apk_path)
 
-      enable_sysui_demo_mode(device_serial)
+      enable_clean_status_bar(device_serial, app_apk_path)
 
       run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, @config[:launch_arguments])
-
-      disable_sysui_demo_mode(device_serial)
 
       number_of_screenshots = pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
 
@@ -390,73 +388,32 @@ module Screengrab
     end
 
     def device_api_version(device_serial)
-      run_adb_command("adb -s #{device_serial} shell getprop ro.build.version.sdk", print_all: true, print_command: true).to_i
+      run_adb_command("adb -s #{device_serial} shell getprop ro.build.version.sdk",
+                      print_all: true, print_command: true).to_i
     end
 
-    def run_sysui_demo_mode_command(device_serial, command)
-      run_adb_command("adb -s #{device_serial} shell am broadcast -a com.android.systemui.demo -e command #{command}",
+    def enable_clean_status_bar(device_serial, app_apk_path)
+      return unless device_api_version(device_serial) >= 23
+
+      # Check if the app want's to use the clean status bar feature
+      badging_dump = @executor.execute(command: "#{@android_env.aapt_path} dump badging #{app_apk_path}",
+                                       print_all: true, print_command: true)
+      return unless badging_dump.include?('uses-feature: name=\'tools.fastlane.screengrab.cleanstatusbar\'')
+
+      UI.message('Enabling clean status bar')
+
+      # Make sure the app has the DUMP permission
+      unless badging_dump.include?('uses-permission: name=\'android.permission.DUMP\'')
+        UI.user_error!("The clean status bar feature requires the android.permission.DUMP permission but it could not be found in your app APK")
+      end
+
+      # Grant the DUMP permission
+      run_adb_command("adb -s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.DUMP",
                       print_all: true, print_command: true)
-    end
 
-    def sysui_config(config, default)
-      @config[:clean_status_bar_config][config] || default
-    end
-
-    def enable_sysui_demo_mode(device_serial)
-      return unless @config[:clean_status_bar]
-      if device_api_version(device_serial) < 23
-        UI.important('Clean status bar is only supported on Android 6.0 and above')
-        return
-      end
-      UI.message('Cleaning status bar')
-      run_adb_command("adb -s #{device_serial} shell settings put global sysui_demo_allowed 1", print_all: true, print_command: true)
-
-      network_airplane = sysui_config(:network_airplane, 'hide')
-      network_carrier_network_change = sysui_config(:network_carrier_network_change, 'hide')
-
-      commands = [
-        "battery -e level #{sysui_config(:battery_level, '100')} -e plugged #{sysui_config(:battery_plugged, 'false')} " \
-          "-e powersave #{sysui_config(:battery_power_save, 'false')}",
-        "network -e wifi #{sysui_config(:network_wifi, 'show')} -e level #{sysui_config(:network_wifi_level, '4')}",
-        "network -e nosim #{sysui_config(:network_no_sim, 'false')}",
-        "network -e airplane #{network_airplane}",
-        "bars -e mode #{sysui_config(:bars_mode, 'transparent')}",
-        "status -e volume #{sysui_config(:status_volume, 'hide')}",
-        "status -e bluetooth #{sysui_config(:status_bluetooth, 'hide')}",
-        "status -e location #{sysui_config(:status_location, 'hide')}",
-        "status -e alarm #{sysui_config(:status_alarm, 'hide')}",
-        "status -e sync #{sysui_config(:status_sync, 'hide')}",
-        "status -e tty #{sysui_config(:status_tty, 'hide')}",
-        "status -e eri #{sysui_config(:status_eri, 'hide')}",
-        "status -e mute #{sysui_config(:status_mute, 'hide')}",
-        "status -e speakerphone #{sysui_config(:status_speakerphone, 'hide')}",
-        "notifications -e visible #{sysui_config(:notifications_visible, 'false')}",
-        "clock -e hhmm #{sysui_config(:clock, '1230')}"
-      ]
-
-      # Some network commands conflict...
-      if network_airplane == 'hide'
-        commands << "network -e sims #{sysui_config(:network_sims, '1')}" \
-                 << "network -e carriernetworkchange #{network_carrier_network_change}"
-        if network_carrier_network_change == 'hide'
-          commands << "network -e mobile #{sysui_config(:network_mobile, 'show')} " \
-            "-e level #{sysui_config(:network_mobile_level, '4')} " \
-            "-e datatype #{sysui_config(:network_mobile_datatype, 'hide')}"
-        end
-      end
-      # For some reason this needs to run after all the other network commands
-      commands << "network -e fully #{sysui_config(:network_fully, 'true')}"
-
-      commands.each do |c|
-        run_sysui_demo_mode_command(device_serial, c)
-      end
-    end
-
-    def disable_sysui_demo_mode(device_serial)
-      return unless @config[:clean_status_bar]
-      return if device_api_version(device_serial) < 23
-      UI.message('Restoring status bar')
-      run_sysui_demo_mode_command(device_serial, 'exit')
+      # Enable the SystemUI demo mode
+      run_adb_command("adb -s #{device_serial} shell settings put global sysui_demo_allowed 1",
+                      print_all: true, print_command: true)
     end
   end
 end
