@@ -11,12 +11,13 @@ module Fastlane
         require 'uri'
         require 'base64'
 
-        UI.message("Parameter App name: #{params[:app_name]}")
         auth_token = params[:auth_token]
         app_name = params[:app_name]
         apns_p12_password = params[:apns_p12_password]
         android_token = params[:android_token]
         android_gcm_sender_id = params[:android_gcm_sender_id]
+
+        UI.message("Parameter App name: #{app_name}")
 
         payload = {}
         payload['name'] = app_name
