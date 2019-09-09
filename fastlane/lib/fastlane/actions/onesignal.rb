@@ -166,7 +166,7 @@ module Fastlane
             apns_env: "production/sandbox (defaults to production)"
           )',
           'onesignal(
-            app_id: "Your OneSignal App ID"
+            app_id: "Your OneSignal App ID",
             auth_token: "Your OneSignal Auth Token",
             app_name: "New Name for OneSignal App",
             android_token: "Your Android GCM key (optional)",
