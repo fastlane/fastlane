@@ -327,9 +327,8 @@ module Fastlane
             when :in_method
               if (string_statement = string_statement_from_line(line))
                 # Multiline support for `description` method
-                if last_method_name == 'description'
-                  # rubocop:disable BlockNesting
-                  last_string_statement.concat(string_statement) unless last_string_statement.nil?
+                if last_method_name == 'description' && !last_string_statement.nil?
+                  last_string_statement.concat(string_statement)
                 else
                   last_string_statement = string_statement
                 end
