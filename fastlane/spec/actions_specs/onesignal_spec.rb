@@ -58,11 +58,11 @@ describe Fastlane do
 
       context 'when params are not valid' do
         it 'outputs error message' do
-          expect {
+          expect do
             Fastlane::FastFile.new.parse('lane :test do
               onesignal()
             end').runner.execute(:test)
-          }.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+          end.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
             expect(error.message).to eq('Please specify the `app_id` or the `app_name` parameters!')
           end
         end
