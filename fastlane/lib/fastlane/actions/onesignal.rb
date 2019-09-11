@@ -89,7 +89,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :app_id,
                                        env_name: "ONE_SIGNAL_APP_ID",
                                        sensitive: true,
-                                       description: "OneSignal App ID",
+                                       description: "OneSignal App ID. Setting this updates an existing app",
                                        optional: true),
 
           FastlaneCore::ConfigItem.new(key: :auth_token,
@@ -105,7 +105,7 @@ module Fastlane
 
           FastlaneCore::ConfigItem.new(key: :app_name,
                                        env_name: "ONE_SIGNAL_APP_NAME",
-                                       description: "OneSignal App Name",
+                                       description: "OneSignal App Name. This is required when creating an app (in other words, when `:app_id` is not set, and optional when updating an app",
                                        optional: true),
 
           FastlaneCore::ConfigItem.new(key: :android_token,
