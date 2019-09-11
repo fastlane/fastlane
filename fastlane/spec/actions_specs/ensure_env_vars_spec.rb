@@ -36,11 +36,13 @@ describe Fastlane do
 
         context 'and env var is not set' do
           it 'outputs error message' do
-            expect(FastlaneCore::UI).to receive(:user_error!).with('Missing environment variable \'MISSING\'')
-
-            Fastlane::FastFile.new.parse('lane :test do
-              ensure_env_vars(env_vars: [\'MISSING\'])
-            end').runner.execute(:test)
+            expect {
+              Fastlane::FastFile.new.parse('lane :test do
+                ensure_env_vars(env_vars: [\'MISSING\'])
+              end').runner.execute(:test)
+            }.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+              expect(error.message).to eq('Missing environment variable \'MISSING\'')
+            end
           end
         end
 
@@ -50,11 +52,13 @@ describe Fastlane do
           end
 
           it 'outputs error message' do
-            expect(FastlaneCore::UI).to receive(:user_error!).with('Missing environment variable \'MISSING\'')
-
-            Fastlane::FastFile.new.parse('lane :test do
-              ensure_env_vars(env_vars: [\'MISSING\'])
-            end').runner.execute(:test)
+            expect {
+              Fastlane::FastFile.new.parse('lane :test do
+                ensure_env_vars(env_vars: [\'MISSING\'])
+              end').runner.execute(:test)
+            }.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+              expect(error.message).to eq('Missing environment variable \'MISSING\'')
+            end
           end
         end
       end
@@ -62,11 +66,13 @@ describe Fastlane do
       context 'when param is not valid' do
         context 'because no env var is passed' do
           it 'outputs error message' do
-            expect(FastlaneCore::UI).to receive(:user_error!).with('Specify at least one environment variable name')
-
-            Fastlane::FastFile.new.parse('lane :test do
-              ensure_env_vars(env_vars: [])
-            end').runner.execute(:test)
+            expect {
+              Fastlane::FastFile.new.parse('lane :test do
+                ensure_env_vars(env_vars: [])
+              end').runner.execute(:test)
+            }.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+              expect(error.message).to eq('Specify at least one environment variable name')
+            end
           end
         end
       end

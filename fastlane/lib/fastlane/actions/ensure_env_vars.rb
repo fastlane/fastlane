@@ -3,19 +3,12 @@ module Fastlane
     class EnsureEnvVarsAction < Action
       def self.run(params)
         variables = params[:env_vars]
-        found_missing = false
 
         variables.each do |variable|
           next unless ENV[variable].to_s.strip.empty?
 
           UI.user_error!("Missing environment variable '#{variable}'")
-
-          found_missing = true
-
-          break
         end
-
-        return if found_missing
 
         is_one = variables.length == 1
 
