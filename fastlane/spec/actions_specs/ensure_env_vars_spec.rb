@@ -3,7 +3,7 @@ describe Fastlane do
     describe 'ensure_env_vars' do
       context 'when param is valid' do
         before :each do
-          allow(FastlaneCore::UI).to receive(:success).with("Driving the lane 'test' 🚀")
+          allow(FastlaneCore::UI).to receive(:success).with('Driving the lane \'test\' 🚀')
         end
 
         context 'and env var is set' do
