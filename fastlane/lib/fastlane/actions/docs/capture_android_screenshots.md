@@ -171,7 +171,39 @@ If you're having trouble getting your device unlocked and the screen activated t
 
 ## Clean Status Bar
 
-You can use [QuickDemo](https://github.com/PSPDFKit-labs/QuickDemo) to clean up the status bar for your screenshots.
+Screengrab can clean your status bar to make your screenshots even more beautiful.  
+Note: the clean status bar feature is only supported on devices with *API level >= 23*.
+
+To use the clean status bar feature add the following lines to your src/debug/AndroidManifest.xml
+```xml
+<!-- Indicates the use of the clean status bar feature -->
+<uses-feature android:name="tools.fastlane.screengrab.cleanstatusbar"/>
+<!-- Allows for changing the status bar -->
+<uses-permission android:name="android.permission.DUMP"/>
+```
+
+After that you can enable and disable the clean status bar at any moment during your tests.  
+In most cases you probably want to do this in the @BeforeClass and @AfterClass methods.
+```java
+@BeforeClass
+public static void beforeAll() {
+    CleanStatusBar.enableWithDefaults();
+}
+
+@AfterClass
+public static void afterAll() {
+    CleanStatusBar.disable();
+}
+```
+
+Have a look at the methods of the `CleanStatusBar` class to customize the status bar even more.  
+You could for example show the Bluetooth icon and the LTE text.
+```java
+new CleanStatusBar()
+    .setBluetoothState(BluetoothState.DISCONNECTED)
+    .setMobileNetworkDataType(MobileDataType.LTE)
+    .enable();
+```
 
 # Advanced _screengrab_
 

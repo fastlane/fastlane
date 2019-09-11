@@ -395,14 +395,14 @@ module Screengrab
     def enable_clean_status_bar(device_serial, app_apk_path)
       return unless device_api_version(device_serial) >= 23
 
-      # Check if the app want's to use the clean status bar feature
+      # Check if the app wants to use the clean status bar feature
       badging_dump = @executor.execute(command: "#{@android_env.aapt_path} dump badging #{app_apk_path}",
                                        print_all: true, print_command: true)
       return unless badging_dump.include?('uses-feature: name=\'tools.fastlane.screengrab.cleanstatusbar\'')
 
       UI.message('Enabling clean status bar')
 
-      # Make sure the app has the DUMP permission
+      # Make sure the app requests the DUMP permission
       unless badging_dump.include?('uses-permission: name=\'android.permission.DUMP\'')
         UI.user_error!("The clean status bar feature requires the android.permission.DUMP permission but it could not be found in your app APK")
       end
