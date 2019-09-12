@@ -1,6 +1,7 @@
 protocol MatchfileProtocol: class {
   var type: String { get }
   var readonly: Bool { get }
+  var skipProvisioningProfiles: Bool { get }
   var appIdentifier: [String] { get }
   var username: String { get }
   var teamId: String? { get }
@@ -30,6 +31,7 @@ protocol MatchfileProtocol: class {
 extension MatchfileProtocol {
   var type: String { return "development" }
   var readonly: Bool { return false }
+  var skipProvisioningProfiles: Bool { return false }
   var appIdentifier: [String] { return [] }
   var username: String { return "" }
   var teamId: String? { return nil }
@@ -58,4 +60,4 @@ extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.5]
+// FastlaneRunnerAPIVersion [0.9.6]
