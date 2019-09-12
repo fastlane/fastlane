@@ -2195,6 +2195,7 @@ func makeChangelogFromJenkins(fallbackChangelog: String = "",
 }
 func match(type: Any = matchfile.type,
            readonly: Bool = matchfile.readonly,
+           skipProvisioningProfiles: Bool = matchfile.skipProvisioningProfiles,
            appIdentifier: [String] = matchfile.appIdentifier,
            username: Any = matchfile.username,
            teamId: Any? = matchfile.teamId,
@@ -2221,6 +2222,7 @@ func match(type: Any = matchfile.type,
            verbose: Bool = matchfile.verbose) {
   let command = RubyCommand(commandID: "", methodName: "match", className: nil, args: [RubyCommand.Argument(name: "type", value: type),
                                                                                        RubyCommand.Argument(name: "readonly", value: readonly),
+                                                                                       RubyCommand.Argument(name: "skip_provisioning_profiles", value: skipProvisioningProfiles),
                                                                                        RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                        RubyCommand.Argument(name: "username", value: username),
                                                                                        RubyCommand.Argument(name: "team_id", value: teamId),
@@ -3601,6 +3603,7 @@ func swiftlint(mode: Any = "lint",
 }
 func syncCodeSigning(type: String = "development",
                      readonly: Bool = false,
+                     skipProvisioningProfiles: Bool = false,
                      appIdentifier: [String],
                      username: String,
                      teamId: String? = nil,
@@ -3627,6 +3630,7 @@ func syncCodeSigning(type: String = "development",
                      verbose: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "sync_code_signing", className: nil, args: [RubyCommand.Argument(name: "type", value: type),
                                                                                                    RubyCommand.Argument(name: "readonly", value: readonly),
+                                                                                                   RubyCommand.Argument(name: "skip_provisioning_profiles", value: skipProvisioningProfiles),
                                                                                                    RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                    RubyCommand.Argument(name: "username", value: username),
                                                                                                    RubyCommand.Argument(name: "team_id", value: teamId),
@@ -4301,7 +4305,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-10.2.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-11_Beta_5.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -4412,4 +4416,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.56]
+// FastlaneRunnerAPIVersion [0.9.57]
