@@ -31,7 +31,7 @@ module Fastlane
         # Set version if it is latest
         if version == 'latest'
           # Try to grab the edit version first, else fallback to live version
-          UI.message("Looking for latest version...")
+          UI.message("Looking for latest or live version...")
           latest_version = app.edit_version(platform: platform) || app.live_version(platform: platform)
 
           UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.version.nil?
@@ -45,6 +45,15 @@ module Fastlane
             version = latest_candidate_build.train_version
             build_number = latest_candidate_build.build_version
           end
+        elsif version == 'live'
+          UI.message("Looking for latest live version...")
+          latest_live_version = app.live_version(platform: platform)
+
+          UI.user_error!("Could not find latest live version for your app, please try setting a specific version") if latest_live_version.version.nil?
+
+          # No need to search for candidates, because released App Store version should only have one build
+          version = latest_live_version.version
+          build_number = latest_live_version.build_version
         end
 
         # Make sure output_directory has a slash on the end
@@ -231,7 +240,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
                                        env_name: "DOWNLOAD_DSYMS_VERSION",
-                                       description: "The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs",
+                                       description: "The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs. Pass in 'live' to download only the latest live build's dSYMs.",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :build_number,
                                        short_option: "-b",
@@ -280,6 +289,7 @@ module Fastlane
         [
           'download_dsyms',
           'download_dsyms(version: "1.0.0", build_number: "345")',
+          'download_dsyms(version: "live")',
           'download_dsyms(min_version: "1.2.3")'
         ]
       end
