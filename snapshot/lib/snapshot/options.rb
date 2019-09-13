@@ -116,7 +116,7 @@ module Snapshot
                                      description: "Enabling this option will configure the Simulator's system language",
                                      default_value: false,
                                      is_string: false),
-      FastlaneCore::ConfigItem.new(key: :dark_mode,
+        FastlaneCore::ConfigItem.new(key: :dark_mode,
                                     env_name: 'DARK_MODE',
                                     description: "Enabling this option will configure the Simulator to be in dark mode",
                                     default_value: false,

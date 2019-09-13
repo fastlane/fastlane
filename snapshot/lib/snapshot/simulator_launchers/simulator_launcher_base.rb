@@ -133,7 +133,7 @@ module Snapshot
         plist = {
           UserInterfaceStyleMode: (dark_mode ? 2 : 1)
         }
-        UI.message("Setting interface style #{device_type} (UserInterfaceStyleMode=#{dark_mode})") 
+        UI.message("Setting interface style #{device_type} (UserInterfaceStyleMode=#{dark_mode})")
         plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/com.apple.uikitservices.userInterfaceStyleMode.plist"
         File.write(plist_path, Plist::Emit.dump(plist))
       end
