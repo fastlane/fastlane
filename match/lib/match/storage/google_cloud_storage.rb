@@ -97,6 +97,7 @@ module Match
         end
 
         ensure_bucket_is_selected
+        check_bucket_permissions
       end
 
       def currently_used_team_id
@@ -292,42 +293,62 @@ module Match
       end
 
       def ensure_bucket_is_selected
-        # In case the user didn't provide a bucket name yet, they will
-        # be asked to provide one here
+        created_bucket = UI.confirm("Did you already create a Google Cloud Storage bucket?")
         while self.bucket_name.to_s.length == 0
-          # Have a nice selection of the available buckets here
-          # This can only happen after we went through auth of Google Cloud
-          available_bucket_identifiers = self.gc_storage.buckets.collect(&:id)
-          if available_bucket_identifiers.count > 0
-            @bucket_name = UI.select("What Google Cloud Storage bucket do you want to use? (you can define it using the `google_cloud_bucket_name` key)", available_bucket_identifiers)
-          else
-            UI.error("Looks like your Google Cloud account for the project ID '#{self.google_cloud_project_id}' doesn't")
-            UI.error("have access to a storage bucket. Please visit the following URL:")
+          unless created_bucket
+            UI.message("Create a bucket at the following URL:")
             UI.message("")
             UI.message("\t\thttps://console.cloud.google.com/storage/browser".cyan)
             UI.message("")
-            UI.message("Make sure to select the right project at the top of the page")
-            UI.message("and create a bucket if you don't already have one:")
+            UI.message("Make sure to select the right project at the top of the page!")
             UI.message("")
             UI.message("\t\t 1. Click 'Create bucket'".cyan)
-            UI.message("\t\t 2. Give the bucket a name".cyan)
+            UI.message("\t\t 2. Enter a unique name".cyan)
             UI.message("\t\t 3. Select a geographic location for your bucket".cyan)
             UI.message("\t\t 4. Make sure the storage class is set to 'Standard'".cyan)
             UI.message("\t\t 5. Click 'Create' to create the bucket".cyan)
             UI.message("")
             UI.input("Press [Enter] once you created a bucket")
-
-            UI.message("Next you need to give your account the correct permissions:")
-            UI.message("")
-            UI.message("\t\t 1. Click on your bucket to open it".cyan)
-            UI.message("\t\t 2. Click 'Permissions'".cyan)
-            UI.message("\t\t 3. Click 'Add members'".cyan)
-            UI.message("\t\t 4. Enter the email of your service account".cyan)
-            UI.message("\t\t 5. Set the role to 'Storage Admin'".cyan)
-            UI.message("\t\t 6. Click 'Save'".cyan)
-            UI.message("")
-            UI.input("Confirm with [Enter] once you're finished")
           end
+          bucket_name = UI.input("Enter the name of your bucket: ")
+
+          # Verify if the bucket exists
+          begin
+            bucket_exists = !self.gc_storage.bucket(bucket_name).nil?
+          rescue Google::Cloud::PermissionDeniedError
+            bucket_exists = true
+          end
+          created_bucket = bucket_exists
+          if bucket_exists
+            @bucket_name = bucket_name
+          else
+            UI.error("It looks like the bucket '#{bucket_name}' doesn't exist. Make sure to create it first.")
+          end
+        end
+      end
+
+      def check_bucket_permissions
+        begin
+          bucket = self.gc_storage.bucket(self.bucket_name)
+        rescue Google::Cloud::PermissionDeniedError
+          bucket = nil
+        end
+        while bucket.nil? == true
+          UI.error("Looks like your Google Cloud account for the project ID '#{self.google_cloud_project_id}' doesn't")
+          UI.error("have access to the storage bucket '#{self.bucket_name}'. Please visit the following URL:")
+          UI.message("")
+          UI.message("\t\thttps://console.cloud.google.com/storage/browser".cyan)
+          UI.message("")
+          UI.message("You need to give your account the correct permissions:")
+          UI.message("")
+          UI.message("\t\t 1. Click on your bucket to open it".cyan)
+          UI.message("\t\t 2. Click 'Permissions'".cyan)
+          UI.message("\t\t 3. Click 'Add members'".cyan)
+          UI.message("\t\t 4. Enter the email of your service account".cyan)
+          UI.message("\t\t 5. Set the role to 'Storage Admin'".cyan)
+          UI.message("\t\t 6. Click 'Save'".cyan)
+          UI.message("")
+          UI.input("Confirm with [Enter] once you're finished")
         end
       end
     end
