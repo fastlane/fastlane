@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Increment Version Number Integration" do
-      it "it increments all targets patch version number" do
+      it "increments all targets' patch version number (from 1.0.0 to 1.0.1)" do
         expect(Fastlane::Actions).to receive(:sh)
           .with(/agvtool what-marketing-version/, any_args)
           .once
@@ -13,36 +13,77 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version 1.0.1/)
       end
 
-      it "it increments all targets minor version number" do
+      ["1.0", "10"].each do |version|
+        it "raises an exception when trying to increment patch version number for #{version} (which has no patch number)" do
+          expect(Fastlane::Actions).to receive(:sh)
+            .with(/agvtool what-marketing-version/, any_args)
+            .once
+            .and_return(version)
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              increment_version_number
+            end").runner.execute(:test)
+          end.to raise_error("Can't increment version")
+        end
+      end
+
+      {
+        "1.0.0" => "1.1.0",
+        "10.13" => "10.14"
+      }.each do |from_version, to_version|
+        it "increments all targets' minor version number from #{from_version} to #{to_version}" do
+          expect(Fastlane::Actions).to receive(:sh)
+            .with(/agvtool what-marketing-version/, any_args)
+            .once
+            .and_return(from_version)
+          Fastlane::FastFile.new.parse("lane :test do
+            increment_version_number(bump_type: 'minor')
+          end").runner.execute(:test)
+
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version #{to_version}/)
+        end
+      end
+
+      it "raises an exception when trying to increment minor version number for 12 (which has no minor number)" do
         expect(Fastlane::Actions).to receive(:sh)
           .with(/agvtool what-marketing-version/, any_args)
           .once
-          .and_return("1.0.0")
-        Fastlane::FastFile.new.parse("lane :test do
-          increment_version_number(bump_type: 'minor')
-        end").runner.execute(:test)
+          .and_return("12")
 
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version 1.1.0/)
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            increment_version_number(bump_type: 'minor')
+          end").runner.execute(:test)
+        end.to raise_error("Can't increment version")
       end
 
-      it "it increments all targets minor version major" do
-        expect(Fastlane::Actions).to receive(:sh)
-          .with(/agvtool what-marketing-version/, any_args)
-          .once
-          .and_return("1.0.0")
-        Fastlane::FastFile.new.parse("lane :test do
-          increment_version_number(bump_type: 'major')
-        end").runner.execute(:test)
+      {
+        "1.0.0" => "2.0.0",
+        "10.13" => "11.0",
+        "12" => "13"
+      }.each do |from_version, to_version|
+        it "it increments all targets' major version number from #{from_version} to #{to_version}" do
+          expect(Fastlane::Actions).to receive(:sh)
+            .with(/agvtool what-marketing-version/, any_args)
+            .once
+            .and_return(from_version)
+          Fastlane::FastFile.new.parse("lane :test do
+            increment_version_number(bump_type: 'major')
+          end").runner.execute(:test)
 
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version 2.0.0/)
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version #{to_version}/)
+        end
       end
 
-      it "pass a custom version number" do
-        result = Fastlane::FastFile.new.parse("lane :test do
-          increment_version_number(version_number: '1.4.3')
-        end").runner.execute(:test)
+      ["1.4.3", "1.0", "10"].each do |version|
+        it "passes a custom version number #{version}" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            increment_version_number(version_number: \"#{version}\")
+          end").runner.execute(:test)
 
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version 1.4.3/)
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version #{version}/)
+        end
       end
 
       it "prefers a custom version number over a boring version bump" do
@@ -89,16 +130,18 @@ describe Fastlane do
         end.to raise_error("Please pass the path to the project, not the workspace")
       end
 
-      it "raises an exception when unable to calculate new version" do
-        expect(Fastlane::Actions).to receive(:sh)
-          .with(/agvtool what-marketing-version/, any_args)
-          .once
-          .and_return("00000")
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            increment_version_number
-          end").runner.execute(:test)
-        end.to raise_error("Your current version (00000) does not respect the format A.B.C")
+      ["A", "1.2.3.4", "1.2.3-pre"].each do |version|
+        it "raises an exception when unable to calculate new version for #{version} (which does not match any of the supported schemes)" do
+          expect(Fastlane::Actions).to receive(:sh)
+            .with(/agvtool what-marketing-version/, any_args)
+            .once
+            .and_return(version)
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              increment_version_number
+            end").runner.execute(:test)
+          end.to raise_error("Your current version (#{version}) does not respect the format A or A.B or A.B.C")
+        end
       end
     end
   end

@@ -79,10 +79,7 @@ module Fastlane
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
-                                       end),
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-e",
                                        env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_NAME",
@@ -90,10 +87,7 @@ module Fastlane
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
-                                       end)
+                                       default_value_dynamic: true)
         ]
       end
 

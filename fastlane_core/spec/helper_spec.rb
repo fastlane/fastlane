@@ -57,6 +57,13 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.ci?).to be(true)
       end
 
+      it "returns true when building in Github Actions" do
+        stub_const('ENV', { 'GITHUB_ACTION' => 'FAKE_ACTION' })
+        expect(FastlaneCore::Helper.ci?).to be(true)
+        stub_const('ENV', { 'GITHUB_ACTIONS' => 'true' })
+        expect(FastlaneCore::Helper.ci?).to be(true)
+      end
+
       it "returns true when building in Xcode Server" do
         stub_const('ENV', { 'XCS' => true })
         expect(FastlaneCore::Helper.ci?).to be(true)
@@ -105,7 +112,7 @@ describe FastlaneCore do
       end
 
       it "#transporter_path", requires_xcode: true do
-        expect(FastlaneCore::Helper.transporter_path).to match(%r{/Applications/Xcode.*.app/Contents/Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter})
+        expect(FastlaneCore::Helper.transporter_path).to match(%r{/Applications/Xcode.*.app/Contents/Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter|/Applications/Xcode.*.app/Contents/SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms/bin/iTMSTransporter})
       end
 
       it "#xcode_version", requires_xcode: true do

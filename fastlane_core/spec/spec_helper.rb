@@ -33,23 +33,6 @@ def before_each_fastlane_core
     to_return(status: 200, body: File.read("fastlane_core/spec/responses/itunesLookup-net.sunapps.invalid.json"), headers: {})
 end
 
-# Executes the provided block after adjusting the ENV to have the
-# provided keys and values set as defined in hash. After the block
-# completes, restores the ENV to its previous state.
-def with_env_values(hash)
-  hash.each do |k, v|
-    stub_const('ENV', ENV.to_h.merge(k => v))
-  end
-end
-
-def with_verbose(verbose)
-  orig_verbose = FastlaneCore::Globals.verbose?
-  FastlaneCore::Globals.verbose = verbose
-  yield if block_given?
-ensure
-  FastlaneCore::Globals.verbose = orig_verbose
-end
-
 def stub_commander_runner_args(args)
   runner = Commander::Runner.new(args)
   allow(Commander::Runner).to receive(:instance).and_return(runner)

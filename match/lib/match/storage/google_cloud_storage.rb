@@ -4,6 +4,7 @@ require 'google/cloud/storage'
 
 require_relative '../options'
 require_relative '../module'
+require_relative '../spaceship_ensure'
 require_relative './interface'
 
 module Match
@@ -18,6 +19,10 @@ module Match
       attr_reader :bucket_name
       attr_reader :google_cloud_keys_file
       attr_reader :google_cloud_project_id
+      attr_reader :readonly
+      attr_reader :username
+      attr_reader :team_id
+      attr_reader :team_name
 
       # Managed values
       attr_accessor :gc_storage
@@ -35,7 +40,11 @@ module Match
           platform: params[:platform].to_s,
           google_cloud_bucket_name: params[:google_cloud_bucket_name],
           google_cloud_keys_file: params[:google_cloud_keys_file],
-          google_cloud_project_id: params[:google_cloud_project_id]
+          google_cloud_project_id: params[:google_cloud_project_id],
+          readonly: params[:readonly],
+          username: params[:username],
+          team_id: params[:team_id],
+          team_name: params[:team_name]
         )
       end
 
@@ -43,11 +52,20 @@ module Match
                      platform: nil,
                      google_cloud_bucket_name: nil,
                      google_cloud_keys_file: nil,
-                     google_cloud_project_id: nil)
+                     google_cloud_project_id: nil,
+                     readonly: nil,
+                     username: nil,
+                     team_id: nil,
+                     team_name: nil)
         @type = type if type
         @platform = platform if platform
         @google_cloud_project_id = google_cloud_project_id if google_cloud_project_id
         @bucket_name = google_cloud_bucket_name
+
+        @readonly = readonly
+        @username = username
+        @team_id = team_id
+        @team_name = team_name
 
         @google_cloud_keys_file = ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id)
 
@@ -79,6 +97,32 @@ module Match
         end
 
         ensure_bucket_is_selected
+      end
+
+      def currently_used_team_id
+        if self.readonly
+          # In readonly mode, we still want to see if the user provided a team_id
+          # see `prefixed_working_directory` comments for more details
+          return self.team_id
+        else
+          spaceship = SpaceshipEnsure.new(self.username, self.team_id, self.team_name)
+          return spaceship.team_id
+        end
+      end
+
+      def prefixed_working_directory
+        # We fall back to "*", which means certificates and profiles
+        # from all teams that use this bucket would be installed. This is not ideal, but
+        # unless the user provides a `team_id`, we can't know which one to use
+        # This only happens if `readonly` is activated, and no `team_id` was provided
+        @_folder_prefix ||= currently_used_team_id
+        if @_folder_prefix.nil?
+          # We use a `@_folder_prefix` variable, to keep state between multiple calls of this
+          # method, as the value won't change. This way the warning is only printed once
+          UI.important("Looks like you run `match` in `readonly` mode, and didn't provide a `team_id`. This will still work, however it is recommended to provide a `team_id` in your Appfile or Matchfile")
+          @_folder_prefix = "*"
+        end
+        return File.join(working_directory, @_folder_prefix)
       end
 
       def download

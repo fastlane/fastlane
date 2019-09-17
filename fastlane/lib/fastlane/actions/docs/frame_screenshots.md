@@ -130,6 +130,7 @@ The general parameters are defined in the `default` key and can be:
 | `interline_spacing` | Specifies whether _frameit_ should add or subtract this many pixels between the individual lines of text. This only applies to a multi-line `title` and/or `keyword` to expand or squash together the individual lines of text. | `0` |
 | `font_scale_factor` | Specifies whether _frameit_ should increase or decrease the font size of the text. | `0.1` |
 | `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
+| `title_min_height` | Specifies a height always reserved for the title. Value can be a percentage of the height or an absolute value. The device will be placed below (or above) this area. Convenient to ensure the device top (or bottom) will be consistently placed at the same height on the different screenshots. | NA |
 
 ### Specific parameters
 
@@ -237,7 +238,7 @@ frameit(
   path: "./fastlane/screenshots",
   force_orientation_block: proc do |filename|
     case filename
-      when "iPad Pro (12.9-inch)-01LoginScreen" 
+      when "iPad Pro (12.9-inch)-01LoginScreen"
         :landscape_right
       when "iPhone 6 Plus-01LoginScreen"
         :portrait
@@ -301,6 +302,10 @@ Check out the [MindNode example project](https://github.com/fastlane/examples/tr
 ## Generate localized screenshots
 
 Check out [_snapshot_](https://docs.fastlane.tools/actions/snapshot/) to automatically generate screenshots using ```UI Automation```.
+
+## Resume framing
+
+Framing screenshots is a slow operation. In case you need to resume framing, or just frame a couple updated screenshots again, you can rely on the `--resume` flag. Only screenshots which have not been framed yet – or for which there isn't an up-to-date framed image – will be framed. This feature uses the file modification dates and will reframe screenshots if the screenshot is newer than the framed file.
 
 ## Upload screenshots
 

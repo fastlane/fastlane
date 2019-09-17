@@ -27,7 +27,7 @@ describe Fastlane do
       end
 
       it "logs the command if verbose" do
-        with_verbose(true) do
+        FastlaneSpec::Env.with_verbose(true) do
           allow(Fastlane::Actions).to receive(:sh)
             .with(anything, hash_including(log: true))
             .and_return("")

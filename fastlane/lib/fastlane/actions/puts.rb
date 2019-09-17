@@ -9,7 +9,7 @@ module Fastlane
           return
         end
 
-        # no paramter included in the call means treat this like a normal fastlane ruby call
+        # no parameter included in the call means treat this like a normal fastlane ruby call
         UI.message(params.join(' '))
       end
 

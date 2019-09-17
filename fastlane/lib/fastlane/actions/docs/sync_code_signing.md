@@ -310,7 +310,7 @@ gym
 
 ##### Registering new devices
 
-By using _match_, you'll save a lot of time every time you add new device to your Ad Hoc or Development profiles. Use _match_ in combination with the [`register_devices`](https://docs.fastlane.tools/actions#register_devices) action.
+By using _match_, you'll save a lot of time every time you add new device to your Ad Hoc or Development profiles. Use _match_ in combination with the [`register_devices`](https://docs.fastlane.tools/actions/register_devices/) action.
 
 ```ruby
 lane :beta do
@@ -406,6 +406,16 @@ fastlane match change_password
 ```
 
 You'll be asked for the new password on all your machines on the next run.
+
+### Import
+
+To import and encrypt a certificate (`.cer`) and the private key (`.p12`) into the _match_ repo run:
+
+```no-highlight
+fastlane match import
+```
+
+You'll be prompted for the certificate (`.cer`) and the private key (`.p12`) paths. _match_ will first validate the certificate (`.cer`) against the Developer Portal before importing the certificate (`.cer`) and the private key (`.p12`).
 
 ### Manual Decrypt
 

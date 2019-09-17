@@ -1,3 +1,5 @@
+require_relative 'globals'
+
 module Spaceship
   ##
   # Spaceship::Base is the superclass for models in Apple Developer Portal.
@@ -64,6 +66,9 @@ module Spaceship
         h = @hash.dup
         h.delete(:application)
         h.to_json(*a)
+      rescue JSON::GeneratorError => e
+        puts("Failed to jsonify #{h} (#{a})") if Spaceship::Globals.verbose?
+        raise e
       end
 
       def to_h
