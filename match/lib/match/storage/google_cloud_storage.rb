@@ -328,12 +328,14 @@ module Match
       end
 
       def check_bucket_permissions
-        begin
-          bucket = self.gc_storage.bucket(self.bucket_name)
-        rescue Google::Cloud::PermissionDeniedError
-          bucket = nil
-        end
-        while bucket.nil? == true
+        bucket = nil
+        while bucket.nil?
+          begin
+            bucket = self.gc_storage.bucket(self.bucket_name)
+          rescue Google::Cloud::PermissionDeniedError
+            bucket = nil
+          end
+          return if bucket.nil? == false
           UI.error("Looks like your Google Cloud account for the project ID '#{self.google_cloud_project_id}' doesn't")
           UI.error("have access to the storage bucket '#{self.bucket_name}'. Please visit the following URL:")
           UI.message("")
