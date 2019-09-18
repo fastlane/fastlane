@@ -25,17 +25,17 @@ module Fastlane
         elsif version_number =~ /\$\{([\w\-]+)\}/
           version_number = get_version_number_from_build_settings!(target, $1, configuration)
         end
-        
+
         # Check if version_number is not set and try retrieving value from project settings
         if version_number.nil?
-            version_number = get_version_number_from_project_settings(project, configuration)
+            version_number = get_version_number_from_build_settings!(project, $1, configuration)
         end
-        
+
         # Error out if version_number is not set
         if version_number.nil?
             UI.user_error!("Unable to find Xcode build setting: #{$1}")
         end
-        
+
         # Store the number in the shared hash
         Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
 
@@ -83,18 +83,6 @@ module Fastlane
         target
       end
 
-      def self.get_version_number_from_project_settings(project, configuration = nil)
-          # loop through project configurations and return MARKETING_VERSION
-          project.build_configurations.each do |config|
-              if config.name == "Release"
-                  value = config.build_settings["MARKETING_VERSION"]
-                  return value if value
-              end
-           end
-          
-          return nil
-      end
-
       def self.get_version_number_from_build_settings!(target, variable, configuration = nil)
         target.build_configurations.each do |config|
           if configuration.nil? || config.name == configuration
@@ -102,7 +90,7 @@ module Fastlane
             return value if value
           end
         end
-        
+
         return nil
       end
 
