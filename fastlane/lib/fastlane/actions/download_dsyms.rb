@@ -46,10 +46,10 @@ module Fastlane
             build_number = latest_candidate_build.build_version
           end
         elsif version == 'live'
-          UI.message("Looking for latest live version...")
+          UI.message("Looking for live version...")
           latest_live_version = app.live_version(platform: platform)
 
-          UI.user_error!("Could not find latest live version for your app, please try setting a specific version") if latest_live_version.version.nil?
+          UI.user_error!("Could not find live version for your app, please try setting 'latest' or a specific version") if latest_live_version.version.nil?
 
           # No need to search for candidates, because released App Store version should only have one build
           version = latest_live_version.version

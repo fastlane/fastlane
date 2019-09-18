@@ -94,7 +94,7 @@ describe Fastlane do
           allow(build3).to receive(:build_version).and_return('2')
           allow(build3).to receive(:upload_date).and_return(1_547_196_482_000)
         end
-        it 'downloads only dsyms of latest live build in latest train' do
+        it 'downloads only dsyms of live build' do
           expect(app).to receive(:tunes_all_builds_for_train).and_return([build, build2, build3])
           expect(app).to receive(:tunes_build_details).with(train: '1.0.0', build_number: '42', platform: :ios).and_return(build_detail)
           expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, train.version_string, build.build_version, nil)
