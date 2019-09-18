@@ -230,7 +230,7 @@ module Produce
 
         if on
           if !(app.details.enable_services.include?("push"))
-            app.update_service(Spaceship.app_service.push_notification.on) 
+            app.update_service(Spaceship.app_service.push_notification.on)
           end
         else
           app.update_service(Spaceship.app_service.push_notification.off)
