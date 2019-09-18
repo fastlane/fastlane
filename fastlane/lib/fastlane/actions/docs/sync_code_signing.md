@@ -92,7 +92,8 @@ app_identifier("tools.fastlane.app")
 username("user@fastlane.tools")
 ```
 
-##### Considerations for GitHub:
+##### Git Storage on GitHub
+
 If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise, you may see an authentication error when you attempt to use match. Alternatively, you can set a basic authorization for _match_:
 
 Using parameter:
