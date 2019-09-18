@@ -61,7 +61,7 @@ module Snapshot
             localize_simulator(type, language, locale)
           end
           if launcher_config.dark_mode
-            inteface_style(type, launcher_config.dark_mode)
+            interface_style(type, launcher_config.dark_mode)
           end
         elsif launcher_config.reinstall_app
           # no need to reinstall if device has been erased
@@ -127,7 +127,7 @@ module Snapshot
       end
     end
 
-    def inteface_style(device_type, dark_mode)
+    def interface_style(device_type, dark_mode)
       device_udid = TestCommandGenerator.device_udid(device_type)
       if device_udid
         plist = {
