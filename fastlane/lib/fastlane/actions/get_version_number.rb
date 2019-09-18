@@ -28,12 +28,12 @@ module Fastlane
 
         # Check if version_number is not set and try retrieving value from project settings
         if version_number.nil?
-            version_number = get_version_number_from_build_settings!(project, $1, configuration)
+          version_number = get_version_number_from_build_settings!(project, $1, configuration)
         end
 
         # Error out if version_number is not set
         if version_number.nil?
-            UI.user_error!("Unable to find Xcode build setting: #{$1}")
+          UI.user_error!("Unable to find Xcode build setting: #{$1}")
         end
 
         # Store the number in the shared hash
