@@ -37,6 +37,7 @@ module Match
         git_full_name: params[:git_full_name],
         git_user_email: params[:git_user_email],
         clone_branch_directly: params[:clone_branch_directly],
+        git_basic_authorization: params[:git_basic_authorization],
         type: params[:type].to_s,
         platform: params[:platform].to_s,
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
