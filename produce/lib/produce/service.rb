@@ -229,7 +229,7 @@ module Produce
         UI.message("\tPush Notifications")
 
         if on
-          if !(app.details.enable_services.include?("push"))
+          unless app.details.enable_services.include?("push")
             app.update_service(Spaceship.app_service.push_notification.on)
           end
         else
