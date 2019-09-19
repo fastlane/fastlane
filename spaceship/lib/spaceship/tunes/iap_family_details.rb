@@ -9,20 +9,12 @@ module Spaceship
       # @return (String) the family name
       attr_accessor :name
 
-      # @return (Intger) the family id
+      # @return (Intger) the Family Id
       attr_accessor :family_id
-
-      # @return (Array) all linked in-app purchases of this family
-      attr_accessor :linked_iaps
-
-      # @return (Intger) amount of linked in-app purchases of this family (read-only)
-      attr_accessor :iap_count
 
       attr_mapping({
         'id' => :family_id,
-        'name.value' => :name,
-        'activeAddOns' => :linked_iaps,
-        'totalActiveAddOns' => :iap_count
+        'name.value' => :name
       })
 
       def versions=(value = {})
