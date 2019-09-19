@@ -72,7 +72,7 @@ module Match
         cert.certificate_content == cert_contents_base_64
       end
 
-      UI.error!("This certificate cannot be imported - the certificate contents did not match with any available on the Developer Portal") if matching_cert.nil?
+      UI.user_error!("This certificate cannot be imported - the certificate contents did not match with any available on the Developer Portal") if matching_cert.nil?
 
       # Make dir if doesn't exist
       FileUtils.mkdir_p(output_dir)

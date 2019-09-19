@@ -16,6 +16,7 @@ protocol GymfileProtocol: class {
   var exportXcargs: String? { get }
   var skipBuildArchive: Bool? { get }
   var skipArchive: Bool? { get }
+  var skipCodesigning: Bool? { get }
   var buildPath: String? { get }
   var archivePath: String? { get }
   var derivedDataPath: String? { get }
@@ -28,15 +29,15 @@ protocol GymfileProtocol: class {
   var exportTeamId: String? { get }
   var xcargs: String? { get }
   var xcconfig: String? { get }
-  var suppressXcodeOutput: String? { get }
-  var disableXcpretty: String? { get }
-  var xcprettyTestFormat: String? { get }
+  var suppressXcodeOutput: Bool? { get }
+  var disableXcpretty: Bool? { get }
+  var xcprettyTestFormat: Bool? { get }
   var xcprettyFormatter: String? { get }
   var xcprettyReportJunit: String? { get }
   var xcprettyReportHtml: String? { get }
   var xcprettyReportJson: String? { get }
-  var analyzeBuildTime: String? { get }
-  var xcprettyUtf: String? { get }
+  var analyzeBuildTime: Bool? { get }
+  var xcprettyUtf: Bool? { get }
   var skipProfileDetection: Bool { get }
 }
 
@@ -58,6 +59,7 @@ extension GymfileProtocol {
   var exportXcargs: String? { return nil }
   var skipBuildArchive: Bool? { return nil }
   var skipArchive: Bool? { return nil }
+  var skipCodesigning: Bool? { return nil }
   var buildPath: String? { return nil }
   var archivePath: String? { return nil }
   var derivedDataPath: String? { return nil }
@@ -70,18 +72,18 @@ extension GymfileProtocol {
   var exportTeamId: String? { return nil }
   var xcargs: String? { return nil }
   var xcconfig: String? { return nil }
-  var suppressXcodeOutput: String? { return nil }
-  var disableXcpretty: String? { return nil }
-  var xcprettyTestFormat: String? { return nil }
+  var suppressXcodeOutput: Bool? { return nil }
+  var disableXcpretty: Bool? { return nil }
+  var xcprettyTestFormat: Bool? { return nil }
   var xcprettyFormatter: String? { return nil }
   var xcprettyReportJunit: String? { return nil }
   var xcprettyReportHtml: String? { return nil }
   var xcprettyReportJson: String? { return nil }
-  var analyzeBuildTime: String? { return nil }
-  var xcprettyUtf: String? { return nil }
+  var analyzeBuildTime: Bool? { return nil }
+  var xcprettyUtf: Bool? { return nil }
   var skipProfileDetection: Bool { return false }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.3]
+// FastlaneRunnerAPIVersion [0.9.5]

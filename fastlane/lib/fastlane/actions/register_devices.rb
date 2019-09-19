@@ -7,41 +7,53 @@ module Fastlane
         [:ios, :mac].include?(platform)
       end
 
+      def self.file_column_headers
+        ['Device ID', 'Device Name', 'Device Platform']
+      end
+
       def self.run(params)
+        if params[:devices]
+          new_devices = params[:devices].map do |name, udid|
+            [udid, name]
+          end
+        elsif params[:devices_file]
+          require 'csv'
+
+          devices_file = CSV.read(File.expand_path(File.join(params[:devices_file])), col_sep: "\t")
+          unless devices_file.first == file_column_headers.first(2) || devices_file.first == file_column_headers
+            UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)")
+          end
+
+          new_devices = devices_file.drop(1).map do |row|
+            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)") unless (2..3).cover?(row.count)
+            row
+          end
+        else
+          UI.user_error!("You must pass either a valid `devices` or `devices_file`. Please check the readme.")
+        end
+
         require 'spaceship'
-
-        devices = params[:devices]
-        devices_file = params[:devices_file]
-
-        mac = params[:platform] == "mac"
-
         credentials = CredentialsManager::AccountManager.new(user: params[:username])
         Spaceship.login(credentials.user, credentials.password)
         Spaceship.select_team
 
         UI.message("Fetching list of currently registered devices...")
-        existing_devices = Spaceship::Device.all(mac: mac)
+        all_platforms = Set[params[:platform]]
+        new_devices.each do |device|
+          next if device[2].nil?
+          all_platforms.add(device[2])
+        end
+        supported_platforms = all_platforms.select { |platform| self.is_supported?(platform.to_sym) }
 
-        if devices
-          device_objs = devices.map do |k, v|
-            next if existing_devices.map(&:udid).include?(v)
-            try_create_device(name: k, udid: v, mac: mac)
-          end
-        elsif devices_file
-          require 'csv'
+        existing_devices = supported_platforms.map { |platform| Spaceship::Device.all(mac: platform == "mac") }.flatten
 
-          devices_file = CSV.read(File.expand_path(File.join(devices_file)), col_sep: "\t")
-          UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)") unless devices_file.first == ['Device ID', 'Device Name']
+        device_objs = new_devices.map do |device|
+          next if existing_devices.map(&:udid).include?(device[0])
 
-          device_objs = devices_file.drop(1).map do |device|
-            next if existing_devices.map(&:udid).include?(device[0])
+          device_platform_supported = !device[2].nil? && self.is_supported?(device[2].to_sym)
+          mac = (device_platform_supported ? device[2] : params[:platform]) == "mac"
 
-            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)") unless device.count == 2
-
-            try_create_device(name: device[1], udid: device[0], mac: mac)
-          end
-        else
-          UI.user_error!("You must pass either a valid `devices` or `devices_file`. Please check the readme.")
+          try_create_device(name: device[1], udid: device[0], mac: mac)
         end
 
         UI.success("Successfully registered new devices.")
@@ -54,6 +66,10 @@ module Fastlane
         UI.error(ex.to_s)
         UI.crash!("Failed to register new device (name: #{name}, UDID: #{udid})")
       end
+
+      #####################################################
+      # @!group Documentation
+      #####################################################
 
       def self.description
         "Registers new devices to the Apple Dev Portal"

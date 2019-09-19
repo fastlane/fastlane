@@ -738,7 +738,7 @@ module Spaceship
         raise InternalServerError, "Received an internal server error from App Store Connect / Developer Portal, please try again later"
       elsif body.to_s.include?("Gateway Timeout - In read")
         raise GatewayTimeoutError, "Received a gateway timeout error from App Store Connect / Developer Portal, please try again later"
-      elsif (body["resultString"] || "").include?("Program License Agreement")
+      elsif (body["userString"] || "").include?("Program License Agreement")
         raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into your Apple Developer account to review and accept the updated agreement."
       end
     end

@@ -621,6 +621,20 @@ describe Fastlane do
             expect(result).to eq("carthage bootstrap --log-path bla.log")
           end
         end
+
+        context "when specify derived_data" do
+          context "when command is archive" do
+            let(:command) { 'archive' }
+            it "--derived-data option should not be present, even if ENV is set" do
+              # Stub the environment variable specifying the derived data path
+              stub_const('ENV', { 'FL_CARTHAGE_DERIVED_DATA' => './derived_data' })
+              result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}')
+              end").runner.execute(:test)
+              expect(result).to eq("carthage archive")
+            end
+          end
+        end
       end
     end
   end

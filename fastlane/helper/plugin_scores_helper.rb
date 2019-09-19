@@ -294,6 +294,7 @@ module Fastlane
         end
 
         # Parses the file to find all included actions
+        # rubocop:disable PerceivedComplexity
         def parse_file(file, debug_state: false)
           lines = File.read(file).lines
           actions = []
@@ -325,7 +326,12 @@ module Fastlane
               end
             when :in_method
               if (string_statement = string_statement_from_line(line))
-                last_string_statement = string_statement
+                # Multiline support for `description` method
+                if last_method_name == 'description' && !last_string_statement.nil?
+                  last_string_statement.concat(string_statement)
+                else
+                  last_string_statement = string_statement
+                end
               end
               if is_block?(line)
                 self.state << :in_block

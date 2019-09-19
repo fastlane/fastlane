@@ -16,7 +16,15 @@ module Fastlane
         project = get_project!(folder)
         target = get_target!(project, target_name)
         plist_file = get_plist!(folder, target, configuration)
-        version_number = get_version_number!(plist_file)
+        version_number = get_version_number_from_plist!(plist_file)
+
+        # Get from build settings if needed (ex: $(MARKETING_VERSION) is default in Xcode 11)
+        if version_number =~ /\$\(([\w\-]+)\)/
+          version_number = get_version_number_from_build_settings!(target, $1, configuration)
+        # ${MARKETING_VERSION} also works
+        elsif version_number =~ /\$\{([\w\-]+)\}/
+          version_number = get_version_number_from_build_settings!(target, $1, configuration)
+        end
 
         # Store the number in the shared hash
         Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
@@ -65,6 +73,17 @@ module Fastlane
         target
       end
 
+      def self.get_version_number_from_build_settings!(target, variable, configuration = nil)
+        target.build_configurations.each do |config|
+          if configuration.nil? || config.name == configuration
+            value = config.build_settings[variable]
+            return value if value
+          end
+        end
+
+        UI.user_error!("Unable to find Xcode build setting: #{variable}")
+      end
+
       def self.get_plist!(folder, target, configuration = nil)
         plist_files = target.resolved_build_setting("INFOPLIST_FILE")
         plist_files_count = plist_files.values.compact.uniq.count
@@ -94,7 +113,7 @@ module Fastlane
         plist_file
       end
 
-      def self.get_version_number!(plist_file)
+      def self.get_version_number_from_plist!(plist_file)
         plist = Xcodeproj::Plist.read_from_path(plist_file)
         UI.user_error!("Unable to read plist: #{plist_file}") unless plist
 

@@ -11,8 +11,10 @@ module Fastlane
 
         if command_name == "archive" && params[:frameworks].count > 0
           cmd.concat(params[:frameworks])
-        elsif ["update", "build", "bootstrap"].include?(command_name) && params[:dependencies].count > 0
-          cmd.concat(params[:dependencies])
+        # "update", "build" and "bootstrap" are the only commands that support "--derived-data" parameter
+        elsif ["update", "build", "bootstrap"].include?(command_name)
+          cmd.concat(params[:dependencies]) if params[:dependencies].count > 0
+          cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
         end
 
         cmd << "--output #{params[:output]}" if params[:output]
@@ -24,7 +26,6 @@ module Fastlane
         cmd << "--verbose" if params[:verbose] == true
         cmd << "--platform #{params[:platform]}" if params[:platform]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
-        cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
         cmd << "--toolchain #{params[:toolchain]}" if params[:toolchain]
         cmd << "--project-directory #{params[:project_directory]}" if params[:project_directory]
         cmd << "--cache-builds" if params[:cache_builds]

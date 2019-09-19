@@ -2,6 +2,7 @@ require:
   - rubocop/require_tools
   - ./rubocop/fork_usage.rb
   - ./rubocop/missing_keys_on_shared_area.rb
+  - ./rubocop/is_string_usage.rb
 
 Style/MultipleComparison:
   Enabled: false
@@ -25,7 +26,7 @@ Performance/RegexpMatch:
   Enabled: false
 
 # This suggests use of `tr` instead of `gsub`. While this might be more performant,
-# these methods are not at all interchangable, and behave very differently. This can
+# these methods are not at all interchangeable, and behave very differently. This can
 # lead to people making the substitution without considering the differences.
 Performance/StringReplacement:
   Enabled: false
@@ -290,6 +291,10 @@ Style/CollectionMethods:
 CrossPlatform/ForkUsage:
   Exclude:
     - '**/plugins/template/**/*'
+
+Lint/IsStringUsage:
+  Include:
+    - 'gym/**/*'
 
 # ( ) for method calls
 Style/MethodCallWithArgsParentheses:

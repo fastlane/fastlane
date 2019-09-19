@@ -1,13 +1,10 @@
 {
   "data": {
     "sectionErrorKeys": [
-
     ],
     "sectionInfoKeys": [
-
     ],
     "sectionWarningKeys": [
-
     ],
     "countriesChanged": false,
     "countries": [
@@ -50,46 +47,57 @@
     "unavailableDate": -2,
     "creatingApp": false,
     "hasApprovedVersion": false,
-    "preOrder":{  
-      "clearedForPreOrder":{  
-        "value":false,
-        "isEditable":true,
-        "isRequired":true,
-        "errorKeys":null
+    "preOrder": {
+      "clearedForPreOrder": {
+        "value": false,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null
       },
-      "appAvailableDate":{  
-        "value":null,
-        "isEditable":true,
-        "isRequired":true,
-        "errorKeys":null
+      "appAvailableDate": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null
       },
-      "preOrderAvailableDate":null
+      "preOrderAvailableDate": null
     },
     "appVersionsForOTAByPlatforms": {
       "iOS": [
-
       ]
     },
     "b2bUsers": [
       {
         "value": {
-          "dsUsername":"b2b1@abc.com",
-          "delete":false,"add":false,
-          "company":"b2b1"
+          "dsUsername": "b2b1@abc.com",
+          "delete": false,
+          "add": false,
+          "company": "b2b1"
         },
-        "isEditable":true,
-        "isRequired":false,
-        "errorKeys":null
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
       },
       {
         "value": {
-          "dsUsername":"b2b2@def.com",
-          "delete":false,"add":false,
-          "company":"b2b2"
+          "dsUsername": "b2b2@def.com",
+          "delete": false,
+          "add": false,
+          "company": "b2b2"
         },
-        "isEditable":true,
-        "isRequired":false,
-        "errorKeys":null
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      }
+    ],
+    "b2bOrganizations": [
+      {
+        "value": {
+          "type": "ADD",
+          "depCustomerId": "123456",
+          "organizationId": null,
+          "name": "the best company"
+        }
       }
     ]
   },

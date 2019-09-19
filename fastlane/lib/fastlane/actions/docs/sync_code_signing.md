@@ -79,7 +79,7 @@ You'll be asked if you want to store your code signing identities inside a **Git
 
 Use Git Storage to store all code signing identities in a private git repo, owned and operated by you. The files will be encrypted using OpenSSL.
 
-First, enter the URL to your private (!) Git repo (You can create one for free on e.g. [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)). The URL you enter can be either a `https://` or a `git` URL. (If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise you may see an authentication error when you attempt to use match.) `fastlane match init` won't read or modify your certificates or profiles yet, and also won't validate your git URL.
+First, enter the URL to your private (!) Git repo (You can create one for free on e.g. [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)). The URL you enter can be either a `https://` or a `git` URL. `fastlane match init` won't read or modify your certificates or profiles yet, and also won't validate your git URL.
 
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder).
 
@@ -91,6 +91,25 @@ git_url("https://github.com/fastlane/certificates")
 app_identifier("tools.fastlane.app")
 username("user@fastlane.tools")
 ```
+
+##### Git Storage on GitHub
+
+If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise, you may see an authentication error when you attempt to use match. Alternatively, you can set a basic authorization for _match_:
+
+Using parameter:
+
+```
+math(git_basic_authorization: '<YOUR KEY>')
+```
+
+Using environment variable:
+
+```
+ENV['MATCH_GIT_BASIC_AUTHORIZATION'] = '<YOUR KEY>'
+match
+```
+
+You can find more information about GitHub basic authentication and personal token generation here: [https://developer.github.com/v3/auth/#basic-authentication](https://developer.github.com/v3/auth/#basic-authentication)
 
 #### Google Cloud Storage
 
