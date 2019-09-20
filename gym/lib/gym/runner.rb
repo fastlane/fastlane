@@ -146,7 +146,6 @@ module Gym
       containing_directory = File.expand_path("..", PackageCommandGenerator.dsym_path)
       bcsymbolmaps_directory = File.expand_path("../../BCSymbolMaps", PackageCommandGenerator.dsym_path)
       available_dsyms = Dir.glob("#{containing_directory}/*.dSYM")
-      uuid_regex = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
 
       if Dir.exist?(bcsymbolmaps_directory)
         UI.message("Mapping dSYM(s) using generated BCSymbolMaps") unless Gym.config[:silent]
