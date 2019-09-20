@@ -36,7 +36,8 @@ module Snapshot
         end
       end
 
-      html_path = File.join(Snapshot::ROOT, "lib", "snapshot/page.html.erb")
+      custom_page_html_path = Snapshot.config[:html_template]
+      html_path = custom_page_html_path ? custom_page_html_path : File.join(Snapshot::ROOT, "lib", "snapshot/page.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
       export_path = "#{screens_path}/screenshots.html"
