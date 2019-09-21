@@ -111,6 +111,8 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency('emoji_regex', '>= 0.1', '< 2.0') # Used to scan for Emoji in the changelog
 
+  spec.add_dependency('aws-sdk', '~> 2.3') # Used in match for S3 storage
+
   # Development only
   spec.add_development_dependency('rake', '< 12')
   spec.add_development_dependency('rspec', '~> 3.5.0')

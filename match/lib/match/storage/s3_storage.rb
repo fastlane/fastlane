@@ -12,6 +12,7 @@ module Match
     # Store the code signing identities on AWS S3
     class S3Storage < Interface
       attr_reader :s3_bucket
+      attr_reader :s3_region
       attr_reader :s3_client
       attr_reader :readonly
       attr_reader :username
@@ -52,7 +53,12 @@ module Match
                      team_id: nil,
                      team_name: nil)
         @s3_bucket = s3_bucket
-        @s3_client = Fastlane::Helper::S3ClientHelper.new(s3_access_key, s3_secret_access_key, s3_region)
+        @s3_region = s3_region
+        @s3_client = Fastlane::Helper::S3ClientHelper.new(access_key: s3_access_key, secret_access_key: s3_secret_access_key, region: s3_region)
+        @readonly = readonly
+        @username = username
+        @team_id = team_id
+        @team_name = team_name
       end
 
       # To make debugging easier, we have a custom exception here
@@ -82,13 +88,14 @@ module Match
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
 
-        s3_client.bucket(s3_bucket).objects.each do |current_file|
-          file_path = current_file.public_url.to_s.split("s3.amazonaws.com/").last
+        s3_client.find_bucket!(s3_bucket).objects.each do |object|
+          file_path = object.public_url.to_s.split("s3.amazonaws.com/").last
           download_path = File.join(self.working_directory, file_path)
 
           FileUtils.mkdir_p(File.expand_path("..", download_path))
           UI.verbose("Downloading file from S3 '#{file_path}' on bucket #{self.s3_bucket}")
-          File.write(download_path, current_file.read)
+
+          object.download_file(download_path)
         end
         UI.verbose("Successfully downloaded files from S3 to #{self.working_directory}")
       end
@@ -96,9 +103,7 @@ module Match
       # Returns a short string describing + identifing the current
       # storage backend. This will be printed when nuking a storage
       def human_readable_description
-        message = "S3 Bucket [#{s3_bucket}]"
-        # message += " on region #{s3_region}" if s3_region
-        message
+        return "S3 Bucket [#{s3_bucket}] on region #{s3_region}"
       end
 
       def upload_files(files_to_upload: [], custom_message: nil)
@@ -115,8 +120,9 @@ module Match
 
           target_path = current_file.gsub(self.working_directory + "/", "")
           UI.verbose("Uploading '#{target_path}' to S3 Storage...")
+
           body = File.read(current_file)
-          acl = readonly ? 'public-read' : 'public-read-write'
+          acl = 'private'
           s3_url = s3_client.upload_file(s3_bucket, target_path, body, acl)
           UI.verbose("Uploaded '#{s3_url}' to S3 Storage.")
         end
