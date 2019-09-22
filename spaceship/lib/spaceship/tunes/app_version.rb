@@ -192,6 +192,9 @@ module Spaceship
       # @return (Hash) Represents the trailers of this app version (read-only)
       attr_reader :trailers
 
+      # @return (Hash) A hash representing all in-app purchases that can get submitted with this version
+      attr_reader :in_app_purchases
+
       # @return (Hash) Represents the phased_release hash (read-only)
       #   For now, please use the `toggle_phased_release` method and call `.save!`
       #   as the API will probably change in the future
@@ -233,6 +236,7 @@ module Spaceship
         'supportsAppleWatch' => :supports_apple_watch,
         'versionId' => :version_id,
         'version.value' => :version,
+        'submittableAddOns.value' => :in_app_purchases,
         'phasedRelease' => :phased_release,
 
         # GeoJson
