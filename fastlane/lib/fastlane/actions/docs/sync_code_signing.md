@@ -6,7 +6,7 @@
 
 A new approach to iOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
 
-_match_ is the implementation of the [https://codesigning.guide concept](https://codesigning.guide). _match_ creates all required certificates & provisioning profiles and stores them in a separate git repository. Every team member with access to the repo can use those credentials for code signing. _match_ also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
+_match_ is the implementation of the [codesigning.guide concept](https://codesigning.guide). _match_ creates all required certificates & provisioning profiles and stores them in a separate git repository. Every team member with access to the repo can use those credentials for code signing. _match_ also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
 
 [More information on how to get started with codesigning](https://docs.fastlane.tools/codesigning/getting-started/)
 
@@ -138,7 +138,7 @@ match(git_branch: "team2", username: "user@team2.com")
 
 #### Google Cloud Storage
 
-If you use Google Cloud Storage, you don't need to do anything manually. Just use Google Cloud Storage, and the top level folder will be the team ID.
+If you use Google Cloud Storage, you don't need to do anything manually for multiple teams. Just use Google Cloud Storage, and the top level folder will be the team ID.
 
 ### Run
 
@@ -233,7 +233,7 @@ There are two cases for reading and writing certificates stored in a Google Clou
 1. Continuous integration jobs. These will authenticate to your Google Cloud project via a service account, and use a `gc_keys.json` file as credentials.
 1. Developers on a local workstation. In this case, you should choose whether everyone on your team will create their own `gc_keys.json` file, or whether you want to manage access to the bucket directly using your developers' Google accounts.
 
-When running `fastlane match init` the first time, the setup process will give you the option to create your `gc_keys.json` file. This file contains the auth credentials needed to access your Google Cloud storage bucket. Make sure to keep that file secret and never add it to version control. We recommend adding `gc_keys.json` to your `.gitignore`
+When running `fastlane match init` the first time, the setup process will give you the option to create your `gc_keys.json` file. This file contains the authentication credentials needed to access your Google Cloud storage bucket. Make sure to keep that file secret and never add it to version control. We recommend adding `gc_keys.json` to your `.gitignore`
 
 ##### Managing developer access via keys
 If you want to manage developer access to your certificates via authentication keys, every developer should create their own `gc_keys.json` and add the file to all their work machines. This will give the admin full control over who has read/write access to the given Storage bucket. At the same time it allows your team to revoke a single key if a file gets compromised.
