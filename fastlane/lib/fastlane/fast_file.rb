@@ -26,10 +26,15 @@ module Fastlane
                 'you should turn off smart quotes in your editor of choice.')
       end
 
-      content.scan(/^\s*require (.*)/).each do |current|
+      content.scan(/^\s*require ["'](.*?)["']/).each do |current|
         gem_name = current.last
         next if gem_name.include?(".") # these are local gems
-        UI.important("You have required a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally.")
+
+        begin
+          require(gem_name)
+        rescue LoadError
+          UI.important("You have required a gem, if this is a third party gem, please use `fastlane_require '#{gem_name}'` to ensure the gem is installed locally.")
+        end
       end
 
       parse(content, @path)
