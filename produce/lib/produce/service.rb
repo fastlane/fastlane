@@ -229,6 +229,10 @@ module Produce
         UI.message("\tPush Notifications")
 
         if on
+          # Don't enable push notifications if already enabled
+          # Enabling push notifications when already on revokes certs
+          # https://github.com/fastlane/fastlane/issues/15315
+          # https://github.com/fastlane/fastlane/issues/8883
           unless app.details.enable_services.include?("push")
             app.update_service(Spaceship.app_service.push_notification.on)
           end
