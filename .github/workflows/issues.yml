@@ -1,5 +1,7 @@
 name: Processing issues
-on: issues
+on: 
+  issues:
+    types: [opened]
 
 jobs:   
   fastlane-env:
