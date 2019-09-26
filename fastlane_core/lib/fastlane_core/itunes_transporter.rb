@@ -147,17 +147,6 @@ module FastlaneCore
         end
       end
     end
-
-    def additional_upload_parameters
-      # Workaround because the traditional transporter broke on 1st March 2018
-      # More information https://github.com/fastlane/fastlane/issues/11958
-      # As there was no communication from Apple, we don't know if this is a temporary
-      # server outage, or something they changed without giving a heads-up
-      if ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"].to_s.length == 0
-        ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV"
-      end
-      return ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"]
-    end
   end
 
   # Generates commands and executes the iTMSTransporter through the shell script it provides by the same name
@@ -169,8 +158,7 @@ module FastlaneCore
         "-u #{username.shellescape}",
         "-p #{shell_escaped_password(password)}",
         "-f \"#{source}\"",
-        additional_upload_parameters, # that's here, because the user might overwrite the -t option
-        "-t Signiant",
+        ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
         "-k 100000",
         ("-WONoPause true" if Helper.windows?), # Windows only: process instantly returns instead of waiting for key press
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?)
@@ -254,8 +242,7 @@ module FastlaneCore
         "-u #{username.shellescape}",
         "-p #{password.shellescape}",
         "-f #{source.shellescape}",
-        additional_upload_parameters, # that's here, because the user might overwrite the -t option
-        '-t Signiant',
+        ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"], # that's here, because the user might overwrite the -t option
         '-k 100000',
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
         '2>&1' # cause stderr to be written to stdout
