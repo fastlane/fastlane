@@ -1,0 +1,14 @@
+name: Processing issues
+on: 
+  issues:
+    types: [opened]
+
+jobs:   
+  fastlane-env:
+    name: fastlane env reminder
+    runs-on: ubuntu-latest    
+    steps:
+    - uses: actions/checkout@master
+    - uses: fastlane/github-actions/fastlane-env-reminder@latest
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"

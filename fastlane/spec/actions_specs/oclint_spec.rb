@@ -50,7 +50,8 @@ describe Fastlane do
               list_enabled_rules: true,
               enable_clang_static_analyzer: true,
               enable_global_analysis: true,
-              allow_duplicated_violations: true
+              allow_duplicated_violations: true,
+              extra_arg: '-Wno-everything'
             )
           end").runner.execute(:test)
 
@@ -65,6 +66,7 @@ describe Fastlane do
         expect(result).to include(' -enable-clang-static-analyzer ')
         expect(result).to include(' -enable-global-analysis ')
         expect(result).to include(' -allow-duplicated-violations ')
+        expect(result).to include(' -extra-arg=-Wno-everything ')
       end
 
       it "works with single quote in rule name" do

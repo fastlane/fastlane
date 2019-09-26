@@ -1,0 +1,128 @@
+{
+  "data": [{
+    "type": "profiles",
+    "id": "123456789",
+    "attributes": {
+      "profileState": "ACTIVE",
+      "uuid": "7ecd2cf1-3eb1-48b5-94e3-eb60eeaf5ad6",
+      "platform": "IOS",
+      "bundlePlatform": "IOS",
+      "createdDate": "2019-06-10T03:15:58.000+0000",
+      "profileType": "IOS_APP_STORE",
+      "name": "match AppStore com.joshholtz.FastlaneApp 1560136558",
+      "profileTypeLabel": "App Store",
+      "profileContent": "content",
+      "platformName": "iOS",
+      "responseId": "75318b6e-62c1-4d7a-9f49-8664fd4acd5c",
+      "expirationDate": "2020-05-01T15:18:38.000+0000"
+    },
+    "relationships": {
+      "bundleId": {
+        "links": {
+          "self": "https://developer.apple.com:443/services-account/v1/profiles/123456789/relationships/bundleId",
+          "related": "https://developer.apple.com:443/services-account/v1/profiles/123456789/bundleId"
+        }
+      },
+      "certificates": {
+        "meta": {
+          "paging": {
+            "total": 0,
+            "limit": 2147483647
+          }
+        },
+        "links": {
+          "self": "https://developer.apple.com:443/services-account/v1/profiles/123456789/relationships/certificates",
+          "related": "https://developer.apple.com:443/services-account/v1/profiles/123456789/certificates"
+        }
+      },
+      "devices": {
+        "meta": {
+          "paging": {
+            "total": 0,
+            "limit": 2147483647
+          }
+        },
+        "links": {
+          "self": "https://developer.apple.com:443/services-account/v1/profiles/123456789/relationships/devices",
+          "related": "https://developer.apple.com:443/services-account/v1/profiles/123456789/devices"
+        }
+      },
+      "referenceProfile": {
+        "links": {
+          "self": "https://developer.apple.com:443/services-account/v1/profiles/123456789/relationships/referenceProfile",
+          "related": "https://developer.apple.com:443/services-account/v1/profiles/123456789/referenceProfile"
+        }
+      }
+    },
+    "links": {
+      "self": "https://developer.apple.com:443/services-account/v1/profiles/123456789"
+    }
+  }, {
+    "type": "profiles",
+    "id": "34Y84C7ZQX",
+    "attributes": {
+      "profileState": "INVALID",
+      "uuid": "4634f1d2-af15-4ad7-8682-dc3d01a36526",
+      "platform": "IOS",
+      "bundlePlatform": "IOS",
+      "createdDate": "2019-02-01T20:59:15.000+0000",
+      "profileType": "IOS_APP_STORE",
+      "name": "match AppStore com.joshholtz.FastlaneApp 1549054755",
+      "profileTypeLabel": "App Store",
+      "profileContent": null,
+      "platformName": "iOS",
+      "responseId": "75318b6e-62c1-4d7a-9f49-8664fd4acd5c",
+      "expirationDate": "2020-02-01T20:49:04.000+0000"
+    },
+    "relationships": {
+      "bundleId": {
+        "links": {
+          "self": "https://developer.apple.com:443/services-account/v1/profiles/34Y84C7ZQX/relationships/bundleId",
+          "related": "https://developer.apple.com:443/services-account/v1/profiles/34Y84C7ZQX/bundleId"
+        }
+      },
+      "certificates": {
+        "meta": {
+          "paging": {
+            "total": 0,
+            "limit": 2147483647
+          }
+        },
+        "links": {
+          "self": "https://developer.apple.com:443/services-account/v1/profiles/34Y84C7ZQX/relationships/certificates",
+          "related": "https://developer.apple.com:443/services-account/v1/profiles/34Y84C7ZQX/certificates"
+        }
+      },
+      "devices": {
+        "meta": {
+          "paging": {
+            "total": 0,
+            "limit": 2147483647
+          }
+        },
+        "links": {
+          "self": "https://developer.apple.com:443/services-account/v1/profiles/34Y84C7ZQX/relationships/devices",
+          "related": "https://developer.apple.com:443/services-account/v1/profiles/34Y84C7ZQX/devices"
+        }
+      },
+      "referenceProfile": {
+        "links": {
+          "self": "https://developer.apple.com:443/services-account/v1/profiles/34Y84C7ZQX/relationships/referenceProfile",
+          "related": "https://developer.apple.com:443/services-account/v1/profiles/34Y84C7ZQX/referenceProfile"
+        }
+      }
+    },
+    "links": {
+      "self": "https://developer.apple.com:443/services-account/v1/profiles/34Y84C7ZQX"
+    }
+  }],
+  "links": {
+    "self": "https://developer.apple.com:443/services-account/v1/profiles"
+  },
+  "meta": {
+    "paging": {
+      "total": 2,
+      "limit": 200
+    }
+  }
+}

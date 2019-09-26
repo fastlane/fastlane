@@ -196,7 +196,7 @@ module FastlaneCore
         return
       end
 
-      # We need to explicity test against Fastlane::Boolean, TrueClass/FalseClass
+      # We need to explicitly test against Fastlane::Boolean, TrueClass/FalseClass
       if value.class != FalseClass && value.class != TrueClass
         UI.user_error!("'#{self.key}' value must be either `true` or `false`! Found #{value.class} instead.")
       end

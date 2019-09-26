@@ -5,6 +5,7 @@ module RuboCop
     class MissingKeysOnSharedArea < RuboCop::Cop::Cop
       MISSING_KEYS_MSG = "Found %<key>s in 'SharedValues' but not in 'output' method. Keys in the 'output' method: %<list>s".freeze
       MISSING_OUTPUT_METHOD_MSG = "There are declared keys on the shared area 'SharedValues', but 'output' method has not been found".freeze
+      MISSING_CONST_DEFINITION_MSG = "Found setting a value for `SharedValues` in a function but the const is not declared in `SharedValues` module".freeze
 
       def_node_search :extract_const_assignment, <<-PATTERN
         (casgn nil? $_ ...)
@@ -12,6 +13,10 @@ module RuboCop
 
       def_node_matcher :find_output_method, <<-PATTERN
         (defs (self) :output ...)
+      PATTERN
+
+      def_node_matcher :extract_shared_values_key?, <<-PATTERN
+        (const (const nil? :SharedValues) $_)
       PATTERN
 
       attr_writer :shared_values_constants
@@ -50,6 +55,19 @@ module RuboCop
         return if body.nil?
 
         has_output_method?(body)
+      end
+
+      def on_send(node)
+        return unless node.arguments?
+
+        _, _, *arg_nodes = *node
+        return unless arg_nodes.count == 2
+
+        key = extract_shared_values_key?(node.first_argument)
+        return if key.nil?
+
+        contains_key = self.shared_values_constants.include?(key.to_s)
+        add_offense(node, :expression, MISSING_CONST_DEFINITION_MSG) unless contains_key
       end
 
       def has_output_method?(node)

@@ -14,6 +14,76 @@ describe Fastlane do
       end
     end
 
+    describe "#sh" do
+      before do
+        @ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
+      end
+
+      context "with command argument" do
+        it "passes command as string with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git commit", log: true, error_callback: nil)
+          @ff.sh("git commit")
+        end
+
+        it "passes command as string and log with default error_callback" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git commit", log: false, error_callback: nil)
+          @ff.sh("git commit", log: false)
+        end
+
+        it "passes command as array with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git", "commit", log: true, error_callback: nil)
+          @ff.sh("git", "commit")
+        end
+
+        it "yields the status, result and command" do
+          proc = proc {}
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git", "commit", log: true, error_callback: nil) do |*args, &block|
+              expect(proc).to be(block)
+            end
+          @ff.sh("git", "commit", &proc)
+        end
+      end
+
+      context "with named command keyword" do
+        it "passes command as string with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git commit", log: true, error_callback: nil)
+          @ff.sh(command: "git commit")
+        end
+
+        it "passes command as string and log with default error_callback" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git commit", log: false, error_callback: nil)
+          @ff.sh(command: "git commit", log: false)
+        end
+
+        it "passes command as array with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git", "commit", log: true, error_callback: nil)
+          @ff.sh(command: ["git", "commit"])
+        end
+
+        it "yields the status, result and command" do
+          proc = proc {}
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git", "commit", log: true, error_callback: nil) do |*args, &block|
+              expect(proc).to be(block)
+            end
+          @ff.sh(command: ["git", "commit"], &proc)
+        end
+
+        it "raises error if no :command keyboard" do
+          expect do
+            @ff.sh(log: true)
+          end.to raise_error(ArgumentError)
+        end
+      end
+    end
+
     describe "#is_platform_block?" do
       before do
         @ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')

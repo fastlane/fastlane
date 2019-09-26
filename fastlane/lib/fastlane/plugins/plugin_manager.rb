@@ -178,6 +178,7 @@ module Fastlane
       with_clean_bundler_env do
         cmd = "bundle install"
         cmd << " --quiet" unless FastlaneCore::Globals.verbose?
+        cmd << " && bundle exec fastlane generate_swift" if FastlaneCore::FastlaneFolder.swift?
         cmd << " && echo 'Successfully installed plugins'"
         UI.command(cmd) if FastlaneCore::Globals.verbose?
         exec(cmd)
@@ -197,6 +198,7 @@ module Fastlane
         cmd = "bundle update"
         cmd << " #{plugins.join(' ')}"
         cmd << " --quiet" unless FastlaneCore::Globals.verbose?
+        cmd << " && bundle exec fastlane generate_swift" if FastlaneCore::FastlaneFolder.swift?
         cmd << " && echo 'Successfully updated plugins'"
         UI.command(cmd) if FastlaneCore::Globals.verbose?
         exec(cmd)

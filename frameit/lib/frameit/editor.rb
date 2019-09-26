@@ -72,7 +72,7 @@ module Frameit
     private
 
     def store_result
-      output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
+      output_path = screenshot.output_path
       image.format("png")
       image.write(output_path)
       Helper.hide_loading_indicator
@@ -330,7 +330,7 @@ module Frameit
         background = put_title_into_background_stacked(background, title, keyword)
         return background
       end
-      # sum_width: the width of both labels together including the space inbetween
+      # sum_width: the width of both labels together including the space in-between
       #   is used to calculate the ratio
       sum_width = title.width
       sum_width += keyword.width + keyword_padding if keyword

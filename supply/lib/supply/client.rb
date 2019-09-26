@@ -78,8 +78,20 @@ module Supply
 
     def call_google_api
       yield if block_given?
-    rescue Google::Apis::ClientError => e
-      UI.user_error!("Google Api Error: #{e.message}")
+    rescue Google::Apis::Error => e
+      error = begin
+                JSON.parse(e.body)
+              rescue
+                nil
+              end
+
+      if error
+        message = error["error"] && error["error"]["message"]
+      else
+        message = e.body
+      end
+
+      UI.user_error!("Google Api Error: #{e.message} - #{message}")
     end
   end
 
@@ -108,7 +120,7 @@ module Supply
           private_key: key.to_s,
           client_email: params[:issuer]
         }
-        service_account_json = StringIO.new(MultiJson.dump(cred_json))
+        service_account_json = StringIO.new(JSON.dump(cred_json))
         service_account_json
       else
         UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
@@ -300,7 +312,7 @@ module Supply
 
       track_version_codes = apk_version_code.kind_of?(Array) ? apk_version_code : [apk_version_code]
 
-      # This change happend on 2018-04-24
+      # This change happened on 2018-04-24
       # rollout cannot be sent on any other track besides "rollout"
       # https://github.com/fastlane/fastlane/issues/12372
       rollout = nil unless track == "rollout"

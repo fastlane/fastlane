@@ -56,10 +56,10 @@ module Snapshot
       command :update do |c|
         c.syntax = 'fastlane snapshot update'
         c.description = "Updates your SnapshotHelper.swift to the latest version"
-
+        c.option('--force', 'Disables confirmation prompts')
         c.action do |args, options|
           require 'snapshot/update'
-          Snapshot::Update.new.update
+          Snapshot::Update.new.update(force: options.force)
         end
       end
 

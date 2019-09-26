@@ -1,8 +1,9 @@
 module Fastlane
   module Actions
     module SharedValues
-      IPA_OUTPUT_PATH = :IPA_OUTPUT_PATH
-      DSYM_OUTPUT_PATH = :DSYM_OUTPUT_PATH
+      IPA_OUTPUT_PATH ||= :IPA_OUTPUT_PATH
+      DSYM_OUTPUT_PATH ||= :DSYM_OUTPUT_PATH
+      XCODEBUILD_ARCHIVE ||= :XCODEBUILD_ARCHIVE # originally defined in XcodebuildAction
     end
 
     class BuildIosAppAction < Action
@@ -95,7 +96,8 @@ module Fastlane
       def self.output
         [
           ['IPA_OUTPUT_PATH', 'The path to the newly generated ipa file'],
-          ['DSYM_OUTPUT_PATH', 'The path to the dSYM files']
+          ['DSYM_OUTPUT_PATH', 'The path to the dSYM files'],
+          ['XCODEBUILD_ARCHIVE', 'The path to the xcodebuild archive']
         ]
       end
 

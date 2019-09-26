@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      VERSION_NUMBER = :VERSION_NUMBER
+      VERSION_NUMBER ||= :VERSION_NUMBER
     end
 
     class IncrementVersionNumberAction < Action
@@ -33,28 +33,30 @@ module Fastlane
           current_version = ''
         end
 
-        version_regex = /^\d+\.\d+\.\d+$/
         if params[:version_number]
-          UI.verbose("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
+          UI.verbose(version_format_error(current_version)) unless current_version =~ version_regex
 
           # Specific version
           next_version_number = params[:version_number]
         else
-          UI.user_error!("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
+          UI.user_error!(version_format_error(current_version)) unless current_version =~ version_regex
           version_array = current_version.split(".").map(&:to_i)
 
           case params[:bump_type]
           when "patch"
+            UI.user_error!(version_token_error) if version_array.count < 3
             version_array[2] = version_array[2] + 1
             next_version_number = version_array.join(".")
           when "minor"
+            UI.user_error!(version_token_error) if version_array.count < 2
             version_array[1] = version_array[1] + 1
-            version_array[2] = version_array[2] = 0
+            version_array[2] = 0 if version_array[2]
             next_version_number = version_array.join(".")
           when "major"
+            UI.user_error!(version_token_error) if version_array.count == 0
             version_array[0] = version_array[0] + 1
-            version_array[1] = version_array[1] = 0
-            version_array[1] = version_array[2] = 0
+            version_array[1] = 0 if version_array[1]
+            version_array[2] = 0 if version_array[2]
             next_version_number = version_array.join(".")
           when "specific_version"
             next_version_number = specific_version_number
@@ -77,6 +79,18 @@ module Fastlane
       rescue => ex
         UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')
         raise ex
+      end
+
+      def self.version_regex
+        /^\d+(\.\d+){0,2}$/
+      end
+
+      def self.version_format_error(version)
+        "Your current version (#{version}) does not respect the format A or A.B or A.B.C"
+      end
+
+      def self.version_token_error
+        "Can't increment version"
       end
 
       def self.description

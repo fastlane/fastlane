@@ -2,7 +2,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      XCODEBUILD_ARCHIVE = :XCODEBUILD_ARCHIVE
+      XCODEBUILD_ARCHIVE ||= :XCODEBUILD_ARCHIVE
       XCODEBUILD_DERIVED_DATA_PATH = :XCODEBUILD_DERIVED_DATA_PATH
     end
 

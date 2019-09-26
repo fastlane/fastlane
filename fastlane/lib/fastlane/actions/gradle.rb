@@ -8,6 +8,8 @@ module Fastlane
       GRADLE_ALL_APK_OUTPUT_PATHS = :GRADLE_ALL_APK_OUTPUT_PATHS
       GRADLE_AAB_OUTPUT_PATH = :GRADLE_AAB_OUTPUT_PATH
       GRADLE_ALL_AAB_OUTPUT_PATHS = :GRADLE_ALL_AAB_OUTPUT_PATHS
+      GRADLE_OUTPUT_JSON_OUTPUT_PATH = :GRADLE_OUTPUT_JSON_OUTPUT_PATH
+      GRADLE_ALL_OUTPUT_JSON_OUTPUT_PATHS = :GRADLE_ALL_OUTPUT_JSON_OUTPUT_PATHS
       GRADLE_FLAVOR = :GRADLE_FLAVOR
       GRADLE_BUILD_TYPE = :GRADLE_BUILD_TYPE
     end
@@ -60,6 +62,7 @@ module Fastlane
 
         apk_search_path = File.join(project_dir, '**', 'build', 'outputs', 'apk', '**', '*.apk')
         aab_search_path = File.join(project_dir, '**', 'build', 'outputs', 'bundle', '**', '*.aab')
+        output_json_search_path = File.join(project_dir, '**', 'build', 'outputs', 'apk', '**', 'output.json')
 
         # Our apk/aab is now built, but there might actually be multiple ones that were built if a flavor was not specified in a multi-flavor project (e.g. `assembleRelease`)
         # However, we're not interested in unaligned apk's...
@@ -67,18 +70,23 @@ module Fastlane
         new_apks = new_apks.map { |path| File.expand_path(path) }
         new_aabs = Dir[aab_search_path]
         new_aabs = new_aabs.map { |path| File.expand_path(path) }
+        new_output_jsons = Dir[output_json_search_path]
+        new_output_jsons = new_output_jsons.map { |path| File.expand_path(path) }
 
         # We expose all of these new apks and aabs
         Actions.lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS] = new_apks
         Actions.lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS] = new_aabs
+        Actions.lane_context[SharedValues::GRADLE_ALL_OUTPUT_JSON_OUTPUT_PATHS] = new_output_jsons
 
         # We also take the most recent apk and aab to return as SharedValues::GRADLE_APK_OUTPUT_PATH and SharedValues::GRADLE_AAB_OUTPUT_PATH
         # This is the one that will be relevant for most projects that just build a single build variant (flavor + build type combo).
         # In multi build variants this value is undefined
         last_apk_path = new_apks.sort_by(&File.method(:mtime)).last
         last_aab_path = new_aabs.sort_by(&File.method(:mtime)).last
+        last_output_json_path = new_output_jsons.sort_by(&File.method(:mtime)).last
         Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] = File.expand_path(last_apk_path) if last_apk_path
         Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH] = File.expand_path(last_aab_path) if last_aab_path
+        Actions.lane_context[SharedValues::GRADLE_OUTPUT_JSON_OUTPUT_PATH] = File.expand_path(last_output_json_path) if last_output_json_path
 
         # Give a helpful message in case there were no new apks or aabs. Remember we're only running this code when assembling, in which case we certainly expect there to be an apk or aab
         UI.message('Couldn\'t find any new signed apk files...') if new_apks.empty? && new_aabs.empty?
@@ -102,7 +110,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :task,
                                        env_name: 'FL_GRADLE_TASK',
-                                       description: 'The gradle task you want to execute, e.g. `assemble` or `test`. For tasks such as `assembleMyFlavorRelease` you should use gradle(task: \'assemble\', flavor: \'Myflavor\', build_type: \'Release\')',
+                                       description: 'The gradle task you want to execute, e.g. `assemble`, `bundle` or `test`. For tasks such as `assembleMyFlavorRelease` you should use gradle(task: \'assemble\', flavor: \'Myflavor\', build_type: \'Release\')',
                                        optional: false,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :flavor,
@@ -165,7 +173,9 @@ module Fastlane
           ['GRADLE_FLAVOR', 'The flavor, e.g. `MyFlavor`'],
           ['GRADLE_BUILD_TYPE', 'The build type, e.g. `Release`'],
           ['GRADLE_AAB_OUTPUT_PATH', 'The path to the most recent Android app bundle'],
-          ['GRADLE_ALL_AAB_OUTPUT_PATHS', 'The paths to the most recent Android app bundles']
+          ['GRADLE_ALL_AAB_OUTPUT_PATHS', 'The paths to the most recent Android app bundles'],
+          ['GRADLE_OUTPUT_JSON_OUTPUT_PATH', 'The path to the most recent output.json file'],
+          ['GRADLE_ALL_OUTPUT_JSON_OUTPUT_PATHS', 'The path to the newly generated output.json files']
         ]
       end
 
@@ -187,8 +197,21 @@ module Fastlane
             task: "assemble",
             flavor: "WorldDomination",
             build_type: "Release"
-          )',
-          'gradle(
+          )
+          ```
+
+          To build an AAB use:
+          ```ruby
+          gradle(
+            task: "bundle",
+            flavor: "WorldDomination",
+            build_type: "Release"
+          )
+          ```
+
+          You can pass properties to gradle:
+          ```ruby
+          gradle(
             # ...
 
             properties: {
@@ -211,8 +234,11 @@ module Fastlane
               "android.injected.signing.key.alias" => "key_alias",
               "android.injected.signing.key.password" => "key_password",
             }
-          )',
-          '# If you need to pass sensitive information through the `gradle` action, and don\'t want the generated command to be printed before it is run, you can suppress that:
+          )
+          ```
+
+          If you need to pass sensitive information through the `gradle` action, and don\'t want the generated command to be printed before it is run, you can suppress that:
+          ```ruby
           gradle(
             # ...
             print_command: false
@@ -233,8 +259,11 @@ module Fastlane
             # ...
 
             flags: "--exitcode --xml file.xml"
-          )',
-          '# Delete the build directory and generated APKs
+          )
+          ```
+
+          Delete the build directory, generated APKs and AABs
+          ```ruby
           gradle(
             task: "clean"
           )'
