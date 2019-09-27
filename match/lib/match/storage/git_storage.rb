@@ -69,7 +69,7 @@ module Match
         self.working_directory = Dir.mktmpdir
 
         command = "git clone #{self.git_url.shellescape} #{self.working_directory.shellescape}"
-        command << " -c http.extraheader='AUTHORIZATION: basic #{self.git_basic_authorization.shellescape}'" unless self.git_basic_authorization.nil?
+        command << " -c http.extraheader='AUTHORIZATION: basic #{self.git_basic_authorization}'" unless self.git_basic_authorization.nil?
 
         if self.shallow_clone
           command << " --depth 1 --no-single-branch"

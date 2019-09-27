@@ -118,7 +118,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :git_basic_authorization,
                                      env_name: "MATCH_GIT_BASIC_AUTHORIZATION",
                                      sensitive: true,
-                                     description: "Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc)",
+                                     description: "Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64",
                                      optional: true,
                                      default_value: nil),
 
