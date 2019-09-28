@@ -103,10 +103,6 @@ module Fastlane
 
         UI.user_error!("Cannot find value for INFOPLIST_FILE build setting") if plist_file.nil?
 
-        # $(SRCROOT) is the path of where the XcodeProject is
-        # We can just set this as empty string since we join with `folder` below
-        if plist_file.include?("$(SRCROOT)/")
-          plist_file.gsub!("$(SRCROOT)/", "")
         end
 
         plist_file = File.absolute_path(File.join(folder, plist_file))
