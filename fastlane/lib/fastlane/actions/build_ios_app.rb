@@ -96,6 +96,7 @@ module Fastlane
       def self.output
         [
           ['IPA_OUTPUT_PATH', 'The path to the newly generated ipa file'],
+          ['PKG_OUTPUT_PATH', 'The path to the newly generated pkg file'],
           ['DSYM_OUTPUT_PATH', 'The path to the dSYM files'],
           ['XCODEBUILD_ARCHIVE', 'The path to the xcodebuild archive']
         ]
