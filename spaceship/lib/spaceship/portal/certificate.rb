@@ -141,10 +141,7 @@ module Spaceship
       class Passbook < Certificate; end
 
       # ApplePay certificate
-      class ApplePayCertificate < Certificate; end
-
-      # ApplePay certificate for backward compatibility
-      class ApplePay < ApplePayCertificate; end
+      class ApplePay < Certificate; end
 
       # ApplePayMerchantIdentity certificate
       class ApplePayMerchantIdentity < Certificate; end
@@ -165,7 +162,7 @@ module Spaceship
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
         "E5D663CMZW" => VoipPush,
-        "4APLUP237T" => ApplePayCertificate,
+        "4APLUP237T" => ApplePay,
         "MD8Q2VRT6A" => ApplePayMerchantIdentity
       }
 
@@ -333,7 +330,7 @@ module Spaceship
           csr = OpenSSL::X509::Request.new(csr) if csr.kind_of?(String)
 
           # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
-          if type == '4APLUP237T' # = ApplePayCertificate
+          if type == '4APLUP237T' # = ApplePay
             response = client.create_certificate_apple_pay!(type, csr.to_pem, merchant_id, mac)
           else
             response = client.create_certificate!(type, csr.to_pem, app_id, mac)
