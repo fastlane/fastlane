@@ -313,7 +313,7 @@ module Gym
                                               end)
 
       # Generates package and signs for installation
-      print_command(command, "Generated Productbuild Command") if FastlaneCore::Globals.verbose?
+      print_command(productbuild_command, "Generated Productbuild Command") if FastlaneCore::Globals.verbose?
       FastlaneCore::CommandExecutor.execute(command: productbuild_command,
                                           print_all: false,
                                       print_command: !Gym.config[:silent],
