@@ -315,7 +315,7 @@ module Spaceship
 
           # look up the app_id by the bundle_id
           if bundle_id
-            if bundle_id.start_with?('merchant.')
+            if bundle_id.start_with?('merchant.') # ApplePay
               merchant = Spaceship::Portal.merchant.find(bundle_id)
               raise "Could not find merchant with bundle id '#{bundle_id}" unless merchant
               merchant_id = merchant.merchant_id
