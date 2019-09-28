@@ -286,7 +286,7 @@ module Gym
       # Generates command for signing for distribution
       codesign_commands = []
       codesign_commands << "codesign"
-      codesign_commands << "--entitlements #{entitlements_path}"
+      codesign_commands << "--entitlements #{entitlements_path.shellescape}"
       codesign_commands << "-f -v"
       codesign_commands << "-s \"#{application_cert}\""
       codesign_commands << "\"#{app_path}\""
