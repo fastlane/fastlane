@@ -619,8 +619,8 @@ module Spaceship
     def with_retry(tries = 5, &_block)
       return yield
     rescue \
-        Faraday::Error::ConnectionFailed,
-        Faraday::Error::TimeoutError, # New Faraday version: Faraday::TimeoutError => ex
+        Faraday::ConnectionFailed,
+        Faraday::TimeoutError,
         BadGatewayError,
         AppleTimeoutError,
         GatewayTimeoutError => ex
