@@ -25,7 +25,7 @@ module Fastlane
         csr, pkey = Spaceship.certificate.create_apple_pay_certificate_signing_request
 
         begin
-          cert = self.certificate.create!(csr: csr, bundle_id: params[:merchant_bundle_id])
+          cert = certificate.create!(csr: csr, bundle_id: params[:merchant_bundle_id])
         rescue => ex
           if ex.to_s.include?("You already have a current")
             UI.message(ex.to_s)
@@ -62,7 +62,7 @@ module Fastlane
         return x509_cert_path
       end
 
-      def certificate
+      def self.certificate
         Spaceship.certificate.apple_pay
       end
 
