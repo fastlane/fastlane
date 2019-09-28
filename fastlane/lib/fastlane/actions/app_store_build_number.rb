@@ -21,52 +21,60 @@ module Fastlane
       def self.get_build_number(params)
         UI.message("Login to App Store Connect (#{params[:username]})")
         Spaceship::Tunes.login(params[:username])
-        Spaceship::Tunes.select_team
+        Spaceship::Tunes.select_team(team_id: params[:team_id], team_name: params[:team_name])
         UI.message("Login successful")
 
-        platform = params[:platform]
-
         app = Spaceship::Tunes::Application.find(params[:app_identifier])
+        UI.user_error!("Could not find an app on App Store Connect with app_identifier: #{params[:app_identifier]}") unless app
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
           UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on iTC") unless app.live_version
           build_nr = app.live_version.current_build_number
+
+          UI.message("Latest upload for live-version #{app.live_version.version} is build: #{build_nr}")
+
+          return build_nr
         else
           version_number = params[:version]
-          unless version_number
-            # Automatically fetch the latest version in testflight
-            begin
-              train_numbers = app.all_build_train_numbers(platform: platform)
-              testflight_version = self.order_versions(train_numbers).last
-            rescue
-              testflight_version = params[:version]
-            end
+          platform = params[:platform]
 
-            if testflight_version
-              version_number = testflight_version
-            else
-              version_number = UI.input("You have to specify a new version number, as there are multiple to choose from")
-            end
-
+          # Create filter for get_builds with optional version number
+          filter = { app: app.apple_id }
+          if version_number
+            filter["preReleaseVersion.version"] = version_number
+            version_number_message = "version #{version_number}"
+          else
+            version_number_message = "any version"
           end
 
-          UI.message("Fetching the latest build number for version #{version_number}")
+          if platform
+            filter["preReleaseVersion.platform"] = Spaceship::ConnectAPI::Platform.map(platform)
+            platform_message = "#{platform} platform"
+          else
+            platform_message = "any platform"
+          end
 
-          begin
-            build_numbers = app.all_builds_for_train(train: version_number, platform: platform).map(&:build_version)
-            build_nr = self.order_versions(build_numbers).last
-            if build_nr.nil? && params[:initial_build_number]
-              UI.message("Could not find a build on iTC. Using supplied 'initial_build_number' option")
-              build_nr = params[:initial_build_number]
-            end
-          rescue
-            UI.user_error!("Could not find a build on iTC - and 'initial_build_number' option is not set") unless params[:initial_build_number]
+          UI.message("Fetching the latest build number for #{version_number_message}")
+
+          # Get latest build for optional version number and return build number if found
+          build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).first
+          if build
+            build_nr = build.version
+            UI.message("Latest upload for version #{build.app_version} on #{platform_message} is build: #{build_nr}")
+            return build_nr
+          end
+
+          # Let user know that build couldn't be found
+          UI.important("Could not find a build for #{version_number_message} on #{platform_message} on App Store Connect")
+
+          if params[:initial_build_number].nil?
+            UI.user_error!("Could not find a build on App Store Connect - and 'initial_build_number' option is not set")
+          else
             build_nr = params[:initial_build_number]
+            UI.message("Using initial build number of #{build_nr}")
+            return build_nr
           end
         end
-        UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
-
-        build_nr
       end
 
       def self.order_versions(versions)

@@ -513,8 +513,9 @@ module Spaceship
     end
 
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
+    # Update (29th March 2019) olympus migrates to new appstoreconnect API
     def fetch_olympus_session
-      response = request(:get, "https://olympus.itunes.apple.com/v1/session")
+      response = request(:get, "https://appstoreconnect.apple.com/olympus/v1/session")
       body = response.body
       if body
         body = JSON.parse(body) if body.kind_of?(String)
@@ -543,7 +544,7 @@ module Spaceship
       # Fixes issue https://github.com/fastlane/fastlane/issues/13281
       # Even though we are using https://appstoreconnect.apple.com, the service key needs to still use a
       # hostname through itunesconnect.apple.com
-      response = request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com")
+      response = request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com")
       @service_key = response.body["authServiceKey"].to_s
 
       raise "Service key is empty" if @service_key.length == 0
@@ -599,7 +600,7 @@ module Spaceship
     def fetch_program_license_agreement_messages
       all_messages = []
 
-      messages_request = request(:get, "https://olympus.itunes.apple.com/v1/contractMessages")
+      messages_request = request(:get, "https://appstoreconnect.apple.com/olympus/v1/contractMessages")
       body = messages_request.body
       if body
         body = JSON.parse(body) if body.kind_of?(String)
@@ -737,7 +738,7 @@ module Spaceship
         raise InternalServerError, "Received an internal server error from App Store Connect / Developer Portal, please try again later"
       elsif body.to_s.include?("Gateway Timeout - In read")
         raise GatewayTimeoutError, "Received a gateway timeout error from App Store Connect / Developer Portal, please try again later"
-      elsif (body["resultString"] || "").include?("Program License Agreement")
+      elsif (body["userString"] || "").include?("Program License Agreement")
         raise ProgramLicenseAgreementUpdated, "#{body['userString']} Please manually log into your Apple Developer account to review and accept the updated agreement."
       end
     end

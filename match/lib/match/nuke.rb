@@ -148,7 +148,7 @@ module Match
         rows = self.profiles.collect do |p|
           status = p.status == 'Active' ? p.status.green : p.status.red
 
-          # Expires is somtimes nil
+          # Expires is sometimes nil
           expires = p.expires ? p.expires.strftime("%Y-%m-%d") : nil
           [p.name, p.id, status, p.type, expires]
         end

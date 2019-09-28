@@ -51,19 +51,19 @@ describe FastlaneCore do
       end
 
       it "works with bundler" do
-        with_env_values('BUNDLE_BIN_PATH' => '/tmp') do
+        FastlaneSpec::Env.with_env_values('BUNDLE_BIN_PATH' => '/tmp') do
           expect(FastlaneCore::UpdateChecker.update_command).to eq("bundle update fastlane")
         end
       end
 
       it "works with bundled fastlane" do
-        with_env_values('FASTLANE_SELF_CONTAINED' => 'true') do
+        FastlaneSpec::Env.with_env_values('FASTLANE_SELF_CONTAINED' => 'true') do
           expect(FastlaneCore::UpdateChecker.update_command).to eq("fastlane update_fastlane")
         end
       end
 
       it "works with Fabric.app installed fastlane" do
-        with_env_values('FASTLANE_SELF_CONTAINED' => 'false') do
+        FastlaneSpec::Env.with_env_values('FASTLANE_SELF_CONTAINED' => 'false') do
           expect(FastlaneCore::UpdateChecker.update_command).to eq("the Fabric app. Launch the app and navigate to the fastlane tab to get the most recent version.")
         end
       end

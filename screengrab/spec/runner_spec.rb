@@ -183,6 +183,80 @@ describe Screengrab::Runner do
     end
   end
 
+  describe :uninstall_existing do
+    let(:device_serial) { 'device_serial' }
+    let(:app_package_name) { 'tools.fastlane.dev' }
+    let(:test_package_name) { 'tools.fastlane.dev.test' }
+    let(:adb_list_packages_command) { "adb -s #{device_serial} shell pm list packages" }
+
+    context 'app and test package installed' do
+      before do
+        expect(mock_android_environment).to receive(:adb_path).and_return("adb").exactly(3).times
+
+        adb_response = strip_heredoc(<<-ADB_OUTPUT)
+          package:android
+          package:com.android.contacts
+          package:com.google.android.webview
+          package:tools.fastlane.dev
+          package:tools.fastlane.dev.test
+
+        ADB_OUTPUT
+
+        mock_adb_response_for_command(adb_list_packages_command, adb_response)
+      end
+
+      it 'uninstalls app and test package' do
+        expect(mock_executor).to receive(:execute).with(hash_including(command: "adb -s #{device_serial} uninstall #{app_package_name}"))
+        expect(mock_executor).to receive(:execute).with(hash_including(command: "adb -s #{device_serial} uninstall #{test_package_name}"))
+        @runner.uninstall_apks(device_serial, app_package_name, test_package_name)
+      end
+    end
+
+    context 'app and test package not installed' do
+      before do
+        expect(mock_android_environment).to receive(:adb_path).and_return("adb")
+
+        adb_response = strip_heredoc(<<-ADB_OUTPUT)
+          package:android
+          package:com.android.contacts
+          package:com.google.android.webview
+
+        ADB_OUTPUT
+
+        mock_adb_response_for_command(adb_list_packages_command, adb_response)
+      end
+
+      it 'skips uninstall of app' do
+        expect(mock_executor).not_to(receive(:execute)).with(hash_including(command: "adb -s #{device_serial} uninstall #{app_package_name}"))
+        expect(mock_executor).not_to(receive(:execute)).with(hash_including(command: "adb -s #{device_serial} uninstall #{test_package_name}"))
+        @runner.uninstall_apks(device_serial, app_package_name, test_package_name)
+      end
+    end
+  end
+
+  describe :installed_packages do
+    let(:device_serial) { 'device_serial' }
+    let(:adb_list_packages_command) { "adb -s #{device_serial} shell pm list packages" }
+
+    before do
+      expect(mock_android_environment).to receive(:adb_path).and_return("adb")
+    end
+
+    it 'returns installed packages' do
+      adb_response = strip_heredoc(<<-ADB_OUTPUT)
+        package:android
+        package:com.android.contacts
+        package:com.google.android.webview
+        package:tools.fastlane.dev
+        package:tools.fastlane.dev.test
+
+      ADB_OUTPUT
+
+      mock_adb_response_for_command(adb_list_packages_command, adb_response)
+      expect(@runner.installed_packages(device_serial)).to eq(['android', 'com.android.contacts', 'com.google.android.webview', 'tools.fastlane.dev', 'tools.fastlane.dev.test'])
+    end
+  end
+
   describe :run_adb_command do
     before do
       expect(mock_android_environment).to receive(:adb_path).and_return("adb")

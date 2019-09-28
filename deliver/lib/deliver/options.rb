@@ -243,7 +243,7 @@ module Deliver
         # rubocop:disable Metrics/LineLength
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "DELIVER_ITC_PROVIDER",
-                                     description: "The provider short name to be used with the iTMSTransporter to identify your team. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
+                                     description: "The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
                                      optional: true),
         # rubocop:enable Metrics/LineLength
 
@@ -324,6 +324,10 @@ module Deliver
                                      optional: true,
                                      is_string: false,
                                      type: Hash),
+        FastlaneCore::ConfigItem.new(key: :app_review_attachment_file,
+                                     description: "Metadata: Path to the app review attachment file",
+                                     optional: true,
+                                     is_string: true),
         # Localised
         FastlaneCore::ConfigItem.new(key: :description,
                                      description: "Metadata: The localised app description",
@@ -370,6 +374,10 @@ module Deliver
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :privacy_url,
                                      description: "Metadata: Localised privacy url",
+                                     optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :apple_tv_privacy_policy,
+                                     description: "Metadata: Localised Apple TV privacy policy text",
                                      optional: true,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :support_url,

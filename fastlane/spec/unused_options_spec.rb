@@ -65,6 +65,7 @@ describe Fastlane do
           xcov
           create_app_on_managed_play_store
           download_from_play_store
+          validate_play_store_json_key
         )
       end
 

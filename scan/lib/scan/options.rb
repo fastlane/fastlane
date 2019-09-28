@@ -2,8 +2,8 @@ require 'fastlane_core/configuration/config_item'
 require 'credentials_manager/appfile_config'
 require_relative 'module'
 
+# rubocop:disable Metrics/ClassLength
 module Scan
-  # rubocop:disable Metrics/ClassLength
   class Options
     def self.verify_type(item_name, acceptable_types, value)
       type_ok = [Array, String].any? { |type| value.kind_of?(type) }
@@ -70,19 +70,28 @@ module Scan
                                      type: Boolean,
                                      optional: true),
 
-        # reset simulator
+        # simulator management
+        FastlaneCore::ConfigItem.new(key: :force_quit_simulator,
+                                     env_name: 'SCAN_FORCE_QUIT_SIMULATOR',
+                                     description: "Enabling this option will automatically killall Simulator processes before the run",
+                                     default_value: false,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :reset_simulator,
                                      env_name: 'SCAN_RESET_SIMULATOR',
                                      description: "Enabling this option will automatically erase the simulator before running the application",
                                      default_value: false,
                                      type: Boolean),
-
-        # reinstall app
+        FastlaneCore::ConfigItem.new(key: :prelaunch_simulator,
+                                     env_name: 'SCAN_PRELAUNCH_SIMULATOR',
+                                     description: "Enabling this option will launch the first simulator prior to calling any xcodebuild command",
+                                     default_value: ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR'],
+                                     optional: true,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :reinstall_app,
                                      env_name: 'SCAN_REINSTALL_APP',
                                      description: "Enabling this option will automatically uninstall the application before running it",
                                      default_value: false,
-                                     is_string: false),
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      env_name: 'SCAN_APP_IDENTIFIER',
                                      optional: true,
@@ -130,6 +139,7 @@ module Scan
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :code_coverage,
+                                     env_name: "SCAN_CODE_COVERAGE",
                                      description: "Should code coverage be generated? (Xcode 7 and up)",
                                      is_string: false,
                                      type: Boolean,
@@ -203,7 +213,7 @@ module Scan
                                      env_name: "SCAN_SUPPRESS_XCODE_OUTPUT",
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
-                                     is_string: false),
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :formatter,
                                      short_option: "-n",
                                      env_name: "SCAN_FORMATTER",
@@ -342,13 +352,15 @@ module Scan
                                      is_string: true,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_slack,
+                                     env_name: "SCAN_SKIP_SLACK",
                                      description: "Don't publish to slack, even when an URL is given",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :slack_only_on_failure,
-                                    description: "Only post on Slack if the tests fail",
-                                    is_string: false,
-                                    default_value: false),
+                                     env_name: "SCAN_SLACK_ONLY_ON_FAILURE",
+                                     description: "Only post on Slack if the tests fail",
+                                     is_string: false,
+                                     default_value: false),
 
         # misc
         FastlaneCore::ConfigItem.new(key: :destination,
@@ -363,7 +375,13 @@ module Scan
                                      deprecated: "Use `--output_files` instead",
                                      conflicting_options: [:output_files],
                                      optional: true,
-                                     is_string: true)
+                                     is_string: true),
+        FastlaneCore::ConfigItem.new(key: :xcodebuild_command,
+                                    env_name: "GYM_XCODE_BUILD_COMMAND",
+                                    description: "Allows for override of the default `xcodebuild` command",
+                                    type: String,
+                                    optional: true,
+                                    default_value: "env NSUnbufferedIO=YES xcodebuild")
 
       ]
     end

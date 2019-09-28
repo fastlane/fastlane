@@ -79,7 +79,7 @@ describe Fastlane do
       end
 
       it "logs the command if verbose" do
-        with_verbose(true) do
+        FastlaneSpec::Env.with_verbose(true) do
           allow(Fastlane::Actions).to receive(:sh).with(anything, { log: true }).and_return("")
           result = Fastlane::FastFile.new.parse("lane :test do
             git_add(path: 'foo.bar')
@@ -88,7 +88,7 @@ describe Fastlane do
       end
 
       it "passes the deprecated pathspec parameter to path parameter" do
-        with_verbose(true) do
+        FastlaneSpec::Env.with_verbose(true) do
           allow(Fastlane::Actions).to receive(:sh).with(anything, { log: true }).and_return("")
           result = Fastlane::FastFile.new.parse("lane :test do
             git_add(pathspec: 'myfile.txt')

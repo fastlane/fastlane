@@ -113,7 +113,7 @@ module Fastlane
                                          optional: true),
             FastlaneCore::ConfigItem.new(key: :raw_body,
                                          env_name: "FL_GITHUB_API_REQUEST_RAW_BODY",
-                                         description: "The request body taken vertabim instead of as JSON, useful for file uploads",
+                                         description: "The request body taken verbatim instead of as JSON, useful for file uploads",
                                          is_string: true,
                                          optional: true),
             FastlaneCore::ConfigItem.new(key: :path,

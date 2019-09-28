@@ -1,5 +1,9 @@
 module Fastlane
   module Actions
+    module SharedValues
+      FL_CHANGELOG ||= :FL_CHANGELOG # originally defined in ChangelogFromGitCommitsAction
+    end
+
     class MakeChangelogFromJenkinsAction < Action
       def self.run(params)
         require 'json'

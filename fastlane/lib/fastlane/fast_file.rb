@@ -182,8 +182,29 @@ module Fastlane
     end
 
     # Execute shell command
-    def sh(*command, log: true, error_callback: nil, &b)
-      FastFile.sh(*command, log: log, error_callback: error_callback, &b)
+    # Accepts arguments with with and without the command named keyword so that sh
+    # behaves like other actions with named keywords
+    # https://github.com/fastlane/fastlane/issues/14930
+    #
+    # Example:
+    #  sh("ls")
+    #  sh("ls", log: false)
+    #  sh(command: "ls")
+    #  sh(command: "ls", log: false)
+    def sh(*args, &b)
+      # First accepts hash (or named keywords) like other actions
+      # Otherwise uses sh method that doesn't have an interface like an action
+      if args.count == 1 && args.first.kind_of?(Hash)
+        hash = args.first
+        command = hash.delete(:command)
+
+        raise ArgumentError, "sh requires :command keyword in argument" if command.nil?
+
+        new_args = [*command, hash]
+        FastFile.sh(*new_args, &b)
+      else
+        FastFile.sh(*args, &b)
+      end
     end
 
     def self.sh(*command, log: true, error_callback: nil, &b)

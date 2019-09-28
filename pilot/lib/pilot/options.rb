@@ -38,11 +38,21 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :apple_id,
                                      short_option: "-p",
                                      env_name: "PILOT_APPLE_ID",
-                                     description: "The unique App ID provided by App Store Connect",
+                                     description: "Apple ID property in the App Information section in App Store Connect",
                                      optional: true,
                                      code_gen_sensitive: true,
                                      default_value: ENV["TESTFLIGHT_APPLE_ID"],
-                                     default_value_dynamic: true),
+                                     default_value_dynamic: true,
+                                     type: String,
+                                     verify_block: proc do |value|
+                                       error_message = "`apple_id` value is incorrect. The correct value should be taken from Apple ID property in the App Information section in App Store Connect."
+
+                                       # Validate if the value is not an email address
+                                       UI.user_error!(error_message) if value =~ /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
+
+                                       # Validate if the value is not a bundle identifier
+                                       UI.user_error!(error_message) if value =~ /^[A-Za-x]{2,6}((?!-)\.[A-Za-z0-9-]{1,63}(?<!-))+$/i
+                                     end),
         FastlaneCore::ConfigItem.new(key: :ipa,
                                      short_option: "-i",
                                      optional: true,
@@ -122,7 +132,7 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :skip_waiting_for_build_processing,
                                      short_option: "-z",
                                      env_name: "PILOT_SKIP_WAITING_FOR_BUILD_PROCESSING",
-                                     description: "Don't wait for the build to process. If set to true, the changelog won't be set, `distribute_external` option won't work and no build will be distributed to testers",
+                                     description: "Don't wait for the build to process. If set to true, the changelog won't be set, `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan)",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :update_build_info_on_upload,
@@ -134,6 +144,12 @@ module Pilot
                                      default_value: false),
 
         # distribution
+        FastlaneCore::ConfigItem.new(key: :uses_non_exempt_encryption,
+                                     short_option: "-X",
+                                     env_name: "PILOT_USES_NON_EXEMPT_ENCRYPTION",
+                                     description: "Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist",
+                                     default_value: false,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :distribute_external,
                                      is_string: false,
                                      env_name: "PILOT_DISTRIBUTE_EXTERNAL",
@@ -218,7 +234,7 @@ module Pilot
         # rubocop:disable Metrics/LineLength
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "PILOT_ITC_PROVIDER",
-                                     description: "The provider short name to be used with the iTMSTransporter to identify your team. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
+                                     description: "The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
                                      optional: true),
         # rubocop:enable Metrics/LineLength
 
@@ -234,6 +250,7 @@ module Pilot
                                      end),
         FastlaneCore::ConfigItem.new(key: :wait_for_uploaded_build,
                                      env_name: "PILOT_WAIT_FOR_UPLOADED_BUILD",
+                                     deprecated: "No longer needed with the transition over to the App Store Connect API",
                                      description: "Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used",
                                      is_string: false,
                                      default_value: false),

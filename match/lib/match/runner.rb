@@ -16,11 +16,7 @@ module Match
     attr_accessor :files_to_commit
     attr_accessor :spaceship
 
-    attr_accessor :storage_mode
-
-    # The Team ID that was fetched
-    # This will always be `nil` in readonly mode
-    attr_accessor :currently_used_team_id
+    attr_accessor :storage
 
     def run(params)
       self.files_to_commit = []
@@ -32,10 +28,8 @@ module Match
 
       update_optional_values_depending_on_storage_type(params)
 
-      self.storage_mode = params[:storage_mode]
-
       # Choose the right storage and encryption implementations
-      storage = Storage.for_mode(params[:storage_mode], {
+      self.storage = Storage.for_mode(params[:storage_mode], {
         git_url: params[:git_url],
         shallow_clone: params[:shallow_clone],
         skip_docs: params[:skip_docs],
@@ -43,11 +37,16 @@ module Match
         git_full_name: params[:git_full_name],
         git_user_email: params[:git_user_email],
         clone_branch_directly: params[:clone_branch_directly],
+        git_basic_authorization: params[:git_basic_authorization],
         type: params[:type].to_s,
         platform: params[:platform].to_s,
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
         google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
-        google_cloud_project_id: params[:google_cloud_project_id].to_s
+        google_cloud_project_id: params[:google_cloud_project_id].to_s,
+        readonly: params[:readonly],
+        username: params[:readonly] ? nil : params[:username], # only pass username if not readonly
+        team_id: params[:team_id],
+        team_name: params[:team_name]
       })
       storage.download
 
@@ -58,14 +57,8 @@ module Match
       })
       encryption.decrypt_files if encryption
 
-      if params[:readonly]
-        # In readonly mode, we still want to see if the user provided a team_id
-        # see `prefixed_working_directory` comments for more details
-        self.currently_used_team_id = params[:team_id]
-      else
+      unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
-        self.currently_used_team_id = self.spaceship.team_id
-
         if params[:type] == "enterprise" && !Spaceship.client.in_house?
           UI.user_error!("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
         end
@@ -93,12 +86,14 @@ module Match
       spaceship.certificate_exists(username: params[:username], certificate_id: cert_id) if spaceship
 
       # Provisioning Profiles
-      app_identifiers.each do |app_identifier|
-        loop do
-          break if fetch_provisioning_profile(params: params,
-                                      certificate_id: cert_id,
-                                      app_identifier: app_identifier,
-                                   working_directory: storage.working_directory)
+      unless params[:skip_provisioning_profiles]
+        app_identifiers.each do |app_identifier|
+          loop do
+            break if fetch_provisioning_profile(params: params,
+                                        certificate_id: cert_id,
+                                        app_identifier: app_identifier,
+                                    working_directory: storage.working_directory)
+          end
         end
       end
 
@@ -124,25 +119,8 @@ module Match
     end
 
     # Used when creating a new certificate or profile
-    def prefixed_working_directory(working_directory)
-      if self.storage_mode == "git"
-        return working_directory
-      elsif self.storage_mode == "google_cloud"
-        # We fall back to "*", which means certificates and profiles
-        # from all teams that use this bucket would be installed. This is not ideal, but
-        # unless the user provides a `team_id`, we can't know which one to use
-        # This only happens if `readonly` is activated, and no `team_id` was provided
-        @_folder_prefix ||= self.currently_used_team_id
-        if @_folder_prefix.nil?
-          # We use a `@_folder_prefix` variable, to keep state between multiple calls of this
-          # method, as the value won't change. This way the warning is only printed once
-          UI.important("Looks like you run `match` in `readonly` mode, and didn't provide a `team_id`. This will still work, however it is recommended to provide a `team_id` in your Appfile or Matchfile")
-          @_folder_prefix = "*"
-        end
-        return File.join(working_directory, @_folder_prefix)
-      else
-        UI.crash!("No implementation for `prefixed_working_directory`")
-      end
+    def prefixed_working_directory
+      return self.storage.prefixed_working_directory
     end
 
     # Be smart about optional values here
@@ -156,13 +134,13 @@ module Match
     def fetch_certificate(params: nil, working_directory: nil)
       cert_type = Match.cert_type_sym(params[:type])
 
-      certs = Dir[File.join(prefixed_working_directory(working_directory), "certs", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(prefixed_working_directory(working_directory), "certs", cert_type.to_s, "*.p12")]
+      certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
+      keys = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.p12")]
 
       if certs.count == 0 || keys.count == 0
         UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory(working_directory))
+        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory)
         private_key_path = cert_path.gsub(".cer", ".p12")
 
         self.files_to_commit << cert_path
@@ -181,7 +159,7 @@ module Match
           UI.message("Installing certificate...")
 
           # Only looking for cert in "custom" (non login.keychain) keychain
-          # Doing this for backwards compatability
+          # Doing this for backwards compatibility
           keychain_name = params[:keychain_name] == "login.keychain" ? nil : params[:keychain_name]
 
           if FastlaneCore::CertChecker.installed?(cert_path, in_keychain: keychain_name)
@@ -221,7 +199,7 @@ module Match
       end
 
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
-      base_dir = File.join(prefixed_working_directory(working_directory), "profiles", prov_type.to_s)
+      base_dir = File.join(prefixed_working_directory, "profiles", prov_type.to_s)
       profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
       if Helper.mac?
         keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
@@ -229,10 +207,11 @@ module Match
 
       # Install the provisioning profiles
       profile = profiles.last
+      force = params[:force]
 
       if params[:force_for_new_devices] && !params[:readonly]
-        if prov_type != :appstore
-          params[:force] = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym) unless params[:force]
+        if prov_type != :appstore && !params[:force]
+          force = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym)
         else
           # App Store provisioning profiles don't contain device identifiers and
           # thus shouldn't be renewed if the device count has changed.
@@ -241,7 +220,7 @@ module Match
         end
       end
 
-      if profile.nil? || params[:force]
+      if profile.nil? || force
         if params[:readonly]
           UI.error("No matching provisioning profiles found for '#{profile_name}'")
           UI.error("A new one cannot be created because you enabled `readonly`")
@@ -253,11 +232,13 @@ module Match
           UI.error("If you are certain that a profile should exist, double-check the recent changes to your match repository")
           UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information.")
         end
+
         profile = Generator.generate_provisioning_profile(params: params,
                                                        prov_type: prov_type,
                                                   certificate_id: certificate_id,
                                                   app_identifier: app_identifier,
-                                               working_directory: prefixed_working_directory(working_directory))
+                                                           force: force,
+                                               working_directory: prefixed_working_directory)
         self.files_to_commit << profile
       end
 

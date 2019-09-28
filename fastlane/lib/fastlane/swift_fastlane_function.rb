@@ -7,15 +7,17 @@ module Fastlane
     attr_accessor :param_default_values
     attr_accessor :param_optionality_values
     attr_accessor :param_type_overrides
+    attr_accessor :param_is_strings
     attr_accessor :reserved_words
     attr_accessor :default_values_to_ignore
 
-    def initialize(action_name: nil, keys: nil, key_descriptions: nil, key_default_values: nil, key_optionality_values: nil, key_type_overrides: nil, return_type: nil)
+    def initialize(action_name: nil, keys: nil, key_descriptions: nil, key_default_values: nil, key_optionality_values: nil, key_type_overrides: nil, key_is_strings: nil, return_type: nil)
       @function_name = action_name
       @param_names = keys
       @param_descriptions = key_descriptions
       @param_default_values = key_default_values
       @param_optionality_values = key_optionality_values
+      @param_is_strings = key_is_strings
       @return_type = return_type
       @param_type_overrides = key_type_overrides
 
@@ -91,11 +93,13 @@ module Fastlane
       return default_value
     end
 
-    def get_type(param: nil, default_value: nil, optional: nil, param_type_override: nil)
+    def get_type(param: nil, default_value: nil, optional: nil, param_type_override: nil, is_string: true)
       unless param_type_override.nil?
         type = determine_type_from_override(type_override: param_type_override)
       end
-      type ||= "String"
+
+      # defaulting type to Any if is_string is false so users are allowed to input all allowed types
+      type ||= is_string ? "String" : "Any"
 
       optional_specifier = ""
       # if we are optional and don't have a default value, we'll need to use ?
@@ -121,8 +125,8 @@ module Fastlane
         return ""
       end
 
-      param_names_and_types = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
-        type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
+      param_names_and_types = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides, param_is_strings).map do |param, default_value, optional, param_type_override, is_string|
+        type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override, is_string: is_string)
 
         unless default_value.nil?
           if type == "[String : Any]"
@@ -304,8 +308,8 @@ module Fastlane
         return ""
       end
 
-      param_names_and_types = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
-        type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
+      param_names_and_types = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override, is_string|
+        type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override, is_string: is_string)
 
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
