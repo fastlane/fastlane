@@ -43,10 +43,10 @@ module Fastlane
       def load_all_devices
         self.devices = []
 
-        command = [adb_path.shellescape, "devices"].join(" ")
+        command = [adb_path.shellescape, "devices -l"].join(" ")
         output = Actions.sh(command, log: false)
         output.split("\n").each do |line|
-          if (result = line.match(/(.*)\tdevice$/))
+          if (result = line.match(/^(\S+)(\s+)(device )/))
             self.devices << AdbDevice.new(serial: result[1])
           end
         end
