@@ -143,7 +143,7 @@ module Fastlane
       end
 
       def self.category
-        :project
+        :misc
       end
     end
   end
