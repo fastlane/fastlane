@@ -5,7 +5,7 @@ module Fastlane
     module SharedValues
     end
 
-    class ApplePayCertAction < Action
+    class GetApplePayCertificateAction < Action
       def self.run(params)
         UI.message("Starting login with user '#{params[:username]}'")
         Spaceship.login(params[:username], nil)
