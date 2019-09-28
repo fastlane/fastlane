@@ -141,7 +141,7 @@ module Gym
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :mac_app_distribution_cert_name,
                                      env_name: "GYM_MAC_APP_DISTRIBUTION_CERT_NAME",
-                                     description: "Full name of Mac App Distribution Certificate. Example: 3rd Party Mac Developer Application: Your Company (ABC1234XWYZ)",
+                                     description: "Full name of Mac App Distribution Certificate. Example: `3rd Party Mac Developer Application: Your Company (ABC1234XWYZ)`",
                                      is_string: true,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :mac_app_installer_cert_name,
