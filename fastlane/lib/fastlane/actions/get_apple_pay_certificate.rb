@@ -128,12 +128,12 @@ module Fastlane
 
       def self.example_code
         [
-          'apple_pay_cert(
+          'get_apple_pay_certificate(
       			username: "test@example.com",
      			  merchant_bundle_id: "merchant.com.rtayal.app",
       			p12_password: "test"
       		)',
-          'apple_pay_cert(
+          'get_apple_pay_certificate(
       			username: "test@example.com",
       			merchant_bundle_id: "merchant.com.rtayal.app",
       			p12_password: "test",
