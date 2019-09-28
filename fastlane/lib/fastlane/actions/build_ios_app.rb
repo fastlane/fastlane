@@ -68,21 +68,24 @@ module Fastlane
           return nil
         end
 
-        absolute_ipa_path = File.expand_path(gym_output_path)
-        absolute_dsym_path = absolute_ipa_path.gsub(".ipa", ".app.dSYM.zip")
+        absolute_output_path = File.expand_path(gym_output_path)
+        absolute_dsym_path = absolute_output_path.gsub(".ipa", ".app.dSYM.zip")
 
         # This might be the mac app path, so we don't want to set it here
         # https://github.com/fastlane/fastlane/issues/5757
-        if absolute_ipa_path.include?(".ipa")
-          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = absolute_ipa_path
-          ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_ipa_path # for deliver
+        if absolute_output_path.include?(".ipa")
+          Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = absolute_output_path
+          ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_output_path # for deliver
+        elsif absolute_output_path.include?(".app")
+          Actions.lane_context[SharedValues::PKG_OUTPUT_PATH] = absolute_output_path
+          ENV[SharedValues::PKG_OUTPUT_PATH.to_s] = absolute_output_path # for deliver
         end
 
         Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path if File.exist?(absolute_dsym_path)
         Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE] = Gym::BuildCommandGenerator.archive_path
         ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path if File.exist?(absolute_dsym_path)
 
-        return absolute_ipa_path
+        return absolute_output_path
       end
 
       def self.description
