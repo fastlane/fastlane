@@ -371,6 +371,7 @@ lane :verify_docs do
 end
 
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
+# this needs to run in the directory/scope of the docs directory (via `clone_docs` block, see above) to work
 private_lane :run_docs_tests do
   Bundler.with_clean_env do
     puts(`sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)`) # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
