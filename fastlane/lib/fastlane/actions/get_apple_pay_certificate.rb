@@ -5,6 +5,7 @@ module Fastlane
     module SharedValues
     end
 
+    # This whole action is an adaption of pem/lib/pem/manager.rb
     class GetApplePayCertificateAction < Action
       def self.run(params)
         login(params)
@@ -20,6 +21,7 @@ module Fastlane
 
       def self.create_certificate(params)
         UI.important("Creating a new Apple Pay certificate.")
+
         csr, pkey = Spaceship.certificate.create_apple_pay_certificate_signing_request
 
         begin
@@ -34,6 +36,7 @@ module Fastlane
         end
 
         x509_certificate = cert.download
+
         filename_base = params[:merchant_bundle_id]
         filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
 
