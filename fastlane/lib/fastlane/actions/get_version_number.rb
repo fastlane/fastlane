@@ -103,9 +103,13 @@ module Fastlane
 
         UI.user_error!("Cannot find value for INFOPLIST_FILE build setting") if plist_file.nil?
 
+        # This is needed to workaround the inconsistent return value of target.resolved_build_setting with second param `true` above
+        # for normal values settings it returns relative paths, for ones that come from xcconfigs it returns absolute paths
+        unless(plist_file.include?(File.absolute_path(folder)))
+          plist_file = File.join(folder, plist_file)
         end
+        plist_file = File.absolute_path(plist_file)
 
-        plist_file = File.absolute_path(File.join(folder, plist_file))
         UI.user_error!("Cannot find plist file: #{plist_file}") unless File.exist?(plist_file)
 
         plist_file
