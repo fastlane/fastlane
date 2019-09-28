@@ -123,22 +123,22 @@ module Fastlane
       end
 
       def self.author
-        'rishabhtayal'
+        ['rishabhtayal', 'janpio']
       end
 
       def self.example_code
         [
           'get_apple_pay_certificate(
-      			username: "test@example.com",
-     			  merchant_bundle_id: "merchant.com.rtayal.app",
-      			p12_password: "test"
-      		)',
+            username: "test@example.com",
+            merchant_bundle_id: "merchant.com.rtayal.app",
+            p12_password: "test"
+          )',
           'get_apple_pay_certificate(
-      			username: "test@example.com",
-      			merchant_bundle_id: "merchant.com.rtayal.app",
-      			p12_password: "test",
-      			team_id: "XXXXXXX"
-      		)'
+            username: "test@example.com",
+            merchant_bundle_id: "merchant.com.rtayal.app",
+            p12_password: "test",
+            team_id: "XXXXXXX"
+          )'
         ]
       end
 
