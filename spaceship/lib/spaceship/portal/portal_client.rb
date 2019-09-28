@@ -592,7 +592,7 @@ module Spaceship
         teamId: team_id,
         type: type,
         csrContent: csr,
-        omcId: merchant_id,
+        omcId: merchant_id, # this is different to `create_certificate!` above
         specialIdentifierDisplayId: merchant_id
       })
       parse_response(r, 'certRequest')
