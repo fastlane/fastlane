@@ -147,7 +147,13 @@ module Spaceship
       class Passbook < Certificate; end
 
       # ApplePay certificate
-      class ApplePay < Certificate; end
+      # per the naming scheme found in this file, this class should be called `ApplePay`
+      # this seems to clash with spaceship/lib/spaceship/portal/app_service.rb somehow
+      # which is why `Certificate` was added here as a workaround
+      class ApplePayCertificate < Certificate; end
+
+      # ApplePay certificate for backward compatibility
+      class ApplePay < ApplePayCertificate; end
 
       # ApplePayMerchantIdentity certificate
       class ApplePayMerchantIdentity < Certificate; end
@@ -173,7 +179,7 @@ module Spaceship
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
         "E5D663CMZW" => VoipPush,
-        "4APLUP237T" => ApplePay,
+        "4APLUP237T" => ApplePayCertificate,
         "MD8Q2VRT6A" => ApplePayMerchantIdentity
       }
 
