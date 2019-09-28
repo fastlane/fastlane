@@ -304,7 +304,7 @@ module Gym
       productbuild_command = productbuild_commands.join(' ')
 
       # Signs application for distribution
-      print_command(command, "Generated Codesign Command") if FastlaneCore::Globals.verbose?
+      print_command(codesign_command, "Generated Codesign Command") if FastlaneCore::Globals.verbose?
       FastlaneCore::CommandExecutor.execute(command: codesign_command,
                                           print_all: false,
                                       print_command: !Gym.config[:silent],
