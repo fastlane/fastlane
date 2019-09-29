@@ -45,7 +45,7 @@ module Fastlane
         end
         supported_platforms = all_platforms.select { |platform| self.is_supported?(platform.to_sym) }
 
-        existing_devices = supported_platforms.map { |platform| Spaceship::Device.all(mac: platform == "mac") }.flatten
+        existing_devices = supported_platforms.flat_map { |platform| Spaceship::Device.all(mac: platform == "mac") }
 
         device_objs = new_devices.map do |device|
           next if existing_devices.map(&:udid).include?(device[0])

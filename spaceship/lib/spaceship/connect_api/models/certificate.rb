@@ -41,7 +41,7 @@ module Spaceship
 
       def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
         resps = Spaceship::ConnectAPI.get_certificates(filter: filter, includes: includes).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
     end
   end

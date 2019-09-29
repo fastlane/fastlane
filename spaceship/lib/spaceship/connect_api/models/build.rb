@@ -109,7 +109,7 @@ module Spaceship
           sort: sort,
           limit: limit
         ).all_pages
-        models = resps.map(&:to_models).flatten
+        models = resps.flat_map(&:to_models)
 
         # Filtering after models are fetched since there is no way to do this in a query param filter
         if platform
@@ -138,7 +138,7 @@ module Spaceship
           sort: sort,
           limit: limit
         ).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil)
@@ -148,7 +148,7 @@ module Spaceship
           sort: sort,
           limit: limit
         ).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def post_beta_app_review_submission
