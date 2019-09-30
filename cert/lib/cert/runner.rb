@@ -137,7 +137,7 @@ module Cert
       # Check if apple certs (Xcode 11 and later) should be used
       if Cert.config[:generate_apple_certs]
         cert_type = Spaceship.certificate.apple_distribution
-        cert_type = Spaceship.certificate.apple_distribution if Spaceship.client.in_house?
+        cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house? # Enterprise doesn't use Apple Distribution
         cert_type = Spaceship.certificate.apple_development if Cert.config[:development]
       else
         case Cert.config[:platform].to_s

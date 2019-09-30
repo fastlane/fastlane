@@ -164,8 +164,8 @@ module Sigh
         # the apple dev portal api has a weird quirk in it where if you query for distribution certificates
         # for enterprise accounts, you get nothing back even if they exist.
         elsif profile_type == Spaceship.provisioning_profile.AdHoc && Spaceship.client && Spaceship.client.in_house?
-          certificates = Spaceship.certificate.in_house.all +
-                         Spaceship.certificate.apple_distribution.all
+          # Enterprise accounts don't have access to Apple Distribution certificates
+          certificates = Spaceship.certificate.in_house.all
         else
           # Ad hoc or App Store
           certificates = Spaceship.certificate.production.all +
