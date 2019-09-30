@@ -18,6 +18,7 @@ describe Cert do
     xcode_versions.each do |xcode_version, dist_cert_type|
       context "Xcode #{xcode_version}" do
         before do
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
           allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
         end
 

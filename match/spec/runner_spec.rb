@@ -16,6 +16,7 @@ describe Match do
       context "Xcode #{xcode_version}" do
         let(:generate_apple_certs) { xcode_version == "11" }
         before do
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
           allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
         end
 
