@@ -119,7 +119,7 @@ module Snapshot
         FastlaneCore::ConfigItem.new(key: :dark_mode,
                                     env_name: 'DARK_MODE',
                                     description: "Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)",
-                                    optional: false,
+                                    optional: true,
                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      env_name: 'SNAPSHOT_APP_IDENTIFIER',
