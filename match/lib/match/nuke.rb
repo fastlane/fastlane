@@ -243,7 +243,7 @@ module Match
       {
         distribution: [Spaceship.certificate.production, Spaceship.certificate.apple_distribution],
         development:  [Spaceship.certificate.development, Spaceship.certificate.apple_development],
-        enterprise:   [Spaceship.certificate.in_house, Spaceship.certificate.apple_distribution]
+        enterprise:   [Spaceship.certificate.in_house]
       }[type] ||= raise "Unknown type '#{type}'"
     end
 

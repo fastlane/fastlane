@@ -158,8 +158,8 @@ module Sigh
           certificates = Spaceship.certificate.development.all +
                          Spaceship.certificate.apple_development.all
         elsif profile_type == Spaceship.provisioning_profile.InHouse
-          certificates = Spaceship.certificate.in_house.all +
-                         Spaceship.certificate.apple_distribution.all
+          # Enterprise accounts don't have access to Apple Distribution certificates
+          certificates = Spaceship.certificate.in_house.all
         # handles case where the desired certificate type is adhoc but the account is an enterprise account
         # the apple dev portal api has a weird quirk in it where if you query for distribution certificates
         # for enterprise accounts, you get nothing back even if they exist.

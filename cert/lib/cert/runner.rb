@@ -152,7 +152,7 @@ module Cert
         end
       end
 
-      cert_type
+      return cert_type
     end
 
     def create_certificate
