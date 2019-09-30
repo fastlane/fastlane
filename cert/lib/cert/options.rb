@@ -24,7 +24,7 @@ module Cert
                                      env_name: "CERT_GENERATE_APPLE_CERTS",
                                      description: "Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)",
                                      type: Boolean,
-                                     default_value: FastlaneCore::Helper.xcode_at_least?('11'),
+                                     default_value: FastlaneCore::Helper.mac? && FastlaneCore::Helper.xcode_at_least?('11'),
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",

@@ -36,7 +36,7 @@ module Match
                                      env_name: "MATCH_GENERATE_APPLE_CERTS",
                                      description: "Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)",
                                      type: Boolean,
-                                     default_value: FastlaneCore::Helper.xcode_at_least?('11'),
+                                     default_value: FastlaneCore::Helper.mac? && FastlaneCore::Helper.xcode_at_least?('11'),
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :skip_provisioning_profiles,
                                      env_name: "MATCH_SKIP_PROVISIONING_PROFILES",
