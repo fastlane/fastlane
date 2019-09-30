@@ -8,6 +8,7 @@ module Snapshot
     attr_accessor :clean
     attr_accessor :erase_simulator
     attr_accessor :localize_simulator
+    attr_accessor :dark_mode
     attr_accessor :reinstall_app
     attr_accessor :app_identifier
 
@@ -32,6 +33,7 @@ module Snapshot
       @clean = snapshot_config[:clean]
       @erase_simulator = snapshot_config[:erase_simulator]
       @localize_simulator = snapshot_config[:localize_simulator]
+      @dark_mode = snapshot_config[:dark_mode]
       @reinstall_app = snapshot_config[:reinstall_app]
       @app_identifier = snapshot_config[:app_identifier]
       @number_of_retries = snapshot_config[:number_of_retries]
