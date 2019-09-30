@@ -28,9 +28,17 @@ def sigh_stub_spaceship(valid_profile = true, expect_create = false, expect_dele
     expect(profile_type).to_not(receive(:create!))
   end
 
+  # Stubs production to only receive certs
   certs = [Spaceship.certificate.production]
   certs.each do |current|
     allow(current).to receive(:all).and_return([certificate])
+  end
+
+  # apple_distribution also gets called for Xcode 11 profiles
+  # so need to stub and empty array return
+  certs = [Spaceship.certificate.apple_distribution]
+  certs.each do |current|
+    allow(current).to receive(:all).and_return([])
   end
 end
 
