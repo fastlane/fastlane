@@ -55,12 +55,12 @@ module Snapshot
       Fixes::HardwareKeyboardFix.patch
 
       device_types.each do |type|
-        if launcher_config.erase_simulator || launcher_config.localize_simulator || launcher_config.dark_mode
+        if launcher_config.erase_simulator || launcher_config.localize_simulator || !launcher_config.dark_mode.nil?
           erase_simulator(type)
           if launcher_config.localize_simulator
             localize_simulator(type, language, locale)
           end
-          if launcher_config.dark_mode
+          unless launcher_config.dark_mode.nil?
             interface_style(type, launcher_config.dark_mode)
           end
         elsif launcher_config.reinstall_app
