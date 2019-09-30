@@ -98,6 +98,21 @@ function checkStatus {
     fi
 }
 
+function resign_application_using_entitlements {
+    local ENTITLEMENTS="$1"  
+
+    log "Resigning application using certificate: '$CERTIFICATE'"
+    log "and entitlements: $ENTITLEMENTS"
+    if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
+        log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
+        cp -f -- "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
+    fi
+    # Must not quote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
+    # shellcheck disable=SC2086
+    /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
+    checkStatus
+} 
+
 usage() {
     echo -e "Usage: $(basename "$0") source identity -p|--provisioning provisioning" >&2
     echo -e "\t\t[-e|--entitlements entitlements]" >&2
@@ -543,7 +558,7 @@ function resign {
         do
             if [[ "$framework" == *.framework || "$framework" == *.dylib ]]; then
                 log "Resigning '$framework'"
-                # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
+                # Must not quote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
                 # shellcheck disable=SC2086
                 /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
                 checkStatus
@@ -593,14 +608,7 @@ function resign {
             fi
         fi
 
-        log "Resigning application using certificate: '$CERTIFICATE'"
-        log "and entitlements: $ENTITLEMENTS"
-        if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
-            log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
-            cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
-        fi
-        /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
-        checkStatus
+        resign_application_using_entitlements "$ENTITLEMENTS"
     elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]]; then
         # Extract entitlements from provisioning profile and from the app binary
         # then combine them together
@@ -829,29 +837,13 @@ function resign {
         #      com.example.foo
         sed -i .bak "s!${OLD_BUNDLE_ID}</string>!${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
 
-        log "Resigning application using certificate: '$CERTIFICATE'"
-        log "and patched entitlements:"
-        log "$(cat "$PATCHED_ENTITLEMENTS")"
-        if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
-            log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
-            cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
-        fi
-        /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
-        checkStatus
+        resign_application_using_entitlements "$PATCHED_ENTITLEMENTS"        
     else
         log "Extracting entitlements from provisioning profile"
         PlistBuddy -x -c "Print Entitlements" "$TEMP_DIR/profile.plist" > "$TEMP_DIR/newEntitlements"
         checkStatus
-        log "Resigning application using certificate: '$CERTIFICATE'"
-        log "and entitlements from provisioning profile: $NEW_PROVISION"
-        if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
-            log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
-            cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
-        fi
-        # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
-        # shellcheck disable=SC2086
-        /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
-        checkStatus
+
+        resign_application_using_entitlements "$TEMP_DIR/newEntitlements"
     fi
 
     # Remove the temporary files if they were created before generating ipa
