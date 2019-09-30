@@ -100,7 +100,7 @@ module Match
       prov_types = [:enterprise] if cert_type == :enterprise
 
       Spaceship.login(params[:username])
-      Spaceship.select_team
+      Spaceship.select_team(team_id: params[:team_id], team_name: params[:team_name])
 
       if Spaceship.client.in_house? && (type == "distribution" || type == "enterprise")
         UI.error("---")
@@ -112,7 +112,7 @@ module Match
         UI.user_error!("Enterprise account nuke cancelled") unless UI.confirm("Do you really want to nuke your Enterprise account?")
       end
 
-      self.certs = certificate_type(cert_type).all
+      self.certs = certificate_type(cert_type).flat_map(&:all)
       self.profiles = []
       prov_types.each do |prov_type|
         self.profiles += profile_type(prov_type).all
@@ -241,9 +241,9 @@ module Match
     # The kind of certificate we're interested in
     def certificate_type(type)
       {
-        distribution: Spaceship.certificate.production,
-        development:  Spaceship.certificate.development,
-        enterprise:   Spaceship.certificate.in_house
+        distribution: [Spaceship.certificate.production, Spaceship.certificate.apple_distribution],
+        development:  [Spaceship.certificate.development, Spaceship.certificate.apple_development],
+        enterprise:   [Spaceship.certificate.in_house]
       }[type] ||= raise "Unknown type '#{type}'"
     end
 
