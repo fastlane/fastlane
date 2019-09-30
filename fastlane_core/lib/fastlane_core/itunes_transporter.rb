@@ -154,7 +154,7 @@ module FastlaneCore
       # As there was no communication from Apple, we don't know if this is a temporary
       # server outage, or something they changed without giving a heads-up
       if ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"].to_s.length == 0
-        ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV"
+        ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV,Signiant"
       end
       return ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"]
     end
@@ -170,7 +170,6 @@ module FastlaneCore
         "-p #{shell_escaped_password(password)}",
         "-f \"#{source}\"",
         additional_upload_parameters, # that's here, because the user might overwrite the -t option
-        "-t Signiant",
         "-k 100000",
         ("-WONoPause true" if Helper.windows?), # Windows only: process instantly returns instead of waiting for key press
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?)
@@ -255,7 +254,6 @@ module FastlaneCore
         "-p #{password.shellescape}",
         "-f #{source.shellescape}",
         additional_upload_parameters, # that's here, because the user might overwrite the -t option
-        '-t Signiant',
         '-k 100000',
         ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
         '2>&1' # cause stderr to be written to stdout
