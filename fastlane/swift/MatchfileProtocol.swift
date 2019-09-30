@@ -1,6 +1,7 @@
 protocol MatchfileProtocol: class {
   var type: String { get }
   var readonly: Bool { get }
+  var generateAppleCerts: Bool { get }
   var skipProvisioningProfiles: Bool { get }
   var appIdentifier: [String] { get }
   var username: String { get }
@@ -13,6 +14,7 @@ protocol MatchfileProtocol: class {
   var gitUserEmail: String? { get }
   var shallowClone: Bool { get }
   var cloneBranchDirectly: Bool { get }
+  var gitBasicAuthorization: String? { get }
   var googleCloudBucketName: String? { get }
   var googleCloudKeysFile: String? { get }
   var googleCloudProjectId: String? { get }
@@ -31,6 +33,7 @@ protocol MatchfileProtocol: class {
 extension MatchfileProtocol {
   var type: String { return "development" }
   var readonly: Bool { return false }
+  var generateAppleCerts: Bool { return true }
   var skipProvisioningProfiles: Bool { return false }
   var appIdentifier: [String] { return [] }
   var username: String { return "" }
@@ -43,6 +46,7 @@ extension MatchfileProtocol {
   var gitUserEmail: String? { return nil }
   var shallowClone: Bool { return false }
   var cloneBranchDirectly: Bool { return false }
+  var gitBasicAuthorization: String? { return nil }
   var googleCloudBucketName: String? { return nil }
   var googleCloudKeysFile: String? { return nil }
   var googleCloudProjectId: String? { return nil }
@@ -60,4 +64,4 @@ extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.6]
+// FastlaneRunnerAPIVersion [0.9.7]

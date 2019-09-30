@@ -15,6 +15,7 @@ protocol SnapshotfileProtocol: class {
   var reinstallApp: Bool { get }
   var eraseSimulator: Bool { get }
   var localizeSimulator: Bool { get }
+  var darkMode: Bool? { get }
   var appIdentifier: String? { get }
   var addPhotos: [String]? { get }
   var addVideos: [String]? { get }
@@ -51,6 +52,7 @@ extension SnapshotfileProtocol {
   var reinstallApp: Bool { return false }
   var eraseSimulator: Bool { return false }
   var localizeSimulator: Bool { return false }
+  var darkMode: Bool? { return nil }
   var appIdentifier: String? { return nil }
   var addPhotos: [String]? { return nil }
   var addVideos: [String]? { return nil }
@@ -72,4 +74,4 @@ extension SnapshotfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.4]
+// FastlaneRunnerAPIVersion [0.9.5]
