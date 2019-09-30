@@ -352,6 +352,31 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    def post_resolution_center(app_id, platform, thread_id, version_id, version_number, from, message_body)
+      r = request(:post) do |req|
+        req.url("ra/apps/#{app_id}/platforms/#{platform}/resolutionCenter")
+        req.body = {
+          appNotes: {
+            threads: [{
+              id: thread_id,
+              versionId: version_id,
+              version: version_number,
+              messages: [{
+                from: from,
+                date: DateTime.now.strftime('%Q'),
+                body: message_body,
+                tokens: []
+              }]
+            }]
+          }
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
+    end
+
     def get_ratings(app_id, platform, version_id = '', storefront = '')
       # if storefront or version_id is empty api fails
       rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews/summary"
