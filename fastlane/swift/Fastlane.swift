@@ -1,4 +1,16 @@
 import Foundation
+/**
+ Run ADB Actions
+
+ - parameters:
+   - serial: Android serial of the device to use for this command
+   - command: All commands you want to pass to the adb command, e.g. `kill-server`
+   - adbPath: The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT environment variable is set)
+
+ - returns: The output of the adb command
+
+ see adb --help for more details
+*/
 @discardableResult func adb(serial: String = "",
                             command: String? = nil,
                             adbPath: String = "adb") -> String {
@@ -7,14 +19,55 @@ import Foundation
                                                                                      RubyCommand.Argument(name: "adb_path", value: adbPath)])
   return runner.executeCommand(command)
 }
+
+/**
+ Get an array of Connected android device serials
+
+ - parameter adbPath: The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT environment variable is set)
+
+ - returns: Returns an array of all currently connected android devices. Example: []
+
+ Fetches device list via adb, e.g. run an adb command on all connected devices.
+*/
 func adbDevices(adbPath: String = "adb") {
   let command = RubyCommand(commandID: "", methodName: "adb_devices", className: nil, args: [RubyCommand.Argument(name: "adb_path", value: adbPath)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Modify the default list of supported platforms
+
+ - parameter platforms: The optional extra platforms to support
+*/
 func addExtraPlatforms(platforms: [String] = []) {
   let command = RubyCommand(commandID: "", methodName: "add_extra_platforms", className: nil, args: [RubyCommand.Argument(name: "platforms", value: platforms)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This will add an annotated git tag to the current branch
+
+ - parameters:
+   - tag: Define your own tag text. This will replace all other parameters
+   - grouping: Is used to keep your tags organised under one 'folder'
+   - prefix: Anything you want to put in front of the version number (e.g. 'v')
+   - postfix: Anything you want to put at the end of the version number (e.g. '-RC1')
+   - buildNumber: The build number. Defaults to the result of increment_build_number if you're using it
+   - message: The tag message. Defaults to the tag's name
+   - commit: The commit or object where the tag will be set. Defaults to the current HEAD
+   - force: Force adding the tag
+   - sign: Make a GPG-signed tag, using the default e-mail address's key
+
+ This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where:|
+ |
+ >- `grouping` is just to keep your tags organised under one 'folder', defaults to 'builds'|
+ - `lane` is the name of the current fastlane lane|
+ - `prefix` is anything you want to stick in front of the version number, e.g. 'v'|
+ - `postfix` is anything you want to stick at the end of the version number, e.g. '-RC1'|
+ - `build_number` is the build number, which defaults to the value emitted by the `increment_build_number` action|
+ >|
+ For example, for build 1234 in the 'appstore' lane, it will tag the commit with `builds/appstore/1234`.
+*/
 func addGitTag(tag: String? = nil,
                grouping: String = "builds",
                `prefix`: String = "",
@@ -35,6 +88,23 @@ func addGitTag(tag: String? = nil,
                                                                                              RubyCommand.Argument(name: "sign", value: sign)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Returns the current build_number of either live or edit version
+
+ - parameters:
+   - initialBuildNumber: sets the build number to given value if no build is in current train
+   - appIdentifier: The bundle identifier of your app
+   - username: Your Apple ID Username
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - live: Query the live version (ready-for-sale)
+   - version: The version number whose latest build number we want
+   - platform: The platform to use (optional)
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+
+ Returns the current build number of either the live or testflight version - it is useful for getting the build_number of the current or ready-for-sale app version, and it also works on non-live testflight version.
+ If you need to handle more build-trains please see `latest_testflight_build_number`.
+*/
 func appStoreBuildNumber(initialBuildNumber: Any,
                          appIdentifier: String,
                          username: String,
@@ -53,6 +123,24 @@ func appStoreBuildNumber(initialBuildNumber: Any,
                                                                                                         RubyCommand.Argument(name: "team_name", value: teamName)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload your app to [Appaloosa Store](https://www.appaloosa-store.com/)
+
+ - parameters:
+   - binary: Binary path. Optional for ipa if you use the `ipa` or `xcodebuild` action
+   - apiToken: Your API token
+   - storeId: Your Store id
+   - groupIds: Your app is limited to special users? Give us the group ids
+   - screenshots: Add some screenshots application to your store or hit [enter]
+   - locale: Select the folder locale for your screenshots
+   - device: Select the device format for your screenshots
+   - description: Your app description
+
+ Appaloosa is a private mobile application store. This action offers a quick deployment on the platform.
+ You can create an account, push to your existing account, or manage your user groups.
+ We accept iOS and Android applications.
+*/
 func appaloosa(binary: String,
                apiToken: String,
                storeId: String,
@@ -71,6 +159,23 @@ func appaloosa(binary: String,
                                                                                            RubyCommand.Argument(name: "description", value: description)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload your app to [Appetize.io](https://appetize.io/) to stream it in browser
+
+ - parameters:
+   - apiHost: Appetize API host
+   - apiToken: Appetize.io API Token
+   - url: URL from which the ipa file can be fetched. Alternative to :path
+   - platform: Platform. Either `ios` or `android`
+   - path: Path to zipped build on the local filesystem. Either this or `url` must be specified
+   - publicKey: If not provided, a new app will be created. If provided, the existing build will be overwritten
+   - note: Notes you wish to add to the uploaded app
+
+ If you provide a `public_key`, this will overwrite an existing application. If you want to have this build as a new app version, you shouldn't provide this value.
+ 
+ To integrate appetize into your GitHub workflow check out the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md).
+*/
 func appetize(apiHost: String = "api.appetize.io",
               apiToken: String,
               url: String? = nil,
@@ -87,6 +192,27 @@ func appetize(apiHost: String = "api.appetize.io",
                                                                                           RubyCommand.Argument(name: "note", value: note)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Generate an URL for appetize simulator
+
+ - parameters:
+   - publicKey: Public key of the app you wish to update
+   - baseUrl: Base URL of Appetize service
+   - device: Device type: iphone4s, iphone5s, iphone6, iphone6plus, ipadair, iphone6s, iphone6splus, ipadair2, nexus5, nexus7 or nexus9
+   - scale: Scale of the simulator
+   - orientation: Device orientation
+   - language: Device language in ISO 639-1 language code, e.g. 'de'
+   - color: Color of the device
+   - launchUrl: Specify a deep link to open when your app is launched
+   - osVersion: The operating system version on which to run your app, e.g. 10.3, 8.0
+   - params: Specify params value to be passed to Appetize
+   - proxy: Specify a HTTP proxy to be passed to Appetize
+
+ - returns: The URL to preview the iPhone app
+
+ Check out the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md) for more information
+*/
 func appetizeViewingUrlGenerator(publicKey: String,
                                  baseUrl: String = "https://appetize.io/embed",
                                  device: String = "iphone5s",
@@ -111,6 +237,21 @@ func appetizeViewingUrlGenerator(publicKey: String,
                                                                                                                 RubyCommand.Argument(name: "proxy", value: proxy)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Run UI test by Appium with RSpec
+
+ - parameters:
+   - platform: Appium platform name
+   - specPath: Path to Appium spec directory
+   - appPath: Path to Appium target app file
+   - invokeAppiumServer: Use local Appium server with invoke automatically
+   - host: Hostname of Appium server
+   - port: HTTP port of Appium server
+   - appiumPath: Path to Appium executable
+   - caps: Hash of caps for Appium::Driver
+   - appiumLib: Hash of appium_lib for Appium::Driver
+*/
 func appium(platform: String,
             specPath: String,
             appPath: String,
@@ -131,6 +272,59 @@ func appium(platform: String,
                                                                                         RubyCommand.Argument(name: "appium_lib", value: appiumLib)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Generate Apple-like source code documentation from the source code
+
+ - parameters:
+   - input: Path(s) to source file directories or individual source files. Accepts a single path or an array of paths
+   - output: Output path
+   - templates: Template files path
+   - docsetInstallPath: DocSet installation path
+   - include: Include static doc(s) at path
+   - ignore: Ignore given path
+   - excludeOutput: Exclude given path from output
+   - indexDesc: File including main index description
+   - projectName: Project name
+   - projectVersion: Project version
+   - projectCompany: Project company
+   - companyId: Company UTI (i.e. reverse DNS name)
+   - createHtml: Create HTML
+   - createDocset: Create documentation set
+   - installDocset: Install documentation set to Xcode
+   - publishDocset: Prepare DocSet for publishing
+   - noCreateDocset: Create HTML and skip creating a DocSet
+   - htmlAnchors: The html anchor format to use in DocSet HTML
+   - cleanOutput: Remove contents of output path before starting
+   - docsetBundleId: DocSet bundle identifier
+   - docsetBundleName: DocSet bundle name
+   - docsetDesc: DocSet description
+   - docsetCopyright: DocSet copyright message
+   - docsetFeedName: DocSet feed name
+   - docsetFeedUrl: DocSet feed URL
+   - docsetFeedFormats: DocSet feed formats. Separated by a comma [atom,xml]
+   - docsetPackageUrl: DocSet package (.xar) URL
+   - docsetFallbackUrl: DocSet fallback URL
+   - docsetPublisherId: DocSet publisher identifier
+   - docsetPublisherName: DocSet publisher name
+   - docsetMinXcodeVersion: DocSet min. Xcode version
+   - docsetPlatformFamily: DocSet platform family
+   - docsetCertIssuer: DocSet certificate issuer
+   - docsetCertSigner: DocSet certificate signer
+   - docsetBundleFilename: DocSet bundle filename
+   - docsetAtomFilename: DocSet atom feed filename
+   - docsetXmlFilename: DocSet xml feed filename
+   - docsetPackageFilename: DocSet package (.xar,.tgz) filename
+   - options: Documentation generation options
+   - crossrefFormat: Cross reference template regex
+   - exitThreshold: Exit code threshold below which 0 is returned
+   - docsSectionTitle: Title of the documentation section (defaults to "Programming Guides"
+   - warnings: Documentation generation warnings
+   - logformat: Log format [0-3]
+   - verbose: Log verbosity level [0-6,xcode]
+
+ Runs `appledoc [OPTIONS] <paths to source dirs or files>` for the project
+*/
 func appledoc(input: Any,
               output: String? = nil,
               templates: String? = nil,
@@ -223,6 +417,79 @@ func appledoc(input: Any,
                                                                                           RubyCommand.Argument(name: "verbose", value: verbose)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `upload_to_app_store` action
+
+ - parameters:
+   - username: Your Apple ID Username
+   - appIdentifier: The bundle identifier of your app
+   - appVersion: The version that should be edited or created
+   - ipa: Path to your ipa file
+   - pkg: Path to your pkg file
+   - buildNumber: If set the given build number (already uploaded to iTC) will be used instead of the current built one
+   - platform: The platform to use (optional)
+   - editLive: Modify live metadata, this option disables ipa upload and screenshot upload
+   - useLiveVersion: Force usage of live version rather than edit version
+   - metadataPath: Path to the folder containing the metadata files
+   - screenshotsPath: Path to the folder containing the screenshots
+   - skipBinaryUpload: Skip uploading an ipa or pkg to App Store Connect
+   - skipScreenshots: Don't upload the screenshots
+   - skipMetadata: Don't upload the metadata (e.g. title, description). This will still upload screenshots
+   - skipAppVersionUpdate: Don't update app version for submission
+   - force: Skip the HTML report file verification
+   - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
+   - submitForReview: Submit the new version for Review after uploading everything
+   - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
+   - automaticRelease: Should the app be automatically released once it's approved?
+   - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval
+   - phasedRelease: Enable the phased release feature of iTC
+   - resetRatings: Reset the summary rating when you release a new version of the application
+   - priceTier: The price tier of this application
+   - appRatingConfigPath: Path to the app rating's config
+   - submissionInformation: Extra information for the submission (e.g. compliance specifications, IDFA settings)
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+   - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
+   - devPortalTeamName: The name of your Developer Portal team if you're in multiple teams
+   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - runPrecheckBeforeSubmit: Run precheck before submitting to app review
+   - precheckDefaultRuleLevel: The default precheck rule level unless otherwise configured
+   - individualMetadataItems: An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
+   - appIcon: Metadata: The path to the app icon
+   - appleWatchAppIcon: Metadata: The path to the Apple Watch app icon
+   - copyright: Metadata: The copyright notice
+   - primaryCategory: Metadata: The english name of the primary category (e.g. `Business`, `Books`)
+   - secondaryCategory: Metadata: The english name of the secondary category (e.g. `Business`, `Books`)
+   - primaryFirstSubCategory: Metadata: The english name of the primary first sub category (e.g. `Educational`, `Puzzle`)
+   - primarySecondSubCategory: Metadata: The english name of the primary second sub category (e.g. `Educational`, `Puzzle`)
+   - secondaryFirstSubCategory: Metadata: The english name of the secondary first sub category (e.g. `Educational`, `Puzzle`)
+   - secondarySecondSubCategory: Metadata: The english name of the secondary second sub category (e.g. `Educational`, `Puzzle`)
+   - tradeRepresentativeContactInformation: Metadata: A hash containing the trade representative contact information
+   - appReviewInformation: Metadata: A hash containing the review information
+   - appReviewAttachmentFile: Metadata: Path to the app review attachment file
+   - description: Metadata: The localised app description
+   - name: Metadata: The localised app name
+   - subtitle: Metadata: The localised app subtitle
+   - keywords: Metadata: An array of localised keywords
+   - promotionalText: Metadata: An array of localised promotional texts
+   - releaseNotes: Metadata: Localised release notes for this version
+   - privacyUrl: Metadata: Localised privacy url
+   - appleTvPrivacyPolicy: Metadata: Localised Apple TV privacy policy text
+   - supportUrl: Metadata: Localised support url
+   - marketingUrl: Metadata: Localised marketing url
+   - languages: Metadata: List of languages to activate
+   - ignoreLanguageDirectoryValidation: Ignore errors when invalid languages are found in metadata and screenshot directories
+   - precheckIncludeInAppPurchases: Should precheck check in-app purchases?
+   - app: The (spaceship) app ID of the app you want to use/modify
+
+ Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
+ 
+ If you don't want a PDF report for App Store builds, use the `:force` option.
+ This is useful when running _fastlane_ on your Continuous Integration server:
+ `_upload_to_app_store_(force: true)`
+ If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
+*/
 func appstore(username: String,
               appIdentifier: String? = nil,
               appVersion: String? = nil,
@@ -345,6 +612,15 @@ func appstore(username: String,
                                                                                           RubyCommand.Argument(name: "app", value: app)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload dSYM file to [Apteligent (Crittercism)](http://www.apteligent.com/)
+
+ - parameters:
+   - dsym: dSYM.zip file to upload to Apteligent
+   - appId: Apteligent App ID key e.g. 569f5c87cb99e10e00c7xxxx
+   - apiKey: Apteligent App API key e.g. IXPQIi8yCbHaLliqzRoo065tH0lxxxxx
+*/
 func apteligent(dsym: String? = nil,
                 appId: String,
                 apiKey: String) {
@@ -353,6 +629,26 @@ func apteligent(dsym: String? = nil,
                                                                                             RubyCommand.Argument(name: "api_key", value: apiKey)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This action uploads an artifact to artifactory
+
+ - parameters:
+   - file: File to be uploaded to artifactory
+   - repo: Artifactory repo to put the file in
+   - repoPath: Path to deploy within the repo, including filename
+   - endpoint: Artifactory endpoint
+   - username: Artifactory username
+   - password: Artifactory password
+   - properties: Artifact properties hash
+   - sslPemFile: Location of pem file to use for ssl verification
+   - sslVerify: Verify SSL
+   - proxyUsername: Proxy username
+   - proxyPassword: Proxy password
+   - proxyAddress: Proxy address
+   - proxyPort: Proxy port
+   - readTimeout: Read timeout
+*/
 func artifactory(file: String,
                  repo: String,
                  repoPath: String,
@@ -383,6 +679,24 @@ func artifactory(file: String,
                                                                                              RubyCommand.Argument(name: "read_timeout", value: readTimeout)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Configures Xcode's Codesigning options
+
+ - parameters:
+   - path: Path to your Xcode project
+   - useAutomaticSigning: Defines if project should use automatic signing
+   - teamId: Team ID, is used when upgrading project
+   - targets: Specify targets you want to toggle the signing mech. (default to all targets)
+   - codeSignIdentity: Code signing identity type (iPhone Developer, iPhone Distribution)
+   - profileName: Provisioning profile name to use for code signing
+   - profileUuid: Provisioning profile UUID to use for code signing
+   - bundleIdentifier: Application Product Bundle Identifier
+
+ - returns: The current status (boolean) of codesigning after modification
+
+ Configures Xcode's Codesigning options of all targets in the project
+*/
 func automaticCodeSigning(path: String,
                           useAutomaticSigning: Bool = false,
                           teamId: String? = nil,
@@ -401,10 +715,27 @@ func automaticCodeSigning(path: String,
                                                                                                         RubyCommand.Argument(name: "bundle_identifier", value: bundleIdentifier)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This action backs up your file to "[path].back"
+
+ - parameter path: Path to the file you want to backup
+*/
 func backupFile(path: String) {
   let command = RubyCommand(commandID: "", methodName: "backup_file", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Save your [zipped] xcarchive elsewhere from default path
+
+ - parameters:
+   - xcarchive: Path to your xcarchive file. Optional if you use the `xcodebuild` action
+   - destination: Where your archive will be placed
+   - zip: Enable compression of the archive
+   - zipFilename: Filename of the compressed archive. Will be appended by `.xcarchive.zip`. Default value is the output xcarchive filename
+   - versioned: Create a versioned (date and app version) subfolder where to put the archive
+*/
 func backupXcarchive(xcarchive: String,
                      destination: String,
                      zip: Bool = true,
@@ -417,6 +748,29 @@ func backupXcarchive(xcarchive: String,
                                                                                                   RubyCommand.Argument(name: "versioned", value: versioned)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Automatically add a badge to your app icon
+
+ - parameters:
+   - dark: Adds a dark flavored badge ontop of your icon
+   - custom: Add your custom overlay/badge image
+   - noBadge: Hides the beta badge
+   - shield: Add a shield to your app icon from shields.io
+   - alpha: Adds and alpha badge instead of the default beta one
+   - path: Sets the root path to look for AppIcons
+   - shieldIoTimeout: Set custom duration for the timeout of the shields.io request in seconds
+   - glob: Glob pattern for finding image files
+   - alphaChannel: Keeps/adds an alpha channel to the icon (useful for android icons)
+   - shieldGravity: Position of shield on icon. Default: North - Choices include: NorthWest, North, NorthEast, West, Center, East, SouthWest, South, SouthEast
+   - shieldNoResize: Shield image will no longer be resized to aspect fill the full icon. Instead it will only be shrunk to not exceed the icon graphic
+
+ Please use the [badge plugin](https://github.com/HazAT/fastlane-plugin-badge) instead.
+ This action will add a light/dark badge onto your app icon.
+ You can also provide your custom badge/overlay or add a shield for more customization.
+ More info: [https://github.com/HazAT/badge](https://github.com/HazAT/badge)
+ **Note**: If you want to reset the badge back to default, you can use `sh 'git checkout -- <path>/Assets.xcassets/'`.
+*/
 func badge(dark: Any? = nil,
            custom: String? = nil,
            noBadge: Any? = nil,
@@ -441,6 +795,20 @@ func badge(dark: Any? = nil,
                                                                                        RubyCommand.Argument(name: "shield_no_resize", value: shieldNoResize)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Generate and upload an ipa file to appetize.io
+
+ - parameters:
+   - xcodebuild: Parameters that are passed to the xcodebuild action
+   - scheme: The scheme to build. Can also be passed using the `xcodebuild` parameter
+   - apiToken: Appetize.io API Token
+   - publicKey: If not provided, a new app will be created. If provided, the existing build will be overwritten
+   - note: Notes you wish to add to the uploaded app
+
+ This should be called from danger.
+ More information in the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md).
+*/
 func buildAndUploadToAppetize(xcodebuild: [String : Any] = [:],
                               scheme: String? = nil,
                               apiToken: String,
@@ -453,6 +821,27 @@ func buildAndUploadToAppetize(xcodebuild: [String : Any] = [:],
                                                                                                               RubyCommand.Argument(name: "note", value: note)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `gradle` action
+
+ - parameters:
+   - task: The gradle task you want to execute, e.g. `assemble`, `bundle` or `test`. For tasks such as `assembleMyFlavorRelease` you should use gradle(task: 'assemble', flavor: 'Myflavor', build_type: 'Release')
+   - flavor: The flavor that you want the task for, e.g. `MyFlavor`. If you are running the `assemble` task in a multi-flavor project, and you rely on Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] then you must specify a flavor here or else this value will be undefined
+   - buildType: The build type that you want the task for, e.g. `Release`. Useful for some tasks such as `assemble`
+   - flags: All parameter flags you want to pass to the gradle command, e.g. `--exitcode --xml file.xml`
+   - projectDir: The root directory of the gradle project
+   - gradlePath: The path to your `gradlew`. If you specify a relative path, it is assumed to be relative to the `project_dir`
+   - properties: Gradle properties to be exposed to the gradle script
+   - systemProperties: Gradle system properties to be exposed to the gradle script
+   - serial: Android serial, which device should be used for this command
+   - printCommand: Control whether the generated Gradle command is printed as output before running it (true/false)
+   - printCommandOutput: Control whether the output produced by given Gradle command is printed while running (true/false)
+
+ - returns: The output of running the gradle task
+
+ Run `./gradlew tasks` to get a list of all available gradle tasks for your project
+*/
 func buildAndroidApp(task: String,
                      flavor: String? = nil,
                      buildType: String? = nil,
@@ -477,6 +866,56 @@ func buildAndroidApp(task: String,
                                                                                                    RubyCommand.Argument(name: "print_command_output", value: printCommandOutput)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `build_ios_app` action
+
+ - parameters:
+   - workspace: Path to the workspace file
+   - project: Path to the project file
+   - scheme: The project's scheme. Make sure it's marked as `Shared`
+   - clean: Should the project be cleaned before building it?
+   - outputDirectory: The directory in which the ipa file should be stored in
+   - outputName: The name of the resulting ipa file
+   - configuration: The configuration to use when building the app. Defaults to 'Release'
+   - silent: Hide all information that's not necessary while building
+   - codesigningIdentity: The name of the code signing identity to use. It has to match the name exactly. e.g. 'iPhone Distribution: SunApps GmbH'
+   - skipPackageIpa: Should we skip packaging the ipa?
+   - includeSymbols: Should the ipa file include symbols?
+   - includeBitcode: Should the ipa file include bitcode?
+   - exportMethod: Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id
+   - exportOptions: Path to an export options plist or a hash with export options. Use 'xcodebuild -help' to print the full set of available options
+   - exportXcargs: Pass additional arguments to xcodebuild for the package phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
+   - skipBuildArchive: Export ipa from previously built xcarchive. Uses archive_path as source
+   - skipArchive: After building, don't archive, effectively not including -archivePath param
+   - skipCodesigning: Build without codesigning
+   - buildPath: The directory in which the archive should be stored in
+   - archivePath: The path to the created archive
+   - derivedDataPath: The directory where built products and other derived data will go
+   - resultBundle: Should an Xcode result bundle be generated in the output directory
+   - resultBundlePath: Path to the result bundle directory to create. Ignored if `result_bundle` if false
+   - buildlogPath: The directory where to store the build log
+   - sdk: The SDK that should be used for building the application
+   - toolchain: The toolchain that should be used for building the application (e.g. com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a)
+   - destination: Use a custom destination for building the app
+   - exportTeamId: Optional: Sometimes you need to specify a team id when exporting the ipa file
+   - xcargs: Pass additional arguments to xcodebuild for the build phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
+   - xcconfig: Use an extra XCCONFIG file to build your app
+   - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
+   - disableXcpretty: Disable xcpretty formatting of build output
+   - xcprettyTestFormat: Use the test (RSpec style) format for build output
+   - xcprettyFormatter: A custom xcpretty formatter to use
+   - xcprettyReportJunit: Have xcpretty create a JUnit-style XML report at the provided path
+   - xcprettyReportHtml: Have xcpretty create a simple HTML report at the provided path
+   - xcprettyReportJson: Have xcpretty create a JSON compilation database at the provided path
+   - analyzeBuildTime: Analyze the project build time and store the output in 'culprits.txt' file
+   - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
+   - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
+
+ - returns: The absolute path to the generated ipa file
+
+ More information: https://fastlane.tools/gym
+*/
 func buildApp(workspace: String? = nil,
               project: String? = nil,
               scheme: String? = nil,
@@ -559,6 +998,56 @@ func buildApp(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Easily build and sign your app (via _gym_)
+
+ - parameters:
+   - workspace: Path to the workspace file
+   - project: Path to the project file
+   - scheme: The project's scheme. Make sure it's marked as `Shared`
+   - clean: Should the project be cleaned before building it?
+   - outputDirectory: The directory in which the ipa file should be stored in
+   - outputName: The name of the resulting ipa file
+   - configuration: The configuration to use when building the app. Defaults to 'Release'
+   - silent: Hide all information that's not necessary while building
+   - codesigningIdentity: The name of the code signing identity to use. It has to match the name exactly. e.g. 'iPhone Distribution: SunApps GmbH'
+   - skipPackageIpa: Should we skip packaging the ipa?
+   - includeSymbols: Should the ipa file include symbols?
+   - includeBitcode: Should the ipa file include bitcode?
+   - exportMethod: Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id
+   - exportOptions: Path to an export options plist or a hash with export options. Use 'xcodebuild -help' to print the full set of available options
+   - exportXcargs: Pass additional arguments to xcodebuild for the package phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
+   - skipBuildArchive: Export ipa from previously built xcarchive. Uses archive_path as source
+   - skipArchive: After building, don't archive, effectively not including -archivePath param
+   - skipCodesigning: Build without codesigning
+   - buildPath: The directory in which the archive should be stored in
+   - archivePath: The path to the created archive
+   - derivedDataPath: The directory where built products and other derived data will go
+   - resultBundle: Should an Xcode result bundle be generated in the output directory
+   - resultBundlePath: Path to the result bundle directory to create. Ignored if `result_bundle` if false
+   - buildlogPath: The directory where to store the build log
+   - sdk: The SDK that should be used for building the application
+   - toolchain: The toolchain that should be used for building the application (e.g. com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a)
+   - destination: Use a custom destination for building the app
+   - exportTeamId: Optional: Sometimes you need to specify a team id when exporting the ipa file
+   - xcargs: Pass additional arguments to xcodebuild for the build phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
+   - xcconfig: Use an extra XCCONFIG file to build your app
+   - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
+   - disableXcpretty: Disable xcpretty formatting of build output
+   - xcprettyTestFormat: Use the test (RSpec style) format for build output
+   - xcprettyFormatter: A custom xcpretty formatter to use
+   - xcprettyReportJunit: Have xcpretty create a JUnit-style XML report at the provided path
+   - xcprettyReportHtml: Have xcpretty create a simple HTML report at the provided path
+   - xcprettyReportJson: Have xcpretty create a JSON compilation database at the provided path
+   - analyzeBuildTime: Analyze the project build time and store the output in 'culprits.txt' file
+   - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
+   - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
+
+ - returns: The absolute path to the generated ipa file
+
+ More information: https://fastlane.tools/gym
+*/
 func buildIosApp(workspace: String? = nil,
                  project: String? = nil,
                  scheme: String? = nil,
@@ -641,6 +1130,30 @@ func buildIosApp(workspace: String? = nil,
                                                                                                RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This action runs `bundle install` (if available)
+
+ - parameters:
+   - binstubs: Generate bin stubs for bundled gems to ./bin
+   - clean: Run bundle clean automatically after install
+   - fullIndex: Use the rubygems modern index instead of the API endpoint
+   - gemfile: Use the specified gemfile instead of Gemfile
+   - jobs: Install gems using parallel workers
+   - local: Do not attempt to fetch gems remotely and use the gem cache instead
+   - deployment: Install using defaults tuned for deployment and CI environments
+   - noCache: Don't update the existing gem cache
+   - noPrune: Don't remove stale gems from the cache
+   - path: Specify a different path than the system default ($BUNDLE_PATH or $GEM_HOME). Bundler will remember this value for future installs on this machine
+   - system: Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application
+   - quiet: Only output warnings and errors
+   - retry: Retry network and git requests that have failed
+   - shebang: Specify a different shebang executable name than the default (usually 'ruby')
+   - standalone: Make a bundle that can work without the Bundler runtime
+   - trustPolicy: Sets level of security when dealing with signed gems. Accepts `LowSecurity`, `MediumSecurity` and `HighSecurity` as values
+   - without: Exclude gems that are part of the specified named group
+   - with: Include gems that are part of the specified named group
+*/
 func bundleInstall(binstubs: String? = nil,
                    clean: Bool = false,
                    fullIndex: Bool = false,
@@ -679,6 +1192,31 @@ func bundleInstall(binstubs: String? = nil,
                                                                                                 RubyCommand.Argument(name: "with", value: with)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Automated localized screenshots of your Android app (via _screengrab_)
+
+ - parameters:
+   - androidHome: Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx
+   - buildToolsVersion: The Android build tools version to use, e.g. '23.0.2'
+   - locales: A list of locales which should be used
+   - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running screengrab
+   - outputDirectory: The directory where to store the screenshots
+   - skipOpenSummary: Don't open the summary after running _screengrab_
+   - appPackageName: The package name of the app under test (e.g. com.yourcompany.yourapp)
+   - testsPackageName: The package name of the tests bundle (e.g. com.yourcompany.yourapp.test)
+   - useTestsInPackages: Only run tests in these Java packages
+   - useTestsInClasses: Only run tests in these Java classes
+   - launchArguments: Additional launch arguments
+   - testInstrumentationRunner: The fully qualified class name of your test instrumentation runner
+   - endingLocale: Return the device to this locale after running tests
+   - appApkPath: The path to the APK for the app under test
+   - testsApkPath: The path to the APK for the the tests bundle
+   - specificDevice: Use the device or emulator with the given serial number or qualifier
+   - deviceType: Type of device used for screenshots. Matches Google Play Types (phone, sevenInch, tenInch, tv, wear)
+   - exitOnTestFailure: Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary
+   - reinstallApp: Enabling this option will automatically uninstall the application before running it
+*/
 func captureAndroidScreenshots(androidHome: String? = nil,
                                buildToolsVersion: String? = nil,
                                locales: [String] = ["en-US"],
@@ -719,6 +1257,46 @@ func captureAndroidScreenshots(androidHome: String? = nil,
                                                                                                              RubyCommand.Argument(name: "reinstall_app", value: reinstallApp)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Generate new localized screenshots on multiple devices (via _snapshot_)
+
+ - parameters:
+   - workspace: Path the workspace file
+   - project: Path the project file
+   - xcargs: Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
+   - xcconfig: Use an extra XCCONFIG file to build your app
+   - devices: A list of devices you want to take the screenshots from
+   - languages: A list of languages which should be used
+   - launchArguments: A list of launch arguments which should be used
+   - outputDirectory: The directory where to store the screenshots
+   - outputSimulatorLogs: If the logs generated by the app (e.g. using NSLog, perror, etc.) in the Simulator should be written to the output_directory
+   - iosVersion: By default, the latest version should be used automatically. If you want to change it, do it here
+   - skipOpenSummary: Don't open the HTML summary after running _snapshot_
+   - skipHelperVersionCheck: Do not check for most recent SnapshotHelper code
+   - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running snapshot
+   - reinstallApp: Enabling this option will automatically uninstall the application before running it
+   - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
+   - localizeSimulator: Enabling this option will configure the Simulator's system language
+   - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
+   - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
+   - addPhotos: A list of photos that should be added to the simulator before running the application
+   - addVideos: A list of videos that should be added to the simulator before running the application
+   - buildlogPath: The directory where to store the build log
+   - clean: Should the project be cleaned before building it?
+   - testWithoutBuilding: Test without building, requires a derived data path
+   - configuration: The configuration to use when building the app. Defaults to 'Release'
+   - xcprettyArgs: Additional xcpretty arguments
+   - sdk: The SDK that should be used for building the application
+   - scheme: The scheme you want to use, this must be the scheme for the UI Tests
+   - numberOfRetries: The number of times a test can fail before snapshot should stop retrying
+   - stopAfterFirstError: Should snapshot stop immediately after the tests completely failed on one device?
+   - derivedDataPath: The directory where build products and other derived data will go
+   - resultBundle: Should an Xcode result bundle be generated in the output directory
+   - testTargetName: The name of the target you want to test (if you desire to override the Target Application from Xcode)
+   - namespaceLogFiles: Separate the log files per device and per language
+   - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
+*/
 func captureIosScreenshots(workspace: String? = nil,
                            project: String? = nil,
                            xcargs: String? = nil,
@@ -735,6 +1313,7 @@ func captureIosScreenshots(workspace: String? = nil,
                            reinstallApp: Bool = false,
                            eraseSimulator: Bool = false,
                            localizeSimulator: Bool = false,
+                           darkMode: Bool? = nil,
                            appIdentifier: String? = nil,
                            addPhotos: [String]? = nil,
                            addVideos: [String]? = nil,
@@ -768,6 +1347,7 @@ func captureIosScreenshots(workspace: String? = nil,
                                                                                                          RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                                          RubyCommand.Argument(name: "erase_simulator", value: eraseSimulator),
                                                                                                          RubyCommand.Argument(name: "localize_simulator", value: localizeSimulator),
+                                                                                                         RubyCommand.Argument(name: "dark_mode", value: darkMode),
                                                                                                          RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                          RubyCommand.Argument(name: "add_photos", value: addPhotos),
                                                                                                          RubyCommand.Argument(name: "add_videos", value: addVideos),
@@ -787,6 +1367,46 @@ func captureIosScreenshots(workspace: String? = nil,
                                                                                                          RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `capture_ios_screenshots` action
+
+ - parameters:
+   - workspace: Path the workspace file
+   - project: Path the project file
+   - xcargs: Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
+   - xcconfig: Use an extra XCCONFIG file to build your app
+   - devices: A list of devices you want to take the screenshots from
+   - languages: A list of languages which should be used
+   - launchArguments: A list of launch arguments which should be used
+   - outputDirectory: The directory where to store the screenshots
+   - outputSimulatorLogs: If the logs generated by the app (e.g. using NSLog, perror, etc.) in the Simulator should be written to the output_directory
+   - iosVersion: By default, the latest version should be used automatically. If you want to change it, do it here
+   - skipOpenSummary: Don't open the HTML summary after running _snapshot_
+   - skipHelperVersionCheck: Do not check for most recent SnapshotHelper code
+   - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running snapshot
+   - reinstallApp: Enabling this option will automatically uninstall the application before running it
+   - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
+   - localizeSimulator: Enabling this option will configure the Simulator's system language
+   - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
+   - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
+   - addPhotos: A list of photos that should be added to the simulator before running the application
+   - addVideos: A list of videos that should be added to the simulator before running the application
+   - buildlogPath: The directory where to store the build log
+   - clean: Should the project be cleaned before building it?
+   - testWithoutBuilding: Test without building, requires a derived data path
+   - configuration: The configuration to use when building the app. Defaults to 'Release'
+   - xcprettyArgs: Additional xcpretty arguments
+   - sdk: The SDK that should be used for building the application
+   - scheme: The scheme you want to use, this must be the scheme for the UI Tests
+   - numberOfRetries: The number of times a test can fail before snapshot should stop retrying
+   - stopAfterFirstError: Should snapshot stop immediately after the tests completely failed on one device?
+   - derivedDataPath: The directory where build products and other derived data will go
+   - resultBundle: Should an Xcode result bundle be generated in the output directory
+   - testTargetName: The name of the target you want to test (if you desire to override the Target Application from Xcode)
+   - namespaceLogFiles: Separate the log files per device and per language
+   - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
+*/
 func captureScreenshots(workspace: String? = nil,
                         project: String? = nil,
                         xcargs: String? = nil,
@@ -803,6 +1423,7 @@ func captureScreenshots(workspace: String? = nil,
                         reinstallApp: Bool = false,
                         eraseSimulator: Bool = false,
                         localizeSimulator: Bool = false,
+                        darkMode: Bool? = nil,
                         appIdentifier: String? = nil,
                         addPhotos: [String]? = nil,
                         addVideos: [String]? = nil,
@@ -836,6 +1457,7 @@ func captureScreenshots(workspace: String? = nil,
                                                                                                      RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                                      RubyCommand.Argument(name: "erase_simulator", value: eraseSimulator),
                                                                                                      RubyCommand.Argument(name: "localize_simulator", value: localizeSimulator),
+                                                                                                     RubyCommand.Argument(name: "dark_mode", value: darkMode),
                                                                                                      RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                      RubyCommand.Argument(name: "add_photos", value: addPhotos),
                                                                                                      RubyCommand.Argument(name: "add_videos", value: addVideos),
@@ -855,6 +1477,31 @@ func captureScreenshots(workspace: String? = nil,
                                                                                                      RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Runs `carthage` for your project
+
+ - parameters:
+   - command: Carthage command (one of: build, bootstrap, update, archive)
+   - dependencies: Carthage dependencies to update, build or bootstrap
+   - useSsh: Use SSH for downloading GitHub repositories
+   - useSubmodules: Add dependencies as Git submodules
+   - useBinaries: Check out dependency repositories even when prebuilt frameworks exist
+   - noBuild: When bootstrapping Carthage do not build
+   - noSkipCurrent: Don't skip building the Carthage project (in addition to its dependencies)
+   - derivedData: Use derived data folder at path
+   - verbose: Print xcodebuild output inline
+   - platform: Define which platform to build for
+   - cacheBuilds: By default Carthage will rebuild a dependency regardless of whether it's the same resolved version as before. Passing the --cache-builds will cause carthage to avoid rebuilding a dependency if it can
+   - frameworks: Framework name or names to archive, could be applied only along with the archive command
+   - output: Output name for the archive, could be applied only along with the archive command. Use following format *.framework.zip
+   - configuration: Define which build configuration to use when building
+   - toolchain: Define which xcodebuild toolchain to use when building
+   - projectDirectory: Define the directory containing the Carthage project
+   - newResolver: Use new resolver when resolving dependency graph
+   - logPath: Path to the xcode build output
+   - executable: Path to the `carthage` executable on your machine
+*/
 func carthage(command: String = "bootstrap",
               dependencies: [String] = [],
               useSsh: Bool? = nil,
@@ -895,8 +1542,29 @@ func carthage(command: String = "bootstrap",
                                                                                           RubyCommand.Argument(name: "executable", value: executable)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `get_certificates` action
+
+ - parameters:
+   - development: Create a development certificate instead of a distribution one
+   - force: Create a certificate even if an existing certificate exists
+   - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
+   - username: Your Apple ID Username
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+   - filename: The filename of certificate to store
+   - outputPath: The path to a directory in which all certificates and private keys should be stored
+   - keychainPath: Path to a custom keychain
+   - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
+   - platform: Set the provisioning profile's platform (ios, macos)
+
+ **Important**: It is recommended to use [match](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
+ Use this action to download the latest code signing identity.
+*/
 func cert(development: Bool = false,
           force: Bool = false,
+          generateAppleCerts: Bool = true,
           username: String,
           teamId: String? = nil,
           teamName: String? = nil,
@@ -907,6 +1575,7 @@ func cert(development: Bool = false,
           platform: Any = "ios") {
   let command = RubyCommand(commandID: "", methodName: "cert", className: nil, args: [RubyCommand.Argument(name: "development", value: development),
                                                                                       RubyCommand.Argument(name: "force", value: force),
+                                                                                      RubyCommand.Argument(name: "generate_apple_certs", value: generateAppleCerts),
                                                                                       RubyCommand.Argument(name: "username", value: username),
                                                                                       RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                       RubyCommand.Argument(name: "team_name", value: teamName),
@@ -917,6 +1586,27 @@ func cert(development: Bool = false,
                                                                                       RubyCommand.Argument(name: "platform", value: platform)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Collect git commit messages into a changelog
+
+ - parameters:
+   - between: Array containing two Git revision values between which to collect messages, you mustn't use it with :commits_count key at the same time
+   - commitsCount: Number of commits to include in changelog, you mustn't use it with :between key at the same time
+   - path: Path of the git repository
+   - pretty: The format applied to each commit while generating the collected value
+   - dateFormat: The date format applied to each commit while generating the collected value
+   - ancestryPath: Whether or not to use ancestry-path param
+   - tagMatchPattern: A glob(7) pattern to match against when finding the last git tag
+   - matchLightweightTag: Whether or not to match a lightweight tag when searching for the last one
+   - quiet: Whether or not to disable changelog output
+   - includeMerges: **DEPRECATED!** Use `:merge_commit_filtering` instead - Whether or not to include any commits that are merges
+   - mergeCommitFiltering: Controls inclusion of merge commits when collecting the changelog. Valid values: `:include_merges`, `:exclude_merges`, `:only_include_merges`
+
+ - returns: Returns a String containing your formatted git commits
+
+ By default, messages will be collected back to the last tag, but the range can be controlled
+*/
 @discardableResult func changelogFromGitCommits(between: Any? = nil,
                                                 commitsCount: Int? = nil,
                                                 path: String = "./",
@@ -941,6 +1631,18 @@ func cert(development: Bool = false,
                                                                                                             RubyCommand.Argument(name: "merge_commit_filtering", value: mergeCommitFiltering)])
   return runner.executeCommand(command)
 }
+
+/**
+ Send a success/error message to [ChatWork](https://go.chatwork.com/)
+
+ - parameters:
+   - apiToken: ChatWork API Token
+   - message: The message to post on ChatWork
+   - roomid: The room ID
+   - success: Was this build successful? (true/false)
+
+ Information on how to obtain an API token: [http://developer.chatwork.com/ja/authenticate.html](http://developer.chatwork.com/ja/authenticate.html)
+*/
 func chatwork(apiToken: String,
               message: String,
               roomid: Any,
@@ -951,6 +1653,32 @@ func chatwork(apiToken: String,
                                                                                           RubyCommand.Argument(name: "success", value: success)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Check your app's metadata before you submit your app to review (via _precheck_)
+
+ - parameters:
+   - appIdentifier: The bundle identifier of your app
+   - username: Your Apple ID Username
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+   - defaultRuleLevel: The default rule level unless otherwise configured
+   - includeInAppPurchases: Should check in-app purchases?
+   - negativeAppleSentiment: mentioning  in a way that could be considered negative
+   - placeholderText: using placeholder text (e.g.:"lorem ipsum", "text here", etc...)
+   - otherPlatforms: mentioning other platforms, like Android or Blackberry
+   - futureFunctionality: mentioning features or content that is not currently available in your app
+   - testWords: using text indicating this release is a test
+   - curseWords: including words that might be considered objectionable
+   - freeStuffInIap: using text indicating that your IAP is free
+   - customText: mentioning any of the user-specified words passed to custom_text(data: [words])
+   - copyrightDate: using a copyright date that is any different from this current year, or missing a date
+   - unreachableUrls: unreachable URLs in app metadata
+
+ - returns: true if precheck passes, else, false
+
+ More information: https://fastlane.tools/precheck
+*/
 func checkAppStoreMetadata(appIdentifier: String,
                            username: String,
                            teamId: String? = nil,
@@ -985,22 +1713,66 @@ func checkAppStoreMetadata(appIdentifier: String,
                                                                                                           RubyCommand.Argument(name: "unreachable_urls", value: unreachableUrls)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Deletes files created as result of running gym, cert, sigh or download_dsyms
+
+ - parameter excludePattern: Exclude all files from clearing that match the given Regex pattern: e.g. '.*.mobileprovision'
+
+ This action deletes the files that get created in your repo as a result of running the _gym_ and _sigh_ commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.
+ 
+ Useful if you quickly want to send out a test build by dropping down to the command line and typing something like `fastlane beta`, without leaving your repo in a messy state afterwards.
+*/
 func cleanBuildArtifacts(excludePattern: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "clean_build_artifacts", className: nil, args: [RubyCommand.Argument(name: "exclude_pattern", value: excludePattern)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Remove the cache for pods
+
+ - parameter name: Pod name to be removed from cache
+*/
 func cleanCocoapodsCache(name: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "clean_cocoapods_cache", className: nil, args: [RubyCommand.Argument(name: "name", value: name)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Deletes the Xcode Derived Data
+
+ - parameter derivedDataPath: Custom path for derivedData
+
+ Deletes the Derived Data from path set on Xcode or a supplied path
+*/
 func clearDerivedData(derivedDataPath: String = "~/Library/Developer/Xcode/DerivedData") {
   let command = RubyCommand(commandID: "", methodName: "clear_derived_data", className: nil, args: [RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Copies a given string into the clipboard. Works only on macOS
+
+ - parameter value: The string that should be copied into the clipboard
+*/
 func clipboard(value: String) {
   let command = RubyCommand(commandID: "", methodName: "clipboard", className: nil, args: [RubyCommand.Argument(name: "value", value: value)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Generates a Code Count that can be read by Jenkins (xml format)
+
+ - parameters:
+   - binaryPath: Where the cloc binary lives on your system (full path including 'cloc')
+   - excludeDir: Comma separated list of directories to exclude
+   - outputDirectory: Where to put the generated report file
+   - sourceDirectory: Where to look for the source code (relative to the project root folder)
+   - xml: Should we generate an XML File (if false, it will generate a plain text file)?
+
+ This action will run cloc to generate a SLOC report that the Jenkins SLOCCount plugin can read.
+ See [https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin](https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin) and [https://github.com/AlDanial/cloc](https://github.com/AlDanial/cloc) for more information.
+*/
 func cloc(binaryPath: String = "/usr/local/bin/cloc",
           excludeDir: String? = nil,
           outputDirectory: String = "build",
@@ -1013,10 +1785,32 @@ func cloc(binaryPath: String = "/usr/local/bin/cloc",
                                                                                       RubyCommand.Argument(name: "xml", value: xml)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Print a Club Mate in your build output
+*/
 func clubmate() {
   let command = RubyCommand(commandID: "", methodName: "clubmate", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Runs `pod install` for the project
+
+ - parameters:
+   - repoUpdate: Add `--repo-update` flag to `pod install` command
+   - silent: Execute command without logging output
+   - verbose: Show more debugging information
+   - ansi: Show output with ANSI codes
+   - useBundleExec: Use bundle exec when there is a Gemfile presented
+   - podfile: Explicitly specify the path to the Cocoapods' Podfile. You can either set it to the Podfile's path or to the folder containing the Podfile file
+   - errorCallback: A callback invoked with the command output if there is a non-zero exit status
+   - tryRepoUpdateOnError: Retry with --repo-update if action was finished with error
+   - clean: **DEPRECATED!** (Option removed from cocoapods) Remove SCM directories
+   - integrate: **DEPRECATED!** (Option removed from cocoapods) Integrate the Pods libraries into the Xcode project(s)
+
+ If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app.
+*/
 func cocoapods(repoUpdate: Bool = false,
                silent: Bool = false,
                verbose: Bool = false,
@@ -1039,6 +1833,26 @@ func cocoapods(repoUpdate: Bool = false,
                                                                                            RubyCommand.Argument(name: "integrate", value: integrate)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This will commit a file directly on GitHub via the API
+
+ - parameters:
+   - repositoryName: The path to your repo, e.g. 'fastlane/fastlane'
+   - serverUrl: The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')
+   - apiToken: Personal API Token for GitHub - generate one at https://github.com/settings/tokens
+   - branch: The branch that the file should be committed on (default: master)
+   - path: The relative path to your file from project root e.g. assets/my_app.xcarchive
+   - message: The commit message. Defaults to the file name
+   - secure: Optionally disable secure requests (ssl_verify_peer)
+
+ - returns: A hash containing all relevant information for this commit
+Access things like 'html_url', 'sha', 'message'
+
+ Commits a file directly to GitHub. You must provide your GitHub Personal token (get one from [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new)), the repository name and the relative file path from the root git project.
+ Out parameters provide the commit sha created, which can be used for later usage for examples such as releases, the direct download link and the full response JSON.
+ Documentation: [https://developer.github.com/v3/repos/contents/#create-a-file](https://developer.github.com/v3/repos/contents/#create-a-file).
+*/
 @discardableResult func commitGithubFile(repositoryName: String,
                                          serverUrl: String = "https://api.github.com",
                                          apiToken: String,
@@ -1055,6 +1869,29 @@ func cocoapods(repoUpdate: Bool = false,
                                                                                                     RubyCommand.Argument(name: "secure", value: secure)])
   return parseDictionary(fromString: runner.executeCommand(command))
 }
+
+/**
+ Creates a 'Version Bump' commit. Run after `increment_build_number`
+
+ - parameters:
+   - message: The commit message when committing the version bump
+   - xcodeproj: The path to your project file (Not the workspace). If you have only one, this is optional
+   - force: Forces the commit, even if other files than the ones containing the version number have been modified
+   - settings: Include Settings.bundle/Root.plist with version bump
+   - ignore: A regular expression used to filter matched plist files to be modified
+   - include: A list of extra files to be included in the version bump (string array or comma-separated string)
+   - noVerify: Whether or not to use --no-verify
+
+ This action will create a 'Version Bump' commit in your repo. Useful in conjunction with `increment_build_number`.
+ It checks the repo to make sure that only the relevant files have changed. These are the files that `increment_build_number` (`agvtool`) touches:|
+ |
+ >- All `.plist` files|
+ - The `.xcodeproj/project.pbxproj` file|
+ >|
+ Then commits those files to the repo.
+ Customize the message with the `:message` option. It defaults to 'Version Bump'.
+ If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [clean_build_artifacts](https://docs.fastlane.tools/actions/clean_build_artifacts/) action to clean those temporary files up before running this action.
+*/
 func commitVersionBump(message: String? = nil,
                        xcodeproj: String? = nil,
                        force: Bool = false,
@@ -1071,6 +1908,19 @@ func commitVersionBump(message: String? = nil,
                                                                                                      RubyCommand.Argument(name: "no_verify", value: noVerify)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Copy and save your build artifacts (useful when you use reset_git_repo)
+
+ - parameters:
+   - keepOriginal: Set this to false if you want move, rather than copy, the found artifacts
+   - targetPath: The directory in which you want your artifacts placed
+   - artifacts: An array of file patterns of the files/folders you want to preserve
+   - failOnMissing: Fail when a source file isn't found
+
+ This action copies artifacts to a target directory. It's useful if you have a CI that will pick up these artifacts and attach them to the build. Useful e.g. for storing your `.ipa`s, `.dSYM.zip`s, `.mobileprovision`s, `.cert`s.
+ Make sure your `:target_path` is ignored from git, and if you use `reset_git_repo`, make sure the artifacts are added to the exclude list.
+*/
 func copyArtifacts(keepOriginal: Bool = true,
                    targetPath: Any = "artifacts",
                    artifacts: [String] = [],
@@ -1081,6 +1931,27 @@ func copyArtifacts(keepOriginal: Bool = true,
                                                                                                 RubyCommand.Argument(name: "fail_on_missing", value: failOnMissing)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload a new build to [Crashlytics Beta](http://try.crashlytics.com/beta/)
+
+ - parameters:
+   - ipaPath: Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action
+   - apkPath: Path to your APK file
+   - crashlyticsPath: Path to the submit binary in the Crashlytics bundle (iOS) or `crashlytics-devtools.jar` file (Android)
+   - apiToken: Crashlytics API Key
+   - buildSecret: Crashlytics Build Secret
+   - notesPath: Path to the release notes
+   - notes: The release notes as string - uses :notes_path under the hood
+   - groups: The groups used for distribution, separated by commas
+   - emails: Pass email addresses of testers, separated by commas
+   - notifications: Crashlytics notification option (true/false)
+   - debug: Crashlytics debug option (true/false)
+
+ Additionally, you can specify `notes`, `emails`, `groups` and `notifications`.
+ Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog by clicking the 'Manage Groups' button.
+ This action uses the `submit` binary provided by the Crashlytics framework. If the binary is not found in its usual path, you'll need to specify the path manually by using the `crashlytics_path` option.
+*/
 func crashlytics(ipaPath: String? = nil,
                  apkPath: String? = nil,
                  crashlyticsPath: String? = nil,
@@ -1105,6 +1976,22 @@ func crashlytics(ipaPath: String? = nil,
                                                                                              RubyCommand.Argument(name: "debug", value: debug)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Create Managed Google Play Apps
+
+ - parameters:
+   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
+   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - developerAccountId: The ID of your Google Play Console account. Can be obtained from the URL when you log in (`https://play.google.com/apps/publish/?account=...` or when you 'Obtain private app publishing rights' (https://developers.google.com/android/work/play/custom-app-api/get-started#retrieve_the_developer_account_id)
+   - apk: Path to the APK file to upload
+   - appTitle: App Title
+   - language: Default app language (e.g. 'en_US')
+   - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
+   - timeout: Timeout for read, open, and send (in seconds)
+
+ Create new apps on Managed Google Play.
+*/
 func createAppOnManagedPlayStore(jsonKey: String? = nil,
                                  jsonKeyData: String? = nil,
                                  developerAccountId: String,
@@ -1123,6 +2010,34 @@ func createAppOnManagedPlayStore(jsonKey: String? = nil,
                                                                                                                   RubyCommand.Argument(name: "timeout", value: timeout)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Creates the given application on iTC and the Dev Portal (via _produce_)
+
+ - parameters:
+   - username: Your Apple ID Username
+   - appIdentifier: App Identifier (Bundle ID, e.g. com.krausefx.app)
+   - bundleIdentifierSuffix: App Identifier Suffix (Ignored if App Identifier does not end with .*)
+   - appName: App Name
+   - appVersion: Initial version number (e.g. '1.0')
+   - sku: SKU Number (e.g. '1234')
+   - platform: The platform to use (optional)
+   - language: Primary Language (e.g. 'English', 'German')
+   - companyName: The name of your company. Only required if it's the first app you create
+   - skipItc: Skip the creation of the app on App Store Connect
+   - itcUsers: Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles
+   - enabledFeatures: **DEPRECATED!** Please use `enable_services` instead - Array with Spaceship App Services
+   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), data_protection: (complete|unlessopen|untilfirstauth), game_center: (on|off), health_kit: (on|off), home_kit: (on|off), hotspot: (on|off), icloud: (legacy|cloudkit), in_app_purchase: (on|off), inter_app_audio: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), siri_kit: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off))
+   - skipDevcenter: Skip the creation of the app on the Apple Developer Portal
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+   - itcTeamId: The ID of your App Store Connect team if you're in multiple teams
+   - itcTeamName: The name of your App Store Connect team if you're in multiple teams
+
+ Create new apps on App Store Connect and Apple Developer Portal via _produce_.
+ If the app already exists, `create_app_online` will not do anything.
+ For more information about _produce_, visit its documentation page: [https://docs.fastlane.tools/actions/produce/](https://docs.fastlane.tools/actions/produce/).
+*/
 func createAppOnline(username: String,
                      appIdentifier: String,
                      bundleIdentifierSuffix: String? = nil,
@@ -1161,6 +2076,22 @@ func createAppOnline(username: String,
                                                                                                    RubyCommand.Argument(name: "itc_team_name", value: itcTeamName)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Create a new Keychain
+
+ - parameters:
+   - name: Keychain name
+   - path: Path to keychain
+   - password: Password for the keychain
+   - defaultKeychain: Should the newly created Keychain be the new system default keychain
+   - unlock: Unlock keychain after create
+   - timeout: timeout interval in seconds. Set `false` if you want to specify "no time-out"
+   - lockWhenSleeps: Lock keychain when the system sleeps
+   - lockAfterTimeout: Lock keychain after timeout interval
+   - addToSearchList: Add keychain to search list
+   - requireCreate: Fail the action if the Keychain already exists
+*/
 func createKeychain(name: String? = nil,
                     path: String? = nil,
                     password: String,
@@ -1183,6 +2114,23 @@ func createKeychain(name: String? = nil,
                                                                                                  RubyCommand.Argument(name: "require_create", value: requireCreate)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This will create a new pull request on GitHub
+
+ - parameters:
+   - apiToken: Personal API Token for GitHub - generate one at https://github.com/settings/tokens
+   - repo: The name of the repository you want to submit the pull request to
+   - title: The title of the pull request
+   - body: The contents of the pull request
+   - labels: The labels for the pull request
+   - head: The name of the branch where your changes are implemented (defaults to the current branch name)
+   - base: The name of the branch you want your changes pulled into (defaults to `master`)
+   - apiUrl: The URL of GitHub API - used when the Enterprise (default to `https://api.github.com`)
+   - assignees: The assignees for the pull request
+
+ - returns: The pull request URL when successful
+*/
 func createPullRequest(apiToken: String,
                        repo: String,
                        title: String,
@@ -1203,6 +2151,26 @@ func createPullRequest(apiToken: String,
                                                                                                      RubyCommand.Argument(name: "assignees", value: assignees)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Runs `danger` for the project
+
+ - parameters:
+   - useBundleExec: Use bundle exec when there is a Gemfile presented
+   - verbose: Show more debugging information
+   - dangerId: The identifier of this Danger instance
+   - dangerfile: The location of your Dangerfile
+   - githubApiToken: GitHub API token for danger
+   - failOnErrors: Should always fail the build process, defaults to false
+   - newComment: Makes Danger post a new comment instead of editing its previous one
+   - removePreviousComments: Makes Danger remove all previous comment and create a new one in the end of the list
+   - base: A branch/tag/commit to use as the base of the diff. [master|dev|stable]
+   - head: A branch/tag/commit to use as the head. [master|dev|stable]
+   - pr: Run danger on a specific pull request. e.g. "https://github.com/danger/danger/pull/518"
+
+ Formalize your Pull Request etiquette.
+ More information: [https://github.com/danger/danger](https://github.com/danger/danger).
+*/
 func danger(useBundleExec: Bool = true,
             verbose: Bool = false,
             dangerId: String? = nil,
@@ -1227,20 +2195,111 @@ func danger(useBundleExec: Bool = true,
                                                                                         RubyCommand.Argument(name: "pr", value: pr)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Print out an overview of the lane context values
+*/
 func debug() {
   let command = RubyCommand(commandID: "", methodName: "debug", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Defines a default platform to not have to specify the platform
+*/
 func defaultPlatform() {
   let command = RubyCommand(commandID: "", methodName: "default_platform", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Delete keychains and remove them from the search list
+
+ - parameters:
+   - name: Keychain name
+   - keychainPath: Keychain path
+
+ Keychains can be deleted after being created with `create_keychain`
+*/
 func deleteKeychain(name: String? = nil,
                     keychainPath: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "delete_keychain", className: nil, args: [RubyCommand.Argument(name: "name", value: name),
                                                                                                  RubyCommand.Argument(name: "keychain_path", value: keychainPath)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `upload_to_app_store` action
+
+ - parameters:
+   - username: Your Apple ID Username
+   - appIdentifier: The bundle identifier of your app
+   - appVersion: The version that should be edited or created
+   - ipa: Path to your ipa file
+   - pkg: Path to your pkg file
+   - buildNumber: If set the given build number (already uploaded to iTC) will be used instead of the current built one
+   - platform: The platform to use (optional)
+   - editLive: Modify live metadata, this option disables ipa upload and screenshot upload
+   - useLiveVersion: Force usage of live version rather than edit version
+   - metadataPath: Path to the folder containing the metadata files
+   - screenshotsPath: Path to the folder containing the screenshots
+   - skipBinaryUpload: Skip uploading an ipa or pkg to App Store Connect
+   - skipScreenshots: Don't upload the screenshots
+   - skipMetadata: Don't upload the metadata (e.g. title, description). This will still upload screenshots
+   - skipAppVersionUpdate: Don't update app version for submission
+   - force: Skip the HTML report file verification
+   - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
+   - submitForReview: Submit the new version for Review after uploading everything
+   - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
+   - automaticRelease: Should the app be automatically released once it's approved?
+   - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval
+   - phasedRelease: Enable the phased release feature of iTC
+   - resetRatings: Reset the summary rating when you release a new version of the application
+   - priceTier: The price tier of this application
+   - appRatingConfigPath: Path to the app rating's config
+   - submissionInformation: Extra information for the submission (e.g. compliance specifications, IDFA settings)
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+   - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
+   - devPortalTeamName: The name of your Developer Portal team if you're in multiple teams
+   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - runPrecheckBeforeSubmit: Run precheck before submitting to app review
+   - precheckDefaultRuleLevel: The default precheck rule level unless otherwise configured
+   - individualMetadataItems: An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
+   - appIcon: Metadata: The path to the app icon
+   - appleWatchAppIcon: Metadata: The path to the Apple Watch app icon
+   - copyright: Metadata: The copyright notice
+   - primaryCategory: Metadata: The english name of the primary category (e.g. `Business`, `Books`)
+   - secondaryCategory: Metadata: The english name of the secondary category (e.g. `Business`, `Books`)
+   - primaryFirstSubCategory: Metadata: The english name of the primary first sub category (e.g. `Educational`, `Puzzle`)
+   - primarySecondSubCategory: Metadata: The english name of the primary second sub category (e.g. `Educational`, `Puzzle`)
+   - secondaryFirstSubCategory: Metadata: The english name of the secondary first sub category (e.g. `Educational`, `Puzzle`)
+   - secondarySecondSubCategory: Metadata: The english name of the secondary second sub category (e.g. `Educational`, `Puzzle`)
+   - tradeRepresentativeContactInformation: Metadata: A hash containing the trade representative contact information
+   - appReviewInformation: Metadata: A hash containing the review information
+   - appReviewAttachmentFile: Metadata: Path to the app review attachment file
+   - description: Metadata: The localised app description
+   - name: Metadata: The localised app name
+   - subtitle: Metadata: The localised app subtitle
+   - keywords: Metadata: An array of localised keywords
+   - promotionalText: Metadata: An array of localised promotional texts
+   - releaseNotes: Metadata: Localised release notes for this version
+   - privacyUrl: Metadata: Localised privacy url
+   - appleTvPrivacyPolicy: Metadata: Localised Apple TV privacy policy text
+   - supportUrl: Metadata: Localised support url
+   - marketingUrl: Metadata: Localised marketing url
+   - languages: Metadata: List of languages to activate
+   - ignoreLanguageDirectoryValidation: Ignore errors when invalid languages are found in metadata and screenshot directories
+   - precheckIncludeInAppPurchases: Should precheck check in-app purchases?
+   - app: The (spaceship) app ID of the app you want to use/modify
+
+ Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
+ 
+ If you don't want a PDF report for App Store builds, use the `:force` option.
+ This is useful when running _fastlane_ on your Continuous Integration server:
+ `_upload_to_app_store_(force: true)`
+ If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
+*/
 func deliver(username: Any = deliverfile.username,
              appIdentifier: Any? = deliverfile.appIdentifier,
              appVersion: Any? = deliverfile.appVersion,
@@ -1363,6 +2422,24 @@ func deliver(username: Any = deliverfile.username,
                                                                                          RubyCommand.Argument(name: "app", value: app)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload a new build to [DeployGate](https://deploygate.com/)
+
+ - parameters:
+   - apiToken: Deploygate API Token
+   - user: Target username or organization name
+   - ipa: Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action
+   - apk: Path to your APK file
+   - message: Release Notes
+   - distributionKey: Target Distribution Key
+   - releaseNote: Release note for distribution page
+   - disableNotify: Disables Push notification emails
+   - distributionName: Target Distribution Name
+
+ You can retrieve your username and API token on [your settings page](https://deploygate.com/settings).
+ More information about the available options can be found in the [DeployGate Push API document](https://deploygate.com/docs/api).
+*/
 func deploygate(apiToken: String,
                 user: String,
                 ipa: String? = nil,
@@ -1383,14 +2460,59 @@ func deploygate(apiToken: String,
                                                                                             RubyCommand.Argument(name: "distribution_name", value: distributionName)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Reads in production secrets set in a dotgpg file and puts them in ENV
+
+ - parameter dotgpgFile: Path to your gpg file
+
+ More information about dotgpg can be found at [https://github.com/ConradIrwin/dotgpg](https://github.com/ConradIrwin/dotgpg).
+*/
 func dotgpgEnvironment(dotgpgFile: String) {
   let command = RubyCommand(commandID: "", methodName: "dotgpg_environment", className: nil, args: [RubyCommand.Argument(name: "dotgpg_file", value: dotgpgFile)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Download a file from a remote server (e.g. JSON file)
+
+ - parameter url: The URL that should be downloaded
+
+ Specify the URL to download and get the content as a return value.
+ Automatically parses JSON into a Ruby data structure.
+ For more advanced networking code, use the Ruby functions instead: [http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html](http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html).
+*/
 func download(url: String) {
   let command = RubyCommand(commandID: "", methodName: "download", className: nil, args: [RubyCommand.Argument(name: "url", value: url)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Download dSYM files from App Store Connect for Bitcode apps
+
+ - parameters:
+   - username: Your Apple ID Username for App Store Connect
+   - appIdentifier: The bundle identifier of your app
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+   - platform: The app platform for dSYMs you wish to download (ios, appletvos)
+   - version: The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs
+   - buildNumber: The app build_number for dSYMs you wish to download
+   - minVersion: The minimum app version for dSYMs you wish to download
+   - outputDirectory: Where to save the download dSYMs, defaults to the current path
+   - waitForDsymProcessing: Wait for dSYMs to process
+
+ This action downloads dSYM files from App Store Connect after the ipa gets re-compiled by Apple. Useful if you have Bitcode enabled.|
+ |
+ ```ruby|
+ lane :refresh_dsyms do|
+   download_dsyms                  # Download dSYM files from iTC|
+   upload_symbols_to_crashlytics   # Upload them to Crashlytics|
+   clean_build_artifacts           # Delete the local dSYM files|
+ end|
+ ```|
+ >|
+*/
 func downloadDsyms(username: String,
                    appIdentifier: String,
                    teamId: Any? = nil,
@@ -1413,6 +2535,22 @@ func downloadDsyms(username: String,
                                                                                                 RubyCommand.Argument(name: "wait_for_dsym_processing", value: waitForDsymProcessing)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Download metadata and binaries from Google Play (via _supply_)
+
+ - parameters:
+   - packageName: The package name of the application to use
+   - metadataPath: Path to the directory containing the metadata files
+   - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
+   - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
+   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
+   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
+   - timeout: Timeout for read, open, and send (in seconds)
+
+ More information: https://docs.fastlane.tools/actions/download_from_play_store/
+*/
 func downloadFromPlayStore(packageName: String,
                            metadataPath: String = "./metadata",
                            key: String? = nil,
@@ -1431,6 +2569,17 @@ func downloadFromPlayStore(packageName: String,
                                                                                                           RubyCommand.Argument(name: "timeout", value: timeout)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Creates a zipped dSYM in the project root from the .xcarchive
+
+ - parameters:
+   - archivePath: Path to your xcarchive file. Optional if you use the `xcodebuild` action
+   - dsymPath: Path for generated dsym. Optional, default is your apps root directory
+   - all: Whether or not all dSYM files are to be included. Optional, default is false in which only your app dSYM is included
+
+ You can manually specify the path to the xcarchive (not needed if you use `xcodebuild`/`xcarchive` to build your archive)
+*/
 func dsymZip(archivePath: String? = nil,
              dsymPath: String? = nil,
              all: Bool = false) {
@@ -1439,24 +2588,85 @@ func dsymZip(archivePath: String? = nil,
                                                                                           RubyCommand.Argument(name: "all", value: all)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `puts` action
+
+ - parameter message: Message to be printed out
+*/
 func echo(message: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "echo", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Raises an exception if not using `bundle exec` to run fastlane
+
+ This action will check if you are using bundle exec to run fastlane.
+ You can put it into `before_all` and make sure that fastlane is run using `bundle exec fastlane` command.
+*/
 func ensureBundleExec() {
   let command = RubyCommand(commandID: "", methodName: "ensure_bundle_exec", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Raises an exception if the specified env vars are not set
+
+ - parameter envVars: The environment variables names that should be checked
+
+ This action will check if some environment variables are set.
+*/
+func ensureEnvVars(envVars: [String]) {
+  let command = RubyCommand(commandID: "", methodName: "ensure_env_vars", className: nil, args: [RubyCommand.Argument(name: "env_vars", value: envVars)])
+  _ = runner.executeCommand(command)
+}
+
+/**
+ Raises an exception if not on a specific git branch
+
+ - parameter branch: The branch that should be checked for. String that can be either the full name of the branch or a regex to match
+
+ This action will check if your git repo is checked out to a specific branch.
+ You may only want to make releases from a specific branch, so `ensure_git_branch` will stop a lane if it was accidentally executed on an incorrect branch.
+*/
 func ensureGitBranch(branch: String = "master") {
   let command = RubyCommand(commandID: "", methodName: "ensure_git_branch", className: nil, args: [RubyCommand.Argument(name: "branch", value: branch)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Raises an exception if there are uncommitted git changes
+
+ - parameters:
+   - showUncommittedChanges: The flag whether to show uncommitted changes if the repo is dirty
+   - showDiff: The flag whether to show the git diff if the repo is dirty
+
+ A sanity check to make sure you are working in a repo that is clean.
+ Especially useful to put at the beginning of your Fastfile in the `before_all` block, if some of your other actions will touch your filesystem, do things to your git repo, or just as a general reminder to save your work.
+ Also needed as a prerequisite for some other actions like `reset_git_repo`.
+*/
 func ensureGitStatusClean(showUncommittedChanges: Bool = false,
                           showDiff: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "ensure_git_status_clean", className: nil, args: [RubyCommand.Argument(name: "show_uncommitted_changes", value: showUncommittedChanges),
                                                                                                          RubyCommand.Argument(name: "show_diff", value: showDiff)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Ensures the given text is nowhere in the code base
+
+ - parameters:
+   - text: The text that must not be in the code base
+   - path: The directory containing all the source files
+   - extension: The extension that should be searched for
+   - extensions: An array of file extensions that should be searched for
+   - exclude: Exclude a certain pattern from the search
+   - excludeDirs: An array of dirs that should not be included in the search
+
+ You don't want any debug code to slip into production.
+ This can be used to check if there is any debug code still in your codebase or if you have things like `// TO DO` or similar.
+*/
 func ensureNoDebugCode(text: String,
                        path: String = ".",
                        `extension`: String? = nil,
@@ -1471,10 +2681,29 @@ func ensureNoDebugCode(text: String,
                                                                                                       RubyCommand.Argument(name: "exclude_dirs", value: excludeDirs)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Ensure the right version of Xcode is used
+
+ - parameter version: Xcode version to verify that is selected
+
+ If building your app requires a specific version of Xcode, you can invoke this command before using gym.
+ For example, to ensure that a beta version of Xcode is not accidentally selected to build, which would make uploading to TestFlight fail.
+ You can either manually provide a specific version using `version: ` or you make use of the `.xcode-version` file.
+*/
 func ensureXcodeVersion(version: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "ensure_xcode_version", className: nil, args: [RubyCommand.Argument(name: "version", value: version)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Sets/gets env vars for Fastlane.swift. Don't use in ruby, use `ENV[key] = val`
+
+ - parameters:
+   - set: Set the environment variables named
+   - get: Get the environment variable named
+   - remove: Remove the environment variable named
+*/
 @discardableResult func environmentVariable(`set`: [String : Any]? = nil,
                                             `get`: String? = nil,
                                             remove: String? = nil) -> String {
@@ -1483,6 +2712,18 @@ func ensureXcodeVersion(version: String? = nil) {
                                                                                                       RubyCommand.Argument(name: "remove", value: remove)])
   return runner.executeCommand(command)
 }
+
+/**
+ Allows to Generate output files based on ERB templates
+
+ - parameters:
+   - template: ERB Template File
+   - destination: Destination file
+   - placeholders: Placeholders given as a hash
+
+ Renders an ERB template with `:placeholders` given as a hash via parameter.
+ If no `:destination` is set, it returns the rendered template as string.
+*/
 func erb(template: String,
          destination: String? = nil,
          placeholders: [String : Any] = [:]) {
@@ -1491,10 +2732,28 @@ func erb(template: String,
                                                                                      RubyCommand.Argument(name: "placeholders", value: placeholders)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `min_fastlane_version` action
+
+ Add this to your `Fastfile` to require a certain version of _fastlane_.
+ Use it if you use an action that just recently came out and you need it.
+*/
 func fastlaneVersion() {
   let command = RubyCommand(commandID: "", methodName: "fastlane_version", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Send a message to a [Flock](https://flock.com/) group
+
+ - parameters:
+   - message: Message text
+   - token: Token for the Flock incoming webhook
+   - baseUrl: Base URL of the Flock incoming message webhook
+
+ To obtain the token, create a new [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks) in your Flock admin panel.
+*/
 func flock(message: String,
            token: String,
            baseUrl: String = "https://api.flock.co/hooks/sendMessage") {
@@ -1503,6 +2762,27 @@ func flock(message: String,
                                                                                        RubyCommand.Argument(name: "base_url", value: baseUrl)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Adds device frames around all screenshots (via _frameit_)
+
+ - parameters:
+   - white: Use white device frames
+   - silver: Use white device frames. Alias for :white
+   - roseGold: Use rose gold device frames. Alias for :rose_gold
+   - gold: Use gold device frames. Alias for :gold
+   - forceDeviceType: Forces a given device type, useful for Mac screenshots, as their sizes vary
+   - useLegacyIphone5s: Use iPhone 5s instead of iPhone SE frames
+   - useLegacyIphone6s: Use iPhone 6s frames instead of iPhone 7 frames
+   - useLegacyIphonex: Use iPhone X instead of iPhone XS frames
+   - forceOrientationBlock: [Advanced] A block to customize your screenshots' device orientation
+   - debugMode: Output debug information in framed screenshots
+   - resume: Resume frameit instead of reprocessing all screenshots
+   - path: The path to the directory containing the screenshots
+
+ Uses [frameit](https://docs.fastlane.tools/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.
+ You can add background and titles to the framed screenshots as well.
+*/
 func frameScreenshots(white: Bool? = nil,
                       silver: Bool? = nil,
                       roseGold: Bool? = nil,
@@ -1529,6 +2809,27 @@ func frameScreenshots(white: Bool? = nil,
                                                                                                    RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `frame_screenshots` action
+
+ - parameters:
+   - white: Use white device frames
+   - silver: Use white device frames. Alias for :white
+   - roseGold: Use rose gold device frames. Alias for :rose_gold
+   - gold: Use gold device frames. Alias for :gold
+   - forceDeviceType: Forces a given device type, useful for Mac screenshots, as their sizes vary
+   - useLegacyIphone5s: Use iPhone 5s instead of iPhone SE frames
+   - useLegacyIphone6s: Use iPhone 6s frames instead of iPhone 7 frames
+   - useLegacyIphonex: Use iPhone X instead of iPhone XS frames
+   - forceOrientationBlock: [Advanced] A block to customize your screenshots' device orientation
+   - debugMode: Output debug information in framed screenshots
+   - resume: Resume frameit instead of reprocessing all screenshots
+   - path: The path to the directory containing the screenshots
+
+ Uses [frameit](https://docs.fastlane.tools/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.
+ You can add background and titles to the framed screenshots as well.
+*/
 func frameit(white: Bool? = nil,
              silver: Bool? = nil,
              roseGold: Bool? = nil,
@@ -1555,22 +2856,72 @@ func frameit(white: Bool? = nil,
                                                                                          RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Runs test coverage reports for your Xcode project
+
+ Generate summarized code coverage reports using [gcovr](http://gcovr.com/)
+*/
 func gcovr() {
   let command = RubyCommand(commandID: "", methodName: "gcovr", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Get the build number of your project
+
+ - parameters:
+   - xcodeproj: optional, you must specify the path to your main Xcode project if it is not in the project root directory
+   - hideErrorWhenVersioningDisabled: Used during `fastlane init` to hide the error message
+
+ This action will return the current build number set on your project.
+ You first have to set up your Xcode project, if you haven't done it already: [https://developer.apple.com/library/ios/qa/qa1827/_index.html](https://developer.apple.com/library/ios/qa/qa1827/_index.html).
+*/
 @discardableResult func getBuildNumber(xcodeproj: String? = nil,
                                        hideErrorWhenVersioningDisabled: Bool = false) -> String {
   let command = RubyCommand(commandID: "", methodName: "get_build_number", className: nil, args: [RubyCommand.Argument(name: "xcodeproj", value: xcodeproj),
                                                                                                   RubyCommand.Argument(name: "hide_error_when_versioning_disabled", value: hideErrorWhenVersioningDisabled)])
   return runner.executeCommand(command)
 }
+
+/**
+ Get the build number from the current repository
+
+ - parameter useHgRevisionNumber: Use hg revision number instead of hash (ignored for non-hg repos)
+
+ - returns: The build number from the current repository
+
+ This action will get the **build number** according to what the SCM HEAD reports.
+ Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision), git (uses short hash) and mercurial (uses short hash or revision number).
+ There is an option, `:use_hg_revision_number`, which allows to use mercurial revision number instead of hash.
+*/
 func getBuildNumberRepository(useHgRevisionNumber: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "get_build_number_repository", className: nil, args: [RubyCommand.Argument(name: "use_hg_revision_number", value: useHgRevisionNumber)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Create new iOS code signing certificates (via _cert_)
+
+ - parameters:
+   - development: Create a development certificate instead of a distribution one
+   - force: Create a certificate even if an existing certificate exists
+   - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
+   - username: Your Apple ID Username
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+   - filename: The filename of certificate to store
+   - outputPath: The path to a directory in which all certificates and private keys should be stored
+   - keychainPath: Path to a custom keychain
+   - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
+   - platform: Set the provisioning profile's platform (ios, macos)
+
+ **Important**: It is recommended to use [match](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
+ Use this action to download the latest code signing identity.
+*/
 func getCertificates(development: Bool = false,
                      force: Bool = false,
+                     generateAppleCerts: Bool = true,
                      username: String,
                      teamId: String? = nil,
                      teamName: String? = nil,
@@ -1581,6 +2932,7 @@ func getCertificates(development: Bool = false,
                      platform: Any = "ios") {
   let command = RubyCommand(commandID: "", methodName: "get_certificates", className: nil, args: [RubyCommand.Argument(name: "development", value: development),
                                                                                                   RubyCommand.Argument(name: "force", value: force),
+                                                                                                  RubyCommand.Argument(name: "generate_apple_certs", value: generateAppleCerts),
                                                                                                   RubyCommand.Argument(name: "username", value: username),
                                                                                                   RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                   RubyCommand.Argument(name: "team_name", value: teamName),
@@ -1591,6 +2943,59 @@ func getCertificates(development: Bool = false,
                                                                                                   RubyCommand.Argument(name: "platform", value: platform)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This will verify if a given release version is available on GitHub
+
+ - parameters:
+   - url: The path to your repo, e.g. 'KrauseFx/fastlane'
+   - serverUrl: The server url. e.g. 'https://your.github.server/api/v3' (Default: 'https://api.github.com')
+   - version: The version tag of the release to check
+   - apiToken: GitHub Personal Token (required for private repositories)
+
+ This will return all information about a release. For example:|
+ |
+ ```no-highlight|
+ {|
+   "url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713",|
+    "assets_url"=>"https://api.github.com/repos/KrauseFx/fastlane/releases/1537713/assets",|
+    "upload_url"=>"https://uploads.github.com/repos/KrauseFx/fastlane/releases/1537713/assets{?name}",|
+    "html_url"=>"https://github.com/fastlane/fastlane/releases/tag/1.8.0",|
+    "id"=>1537713,|
+    "tag_name"=>"1.8.0",|
+    "target_commitish"=>"master",|
+    "name"=>"1.8.0 Switch Lanes & Pass Parameters",|
+    "draft"=>false,|
+    "author"=>|
+     {"login"=>"KrauseFx",|
+      "id"=>869950,|
+      "avatar_url"=>"https://avatars.githubusercontent.com/u/869950?v=3",|
+      "gravatar_id"=>"",|
+      "url"=>"https://api.github.com/users/KrauseFx",|
+      "html_url"=>"https://github.com/fastlane",|
+      "followers_url"=>"https://api.github.com/users/KrauseFx/followers",|
+      "following_url"=>"https://api.github.com/users/KrauseFx/following{/other_user}",|
+      "gists_url"=>"https://api.github.com/users/KrauseFx/gists{/gist_id}",|
+      "starred_url"=>"https://api.github.com/users/KrauseFx/starred{/owner}{/repo}",|
+      "subscriptions_url"=>"https://api.github.com/users/KrauseFx/subscriptions",|
+      "organizations_url"=>"https://api.github.com/users/KrauseFx/orgs",|
+      "repos_url"=>"https://api.github.com/users/KrauseFx/repos",|
+      "events_url"=>"https://api.github.com/users/KrauseFx/events{/privacy}",|
+      "received_events_url"=>"https://api.github.com/users/KrauseFx/received_events",|
+      "type"=>"User",|
+      "site_admin"=>false},|
+    "prerelease"=>false,|
+    "created_at"=>"2015-07-14T23:33:01Z",|
+    "published_at"=>"2015-07-14T23:44:10Z",|
+    "assets"=>[],|
+    "tarball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/tarball/1.8.0",|
+    "zipball_url"=>"https://api.github.com/repos/KrauseFx/fastlane/zipball/1.8.0",|
+    "body"=> ...Markdown...|
+   "This is one of the biggest updates of _fastlane_ yet"|
+ }|
+ ```|
+ >|
+*/
 func getGithubRelease(url: String,
                       serverUrl: String = "https://api.github.com",
                       version: String,
@@ -1601,24 +3006,91 @@ func getGithubRelease(url: String,
                                                                                                     RubyCommand.Argument(name: "api_token", value: apiToken)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Returns value from Info.plist of your project as native Ruby data structures
+
+ - parameters:
+   - key: Name of parameter
+   - path: Path to plist file you want to read
+
+ Get a value from a plist file, which can be used to fetch the app identifier and more information about your app
+*/
 @discardableResult func getInfoPlistValue(key: String,
                                           path: String) -> String {
   let command = RubyCommand(commandID: "", methodName: "get_info_plist_value", className: nil, args: [RubyCommand.Argument(name: "key", value: key),
                                                                                                       RubyCommand.Argument(name: "path", value: path)])
   return runner.executeCommand(command)
 }
+
+/**
+ Returns a value from Info.plist inside a .ipa file
+
+ - parameters:
+   - key: Name of parameter
+   - ipa: Path to IPA
+
+ - returns: Returns the value in the .ipa's Info.plist corresponding to the passed in Key
+
+ This is useful for introspecting Info.plist files for `.ipa` files that have already been built.
+*/
 @discardableResult func getIpaInfoPlistValue(key: String,
                                              ipa: String) -> String {
   let command = RubyCommand(commandID: "", methodName: "get_ipa_info_plist_value", className: nil, args: [RubyCommand.Argument(name: "key", value: key),
                                                                                                           RubyCommand.Argument(name: "ipa", value: ipa)])
   return runner.executeCommand(command)
 }
+
+/**
+ Obtain publishing rights for custom apps on Managed Google Play Store
+
+ - parameters:
+   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
+   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+
+ - returns: An URI to obtain publishing rights for custom apps on Managed Play Store
+
+ If you haven't done so before, start by following the first two steps of Googles ["Get started with custom app publishing"](https://developers.google.com/android/work/play/custom-app-api/get-started) -> ["Preliminary setup"](https://developers.google.com/android/work/play/custom-app-api/get-started#preliminary_setup) instructions:
+ "[Enable the Google Play Custom App Publishing API](https://developers.google.com/android/work/play/custom-app-api/get-started#enable_the_google_play_custom_app_publishing_api)" and "[Create a service account](https://developers.google.com/android/work/play/custom-app-api/get-started#create_a_service_account)".
+ You need the "service account's private key file" to continue.
+ Run the action and supply the "private key file" to it as the `json_key` parameter. The command will output a URL to visit. After logging in you are redirected to a page that outputs your "Developer Account ID" - take note of that, you will need it to be able to use [`create_app_on_managed_play_store`](https://docs.fastlane.tools/actions/create_app_on_managed_play_store/).
+*/
 func getManagedPlayStorePublishingRights(jsonKey: String? = nil,
                                          jsonKeyData: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "get_managed_play_store_publishing_rights", className: nil, args: [RubyCommand.Argument(name: "json_key", value: jsonKey),
                                                                                                                           RubyCommand.Argument(name: "json_key_data", value: jsonKeyData)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Generates a provisioning profile, saving it in the current folder (via _sigh_)
+
+ - parameters:
+   - adhoc: Setting this flag will generate AdHoc profiles instead of App Store Profiles
+   - developerId: Setting this flag will generate Developer ID profiles instead of App Store Profiles
+   - development: Renew the development certificate instead of the production one
+   - skipInstall: By default, the certificate will be added to your local machine. Setting this flag will skip this action
+   - force: Renew provisioning profiles regardless of its state - to automatically add all devices for ad hoc profiles
+   - appIdentifier: The bundle identifier of your app
+   - username: Your Apple ID Username
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+   - provisioningName: The name of the profile that is used on the Apple Developer Portal
+   - ignoreProfilesWithDifferentName: Use in combination with :provisioning_name - when true only profiles matching this exact name will be downloaded
+   - outputPath: Directory in which the profile should be stored
+   - certId: The ID of the code signing certificate to use (e.g. 78ADL6LVAA) 
+   - certOwnerName: The certificate name to use for new profiles, or to renew with. (e.g. "Felix Krause")
+   - filename: Filename to use for the generated provisioning profile (must include .mobileprovision)
+   - skipFetchProfiles: Skips the verification of existing profiles which is useful if you have thousands of profiles
+   - skipCertificateVerification: Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine
+   - platform: Set the provisioning profile's platform (i.e. ios, tvos)
+   - readonly: Only fetch existing profile, don't generate new ones
+   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+
+ - returns: The UUID of the profile sigh just fetched/generated
+
+ **Note**: It is recommended to use [match](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use _sigh_ directly only if you want full control over what's going on and know more about codesigning.
+*/
 func getProvisioningProfile(adhoc: Bool = false,
                             developerId: Bool = false,
                             development: Bool = false,
@@ -1661,6 +3133,38 @@ func getProvisioningProfile(adhoc: Bool = false,
                                                                                                           RubyCommand.Argument(name: "template_name", value: templateName)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Ensure a valid push profile is active, creating a new one if needed (via _pem_)
+
+ - parameters:
+   - development: Renew the development push certificate instead of the production one
+   - websitePush: Create a Website Push certificate
+   - generateP12: Generate a p12 file additionally to a PEM file
+   - activeDaysLimit: If the current certificate is active for less than this number of days, generate a new one
+   - force: Create a new push certificate, even if the current one is active for 30 (or PEM_ACTIVE_DAYS_LIMIT) more days
+   - savePrivateKey: Set to save the private RSA key
+   - appIdentifier: The bundle identifier of your app
+   - username: Your Apple ID Username
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+   - p12Password: The password that is used for your p12 file
+   - pemName: The file name of the generated .pem file
+   - outputPath: The path to a directory in which all certificates and private keys should be stored
+   - newProfile: Block that is called if there is a new profile
+
+ Additionally to the available options, you can also specify a block that only gets executed if a new profile was created. You can use it to upload the new profile to your server.
+ Use it like this:|
+ |
+ ```ruby|
+ get_push_certificate(|
+   new_profile: proc do|
+     # your upload code|
+   end|
+ )|
+ ```|
+ >|
+*/
 func getPushCertificate(development: Bool = false,
                         websitePush: Bool = false,
                         generateP12: Bool = true,
@@ -1691,6 +3195,17 @@ func getPushCertificate(development: Bool = false,
                                                                                                       RubyCommand.Argument(name: "new_profile", value: newProfile)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Get the version number of your project
+
+ - parameters:
+   - xcodeproj: Path to the main Xcode project to read version number from, optional. By default will use the first Xcode project found within the project root directory
+   - target: Target name, optional. Will be needed if you have more than one non-test target to avoid being prompted to select one
+   - configuration: Configuration name, optional. Will be needed if you have altered the configurations from the default or your version number depends on the configuration selected
+
+ This action will return the current version number set on your project.
+*/
 @discardableResult func getVersionNumber(xcodeproj: String? = nil,
                                          target: String? = nil,
                                          configuration: String? = nil) -> String {
@@ -1699,6 +3214,15 @@ func getPushCertificate(development: Bool = false,
                                                                                                     RubyCommand.Argument(name: "configuration", value: configuration)])
   return runner.executeCommand(command)
 }
+
+/**
+ Directly add the given file or all files
+
+ - parameters:
+   - path: The file(s) and path(s) you want to add
+   - shellEscape: Shell escapes paths (set to false if using wildcards or manually escaping spaces in :path)
+   - pathspec: **DEPRECATED!** Use `--path` instead - The pathspec you want to add files from
+*/
 func gitAdd(path: Any? = nil,
             shellEscape: Bool = true,
             pathspec: String? = nil) {
@@ -1707,10 +3231,26 @@ func gitAdd(path: Any? = nil,
                                                                                          RubyCommand.Argument(name: "pathspec", value: pathspec)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Returns the name of the current git branch, possibly as managed by CI ENV vars
+
+ If no branch could be found, this action will return an empty string
+*/
 @discardableResult func gitBranch() -> String {
   let command = RubyCommand(commandID: "", methodName: "git_branch", className: nil, args: [])
   return runner.executeCommand(command)
 }
+
+/**
+ Directly commit the given file with the given message
+
+ - parameters:
+   - path: The file you want to commit
+   - message: The commit message that should be used
+   - skipGitHooks: Set to true to pass --no-verify to git
+   - allowNothingToCommit: Set to true to allow commit without any git changes
+*/
 func gitCommit(path: Any,
                message: String,
                skipGitHooks: Bool? = nil,
@@ -1721,16 +3261,41 @@ func gitCommit(path: Any,
                                                                                             RubyCommand.Argument(name: "allow_nothing_to_commit", value: allowNothingToCommit)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Executes a simple git pull command
+
+ - parameter onlyTags: Simply pull the tags, and not bring new commits to the current branch from the remote
+*/
 func gitPull(onlyTags: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "git_pull", className: nil, args: [RubyCommand.Argument(name: "only_tags", value: onlyTags)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Executes a git submodule command
+
+ - parameters:
+   - recursive: Should the submodules be updated recursively
+   - init: Should the submodules be initiated before update
+*/
 func gitSubmoduleUpdate(recursive: Bool = false,
                         `init`: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "git_submodule_update", className: nil, args: [RubyCommand.Argument(name: "recursive", value: recursive),
                                                                                                       RubyCommand.Argument(name: "init", value: `init`)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Checks if the git tag with the given name exists in the current repo
+
+ - parameters:
+   - tag: The tag name that should be checked
+   - remote: Whether to check remote. Defaults to `false`
+   - remoteName: The remote to check. Defaults to `origin`
+
+ - returns: Boolean value whether the tag exists or not
+*/
 func gitTagExists(tag: String,
                   remote: Bool = false,
                   remoteName: String = "origin") {
@@ -1739,6 +3304,28 @@ func gitTagExists(tag: String,
                                                                                                 RubyCommand.Argument(name: "remote_name", value: remoteName)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Call a GitHub API endpoint and get the resulting JSON response
+
+ - parameters:
+   - serverUrl: The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')
+   - apiToken: Personal API Token for GitHub - generate one at https://github.com/settings/tokens
+   - httpMethod: The HTTP method. e.g. GET / POST
+   - body: The request body in JSON or hash format
+   - rawBody: The request body taken verbatim instead of as JSON, useful for file uploads
+   - path: The endpoint path. e.g. '/repos/:owner/:repo/readme'
+   - url: The complete full url - used instead of path. e.g. 'https://uploads.github.com/repos/fastlane...'
+   - errorHandlers: Optional error handling hash based on status code, or pass '*' to handle all errors
+   - headers: Optional headers to apply
+   - secure: Optionally disable secure requests (ssl_verify_peer)
+
+ - returns: A hash including the HTTP status code (:status), the response body (:body), and if valid JSON has been returned the parsed JSON (:json).
+
+ Calls any GitHub API endpoint. You must provide your GitHub Personal token (get one from [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new)).
+ Out parameters provide the status code and the full response JSON if valid, otherwise the raw response body.
+ Documentation: [https://developer.github.com/v3](https://developer.github.com/v3).
+*/
 func githubApi(serverUrl: String = "https://api.github.com",
                apiToken: String,
                httpMethod: String = "GET",
@@ -1761,6 +3348,24 @@ func githubApi(serverUrl: String = "https://api.github.com",
                                                                                             RubyCommand.Argument(name: "secure", value: secure)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Retrieves version codes for a Google Play track
+
+ - parameters:
+   - packageName: The package name of the application to use
+   - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal, rollout
+   - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
+   - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
+   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
+   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
+   - timeout: Timeout for read, open, and send (in seconds)
+
+ - returns: Array of integers representing the version codes for the given Google Play track
+
+ More information: [https://docs.fastlane.tools/actions/supply/](https://docs.fastlane.tools/actions/supply/)
+*/
 func googlePlayTrackVersionCodes(packageName: String,
                                  track: String = "production",
                                  key: String? = nil,
@@ -1779,6 +3384,27 @@ func googlePlayTrackVersionCodes(packageName: String,
                                                                                                                  RubyCommand.Argument(name: "timeout", value: timeout)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ All gradle related actions, including building and testing your Android app
+
+ - parameters:
+   - task: The gradle task you want to execute, e.g. `assemble`, `bundle` or `test`. For tasks such as `assembleMyFlavorRelease` you should use gradle(task: 'assemble', flavor: 'Myflavor', build_type: 'Release')
+   - flavor: The flavor that you want the task for, e.g. `MyFlavor`. If you are running the `assemble` task in a multi-flavor project, and you rely on Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] then you must specify a flavor here or else this value will be undefined
+   - buildType: The build type that you want the task for, e.g. `Release`. Useful for some tasks such as `assemble`
+   - flags: All parameter flags you want to pass to the gradle command, e.g. `--exitcode --xml file.xml`
+   - projectDir: The root directory of the gradle project
+   - gradlePath: The path to your `gradlew`. If you specify a relative path, it is assumed to be relative to the `project_dir`
+   - properties: Gradle properties to be exposed to the gradle script
+   - systemProperties: Gradle system properties to be exposed to the gradle script
+   - serial: Android serial, which device should be used for this command
+   - printCommand: Control whether the generated Gradle command is printed as output before running it (true/false)
+   - printCommandOutput: Control whether the output produced by given Gradle command is printed while running (true/false)
+
+ - returns: The output of running the gradle task
+
+ Run `./gradlew tasks` to get a list of all available gradle tasks for your project
+*/
 func gradle(task: String,
             flavor: String? = nil,
             buildType: String? = nil,
@@ -1803,6 +3429,56 @@ func gradle(task: String,
                                                                                         RubyCommand.Argument(name: "print_command_output", value: printCommandOutput)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `build_ios_app` action
+
+ - parameters:
+   - workspace: Path to the workspace file
+   - project: Path to the project file
+   - scheme: The project's scheme. Make sure it's marked as `Shared`
+   - clean: Should the project be cleaned before building it?
+   - outputDirectory: The directory in which the ipa file should be stored in
+   - outputName: The name of the resulting ipa file
+   - configuration: The configuration to use when building the app. Defaults to 'Release'
+   - silent: Hide all information that's not necessary while building
+   - codesigningIdentity: The name of the code signing identity to use. It has to match the name exactly. e.g. 'iPhone Distribution: SunApps GmbH'
+   - skipPackageIpa: Should we skip packaging the ipa?
+   - includeSymbols: Should the ipa file include symbols?
+   - includeBitcode: Should the ipa file include bitcode?
+   - exportMethod: Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id
+   - exportOptions: Path to an export options plist or a hash with export options. Use 'xcodebuild -help' to print the full set of available options
+   - exportXcargs: Pass additional arguments to xcodebuild for the package phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
+   - skipBuildArchive: Export ipa from previously built xcarchive. Uses archive_path as source
+   - skipArchive: After building, don't archive, effectively not including -archivePath param
+   - skipCodesigning: Build without codesigning
+   - buildPath: The directory in which the archive should be stored in
+   - archivePath: The path to the created archive
+   - derivedDataPath: The directory where built products and other derived data will go
+   - resultBundle: Should an Xcode result bundle be generated in the output directory
+   - resultBundlePath: Path to the result bundle directory to create. Ignored if `result_bundle` if false
+   - buildlogPath: The directory where to store the build log
+   - sdk: The SDK that should be used for building the application
+   - toolchain: The toolchain that should be used for building the application (e.g. com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a)
+   - destination: Use a custom destination for building the app
+   - exportTeamId: Optional: Sometimes you need to specify a team id when exporting the ipa file
+   - xcargs: Pass additional arguments to xcodebuild for the build phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
+   - xcconfig: Use an extra XCCONFIG file to build your app
+   - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
+   - disableXcpretty: Disable xcpretty formatting of build output
+   - xcprettyTestFormat: Use the test (RSpec style) format for build output
+   - xcprettyFormatter: A custom xcpretty formatter to use
+   - xcprettyReportJunit: Have xcpretty create a JUnit-style XML report at the provided path
+   - xcprettyReportHtml: Have xcpretty create a simple HTML report at the provided path
+   - xcprettyReportJson: Have xcpretty create a JSON compilation database at the provided path
+   - analyzeBuildTime: Analyze the project build time and store the output in 'culprits.txt' file
+   - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
+   - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
+
+ - returns: The absolute path to the generated ipa file
+
+ More information: https://fastlane.tools/gym
+*/
 func gym(workspace: Any? = gymfile.workspace,
          project: Any? = gymfile.project,
          scheme: Any? = gymfile.scheme,
@@ -1885,10 +3561,37 @@ func gym(workspace: Any? = gymfile.workspace,
                                                                                      RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This will add a hg tag to the current branch
+
+ - parameter tag: Tag to create
+*/
 func hgAddTag(tag: String) {
   let command = RubyCommand(commandID: "", methodName: "hg_add_tag", className: nil, args: [RubyCommand.Argument(name: "tag", value: tag)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This will commit a version bump to the hg repo
+
+ - parameters:
+   - message: The commit message when committing the version bump
+   - xcodeproj: The path to your project file (Not the workspace). If you have only one, this is optional
+   - force: Forces the commit, even if other files than the ones containing the version number have been modified
+   - testDirtyFiles: A list of dirty files passed in for testing
+   - testExpectedFiles: A list of expected changed files passed in for testing
+
+ The mercurial equivalent of the [commit_version_bump](https://docs.fastlane.tools/actions/commit_version_bump/) git action. Like the git version, it is useful in conjunction with [`increment_build_number`](https://docs.fastlane.tools/actions/increment_build_number/).
+ It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:|
+ |
+ >- All `.plist` files|
+ - The `.xcodeproj/project.pbxproj` file|
+ >|
+ Then commits those files to the repo.
+ Customize the message with the `:message` option, defaults to 'Version Bump'
+ If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [clean_build_artifacts](https://docs.fastlane.tools/actions/clean_build_artifacts/) action to clean those temporary files up before running this action.
+*/
 func hgCommitVersionBump(message: String = "Version Bump",
                          xcodeproj: String? = nil,
                          force: Bool = false,
@@ -1901,16 +3604,51 @@ func hgCommitVersionBump(message: String = "Version Bump",
                                                                                                         RubyCommand.Argument(name: "test_expected_files", value: testExpectedFiles)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Raises an exception if there are uncommitted hg changes
+
+ Along the same lines as the [ensure_git_status_clean](https://docs.fastlane.tools/actions/ensure_git_status_clean/) action, this is a sanity check to ensure the working mercurial repo is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block.
+*/
 func hgEnsureCleanStatus() {
   let command = RubyCommand(commandID: "", methodName: "hg_ensure_clean_status", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This will push changes to the remote hg repository
+
+ - parameters:
+   - force: Force push to remote
+   - destination: The destination to push to
+
+ The mercurial equivalent of [push_to_git_remote](https://docs.fastlane.tools/actions/push_to_git_remote/). Pushes your local commits to a remote mercurial repo. Useful when local changes such as adding a version bump commit or adding a tag are part of your lane’s actions.
+*/
 func hgPush(force: Bool = false,
             destination: String = "") {
   let command = RubyCommand(commandID: "", methodName: "hg_push", className: nil, args: [RubyCommand.Argument(name: "force", value: force),
                                                                                          RubyCommand.Argument(name: "destination", value: destination)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Send a error/success message to [HipChat](https://www.hipchat.com/)
+
+ - parameters:
+   - message: The message to post on HipChat
+   - channel: The room or @username
+   - apiToken: Hipchat API Token
+   - customColor: Specify a custom color, this overrides the success boolean. Can be one of 'yellow', 'red', 'green', 'purple', 'gray', or 'random'
+   - success: Was this build successful? (true/false)
+   - version: Version of the Hipchat API. Must be 1 or 2
+   - notifyRoom: Should the people in the room be notified? (true/false)
+   - apiHost: The host of the HipChat-Server API
+   - messageFormat: Format of the message to post. Must be either 'html' or 'text'
+   - includeHtmlHeader: Should html formatted messages include a preformatted header? (true/false)
+   - from: Name the message will appear to be sent from
+
+ Send a message to **room** (by default) or a direct message to **@username** with success (green) or failure (red) status.
+*/
 func hipchat(message: String = "",
              channel: String,
              apiToken: String,
@@ -1935,6 +3673,45 @@ func hipchat(message: String = "",
                                                                                          RubyCommand.Argument(name: "from", value: from)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Refer to [App Center](https://github.com/Microsoft/fastlane-plugin-appcenter/)
+
+ - parameters:
+   - apk: Path to your APK file
+   - apiToken: API Token for Hockey Access
+   - ipa: Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action. For Mac zip the .app. For Android provide path to .apk file. In addition you could use this to upload .msi, .zip, .pkg, etc if you use the 'create_update' mechanism
+   - dsym: Path to your symbols file. For iOS and Mac provide path to app.dSYM.zip. For Android provide path to mappings.txt file
+   - createUpdate: Set true if you want to create then update your app as opposed to just upload it. You will need the 'public_identifier', 'bundle_version' and 'bundle_short_version'
+   - notes: Beta Notes
+   - notify: Notify testers? "1" for yes
+   - status: Download status: "1" = No user can download; "2" = Available for download (only possible with full-access token)
+   - createStatus: Download status for initial version creation when create_update is true: "1" = No user can download; "2" = Available for download (only possible with full-access token)
+   - notesType: Notes type for your :notes, "0" = Textile, "1" = Markdown (default)
+   - releaseType: Release type of the app: "0" = Beta (default), "1" = Store, "2" = Alpha, "3" = Enterprise
+   - mandatory: Set to "1" to make this update mandatory
+   - teams: Comma separated list of team ID numbers to which this build will be restricted
+   - users: Comma separated list of user ID numbers to which this build will be restricted
+   - tags: Comma separated list of tags which will receive access to the build
+   - bundleShortVersion: The bundle_short_version of your application, required when using `create_update`
+   - bundleVersion: The bundle_version of your application, required when using `create_update`
+   - publicIdentifier: App id of the app you are targeting, usually you won't need this value. Required, if `upload_dsym_only` set to `true`
+   - commitSha: The Git commit SHA for this build
+   - repositoryUrl: The URL of your source repository
+   - buildServerUrl: The URL of the build job on your build server
+   - uploadDsymOnly: Flag to upload only the dSYM file to hockey app
+   - ownerId: ID for the owner of the app
+   - strategy: Strategy: 'add' = to add the build as a new build even if it has the same build number (default); 'replace' = to replace a build with the same build number
+   - timeout: Request timeout in seconds
+   - bypassCdn: Flag to bypass Hockey CDN when it uploads successfully but reports error
+   - dsaSignature: DSA signature for sparkle updates for macOS
+
+ HockeyApp will be no longer supported and will be transitioned into App Center on November 16, 2019.
+ Please migrate over to [App Center](https://github.com/Microsoft/fastlane-plugin-appcenter/)
+ 
+ Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in the `:dsym` parameter.
+ More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version).
+*/
 func hockey(apk: String? = nil,
             apiToken: String,
             ipa: String? = nil,
@@ -1991,6 +3768,19 @@ func hockey(apk: String? = nil,
                                                                                         RubyCommand.Argument(name: "dsa_signature", value: dsaSignature)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Connect to the [IFTTT Maker Channel](https://ifttt.com/maker)
+
+ - parameters:
+   - apiKey: API key
+   - eventName: The name of the event that will be triggered
+   - value1: Extra data sent with the event
+   - value2: Extra data sent with the event
+   - value3: Extra data sent with the event
+
+ Connect to the IFTTT [Maker Channel](https://ifttt.com/maker). An IFTTT Recipe has two components: a Trigger and an Action. In this case, the Trigger will fire every time the Maker Channel receives a web request (made by this _fastlane_ action) to notify it of an event. The Action can be anything that IFTTT supports: email, SMS, etc.
+*/
 func ifttt(apiKey: String,
            eventName: String,
            value1: String? = nil,
@@ -2003,6 +3793,20 @@ func ifttt(apiKey: String,
                                                                                        RubyCommand.Argument(name: "value3", value: value3)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Import certificate from inputfile into a keychain
+
+ - parameters:
+   - certificatePath: Path to certificate
+   - certificatePassword: Certificate password
+   - keychainName: Keychain the items should be imported to
+   - keychainPath: Path to the Keychain file to which the items should be imported
+   - keychainPassword: The password for the keychain. Note that for the login keychain this is your user's password
+   - logOutput: If output should be logged to the console
+
+ Import certificates (and private keys) into the current default keychain. Use the `create_keychain` action to create a new keychain.
+*/
 func importCertificate(certificatePath: String,
                        certificatePassword: String? = nil,
                        keychainName: String,
@@ -2017,12 +3821,36 @@ func importCertificate(certificatePath: String,
                                                                                                     RubyCommand.Argument(name: "log_output", value: logOutput)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Increment the build number of your project
+
+ - parameters:
+   - buildNumber: Change to a specific version. When you provide this parameter, Apple Generic Versioning does not have to be enabled
+   - xcodeproj: optional, you must specify the path to your main Xcode project if it is not in the project root directory
+
+ - returns: The new build number
+*/
 @discardableResult func incrementBuildNumber(buildNumber: Any? = nil,
                                              xcodeproj: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "increment_build_number", className: nil, args: [RubyCommand.Argument(name: "build_number", value: buildNumber),
                                                                                                         RubyCommand.Argument(name: "xcodeproj", value: xcodeproj)])
   return runner.executeCommand(command)
 }
+
+/**
+ Increment the version number of your project
+
+ - parameters:
+   - bumpType: The type of this version bump. Available: patch, minor, major
+   - versionNumber: Change to a specific version. This will replace the bump type value
+   - xcodeproj: optional, you must specify the path to your main Xcode project if it is not in the project root directory
+
+ - returns: The new version number
+
+ This action will increment the version number.
+ You first have to set up your Xcode project, if you haven't done it already: [https://developer.apple.com/library/ios/qa/qa1827/_index.html](https://developer.apple.com/library/ios/qa/qa1827/_index.html).
+*/
 @discardableResult func incrementVersionNumber(bumpType: String = "patch",
                                                versionNumber: String? = nil,
                                                xcodeproj: String? = nil) -> String {
@@ -2031,6 +3859,18 @@ func importCertificate(certificatePath: String,
                                                                                                           RubyCommand.Argument(name: "xcodeproj", value: xcodeproj)])
   return runner.executeCommand(command)
 }
+
+/**
+ Installs an .ipa file on a connected iOS-device via usb or wifi
+
+ - parameters:
+   - extra: Extra Commandline arguments passed to ios-deploy
+   - deviceId: id of the device / if not set defaults to first found device
+   - skipWifi: Do not search for devices via WiFi
+   - ipa: The IPA file to put on the device
+
+ Installs the ipa on the device. If no id is given, the first found iOS device will be used. Works via USB or Wi-Fi. This requires `ios-deploy` to be installed. Please have a look at [ios-deploy](https://github.com/ios-control/ios-deploy). To quickly install it, use `npm -g i ios-deploy`
+*/
 func installOnDevice(extra: String? = nil,
                      deviceId: String? = nil,
                      skipWifi: Any? = nil,
@@ -2041,16 +3881,45 @@ func installOnDevice(extra: String? = nil,
                                                                                                    RubyCommand.Argument(name: "ipa", value: ipa)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Install provisioning profile from path
+
+ - parameter path: Path to provisioning profile
+
+ - returns: The absolute path to the installed provisioning profile
+
+ Install provisioning profile from path for current user
+*/
 func installProvisioningProfile(path: String) {
   let command = RubyCommand(commandID: "", methodName: "install_provisioning_profile", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Install an Xcode plugin for the current user
+
+ - parameters:
+   - url: URL for Xcode plugin ZIP file
+   - github: GitHub repository URL for Xcode plugin
+*/
 func installXcodePlugin(url: String,
                         github: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "install_xcode_plugin", className: nil, args: [RubyCommand.Argument(name: "url", value: url),
                                                                                                       RubyCommand.Argument(name: "github", value: github)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload a new build to [Installr](http://installrapp.com/)
+
+ - parameters:
+   - apiToken: API Token for Installr Access
+   - ipa: Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action
+   - notes: Release notes
+   - notify: Groups to notify (e.g. 'dev,qa')
+   - add: Groups to add (e.g. 'exec,ops')
+*/
 func installr(apiToken: String,
               ipa: String,
               notes: String? = nil,
@@ -2063,6 +3932,25 @@ func installr(apiToken: String,
                                                                                           RubyCommand.Argument(name: "add", value: add)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Easily build and sign your app using shenzhen
+
+ - parameters:
+   - workspace: WORKSPACE Workspace (.xcworkspace) file to use to build app (automatically detected in current directory)
+   - project: Project (.xcodeproj) file to use to build app (automatically detected in current directory, overridden by --workspace option, if passed)
+   - configuration: Configuration used to build
+   - scheme: Scheme used to build app
+   - clean: Clean project before building
+   - archive: Archive project after building
+   - destination: Build destination. Defaults to current directory
+   - embed: Sign .ipa file with .mobileprovision
+   - identity: Identity to be used along with --embed
+   - sdk: Use SDK as the name or path of the base SDK when building the project
+   - ipa: Specify the name of the .ipa file to generate (including file extension)
+   - xcconfig: Use an extra XCCONFIG file to build the app
+   - xcargs: Pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args
+*/
 func ipa(workspace: String? = nil,
          project: String? = nil,
          configuration: String? = nil,
@@ -2091,14 +3979,38 @@ func ipa(workspace: String? = nil,
                                                                                      RubyCommand.Argument(name: "xcargs", value: xcargs)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Is the current run being executed on a CI system, like Jenkins or Travis
+
+ The return value of this method is true if fastlane is currently executed on Travis, Jenkins, Circle or a similar CI service
+*/
 @discardableResult func isCi() -> Bool {
   let command = RubyCommand(commandID: "", methodName: "is_ci", className: nil, args: [])
   return parseBool(fromString: runner.executeCommand(command))
 }
+
+/**
+ Generate docs using Jazzy
+
+ - parameter config: Path to jazzy config file
+*/
 func jazzy(config: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "jazzy", className: nil, args: [RubyCommand.Argument(name: "config", value: config)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Leave a comment on JIRA tickets
+
+ - parameters:
+   - url: URL for Jira instance
+   - contextPath: Appends to the url (ex: "/jira")
+   - username: Username for JIRA instance
+   - password: Password for Jira
+   - ticketId: Ticket ID for Jira, i.e. IOS-123
+   - commentText: Text to add to the ticket as a comment
+*/
 func jira(url: String,
           contextPath: String = "",
           username: String,
@@ -2113,18 +4025,56 @@ func jira(url: String,
                                                                                       RubyCommand.Argument(name: "comment_text", value: commentText)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Access lane context values
+
+ Access the fastlane lane context values.
+ More information about how the lane context works: [https://docs.fastlane.tools/advanced/#lane-context](https://docs.fastlane.tools/advanced/#lane-context).
+*/
 @discardableResult func laneContext() -> [String : Any] {
   let command = RubyCommand(commandID: "", methodName: "lane_context", className: nil, args: [])
   return parseDictionary(fromString: runner.executeCommand(command))
 }
+
+/**
+ Return last git commit hash, abbreviated commit hash, commit message and author
+
+ - returns: Returns the following dict: {commit_hash: "commit hash", abbreviated_commit_hash: "abbreviated commit hash" author: "Author", author_email: "author email", message: "commit message"}. Example: {:message=>"message", :author=>"author", :author_email=>"author_email", :commit_hash=>"commit_hash", :abbreviated_commit_hash=>"short_hash"}
+*/
 @discardableResult func lastGitCommit() -> [String : String] {
   let command = RubyCommand(commandID: "", methodName: "last_git_commit", className: nil, args: [])
   return parseDictionary(fromString: runner.executeCommand(command))
 }
+
+/**
+ Get the most recent git tag
+
+ If you are using this action on a **shallow clone**, *the default with some CI systems like Bamboo*, you need to ensure that you have also pulled all the git tags appropriately. Assuming your git repo has the correct remote set you can issue `sh('git fetch --tags')`.
+*/
 @discardableResult func lastGitTag() -> String {
   let command = RubyCommand(commandID: "", methodName: "last_git_tag", className: nil, args: [])
   return runner.executeCommand(command)
 }
+
+/**
+ Fetches most recent build number from TestFlight
+
+ - parameters:
+   - live: Query the live version (ready-for-sale)
+   - appIdentifier: The bundle identifier of your app
+   - username: Your Apple ID Username
+   - version: The version number whose latest build number we want
+   - platform: The platform to use (optional)
+   - initialBuildNumber: sets the build number to given value if no build is in current train
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+
+ - returns: Integer representation of the latest build number uploaded to TestFlight. Example: 2
+
+ Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC.
+ Fetches the most recent build number from TestFlight based on the version number. Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC.
+*/
 @discardableResult func latestTestflightBuildNumber(live: Bool = false,
                                                     appIdentifier: String,
                                                     username: String,
@@ -2143,6 +4093,16 @@ func jira(url: String,
                                                                                                                 RubyCommand.Argument(name: "team_name", value: teamName)])
   return parseInt(fromString: runner.executeCommand(command))
 }
+
+/**
+ Generates coverage data using lcov
+
+ - parameters:
+   - projectName: Name of the project
+   - scheme: Scheme of the project
+   - arch: The build arch where will search .gcda files
+   - outputDir: The output directory that coverage data will be stored. If not passed will use coverage_reports as default value
+*/
 func lcov(projectName: String,
           scheme: String,
           arch: String = "i386",
@@ -2153,6 +4113,28 @@ func lcov(projectName: String,
                                                                                       RubyCommand.Argument(name: "output_dir", value: outputDir)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Send a success/error message to an email group
+
+ - parameters:
+   - mailgunSandboxDomain: Mailgun sandbox domain postmaster for your mail. Please use postmaster instead
+   - mailgunSandboxPostmaster: Mailgun sandbox domain postmaster for your mail. Please use postmaster instead
+   - mailgunApikey: Mailgun apikey for your mail. Please use postmaster instead
+   - postmaster: Mailgun sandbox domain postmaster for your mail
+   - apikey: Mailgun apikey for your mail
+   - to: Destination of your mail
+   - from: Mailgun sender name
+   - message: Message of your mail
+   - subject: Subject of your mail
+   - success: Was this build successful? (true/false)
+   - appLink: App Release link
+   - ciBuildLink: CI Build Link
+   - templatePath: Mail HTML template
+   - replyTo: Mail Reply to
+   - attachment: Mail Attachment filenames, either an array or just one string
+   - customPlaceholders: Placeholders for template given as a hash
+*/
 func mailgun(mailgunSandboxDomain: String? = nil,
              mailgunSandboxPostmaster: String? = nil,
              mailgunApikey: String? = nil,
@@ -2187,14 +4169,62 @@ func mailgun(mailgunSandboxDomain: String? = nil,
                                                                                          RubyCommand.Argument(name: "custom_placeholders", value: customPlaceholders)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Generate a changelog using the Changes section from the current Jenkins build
+
+ - parameters:
+   - fallbackChangelog: Fallback changelog if there is not one on Jenkins, or it couldn't be read
+   - includeCommitBody: Include the commit body along with the summary
+
+ This is useful when deploying automated builds. The changelog from Jenkins lists all the commit messages since the last build.
+*/
 func makeChangelogFromJenkins(fallbackChangelog: String = "",
                               includeCommitBody: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "make_changelog_from_jenkins", className: nil, args: [RubyCommand.Argument(name: "fallback_changelog", value: fallbackChangelog),
                                                                                                              RubyCommand.Argument(name: "include_commit_body", value: includeCommitBody)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `sync_code_signing` action
+
+ - parameters:
+   - type: Define the profile type, can be appstore, adhoc, development, enterprise
+   - readonly: Only fetch existing certificates and profiles, don't generate new ones
+   - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
+   - skipProvisioningProfiles: Skip syncing provisioning profiles
+   - appIdentifier: The bundle identifier(s) of your app (comma-separated)
+   - username: Your Apple ID Username
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+   - storageMode: Define where you want to store your certificates
+   - gitUrl: URL to the git repo containing all the certificates
+   - gitBranch: Specific git branch to use
+   - gitFullName: git user full name to commit
+   - gitUserEmail: git user email to commit
+   - shallowClone: Make a shallow clone of the repository (truncate the history to 1 revision)
+   - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
+   - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
+   - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
+   - googleCloudKeysFile: Path to the gc_keys.json file
+   - googleCloudProjectId: ID of the Google Cloud project to use for authentication
+   - keychainName: Keychain the items should be imported to
+   - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
+   - force: Renew the provisioning profiles every time you run match
+   - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile type 'appstore'
+   - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
+   - skipDocs: Skip generation of a README.md for the created git repository
+   - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos)
+   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - outputPath: Path in which to export certificates, key and profile
+   - verbose: Print out extra information and all commands
+
+ More information: https://docs.fastlane.tools/actions/match/
+*/
 func match(type: Any = matchfile.type,
            readonly: Bool = matchfile.readonly,
+           generateAppleCerts: Bool = matchfile.generateAppleCerts,
            skipProvisioningProfiles: Bool = matchfile.skipProvisioningProfiles,
            appIdentifier: [String] = matchfile.appIdentifier,
            username: Any = matchfile.username,
@@ -2207,6 +4237,7 @@ func match(type: Any = matchfile.type,
            gitUserEmail: Any? = matchfile.gitUserEmail,
            shallowClone: Bool = matchfile.shallowClone,
            cloneBranchDirectly: Bool = matchfile.cloneBranchDirectly,
+           gitBasicAuthorization: Any? = matchfile.gitBasicAuthorization,
            googleCloudBucketName: Any? = matchfile.googleCloudBucketName,
            googleCloudKeysFile: Any? = matchfile.googleCloudKeysFile,
            googleCloudProjectId: Any? = matchfile.googleCloudProjectId,
@@ -2222,6 +4253,7 @@ func match(type: Any = matchfile.type,
            verbose: Bool = matchfile.verbose) {
   let command = RubyCommand(commandID: "", methodName: "match", className: nil, args: [RubyCommand.Argument(name: "type", value: type),
                                                                                        RubyCommand.Argument(name: "readonly", value: readonly),
+                                                                                       RubyCommand.Argument(name: "generate_apple_certs", value: generateAppleCerts),
                                                                                        RubyCommand.Argument(name: "skip_provisioning_profiles", value: skipProvisioningProfiles),
                                                                                        RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                        RubyCommand.Argument(name: "username", value: username),
@@ -2234,6 +4266,7 @@ func match(type: Any = matchfile.type,
                                                                                        RubyCommand.Argument(name: "git_user_email", value: gitUserEmail),
                                                                                        RubyCommand.Argument(name: "shallow_clone", value: shallowClone),
                                                                                        RubyCommand.Argument(name: "clone_branch_directly", value: cloneBranchDirectly),
+                                                                                       RubyCommand.Argument(name: "git_basic_authorization", value: gitBasicAuthorization),
                                                                                        RubyCommand.Argument(name: "google_cloud_bucket_name", value: googleCloudBucketName),
                                                                                        RubyCommand.Argument(name: "google_cloud_keys_file", value: googleCloudKeysFile),
                                                                                        RubyCommand.Argument(name: "google_cloud_project_id", value: googleCloudProjectId),
@@ -2249,10 +4282,30 @@ func match(type: Any = matchfile.type,
                                                                                        RubyCommand.Argument(name: "verbose", value: verbose)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Verifies the minimum fastlane version required
+
+ Add this to your `Fastfile` to require a certain version of _fastlane_.
+ Use it if you use an action that just recently came out and you need it.
+*/
 func minFastlaneVersion() {
   let command = RubyCommand(commandID: "", methodName: "min_fastlane_version", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Modifies the services of the app created on Developer Portal
+
+ - parameters:
+   - username: Your Apple ID Username
+   - appIdentifier: App Identifier (Bundle ID, e.g. com.krausefx.app)
+   - services: Array with Spaceship App Services (e.g. access_wifi: (on|off)(:on|:off)(true|false), app_group: (on|off)(:on|:off)(true|false), apple_pay: (on|off)(:on|:off)(true|false), associated_domains: (on|off)(:on|:off)(true|false), auto_fill_credential: (on|off)(:on|:off)(true|false), data_protection: (complete|unlessopen|untilfirstauth)(:on|:off)(true|false), game_center: (on|off)(:on|:off)(true|false), health_kit: (on|off)(:on|:off)(true|false), home_kit: (on|off)(:on|:off)(true|false), hotspot: (on|off)(:on|:off)(true|false), icloud: (legacy|cloudkit)(:on|:off)(true|false), in_app_purchase: (on|off)(:on|:off)(true|false), inter_app_audio: (on|off)(:on|:off)(true|false), multipath: (on|off)(:on|:off)(true|false), network_extension: (on|off)(:on|:off)(true|false), nfc_tag_reading: (on|off)(:on|:off)(true|false), personal_vpn: (on|off)(:on|:off)(true|false), passbook: (on|off)(:on|:off)(true|false), push_notification: (on|off)(:on|:off)(true|false), siri_kit: (on|off)(:on|:off)(true|false), vpn_configuration: (on|off)(:on|:off)(true|false), wallet: (on|off)(:on|:off)(true|false), wireless_accessory: (on|off)(:on|:off)(true|false))
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+
+ The options are the same as `:enable_services` in the [produce action](https://docs.fastlane.tools/actions/produce/#parameters_1)
+*/
 func modifyServices(username: String,
                     appIdentifier: String,
                     services: [String : Any] = [:],
@@ -2265,6 +4318,29 @@ func modifyServices(username: String,
                                                                                                  RubyCommand.Argument(name: "team_name", value: teamName)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload a file to [Sonatype Nexus platform](https://www.sonatype.com)
+
+ - parameters:
+   - file: File to be uploaded to Nexus
+   - repoId: Nexus repository id e.g. artefacts
+   - repoGroupId: Nexus repository group id e.g. com.company
+   - repoProjectName: Nexus repository commandect name. Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed
+   - repoProjectVersion: Nexus repository commandect version
+   - repoClassifier: Nexus repository artifact classifier (optional)
+   - endpoint: Nexus endpoint e.g. http://nexus:8081
+   - mountPath: Nexus mount path (Nexus 3 instances have this configured as empty by default)
+   - username: Nexus username
+   - password: Nexus password
+   - sslVerify: Verify SSL
+   - nexusVersion: Nexus major version
+   - verbose: Make detailed output
+   - proxyUsername: Proxy username
+   - proxyPassword: Proxy password
+   - proxyAddress: Proxy address
+   - proxyPort: Proxy port
+*/
 func nexusUpload(file: String,
                  repoId: String,
                  repoGroupId: String,
@@ -2301,6 +4377,21 @@ func nexusUpload(file: String,
                                                                                               RubyCommand.Argument(name: "proxy_port", value: proxyPort)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Display a macOS notification with custom message and title
+
+ - parameters:
+   - title: The title to display in the notification
+   - subtitle: A subtitle to display in the notification
+   - message: The message to display in the notification
+   - sound: The name of a sound to play when the notification appears (names are listed in Sound Preferences)
+   - activate: Bundle identifier of application to be opened when the notification is clicked
+   - appIcon: The URL of an image to display instead of the application icon (Mavericks+ only)
+   - contentImage: The URL of an image to display attached to the notification (Mavericks+ only)
+   - open: URL of the resource to be opened when the notification is clicked
+   - execute: Shell command to run when the notification is clicked
+*/
 func notification(title: String = "fastlane",
                   subtitle: String? = nil,
                   message: String,
@@ -2321,14 +4412,55 @@ func notification(title: String = "fastlane",
                                                                                               RubyCommand.Argument(name: "execute", value: execute)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Shows a macOS notification - use `notification` instead
+*/
 func notify() {
   let command = RubyCommand(commandID: "", methodName: "notify", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Return the number of commits in current git branch
+
+ - parameter all: Returns number of all commits instead of current branch
+
+ - returns: The total number of all commits in current git branch
+
+ You can use this action to get the number of commits of this branch. This is useful if you want to set the build number to the number of commits. See `fastlane actions number_of_commits` for more details.
+*/
 @discardableResult func numberOfCommits(all: Any? = nil) -> Int {
   let command = RubyCommand(commandID: "", methodName: "number_of_commits", className: nil, args: [RubyCommand.Argument(name: "all", value: all)])
   return parseInt(fromString: runner.executeCommand(command))
 }
+
+/**
+ Lints implementation files with OCLint
+
+ - parameters:
+   - oclintPath: The path to oclint binary
+   - compileCommands: The json compilation database, use xctool reporter 'json-compilation-database'
+   - selectReqex: Select all files matching this reqex
+   - selectRegex: Select all files matching this regex
+   - excludeRegex: Exclude all files matching this regex
+   - reportType: The type of the report (default: html)
+   - reportPath: The reports file path
+   - listEnabledRules: List enabled rules
+   - rc: Override the default behavior of rules
+   - thresholds: List of rule thresholds to override the default behavior of rules
+   - enableRules: List of rules to pick explicitly
+   - disableRules: List of rules to disable
+   - maxPriority1: The max allowed number of priority 1 violations
+   - maxPriority2: The max allowed number of priority 2 violations
+   - maxPriority3: The max allowed number of priority 3 violations
+   - enableClangStaticAnalyzer: Enable Clang Static Analyzer, and integrate results into OCLint report
+   - enableGlobalAnalysis: Compile every source, and analyze across global contexts (depends on number of source files, could results in high memory load)
+   - allowDuplicatedViolations: Allow duplicated violations in the OCLint report
+   - extraArg: Additional argument to append to the compiler command line
+
+ Run the static analyzer tool [OCLint](http://oclint.org) for your project. You need to have a `compile_commands.json` file in your _fastlane_ directory or pass a path to your file.
+*/
 func oclint(oclintPath: String = "oclint",
             compileCommands: String = "compile_commands.json",
             selectReqex: Any? = nil,
@@ -2369,14 +4501,32 @@ func oclint(oclintPath: String = "oclint",
                                                                                         RubyCommand.Argument(name: "extra_arg", value: extraArg)])
   _ = runner.executeCommand(command)
 }
-func onesignal(authToken: String,
-               appName: String,
+
+/**
+ Create or update a new [OneSignal](https://onesignal.com/) application
+
+ - parameters:
+   - appId: OneSignal App ID. Setting this updates an existing app
+   - authToken: OneSignal Authorization Key
+   - appName: OneSignal App Name. This is required when creating an app (in other words, when `:app_id` is not set, and optional when updating an app
+   - androidToken: ANDROID GCM KEY
+   - androidGcmSenderId: GCM SENDER ID
+   - apnsP12: APNS P12 File (in .p12 format)
+   - apnsP12Password: APNS P12 password
+   - apnsEnv: APNS environment
+
+ You can use this action to automatically create or update a OneSignal application. You can also upload a `.p12` with password, a GCM key, or both.
+*/
+func onesignal(appId: String? = nil,
+               authToken: String,
+               appName: String? = nil,
                androidToken: String? = nil,
                androidGcmSenderId: String? = nil,
                apnsP12: String? = nil,
                apnsP12Password: String? = nil,
                apnsEnv: String = "production") {
-  let command = RubyCommand(commandID: "", methodName: "onesignal", className: nil, args: [RubyCommand.Argument(name: "auth_token", value: authToken),
+  let command = RubyCommand(commandID: "", methodName: "onesignal", className: nil, args: [RubyCommand.Argument(name: "app_id", value: appId),
+                                                                                           RubyCommand.Argument(name: "auth_token", value: authToken),
                                                                                            RubyCommand.Argument(name: "app_name", value: appName),
                                                                                            RubyCommand.Argument(name: "android_token", value: androidToken),
                                                                                            RubyCommand.Argument(name: "android_gcm_sender_id", value: androidGcmSenderId),
@@ -2385,14 +4535,60 @@ func onesignal(authToken: String,
                                                                                            RubyCommand.Argument(name: "apns_env", value: apnsEnv)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This will prevent reports from being uploaded when _fastlane_ crashes
+
+ _fastlane_ doesn't have crash reporting any more. Feel free to remove `opt_out_crash_reporting` from your Fastfile.
+*/
 func optOutCrashReporting() {
   let command = RubyCommand(commandID: "", methodName: "opt_out_crash_reporting", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This will stop uploading the information which actions were run
+
+ By default, _fastlane_ will track what actions are being used. No personal/sensitive information is recorded.
+ Learn more at [https://docs.fastlane.tools/#metrics](https://docs.fastlane.tools/#metrics).
+ Add `opt_out_usage` at the top of your Fastfile to disable metrics collection.
+*/
 func optOutUsage() {
   let command = RubyCommand(commandID: "", methodName: "opt_out_usage", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `get_push_certificate` action
+
+ - parameters:
+   - development: Renew the development push certificate instead of the production one
+   - websitePush: Create a Website Push certificate
+   - generateP12: Generate a p12 file additionally to a PEM file
+   - activeDaysLimit: If the current certificate is active for less than this number of days, generate a new one
+   - force: Create a new push certificate, even if the current one is active for 30 (or PEM_ACTIVE_DAYS_LIMIT) more days
+   - savePrivateKey: Set to save the private RSA key
+   - appIdentifier: The bundle identifier of your app
+   - username: Your Apple ID Username
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+   - p12Password: The password that is used for your p12 file
+   - pemName: The file name of the generated .pem file
+   - outputPath: The path to a directory in which all certificates and private keys should be stored
+   - newProfile: Block that is called if there is a new profile
+
+ Additionally to the available options, you can also specify a block that only gets executed if a new profile was created. You can use it to upload the new profile to your server.
+ Use it like this:|
+ |
+ ```ruby|
+ get_push_certificate(|
+   new_profile: proc do|
+     # your upload code|
+   end|
+ )|
+ ```|
+ >|
+*/
 func pem(development: Bool = false,
          websitePush: Bool = false,
          generateP12: Bool = true,
@@ -2423,6 +4619,45 @@ func pem(development: Bool = false,
                                                                                      RubyCommand.Argument(name: "new_profile", value: newProfile)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `upload_to_testflight` action
+
+ - parameters:
+   - username: Your Apple ID Username
+   - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
+   - appPlatform: The platform to use (optional)
+   - appleId: Apple ID property in the App Information section in App Store Connect
+   - ipa: Path to the ipa file to upload
+   - demoAccountRequired: Do you need a demo account when Apple does review?
+   - betaAppReviewInfo: Beta app review information for contact info and demo account
+   - localizedAppInfo: Localized beta app test info for description, feedback email, marketing url, and privacy policy
+   - betaAppDescription: Provide the 'Beta App Description' when uploading a new build
+   - betaAppFeedbackEmail: Provide the beta app email when uploading a new build
+   - localizedBuildInfo: Localized beta app test info for what's new
+   - changelog: Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog
+   - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
+   - skipWaitingForBuildProcessing: Don't wait for the build to process. If set to true, the changelog won't be set, `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan)
+   - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
+   - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
+   - distributeExternal: Should the build be distributed to external testers?
+   - notifyExternalTesters: Should notify external testers?
+   - firstName: The tester's first name
+   - lastName: The tester's last name
+   - email: The tester's email
+   - testersFilePath: Path to a CSV file of testers
+   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","Team 2"`
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+   - devPortalTeamId: The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!
+   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - waitProcessingInterval: Interval in seconds to wait for App Store Connect processing
+   - waitForUploadedBuild: **DEPRECATED!** No longer needed with the transition over to the App Store Connect API - Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used
+   - rejectBuildWaitingForReview: Expire previous if it's 'waiting for review'
+
+ More details can be found on https://docs.fastlane.tools/actions/pilot/.
+ This integration will only do the TestFlight upload.
+*/
 func pilot(username: String,
            appIdentifier: String? = nil,
            appPlatform: String = "ios",
@@ -2485,6 +4720,15 @@ func pilot(username: String,
                                                                                        RubyCommand.Argument(name: "reject_build_waiting_for_review", value: rejectBuildWaitingForReview)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ [31mNo description provided[0m
+
+ - parameters:
+   - outputPath: 
+   - templatePath: 
+   - cachePath: 
+*/
 func pluginScores(outputPath: String,
                   templatePath: String,
                   cachePath: String) {
@@ -2493,6 +4737,33 @@ func pluginScores(outputPath: String,
                                                                                                RubyCommand.Argument(name: "cache_path", value: cachePath)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Pod lib lint
+
+ - parameters:
+   - useBundleExec: Use bundle exec when there is a Gemfile presented
+   - podspec: Path of spec to lint
+   - verbose: Allow output detail in console
+   - allowWarnings: Allow warnings during pod lint
+   - sources: The sources of repos you want the pod spec to lint with, separated by commas
+   - subspec: A specific subspec to lint instead of the entire spec
+   - includePodspecs: A Glob of additional ancillary podspecs which are used for linting via :path (available since cocoapods >= 1.7)
+   - externalPodspecs: A Glob of additional ancillary podspecs which are used for linting via :podspec. If there are --include-podspecs, then these are removed from them (available since cocoapods >= 1.7)
+   - swiftVersion: The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file
+   - useLibraries: Lint uses static libraries to install the spec
+   - useModularHeaders: Lint using modular libraries (available since cocoapods >= 1.6)
+   - failFast: Lint stops on the first failing platform or subspec
+   - private: Lint skips checks that apply only to public specs
+   - quick: Lint skips checks that would require to download and build the spec
+   - noClean: Lint leaves the build directory intact for inspection
+   - noSubspecs: Lint skips validation of subspecs
+   - platforms: Lint against specific platforms (defaults to all platforms supported by the podspec). Multiple platforms must be comma-delimited (available since cocoapods >= 1.6)
+   - skipImportValidation: Lint skips validating that the pod can be imported (available since cocoapods >= 1.3)
+   - skipTests: Lint skips building and running tests during validation (available since cocoapods >= 1.3)
+
+ Test the syntax of your Podfile by linting the pod against the files of its directory
+*/
 func podLibLint(useBundleExec: Bool = true,
                 podspec: String? = nil,
                 verbose: Bool? = nil,
@@ -2533,6 +4804,23 @@ func podLibLint(useBundleExec: Bool = true,
                                                                                               RubyCommand.Argument(name: "skip_tests", value: skipTests)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Push a Podspec to Trunk or a private repository
+
+ - parameters:
+   - useBundleExec: Use bundle exec when there is a Gemfile presented
+   - path: The Podspec you want to push
+   - repo: The repo you want to push. Pushes to Trunk by default
+   - allowWarnings: Allow warnings during pod push
+   - useLibraries: Allow lint to use static libraries to install the spec
+   - sources: The sources of repos you want the pod spec to lint with, separated by commas
+   - swiftVersion: The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file
+   - skipImportValidation: Lint skips validating that the pod can be imported
+   - skipTests: Lint skips building and running tests during validation
+   - verbose: Show more debugging information
+   - useModularHeaders: Use modular headers option during validation
+*/
 func podPush(useBundleExec: Bool = false,
              path: String? = nil,
              repo: String? = nil,
@@ -2542,7 +4830,8 @@ func podPush(useBundleExec: Bool = false,
              swiftVersion: String? = nil,
              skipImportValidation: Bool? = nil,
              skipTests: Bool? = nil,
-             verbose: Bool = false) {
+             verbose: Bool = false,
+             useModularHeaders: Bool? = nil) {
   let command = RubyCommand(commandID: "", methodName: "pod_push", className: nil, args: [RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec),
                                                                                           RubyCommand.Argument(name: "path", value: path),
                                                                                           RubyCommand.Argument(name: "repo", value: repo),
@@ -2552,9 +4841,27 @@ func podPush(useBundleExec: Bool = false,
                                                                                           RubyCommand.Argument(name: "swift_version", value: swiftVersion),
                                                                                           RubyCommand.Argument(name: "skip_import_validation", value: skipImportValidation),
                                                                                           RubyCommand.Argument(name: "skip_tests", value: skipTests),
-                                                                                          RubyCommand.Argument(name: "verbose", value: verbose)])
+                                                                                          RubyCommand.Argument(name: "verbose", value: verbose),
+                                                                                          RubyCommand.Argument(name: "use_modular_headers", value: useModularHeaders)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Creates or updates an item within your Podio app
+
+ - parameters:
+   - clientId: Client ID for Podio API (see https://developers.podio.com/api-key)
+   - clientSecret: Client secret for Podio API (see https://developers.podio.com/api-key)
+   - appId: App ID of the app you intend to authenticate with (see https://developers.podio.com/authentication/app_auth)
+   - appToken: App token of the app you intend to authenticate with (see https://developers.podio.com/authentication/app_auth)
+   - identifyingField: String specifying the field key used for identification of an item
+   - identifyingValue: String uniquely specifying an item within the app
+   - otherFields: Dictionary of your app fields. Podio supports several field types, see https://developers.podio.com/doc/items
+
+ Use this action to create or update an item within your Podio app (see [https://help.podio.com/hc/en-us/articles/201019278-Creating-apps-](https://help.podio.com/hc/en-us/articles/201019278-Creating-apps-)).
+ Pass in dictionary with field keys and their values.
+ Field key is located under `Modify app` -> `Advanced` -> `Developer` -> `External ID` (see [https://developers.podio.com/examples/items](https://developers.podio.com/examples/items)).
+*/
 func podioItem(clientId: String,
                clientSecret: String,
                appId: String,
@@ -2571,6 +4878,23 @@ func podioItem(clientId: String,
                                                                                             RubyCommand.Argument(name: "other_fields", value: otherFields)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `check_app_store_metadata` action
+
+ - parameters:
+   - appIdentifier: The bundle identifier of your app
+   - username: Your Apple ID Username
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+   - defaultRuleLevel: The default rule level unless otherwise configured
+   - includeInAppPurchases: Should check in-app purchases?
+   - freeStuffInIap: using text indicating that your IAP is free
+
+ - returns: true if precheck passes, else, false
+
+ More information: https://fastlane.tools/precheck
+*/
 func precheck(appIdentifier: Any = precheckfile.appIdentifier,
               username: Any = precheckfile.username,
               teamId: Any? = precheckfile.teamId,
@@ -2587,10 +4911,44 @@ func precheck(appIdentifier: Any = precheckfile.appIdentifier,
                                                                                           RubyCommand.Argument(name: "free_stuff_in_iap", value: freeStuffInIap)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `puts` action
+
+ - parameter message: Message to be printed out
+*/
 func println(message: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "println", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `create_app_online` action
+
+ - parameters:
+   - username: Your Apple ID Username
+   - appIdentifier: App Identifier (Bundle ID, e.g. com.krausefx.app)
+   - bundleIdentifierSuffix: App Identifier Suffix (Ignored if App Identifier does not end with .*)
+   - appName: App Name
+   - appVersion: Initial version number (e.g. '1.0')
+   - sku: SKU Number (e.g. '1234')
+   - platform: The platform to use (optional)
+   - language: Primary Language (e.g. 'English', 'German')
+   - companyName: The name of your company. Only required if it's the first app you create
+   - skipItc: Skip the creation of the app on App Store Connect
+   - itcUsers: Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles
+   - enabledFeatures: **DEPRECATED!** Please use `enable_services` instead - Array with Spaceship App Services
+   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), data_protection: (complete|unlessopen|untilfirstauth), game_center: (on|off), health_kit: (on|off), home_kit: (on|off), hotspot: (on|off), icloud: (legacy|cloudkit), in_app_purchase: (on|off), inter_app_audio: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), siri_kit: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off))
+   - skipDevcenter: Skip the creation of the app on the Apple Developer Portal
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+   - itcTeamId: The ID of your App Store Connect team if you're in multiple teams
+   - itcTeamName: The name of your App Store Connect team if you're in multiple teams
+
+ Create new apps on App Store Connect and Apple Developer Portal via _produce_.
+ If the app already exists, `create_app_online` will not do anything.
+ For more information about _produce_, visit its documentation page: [https://docs.fastlane.tools/actions/produce/](https://docs.fastlane.tools/actions/produce/).
+*/
 func produce(username: String,
              appIdentifier: String,
              bundleIdentifierSuffix: String? = nil,
@@ -2629,6 +4987,21 @@ func produce(username: String,
                                                                                          RubyCommand.Argument(name: "itc_team_name", value: itcTeamName)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Ask the user for a value or for confirmation
+
+ - parameters:
+   - text: The text that will be displayed to the user
+   - ciInput: The default text that will be used when being executed on a CI service
+   - boolean: Is that a boolean question (yes/no)? This will add (y/n) at the end
+   - secureText: Is that a secure text (yes/no)?
+   - multiLineEndKeyword: Enable multi-line inputs by providing an end text (e.g. 'END') which will stop the user input
+
+ You can use `prompt` to ask the user for a value or to just let the user confirm the next step.
+ When this is executed on a CI service, the passed `ci_input` value will be returned.
+ This action also supports multi-line inputs using the `multi_line_end_keyword` option.
+*/
 @discardableResult func prompt(text: String = "Please enter some text: ",
                                ciInput: String = "",
                                boolean: Bool = false,
@@ -2641,6 +5014,17 @@ func produce(username: String,
                                                                                         RubyCommand.Argument(name: "multi_line_end_keyword", value: multiLineEndKeyword)])
   return runner.executeCommand(command)
 }
+
+/**
+ Push local tags to the remote - this will only push tags
+
+ - parameters:
+   - force: Force push to remote
+   - remote: The remote to push tags to
+   - tag: The tag to push to remote
+
+ If you only want to push the tags and nothing else, you can use the `push_git_tags` action
+*/
 func pushGitTags(force: Bool = false,
                  remote: String = "origin",
                  tag: String? = nil) {
@@ -2649,6 +5033,23 @@ func pushGitTags(force: Bool = false,
                                                                                                RubyCommand.Argument(name: "tag", value: tag)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Push local changes to the remote branch
+
+ - parameters:
+   - localBranch: The local branch to push from. Defaults to the current branch
+   - remoteBranch: The remote branch to push to. Defaults to the local branch
+   - force: Force push to remote
+   - forceWithLease: Force push with lease to remote
+   - tags: Whether tags are pushed to remote
+   - remote: The remote to push to
+   - noVerify: Whether or not to use --no-verify
+   - setUpstream: Whether or not to use --set-upstream
+
+ Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.
+ If this is a new branch, use the `set_upstream` option to set the remote branch as upstream.
+*/
 func pushToGitRemote(localBranch: String? = nil,
                      remoteBranch: String? = nil,
                      force: Bool = false,
@@ -2667,18 +5068,56 @@ func pushToGitRemote(localBranch: String? = nil,
                                                                                                     RubyCommand.Argument(name: "set_upstream", value: setUpstream)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Prints out the given text
+
+ - parameter message: Message to be printed out
+*/
 func puts(message: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "puts", className: nil, args: [RubyCommand.Argument(name: "message", value: message)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Loads a CocoaPods spec as JSON
+
+ - parameter path: Path to the podspec to be read
+
+ This can be used for only specifying a version string in your podspec - and during your release process you'd read it from the podspec by running `version = read_podspec['version']` at the beginning of your lane.
+ Loads the specified (or the first found) podspec in the folder as JSON, so that you can inspect its `version`, `files` etc.
+ This can be useful when basing your release process on the version string only stored in one place - in the podspec.
+ As one of the first steps you'd read the podspec and its version and the rest of the workflow can use that version string (when e.g. creating a new git tag or a GitHub Release).
+*/
 @discardableResult func readPodspec(path: String) -> [String : String] {
   let command = RubyCommand(commandID: "", methodName: "read_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
   return parseDictionary(fromString: runner.executeCommand(command))
 }
+
+/**
+ Recreate not shared Xcode project schemes
+
+ - parameter project: The Xcode project
+*/
 func recreateSchemes(project: String) {
   let command = RubyCommand(commandID: "", methodName: "recreate_schemes", className: nil, args: [RubyCommand.Argument(name: "project", value: project)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Registers a new device to the Apple Dev Portal
+
+ - parameters:
+   - name: Provide the name of the device to register as
+   - udid: Provide the UDID of the device to register as
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+   - username: Optional: Your Apple ID
+
+ This will register an iOS device with the Developer Portal so that you can include it in your provisioning profiles.
+ This is an optimistic action, in that it will only ever add a device to the member center. If the device has already been registered within the member center, it will be left alone in the member center.
+ The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `:username` option.
+*/
 @discardableResult func registerDevice(name: String,
                                        udid: String,
                                        teamId: String? = nil,
@@ -2691,6 +5130,22 @@ func recreateSchemes(project: String) {
                                                                                                  RubyCommand.Argument(name: "username", value: username)])
   return runner.executeCommand(command)
 }
+
+/**
+ Registers new devices to the Apple Dev Portal
+
+ - parameters:
+   - devices: A hash of devices, with the name as key and the UDID as value
+   - devicesFile: Provide a path to a file with the devices to register. For the format of the file see the examples
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+   - username: Optional: Your Apple ID
+   - platform: The platform to use (optional)
+
+ This will register iOS/Mac devices with the Developer Portal so that you can include them in your provisioning profiles.
+ This is an optimistic action, in that it will only ever add new devices to the member center, and never remove devices. If a device which has already been registered within the member center is not passed to this action, it will be left alone in the member center and continue to work.
+ The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable `ENV['DELIVER_USER']`.
+*/
 func registerDevices(devices: [String : Any]? = nil,
                      devicesFile: String? = nil,
                      teamId: String? = nil,
@@ -2705,6 +5160,24 @@ func registerDevices(devices: [String : Any]? = nil,
                                                                                                   RubyCommand.Argument(name: "platform", value: platform)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Resets git repo to a clean state by discarding uncommitted changes
+
+ - parameters:
+   - files: Array of files the changes should be discarded. If not given, all files will be discarded
+   - force: Skip verifying of previously clean state of repo. Only recommended in combination with `files` option
+   - skipClean: Skip 'git clean' to avoid removing untracked files like `.env`
+   - disregardGitignore: Setting this to true will clean the whole repository, ignoring anything in your local .gitignore. Set this to true if you want the equivalent of a fresh clone, and for all untracked and ignore files to also be removed
+   - exclude: You can pass a string, or array of, file pattern(s) here which you want to have survive the cleaning process, and remain on disk, e.g. to leave the `artifacts` directory you would specify `exclude: 'artifacts'`. Make sure this pattern is also in your gitignore! See the gitignore documentation for info on patterns
+
+ This action will reset your git repo to a clean state, discarding any uncommitted and untracked changes. Useful in case you need to revert the repo back to a clean state, e.g. after running _fastlane_.
+ Untracked files like `.env` will also be deleted, unless `:skip_clean` is true.
+ It's a pretty drastic action so it comes with a sort of safety latch. It will only proceed with the reset if this condition is met:|
+ |
+ >- You have called the `ensure_git_status_clean` action prior to calling this action. This ensures that your repo started off in a clean state, so the only things that will get destroyed by this action are files that are created as a byproduct of the fastlane run.|
+ >|
+*/
 func resetGitRepo(files: Any? = nil,
                   force: Bool = false,
                   skipClean: Bool = false,
@@ -2717,12 +5190,37 @@ func resetGitRepo(files: Any? = nil,
                                                                                                 RubyCommand.Argument(name: "exclude", value: exclude)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Shutdown and reset running simulators
+
+ - parameters:
+   - ios: **DEPRECATED!** Use `:os_versions` instead - Which OS versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators
+   - osVersions: Which OS versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators
+*/
 func resetSimulatorContents(ios: [String]? = nil,
                             osVersions: [String]? = nil) {
   let command = RubyCommand(commandID: "", methodName: "reset_simulator_contents", className: nil, args: [RubyCommand.Argument(name: "ios", value: ios),
                                                                                                           RubyCommand.Argument(name: "os_versions", value: osVersions)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Codesign an existing ipa file
+
+ - parameters:
+   - ipa: Path to the ipa file to resign. Optional if you use the _gym_ or _xcodebuild_ action
+   - signingIdentity: Code signing identity to use. e.g. `iPhone Distribution: Luka Mirosevic (0123456789)`
+   - entitlements: Path to the entitlement file to use, e.g. `myApp/MyApp.entitlements`
+   - provisioningProfile: Path to your provisioning_profile. Optional if you use _sigh_
+   - version: Version number to force resigned ipa to use. Updates both `CFBundleShortVersionString` and `CFBundleVersion` values in `Info.plist`. Applies for main app and all nested apps or extensions
+   - displayName: Display name to force resigned ipa to use
+   - shortVersion: Short version string to force resigned ipa to use (`CFBundleShortVersionString`)
+   - bundleVersion: Bundle version to force resigned ipa to use (`CFBundleVersion`)
+   - bundleId: Set new bundle ID during resign (`CFBundleIdentifier`)
+   - useAppEntitlements: Extract app bundle codesigning entitlements and combine with entitlements from new provisionin profile
+   - keychainPath: Provide a path to a keychain file that should be used by `/usr/bin/codesign`
+*/
 func resign(ipa: String,
             signingIdentity: String,
             entitlements: String? = nil,
@@ -2747,18 +5245,45 @@ func resign(ipa: String,
                                                                                         RubyCommand.Argument(name: "keychain_path", value: keychainPath)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This action restore your file that was backuped with the `backup_file` action
+
+ - parameter path: Original file name you want to restore
+*/
 func restoreFile(path: String) {
   let command = RubyCommand(commandID: "", methodName: "restore_file", className: nil, args: [RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Outputs ascii-art for a rocket 🚀
+
+ Print an ascii Rocket :rocket:. Useful after using _crashlytics_ or _pilot_ to indicate that your new build has been shipped to outer-space.
+*/
 @discardableResult func rocket() -> String {
   let command = RubyCommand(commandID: "", methodName: "rocket", className: nil, args: [])
   return runner.executeCommand(command)
 }
+
+/**
+ Run tests using rspec
+*/
 func rspec() {
   let command = RubyCommand(commandID: "", methodName: "rspec", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Rsync files from :source to :destination
+
+ - parameters:
+   - extra: Port
+   - source: source file/folder
+   - destination: destination file/folder
+
+ A wrapper around `rsync`, which is a tool that lets you synchronize files, including permissions and so on. For a more detailed information about `rsync`, please see [rsync(1) man page](https://linux.die.net/man/1/rsync).
+*/
 func rsync(extra: String = "-av",
            source: String,
            destination: String) {
@@ -2767,14 +5292,87 @@ func rsync(extra: String = "-av",
                                                                                        RubyCommand.Argument(name: "destination", value: destination)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Runs the code style checks
+*/
 func rubocop() {
   let command = RubyCommand(commandID: "", methodName: "rubocop", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Verifies the minimum ruby version required
+
+ Add this to your `Fastfile` to require a certain version of _ruby_.
+ Put it at the top of your `Fastfile to ensure that _fastlane_ is executed appropriately.
+*/
 func rubyVersion() {
   let command = RubyCommand(commandID: "", methodName: "ruby_version", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Easily run tests of your iOS app (via _scan_)
+
+ - parameters:
+   - workspace: Path to the workspace file
+   - project: Path to the project file
+   - scheme: The project's scheme. Make sure it's marked as `Shared`
+   - device: The name of the simulator type you want to run tests on (e.g. 'iPhone 6')
+   - devices: Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])
+   - skipDetectDevices: Should skip auto detecting of devices if none were specified
+   - forceQuitSimulator: Enabling this option will automatically killall Simulator processes before the run
+   - resetSimulator: Enabling this option will automatically erase the simulator before running the application
+   - prelaunchSimulator: Enabling this option will launch the first simulator prior to calling any xcodebuild command
+   - reinstallApp: Enabling this option will automatically uninstall the application before running it
+   - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
+   - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
+   - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - xctestrun: Run tests using the provided `.xctestrun` file
+   - toolchain: The toolchain that should be used for building the application (e.g. `com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a`)
+   - clean: Should the project be cleaned before building it?
+   - codeCoverage: Should code coverage be generated? (Xcode 7 and up)
+   - addressSanitizer: Should the address sanitizer be turned on?
+   - threadSanitizer: Should the thread sanitizer be turned on?
+   - openReport: Should the HTML report be opened when tests are completed?
+   - outputDirectory: The directory in which all reports will be stored
+   - outputStyle: Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty)
+   - outputTypes: Comma separated list of the output types (e.g. html, junit, json-compilation-database)
+   - outputFiles: Comma separated list of the output files, corresponding to the types provided by :output_types (order should match). If specifying an output type of json-compilation-database with :use_clang_report_name enabled, that option will take precedence
+   - buildlogPath: The directory where to store the raw log
+   - includeSimulatorLogs: If the logs generated by the app (e.g. using NSLog, perror, etc.) in the Simulator should be written to the output_directory
+   - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
+   - formatter: A custom xcpretty formatter to use
+   - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
+   - derivedDataPath: The directory where build products and other derived data will go
+   - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
+   - resultBundle: Should an Xcode result bundle be generated in the output directory
+   - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
+   - maxConcurrentSimulators: Constrain the number of simulator devices on which to test concurrently. Equivalent to -maximum-concurrent-test-simulator-destinations
+   - disableConcurrentTesting: Do not run test bundles in parallel on the specified destinations. Testing will occur on each destination serially. Equivalent to -disable-concurrent-testing
+   - skipBuild: Should debug build be skipped before test build?
+   - testWithoutBuilding: Test without building, requires a derived data path
+   - buildForTesting: Build for testing only, does not run tests
+   - sdk: The SDK that should be used for building the application
+   - configuration: The configuration to use when building the app. Defaults to 'Release'
+   - xcargs: Pass additional arguments to xcodebuild. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
+   - xcconfig: Use an extra XCCONFIG file to build your app
+   - slackUrl: Create an Incoming WebHook for your Slack group to post results there
+   - slackChannel: #channel or @username
+   - slackMessage: The message included with each message posted to slack
+   - slackUseWebhookConfiguredUsernameAndIcon: Use webhook's default username and icon settings? (true/false)
+   - slackUsername: Overrides the webhook's username property if slack_use_webhook_configured_username_and_icon is false
+   - slackIconUrl: Overrides the webhook's image property if slack_use_webhook_configured_username_and_icon is false
+   - skipSlack: Don't publish to slack, even when an URL is given
+   - slackOnlyOnFailure: Only post on Slack if the tests fail
+   - destination: Use only if you're a pro, use the other options instead
+   - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
+   - xcodebuildCommand: Allows for override of the default `xcodebuild` command
+   - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
+
+ More information: https://docs.fastlane.tools/actions/scan/
+*/
 func runTests(workspace: String? = nil,
               project: String? = nil,
               scheme: String? = nil,
@@ -2885,6 +5483,32 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "fail_build", value: failBuild)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Generates a plist file and uploads all to AWS S3
+
+ - parameters:
+   - ipa: .ipa file for the build 
+   - dsym: zipped .dsym package for the build 
+   - uploadMetadata: Upload relevant metadata for this build
+   - plistTemplatePath: plist template path
+   - plistFileName: uploaded plist filename
+   - htmlTemplatePath: html erb template path
+   - htmlFileName: uploaded html filename
+   - versionTemplatePath: version erb template path
+   - versionFileName: uploaded version filename
+   - accessKey: AWS Access Key ID 
+   - secretAccessKey: AWS Secret Access Key 
+   - bucket: AWS bucket name
+   - region: AWS region (for bucket creation) 
+   - path: S3 'path'. Values from Info.plist will be substituted for keys wrapped in {}  
+   - source: Optional source directory e.g. ./build 
+   - acl: Uploaded object permissions e.g public_read (default), private, public_read_write, authenticated_read 
+
+ Upload a new build to Amazon S3 to distribute the build to beta testers.
+ Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML, plist, and version files for you.
+ It is recommended to **not** store the AWS access keys in the `Fastfile`. The uploaded `version.json` file provides an easy way for apps to poll if a new update is available.
+*/
 func s3(ipa: String? = nil,
         dsym: String? = nil,
         uploadMetadata: Bool = true,
@@ -2919,12 +5543,82 @@ func s3(ipa: String? = nil,
                                                                                     RubyCommand.Argument(name: "acl", value: acl)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This action speaks the given text out loud
+
+ - parameters:
+   - text: Text to be spoken out loud (as string or array of strings)
+   - mute: If say should be muted with text printed out
+*/
 func say(text: Any,
          mute: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "say", className: nil, args: [RubyCommand.Argument(name: "text", value: text),
                                                                                      RubyCommand.Argument(name: "mute", value: mute)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `run_tests` action
+
+ - parameters:
+   - workspace: Path to the workspace file
+   - project: Path to the project file
+   - scheme: The project's scheme. Make sure it's marked as `Shared`
+   - device: The name of the simulator type you want to run tests on (e.g. 'iPhone 6')
+   - devices: Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])
+   - skipDetectDevices: Should skip auto detecting of devices if none were specified
+   - forceQuitSimulator: Enabling this option will automatically killall Simulator processes before the run
+   - resetSimulator: Enabling this option will automatically erase the simulator before running the application
+   - prelaunchSimulator: Enabling this option will launch the first simulator prior to calling any xcodebuild command
+   - reinstallApp: Enabling this option will automatically uninstall the application before running it
+   - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
+   - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
+   - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - xctestrun: Run tests using the provided `.xctestrun` file
+   - toolchain: The toolchain that should be used for building the application (e.g. `com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a`)
+   - clean: Should the project be cleaned before building it?
+   - codeCoverage: Should code coverage be generated? (Xcode 7 and up)
+   - addressSanitizer: Should the address sanitizer be turned on?
+   - threadSanitizer: Should the thread sanitizer be turned on?
+   - openReport: Should the HTML report be opened when tests are completed?
+   - outputDirectory: The directory in which all reports will be stored
+   - outputStyle: Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty)
+   - outputTypes: Comma separated list of the output types (e.g. html, junit, json-compilation-database)
+   - outputFiles: Comma separated list of the output files, corresponding to the types provided by :output_types (order should match). If specifying an output type of json-compilation-database with :use_clang_report_name enabled, that option will take precedence
+   - buildlogPath: The directory where to store the raw log
+   - includeSimulatorLogs: If the logs generated by the app (e.g. using NSLog, perror, etc.) in the Simulator should be written to the output_directory
+   - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
+   - formatter: A custom xcpretty formatter to use
+   - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
+   - derivedDataPath: The directory where build products and other derived data will go
+   - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
+   - resultBundle: Should an Xcode result bundle be generated in the output directory
+   - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
+   - maxConcurrentSimulators: Constrain the number of simulator devices on which to test concurrently. Equivalent to -maximum-concurrent-test-simulator-destinations
+   - disableConcurrentTesting: Do not run test bundles in parallel on the specified destinations. Testing will occur on each destination serially. Equivalent to -disable-concurrent-testing
+   - skipBuild: Should debug build be skipped before test build?
+   - testWithoutBuilding: Test without building, requires a derived data path
+   - buildForTesting: Build for testing only, does not run tests
+   - sdk: The SDK that should be used for building the application
+   - configuration: The configuration to use when building the app. Defaults to 'Release'
+   - xcargs: Pass additional arguments to xcodebuild. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
+   - xcconfig: Use an extra XCCONFIG file to build your app
+   - slackUrl: Create an Incoming WebHook for your Slack group to post results there
+   - slackChannel: #channel or @username
+   - slackMessage: The message included with each message posted to slack
+   - slackUseWebhookConfiguredUsernameAndIcon: Use webhook's default username and icon settings? (true/false)
+   - slackUsername: Overrides the webhook's username property if slack_use_webhook_configured_username_and_icon is false
+   - slackIconUrl: Overrides the webhook's image property if slack_use_webhook_configured_username_and_icon is false
+   - skipSlack: Don't publish to slack, even when an URL is given
+   - slackOnlyOnFailure: Only post on Slack if the tests fail
+   - destination: Use only if you're a pro, use the other options instead
+   - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
+   - xcodebuildCommand: Allows for override of the default `xcodebuild` command
+   - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
+
+ More information: https://docs.fastlane.tools/actions/scan/
+*/
 func scan(workspace: Any? = scanfile.workspace,
           project: Any? = scanfile.project,
           scheme: Any? = scanfile.scheme,
@@ -3035,6 +5729,18 @@ func scan(workspace: Any? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "fail_build", value: failBuild)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Transfer files via SCP
+
+ - parameters:
+   - username: Username
+   - password: Password
+   - host: Hostname
+   - port: Port
+   - upload: Upload
+   - download: Download
+*/
 func scp(username: String,
          password: String? = nil,
          host: String,
@@ -3049,6 +5755,31 @@ func scp(username: String,
                                                                                      RubyCommand.Argument(name: "download", value: download)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `capture_android_screenshots` action
+
+ - parameters:
+   - androidHome: Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx
+   - buildToolsVersion: The Android build tools version to use, e.g. '23.0.2'
+   - locales: A list of locales which should be used
+   - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running screengrab
+   - outputDirectory: The directory where to store the screenshots
+   - skipOpenSummary: Don't open the summary after running _screengrab_
+   - appPackageName: The package name of the app under test (e.g. com.yourcompany.yourapp)
+   - testsPackageName: The package name of the tests bundle (e.g. com.yourcompany.yourapp.test)
+   - useTestsInPackages: Only run tests in these Java packages
+   - useTestsInClasses: Only run tests in these Java classes
+   - launchArguments: Additional launch arguments
+   - testInstrumentationRunner: The fully qualified class name of your test instrumentation runner
+   - endingLocale: Return the device to this locale after running tests
+   - appApkPath: The path to the APK for the app under test
+   - testsApkPath: The path to the APK for the the tests bundle
+   - specificDevice: Use the device or emulator with the given serial number or qualifier
+   - deviceType: Type of device used for screenshots. Matches Google Play Types (phone, sevenInch, tenInch, tv, wear)
+   - exitOnTestFailure: Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary
+   - reinstallApp: Enabling this option will automatically uninstall the application before running it
+*/
 func screengrab(androidHome: Any? = screengrabfile.androidHome,
                 buildToolsVersion: Any? = screengrabfile.buildToolsVersion,
                 locales: [String] = screengrabfile.locales,
@@ -3089,12 +5820,41 @@ func screengrab(androidHome: Any? = screengrabfile.androidHome,
                                                                                             RubyCommand.Argument(name: "reinstall_app", value: reinstallApp)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Set the build number from the current repository
+
+ - parameters:
+   - useHgRevisionNumber: Use hg revision number instead of hash (ignored for non-hg repos)
+   - xcodeproj: explicitly specify which xcodeproj to use
+
+ This action will set the **build number** according to what the SCM HEAD reports.
+ Currently supported SCMs are svn (uses root revision), git-svn (uses svn revision) and git (uses short hash) and mercurial (uses short hash or revision number).
+ There is an option, `:use_hg_revision_number`, which allows to use mercurial revision number instead of hash.
+*/
 func setBuildNumberRepository(useHgRevisionNumber: Bool = false,
                               xcodeproj: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "set_build_number_repository", className: nil, args: [RubyCommand.Argument(name: "use_hg_revision_number", value: useHgRevisionNumber),
                                                                                                              RubyCommand.Argument(name: "xcodeproj", value: xcodeproj)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Set the changelog for all languages on App Store Connect
+
+ - parameters:
+   - appIdentifier: The bundle identifier of your app
+   - username: Your Apple ID Username
+   - version: The version number to create/update
+   - changelog: Changelog text that should be uploaded to App Store Connect
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+   - platform: The platform of the app (ios, appletvos, mac)
+
+ This is useful if you have only one changelog for all languages.
+ You can store the changelog in `./changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same "What's new"-text for all languages.
+ Defining the version is optional. _fastlane_ will try to automatically detect it if you don't provide one.
+*/
 func setChangelog(appIdentifier: String,
                   username: String,
                   version: String? = nil,
@@ -3111,6 +5871,29 @@ func setChangelog(appIdentifier: String,
                                                                                                RubyCommand.Argument(name: "platform", value: platform)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This will create a new release on GitHub and upload assets for it
+
+ - parameters:
+   - repositoryName: The path to your repo, e.g. 'fastlane/fastlane'
+   - serverUrl: The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')
+   - apiToken: Personal API Token for GitHub - generate one at https://github.com/settings/tokens
+   - tagName: Pass in the tag name
+   - name: Name of this release
+   - commitish: Specifies the commitish value that determines where the Git tag is created from. Can be any branch or commit SHA. Unused if the Git tag already exists. Default: the repository's default branch (usually master)
+   - description: Description of this release
+   - isDraft: Whether the release should be marked as draft
+   - isPrerelease: Whether the release should be marked as prerelease
+   - uploadAssets: Path to assets to be uploaded with the release
+
+ - returns: A hash containing all relevant information of this release
+Access things like 'html_url', 'tag_name', 'name', 'body'
+
+ Creates a new release on GitHub. You must provide your GitHub Personal token (get one from [https://github.com/settings/tokens/new](https://github.com/settings/tokens/new)), the repository name and tag name. By default, that's `master`.
+ If the tag doesn't exist, one will be created on the commit or branch passed in as commitish.
+ Out parameters provide the release's id, which can be used for later editing and the release HTML link to GitHub. You can also specify a list of assets to be uploaded to the release with the `:upload_assets` parameter.
+*/
 @discardableResult func setGithubRelease(repositoryName: String,
                                          serverUrl: String = "https://api.github.com",
                                          apiToken: String,
@@ -3133,6 +5916,17 @@ func setChangelog(appIdentifier: String,
                                                                                                     RubyCommand.Argument(name: "upload_assets", value: uploadAssets)])
   return parseDictionary(fromString: runner.executeCommand(command))
 }
+
+/**
+ Sets value to Info.plist of your project as native Ruby data structures
+
+ - parameters:
+   - key: Name of key in plist
+   - subkey: Name of subkey in plist
+   - value: Value to setup
+   - path: Path to plist file you want to update
+   - outputFileName: Path to the output file you want to generate
+*/
 func setInfoPlistValue(key: String,
                        subkey: String? = nil,
                        value: Any,
@@ -3145,6 +5939,18 @@ func setInfoPlistValue(key: String,
                                                                                                       RubyCommand.Argument(name: "output_file_name", value: outputFileName)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Sets a value for a key with cocoapods-keys
+
+ - parameters:
+   - useBundleExec: Use bundle exec when there is a Gemfile presented
+   - key: The key to be saved with cocoapods-keys
+   - value: The value to be saved with cocoapods-keys
+   - project: The project name
+
+ Adds a key to [cocoapods-keys](https://github.com/orta/cocoapods-keys)
+*/
 func setPodKey(useBundleExec: Bool = true,
                key: String,
                value: String,
@@ -3155,16 +5961,68 @@ func setPodKey(useBundleExec: Bool = true,
                                                                                              RubyCommand.Argument(name: "project", value: project)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Setup the keychain and match to work with CI
+
+ - parameters:
+   - force: Force setup, even if not executed by CI
+   - provider: CI provider
+
+ - Creates a new temporary keychain for use with match|
+ - Switches match to `readonly` mode to not create new profiles/cert on CI|
+ - Sets up log and test result paths to be easily collectible|
+ >|
+ This action helps with CI integration. Add this to the top of your Fastfile if you use CI.
+*/
 func setupCi(force: Bool = false,
              provider: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "setup_ci", className: nil, args: [RubyCommand.Argument(name: "force", value: force),
                                                                                           RubyCommand.Argument(name: "provider", value: provider)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Setup the keychain and match to work with CircleCI
+
+ - parameter force: Force setup, even if not executed by CircleCI
+
+ - Creates a new temporary keychain for use with match|
+ - Switches match to `readonly` mode to not create new profiles/cert on CI|
+ - Sets up log and test result paths to be easily collectible|
+ >|
+ This action helps with CircleCI integration. Add this to the top of your Fastfile if you use CircleCI.
+*/
 func setupCircleCi(force: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "setup_circle_ci", className: nil, args: [RubyCommand.Argument(name: "force", value: force)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Setup xcodebuild, gym and scan for easier Jenkins integration
+
+ - parameters:
+   - force: Force setup, even if not executed by Jenkins
+   - unlockKeychain: Unlocks keychain
+   - addKeychainToSearchList: Add to keychain search list
+   - setDefaultKeychain: Set keychain as default
+   - keychainPath: Path to keychain
+   - keychainPassword: Keychain password
+   - setCodeSigningIdentity: Set code signing identity from CODE_SIGNING_IDENTITY environment
+   - codeSigningIdentity: Code signing identity
+   - outputDirectory: The directory in which the ipa file should be stored in
+   - derivedDataPath: The directory where built products and other derived data will go
+   - resultBundle: Produce the result bundle describing what occurred will be placed
+
+ - Adds and unlocks keychains from Jenkins 'Keychains and Provisioning Profiles Plugin'|
+ - Sets code signing identity from Jenkins 'Keychains and Provisioning Profiles Plugin'|
+ - Sets output directory to './output' (gym, scan and backup_xcarchive)|
+ - Sets derived data path to './derivedData' (xcodebuild, gym, scan and clear_derived_data, carthage)|
+ - Produce result bundle (gym and scan)|
+ >|
+ This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory.
+ The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), the selected keychain will be automatically unlocked and the selected code signing identity will be used. By default this action will only work when _fastlane_ is executed on a CI system.
+*/
 func setupJenkins(force: Bool = false,
                   unlockKeychain: Bool = true,
                   addKeychainToSearchList: Any = "replace",
@@ -3189,10 +6047,35 @@ func setupJenkins(force: Bool = false,
                                                                                                RubyCommand.Argument(name: "result_bundle", value: resultBundle)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Setup the keychain and match to work with Travis CI
+
+ - parameter force: Force setup, even if not executed by travis
+
+ - Creates a new temporary keychain for use with match|
+ - Switches match to `readonly` mode to not create new profiles/cert on CI|
+ >|
+ This action helps with Travis integration. Add this to the top of your Fastfile if you use Travis.
+*/
 func setupTravis(force: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "setup_travis", className: nil, args: [RubyCommand.Argument(name: "force", value: force)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Runs a shell command
+
+ - parameters:
+   - command: Shell command to be executed
+   - log: Determines whether fastlane should print out the executed command itself and output of the executed command. If command line option --troubleshoot is used, then it overrides this option to true
+   - errorCallback: A callback invoked with the command output if there is a non-zero exit status
+
+ - returns: Outputs the string and executes it. When running in tests, it returns the actual command instead of executing it
+
+ Allows running an arbitrary shell command.
+ Be aware of a specific behavior of `sh` action with regard to the working directory. For details, refer to [Advanced](https://docs.fastlane.tools/advanced/#directory-behavior).
+*/
 @discardableResult func sh(command: String,
                            log: Bool = true,
                            errorCallback: Any? = nil) -> String {
@@ -3201,6 +6084,36 @@ func setupTravis(force: Bool = false) {
                                                                                     RubyCommand.Argument(name: "error_callback", value: errorCallback)])
   return runner.executeCommand(command)
 }
+
+/**
+ Alias for the `get_provisioning_profile` action
+
+ - parameters:
+   - adhoc: Setting this flag will generate AdHoc profiles instead of App Store Profiles
+   - developerId: Setting this flag will generate Developer ID profiles instead of App Store Profiles
+   - development: Renew the development certificate instead of the production one
+   - skipInstall: By default, the certificate will be added to your local machine. Setting this flag will skip this action
+   - force: Renew provisioning profiles regardless of its state - to automatically add all devices for ad hoc profiles
+   - appIdentifier: The bundle identifier of your app
+   - username: Your Apple ID Username
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+   - provisioningName: The name of the profile that is used on the Apple Developer Portal
+   - ignoreProfilesWithDifferentName: Use in combination with :provisioning_name - when true only profiles matching this exact name will be downloaded
+   - outputPath: Directory in which the profile should be stored
+   - certId: The ID of the code signing certificate to use (e.g. 78ADL6LVAA) 
+   - certOwnerName: The certificate name to use for new profiles, or to renew with. (e.g. "Felix Krause")
+   - filename: Filename to use for the generated provisioning profile (must include .mobileprovision)
+   - skipFetchProfiles: Skips the verification of existing profiles which is useful if you have thousands of profiles
+   - skipCertificateVerification: Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine
+   - platform: Set the provisioning profile's platform (i.e. ios, tvos)
+   - readonly: Only fetch existing profile, don't generate new ones
+   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+
+ - returns: The UUID of the profile sigh just fetched/generated
+
+ **Note**: It is recommended to use [match](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use _sigh_ directly only if you want full control over what's going on and know more about codesigning.
+*/
 func sigh(adhoc: Bool = false,
           developerId: Bool = false,
           development: Bool = false,
@@ -3243,10 +6156,37 @@ func sigh(adhoc: Bool = false,
                                                                                       RubyCommand.Argument(name: "template_name", value: templateName)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Skip the creation of the fastlane/README.md file when running fastlane
+
+ Tell _fastlane_ to not automatically create a `fastlane/README.md` when running _fastlane_. You can always trigger the creation of this file manually by running `fastlane docs`.
+*/
 func skipDocs() {
   let command = RubyCommand(commandID: "", methodName: "skip_docs", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Send a success/error message to your [Slack](https://slack.com) group
+
+ - parameters:
+   - message: The message that should be displayed on Slack. This supports the standard Slack markup language
+   - pretext: This is optional text that appears above the message attachment block. This supports the standard Slack markup language
+   - channel: #channel or @username
+   - useWebhookConfiguredUsernameAndIcon: Use webhook's default username and icon settings? (true/false)
+   - slackUrl: Create an Incoming WebHook for your Slack group
+   - username: Overrides the webhook's username property if use_webhook_configured_username_and_icon is false
+   - iconUrl: Overrides the webhook's image property if use_webhook_configured_username_and_icon is false
+   - payload: Add additional information to this post. payload must be a hash containing any key with any value
+   - defaultPayloads: Remove some of the default payloads. More information about the available payloads on GitHub
+   - attachmentProperties: Merge additional properties in the slack attachment, see https://api.slack.com/docs/attachments
+   - success: Was this build successful? (true/false)
+   - failOnError: Should an error sending the slack notification cause a failure? (true/false)
+   - linkNames: Find and link channel names and usernames (true/false)
+
+ Create an Incoming WebHook and export this as `SLACK_URL`. Can send a message to **#channel** (by default), a direct message to **@username** or a message to a private group **group** with success (green) or failure (red) status.
+*/
 func slack(message: String? = nil,
            pretext: String? = nil,
            channel: String? = nil,
@@ -3275,14 +6215,34 @@ func slack(message: String? = nil,
                                                                                        RubyCommand.Argument(name: "link_names", value: linkNames)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Show a train of the fastlane progress
+
+ - returns: A string that is being sent to slack
+*/
 func slackTrain() {
   let command = RubyCommand(commandID: "", methodName: "slack_train", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ 
+*/
 func slackTrainCrash() {
   let command = RubyCommand(commandID: "", methodName: "slack_train_crash", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Show a train of the fastlane progress
+
+ - parameters:
+   - distance: How many rails do we need?
+   - train: Train emoji
+   - rail: Character or emoji for the rail
+   - reverseDirection: Pass true if you want the train to go from left to right
+*/
 func slackTrainStart(distance: Int = 5,
                      train: String = "🚝",
                      rail: String = "=",
@@ -3293,6 +6253,44 @@ func slackTrainStart(distance: Int = 5,
                                                                                                    RubyCommand.Argument(name: "reverse_direction", value: reverseDirection)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Use slather to generate a code coverage report
+
+ - parameters:
+   - buildDirectory: The location of the build output
+   - proj: The project file that slather looks at
+   - workspace: The workspace that slather looks at
+   - scheme: Scheme to use when calling slather
+   - configuration: Configuration to use when calling slather (since slather-2.4.1)
+   - inputFormat: The input format that slather should look for
+   - buildkite: Tell slather that it is running on Buildkite
+   - teamcity: Tell slather that it is running on TeamCity
+   - jenkins: Tell slather that it is running on Jenkins
+   - travis: Tell slather that it is running on TravisCI
+   - travisPro: Tell slather that it is running on TravisCI Pro
+   - circleci: Tell slather that it is running on CircleCI
+   - coveralls: Tell slather that it should post data to Coveralls
+   - simpleOutput: Tell slather that it should output results to the terminal
+   - gutterJson: Tell slather that it should output results as Gutter JSON format
+   - coberturaXml: Tell slather that it should output results as Cobertura XML format
+   - llvmCov: Tell slather that it should output results as llvm-cov show format
+   - html: Tell slather that it should output results as static HTML pages
+   - show: Tell slather that it should open static html pages automatically
+   - sourceDirectory: Tell slather the location of your source files
+   - outputDirectory: Tell slather the location of for your output files
+   - ignore: Tell slather to ignore files matching a path or any path from an array of paths
+   - verbose: Tell slather to enable verbose mode
+   - useBundleExec: Use bundle exec to execute slather. Make sure it is in the Gemfile
+   - binaryBasename: Basename of the binary file, this should match the name of your bundle excluding its extension (i.e. YourApp [for YourApp.app bundle])
+   - binaryFile: Binary file name to be used for code coverage
+   - arch: Specify which architecture the binary file is in. Needed for universal binaries
+   - sourceFiles: A Dir.glob compatible pattern used to limit the lookup to specific source files. Ignored in gcov mode
+   - decimals: The amount of decimals to use for % coverage reporting
+
+ Slather works with multiple code coverage formats, including Xcode 7 code coverage.
+ Slather is available at [https://github.com/SlatherOrg/slather](https://github.com/SlatherOrg/slather).
+*/
 func slather(buildDirectory: String? = nil,
              proj: String? = nil,
              workspace: String? = nil,
@@ -3353,6 +6351,46 @@ func slather(buildDirectory: String? = nil,
                                                                                          RubyCommand.Argument(name: "decimals", value: decimals)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `capture_ios_screenshots` action
+
+ - parameters:
+   - workspace: Path the workspace file
+   - project: Path the project file
+   - xcargs: Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
+   - xcconfig: Use an extra XCCONFIG file to build your app
+   - devices: A list of devices you want to take the screenshots from
+   - languages: A list of languages which should be used
+   - launchArguments: A list of launch arguments which should be used
+   - outputDirectory: The directory where to store the screenshots
+   - outputSimulatorLogs: If the logs generated by the app (e.g. using NSLog, perror, etc.) in the Simulator should be written to the output_directory
+   - iosVersion: By default, the latest version should be used automatically. If you want to change it, do it here
+   - skipOpenSummary: Don't open the HTML summary after running _snapshot_
+   - skipHelperVersionCheck: Do not check for most recent SnapshotHelper code
+   - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running snapshot
+   - reinstallApp: Enabling this option will automatically uninstall the application before running it
+   - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
+   - localizeSimulator: Enabling this option will configure the Simulator's system language
+   - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
+   - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
+   - addPhotos: A list of photos that should be added to the simulator before running the application
+   - addVideos: A list of videos that should be added to the simulator before running the application
+   - buildlogPath: The directory where to store the build log
+   - clean: Should the project be cleaned before building it?
+   - testWithoutBuilding: Test without building, requires a derived data path
+   - configuration: The configuration to use when building the app. Defaults to 'Release'
+   - xcprettyArgs: Additional xcpretty arguments
+   - sdk: The SDK that should be used for building the application
+   - scheme: The scheme you want to use, this must be the scheme for the UI Tests
+   - numberOfRetries: The number of times a test can fail before snapshot should stop retrying
+   - stopAfterFirstError: Should snapshot stop immediately after the tests completely failed on one device?
+   - derivedDataPath: The directory where build products and other derived data will go
+   - resultBundle: Should an Xcode result bundle be generated in the output directory
+   - testTargetName: The name of the target you want to test (if you desire to override the Target Application from Xcode)
+   - namespaceLogFiles: Separate the log files per device and per language
+   - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
+*/
 func snapshot(workspace: Any? = snapshotfile.workspace,
               project: Any? = snapshotfile.project,
               xcargs: Any? = snapshotfile.xcargs,
@@ -3369,6 +6407,7 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
               reinstallApp: Bool = snapshotfile.reinstallApp,
               eraseSimulator: Bool = snapshotfile.eraseSimulator,
               localizeSimulator: Bool = snapshotfile.localizeSimulator,
+              darkMode: Bool? = snapshotfile.darkMode,
               appIdentifier: Any? = snapshotfile.appIdentifier,
               addPhotos: [String]? = snapshotfile.addPhotos,
               addVideos: [String]? = snapshotfile.addVideos,
@@ -3402,6 +6441,7 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
                                                                                           RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                           RubyCommand.Argument(name: "erase_simulator", value: eraseSimulator),
                                                                                           RubyCommand.Argument(name: "localize_simulator", value: localizeSimulator),
+                                                                                          RubyCommand.Argument(name: "dark_mode", value: darkMode),
                                                                                           RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                           RubyCommand.Argument(name: "add_photos", value: addPhotos),
                                                                                           RubyCommand.Argument(name: "add_videos", value: addVideos),
@@ -3421,6 +6461,31 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
                                                                                           RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Invokes sonar-scanner to programmatically run SonarQube analysis
+
+ - parameters:
+   - projectConfigurationPath: The path to your sonar project configuration file; defaults to `sonar-project.properties`
+   - projectKey: The key sonar uses to identify the project, e.g. `name.gretzki.awesomeApp`. Must either be specified here or inside the sonar project configuration file
+   - projectName: The name of the project that gets displayed on the sonar report page. Must either be specified here or inside the sonar project configuration file
+   - projectVersion: The project's version that gets displayed on the sonar report page. Must either be specified here or inside the sonar project configuration file
+   - sourcesPath: Comma-separated paths to directories containing source files. Must either be specified here or inside the sonar project configuration file
+   - projectLanguage: Language key, e.g. objc
+   - sourceEncoding: Used encoding of source files, e.g., UTF-8
+   - sonarRunnerArgs: Pass additional arguments to sonar-scanner. Be sure to provide the arguments with a leading `-D` e.g. FL_SONAR_RUNNER_ARGS="-Dsonar.verbose=true"
+   - sonarLogin: Pass the Sonar Login token (e.g: xxxxxxprivate_token_XXXXbXX7e)
+   - sonarUrl: Pass the url of the Sonar server
+   - branchName: Pass the branch name which is getting scanned
+   - pullRequestBranch: The name of the branch that contains the changes to be merged
+   - pullRequestBase: The long-lived branch into which the PR will be merged
+   - pullRequestKey: Unique identifier of your PR. Must correspond to the key of the PR in GitHub or TFS
+
+ - returns: The exit code of the sonar-scanner binary
+
+ See [http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner](http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) for details.
+ It can process unit test results if formatted as junit report as shown in [xctest](https://docs.fastlane.tools/actions/xctest/) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by the [slather](https://docs.fastlane.tools/actions/slather/) action.
+*/
 func sonar(projectConfigurationPath: String? = nil,
            projectKey: String? = nil,
            projectName: String? = nil,
@@ -3451,6 +6516,19 @@ func sonar(projectConfigurationPath: String? = nil,
                                                                                        RubyCommand.Argument(name: "pull_request_key", value: pullRequestKey)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Find, print, and copy Spaceship logs
+
+ - parameters:
+   - latest: Finds only the latest Spaceshop log file if set to true, otherwise returns all
+   - printContents: Prints the contents of the found Spaceship log file(s)
+   - printPaths: Prints the paths of the found Spaceship log file(s)
+   - copyToPath: Copies the found Spaceship log file(s) to a directory
+   - copyToClipboard: Copies the contents of the found Spaceship log file(s) to the clipboard
+
+ - returns: The array of Spaceship logs
+*/
 func spaceshipLogs(latest: Bool = true,
                    printContents: Bool = false,
                    printPaths: Bool = false,
@@ -3463,6 +6541,21 @@ func spaceshipLogs(latest: Bool = true,
                                                                                                 RubyCommand.Argument(name: "copy_to_clipboard", value: copyToClipboard)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload dSYM file to [Splunk MINT](https://mint.splunk.com/)
+
+ - parameters:
+   - dsym: dSYM.zip file to upload to Splunk MINT
+   - apiKey: Splunk MINT App API key e.g. f57a57ca
+   - apiToken: Splunk MINT API token e.g. e05ba40754c4869fb7e0b61
+   - verbose: Make detailed output
+   - uploadProgress: Show upload progress
+   - proxyUsername: Proxy username
+   - proxyPassword: Proxy password
+   - proxyAddress: Proxy address
+   - proxyPort: Proxy port
+*/
 func splunkmint(dsym: String? = nil,
                 apiKey: String,
                 apiToken: String,
@@ -3483,6 +6576,19 @@ func splunkmint(dsym: String? = nil,
                                                                                             RubyCommand.Argument(name: "proxy_port", value: proxyPort)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Runs Swift Package Manager on your project
+
+ - parameters:
+   - command: The swift command (one of: build, test, clean, reset, update, resolve, generate-xcodeproj, init)
+   - buildPath: Specify build/cache directory [default: ./.build]
+   - packagePath: Change working directory before any other operation
+   - xcconfig: Use xcconfig file to override swift package generate-xcodeproj defaults
+   - configuration: Build with configuration (debug|release) [default: debug]
+   - xcprettyOutput: Specifies the output type for xcpretty. eg. 'test', or 'simple'
+   - verbose: Increase verbosity of informational output
+*/
 func spm(command: String = "build",
          buildPath: String? = nil,
          packagePath: String? = nil,
@@ -3499,6 +6605,20 @@ func spm(command: String = "build",
                                                                                      RubyCommand.Argument(name: "verbose", value: verbose)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Allows remote command execution using ssh
+
+ - parameters:
+   - username: Username
+   - password: Password
+   - host: Hostname
+   - port: Port
+   - commands: Commands
+   - log: Log commands and output
+
+ Lets you execute remote commands via ssh using username/password or ssh-agent. If one of the commands in command-array returns non 0, it fails.
+*/
 func ssh(username: String,
          password: String? = nil,
          host: String,
@@ -3513,6 +6633,44 @@ func ssh(username: String,
                                                                                      RubyCommand.Argument(name: "log", value: log)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `upload_to_play_store` action
+
+ - parameters:
+   - packageName: The package name of the application to use
+   - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal, rollout
+   - rollout: The percentage of the user fraction when uploading to the rollout track
+   - metadataPath: Path to the directory containing the metadata files
+   - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
+   - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
+   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
+   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - apk: Path to the APK file to upload
+   - apkPaths: An array of paths to APK files to upload
+   - aab: Path to the AAB file to upload
+   - aabPaths: An array of paths to AAB files to upload
+   - skipUploadApk: Whether to skip uploading APK
+   - skipUploadAab: Whether to skip uploading AAB
+   - skipUploadMetadata: Whether to skip uploading metadata
+   - skipUploadImages: Whether to skip uploading images, screenshots not included
+   - skipUploadScreenshots: Whether to skip uploading SCREENSHOTS
+   - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal, rollout
+   - validateOnly: Only validate changes with Google Play rather than actually publish
+   - mapping: Path to the mapping file to upload
+   - mappingPaths: An array of paths to mapping files to upload
+   - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
+   - checkSupersededTracks: Check the other tracks for superseded versions and disable them
+   - timeout: Timeout for read, open, and send (in seconds)
+   - deactivateOnPromote: When promoting to a new track, deactivate the binary in the origin track
+   - versionCodesToRetain: An array of version codes to retain when publishing a new APK
+   - obbMainReferencesVersion: References version of 'main' expansion file
+   - obbMainFileSize: Size of 'main' expansion file in bytes
+   - obbPatchReferencesVersion: References version of 'patch' expansion file
+   - obbPatchFileSize: Size of 'patch' expansion file in bytes
+
+ More information: https://docs.fastlane.tools/actions/supply/
+*/
 func supply(packageName: String,
             track: String = "production",
             rollout: String? = nil,
@@ -3575,6 +6733,24 @@ func supply(packageName: String,
                                                                                         RubyCommand.Argument(name: "obb_patch_file_size", value: obbPatchFileSize)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Run swift code validation using SwiftLint
+
+ - parameters:
+   - mode: SwiftLint mode: :lint, :autocorrect or :analyze
+   - path: Specify path to lint
+   - outputFile: Path to output SwiftLint result
+   - configFile: Custom configuration file of SwiftLint
+   - strict: Fail on warnings? (true/false)
+   - files: List of files to process
+   - ignoreExitStatus: Ignore the exit status of the SwiftLint command, so that serious violations                                                     don't fail the build (true/false)
+   - reporter: Choose output reporter
+   - quiet: Don't print status logs like 'Linting <file>' & 'Done linting'
+   - executable: Path to the `swiftlint` executable on your machine
+   - format: Format code when mode is :autocorrect
+   - compilerLogPath: Compiler log path when mode is :analyze
+*/
 func swiftlint(mode: Any = "lint",
                path: String? = nil,
                outputFile: String? = nil,
@@ -3601,8 +6777,46 @@ func swiftlint(mode: Any = "lint",
                                                                                            RubyCommand.Argument(name: "compiler_log_path", value: compilerLogPath)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Easily sync your certificates and profiles across your team (via _match_)
+
+ - parameters:
+   - type: Define the profile type, can be appstore, adhoc, development, enterprise
+   - readonly: Only fetch existing certificates and profiles, don't generate new ones
+   - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
+   - skipProvisioningProfiles: Skip syncing provisioning profiles
+   - appIdentifier: The bundle identifier(s) of your app (comma-separated)
+   - username: Your Apple ID Username
+   - teamId: The ID of your Developer Portal team if you're in multiple teams
+   - teamName: The name of your Developer Portal team if you're in multiple teams
+   - storageMode: Define where you want to store your certificates
+   - gitUrl: URL to the git repo containing all the certificates
+   - gitBranch: Specific git branch to use
+   - gitFullName: git user full name to commit
+   - gitUserEmail: git user email to commit
+   - shallowClone: Make a shallow clone of the repository (truncate the history to 1 revision)
+   - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
+   - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
+   - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
+   - googleCloudKeysFile: Path to the gc_keys.json file
+   - googleCloudProjectId: ID of the Google Cloud project to use for authentication
+   - keychainName: Keychain the items should be imported to
+   - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
+   - force: Renew the provisioning profiles every time you run match
+   - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile type 'appstore'
+   - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
+   - skipDocs: Skip generation of a README.md for the created git repository
+   - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos)
+   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - outputPath: Path in which to export certificates, key and profile
+   - verbose: Print out extra information and all commands
+
+ More information: https://docs.fastlane.tools/actions/match/
+*/
 func syncCodeSigning(type: String = "development",
                      readonly: Bool = false,
+                     generateAppleCerts: Bool = true,
                      skipProvisioningProfiles: Bool = false,
                      appIdentifier: [String],
                      username: String,
@@ -3615,6 +6829,7 @@ func syncCodeSigning(type: String = "development",
                      gitUserEmail: String? = nil,
                      shallowClone: Bool = false,
                      cloneBranchDirectly: Bool = false,
+                     gitBasicAuthorization: String? = nil,
                      googleCloudBucketName: String? = nil,
                      googleCloudKeysFile: String? = nil,
                      googleCloudProjectId: String? = nil,
@@ -3630,6 +6845,7 @@ func syncCodeSigning(type: String = "development",
                      verbose: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "sync_code_signing", className: nil, args: [RubyCommand.Argument(name: "type", value: type),
                                                                                                    RubyCommand.Argument(name: "readonly", value: readonly),
+                                                                                                   RubyCommand.Argument(name: "generate_apple_certs", value: generateAppleCerts),
                                                                                                    RubyCommand.Argument(name: "skip_provisioning_profiles", value: skipProvisioningProfiles),
                                                                                                    RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                    RubyCommand.Argument(name: "username", value: username),
@@ -3642,6 +6858,7 @@ func syncCodeSigning(type: String = "development",
                                                                                                    RubyCommand.Argument(name: "git_user_email", value: gitUserEmail),
                                                                                                    RubyCommand.Argument(name: "shallow_clone", value: shallowClone),
                                                                                                    RubyCommand.Argument(name: "clone_branch_directly", value: cloneBranchDirectly),
+                                                                                                   RubyCommand.Argument(name: "git_basic_authorization", value: gitBasicAuthorization),
                                                                                                    RubyCommand.Argument(name: "google_cloud_bucket_name", value: googleCloudBucketName),
                                                                                                    RubyCommand.Argument(name: "google_cloud_keys_file", value: googleCloudKeysFile),
                                                                                                    RubyCommand.Argument(name: "google_cloud_project_id", value: googleCloudProjectId),
@@ -3657,14 +6874,42 @@ func syncCodeSigning(type: String = "development",
                                                                                                    RubyCommand.Argument(name: "verbose", value: verbose)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Specify the Team ID you want to use for the Apple Developer Portal
+*/
 func teamId() {
   let command = RubyCommand(commandID: "", methodName: "team_id", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Set a team to use by its name
+*/
 func teamName() {
   let command = RubyCommand(commandID: "", methodName: "team_name", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload a new build to [TestFairy](https://www.testfairy.com/)
+
+ - parameters:
+   - apiKey: API Key for TestFairy
+   - ipa: Path to your IPA file for iOS
+   - apk: Path to your APK file for Android
+   - symbolsFile: Symbols mapping file
+   - uploadUrl: API URL for TestFairy
+   - testersGroups: Array of tester groups to be notified
+   - metrics: Array of metrics to record (cpu,memory,network,phone_signal,gps,battery,mic,wifi)
+   - comment: Additional release notes for this upload. This text will be added to email notifications
+   - autoUpdate: Allows an easy upgrade of all users to the current version. To enable set to 'on'
+   - notify: Send email to testers
+   - options: Array of options (shake,video_only_wifi,anonymous)
+   - timeout: Request timeout in seconds
+
+ You can retrieve your API key on [your settings page](https://free.testfairy.com/settings/)
+*/
 func testfairy(apiKey: String,
                ipa: String? = nil,
                apk: String? = nil,
@@ -3691,6 +6936,45 @@ func testfairy(apiKey: String,
                                                                                            RubyCommand.Argument(name: "timeout", value: timeout)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Alias for the `upload_to_testflight` action
+
+ - parameters:
+   - username: Your Apple ID Username
+   - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
+   - appPlatform: The platform to use (optional)
+   - appleId: Apple ID property in the App Information section in App Store Connect
+   - ipa: Path to the ipa file to upload
+   - demoAccountRequired: Do you need a demo account when Apple does review?
+   - betaAppReviewInfo: Beta app review information for contact info and demo account
+   - localizedAppInfo: Localized beta app test info for description, feedback email, marketing url, and privacy policy
+   - betaAppDescription: Provide the 'Beta App Description' when uploading a new build
+   - betaAppFeedbackEmail: Provide the beta app email when uploading a new build
+   - localizedBuildInfo: Localized beta app test info for what's new
+   - changelog: Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog
+   - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
+   - skipWaitingForBuildProcessing: Don't wait for the build to process. If set to true, the changelog won't be set, `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan)
+   - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
+   - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
+   - distributeExternal: Should the build be distributed to external testers?
+   - notifyExternalTesters: Should notify external testers?
+   - firstName: The tester's first name
+   - lastName: The tester's last name
+   - email: The tester's email
+   - testersFilePath: Path to a CSV file of testers
+   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","Team 2"`
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+   - devPortalTeamId: The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!
+   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - waitProcessingInterval: Interval in seconds to wait for App Store Connect processing
+   - waitForUploadedBuild: **DEPRECATED!** No longer needed with the transition over to the App Store Connect API - Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used
+   - rejectBuildWaitingForReview: Expire previous if it's 'waiting for review'
+
+ More details can be found on https://docs.fastlane.tools/actions/pilot/.
+ This integration will only do the TestFlight upload.
+*/
 func testflight(username: String,
                 appIdentifier: String? = nil,
                 appPlatform: String = "ios",
@@ -3753,6 +7037,21 @@ func testflight(username: String,
                                                                                             RubyCommand.Argument(name: "reject_build_waiting_for_review", value: rejectBuildWaitingForReview)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload a new build to [Tryouts](https://tryouts.io/)
+
+ - parameters:
+   - appId: Tryouts application hash
+   - apiToken: API Token (api_key:api_secret) for Tryouts Access
+   - buildFile: Path to your IPA or APK file. Optional if you use the _gym_ or _xcodebuild_ action
+   - notes: Release notes
+   - notesPath: Release notes text file path. Overrides the :notes parameter
+   - notify: Notify testers? 0 for no
+   - status: 2 to make your release public. Release will be distributed to available testers. 1 to make your release private. Release won't be distributed to testers. This also prevents release from showing up for SDK update
+
+ More information: [http://tryouts.readthedocs.org/en/latest/releases.html#create-release](http://tryouts.readthedocs.org/en/latest/releases.html#create-release)
+*/
 func tryouts(appId: String,
              apiToken: String,
              buildFile: String,
@@ -3769,6 +7068,19 @@ func tryouts(appId: String,
                                                                                          RubyCommand.Argument(name: "status", value: status)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Post a tweet on [Twitter.com](https://twitter.com)
+
+ - parameters:
+   - consumerKey: Consumer Key
+   - consumerSecret: Consumer Secret
+   - accessToken: Access Token
+   - accessTokenSecret: Access Token Secret
+   - message: The tweet
+
+ Post a tweet on Twitter. Requires you to setup an app on [twitter.com](https://twitter.com) and obtain `consumer` and `access_token`.
+*/
 func twitter(consumerKey: String,
              consumerSecret: String,
              accessToken: String,
@@ -3781,10 +7093,27 @@ func twitter(consumerKey: String,
                                                                                          RubyCommand.Argument(name: "message", value: message)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Post a message to [Typetalk](https://www.typetalk.com/)
+*/
 func typetalk() {
   let command = RubyCommand(commandID: "", methodName: "typetalk", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Unlock a keychain
+
+ - parameters:
+   - path: Path to the keychain file
+   - password: Keychain password
+   - addToSearchList: Add to keychain search list
+   - setDefault: Set as default keychain
+
+ Unlocks the given keychain file and adds it to the keychain search list.
+ Keychains can be replaced with `add_to_search_list: :replace`.
+*/
 func unlockKeychain(path: String = "login",
                     password: String,
                     addToSearchList: Bool = true,
@@ -3795,12 +7124,33 @@ func unlockKeychain(path: String = "login",
                                                                                                  RubyCommand.Argument(name: "set_default", value: setDefault)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This action changes the app group identifiers in the entitlements file
+
+ - parameters:
+   - entitlementsFile: The path to the entitlement file which contains the app group identifiers
+   - appGroupIdentifiers: An Array of unique identifiers for the app groups. Eg. ['group.com.test.testapp']
+
+ Updates the App Group Identifiers in the given Entitlements file, so you can have app groups for the app store build and app groups for an enterprise build.
+*/
 func updateAppGroupIdentifiers(entitlementsFile: String,
                                appGroupIdentifiers: Any) {
   let command = RubyCommand(commandID: "", methodName: "update_app_group_identifiers", className: nil, args: [RubyCommand.Argument(name: "entitlements_file", value: entitlementsFile),
                                                                                                               RubyCommand.Argument(name: "app_group_identifiers", value: appGroupIdentifiers)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Update the project's bundle identifier
+
+ - parameters:
+   - xcodeproj: Path to your Xcode project
+   - plistPath: Path to info plist, relative to your Xcode project
+   - appIdentifier: The app Identifier you want to set
+
+ Update an app identifier by either setting `CFBundleIdentifier` or `PRODUCT_BUNDLE_IDENTIFIER`, depending on which is already in use.
+*/
 func updateAppIdentifier(xcodeproj: String,
                          plistPath: String,
                          appIdentifier: String) {
@@ -3809,6 +7159,30 @@ func updateAppIdentifier(xcodeproj: String,
                                                                                                        RubyCommand.Argument(name: "app_identifier", value: appIdentifier)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Makes sure fastlane-tools are up-to-date when running fastlane
+
+ - parameters:
+   - nightly: Opt-in to install and use nightly fastlane builds
+   - noUpdate: Don't update during this run. This is used internally
+   - tools: **DEPRECATED!** Comma separated list of fastlane tools to update (e.g. `fastlane,deliver,sigh`)
+
+ This action will update fastlane to the most recent version - major version updates will not be performed automatically, as they might include breaking changes. If an update was performed, fastlane will be restarted before the run continues.
+ 
+ If you are using rbenv or rvm, everything should be good to go. However, if you are using the system's default ruby, some additional setup is needed for this action to work correctly. In short, fastlane needs to be able to access your gem library without running in `sudo` mode.
+ 
+ The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:|
+ |
+ ```bash|
+ export GEM_HOME=~/.gems|
+ export PATH=$PATH:~/.gems/bin|
+ ```|
+ >|
+ After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to create the new gem directory. After this, you're good to go!
+ 
+ Recommended usage of the `update_fastlane` action is at the top inside of the `before_all` block, before running any other action.
+*/
 func updateFastlane(nightly: Bool = false,
                     noUpdate: Bool = false,
                     tools: String? = nil) {
@@ -3817,12 +7191,36 @@ func updateFastlane(nightly: Bool = false,
                                                                                                  RubyCommand.Argument(name: "tools", value: tools)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ This action changes the iCloud container identifiers in the entitlements file
+
+ - parameters:
+   - entitlementsFile: The path to the entitlement file which contains the iCloud container identifiers
+   - icloudContainerIdentifiers: An Array of unique identifiers for the iCloud containers. Eg. ['iCloud.com.test.testapp']
+
+ Updates the iCloud Container Identifiers in the given Entitlements file, so you can use different iCloud containers for different builds like Adhoc, App Store, etc.
+*/
 func updateIcloudContainerIdentifiers(entitlementsFile: String,
                                       icloudContainerIdentifiers: Any) {
   let command = RubyCommand(commandID: "", methodName: "update_icloud_container_identifiers", className: nil, args: [RubyCommand.Argument(name: "entitlements_file", value: entitlementsFile),
                                                                                                                      RubyCommand.Argument(name: "icloud_container_identifiers", value: icloudContainerIdentifiers)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Update a Info.plist file with bundle identifier and display name
+
+ - parameters:
+   - xcodeproj: Path to your Xcode project
+   - plistPath: Path to info plist
+   - scheme: Scheme of info plist
+   - appIdentifier: The App Identifier of your app
+   - displayName: The Display Name of your app
+   - block: A block to process plist with custom logic
+
+ This action allows you to modify your `Info.plist` file before building. This may be useful if you want a separate build for alpha, beta or nightly builds, but don't want a separate target.
+*/
 func updateInfoPlist(xcodeproj: String? = nil,
                      plistPath: String? = nil,
                      scheme: String? = nil,
@@ -3837,12 +7235,31 @@ func updateInfoPlist(xcodeproj: String? = nil,
                                                                                                    RubyCommand.Argument(name: "block", value: block)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Update a plist file
+
+ - parameters:
+   - plistPath: Path to plist file
+   - block: A block to process plist with custom logic
+
+ This action allows you to modify any `plist` file.
+*/
 func updatePlist(plistPath: String? = nil,
                  block: Any) {
   let command = RubyCommand(commandID: "", methodName: "update_plist", className: nil, args: [RubyCommand.Argument(name: "plist_path", value: plistPath),
                                                                                               RubyCommand.Argument(name: "block", value: block)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Updated code signing settings from 'Automatic' to a specific profile
+
+ - parameters:
+   - path: Path to your Xcode project
+   - udid: **DEPRECATED!** Use `:uuid` instead
+   - uuid: The UUID of the provisioning profile you want to use
+*/
 func updateProjectCodeSigning(path: String,
                               udid: String? = nil,
                               uuid: String) {
@@ -3851,6 +7268,26 @@ func updateProjectCodeSigning(path: String,
                                                                                                              RubyCommand.Argument(name: "uuid", value: uuid)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Update projects code signing settings from your provisioning profile
+
+ - parameters:
+   - xcodeproj: Path to your Xcode project
+   - profile: Path to provisioning profile (.mobileprovision)
+   - targetFilter: A filter for the target name. Use a standard regex
+   - buildConfigurationFilter: Legacy option, use 'target_filter' instead
+   - buildConfiguration: A filter for the build configuration name. Use a standard regex. Applied to all configurations if not specified
+   - certificate: Path to apple root certificate
+   - codeSigningIdentity: Code sign identity for build configuration
+
+ You should check out the [code signing guide](https://docs.fastlane.tools/codesigning/getting-started/) before using this action.
+ This action retrieves a provisioning profile UUID from a provisioning profile (`.mobileprovision`) to set up the Xcode projects' code signing settings in `*.xcodeproj/project.pbxproj`.
+ The `:target_filter` value can be used to only update code signing for the specified targets.
+ The `:build_configuration` value can be used to only update code signing for the specified build configurations of the targets passing through the `:target_filter`.
+ Example usage is the WatchKit Extension or WatchKit App, where you need separate provisioning profiles.
+ Example: `update_project_provisioning(xcodeproj: "..", target_filter: ".*WatchKit App.*")`.
+*/
 func updateProjectProvisioning(xcodeproj: String? = nil,
                                profile: String,
                                targetFilter: Any? = nil,
@@ -3867,6 +7304,17 @@ func updateProjectProvisioning(xcodeproj: String? = nil,
                                                                                                              RubyCommand.Argument(name: "code_signing_identity", value: codeSigningIdentity)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Update Xcode Development Team ID
+
+ - parameters:
+   - path: Path to your Xcode project
+   - targets: Name of the targets you want to update
+   - teamid: The Team ID you want to use
+
+ This action updates the Developer Team ID of your Xcode project.
+*/
 func updateProjectTeam(path: String,
                        targets: [String]? = nil,
                        teamid: String) {
@@ -3875,6 +7323,20 @@ func updateProjectTeam(path: String,
                                                                                                      RubyCommand.Argument(name: "teamid", value: teamid)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Set [Urban Airship](https://www.urbanairship.com/) plist configuration values
+
+ - parameters:
+   - plistPath: Path to Urban Airship configuration Plist
+   - developmentAppKey: The development app key
+   - developmentAppSecret: The development app secret
+   - productionAppKey: The production app key
+   - productionAppSecret: The production app secret
+   - detectProvisioningMode: Automatically detect provisioning mode
+
+ This action updates the `AirshipConfig.plist` needed to configure the Urban Airship SDK at runtime, allowing keys and secrets to easily be set for the Enterprise and Production versions of the application.
+*/
 func updateUrbanAirshipConfiguration(plistPath: String,
                                      developmentAppKey: String? = nil,
                                      developmentAppSecret: String? = nil,
@@ -3889,6 +7351,18 @@ func updateUrbanAirshipConfiguration(plistPath: String,
                                                                                                                     RubyCommand.Argument(name: "detect_provisioning_mode", value: detectProvisioningMode)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Updates the URL schemes in the given Info.plist
+
+ - parameters:
+   - path: The Plist file's path
+   - urlSchemes: The new URL schemes
+   - updateUrlSchemes: Block that is called to update schemes with current schemes passed in as parameter
+
+ This action allows you to update the URL schemes of the app before building it.
+ For example, you can use this to set a different URL scheme for the alpha or beta version of the app.
+*/
 func updateUrlSchemes(path: String,
                       urlSchemes: Any? = nil,
                       updateUrlSchemes: Any? = nil) {
@@ -3897,6 +7371,21 @@ func updateUrlSchemes(path: String,
                                                                                                     RubyCommand.Argument(name: "update_url_schemes", value: updateUrlSchemes)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload dSYM symbolication files to Crashlytics
+
+ - parameters:
+   - dsymPath: Path to the DSYM file or zip to upload
+   - dsymPaths: Paths to the DSYM files or zips to upload
+   - apiToken: Crashlytics API Key
+   - gspPath: Path to GoogleService-Info.plist
+   - binaryPath: The path to the upload-symbols file of the Fabric app
+   - platform: The platform of the app (ios, appletvos, mac)
+   - dsymWorkerThreads: The number of threads to use for simultaneous dSYM upload
+
+ This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode. This action will not fail the build if one of the uploads failed. The reason for that is that sometimes some of dSYM files are invalid, and we don't want them to fail the complete build.
+*/
 func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji2.dSYM",
                                 dsymPaths: [String]? = nil,
                                 apiToken: String? = nil,
@@ -3913,6 +7402,23 @@ func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji
                                                                                                                RubyCommand.Argument(name: "dsym_worker_threads", value: dsymWorkerThreads)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload dSYM symbolication files to Sentry
+
+ - parameters:
+   - apiHost: API host url for Sentry
+   - apiKey: API key for Sentry
+   - authToken: Authentication token for Sentry
+   - orgSlug: Organization slug for Sentry project
+   - projectSlug: Project slug for Sentry
+   - dsymPath: Path to your symbols file. For iOS and Mac provide path to app.dSYM.zip
+   - dsymPaths: Path to an array of your symbols file. For iOS and Mac provide path to app.dSYM.zip
+
+ - returns: The uploaded dSYM path(s)
+
+ This action allows you to upload symbolication files to Sentry. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode.
+*/
 func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/api/0",
                            apiKey: String? = nil,
                            authToken: String? = nil,
@@ -3929,6 +7435,79 @@ func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/api/0",
                                                                                                           RubyCommand.Argument(name: "dsym_paths", value: dsymPaths)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload metadata and binary to App Store Connect (via _deliver_)
+
+ - parameters:
+   - username: Your Apple ID Username
+   - appIdentifier: The bundle identifier of your app
+   - appVersion: The version that should be edited or created
+   - ipa: Path to your ipa file
+   - pkg: Path to your pkg file
+   - buildNumber: If set the given build number (already uploaded to iTC) will be used instead of the current built one
+   - platform: The platform to use (optional)
+   - editLive: Modify live metadata, this option disables ipa upload and screenshot upload
+   - useLiveVersion: Force usage of live version rather than edit version
+   - metadataPath: Path to the folder containing the metadata files
+   - screenshotsPath: Path to the folder containing the screenshots
+   - skipBinaryUpload: Skip uploading an ipa or pkg to App Store Connect
+   - skipScreenshots: Don't upload the screenshots
+   - skipMetadata: Don't upload the metadata (e.g. title, description). This will still upload screenshots
+   - skipAppVersionUpdate: Don't update app version for submission
+   - force: Skip the HTML report file verification
+   - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
+   - submitForReview: Submit the new version for Review after uploading everything
+   - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
+   - automaticRelease: Should the app be automatically released once it's approved?
+   - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval
+   - phasedRelease: Enable the phased release feature of iTC
+   - resetRatings: Reset the summary rating when you release a new version of the application
+   - priceTier: The price tier of this application
+   - appRatingConfigPath: Path to the app rating's config
+   - submissionInformation: Extra information for the submission (e.g. compliance specifications, IDFA settings)
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+   - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
+   - devPortalTeamName: The name of your Developer Portal team if you're in multiple teams
+   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - runPrecheckBeforeSubmit: Run precheck before submitting to app review
+   - precheckDefaultRuleLevel: The default precheck rule level unless otherwise configured
+   - individualMetadataItems: An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
+   - appIcon: Metadata: The path to the app icon
+   - appleWatchAppIcon: Metadata: The path to the Apple Watch app icon
+   - copyright: Metadata: The copyright notice
+   - primaryCategory: Metadata: The english name of the primary category (e.g. `Business`, `Books`)
+   - secondaryCategory: Metadata: The english name of the secondary category (e.g. `Business`, `Books`)
+   - primaryFirstSubCategory: Metadata: The english name of the primary first sub category (e.g. `Educational`, `Puzzle`)
+   - primarySecondSubCategory: Metadata: The english name of the primary second sub category (e.g. `Educational`, `Puzzle`)
+   - secondaryFirstSubCategory: Metadata: The english name of the secondary first sub category (e.g. `Educational`, `Puzzle`)
+   - secondarySecondSubCategory: Metadata: The english name of the secondary second sub category (e.g. `Educational`, `Puzzle`)
+   - tradeRepresentativeContactInformation: Metadata: A hash containing the trade representative contact information
+   - appReviewInformation: Metadata: A hash containing the review information
+   - appReviewAttachmentFile: Metadata: Path to the app review attachment file
+   - description: Metadata: The localised app description
+   - name: Metadata: The localised app name
+   - subtitle: Metadata: The localised app subtitle
+   - keywords: Metadata: An array of localised keywords
+   - promotionalText: Metadata: An array of localised promotional texts
+   - releaseNotes: Metadata: Localised release notes for this version
+   - privacyUrl: Metadata: Localised privacy url
+   - appleTvPrivacyPolicy: Metadata: Localised Apple TV privacy policy text
+   - supportUrl: Metadata: Localised support url
+   - marketingUrl: Metadata: Localised marketing url
+   - languages: Metadata: List of languages to activate
+   - ignoreLanguageDirectoryValidation: Ignore errors when invalid languages are found in metadata and screenshot directories
+   - precheckIncludeInAppPurchases: Should precheck check in-app purchases?
+   - app: The (spaceship) app ID of the app you want to use/modify
+
+ Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
+ 
+ If you don't want a PDF report for App Store builds, use the `:force` option.
+ This is useful when running _fastlane_ on your Continuous Integration server:
+ `_upload_to_app_store_(force: true)`
+ If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
+*/
 func uploadToAppStore(username: String,
                       appIdentifier: String? = nil,
                       appVersion: String? = nil,
@@ -4051,6 +7630,44 @@ func uploadToAppStore(username: String,
                                                                                                      RubyCommand.Argument(name: "app", value: app)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload metadata, screenshots and binaries to Google Play (via _supply_)
+
+ - parameters:
+   - packageName: The package name of the application to use
+   - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal, rollout
+   - rollout: The percentage of the user fraction when uploading to the rollout track
+   - metadataPath: Path to the directory containing the metadata files
+   - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
+   - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
+   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
+   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - apk: Path to the APK file to upload
+   - apkPaths: An array of paths to APK files to upload
+   - aab: Path to the AAB file to upload
+   - aabPaths: An array of paths to AAB files to upload
+   - skipUploadApk: Whether to skip uploading APK
+   - skipUploadAab: Whether to skip uploading AAB
+   - skipUploadMetadata: Whether to skip uploading metadata
+   - skipUploadImages: Whether to skip uploading images, screenshots not included
+   - skipUploadScreenshots: Whether to skip uploading SCREENSHOTS
+   - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal, rollout
+   - validateOnly: Only validate changes with Google Play rather than actually publish
+   - mapping: Path to the mapping file to upload
+   - mappingPaths: An array of paths to mapping files to upload
+   - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
+   - checkSupersededTracks: Check the other tracks for superseded versions and disable them
+   - timeout: Timeout for read, open, and send (in seconds)
+   - deactivateOnPromote: When promoting to a new track, deactivate the binary in the origin track
+   - versionCodesToRetain: An array of version codes to retain when publishing a new APK
+   - obbMainReferencesVersion: References version of 'main' expansion file
+   - obbMainFileSize: Size of 'main' expansion file in bytes
+   - obbPatchReferencesVersion: References version of 'patch' expansion file
+   - obbPatchFileSize: Size of 'patch' expansion file in bytes
+
+ More information: https://docs.fastlane.tools/actions/supply/
+*/
 func uploadToPlayStore(packageName: String,
                        track: String = "production",
                        rollout: String? = nil,
@@ -4113,6 +7730,45 @@ func uploadToPlayStore(packageName: String,
                                                                                                       RubyCommand.Argument(name: "obb_patch_file_size", value: obbPatchFileSize)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Upload new binary to App Store Connect for TestFlight beta testing (via _pilot_)
+
+ - parameters:
+   - username: Your Apple ID Username
+   - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
+   - appPlatform: The platform to use (optional)
+   - appleId: Apple ID property in the App Information section in App Store Connect
+   - ipa: Path to the ipa file to upload
+   - demoAccountRequired: Do you need a demo account when Apple does review?
+   - betaAppReviewInfo: Beta app review information for contact info and demo account
+   - localizedAppInfo: Localized beta app test info for description, feedback email, marketing url, and privacy policy
+   - betaAppDescription: Provide the 'Beta App Description' when uploading a new build
+   - betaAppFeedbackEmail: Provide the beta app email when uploading a new build
+   - localizedBuildInfo: Localized beta app test info for what's new
+   - changelog: Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog
+   - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
+   - skipWaitingForBuildProcessing: Don't wait for the build to process. If set to true, the changelog won't be set, `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan)
+   - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
+   - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
+   - distributeExternal: Should the build be distributed to external testers?
+   - notifyExternalTesters: Should notify external testers?
+   - firstName: The tester's first name
+   - lastName: The tester's last name
+   - email: The tester's email
+   - testersFilePath: Path to a CSV file of testers
+   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","Team 2"`
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+   - devPortalTeamId: The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!
+   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - waitProcessingInterval: Interval in seconds to wait for App Store Connect processing
+   - waitForUploadedBuild: **DEPRECATED!** No longer needed with the transition over to the App Store Connect API - Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used
+   - rejectBuildWaitingForReview: Expire previous if it's 'waiting for review'
+
+ More details can be found on https://docs.fastlane.tools/actions/pilot/.
+ This integration will only do the TestFlight upload.
+*/
 func uploadToTestflight(username: String,
                         appIdentifier: String? = nil,
                         appPlatform: String = "ios",
@@ -4175,6 +7831,18 @@ func uploadToTestflight(username: String,
                                                                                                       RubyCommand.Argument(name: "reject_build_waiting_for_review", value: rejectBuildWaitingForReview)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Validate that the Google Play Store `json_key` works
+
+ - parameters:
+   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
+   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
+   - timeout: Timeout for read, open, and send (in seconds)
+
+ Use this action to test and validate your private key json key file used to connect and authenticate with the Google Play API
+*/
 func validatePlayStoreJsonKey(jsonKey: String? = nil,
                               jsonKeyData: String? = nil,
                               rootUrl: String? = nil,
@@ -4185,6 +7853,22 @@ func validatePlayStoreJsonKey(jsonKey: String? = nil,
                                                                                                               RubyCommand.Argument(name: "timeout", value: timeout)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Able to verify various settings in ipa file
+
+ - parameters:
+   - provisioningType: Required type of provisioning
+   - provisioningUuid: Required UUID of provisioning profile
+   - teamIdentifier: Required team identifier
+   - teamName: Required team name
+   - appName: Required app name
+   - bundleIdentifier: Required bundle identifier
+   - ipaPath: Explicitly set the ipa path
+   - buildPath: Explicitly set the ipa, app or xcarchive path
+
+ Verifies that the built app was built using the expected build resources. This is relevant for people who build on machines that are used to build apps with different profiles, certificates and/or bundle identifiers to guard against configuration mistakes.
+*/
 func verifyBuild(provisioningType: String? = nil,
                  provisioningUuid: String? = nil,
                  teamIdentifier: String? = nil,
@@ -4203,14 +7887,44 @@ func verifyBuild(provisioningType: String? = nil,
                                                                                               RubyCommand.Argument(name: "build_path", value: buildPath)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Verifies all keys referenced from the Podfile are non-empty
+
+ Runs a check against all keys specified in your Podfile to make sure they're more than a single character long. This is to ensure you don't deploy with stubbed keys.
+*/
 func verifyPodKeys() {
   let command = RubyCommand(commandID: "", methodName: "verify_pod_keys", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Verifies that the Xcode installation is properly signed by Apple
+
+ - parameter xcodePath: The path to the Xcode installation to test
+
+ This action was implemented after the recent Xcode attack to make sure you're not using a [hacked Xcode installation](http://researchcenter.paloaltonetworks.com/2015/09/novel-malware-xcodeghost-modifies-xcode-infects-apple-ios-apps-and-hits-app-store/).
+*/
 func verifyXcode(xcodePath: String) {
   let command = RubyCommand(commandID: "", methodName: "verify_xcode", className: nil, args: [RubyCommand.Argument(name: "xcode_path", value: xcodePath)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Increment or set the version in a podspec file
+
+ - parameters:
+   - path: You must specify the path to the podspec file to update
+   - bumpType: The type of this version bump. Available: patch, minor, major
+   - versionNumber: Change to a specific version. This will replace the bump type value
+   - versionAppendix: Change version appendix to a specific value. For example 1.4.14.4.1 -> 1.4.14.5
+   - requireVariablePrefix: true by default, this is used for non CocoaPods version bumps only
+
+ You can use this action to manipulate any 'version' variable contained in a ruby file.
+ For example, you can use it to bump the version of a CocoaPods' podspec file.
+ It also supports versions that are not semantic: `1.4.14.4.1`.
+ For such versions, there is an option to change the appendix (e.g. `4.1`).
+*/
 func versionBumpPodspec(path: String,
                         bumpType: String = "patch",
                         versionNumber: String? = nil,
@@ -4223,28 +7937,65 @@ func versionBumpPodspec(path: String,
                                                                                                       RubyCommand.Argument(name: "require_variable_prefix", value: requireVariablePrefix)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Receive the version number from a podspec file
+
+ - parameters:
+   - path: You must specify the path to the podspec file
+   - requireVariablePrefix: true by default, this is used for non CocoaPods version bumps only
+*/
 func versionGetPodspec(path: String,
                        requireVariablePrefix: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "version_get_podspec", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
                                                                                                      RubyCommand.Argument(name: "require_variable_prefix", value: requireVariablePrefix)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Archives the project using `xcodebuild`
+*/
 func xcarchive() {
   let command = RubyCommand(commandID: "", methodName: "xcarchive", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Builds the project using `xcodebuild`
+*/
 func xcbuild() {
   let command = RubyCommand(commandID: "", methodName: "xcbuild", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Cleans the project using `xcodebuild`
+*/
 func xcclean() {
   let command = RubyCommand(commandID: "", methodName: "xcclean", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Exports the project using `xcodebuild`
+*/
 func xcexport() {
   let command = RubyCommand(commandID: "", methodName: "xcexport", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Make sure a certain version of Xcode is installed
+
+ - parameters:
+   - version: The version number of the version of Xcode to install
+   - username: Your Apple ID Username
+   - teamId: The ID of your team if you're in multiple teams
+
+ - returns: The path to the newly installed Xcode version
+
+ Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by the [xcode_install](https://github.com/neonichu/xcode-install) gem. This will make sure to use the correct Xcode for later actions.
+*/
 @discardableResult func xcodeInstall(version: String,
                                      username: String,
                                      teamId: String? = nil) -> String {
@@ -4253,10 +8004,34 @@ func xcexport() {
                                                                                                RubyCommand.Argument(name: "team_id", value: teamId)])
   return runner.executeCommand(command)
 }
+
+/**
+ Change the xcode-path to use. Useful for beta versions of Xcode
+
+ Select and build with the Xcode installed at the provided path. Use the `xcversion` action if you want to select an Xcode based on a version specifier or you don't have known, stable paths as may happen in a CI environment.
+*/
 func xcodeSelect() {
   let command = RubyCommand(commandID: "", methodName: "xcode_select", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Downloads Xcode Bot assets like the `.xcarchive` and logs
+
+ - parameters:
+   - host: IP Address/Hostname of Xcode Server
+   - botName: Name of the Bot to pull assets from
+   - integrationNumber: Optionally you can override which integration's assets should be downloaded. If not provided, the latest integration is used
+   - username: Username for your Xcode Server
+   - password: Password for your Xcode Server
+   - targetFolder: Relative path to a folder into which to download assets
+   - keepAllAssets: Whether to keep all assets or let the script delete everything except for the .xcarchive
+   - trustSelfSignedCerts: Whether to trust self-signed certs on your Xcode Server
+
+ This action downloads assets from your Xcode Server Bot (works with Xcode Server using Xcode 6 and 7. By default, this action downloads all assets, unzips them and deletes everything except for the `.xcarchive`.
+ If you'd like to keep all downloaded assets, pass `keep_all_assets: true`.
+ This action returns the path to the downloaded assets folder and puts into shared values the paths to the asset folder and to the `.xcarchive` inside it.
+*/
 @discardableResult func xcodeServerGetAssets(host: String,
                                              botName: String,
                                              integrationNumber: Any? = nil,
@@ -4275,10 +8050,53 @@ func xcodeSelect() {
                                                                                                          RubyCommand.Argument(name: "trust_self_signed_certs", value: trustSelfSignedCerts)])
   return parseArray(fromString: runner.executeCommand(command))
 }
+
+/**
+ Use the `xcodebuild` command to build and sign your app
+
+ **Note**: `xcodebuild` is a complex command, so it is recommended to use [_gym_](https://docs.fastlane.tools/actions/gym/) for building your ipa file and [_scan_](https://docs.fastlane.tools/actions/scan/) for testing your app instead.
+*/
 func xcodebuild() {
   let command = RubyCommand(commandID: "", methodName: "xcodebuild", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Nice code coverage reports without hassle
+
+ - parameters:
+   - workspace: Path the workspace file
+   - project: Path the project file
+   - scheme: The project's scheme. Make sure it's marked as `Shared`
+   - configuration: The configuration used when building the app. Defaults to 'Release'
+   - sourceDirectory: The path to project's root directory
+   - derivedDataPath: The directory where build products and other derived data will go
+   - outputDirectory: The directory in which all reports will be stored
+   - htmlReport: Produce an HTML report
+   - markdownReport: Produce a Markdown report
+   - jsonReport: Produce a JSON report
+   - minimumCoveragePercentage: Raise exception if overall coverage percentage is under this value (ie. 75)
+   - slackUrl: Create an Incoming WebHook for your Slack group to post results there
+   - slackChannel: #channel or @username
+   - skipSlack: Don't publish to slack, even when an URL is given
+   - slackUsername: The username which is used to publish to slack
+   - slackMessage: The message which is published together with a successful report
+   - ignoreFilePath: Relative or absolute path to the file containing the list of ignored files
+   - includeTestTargets: Enables coverage reports for .xctest targets
+   - excludeTargets: Comma separated list of targets to exclude from coverage report
+   - includeTargets: Comma separated list of targets to include in coverage report. If specified then exlude_targets will be ignored
+   - onlyProjectTargets: Display the coverage only for main project targets (e.g. skip Pods targets)
+   - disableCoveralls: Add this flag to disable automatic submission to Coveralls
+   - coverallsServiceName: Name of the CI service compatible with Coveralls. i.e. travis-ci. This option must be defined along with coveralls_service_job_id
+   - coverallsServiceJobId: Name of the current job running on a CI service compatible with Coveralls. This option must be defined along with coveralls_service_name
+   - coverallsRepoToken: Repository token to be used by integrations not compatible with Coveralls
+   - xcconfig: Use an extra XCCONFIG file to build your app
+   - ideFoundationPath: Absolute path to the IDEFoundation.framework binary
+   - legacySupport: Whether xcov should parse a xccoverage file instead on xccovreport
+
+ Create nice code coverage reports and post coverage summaries on Slack *(xcov gem is required)*.
+ More information: [https://github.com/nakiostudio/xcov](https://github.com/nakiostudio/xcov).
+*/
 func xcov(workspace: String? = nil,
           project: String? = nil,
           scheme: String? = nil,
@@ -4305,7 +8123,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-11_Beta_5.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-11.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -4337,18 +8155,51 @@ func xcov(workspace: String? = nil,
                                                                                       RubyCommand.Argument(name: "legacy_support", value: legacySupport)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Runs tests on the given simulator
+*/
 func xctest() {
   let command = RubyCommand(commandID: "", methodName: "xctest", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Run tests using xctool
+
+ You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [Homebrew](http://brew.sh).
+ It is recommended to store the build configuration in the `.xctool-args` file.
+ More information: [https://docs.fastlane.tools/actions/xctool/](https://docs.fastlane.tools/actions/xctool/).
+*/
 func xctool() {
   let command = RubyCommand(commandID: "", methodName: "xctool", className: nil, args: [])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Select an Xcode to use by version specifier
+
+ - parameter version: The version of Xcode to select specified as a Gem::Version requirement string (e.g. '~> 7.1.0')
+
+ Finds and selects a version of an installed Xcode that best matches the provided [`Gem::Version` requirement specifier](http://www.rubydoc.info/github/rubygems/rubygems/Gem/Version)
+*/
 func xcversion(version: String) {
   let command = RubyCommand(commandID: "", methodName: "xcversion", className: nil, args: [RubyCommand.Argument(name: "version", value: version)])
   _ = runner.executeCommand(command)
 }
+
+/**
+ Compress a file or folder to a zip
+
+ - parameters:
+   - path: Path to the directory or file to be zipped
+   - outputPath: The name of the resulting zip file
+   - verbose: Enable verbose output of zipped file
+   - password: Encrypt the contents of the zip archive using a password
+   - symlinks: Store symbolic links as such in the zip archive
+
+ - returns: The path to the output zip file
+*/
 @discardableResult func zip(path: String,
                             outputPath: String? = nil,
                             verbose: Bool = true,
@@ -4361,6 +8212,7 @@ func xcversion(version: String) {
                                                                                      RubyCommand.Argument(name: "symlinks", value: symlinks)])
   return runner.executeCommand(command)
 }
+
 
 // These are all the parsing functions needed to transform our data into the expected types
 func parseArray(fromString: String, function: String = #function) -> [String] {
@@ -4416,4 +8268,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.57]
+// FastlaneRunnerAPIVersion [0.9.60]

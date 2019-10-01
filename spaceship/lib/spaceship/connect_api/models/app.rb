@@ -32,7 +32,7 @@ module Spaceship
 
       def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
         resps = Spaceship::ConnectAPI.get_apps(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def self.find(bundle_id)
@@ -54,7 +54,7 @@ module Spaceship
         filter[:apps] = id
 
         resps = Spaceship::ConnectAPI.get_beta_testers(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       #
@@ -66,7 +66,7 @@ module Spaceship
         filter[:app] = id
 
         resps = Spaceship::ConnectAPI.get_builds(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def get_build_deliveries(filter: {}, includes: nil, limit: nil, sort: nil)
@@ -74,7 +74,7 @@ module Spaceship
         filter[:app] = id
 
         resps = Spaceship::ConnectAPI.get_build_deliveries(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def get_beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
@@ -82,7 +82,7 @@ module Spaceship
         filter[:app] = id
 
         resps = Spaceship::ConnectAPI.get_beta_app_localizations(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def get_beta_groups(filter: {}, includes: nil, limit: nil, sort: nil)
@@ -90,7 +90,7 @@ module Spaceship
         filter[:app] = id
 
         resps = Spaceship::ConnectAPI.get_beta_groups(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
     end
   end

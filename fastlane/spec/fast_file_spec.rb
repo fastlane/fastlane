@@ -12,6 +12,18 @@ describe Fastlane do
           Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileInvalid')
         end.to raise_exception("Could not find action, lane or variable 'laneasdf'. Check out the documentation for more details: https://docs.fastlane.tools/actions")
       end
+
+      it "prints a warning if an uninstalled library is required" do
+        expect_any_instance_of(Fastlane::FastFile).to receive(:parse)
+        expect(UI).to receive(:important).with("You have required a gem, if this is a third party gem, please use `fastlane_require 'some_remote_gem'` to ensure the gem is installed locally.")
+        Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileRequireUninstalledGem')
+      end
+
+      it "does not print a warning if required library is installed" do
+        expect_any_instance_of(Fastlane::FastFile).to receive(:parse)
+        expect(UI).not_to(receive(:important))
+        Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileRequireInstalledGem')
+      end
     end
 
     describe "#sh" do
