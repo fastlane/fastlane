@@ -1,5 +1,6 @@
 require 'addressable'
 require 'faraday_middleware'
+
 require_relative '../rule'
 
 module Precheck
