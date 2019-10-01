@@ -1,22 +1,60 @@
 protocol ScreengrabfileProtocol: class {
+
+  /// Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx
   var androidHome: String? { get }
+
+  /// The Android build tools version to use, e.g. '23.0.2'
   var buildToolsVersion: String? { get }
+
+  /// A list of locales which should be used
   var locales: [String] { get }
+
+  /// Enabling this option will automatically clear previously generated screenshots before running screengrab
   var clearPreviousScreenshots: Bool { get }
+
+  /// The directory where to store the screenshots
   var outputDirectory: String { get }
+
+  /// Don't open the summary after running _screengrab_
   var skipOpenSummary: Bool { get }
+
+  /// The package name of the app under test (e.g. com.yourcompany.yourapp)
   var appPackageName: String { get }
+
+  /// The package name of the tests bundle (e.g. com.yourcompany.yourapp.test)
   var testsPackageName: String? { get }
+
+  /// Only run tests in these Java packages
   var useTestsInPackages: [String]? { get }
+
+  /// Only run tests in these Java classes
   var useTestsInClasses: [String]? { get }
+
+  /// Additional launch arguments
   var launchArguments: [String]? { get }
+
+  /// The fully qualified class name of your test instrumentation runner
   var testInstrumentationRunner: String { get }
+
+  /// Return the device to this locale after running tests
   var endingLocale: String { get }
+
+  /// The path to the APK for the app under test
   var appApkPath: String? { get }
+
+  /// The path to the APK for the the tests bundle
   var testsApkPath: String? { get }
+
+  /// Use the device or emulator with the given serial number or qualifier
   var specificDevice: String? { get }
+
+  /// Type of device used for screenshots. Matches Google Play Types (phone, sevenInch, tenInch, tv, wear)
   var deviceType: String { get }
+
+  /// Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary
   var exitOnTestFailure: Bool { get }
+
+  /// Enabling this option will automatically uninstall the application before running it
   var reinstallApp: Bool { get }
 }
 
@@ -42,7 +80,6 @@ extension ScreengrabfileProtocol {
   var reinstallApp: Bool { return false }
 }
 
-
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.1]
+// FastlaneRunnerAPIVersion [0.9.11]
