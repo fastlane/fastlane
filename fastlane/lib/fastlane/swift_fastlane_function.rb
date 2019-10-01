@@ -1,7 +1,11 @@
 module Fastlane
   class SwiftFunction
     attr_accessor :function_name
+    attr_accessor :function_description
+    attr_accessor :function_details
     attr_accessor :return_type
+    attr_accessor :return_value
+    attr_accessor :sample_return_value
     attr_accessor :param_names
     attr_accessor :param_descriptions
     attr_accessor :param_default_values
@@ -11,14 +15,18 @@ module Fastlane
     attr_accessor :reserved_words
     attr_accessor :default_values_to_ignore
 
-    def initialize(action_name: nil, keys: nil, key_descriptions: nil, key_default_values: nil, key_optionality_values: nil, key_type_overrides: nil, key_is_strings: nil, return_type: nil)
+    def initialize(action_name: nil, action_description: nil, action_details: nil, keys: nil, key_descriptions: nil, key_default_values: nil, key_optionality_values: nil, key_type_overrides: nil, key_is_strings: nil, return_type: nil, return_value: nil, sample_return_value: nil)
       @function_name = action_name
+      @function_description = action_description
+      @function_details = action_details
       @param_names = keys
       @param_descriptions = key_descriptions
       @param_default_values = key_default_values
       @param_optionality_values = key_optionality_values
       @param_is_strings = key_is_strings
       @return_type = return_type
+      @return_value = non_empty(string: return_value)
+      @sample_return_value = non_empty(string: sample_return_value)
       @param_type_overrides = key_type_overrides
 
       # rubocop:disable LineLength
@@ -32,6 +40,14 @@ module Fastlane
         return word
       end
       return "`#{word}`"
+    end
+
+    def non_empty(string: nil)
+      if string.nil? || string.to_s.empty?
+        return nil
+      else
+        return string
+      end
     end
 
     def return_declaration
@@ -178,7 +194,54 @@ module Fastlane
       indent = ' ' * (discardable_result.length + function_name.length + function_keyword_definition.length + open_paren.length)
       params = self.parameters.join(",\n#{indent}")
 
-      return "#{discardable_result}#{function_keyword_definition}#{function_name}#{open_paren}#{params}#{closed_paren}#{function_return_declaration} {\n#{self.implementation}\n}"
+      return "#{swift_documentation}#{discardable_result}#{function_keyword_definition}#{function_name}#{open_paren}#{params}#{closed_paren}#{function_return_declaration} {\n#{self.implementation}\n}\n"
+    end
+
+    def swift_documentation
+      has_parameters = @param_names && @param_names.length > 0
+      unless @function_description || @function_details || has_parameters
+        return ''
+      end
+
+      description = " #{fix_documentation_indentation(string: @function_description)}" if @function_description
+      details = " #{fix_documentation_indentation(string: @function_details)}" if @function_details
+      separator = ''
+      documentation_elements = [description, swift_parameter_documentation, swift_return_value_documentation, details].compact
+      # Adds newlines between each documentation element.
+      documentation = documentation_elements.flat_map { |element| [element, separator] }.tap(&:pop).join("\n")
+
+      return "/**\n#{documentation}\n*/\n"
+    end
+
+    def swift_parameter_documentation
+      unless @param_names && @param_names.length > 0
+        return nil
+      end
+
+      names_and_descriptions = @param_names.zip(@param_descriptions)
+
+      if @param_names.length == 1
+        detail_strings = names_and_descriptions.map { |name, description| " - parameter #{camel_case_lower(string: name)}: #{description}" }
+        return detail_strings.first
+      else
+        detail_strings = names_and_descriptions.map { |name, description| "   - #{camel_case_lower(string: name)}: #{description}" }
+        return " - parameters:\n#{detail_strings.join("\n")}"
+      end
+    end
+
+    def swift_return_value_documentation
+      unless @return_value
+        return nil
+      end
+
+      sample = ". Example: #{@sample_return_value}" if @sample_return_value
+
+      return " - returns: #{return_value}#{sample}"
+    end
+
+    def fix_documentation_indentation(string: nil)
+      indent = ' '
+      string.gsub("\n", "\n#{indent}")
     end
 
     def build_argument_list
@@ -248,12 +311,18 @@ module Fastlane
       unless @param_names
         return []
       end
-      swift_vars = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides).map do |param, default_value, optional, param_type_override|
+      swift_vars = @param_names.zip(param_default_values, param_optionality_values, param_type_overrides, param_descriptions).map do |param, default_value, optional, param_type_override, param_description|
         type = get_type(param: param, default_value: default_value, optional: optional, param_type_override: param_type_override)
 
         param = camel_case_lower(string: param)
         param = sanitize_reserved_word(word: param)
         static_var_for_parameter_name = param
+
+        if param_description
+          documentation = "  /// #{param_description}\n"
+        end
+
+        "\n#{documentation}"\
         "  var #{static_var_for_parameter_name}: #{type} { get }"
       end
 

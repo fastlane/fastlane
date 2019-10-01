@@ -439,13 +439,17 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       if self.tools_option_files.include?(action_name.to_s.downcase)
         tool_swift_function = ToolSwiftFunction.new(
           action_name: action_name,
+          action_description: action.description,
+          action_details: action.details,
           keys: keys,
           key_descriptions: key_descriptions,
           key_default_values: key_default_values,
           key_optionality_values: key_optionality_values,
           key_type_overrides: key_type_overrides,
           key_is_strings: key_is_strings,
-          return_type: action_return_type
+          return_type: action_return_type,
+          return_value: action.return_value,
+          sample_return_value: action.sample_return_value
         )
         generated_protocol_file_path = generate_tool_protocol(tool_swift_function: tool_swift_function)
         self.generated_paths << generated_protocol_file_path unless generated_protocol_file_path.nil?
@@ -453,13 +457,17 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       else
         return SwiftFunction.new(
           action_name: action_name,
+          action_description: action.description,
+          action_details: action.details,
           keys: keys,
           key_descriptions: key_descriptions,
           key_default_values: key_default_values,
           key_optionality_values: key_optionality_values,
           key_type_overrides: key_type_overrides,
           key_is_strings: key_is_strings,
-          return_type: action_return_type
+          return_type: action_return_type,
+          return_value: action.return_value,
+          sample_return_value: action.sample_return_value
         )
       end
     end
