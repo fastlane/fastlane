@@ -14,7 +14,19 @@ module Supply
 
       apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
 
-      track_edit = AndroidPublisher::Track.new()
+      track_edit = AndroidPublisher::Track.new(track: Supply.config[:track])
+      track_edit.releases = [
+        AndroidPublisher::TrackRelease.new(
+          name: "josh_release_name_3",
+          release_notes: [],
+          status: "completed",
+
+          #status: "inProgress",
+          #user_fraction: 0.5,
+
+          version_codes: apk_version_codes
+        )
+      ]
 
       if ((!Supply.config[:skip_upload_metadata] || !Supply.config[:skip_upload_changelogs] || !Supply.config[:skip_upload_screenshots]) && metadata_path)
         UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
@@ -37,10 +49,10 @@ module Supply
 
       # Only update tracks if we have version codes
       # Updating a track with empty version codes can completely clear out a track
-      update_track() unless apk_version_codes.empty?
+      update_track(track_edit, apk_version_codes) unless apk_version_codes.empty?
 
       unless Supply.config[:rollout].nil? && Supply.config[:version_name].nil? && Supply.config[:track].nil?
-        update_rollout
+        #update_rollout
       end
 
       promote_track if Supply.config[:track_promote_to]
@@ -305,14 +317,16 @@ binding.pry
                         file_size)
     end
 
-    def update_track(apk_version_codes)
+    def update_track(track, apk_version_codes)
       UI.message("Updating track '#{Supply.config[:track]}'...")
       check_superseded_tracks(apk_version_codes) if Supply.config[:check_superseded_tracks]
 
       if Supply.config[:track].eql?("rollout")
-        client.update_track(Supply.config[:track], Supply.config[:rollout] || 0.1, apk_version_codes)
+        raise "do something here"
+        #client.update_track(Supply.config[:track], Supply.config[:rollout] || 0.1, apk_version_codes)
       else
-        client.update_track(Supply.config[:track], 1.0, apk_version_codes)
+        client.update_track(Supply.config[:track], track)
+        #client.update_track(Supply.config[:track], 1.0, apk_version_codes)
       end
     end
 

@@ -1,4 +1,3 @@
-require 'pry'
 require 'googleauth'
 require 'google/apis/androidpublisher_v3'
 AndroidPublisher = Google::Apis::AndroidpublisherV3
@@ -363,6 +362,9 @@ module Supply
       ensure_active_edit!
 
       all_tracks = call_google_api { client.list_edit_tracks(current_package_name, current_edit.id) }.tracks
+
+      require 'pp'
+      pp all_tracks
 
       if tracknames.length > 0
         all_tracks = all_tracks.select { |track| tracknames.include?(track.track) }
