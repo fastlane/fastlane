@@ -293,6 +293,9 @@ module Match
       end
 
       def ensure_bucket_is_selected
+        # Skip the instructions if the user provided a bucket name
+        return unless self.bucket_name.to_s.length == 0
+
         created_bucket = UI.confirm("Did you already create a Google Cloud Storage bucket?")
         while self.bucket_name.to_s.length == 0
           unless created_bucket
