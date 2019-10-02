@@ -37,10 +37,7 @@ module Supply
                                      env_name: "SUPPLY_TRACK",
                                      description: "The track of the application to use. The default available tracks are: #{Supply::AVAILABLE_TRACKS.join(', ')}",
                                      default_value: DEFAULT_TRACK,
-                                     type: String,
-                                     verify_block: proc do |value|
-                                      UI.user_error!("Value must be one of '#{Supply::AVAILABLE_TRACKS}'") unless Supply::AVAILABLE_TRACKS.include?(value)
-                                    end),
+                                     type: String),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
                                      description: "The percentage of the user fraction when uploading to the rollout track",
@@ -203,10 +200,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track_promote_to,
                                      env_name: "SUPPLY_TRACK_PROMOTE_TO",
                                      optional: true,
-                                     description: "The track to promote to. The default available tracks are: #{Supply::AVAILABLE_TRACKS.join(', ')}",
-                                     verify_block: proc do |value|
-                                      UI.user_error!("Value must be one of '#{Supply::AVAILABLE_TRACKS}'") unless Supply::AVAILABLE_TRACKS.include?(value)
-                                    end),
+                                     description: "The track to promote to. The default available tracks are: #{Supply::AVAILABLE_TRACKS.join(', ')}"),
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,
