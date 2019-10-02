@@ -21,14 +21,16 @@ module Fastlane
         # Get from build settings if needed (ex: $(MARKETING_VERSION) is default in Xcode 11)
         if version_number =~ /\$\(([\w\-]+)\)/
           version_number = get_version_number_from_build_settings!(target, $1, configuration)
+
+          # Read $(MARKETING_VERSION) from project settings if version_number is not set in target settings
+          version_number ||= get_version_number_from_build_settings!(project, $1, configuration)
+
         # ${MARKETING_VERSION} also works
         elsif version_number =~ /\$\{([\w\-]+)\}/
           version_number = get_version_number_from_build_settings!(target, $1, configuration)
-        end
 
-        # Check if version_number is not set and try retrieving value from project settings
-        if version_number.nil?
-          version_number = get_version_number_from_build_settings!(project, $1, configuration)
+          # Read ${MARKETING_VERSION} from project settings if version_number is not set in target settings
+          version_number ||= get_version_number_from_build_settings!(project, $1, configuration)
         end
 
         # Error out if version_number is not set
