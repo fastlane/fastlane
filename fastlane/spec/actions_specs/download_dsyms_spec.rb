@@ -4,6 +4,7 @@ describe Fastlane do
       # 1 app, 2 trains/versions, 2 builds each
       let(:app) { double('app') }
       let(:version) { double('version') }
+      let(:live_version) { double('live_version') }
       let(:train) { double('train') }
       let(:train2) { double('train2') }
       let(:build) { double('build') }
@@ -70,6 +71,27 @@ describe Fastlane do
           expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, train2.version_string, build2.build_version, nil)
           Fastlane::FastFile.new.parse("lane :test do
               download_dsyms(username: 'user@fastlane.tools', app_identifier: 'tools.fastlane.myapp', version: 'latest')
+          end").runner.execute(:test)
+        end
+      end
+
+      context 'when version is live' do
+        before do
+          # live
+          allow(app).to receive(:live_version).and_return(live_version)
+          allow(live_version).to receive(:version).and_return('1.0.0')
+          allow(live_version).to receive(:build_version).and_return('42')
+          allow(live_version).to receive(:candidate_builds).and_return([build])
+          allow(build).to receive(:build_version).and_return('42')
+          allow(build).to receive(:upload_date).and_return(1_547_196_482_000)
+        end
+        it 'downloads only dsyms of live build' do
+          expect(app).to receive(:tunes_all_builds_for_train).and_return([build, build2, build3])
+          expect(app).to receive(:tunes_build_details).with(train: '1.0.0', build_number: '42', platform: :ios).and_return(build_detail)
+          expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, train.version_string, build.build_version, nil)
+
+          Fastlane::FastFile.new.parse("lane :test do
+              download_dsyms(username: 'user@fastlane.tools', app_identifier: 'tools.fastlane.myapp', version: 'live')
           end").runner.execute(:test)
         end
       end
