@@ -295,11 +295,9 @@ module Fastlane
     end
 
     def self.git_version
-      begin
-        return `git --version`.strip.split("\n").first
-      rescue => ex
-        return "not found"
-      end
+      return `git --version`.strip.split("\n").first
+    rescue
+      return "not found"
     end
   end
 end
