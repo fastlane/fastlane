@@ -26,6 +26,7 @@ module Fastlane
         platform = params[:platform]
         output_directory = params[:output_directory]
         wait_for_dsym_processing = params[:wait_for_dsym_processing]
+        wait_timeout = params[:wait_timeout]
         min_version = Gem::Version.new(params[:min_version]) if params[:min_version]
 
         # Set version if it is latest
@@ -110,7 +111,7 @@ module Fastlane
               end
 
               unless download_url
-                if !wait_for_dsym_processing || (Time.now - start) > (60 * 5)
+                if !wait_for_dsym_processing || (Time.now - start) > wait_timeout
                   # In some cases, AppStoreConnect does not process the dSYMs, thus no error should be thrown.
                   UI.message("Could not find any dSYM for #{build.build_version} (#{train.version_string})")
                 else
@@ -263,7 +264,14 @@ module Fastlane
                                        description: "Wait for dSYMs to process",
                                        optional: true,
                                        default_value: false,
-                                       type: Boolean)
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :wait_timeout,
+                                       short_option: "-t",
+                                       env_name: "DOWNLOAD_DSYMS_WAIT_TIMEOUT",
+                                       description: "Number of seconds to wait for dSYMs to process",
+                                       optional: true,
+                                       default_value: 300,
+                                       type: Integer)
         ]
       end
 
