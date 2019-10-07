@@ -64,13 +64,13 @@ describe Commander::Runner do
       runner = Commander::Runner.new
       expect(runner).to receive(:abort).with("\n[!] Title\n\tLine 1\n\tLine 2".red)
 
-      with_verbose(false) do
+      FastlaneSpec::Env.with_verbose(false) do
         runner.handle_unknown_error!(CustomError.new)
       end
     end
 
     it 'should reraise and show custom info for errors that have the Apple error info provider method with FastlaneCore::Globals.verbose?=true' do
-      with_verbose(true) do
+      FastlaneSpec::Env.with_verbose(true) do
         expect do
           Commander::Runner.new.handle_unknown_error!(CustomError.new)
         end.to raise_error(CustomError, "[!] Title\n\tLine 1\n\tLine 2".red)

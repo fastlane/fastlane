@@ -234,7 +234,7 @@ describe Deliver::CommandsGenerator do
       end
 
       it "forces overwriting metadata if DELIVER_FORCE_OVERWRITE is set" do
-        with_env_values('DELIVER_FORCE_OVERWRITE' => '1') do
+        FastlaneSpec::Env.with_env_values('DELIVER_FORCE_OVERWRITE' => '1') do
           expect(Deliver::CommandsGenerator.force_overwrite_metadata?({}, "an/ignored/path")).to be_truthy
         end
       end

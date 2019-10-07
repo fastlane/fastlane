@@ -72,7 +72,7 @@ module Frameit
     private
 
     def store_result
-      output_path = screenshot.path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
+      output_path = screenshot.output_path
       image.format("png")
       image.write(output_path)
       Helper.hide_loading_indicator
@@ -193,7 +193,8 @@ module Frameit
     def horizontal_frame_padding
       padding = fetch_config['padding']
       if padding.kind_of?(String) && padding.split('x').length == 2
-        padding = padding.split('x')[0].to_i
+        padding = padding.split('x')[0]
+        padding = padding.to_i unless padding.end_with?('%')
       end
       return scale_padding(padding)
     end
@@ -202,7 +203,8 @@ module Frameit
     def vertical_frame_padding
       padding = fetch_config['padding']
       if padding.kind_of?(String) && padding.split('x').length == 2
-        padding = padding.split('x')[1].to_i
+        padding = padding.split('x')[1]
+        padding = padding.to_i unless padding.end_with?('%')
       end
       return scale_padding(padding)
     end
@@ -328,7 +330,7 @@ module Frameit
         background = put_title_into_background_stacked(background, title, keyword)
         return background
       end
-      # sum_width: the width of both labels together including the space inbetween
+      # sum_width: the width of both labels together including the space in-between
       #   is used to calculate the ratio
       sum_width = title.width
       sum_width += keyword.width + keyword_padding if keyword

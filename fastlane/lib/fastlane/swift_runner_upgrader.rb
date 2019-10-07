@@ -90,6 +90,10 @@ module Fastlane
       source_file_content = File.read(source)
       target_file_content = File.read(target)
 
+      # ignore if files don't contain FastlaneRunnerAPIVersion
+      return false unless source_file_content.include?("FastlaneRunnerAPIVersion")
+      return false unless target_file_content.include?("FastlaneRunnerAPIVersion")
+
       bundled_version = source_file_content.match(regex_to_use)[1]
       target_version = target_file_content.match(regex_to_use)[1]
       file_versions_are_different = bundled_version != target_version

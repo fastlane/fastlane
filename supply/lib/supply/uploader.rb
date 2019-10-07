@@ -162,7 +162,16 @@ module Supply
 
       aab_paths.each do |aab_path|
         UI.message("Preparing aab at path '#{aab_path}' for upload...")
-        aab_version_codes.push(client.upload_bundle(aab_path))
+        bundle_version_code = client.upload_bundle(aab_path)
+
+        if metadata_path
+          all_languages.each do |language|
+            next if language.start_with?('.') # e.g. . or .. or hidden folders
+            upload_changelog(language, bundle_version_code)
+          end
+        end
+
+        aab_version_codes.push(bundle_version_code)
       end
 
       return aab_version_codes

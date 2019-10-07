@@ -146,15 +146,43 @@ module Gym
       containing_directory = File.expand_path("..", PackageCommandGenerator.dsym_path)
       bcsymbolmaps_directory = File.expand_path("../../BCSymbolMaps", PackageCommandGenerator.dsym_path)
       available_dsyms = Dir.glob("#{containing_directory}/*.dSYM")
+      uuid_regex = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
 
       if Dir.exist?(bcsymbolmaps_directory)
         UI.message("Mapping dSYM(s) using generated BCSymbolMaps") unless Gym.config[:silent]
         available_dsyms.each do |dsym|
-          command = []
-          command << "dsymutil"
-          command << "--symbol-map #{bcsymbolmaps_directory.shellescape}"
-          command << dsym.shellescape
-          Helper.backticks(command.join(" "), print: !Gym.config[:silent])
+          dwarfdump_command = []
+          dwarfdump_command << "dwarfdump"
+          dwarfdump_command << "--uuid #{dsym.shellescape}"
+
+          dwarfdump_result = Helper.backticks(dwarfdump_command.join(" "), print: false)
+          architecture_infos = dwarfdump_result.split("\n")
+          architecture_uuids = architecture_infos.map do |info|
+            info_array = info.split(" ")
+            uuid = info_array[1]
+
+            if uuid.nil? || !uuid.match(uuid_regex)
+              nil
+            else
+              uuid
+            end
+          end
+
+          architecture_uuids = architecture_uuids.reject(&:nil?)
+
+          symbol_map_paths = architecture_uuids.map do |uuid|
+            "#{bcsymbolmaps_directory.shellescape}/#{uuid}.bcsymbolmap"
+          end
+
+          symbol_map_paths << bcsymbolmaps_directory.shellescape if symbol_map_paths.empty?
+
+          symbol_map_paths.each do |path|
+            command = []
+            command << "dsymutil"
+            command << "--symbol-map #{path}"
+            command << dsym.shellescape
+            Helper.backticks(command.join(" "), print: !Gym.config[:silent])
+          end
         end
       end
 

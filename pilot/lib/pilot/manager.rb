@@ -10,10 +10,10 @@ require_relative 'module'
 
 module Pilot
   class Manager
-    def start(options)
+    def start(options, should_login: true)
       return if @config # to not login multiple times
       @config = options
-      login
+      login if should_login
     end
 
     def login
@@ -27,9 +27,9 @@ module Pilot
 
     # The app object we're currently using
     def app
-      @apple_id ||= fetch_app_id
+      @app_id ||= fetch_app_id
 
-      @app ||= Spaceship::Tunes::Application.find(@apple_id)
+      @app ||= Spaceship::ConnectAPI::App.get(app_id: @app_id)
       unless @app
         UI.user_error!("Could not find app with #{(config[:apple_id] || config[:app_identifier])}")
       end
@@ -43,18 +43,19 @@ module Pilot
     ################
 
     def fetch_app_id
-      return @apple_id if @apple_id
+      @app_id ||= config[:apple_id]
+      return @app_id if @app_id
       config[:app_identifier] = fetch_app_identifier
 
       if config[:app_identifier]
-        @app ||= Spaceship::Tunes::Application.find(config[:app_identifier])
+        @app ||= Spaceship::ConnectAPI::App.find(config[:app_identifier])
         UI.user_error!("Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}' on App Store Connect") unless @app
-        app_id ||= @app.apple_id
+        @app_id ||= @app.id
       end
 
-      app_id ||= UI.input("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
+      @app_id ||= UI.input("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
 
-      return app_id
+      return @app_id
     end
 
     def fetch_app_identifier

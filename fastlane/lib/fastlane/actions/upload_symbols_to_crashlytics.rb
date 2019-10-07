@@ -7,8 +7,8 @@ module Fastlane
         require 'tmpdir'
 
         find_binary_path(params)
-        find_api_token(params)
         find_gsp_path(params)
+        find_api_token(params)
 
         if !params[:api_token] && !params[:gsp_path]
           UI.user_error!('Either Fabric API key or path to Firebase Crashlytics GoogleService-Info.plist must be given.')
@@ -87,8 +87,11 @@ module Fastlane
         UI.message("Uploading '#{path}'...")
         command = []
         command << File.expand_path(params[:binary_path]).shellescape
-        command << "-a #{params[:api_token]}" if params[:api_token]
-        command << "-gsp #{params[:gsp_path].shellescape}" if params[:gsp_path]
+        if params[:gsp_path]
+          command << "-gsp #{params[:gsp_path].shellescape}"
+        elsif params[:api_token]
+          command << "-a #{params[:api_token]}"
+        end
         command << "-p #{params[:platform] == 'appletvos' ? 'tvos' : params[:platform]}"
         command << File.expand_path(path).shellescape
         begin

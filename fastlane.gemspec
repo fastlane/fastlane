@@ -15,26 +15,26 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Stefan Natchev",
-                        "Josh Holtz",
-                        "Maksym Grebenets",
-                        "Manu Wallner",
+  spec.authors       = ["Danielle Tomlinson",
                         "Fumiya Nakamura",
-                        "Luka Mirosevic",
-                        "Jan Piotrowski",
-                        "Danielle Tomlinson",
-                        "Helmut Januschka",
-                        "Kohki Miki",
-                        "Aaron Brager",
-                        "Jimmy Dee",
-                        "Andrew McBurney",
-                        "Jorge Revuelta H",
-                        "Joshua Liebowitz",
-                        "Olivier Halligon",
-                        "Jérôme Lacoste",
                         "Felix Krause",
+                        "Maksym Grebenets",
+                        "Helmut Januschka",
+                        "Jorge Revuelta H",
+                        "Stefan Natchev",
+                        "Andrew McBurney",
+                        "Kohki Miki",
+                        "Matthew Ellis",
+                        "Luka Mirosevic",
+                        "Jimmy Dee",
+                        "Manu Wallner",
+                        "Olivier Halligon",
+                        "Joshua Liebowitz",
+                        "Jan Piotrowski",
+                        "Josh Holtz",
                         "Iulian Onofrei",
-                        "Matthew Ellis"]
+                        "Jérôme Lacoste",
+                        "Aaron Brager"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -75,22 +75,22 @@ Gem::Specification.new do |spec|
   spec.add_dependency('colored') # colored terminal output
   spec.add_dependency('commander-fastlane', '>= 4.4.6', '< 5.0.0') # CLI parser
   spec.add_dependency('excon', '>= 0.45.0', '< 1.0.0') # Great HTTP Client
+  spec.add_dependency('faraday', '< 0.16.0') # Used for deploygate, hockey and testfairy actions
+  spec.add_dependency('faraday_middleware', '< 0.16.0') # same as faraday
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
-  spec.add_dependency('mini_magick', '~> 4.5.1') # To open, edit and export PSD files
-  spec.add_dependency('multi_json') # Because sometimes it's just not installed
+  spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
   spec.add_dependency('multi_xml', '~> 0.5')
-  spec.add_dependency('rubyzip', '>= 1.2.2', '< 2.0.0') # fix swift/ipa in gym
+  spec.add_dependency('rubyzip', '>= 1.3.0', '< 2.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
   spec.add_dependency('bundler', '>= 1.12.0', '< 3.0.0') # Used for fastlane plugins
-  spec.add_dependency('faraday', '~> 0.9') # Used for deploygate, hockey and testfairy actions
-  spec.add_dependency('faraday_middleware', '~> 0.9') # same as faraday
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
+  spec.add_dependency('jwt', '~> 2.1.0') # Used for generating authentication tokens for AppStore connect api
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
@@ -117,4 +117,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('fakefs', '~> 0.8.1')
   spec.add_development_dependency('sinatra', '~> 1.4.8')
   spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
+  spec.add_development_dependency('climate_control', '~> 0.2.0')
 end

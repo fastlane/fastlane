@@ -8,6 +8,7 @@ require_relative 'setup'
 require_relative 'runner'
 require_relative 'options'
 require_relative 'migrate'
+require_relative 'importer'
 
 require_relative 'storage'
 require_relative 'encryption'
@@ -129,6 +130,19 @@ module Match
           })
           encryption.decrypt_files if encryption
           UI.success("Repo is at: '#{storage.working_directory}'")
+        end
+      end
+
+      command :import do |c|
+        c.syntax = "fastlane match import"
+        c.description = "Imports certificates and profiles into the encrypted repository"
+
+        FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
+
+        c.action do |args, options|
+          params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
+          params.load_configuration_file("Matchfile") # this has to be done *before* overwriting the value
+          Match::Importer.new.import_cert(params)
         end
       end
 

@@ -158,6 +158,10 @@ module Spaceship
         client.get_resolution_center(apple_id, platform)
       end
 
+      def reply_resolution_center(app_id, platform, thread_id, version_id, version_number, from, message_body)
+        client.post_resolution_center(app_id, platform, thread_id, version_id, version_number, from, message_body)
+      end
+
       def ratings(version_id: '', storefront: '')
         attrs = client.get_ratings(apple_id, platform, version_id, storefront)
         attrs[:application] = self

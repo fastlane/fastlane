@@ -45,8 +45,14 @@ module Frameit
         return 'iPhone 4'
       when sizes::IOS_IPAD
         return 'iPad Air 2'
+      when sizes::IOS_IPAD_10_5
+        return 'iPad Pro (10.5-inch)'
+      when sizes::IOS_IPAD_11
+        return 'iPad Pro (11-inch)'
       when sizes::IOS_IPAD_PRO
         return 'iPad Pro'
+      when sizes::IOS_IPAD_PRO_12_9
+        return 'iPad Pro (12.9-inch) (3rd generation)'
       when sizes::MAC
         return 'MacBook'
       else
@@ -59,8 +65,6 @@ module Frameit
       if !Frameit.config[:use_legacy_iphone6s] && @color == Frameit::Color::BLACK
         if @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_55 || @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_47
           return "Matte Black" # RIP space gray
-        elsif @screen_size == Deliver::AppScreenshot::ScreenSize::IOS_61
-          return "Black"
         end
       end
       return @color
@@ -117,6 +121,17 @@ module Frameit
 
     def landscape?
       return self.landscape_left? || self.landscape_right
+    end
+
+    def output_path
+      path.gsub('.png', '_framed.png').gsub('.PNG', '_framed.png')
+    end
+
+    # If the framed screenshot was generated *before* the screenshot file,
+    # then we must be outdated.
+    def outdated?
+      return true unless File.exist?(output_path)
+      return File.mtime(path) > File.mtime(output_path)
     end
 
     def to_s

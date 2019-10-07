@@ -6,7 +6,7 @@ module Fastlane
       SIGH_UDID = :SIGH_UDID # deprecated
       SIGH_UUID = :SIGH_UUID
       SIGH_NAME = :SIGH_NAME
-      SIGH_PROFILE_TYPE = :SIGH_PROFILE_TYPE
+      SIGH_PROFILE_TYPE ||= :SIGH_PROFILE_TYPE
     end
 
     class GetProvisioningProfileAction < Action
@@ -50,6 +50,17 @@ module Fastlane
 
       def self.author
         "KrauseFx"
+      end
+
+      # rubocop:disable Lint/MissingKeysOnSharedArea
+      def self.output
+        [
+          ['SIGH_PROFILE_PATH', 'A path in which certificates, key and profile are exported'],
+          ['SIGH_PROFILE_PATHS', 'Paths in which certificates, key and profile are exported'],
+          ['SIGH_UUID', 'UUID (Universally Unique IDentifier) of a provisioning profile'],
+          ['SIGH_NAME', 'The name of the profile'],
+          ['SIGH_PROFILE_TYPE', 'The profile type, can be appstore, adhoc, development, enterprise']
+        ]
       end
 
       def self.return_value

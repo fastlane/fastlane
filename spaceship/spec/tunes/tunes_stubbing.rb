@@ -21,9 +21,9 @@ class TunesStubbing
         to_return(status: 200, body: "")
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/wa").
         to_return(status: 200, body: "")
-      stub_request(:get, "https://olympus.itunes.apple.com/v1/session").
+      stub_request(:get, "https://appstoreconnect.apple.com/olympus/v1/session").
         to_return(status: 200, body: itc_read_fixture_file('olympus_session.json'))
-      stub_request(:get, "https://olympus.itunes.apple.com/v1/app/config?hostname=itunesconnect.apple.com").
+      stub_request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com").
         to_return(status: 200, body: { authServiceKey: 'e0abc' }.to_json, headers: { 'Content-Type' => 'application/json' })
 
       # Actual login
@@ -39,6 +39,20 @@ class TunesStubbing
       stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/v1/session/webSession").
         with(body: "{\"contentProviderId\":\"5678\",\"dsId\":null}",
               headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json' }).
+        to_return(status: 200, body: "", headers: {})
+
+      # 2FA: Request security code to trusted phone
+      stub_request(:put, "https://idmsa.apple.com/appleauth/auth/verify/phone").
+        with(body: "{\"phoneNumber\":{\"id\":1},\"mode\":\"sms\"}").
+        to_return(status: 200, body: "", headers: {})
+
+      # 2FA: Submit security code from trusted phone for verification
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode").
+        with(body: "{\"securityCode\":{\"code\":\"123\"},\"phoneNumber\":{\"id\":1},\"mode\":\"sms\"}").
+        to_return(status: 200, body: "", headers: {})
+
+      # 2FA: Trust computer
+      stub_request(:get, "https://idmsa.apple.com/appleauth/auth/2sv/trust").
         to_return(status: 200, body: "", headers: {})
     end
 
@@ -102,7 +116,7 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file('build_details.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
-    def itc_stub_candiate_builds
+    def itc_stub_candidate_builds
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/candidateBuilds").
         to_return(status: 200, body: itc_read_fixture_file('candiate_builds.json'), headers: { 'Content-Type' => 'application/json' })
     end
@@ -137,6 +151,12 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file('app_version.json'), headers: { 'Content-Type' => 'application/json' })
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/1000000000/platforms/ios/versions/800000000").
         to_return(status: 200, body: itc_read_fixture_file('app_version.json'), headers: { 'Content-Type' => 'application/json' })
+    end
+
+    def itc_stub_app_attachment
+      # Receiving app version
+      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/versions/813314674").
+        to_return(status: 200, body: itc_read_fixture_file('app_review_attachment.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     def itc_stub_app_submissions

@@ -237,6 +237,15 @@ app_review_information(
 
 You can also provide these values by creating files in a `metadata/review_information/` directory. The file names must match the pattern `<key>.txt` (e.g. `first_name.txt`, `notes.txt` etc.). The contents of each file will be used as the value for the matching key. Values provided in the `Deliverfile` or `Fastfile` will be take priority over values from these files.
 
+##### app_review_attachment_file
+You can provide additional information to the app review team as a file attachment. As of this writing, Apple supports following file attachment formats: .pdf, .doc, .docx, .rtf, .pages, .xls, .xlsx, .numbers, .zip, .rar, .plist, .crash, .jpg, .png, .mp4, or .avi.
+
+Provide an empty string (i.e. "", not null) to remove the existing attachment file (if any) from the review information being edited.
+
+```ruby-skip-tests
+app_review_attachment_file: "./readme.txt"
+```
+
 ##### submission_information
 Must be a hash. This is used as the last step for the deployment process, where you define if you use third party content or use encryption. [A list of available options](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_submission.rb).
 
@@ -489,7 +498,7 @@ Key | Editable While Live | Directory | Filename
 ## Reference
 
 <details>
-<summary>View all available categories, languages, etc.</summary>
+<summary>View all available categories, etc.</summary>
 
 ### Available Categories
 
@@ -591,37 +600,6 @@ You can always prefix the category using `MZGenre.` (e.g. `MZGenre.Book`). _deli
 - `MZGenre.Apps.Stickers.Places`
 - `MZGenre.Apps.Stickers.Sports`
 
-### Available Languages
-
-- `da`
-- `de-DE`
-- `el`
-- `en-AU`
-- `en-CA`
-- `en-GB`
-- `en-US`
-- `es-ES`
-- `es-MX`
-- `fi`
-- `fr-CA`
-- `fr-FR`
-- `id`
-- `it`
-- `ja`
-- `ko`
-- `ms`
-- `nl-NL`
-- `no`
-- `pt-BR`
-- `pt-PT`
-- `ru`
-- `sv`
-- `th`
-- `tr`
-- `vi`
-- `zh-Hans`
-- `zh-Hant`
-
 ### Available age rating groups
 
 #### Non Boolean
@@ -704,7 +682,11 @@ You can do the same with folders
 
 In this case, default values for keywords, urls, name and release notes are used in all localizations, but each language has a fully localized description
 
+## Uploading screenshots for "iPad Pro (12.9-inch) (3rd generation)"
 
+[Starting March 20, 2019 Apple's App Store](https://developer.apple.com/news/?id=03202019a) requires 12.9-inch iPad Pro (3rd generation) screenshots additionally to the iPad Pro 2nd generation [screenshots](https://help.apple.com/app-store-connect/#/devd274dd925). As fastlane historically uses the screenshot dimensions to determine the "display family" of a screenshot, this poses a problem as both use the same dimensions and are recognized as the same device family.
+
+To solve this a screenshot of a 12.9-inch iPad Pro (3rd generation) must contain either the string `iPad Pro (12.9-inch) (3rd generation)` or `ipadPro129` (Apple's internal naming of the display family for the 3rd generation iPad Pro) in its filename to be assigned the correct display family and to be uploaded to the correct screenshot slot in your app's metadata.
 
 ## Automatically create screenshots
 

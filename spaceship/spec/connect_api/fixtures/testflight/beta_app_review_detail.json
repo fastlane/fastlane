@@ -1,0 +1,30 @@
+{
+    "data" : {
+      "type" : "betaAppReviewDetails",
+      "id" : "123456789",
+      "attributes" : {
+        "contactFirstName" : "Connect",
+        "contactLastName" : "API",
+        "contactPhone" : "5558674309",
+        "contactEmail" : "email@email.com",
+        "demoAccountName" : "username",
+        "demoAccountPassword" : "password",
+        "demoAccountRequired" : true,
+        "notes" : "this is review notes"
+      },
+      "relationships" : {
+        "app" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaAppReviewDetails/1358899889/relationships/app",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaAppReviewDetails/1358899889/app"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/betaAppReviewDetails/1358899889"
+      }
+    },
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/betaAppReviewDetails/1358899889"
+    }
+  }

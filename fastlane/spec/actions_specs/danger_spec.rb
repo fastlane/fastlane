@@ -86,6 +86,22 @@ describe Fastlane do
         expect(result).to eq("bundle exec danger")
       end
 
+      it "appends remove-previous-comments flag when set" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          danger(remove_previous_comments: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec danger --remove-previous-comments")
+      end
+
+      it "does not append remove-previous-comments flag when unset" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          danger(remove_previous_comments: false)
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec danger")
+      end
+
       it "appends base" do
         result = Fastlane::FastFile.new.parse("lane :test do
           danger(base: 'master')

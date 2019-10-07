@@ -94,7 +94,7 @@ module Cert
 
         # As keychain is specific to macOS, this will likely fail on non macOS systems.
         # See also: https://github.com/fastlane/fastlane/pull/14462
-        keychain = File.expand_path(Cert.config[:keychain_path])
+        keychain = File.expand_path(Cert.config[:keychain_path]) unless Cert.config[:keychain_path].nil?
         if FastlaneCore::CertChecker.installed?(path, in_keychain: keychain)
           # This certificate is installed on the local machine
           ENV["CER_CERTIFICATE_ID"] = certificate.id
@@ -134,26 +134,32 @@ module Cert
 
     # The kind of certificate we're interested in
     def certificate_type
-      case Cert.config[:platform].to_s
-      when 'ios', 'tvos'
-        cert_type = Spaceship.certificate.production
-        cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
-        cert_type = Spaceship.certificate.development if Cert.config[:development]
+      # Check if apple certs (Xcode 11 and later) should be used
+      if Cert.config[:generate_apple_certs]
+        cert_type = Spaceship.certificate.apple_distribution
+        cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house? # Enterprise doesn't use Apple Distribution
+        cert_type = Spaceship.certificate.apple_development if Cert.config[:development]
+      else
+        case Cert.config[:platform].to_s
+        when 'ios', 'tvos'
+          cert_type = Spaceship.certificate.production
+          cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
+          cert_type = Spaceship.certificate.development if Cert.config[:development]
 
-      when 'macos'
-        cert_type = Spaceship.certificate.mac_app_distribution
-        cert_type = Spaceship.certificate.mac_development if Cert.config[:development]
-
+        when 'macos'
+          cert_type = Spaceship.certificate.mac_app_distribution
+          cert_type = Spaceship.certificate.mac_development if Cert.config[:development]
+        end
       end
 
-      cert_type
+      return cert_type
     end
 
     def create_certificate
       # Create a new certificate signing request
       csr, pkey = Spaceship.certificate.create_certificate_signing_request
 
-      # Use the signing request to create a new distribution certificate
+      # Use the signing request to create a new (development|distribution) certificate
       begin
         certificate = certificate_type.create!(csr: csr)
       rescue => ex

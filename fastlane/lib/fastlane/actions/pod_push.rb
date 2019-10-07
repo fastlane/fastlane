@@ -47,6 +47,10 @@ module Fastlane
           command << "--verbose"
         end
 
+        if params[:use_modular_headers]
+          command << "--use-modular-headers"
+        end
+
         result = Actions.sh(command.join(' '))
         UI.success("Successfully pushed Podspec ⬆️ ")
         return result
@@ -65,25 +69,30 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
                                          description: "Use bundle exec when there is a Gemfile presented",
                                          type: Boolean,
-                                         default_value: false),
+                                         default_value: false,
+                                         env_name: "FL_POD_PUSH_USE_BUNDLE_EXEC"),
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "The Podspec you want to push",
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                          UI.user_error!("File must be a `.podspec` or `.podspec.json`") unless value.end_with?(".podspec", ".podspec.json")
-                                       end),
+                                       end,
+                                       env_name: "FL_POD_PUSH_PATH"),
           FastlaneCore::ConfigItem.new(key: :repo,
                                        description: "The repo you want to push. Pushes to Trunk by default",
-                                       optional: true),
+                                       optional: true,
+                                       env_name: "FL_POD_PUSH_REPO"),
           FastlaneCore::ConfigItem.new(key: :allow_warnings,
                                        description: "Allow warnings during pod push",
                                        optional: true,
-                                       type: Boolean),
+                                       type: Boolean,
+                                       env_name: "FL_POD_PUSH_ALLOW_WARNINGS"),
           FastlaneCore::ConfigItem.new(key: :use_libraries,
                                        description: "Allow lint to use static libraries to install the spec",
                                        optional: true,
-                                       type: Boolean),
+                                       type: Boolean,
+                                       env_name: "FL_POD_PUSH_USE_LIBRARIES"),
           FastlaneCore::ConfigItem.new(key: :sources,
                                        description: "The sources of repos you want the pod spec to lint with, separated by commas",
                                        optional: true,
@@ -91,24 +100,34 @@ module Fastlane
                                        type: Array,
                                        verify_block: proc do |value|
                                          UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
-                                       end),
+                                       end,
+                                       env_name: "FL_POD_PUSH_SOURCES"),
           FastlaneCore::ConfigItem.new(key: :swift_version,
                                        description: "The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file",
                                        optional: true,
-                                       is_string: true),
+                                       is_string: true,
+                                       env_name: "FL_POD_PUSH_SWIFT_VERSION"),
           FastlaneCore::ConfigItem.new(key: :skip_import_validation,
                                        description: "Lint skips validating that the pod can be imported",
                                        optional: true,
-                                       type: Boolean),
+                                       type: Boolean,
+                                       env_name: "FL_POD_PUSH_SKIP_IMPORT_VALIDATION"),
           FastlaneCore::ConfigItem.new(key: :skip_tests,
                                        description: "Lint skips building and running tests during validation",
                                        optional: true,
-                                       type: Boolean),
+                                       type: Boolean,
+                                       env_name: "FL_POD_PUSH_SKIP_TESTS"),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        description: "Show more debugging information",
                                        optional: true,
                                        type: Boolean,
-                                       default_value: false)
+                                       default_value: false,
+                                       env_name: "FL_POD_PUSH_VERBOSE"),
+          FastlaneCore::ConfigItem.new(key: :use_modular_headers,
+                                       description: "Use modular headers option during validation",
+                                       optional: true,
+                                       type: Boolean,
+                                       env_name: "FL_POD_PUSH_USE_MODULAR_HEADERS")
         ]
       end
 
