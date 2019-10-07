@@ -268,11 +268,11 @@ describe Scan do
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: "xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
+            with(command: "xcrun simctl spawn --standalone 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
+            with(command: "xcrun simctl spawn --standalone 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
 
           mock_test_result_parser = Object.new
           allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)
