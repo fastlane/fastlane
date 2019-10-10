@@ -36,6 +36,7 @@ module Fastlane
           return build_nr
         else
           version_number = params[:version]
+          platform = params[:platform]
 
           # Create filter for get_builds with optional version number
           filter = { app: app.apple_id }
@@ -46,18 +47,25 @@ module Fastlane
             version_number_message = "any version"
           end
 
+          if platform
+            filter["preReleaseVersion.platform"] = Spaceship::ConnectAPI::Platform.map(platform)
+            platform_message = "#{platform} platform"
+          else
+            platform_message = "any platform"
+          end
+
           UI.message("Fetching the latest build number for #{version_number_message}")
 
           # Get latest build for optional version number and return build number if found
-          build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-version", includes: "preReleaseVersion", limit: 1).first
+          build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).first
           if build
             build_nr = build.version
-            UI.message("Latest upload for version #{build.app_version} is build: #{build_nr}")
+            UI.message("Latest upload for version #{build.app_version} on #{platform_message} is build: #{build_nr}")
             return build_nr
           end
 
           # Let user know that build couldn't be found
-          UI.important("Could not find a build for #{version_number_message} on App Store Connect")
+          UI.important("Could not find a build for #{version_number_message} on #{platform_message} on App Store Connect")
 
           if params[:initial_build_number].nil?
             UI.user_error!("Could not find a build on App Store Connect - and 'initial_build_number' option is not set")

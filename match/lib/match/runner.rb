@@ -37,7 +37,9 @@ module Match
         git_full_name: params[:git_full_name],
         git_user_email: params[:git_user_email],
         clone_branch_directly: params[:clone_branch_directly],
+        git_basic_authorization: params[:git_basic_authorization],
         type: params[:type].to_s,
+        generate_apple_certs: params[:generate_apple_certs],
         platform: params[:platform].to_s,
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
         google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
@@ -85,12 +87,14 @@ module Match
       spaceship.certificate_exists(username: params[:username], certificate_id: cert_id) if spaceship
 
       # Provisioning Profiles
-      app_identifiers.each do |app_identifier|
-        loop do
-          break if fetch_provisioning_profile(params: params,
-                                      certificate_id: cert_id,
-                                      app_identifier: app_identifier,
-                                   working_directory: storage.working_directory)
+      unless params[:skip_provisioning_profiles]
+        app_identifiers.each do |app_identifier|
+          loop do
+            break if fetch_provisioning_profile(params: params,
+                                        certificate_id: cert_id,
+                                        app_identifier: app_identifier,
+                                    working_directory: storage.working_directory)
+          end
         end
       end
 

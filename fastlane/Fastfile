@@ -175,7 +175,8 @@ end
 
 desc "Generate the Swift api and test it"
 lane :generate_swift_api do |options|
-  Fastlane::VERSION = options[:fastlane_version]
+  Fastlane::VERSION = options[:fastlane_version] if options[:fastlane_version]
+
   require "../fastlane/lib/fastlane/swift_fastlane_api_generator.rb"
   swift_generator = Fastlane::SwiftFastlaneAPIGenerator.new
   generated_files = swift_generator.generate_swift
@@ -486,10 +487,8 @@ end
 desc "Ensure all the requirement environment variables are provided"
 desc "this way the deployment script will fail early (and often)"
 private_lane :verify_env_variables do
-  ["GITHUB_USER_NAME", "GITHUB_API_TOKEN"].each do |variable|
-    next if ENV[variable].to_s.length > 0
-    UI.user_error!("Missing ENV variables #{variable}, make sure to provide one for fastlane to be successful")
-  end
+  ensure_env_vars(env_vars: ['GITHUB_USER_NAME', 'GITHUB_API_TOKEN'])
+
   UI.user_error!("You're not logged in RubyGems. Log in using `gem push` if using RubyGems < 2.7.0 or `gem signin` if using RubyGems >=2.7.0") unless File.file?(File.expand_path("~/.gem/credentials"))
 end
 

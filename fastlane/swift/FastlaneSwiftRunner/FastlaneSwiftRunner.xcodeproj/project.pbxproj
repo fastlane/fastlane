@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0311E387230AC1B20060BB5C /* Plugins.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0311E386230AC1B20060BB5C /* Plugins.swift */; };
+		0311E38B230AC9490060BB5C /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0311E38A230AC9490060BB5C /* Actions.swift */; };
 		B302067B1F5E3E9000DE6EBD /* SnapshotfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */; };
 		B302067C1F5E3E9000DE6EBD /* GymfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */; };
 		B302067D1F5E3E9000DE6EBD /* MatchfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */; };
@@ -38,6 +40,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0311E386230AC1B20060BB5C /* Plugins.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Plugins.swift; path = ../Plugins.swift; sourceTree = "<group>"; };
+		0311E38A230AC9490060BB5C /* Actions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Actions.swift; path = ../Actions.swift; sourceTree = "<group>"; };
 		B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotfileProtocol.swift; path = ../SnapshotfileProtocol.swift; sourceTree = "<group>"; };
 		B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GymfileProtocol.swift; path = ../GymfileProtocol.swift; sourceTree = "<group>"; };
 		B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MatchfileProtocol.swift; path = ../MatchfileProtocol.swift; sourceTree = "<group>"; };
@@ -131,10 +135,12 @@
 			isa = PBXGroup;
 			children = (
 				B3144C09200553D400470AFE /* README.txt */,
+				0311E38A230AC9490060BB5C /* Actions.swift */,
 				B3BA659D1F5A269100B34850 /* Fastlane.swift */,
 				B302067A1F5E3E9000DE6EBD /* DeliverfileProtocol.swift */,
 				B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */,
 				B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */,
+				0311E386230AC1B20060BB5C /* Plugins.swift */,
 				B30206771F5E3E9000DE6EBD /* PrecheckfileProtocol.swift */,
 				B30206781F5E3E9000DE6EBD /* ScanfileProtocol.swift */,
 				B30206791F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift */,
@@ -205,6 +211,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = B33BAF4E1F51F8D90001A751;
@@ -253,6 +260,7 @@
 				B302067B1F5E3E9000DE6EBD /* SnapshotfileProtocol.swift in Sources */,
 				D55B28C31F6C588300DC42C5 /* Deliverfile.swift in Sources */,
 				D5A7C4901F7C4DAF00A91DE6 /* Fastfile.swift in Sources */,
+				0311E38B230AC9490060BB5C /* Actions.swift in Sources */,
 				D5A7C48F1F7C4DAF00A91DE6 /* Appfile.swift in Sources */,
 				B3BA65AB1F5A269100B34850 /* SocketClient.swift in Sources */,
 				B30206811F5E3E9000DE6EBD /* DeliverfileProtocol.swift in Sources */,
@@ -263,6 +271,7 @@
 				B3BA65AD1F5A269100B34850 /* SocketResponse.swift in Sources */,
 				B3BA65A81F5A269100B34850 /* main.swift in Sources */,
 				D55B28C71F6C588300DC42C5 /* Scanfile.swift in Sources */,
+				0311E387230AC1B20060BB5C /* Plugins.swift in Sources */,
 				D55B28C91F6C588300DC42C5 /* Snapshotfile.swift in Sources */,
 				B3BA65A61F5A269100B34850 /* Fastlane.swift in Sources */,
 				D55B28C81F6C588300DC42C5 /* Screengrabfile.swift in Sources */,

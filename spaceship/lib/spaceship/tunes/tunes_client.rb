@@ -352,6 +352,31 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    def post_resolution_center(app_id, platform, thread_id, version_id, version_number, from, message_body)
+      r = request(:post) do |req|
+        req.url("ra/apps/#{app_id}/platforms/#{platform}/resolutionCenter")
+        req.body = {
+          appNotes: {
+            threads: [{
+              id: thread_id,
+              versionId: version_id,
+              version: version_number,
+              messages: [{
+                from: from,
+                date: DateTime.now.strftime('%Q'),
+                body: message_body,
+                tokens: []
+              }]
+            }]
+          }
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
+    end
+
     def get_ratings(app_id, platform, version_id = '', storefront = '')
       # if storefront or version_id is empty api fails
       rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews/summary"
@@ -718,7 +743,7 @@ module Spaceship
       data["preOrder"]["clearedForPreOrder"] = { "value" => cleared_for_preorder, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
       data["preOrder"]["appAvailableDate"] = { "value" => app_available_date, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
       data["b2bUsers"] = availability.b2b_app_enabled ? availability.b2b_users.map { |user| { "value" => { "add" => user.add, "delete" => user.delete, "dsUsername" => user.ds_username } } } : []
-
+      data["b2bOrganizations"] = availability.b2b_app_enabled ? availability.b2b_organizations.map { |org| { "value" => { "type" => org.type, "depCustomerId" => org.dep_customer_id, "organizationId" => org.dep_organization_id, "name" => org.name } } } : []
       # send the changes back to Apple
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/pricing/intervals")
