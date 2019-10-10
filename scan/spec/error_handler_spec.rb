@@ -2,29 +2,61 @@ require 'scan'
 
 describe Scan do
   describe Scan::ErrorHandler do
+    let(:log_path) { '~/scan.log' }
+
     describe "handle_build_error" do
       describe "when parsing parallel test failure output" do
         it "does not report a build failure" do
           output = File.open('./scan/spec/fixtures/parallel_testing_failure.log', &:read)
           expect do
-            Scan::ErrorHandler.handle_build_error(output)
+            Scan::ErrorHandler.handle_build_error(output, log_path)
           end.to_not(raise_error(FastlaneCore::Interface::FastlaneBuildFailure))
         end
       end
+
       describe "when parsing non-parallel test failure output" do
         it "does not report a build failure" do
           output = File.open('./scan/spec/fixtures/non_parallel_testing_failure.log', &:read)
           expect do
-            Scan::ErrorHandler.handle_build_error(output)
+            Scan::ErrorHandler.handle_build_error(output, log_path)
           end.to_not(raise_error(FastlaneCore::Interface::FastlaneBuildFailure))
         end
       end
+
       describe "when parsing early failure output" do
+        let(:output_path) { './scan/spec/fixtures/early_testing_failure.log' }
+
+        before(:each) {
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            project: './scan/examples/standard/app.xcodeproj',
+          })
+        }
+
         it "reports a build failure" do
-          output = File.open('./scan/spec/fixtures/early_testing_failure.log', &:read)
+          output = File.open(output_path, &:read)
           expect do
-            Scan::ErrorHandler.handle_build_error(output)
+            Scan::ErrorHandler.handle_build_error(output, log_path)
           end.to(raise_error(FastlaneCore::Interface::FastlaneBuildFailure))
+        end
+
+        it "mentions log above when not suppressing output" do
+          expect(FastlaneCore::UI).to receive(:build_failure!).with("Error building the application. See the log above.")
+
+          output = File.open(output_path, &:read)
+          expect do
+            Scan::ErrorHandler.handle_build_error(output, log_path)
+          end.to(raise_error)
+        end
+
+        it "mentions log file when suppressing output" do
+          Scan.config[:suppress_xcode_output] = true
+
+          expect(FastlaneCore::UI).to receive(:build_failure!).with("Error building the application. See the log here: '#{log_path}'.")
+
+          output = File.open(output_path, &:read)
+          expect do
+            Scan::ErrorHandler.handle_build_error(output, log_path)
+          end.to(raise_error)
         end
       end
     end
