@@ -17,7 +17,7 @@ module Match
       UI.user_error!("Certificate does not exist at path: #{cert_path}") unless File.exist?(cert_path)
       UI.user_error!("Private key does not exist at path: #{p12_path}") unless File.exist?(p12_path)
 
-      # Base64 encrypt contents to find match from API to find a cert ID
+      # Base64 encode contents to find match from API to find a cert ID
       cert_contents_base_64 = Base64.strict_encode64(File.open(cert_path).read)
 
       # Storage
