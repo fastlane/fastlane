@@ -32,14 +32,14 @@ describe Scan do
           })
         end
 
-        it "reports a build failure" do
+        it "reports a build failure", requires_xcodebuild: true do
           output = File.open(output_path, &:read)
           expect do
             Scan::ErrorHandler.handle_build_error(output, log_path)
           end.to(raise_error(FastlaneCore::Interface::FastlaneBuildFailure))
         end
 
-        it "mentions log above when not suppressing output" do
+        it "mentions log above when not suppressing output", requires_xcodebuild: true do
           expect(FastlaneCore::UI).to receive(:build_failure!).with("Error building the application. See the log above.")
 
           output = File.open(output_path, &:read)
@@ -48,7 +48,7 @@ describe Scan do
           end.to(raise_error)
         end
 
-        it "mentions log file when suppressing output" do
+        it "mentions log file when suppressing output", requires_xcodebuild: true do
           Scan.config[:suppress_xcode_output] = true
 
           expect(FastlaneCore::UI).to receive(:build_failure!).with("Error building the application. See the log here: '#{log_path}'.")
