@@ -26,11 +26,11 @@ describe Scan do
       describe "when parsing early failure output" do
         let(:output_path) { './scan/spec/fixtures/early_testing_failure.log' }
 
-        before(:each) {
+        before(:each) do
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-            project: './scan/examples/standard/app.xcodeproj',
+            project: './scan/examples/standard/app.xcodeproj'
           })
-        }
+        end
 
         it "reports a build failure" do
           output = File.open(output_path, &:read)
