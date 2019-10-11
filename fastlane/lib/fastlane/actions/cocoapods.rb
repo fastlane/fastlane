@@ -17,15 +17,13 @@ module Fastlane
         cmd << ['bundle exec'] if use_bundle_exec?(params)
         cmd << ['pod install']
 
+        cmd << '--no-clean' unless params[:clean]
+        cmd << '--no-integrate' unless params[:integrate]
         cmd << '--clean-install' if params[:clean_install] && pod_version.to_f >= 1.7
         cmd << '--repo-update' if params[:repo_update]
         cmd << '--silent' if params[:silent]
         cmd << '--verbose' if params[:verbose]
         cmd << '--no-ansi' unless params[:ansi]
-
-        # deprecated options
-        cmd << '--no-clean' unless params[:clean]
-        cmd << '--no-integrate' unless params[:integrate]
 
         Actions.sh(cmd.join(' '), error_callback: lambda { |result|
           if !params[:repo_update] && params[:try_repo_update_on_error]
@@ -44,7 +42,7 @@ module Fastlane
       end
 
       def self.pod_version
-        use_bundle_exec(params)? ? `bundle exec pod --version` : `pod --version`
+        use_bundle_exec?(params) ? `bundle exec pod --version` : `pod --version`
       end
 
       def self.call_error_callback(params, result)
