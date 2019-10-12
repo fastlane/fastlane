@@ -121,6 +121,16 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap")
       end
 
+      it "adds no-checkout flag to command if no_checkout is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              no_checkout: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --no-checkout")
+      end
+
       it "adds no-build flag to command if no_build is set to true" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
