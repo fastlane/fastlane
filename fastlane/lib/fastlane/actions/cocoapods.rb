@@ -116,7 +116,7 @@ module Fastlane
           # Deprecated
           FastlaneCore::ConfigItem.new(key: :clean,
                                        env_name: "FL_COCOAPODS_CLEAN",
-                                       description: "(Option renamed as --clean-install) Remove SCM directories",
+                                       description: "(Option renamed as clean_install) Remove SCM directories",
                                        deprecated: true,
                                        is_string: false,
                                        default_value: true),
