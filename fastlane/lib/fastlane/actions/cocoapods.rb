@@ -14,11 +14,12 @@ module Fastlane
           cmd << ["cd '#{podfile_folder}' &&"]
         end
 
-        cmd << ['bundle exec'] if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+        cmd << ['bundle exec'] if use_bundle_exec?(params)
         cmd << ['pod install']
 
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
+        cmd << '--clean-install' if params[:clean_install] && pod_version.to_f >= 1.7
         cmd << '--repo-update' if params[:repo_update]
         cmd << '--silent' if params[:silent]
         cmd << '--verbose' if params[:verbose]
@@ -34,6 +35,14 @@ module Fastlane
             call_error_callback(params, result)
           end
         })
+      end
+
+      def self.use_bundle_exec?(params)
+        params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+      end
+
+      def self.pod_version
+        use_bundle_exec?(params) ? `bundle exec pod --version` : `pod --version`
       end
 
       def self.call_error_callback(params, result)
@@ -55,6 +64,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :repo_update,
                                        env_name: "FL_COCOAPODS_REPO_UPDATE",
                                        description: "Add `--repo-update` flag to `pod install` command",
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :clean_install,
+                                       env_name: "FL_COCOAPODS_CLEAN_INSTALL",
+                                       description: "Execute a full pod installation ignoring the content of the project cache",
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :silent,
@@ -102,7 +116,7 @@ module Fastlane
           # Deprecated
           FastlaneCore::ConfigItem.new(key: :clean,
                                        env_name: "FL_COCOAPODS_CLEAN",
-                                       description: "(Option removed from cocoapods) Remove SCM directories",
+                                       description: "(Option renamed as clean_install) Remove SCM directories",
                                        deprecated: true,
                                        is_string: false,
                                        default_value: true),
