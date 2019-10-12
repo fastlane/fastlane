@@ -218,7 +218,7 @@ jobs:
           name: Setup Build
           # Build gem from fastlane.gemspec and install locally
           command: |
-            gem update --system && gem install $(echo $(gem build fastlane.gemspec) | sed 's/.*File: //')
+            sudo gem update --system && gem install $(echo $(gem build fastlane.gemspec) | sed 's/.*File: //')
 
       - run: /bin/bash ./test_modules/run_tests.sh
 
