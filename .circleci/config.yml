@@ -22,7 +22,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            echo "2.3" > .ruby-version
+            echo "2.4" > .ruby-version
             gem update --system
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
@@ -209,7 +209,7 @@ jobs:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
     docker:
-      - image: circleci/ruby:2.3
+      - image: circleci/ruby:2.4
     shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
