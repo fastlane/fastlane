@@ -92,10 +92,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
   spec.add_dependency('jwt', '~> 2.1.0') # Used for generating authentication tokens for AppStore connect api
 
-  if true
-    spec.add_dependency('signet', '0.11') # Because yeah
+  # need to lock 0.11 and under when using less than Ruby 2.4
+  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4')
+    spec.add_dependency('signet', '<= 0.11') # Because yeah
   end
-  # Space to test something
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
