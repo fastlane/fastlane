@@ -209,7 +209,7 @@ jobs:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
     docker:
-      - image: fastlanetools/ci:0.1.0
+      - image: circleci/ruby:2.3
     shell: /bin/bash --login -eo pipefail
     steps:
       - checkout
