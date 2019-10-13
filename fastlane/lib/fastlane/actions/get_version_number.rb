@@ -85,7 +85,7 @@ module Fastlane
       end
 
       def self.get_plist!(folder, target, configuration = nil)
-        plist_files = target.resolved_build_setting("INFOPLIST_FILE")
+        plist_files = target.resolved_build_setting("INFOPLIST_FILE", true)
         plist_files_count = plist_files.values.compact.uniq.count
 
         # Get plist file for specified configuration
@@ -101,13 +101,15 @@ module Fastlane
           plist_file = plist_files.values.first
         end
 
-        # $(SRCROOT) is the path of where the XcodeProject is
-        # We can just set this as empty string since we join with `folder` below
-        if plist_file.include?("$(SRCROOT)/")
-          plist_file.gsub!("$(SRCROOT)/", "")
-        end
+        UI.user_error!("Cannot find value for INFOPLIST_FILE build setting") if plist_file.nil?
 
-        plist_file = File.absolute_path(File.join(folder, plist_file))
+        # This is needed to workaround the inconsistent return value of target.resolved_build_setting with second param `true` above
+        # for normal values settings it returns relative paths, for ones that come from xcconfigs it returns absolute paths
+        unless plist_file.include?(File.absolute_path(folder))
+          plist_file = File.join(folder, plist_file)
+        end
+        plist_file = File.absolute_path(plist_file)
+
         UI.user_error!("Cannot find plist file: #{plist_file}") unless File.exist?(plist_file)
 
         plist_file
