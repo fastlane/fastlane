@@ -7125,23 +7125,6 @@ func unlockKeychain(path: String = "login",
   _ = runner.executeCommand(command)
 }
 
-
-/**
- This action changes the keychain access groups in the entitlements file
-
- - parameters:
-   - entitlementsFile: The path to the entitlement file which contains the keychain access groups
-   - identifiers: An Array of unique identifiers for the keychain access groups. Eg. ['your.keychain.access.groups.identifiers']
-
- Updates the Keychain Group Access Groups in the given Entitlements file, so you can have keychain access groups for the app store build and keychain access groups for an enterprise build.
-*/
-func updateKeychainAccessGroups(entitlementsFile: String,
-                               identifiers: Any) {
-  let command = RubyCommand(commandID: "", methodName: "update_keychain_access_groups", className: nil, args: [RubyCommand.Argument(name: "entitlements_file", value: entitlementsFile),
-                                                                                                               RubyCommand.Argument(name: "identifiers", value: identifiers)])
-  _ = runner.executeCommand(command)
-}
-
 /**
  This action changes the app group identifiers in the entitlements file
 
