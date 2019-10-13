@@ -2,6 +2,7 @@ module Fastlane
   module Helper
     module PluginScoresHelper
       require 'faraday'
+      require 'faraday_middleware'
       require 'yaml'
 
       class FastlanePluginRating
