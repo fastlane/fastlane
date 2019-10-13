@@ -808,7 +808,7 @@ module Spaceship
 
     def log_response(method, url, response, headers = nil, &block)
       url ||= extract_key_from_block('url', &block)
-      body = response.body.kind_of?(String) ? response.body.dup.force_encoding(Encoding::UTF_8) : response.body
+      body = response.body.kind_of?(String) ? response.body.force_encoding(Encoding::UTF_8) : response.body
       logger.debug("<< #{method.upcase} #{url}: #{response.status} #{body}")
     end
 
