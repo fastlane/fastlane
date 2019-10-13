@@ -33,24 +33,56 @@ describe Fastlane do
 
       context "with command argument" do
         it "passes command as string with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git commit", log: true, error_callback: nil)
           @ff.sh("git commit")
         end
 
         it "passes command as string and log with default error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git commit", log: true, error_callback: nil)
+          @ff.sh("git commit", log: true)
+        end
+
+        it "passes command as string, step_name, and log false with default error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("shell command").and_call_original
+
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git commit", log: false, error_callback: nil)
-          @ff.sh("git commit", log: false)
+          @ff.sh("git commit", step_name: "some_name", log: false)
+        end
+
+        it "passes command as string, step_name, and log true with default error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("some_name").and_call_original
+
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git commit", log: true, error_callback: nil)
+          @ff.sh("git commit", step_name: "some_name", log: true)
         end
 
         it "passes command as array with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git", "commit", log: true, error_callback: nil)
+          @ff.sh("git", "commit")
+        end
+
+        it "passes command as array with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git", "commit", log: true, error_callback: nil)
           @ff.sh("git", "commit")
         end
 
         it "yields the status, result and command" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
           proc = proc {}
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git", "commit", log: true, error_callback: nil) do |*args, &block|
@@ -62,24 +94,32 @@ describe Fastlane do
 
       context "with named command keyword" do
         it "passes command as string with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git commit", log: true, error_callback: nil)
           @ff.sh(command: "git commit")
         end
 
         it "passes command as string and log with default error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("shell command").and_call_original
+
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git commit", log: false, error_callback: nil)
           @ff.sh(command: "git commit", log: false)
         end
 
         it "passes command as array with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git", "commit", log: true, error_callback: nil)
           @ff.sh(command: ["git", "commit"])
         end
 
         it "yields the status, result and command" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
           proc = proc {}
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git", "commit", log: true, error_callback: nil) do |*args, &block|
