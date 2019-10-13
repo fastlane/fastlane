@@ -61,8 +61,8 @@ describe Fastlane do
         end
       end
 
-      context 'with no special options' do
-        it 'downloads all dsyms of all builds in all trains' do
+      context 'with version with leading zero' do
+        it 'downloads all dsyms of all builds in train 1.07.0' do
           expect(app).to receive(:tunes_all_builds_for_train).and_return([build3])
           expect(app).to receive(:tunes_build_details).with(train: '1.7.0', build_number: '3', platform: :ios).and_return(build_detail)
           expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, train2.version_string, build3.build_version, nil)
