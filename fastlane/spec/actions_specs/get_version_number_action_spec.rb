@@ -12,18 +12,36 @@ describe Fastlane do
         expect(result).to eq("4.3.2")
       end
 
-      it "gets the correct version number for 'TargetVariableParentheses'", requires_xcodeproj: true do
-        result = Fastlane::FastFile.new.parse("lane :test do
-          get_version_number(xcodeproj: '#{path}', target: 'TargetVariableParentheses')
-        end").runner.execute(:test)
-        expect(result).to eq("4.3.2")
+      context "Target Settings" do
+        it "gets the correct version number for 'TargetVariableParentheses'", requires_xcodeproj: true do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj: '#{path}', target: 'TargetVariableParentheses')
+          end").runner.execute(:test)
+          expect(result).to eq("4.3.2")
+        end
+
+        it "gets the correct version number for 'TargetVariableCurlyBraces'", requires_xcodeproj: true do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj: '#{path}', target: 'TargetVariableCurlyBraces')
+          end").runner.execute(:test)
+          expect(result).to eq("4.3.2")
+        end
       end
 
-      it "gets the correct version number for 'TargetVariableCurlyBraces'", requires_xcodeproj: true do
-        result = Fastlane::FastFile.new.parse("lane :test do
-          get_version_number(xcodeproj: '#{path}', target: 'TargetVariableCurlyBraces')
-        end").runner.execute(:test)
-        expect(result).to eq("4.3.2")
+      context "Project Settings" do
+        it "gets the correct version number for 'TargetVariableParenthesesBuildSettings'", requires_xcodeproj: true do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj: '#{path}', target: 'TargetVariableParenthesesBuildSettings')
+          end").runner.execute(:test)
+          expect(result).to eq("7.6.5")
+        end
+
+        it "gets the correct version number for 'TargetVariableCurlyBracesBuildSettings'", requires_xcodeproj: true do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj: '#{path}', target: 'TargetVariableCurlyBracesBuildSettings')
+          end").runner.execute(:test)
+          expect(result).to eq("7.6.5")
+        end
       end
 
       it "gets the correct version number for 'TargetATests'", requires_xcodeproj: true do
