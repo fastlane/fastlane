@@ -33,7 +33,7 @@ module Fastlane
             req.url("/api/upload/")
             req.body = options
           end
-        rescue Faraday::Error::TimeoutError
+        rescue Faraday::TimeoutError
           UI.crash!("Uploading build to TestFairy timed out ⏳")
         end
       end
