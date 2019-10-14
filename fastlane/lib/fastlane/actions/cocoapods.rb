@@ -24,6 +24,7 @@ module Fastlane
         cmd << '--silent' if params[:silent]
         cmd << '--verbose' if params[:verbose]
         cmd << '--no-ansi' unless params[:ansi]
+        cmd << '--deployment' if params[:deployment]
 
         Actions.sh(cmd.join(' '), error_callback: lambda { |result|
           if !params[:repo_update] && params[:try_repo_update_on_error]
@@ -108,6 +109,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :try_repo_update_on_error,
                                        env_name: "FL_COCOAPODS_TRY_REPO_UPDATE_ON_ERROR",
                                        description: 'Retry with --repo-update if action was finished with error',
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: false,
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :deployment,
+                                       env_name: "FL_COCOAPODS_DEPLOYMENT",
+                                       description: 'Disallow any changes to the Podfile or the Podfile.lock during installation',
                                        optional: true,
                                        is_string: false,
                                        default_value: false,

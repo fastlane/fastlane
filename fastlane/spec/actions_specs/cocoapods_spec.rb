@@ -105,6 +105,16 @@ describe Fastlane do
         expect(result).to eq("bundle exec pod install --no-ansi")
       end
 
+      it "adds deployment to command if deployment is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            deployment: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod install --deployment")
+      end
+
       it "changes directory if podfile is set to the Podfile path" do
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
