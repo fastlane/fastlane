@@ -1487,6 +1487,7 @@ func captureScreenshots(workspace: String? = nil,
    - useSsh: Use SSH for downloading GitHub repositories
    - useSubmodules: Add dependencies as Git submodules
    - useBinaries: Check out dependency repositories even when prebuilt frameworks exist
+   - noCheckout: When bootstrapping Carthage do not checkout
    - noBuild: When bootstrapping Carthage do not build
    - noSkipCurrent: Don't skip building the Carthage project (in addition to its dependencies)
    - derivedData: Use derived data folder at path
@@ -1507,6 +1508,7 @@ func carthage(command: String = "bootstrap",
               useSsh: Bool? = nil,
               useSubmodules: Bool? = nil,
               useBinaries: Bool? = nil,
+              noCheckout: Bool? = nil,
               noBuild: Bool? = nil,
               noSkipCurrent: Bool? = nil,
               derivedData: String? = nil,
@@ -1526,6 +1528,7 @@ func carthage(command: String = "bootstrap",
                                                                                           RubyCommand.Argument(name: "use_ssh", value: useSsh),
                                                                                           RubyCommand.Argument(name: "use_submodules", value: useSubmodules),
                                                                                           RubyCommand.Argument(name: "use_binaries", value: useBinaries),
+                                                                                          RubyCommand.Argument(name: "no_checkout", value: noCheckout),
                                                                                           RubyCommand.Argument(name: "no_build", value: noBuild),
                                                                                           RubyCommand.Argument(name: "no_skip_current", value: noSkipCurrent),
                                                                                           RubyCommand.Argument(name: "derived_data", value: derivedData),
@@ -1799,6 +1802,7 @@ func clubmate() {
 
  - parameters:
    - repoUpdate: Add `--repo-update` flag to `pod install` command
+   - cleanInstall: Execute a full pod installation ignoring the content of the project cache
    - silent: Execute command without logging output
    - verbose: Show more debugging information
    - ansi: Show output with ANSI codes
@@ -1806,12 +1810,14 @@ func clubmate() {
    - podfile: Explicitly specify the path to the Cocoapods' Podfile. You can either set it to the Podfile's path or to the folder containing the Podfile file
    - errorCallback: A callback invoked with the command output if there is a non-zero exit status
    - tryRepoUpdateOnError: Retry with --repo-update if action was finished with error
-   - clean: **DEPRECATED!** (Option removed from cocoapods) Remove SCM directories
+   - deployment: Disallow any changes to the Podfile or the Podfile.lock during installation
+   - clean: **DEPRECATED!** (Option renamed as clean_install) Remove SCM directories
    - integrate: **DEPRECATED!** (Option removed from cocoapods) Integrate the Pods libraries into the Xcode project(s)
 
  If you use [CocoaPods](http://cocoapods.org) you can use the `cocoapods` integration to run `pod install` before building your app.
 */
 func cocoapods(repoUpdate: Bool = false,
+               cleanInstall: Bool = false,
                silent: Bool = false,
                verbose: Bool = false,
                ansi: Bool = true,
@@ -1819,9 +1825,11 @@ func cocoapods(repoUpdate: Bool = false,
                podfile: String? = nil,
                errorCallback: Any? = nil,
                tryRepoUpdateOnError: Bool = false,
+               deployment: Bool = false,
                clean: Bool = true,
                integrate: Bool = true) {
   let command = RubyCommand(commandID: "", methodName: "cocoapods", className: nil, args: [RubyCommand.Argument(name: "repo_update", value: repoUpdate),
+                                                                                           RubyCommand.Argument(name: "clean_install", value: cleanInstall),
                                                                                            RubyCommand.Argument(name: "silent", value: silent),
                                                                                            RubyCommand.Argument(name: "verbose", value: verbose),
                                                                                            RubyCommand.Argument(name: "ansi", value: ansi),
@@ -1829,6 +1837,7 @@ func cocoapods(repoUpdate: Bool = false,
                                                                                            RubyCommand.Argument(name: "podfile", value: podfile),
                                                                                            RubyCommand.Argument(name: "error_callback", value: errorCallback),
                                                                                            RubyCommand.Argument(name: "try_repo_update_on_error", value: tryRepoUpdateOnError),
+                                                                                           RubyCommand.Argument(name: "deployment", value: deployment),
                                                                                            RubyCommand.Argument(name: "clean", value: clean),
                                                                                            RubyCommand.Argument(name: "integrate", value: integrate)])
   _ = runner.executeCommand(command)
@@ -2496,11 +2505,12 @@ func download(url: String) {
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - platform: The app platform for dSYMs you wish to download (ios, appletvos)
-   - version: The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs
+   - version: The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs or 'live' to download only the live verion dSYMs
    - buildNumber: The app build_number for dSYMs you wish to download
    - minVersion: The minimum app version for dSYMs you wish to download
    - outputDirectory: Where to save the download dSYMs, defaults to the current path
    - waitForDsymProcessing: Wait for dSYMs to process
+   - waitTimeout: Number of seconds to wait for dSYMs to process
 
  This action downloads dSYM files from App Store Connect after the ipa gets re-compiled by Apple. Useful if you have Bitcode enabled.|
  |
@@ -2522,7 +2532,8 @@ func downloadDsyms(username: String,
                    buildNumber: String? = nil,
                    minVersion: String? = nil,
                    outputDirectory: String? = nil,
-                   waitForDsymProcessing: Bool = false) {
+                   waitForDsymProcessing: Bool = false,
+                   waitTimeout: Int = 300) {
   let command = RubyCommand(commandID: "", methodName: "download_dsyms", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
                                                                                                 RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                 RubyCommand.Argument(name: "team_id", value: teamId),
@@ -2532,7 +2543,8 @@ func downloadDsyms(username: String,
                                                                                                 RubyCommand.Argument(name: "build_number", value: buildNumber),
                                                                                                 RubyCommand.Argument(name: "min_version", value: minVersion),
                                                                                                 RubyCommand.Argument(name: "output_directory", value: outputDirectory),
-                                                                                                RubyCommand.Argument(name: "wait_for_dsym_processing", value: waitForDsymProcessing)])
+                                                                                                RubyCommand.Argument(name: "wait_for_dsym_processing", value: waitForDsymProcessing),
+                                                                                                RubyCommand.Argument(name: "wait_timeout", value: waitTimeout)])
   _ = runner.executeCommand(command)
 }
 
@@ -6476,6 +6488,7 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
    - sonarRunnerArgs: Pass additional arguments to sonar-scanner. Be sure to provide the arguments with a leading `-D` e.g. FL_SONAR_RUNNER_ARGS="-Dsonar.verbose=true"
    - sonarLogin: Pass the Sonar Login token (e.g: xxxxxxprivate_token_XXXXbXX7e)
    - sonarUrl: Pass the url of the Sonar server
+   - sonarOrganization: Key of the organization on SonarCloud
    - branchName: Pass the branch name which is getting scanned
    - pullRequestBranch: The name of the branch that contains the changes to be merged
    - pullRequestBase: The long-lived branch into which the PR will be merged
@@ -6496,6 +6509,7 @@ func sonar(projectConfigurationPath: String? = nil,
            sonarRunnerArgs: String? = nil,
            sonarLogin: String? = nil,
            sonarUrl: String? = nil,
+           sonarOrganization: String? = nil,
            branchName: String? = nil,
            pullRequestBranch: String? = nil,
            pullRequestBase: String? = nil,
@@ -6510,6 +6524,7 @@ func sonar(projectConfigurationPath: String? = nil,
                                                                                        RubyCommand.Argument(name: "sonar_runner_args", value: sonarRunnerArgs),
                                                                                        RubyCommand.Argument(name: "sonar_login", value: sonarLogin),
                                                                                        RubyCommand.Argument(name: "sonar_url", value: sonarUrl),
+                                                                                       RubyCommand.Argument(name: "sonar_organization", value: sonarOrganization),
                                                                                        RubyCommand.Argument(name: "branch_name", value: branchName),
                                                                                        RubyCommand.Argument(name: "pull_request_branch", value: pullRequestBranch),
                                                                                        RubyCommand.Argument(name: "pull_request_base", value: pullRequestBase),
@@ -7164,9 +7179,8 @@ func updateAppIdentifier(xcodeproj: String,
  Makes sure fastlane-tools are up-to-date when running fastlane
 
  - parameters:
-   - nightly: Opt-in to install and use nightly fastlane builds
    - noUpdate: Don't update during this run. This is used internally
-   - tools: **DEPRECATED!** Comma separated list of fastlane tools to update (e.g. `fastlane,deliver,sigh`)
+   - nightly: **DEPRECATED!** Nightly builds are no longer being made available - Opt-in to install and use nightly fastlane builds
 
  This action will update fastlane to the most recent version - major version updates will not be performed automatically, as they might include breaking changes. If an update was performed, fastlane will be restarted before the run continues.
  
@@ -7183,12 +7197,10 @@ func updateAppIdentifier(xcodeproj: String,
  
  Recommended usage of the `update_fastlane` action is at the top inside of the `before_all` block, before running any other action.
 */
-func updateFastlane(nightly: Bool = false,
-                    noUpdate: Bool = false,
-                    tools: String? = nil) {
-  let command = RubyCommand(commandID: "", methodName: "update_fastlane", className: nil, args: [RubyCommand.Argument(name: "nightly", value: nightly),
-                                                                                                 RubyCommand.Argument(name: "no_update", value: noUpdate),
-                                                                                                 RubyCommand.Argument(name: "tools", value: tools)])
+func updateFastlane(noUpdate: Bool = false,
+                    nightly: Bool = false) {
+  let command = RubyCommand(commandID: "", methodName: "update_fastlane", className: nil, args: [RubyCommand.Argument(name: "no_update", value: noUpdate),
+                                                                                                 RubyCommand.Argument(name: "nightly", value: nightly)])
   _ = runner.executeCommand(command)
 }
 
@@ -7233,6 +7245,22 @@ func updateInfoPlist(xcodeproj: String? = nil,
                                                                                                    RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                    RubyCommand.Argument(name: "display_name", value: displayName),
                                                                                                    RubyCommand.Argument(name: "block", value: block)])
+  _ = runner.executeCommand(command)
+}
+
+/**
+ This action changes the keychain access groups in the entitlements file
+
+ - parameters:
+   - entitlementsFile: The path to the entitlement file which contains the keychain access groups
+   - identifiers: An Array of unique identifiers for the keychain access groups. Eg. ['your.keychain.access.groups.identifiers']
+
+ Updates the Keychain Group Access Groups in the given Entitlements file, so you can have keychain access groups for the app store build and keychain access groups for an enterprise build.
+*/
+func updateKeychainAccessGroups(entitlementsFile: String,
+                                identifiers: Any) {
+  let command = RubyCommand(commandID: "", methodName: "update_keychain_access_groups", className: nil, args: [RubyCommand.Argument(name: "entitlements_file", value: entitlementsFile),
+                                                                                                               RubyCommand.Argument(name: "identifiers", value: identifiers)])
   _ = runner.executeCommand(command)
 }
 
@@ -8268,4 +8296,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.60]
+// FastlaneRunnerAPIVersion [0.9.61]
