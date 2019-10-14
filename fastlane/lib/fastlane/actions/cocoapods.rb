@@ -24,7 +24,7 @@ module Fastlane
         cmd << '--silent' if params[:silent]
         cmd << '--verbose' if params[:verbose]
         cmd << '--no-ansi' unless params[:ansi]
-        cmd << '--deployment'  if params[:deployment]
+        cmd << '--deployment' if params[:deployment]
 
         Actions.sh(cmd.join(' '), error_callback: lambda { |result|
           if !params[:repo_update] && params[:try_repo_update_on_error]
