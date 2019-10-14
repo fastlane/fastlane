@@ -121,7 +121,8 @@ module Deliver
 
           if framed_screenshots_found && !is_framed && !is_watch
             # check to see if there is a framed version of this file
-            if Dir.glob(File.basename(file_path,"*.#{extensions}")+"_framed*").any?
+            fext = File.extname(file_path)
+            if Dir.glob(file_path.gsub("#{fext}", "_framed#{fext}")).any?
               UI.important("🏃 Skipping screenshot file: #{file_path} because this file has a framed version")
               next
             end
