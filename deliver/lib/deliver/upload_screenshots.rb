@@ -120,8 +120,11 @@ module Deliver
           is_watch = file_path.downcase.include?("watch")
 
           if framed_screenshots_found && !is_framed && !is_watch
-            UI.important("🏃 Skipping screenshot file: #{file_path}")
-            next
+            # check to see if there is a framed version of this file
+            if Dir.glob(File.basename(file_path,"*.#{extensions}")+"_framed*").any?
+              UI.important("🏃 Skipping screenshot file: #{file_path} because this file has a framed version")
+              next
+            end
           end
 
           screenshots << AppScreenshot.new(file_path, language)
