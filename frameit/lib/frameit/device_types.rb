@@ -91,6 +91,10 @@ module Frameit
     # priority must be lower than IPAD_PRO so that users who didn't copy the frame to their frameit frames folder will not get an error
     # ID and formatted name must be exactly as specified so that device.detect_device() will select this device if the filename includes them
     IPAD_PRO_12_9 = Frameit::Device.new("ipadPro129", "Apple iPad Pro (12.9-inch) (3rd generation)", 2, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO_12_9)
+    # iPad Pro (10.5-inch) and Apple iPad Pro (11-inch) are also nit in frameit-frames repo similarly as above, backward compatibility with PR #15373
+    IPAD_PRO_10_5 = Frameit::Device.new("ipad105", "Apple iPad Pro (10.5-inch)", 1, [[1668, 2224], [2224, 1668]], 265, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_10_5)
+    IPAD_PRO_11 = Frameit::Device.new("ipadPro11", "Apple iPad Pro (11-inch)", 1, [[1668, 2388], [2388, 1668]], 265, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_11)
+
     MAC = Frameit::Device.new("mac", "Apple MacBook", 0, [[1280, 800], [1440, 900], [2560, 1600], [2880, 1800]], nil, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::MAC)
 
     def self.all_device_names_without_apple
