@@ -99,7 +99,7 @@ If your machine is currently using SSH to authenticate with GitHub, you'll want 
 Using parameter:
 
 ```
-math(git_basic_authorization: '<YOUR KEY>')
+match(git_basic_authorization: '<YOUR KEY>')
 ```
 
 Using environment variable:
