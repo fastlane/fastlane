@@ -105,6 +105,7 @@ module Fastlane
     def self.load_external_actions(path)
       UI.user_error!("You need to pass a valid path") unless File.exist?(path)
 
+      class_refs = []
       Dir[File.expand_path('*.rb', path)].each do |file|
         begin
           require file
@@ -123,6 +124,7 @@ module Fastlane
         class_name = file_name.fastlane_class + 'Action'
         begin
           class_ref = Fastlane::Actions.const_get(class_name)
+          class_refs << class_ref
 
           if class_ref.respond_to?(:run)
             UI.success("Successfully loaded custom action '#{file}'.") if FastlaneCore::Globals.verbose?
@@ -139,6 +141,8 @@ module Fastlane
         end
       end
       Actions.reset_aliases
+
+      return class_refs
     end
 
     def self.formerly_bundled_actions

@@ -26,10 +26,15 @@ module Fastlane
                 'you should turn off smart quotes in your editor of choice.')
       end
 
-      content.scan(/^\s*require (.*)/).each do |current|
+      content.scan(/^\s*require ["'](.*?)["']/).each do |current|
         gem_name = current.last
         next if gem_name.include?(".") # these are local gems
-        UI.important("You have required a gem, if this is a third party gem, please use `fastlane_require #{gem_name}` to ensure the gem is installed locally.")
+
+        begin
+          require(gem_name)
+        rescue LoadError
+          UI.important("You have required a gem, if this is a third party gem, please use `fastlane_require '#{gem_name}'` to ensure the gem is installed locally.")
+        end
       end
 
       parse(content, @path)
@@ -190,6 +195,7 @@ module Fastlane
     #  sh("ls")
     #  sh("ls", log: false)
     #  sh(command: "ls")
+    #  sh(command: "ls", step_name: "listing the files")
     #  sh(command: "ls", log: false)
     def sh(*args, &b)
       # First accepts hash (or named keywords) like other actions
@@ -207,8 +213,8 @@ module Fastlane
       end
     end
 
-    def self.sh(*command, log: true, error_callback: nil, &b)
-      command_header = log ? Actions.shell_command_from_args(*command) : "shell command"
+    def self.sh(*command, step_name: nil, log: true, error_callback: nil, &b)
+      command_header = log ? step_name || Actions.shell_command_from_args(*command) : "shell command"
       Actions.execute_action(command_header) do
         Actions.sh_no_action(*command, log: log, error_callback: error_callback, &b)
       end

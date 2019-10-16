@@ -43,7 +43,7 @@ module Fastlane
       Fastlane::PluginUpdateManager.show_update_status
       if FastlaneCore::Globals.capture_output?
         if $stdout.respond_to?(:string)
-          # Sometimes you can get NoMethodError: undefined method `string' for #<IO:<STDOUT>> when runing with FastlaneRunner (swift)
+          # Sometimes you can get NoMethodError: undefined method `string' for #<IO:<STDOUT>> when running with FastlaneRunner (swift)
           FastlaneCore::Globals.captured_output = Helper.strip_ansi_colors($stdout.string)
         end
         $stdout = STDOUT
@@ -326,6 +326,22 @@ module Fastlane
         c.action do |args, options|
           search_query = args.last
           PluginSearch.print_plugins(search_query: search_query)
+        end
+      end
+
+      #####################################################
+      # @!group Swift
+      #####################################################
+
+      if FastlaneCore::FastlaneFolder.swift?
+        command :generate_swift do |c|
+          c.syntax = 'fastlane generate_swift'
+          c.description = 'Generates additional Swift APIs for plugins and local actions'
+
+          c.action do |args, options|
+            SwiftActionsAPIGenerator.new(target_output_path: FastlaneCore::FastlaneFolder.swift_folder_path).generate_swift
+            SwiftPluginsAPIGenerator.new(target_output_path: FastlaneCore::FastlaneFolder.swift_folder_path).generate_swift
+          end
         end
       end
 

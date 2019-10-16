@@ -23,7 +23,7 @@ module Match
 
       # Call this method after creating a new object to configure
       # the given Storage object. This method will take
-      # different paramters depending on specific class being used
+      # different parameters depending on specific class being used
       def configure
         not_implemented(__method__)
       end

@@ -59,7 +59,7 @@ module Deliver
       build = nil
 
       loop do
-        # Sometimes candidate_builds don't appear immediately after submittion
+        # Sometimes candidate_builds don't appear immediately after submission
         # Wait for candidate_builds to appear on App Store Connect
         # Issue https://github.com/fastlane/fastlane/issues/10411
         candidate_builds = app.latest_version.candidate_builds

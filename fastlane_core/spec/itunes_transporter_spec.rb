@@ -20,8 +20,7 @@ describe FastlaneCore do
         "-u #{email.shellescape}",
         "-p #{escaped_password}",
         "-f \"/tmp/my.app.id.itmsp\"",
-        "-t DAV",
-        "-t Signiant",
+        "-t DAV,Signiant",
         "-k 100000",
         ("-WONoPause true" if FastlaneCore::Helper.windows?),
         ("-itc_provider #{provider_short_name}" if provider_short_name)
@@ -72,8 +71,7 @@ describe FastlaneCore do
         "-u #{email.shellescape}",
         "-p #{password.shellescape}",
         "-f /tmp/my.app.id.itmsp",
-        "-t DAV",
-        "-t Signiant",
+        "-t DAV,Signiant",
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
         '2>&1'
@@ -136,8 +134,7 @@ describe FastlaneCore do
         "-u #{email.shellescape}",
         "-p #{password.shellescape}",
         "-f /tmp/my.app.id.itmsp",
-        "-t DAV",
-        "-t Signiant",
+        "-t DAV,Signiant",
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
         '2>&1'

@@ -32,6 +32,17 @@ module Match
                                      description: "Only fetch existing certificates and profiles, don't generate new ones",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :generate_apple_certs,
+                                     env_name: "MATCH_GENERATE_APPLE_CERTS",
+                                     description: "Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)",
+                                     type: Boolean,
+                                     default_value: FastlaneCore::Helper.mac? && FastlaneCore::Helper.xcode_at_least?('11'),
+                                     default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :skip_provisioning_profiles,
+                                     env_name: "MATCH_SKIP_PROVISIONING_PROFILES",
+                                     description: "Skip syncing provisioning profiles",
+                                     is_string: false,
+                                     default_value: false),
 
         # app
         FastlaneCore::ConfigItem.new(key: :app_identifier,
@@ -110,6 +121,12 @@ module Match
                                      description: "Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :git_basic_authorization,
+                                     env_name: "MATCH_GIT_BASIC_AUTHORIZATION",
+                                     sensitive: true,
+                                     description: "Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64",
+                                     optional: true,
+                                     default_value: nil),
 
         # Storage: Google Cloud
         FastlaneCore::ConfigItem.new(key: :google_cloud_bucket_name,

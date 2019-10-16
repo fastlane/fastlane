@@ -6,7 +6,7 @@
 
 A new approach to iOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
 
-_match_ is the implementation of the [https://codesigning.guide concept](https://codesigning.guide). _match_ creates all required certificates & provisioning profiles and stores them in a separate git repository. Every team member with access to the repo can use those credentials for code signing. _match_ also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
+_match_ is the implementation of the [codesigning.guide concept](https://codesigning.guide). _match_ creates all required certificates & provisioning profiles and stores them in a separate git repository. Every team member with access to the repo can use those credentials for code signing. _match_ also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
 
 [More information on how to get started with codesigning](https://docs.fastlane.tools/codesigning/getting-started/)
 
@@ -79,7 +79,7 @@ You'll be asked if you want to store your code signing identities inside a **Git
 
 Use Git Storage to store all code signing identities in a private git repo, owned and operated by you. The files will be encrypted using OpenSSL.
 
-First, enter the URL to your private (!) Git repo (You can create one for free on e.g. [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)). The URL you enter can be either a `https://` or a `git` URL. (If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise you may see an authentication error when you attempt to use match.) `fastlane match init` won't read or modify your certificates or profiles yet, and also won't validate your git URL.
+First, enter the URL to your private (!) Git repo (You can create one for free on e.g. [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)). The URL you enter can be either a `https://` or a `git` URL. `fastlane match init` won't read or modify your certificates or profiles yet, and also won't validate your git URL.
 
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder).
 
@@ -91,6 +91,25 @@ git_url("https://github.com/fastlane/certificates")
 app_identifier("tools.fastlane.app")
 username("user@fastlane.tools")
 ```
+
+##### Git Storage on GitHub
+
+If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise, you may see an authentication error when you attempt to use match. Alternatively, you can set a basic authorization for _match_:
+
+Using parameter:
+
+```
+math(git_basic_authorization: '<YOUR KEY>')
+```
+
+Using environment variable:
+
+```
+ENV['MATCH_GIT_BASIC_AUTHORIZATION'] = '<YOUR KEY>'
+match
+```
+
+You can find more information about GitHub basic authentication and personal token generation here: [https://developer.github.com/v3/auth/#basic-authentication](https://developer.github.com/v3/auth/#basic-authentication)
 
 #### Google Cloud Storage
 
@@ -119,7 +138,7 @@ match(git_branch: "team2", username: "user@team2.com")
 
 #### Google Cloud Storage
 
-If you use Google Cloud Storage, you don't need to do anything manually. Just use Google Cloud Storage, and the top level folder will be the team ID.
+If you use Google Cloud Storage, you don't need to do anything manually for multiple teams. Just use Google Cloud Storage, and the top level folder will be the team ID.
 
 ### Run
 
@@ -214,7 +233,7 @@ There are two cases for reading and writing certificates stored in a Google Clou
 1. Continuous integration jobs. These will authenticate to your Google Cloud project via a service account, and use a `gc_keys.json` file as credentials.
 1. Developers on a local workstation. In this case, you should choose whether everyone on your team will create their own `gc_keys.json` file, or whether you want to manage access to the bucket directly using your developers' Google accounts.
 
-When running `fastlane match init` the first time, the setup process will give you the option to create your `gc_keys.json` file. This file contains the auth credentials needed to access your Google Cloud storage bucket. Make sure to keep that file secret and never add it to version control. We recommend adding `gc_keys.json` to your `.gitignore`
+When running `fastlane match init` the first time, the setup process will give you the option to create your `gc_keys.json` file. This file contains the authentication credentials needed to access your Google Cloud storage bucket. Make sure to keep that file secret and never add it to version control. We recommend adding `gc_keys.json` to your `.gitignore`
 
 ##### Managing developer access via keys
 If you want to manage developer access to your certificates via authentication keys, every developer should create their own `gc_keys.json` and add the file to all their work machines. This will give the admin full control over who has read/write access to the given Storage bucket. At the same time it allows your team to revoke a single key if a file gets compromised.

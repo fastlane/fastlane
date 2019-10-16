@@ -17,7 +17,7 @@ module Match
       UI.user_error!("Certificate does not exist at path: #{cert_path}") unless File.exist?(cert_path)
       UI.user_error!("Private key does not exist at path: #{p12_path}") unless File.exist?(p12_path)
 
-      # Base64 encrypt contents to find match from API to find a cert ID
+      # Base64 encode contents to find match from API to find a cert ID
       cert_contents_base_64 = Base64.strict_encode64(File.open(cert_path).read)
 
       # Storage
@@ -72,7 +72,7 @@ module Match
         cert.certificate_content == cert_contents_base_64
       end
 
-      UI.error!("This certificate cannot be imported - the certificate contents did not match with any available on the Developer Portal") if matching_cert.nil?
+      UI.user_error!("This certificate cannot be imported - the certificate contents did not match with any available on the Developer Portal") if matching_cert.nil?
 
       # Make dir if doesn't exist
       FileUtils.mkdir_p(output_dir)
