@@ -10,6 +10,13 @@ describe "Build Manager" do
       changelog = Pilot::BuildManager.truncate_changelog(changelog)
       expect(changelog).to eq("1234")
     end
+    it "Truncates based on bytes not characters" do
+      changelog = "ü" * 4000
+      expect(changelog.unpack("C*").length).to eq(8000)
+      changelog = Pilot::BuildManager.truncate_changelog(changelog)
+      # Truncation appends "...", so the result is 1998 two-byte characters plus "..." for 3999 bytes.
+      expect(changelog.unpack("C*").length).to eq(3999)
+    end
   end
 
   describe ".sanitize_changelog" do
