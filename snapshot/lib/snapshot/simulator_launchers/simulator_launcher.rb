@@ -50,7 +50,7 @@ module Snapshot
             language = language[0]
           end
 
-          # Clear logs so subsequent xcodebuild executions dont append to old ones
+          # Clear logs so subsequent xcodebuild executions don't append to old ones
           log_path = xcodebuild_log_path(language: language, locale: locale)
           File.delete(log_path) if File.exist?(log_path)
 

@@ -128,7 +128,7 @@ Your screenshots will be stored in the `./screenshots/` folder by default (or `.
 
 New with Xcode 9, *snapshot* can run multiple simulators concurrently. This is the default behavior in order to take your screenshots as quickly as possible. This can be disabled to run each device, one at a time, by setting the `:concurrent_simulators` option to `false`.
 
-**Note:** While running *snapshot* with Xcode 9, the simulators will not be visibly spawned. So, while you wont see the simulators running your tests, they will, in fact, be taking your screenshots.
+**Note:** While running *snapshot* with Xcode 9, the simulators will not be visibly spawned. So, while you won't see the simulators running your tests, they will, in fact, be taking your screenshots.
 
 If any error occurs while running the snapshot script on a device, that device will not have any screenshots, and _snapshot_ will continue with the next device or language. To stop the flow after the first error, run
 

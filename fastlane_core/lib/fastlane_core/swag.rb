@@ -45,7 +45,7 @@ module FastlaneCore
 
     def self.show_loader
       return unless should_be_shown?
-      # sound is disabled as i didn't find a royality free nice midi :(
+      # sound is disabled as I didn't find a royality free nice midi :(
       @output = StringIO.new
       # if FastlaneCore::Env.truthy?("FL_DO_SOUND")
       #  @sound_thr = Thread.new do

@@ -252,13 +252,13 @@ module Fastlane
               puts(class_ref.deprecated_notes.to_s.remove_markdown.deprecated) if class_ref.deprecated_notes
               puts("==========================================\n".deprecated)
             end
-            class_ref.runner = self # needed to call another action form an action
+            class_ref.runner = self # needed to call another action from an action
             return class_ref.run(arguments)
           end
         end
       rescue Interrupt => e
         raise e # reraise the interruption to avoid logging this as a crash
-      rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we dont count as crashes
+      rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we don't count as crashes
         raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)

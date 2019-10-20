@@ -77,7 +77,7 @@ module Fastlane
     # rubocop:enable Style/AccessorMethodName
 
     # Returns the class ref to the action based on the action name
-    # Returns nil if the action is not aailable
+    # Returns nil if the action is not available
     def self.action_class_ref(action_name)
       class_name = action_name.to_s.fastlane_class + 'Action'
       class_ref = nil
