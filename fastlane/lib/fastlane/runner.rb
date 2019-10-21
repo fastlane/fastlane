@@ -215,6 +215,13 @@ module Fastlane
       end
     end
 
+    # task name is printed out instead of gradle
+    def gradle_task(step_name, args)
+      return nil unless step_name == 'gradle'
+
+      [args[:task], args[:flavor], args[:build_type]].join
+    end
+
     def execute_action(method_sym, class_ref, arguments, custom_dir: nil, from_action: false)
       if custom_dir.nil?
         custom_dir ||= "." if Helper.test?
@@ -223,13 +230,15 @@ module Fastlane
 
       verify_supported_os(method_sym, class_ref)
 
+      step_name = class_ref.step_text
+
       begin
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
           # If another action is calling this action, we shouldn't show it in the summary
 
           unless from_action
             args = arguments.kind_of?(Array) && arguments.first.kind_of?(Hash) ? arguments.first : {}
-            action_name = args[:step_name] || class_ref.step_text
+            action_name = args[:step_name] || gradle_task(step_name, args) || step_name
             args.delete(:step_name)
           end
           Actions.execute_action(action_name) do
