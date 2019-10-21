@@ -21,8 +21,11 @@ module Fastlane
         task = params[:task]
         flavor = params[:flavor]
         build_type = params[:build_type]
+        tasks = params[:tasks]
 
-        gradle_task = [task, flavor, build_type].join
+        gradle_task = gradle_task(task, flavor, build_type, tasks)
+
+        UI.user_error!('Please pass a gradle task or tasks') if gradle_task.empty?
 
         project_dir = params[:project_dir]
 
@@ -102,6 +105,16 @@ module Fastlane
         return result
       end
 
+      def self.gradle_task(task, flavor, build_type, tasks)
+        gradle_task = [task, flavor, build_type].join
+
+        if gradle_task.empty? && !tasks.nil?
+          gradle_task = tasks.join(' ')
+        end
+
+        gradle_task
+      end
+
       #####################################################
       # @!group Documentation
       #####################################################
@@ -119,7 +132,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :task,
                                        env_name: 'FL_GRADLE_TASK',
                                        description: 'The gradle task you want to execute, e.g. `assemble`, `bundle` or `test`. For tasks such as `assembleMyFlavorRelease` you should use gradle(task: \'assemble\', flavor: \'Myflavor\', build_type: \'Release\')',
-                                       optional: false,
+                                       optional: true,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :flavor,
                                        env_name: 'FL_GRADLE_FLAVOR',
@@ -131,6 +144,12 @@ module Fastlane
                                        description: 'The build type that you want the task for, e.g. `Release`. Useful for some tasks such as `assemble`',
                                        optional: true,
                                        is_string: true),
+          FastlaneCore::ConfigItem.new(key: :tasks,
+                                       type: Array,
+                                       env_name: 'FL_GRADLE_TASKS',
+                                       description: 'The multiple gradle tasks that you want to execute, e.g. `[assembleDebug, bundleDebug]`',
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :flags,
                                        env_name: 'FL_GRADLE_FLAGS',
                                        description: 'All parameter flags you want to pass to the gradle command, e.g. `--exitcode --xml file.xml`',
@@ -216,6 +235,13 @@ module Fastlane
             task: "bundle",
             flavor: "WorldDomination",
             build_type: "Release"
+          )
+          ```
+
+          You can pass multiple gradle tasks:
+          ```ruby
+          gradle(
+            tasks: ["assembleDebug", "bundleDebug"]
           )
           ```
 
