@@ -29,6 +29,9 @@ If the above doesn't help, please [submit an issue](https://github.com/fastlane/
 
 **Note**: If you want to report a regression in _fastlane_ (something that has worked before, but broke with a new release), please mark your issue title as such using `[Regression] Your title here`. This enables us to quickly detect and fix regressions.
 
+## Why Fastlane?
+<img src="fastlane.png" alt="why fastlane"/>
+
 ## _fastlane_ team
 
 <!-- This table is regenerated and resorted on each release -->
