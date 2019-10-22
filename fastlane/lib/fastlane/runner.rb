@@ -215,7 +215,7 @@ module Fastlane
       end
     end
 
-    # task name is printed out instead of gradle
+    # task name is printed out instead of 'gradle'
     def gradle_task(step_name, args)
       return nil unless step_name == 'gradle'
 
