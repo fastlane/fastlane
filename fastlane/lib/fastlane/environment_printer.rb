@@ -50,11 +50,11 @@ module Fastlane
     end
 
     def self.print_loaded_plugins
-      ENV["FASTLANE_ENV_PRINTER"] = "enabled"
       env_output =  "### Loaded fastlane plugins:\n"
       env_output << "\n"
       plugin_manager = Fastlane::PluginManager.new
-      plugin_manager.load_plugins
+      plugin_manager.load_plugins(print_table: false)
+
       if plugin_manager.available_plugins.length <= 0
         env_output << "**No plugins Loaded**\n"
       else
