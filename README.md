@@ -1,4 +1,4 @@
-<h3 align="center">
+\<h3 align="center">
   <a href="https://github.com/fastlane/fastlane/blob/master/fastlane/assets/fastlane_text.png">
   <img src="https://github.com/fastlane/fastlane/blob/master/fastlane/assets/fastlane_text.png?raw=true" alt="fastlane Logo" width="500">
   </a>
@@ -25,7 +25,7 @@ Before submitting a new GitHub issue, please make sure to
 - Check out [docs.fastlane.tools](https://docs.fastlane.tools)
 - Search for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
 
-If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular the output of the `fastlane env` command.
+If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular, the output of the `Fastlane env` command.
 
 **Note**: If you want to report a regression in _fastlane_ (something that has worked before, but broke with a new release), please mark your issue title as such using `[Regression] Your title here`. This enables us to quickly detect and fix regressions.
 
@@ -180,13 +180,13 @@ _fastlane_ tracks a few key metrics to understand how developers are using the t
 * The number of _fastlane_ runs
 * A salted hash of the app identifier or package name, which helps us anonymously identify unique usage of _fastlane_
  
-You can easily opt-out of metrics collection by adding `opt_out_usage` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. [Check out the metrics code on GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane_core/lib/fastlane_core/analytics)
+You can easily opt-out of metrics collection by adding `opt_out_usage` at the top of your `Fast file` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. [Check out the metrics code on GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane_core/lib/fastlane_core/analytics)
 
 ## License
 
 This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file.
 
-> This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
+> This project and all Fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All Fastlane tools run on your computer or server, so your credentials or other sensitive information will never leave your computer. You are responsible for how you use Fastlane tools.
 
 <hr />
 <h2 align="center">

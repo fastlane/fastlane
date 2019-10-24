@@ -4,7 +4,7 @@
 
 Before you start working on _fastlane_, make sure you had a look at [CONTRIBUTING.md](CONTRIBUTING.md).
 
-For working on _fastlane_ you should have [Bundler][bundler] installed. Bundler is a ruby project that allows you to specify all ruby dependencies in a file called the `Gemfile`. If you want to learn more about how Bundler works, check out [their website][bundler help].
+For working on _fastlane_ you should have [Bundler][bundler] installed. Bundler is a Ruby project that allows you to specify all ruby dependencies in a file called the `Gemfile`. If you want to learn more about how Bundler works, check out [their website][bundler help].
 
 ## Finding things to work on
 
@@ -28,7 +28,7 @@ If you want to work on something else, e.g. new functionality or fixing a bug, i
 
 ## Testing your changes
 
-[Testing _fastlane_](Testing.md) is so important, that the instructions have their own documentation file. They include [how to test your local changes](Testing.md#testing-your-local-changes) and [how to test your local fastlane code base with your setup](Testing.md#test-your-local-fastlane-code-base-with-your-setup).
+[Testing _fastlane_](Testing.md) is so important, that the instructions have their documentation file. They include [how to test your local changes](Testing.md#testing-your-local-changes) and [how to test your local Fastlane code base with your setup](Testing.md#test-your-local-Fastlane-code-base-with-your-setup).
 
 ## Submitting the PR
 
@@ -39,11 +39,11 @@ When the coding is done and you’re finished testing your changes, you are read
 
 ## After the review
 
-Once a core member has reviewed your PR, you might need to make changes before it gets merged. To make it easier on us, please make sure to avoid using `git commit --amend` or force pushes to make corrections. By avoiding rewriting the commit history, you will allow each round of edits to become its own visible commit. This helps the people who need to review your code easily understand exactly what has changed since the last time they looked. Feel free to use whatever commit messages you like, as we will squash them anyway. When you are done addressing your review, also add a small comment like “Feedback addressed @<your_reviewer>”.
+Once a core member has reviewed your PR, you might need to make changes before it gets merged. To make it easier on us, please make sure to avoid using `git commit --amend` or force pushes to make corrections. By avoiding rewriting the commit history, you will allow each round of edits to become its visible commit. This helps the people who need to review your code easily understand exactly what has changed since the last time they looked. Feel free to use whatever commit messages you like, as we will squash them anyway. When you are done addressing your review, also add a small comment like “Feedback addressed @<your_reviewer>”.
 
 _fastlane_ changes a lot and is in constant flux. We usually merge multiple PRs per day, so sometimes when we are done reviewing, your code might not work with the latest master branch anymore. To prevent this, before you make any changes after your code has been reviewed, you should always rebase the latest changes from the master branch.
 
-After your contribution is merged, it’s not immediately available to all users. Your change will be shipped as part of the next release, which is usually once per week. If your change is time critical, please let us know so we can schedule a release for your change.
+After your contribution is merged, it’s not immediately available to all users. Your change will be shipped as part of the next release, which is usually once per week. If your change is time-critical, please let us know so we can schedule a release for your change.
 
 <!-- Links -->
 [you can do this]: https://github.com/fastlane/fastlane/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3A%22complexity%3A+you+can+do+this%22+
