@@ -80,7 +80,11 @@ module Spaceship
 
       # Push all changes that were made back to App Store Connect
       def save!
-        client.update_app_details!(application.apple_id, raw_data)
+        # Apple no longer accept 'language' in 'localizedMetadata', or itc will return 'invalid_request'
+        raw_data_copy = Spaceship::Base::DataHash.new(raw_data.to_h.deep_dup)
+        locales = raw_data_copy["localizedMetadata"]["value"]
+        locales.each { |local_hash| local_hash.delete("language") }
+        client.update_app_details!(application.apple_id, raw_data_copy)
       rescue Spaceship::Tunes::Error => ex
         if ex.to_s == "operation_failed"
           # That's alright, we get this error message if nothing has changed
