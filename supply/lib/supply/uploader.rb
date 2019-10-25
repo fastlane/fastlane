@@ -37,7 +37,7 @@ module Supply
       # Updating a track with empty version codes can completely clear out a track
       update_track(apk_version_codes) unless apk_version_codes.empty?
 
-      if !Supply.config[:rollout].nil? && Supply.config[:version_name].to_s != "" && Supply.config[:track].to_s != ""
+      if !Supply.config[:rollout].nil? && Supply.config[:version_code].to_s != "" && Supply.config[:track].to_s != ""
         update_rollout
       end
 
@@ -55,22 +55,18 @@ module Supply
     end
 
     def update_rollout
-      UI.message("Updating #{Supply.config[:version_name]}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
+      UI.message("Updating #{Supply.config[:version_code]}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
 
       tracks = @client.tracks(Supply.config[:track])
       UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") if tracks.length == 0
 
       track = tracks.first
-      releases = track.releases.select { |r| r.name == Supply.config[:version_name] }
+      releases = track.releases.select { |r| r.version_codes.include?(Supply.config[:version_code]) }
 
       version_codes = Supply.config
       if Supply.config[:version_code]
         releases = releases.select { |r| r.version_codes.include?(Supply.config[:version_code]) }
       end
-
-      if releases.size > 1
-        UI.user_error!("Unable to rollout - multiple versions with name '#{Supply.config[:version_name]}' in track '#{Supply.config[:track]}'. Filter with :version_code")
-      end 
 
       release = releases.first
       if release
@@ -80,7 +76,7 @@ module Supply
 
         track.releases.delete_if { |r| !r.version_codes.include?(Supply.config[:version_code]) } if completed
       else
-        UI.user_error!("Unable to find version '#{Supply.config[:version_name]}' in track '#{Supply.config[:track]}'")
+        UI.user_error!("Unable to find version code '#{Supply.config[:version_code]}' in track '#{Supply.config[:track]}'")
       end
 
       client.update_track(Supply.config[:track], track)
@@ -115,10 +111,14 @@ module Supply
         UI.user_error!("Cannot promote from track '#{Supply.config[:track]}' - track doesn't exist")
       end
 
-      if track_from.releases.size == 0
+      releases = track_from.releases.select do |release|
+        release.version_codes.include?(Supply.config[:version_code])
+      end if Supply.config[:version_code].to_s != ""
+
+      if releases.size == 0
         UI.user_error!("Track '#{Supply.config[:track]}' doesn't have any releases")
-      elsif track_from.releases.size > 1
-        UI.user_error!("Track '#{Supply.config[:track]}' has more than one release (please complete rolling out before promoting)")
+      elsif releases.size > 1
+        UI.user_error!("Track '#{Supply.config[:track]}' has more than one release - use :version_code to filter the release to promote")
       end
 
       release = track_from.releases.first
@@ -137,7 +137,7 @@ module Supply
     end
 
     def upload_changelog(language)
-      path = File.join(Supply.config[:metadata_path], language, Supply::CHANGELOGS_FOLDER_NAME, "#{Supply.config[:version_name]}.txt")
+      path = File.join(Supply.config[:metadata_path], language, Supply::CHANGELOGS_FOLDER_NAME, "#{Supply.config[:version_code]}.txt")
       changelog_text = ''
       if File.exist?(path)
         changelog_text = File.read(path, encoding: 'UTF-8')
@@ -153,7 +153,7 @@ module Supply
 
     def upload_changelogs(release_notes, version_codes = [])
       track_release = AndroidPublisher::TrackRelease.new({
-        name: Supply.config[:version_name],
+        name: Supply.config[:version_code],
         release_notes: release_notes,
         status: Supply.config[:release_status]
       })
@@ -338,8 +338,7 @@ module Supply
       check_superseded_tracks(apk_version_codes) if Supply.config[:check_superseded_tracks]
 
       track_release = AndroidPublisher::TrackRelease.new(
-        # TODO: Don't hardcode this
-        name: "josh_release_name_3",
+        name: Supply.config[:version_name],
         # TODO: Put in release notes here
         release_notes: [],
         status: "completed",
