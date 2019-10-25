@@ -75,7 +75,7 @@ This will also upload app metadata if you previously ran `fastlane supply init`.
 To gradually roll out a new build use
 
 ```no-highlight
-fastlane supply --apk path/app.apk --track rollout --rollout 0.5
+fastlane supply --apk path/app.apk --rollout 0.5
 ```
 
 ### Expansion files (`.obb`)
@@ -110,7 +110,7 @@ This will also upload app metadata if you previously ran `fastlane supply init`.
 To gradually roll out a new build use
 
 ```no-highlight
-fastlane supply --aab path/app.aab --track rollout --rollout 0.5
+fastlane supply --aab path/app.aab --rollout 0.5
 ```
 
 ## Images and Screenshots
