@@ -463,12 +463,12 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        client.update_expansion_file(
+        client.update_edit_expansionfile(
           current_package_name,
           current_edit.id,
           apk_version_code,
           expansion_file_type,
-          Google::Apis::AndroidpublisherV2::ExpansionFile.new(
+          AndroidPublisher::ExpansionFile.new(
             references_version: references_version,
             file_size: file_size
           )
@@ -544,7 +544,7 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        client.upload_expansion_file(
+        client.upload_edit_expansionfile(
           current_package_name,
           current_edit.id,
           apk_version_code,
