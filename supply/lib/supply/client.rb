@@ -363,9 +363,6 @@ module Supply
 
       all_tracks = call_google_api { client.list_edit_tracks(current_package_name, current_edit.id) }.tracks
 
-      require 'pp'
-      pp all_tracks
-
       if tracknames.length > 0
         all_tracks = all_tracks.select { |track| tracknames.include?(track.track) }
       end
@@ -418,12 +415,12 @@ module Supply
       ensure_active_edit!
 
       begin
-        result = client.get_track(
+        result = client.get_edit_track(
           current_package_name,
           current_edit.id,
           track
         )
-        return result.version_codes || []
+        return result.releases.flat_map { |release| release.version_codes } || []
       rescue Google::Apis::ClientError => e
         return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
         raise

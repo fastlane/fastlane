@@ -37,8 +37,8 @@ module Supply
       # Updating a track with empty version codes can completely clear out a track
       update_track(apk_version_codes) unless apk_version_codes.empty?
 
-      unless Supply.config[:rollout].nil? && Supply.config[:version_name].nil? && Supply.config[:track].nil?
-        #update_rollout
+      if !Supply.config[:rollout].nil? && Supply.config[:version_name].to_s != "" && Supply.config[:track].to_s != ""
+        update_rollout
       end
 
       promote_track if Supply.config[:track_promote_to]
@@ -54,27 +54,36 @@ module Supply
       end
     end
 
-    def update_rollout()
+    def update_rollout
       UI.message("Updating #{Supply.config[:version_name]}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
 
-      track = @client.tracks(Supply.config[:track])
-      UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") if track.length == 0
+      tracks = @client.tracks(Supply.config[:track])
+      UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") if tracks.length == 0
 
-      if track[0].releases.any? { |r| r.name == Supply.config[:version_name] }
-        track[0].send("track=", 'rollout')
-        track[0].releases.select { |r| r.name == Supply.config[:version_name]}[0].send("user_fraction=", Supply.config[:rollout])
-        # track[0].releases.delete_if { |r| r.name != Supply.config[:version_name] }
+      track = tracks.first
+      releases = track.releases.select { |r| r.name == Supply.config[:version_name] }
 
-        track[0].releases.select { |r| r.name == Supply.config[:version_name]}[0].send("status=", 'completed') if Supply.config[:rollout] == 1
+      version_codes = Supply.config
+      if Supply.config[:version_code]
+        releases = releases.select { |r| r.version_codes.include?(Supply.config[:version_code]) }
+      end
+
+      if releases.size > 1
+        UI.user_error!("Unable to rollout - multiple versions with name '#{Supply.config[:version_name]}' in track '#{Supply.config[:track]}'. Filter with :version_code")
+      end 
+
+      release = releases.first
+      if release
+        completed = Supply.config[:rollout].to_f == 1
+        release.send("user_fraction=", completed ? nil : Supply.config[:rollout])
+        release.send("status=", 'completed') if completed
+
+        track.releases.delete_if { |r| !r.version_codes.include?(Supply.config[:version_code]) } if completed
       else
         UI.user_error!("Unable to find version '#{Supply.config[:version_name]}' in track '#{Supply.config[:track]}'")
       end
-binding.pry
-      client.update_track('rollout', track)
 
-      binding.pry
-      p 123
-      
+      client.update_track(Supply.config[:track], track)
     end
 
     def verify_config!
@@ -101,11 +110,30 @@ binding.pry
     end
 
     def promote_track
-      version_codes = client.track_version_codes(Supply.config[:track])
-      # the actual value passed for the rollout argument does not matter because it will be ignored by the Google Play API
-      # but it has to be between 0.0 and 1.0 to pass the validity check. So we are passing the default value 0.1
-      client.update_track(Supply.config[:track], 0.1, nil) if Supply.config[:deactivate_on_promote]
-      client.update_track(Supply.config[:track_promote_to], Supply.config[:rollout] || 0.1, version_codes)
+      track_from = @client.tracks(Supply.config[:track]).first
+      unless track_from
+        UI.user_error!("Cannot promote from track '#{Supply.config[:track]}' - track doesn't exist")
+      end
+
+      if track_from.releases.size == 0
+        UI.user_error!("Track '#{Supply.config[:track]}' doesn't have any releases")
+      elsif track_from.releases.size > 1
+        UI.user_error!("Track '#{Supply.config[:track]}' has more than one release (please complete rolling out before promoting)")
+      end
+
+      release = track_from.releases.first
+      track_to = @client.tracks(Supply.config[:track_promote_to]).first
+
+      if track_to
+        track_to.releases = [release]
+      else
+        track_to = AndroidPublisher::Track.new(
+          track: Supply.config[:track_promote_to],
+          releases: [release]
+        )
+      end
+
+      client.update_track(Supply.config[:track_promote_to], track_to)
     end
 
     def upload_changelog(language)
@@ -310,7 +338,9 @@ binding.pry
       check_superseded_tracks(apk_version_codes) if Supply.config[:check_superseded_tracks]
 
       track_release = AndroidPublisher::TrackRelease.new(
+        # TODO: Don't hardcode this
         name: "josh_release_name_3",
+        # TODO: Put in release notes here
         release_notes: [],
         status: "completed",
         version_codes: apk_version_codes
@@ -326,12 +356,7 @@ binding.pry
         releases: [track_release]
       )
 
-      if Supply.config[:track].eql?("rollout")
-        raise "rollout is not a valid track anymore???"
-        #client.update_track(Supply.config[:track], Supply.config[:rollout] || 0.1, apk_version_codes)
-      else
-        client.update_track(Supply.config[:track], track)
-      end
+      client.update_track(Supply.config[:track], track)
     end
 
     # Remove any version codes that is:
