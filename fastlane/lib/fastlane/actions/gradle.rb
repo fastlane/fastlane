@@ -103,6 +103,9 @@ module Fastlane
         # Give a helpful message in case there were no new apks or aabs. Remember we're only running this code when assembling, in which case we certainly expect there to be an apk or aab
         UI.message('Couldn\'t find any new signed apk files...') if new_apks.empty? && new_aabs.empty?
 
+        # Display a gradle task name in fastlane summary to make it easy to understand the content of this step
+        print_task_name_in_summary(params, gradle_task)
+
         return result
       end
       # rubocop:enable Metrics/PerceivedComplexity
@@ -115,6 +118,12 @@ module Fastlane
         end
 
         gradle_task
+      end
+
+      def self.print_task_name_in_summary(params, gradle_task)
+        if params[:print_task_name_in_summary]
+          Actions.executed_actions << { name: gradle_task }
+        end
       end
 
       #####################################################
@@ -192,6 +201,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :print_command_output,
                                        env_name: 'FL_GRADLE_PRINT_COMMAND_OUTPUT',
                                        description: 'Control whether the output produced by given Gradle command is printed while running (true/false)',
+                                       is_string: false,
+                                       default_value: true),
+          FastlaneCore::ConfigItem.new(key: :print_task_name_in_summary,
+                                       env_name: 'FL_GRADLE_PRINT_TASK_NAME_IN_SUMMARY',
+                                       description: 'Display the gradle task name instead of `gradle` in fastlane summary. If you want to display `gradle` or step_name which you set in summary, please set this option to `false`.(true/false)',
                                        is_string: false,
                                        default_value: true)
         ]

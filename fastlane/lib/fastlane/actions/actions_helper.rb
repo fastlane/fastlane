@@ -56,12 +56,21 @@ module Fastlane
       # This is also called, when the block has a return statement
       if step_name
         duration = Time.now - start
+        last_action = executed_actions.last
 
-        executed_actions << {
-          name: step_name,
-          error: error,
-          time: duration
-        }
+        if last_action && last_action[:name] && last_action[:error].nil? && last_action[:time].nil?
+          executed_actions[-1] = {
+            name: last_action[:name],
+            error: error,
+            time: duration
+          }
+        else
+          executed_actions << {
+            name: step_name,
+            error: error,
+            time: duration
+          }
+        end
       end
 
       raise exc if exc

@@ -31,18 +31,6 @@ describe Fastlane do
           @ff.runner.execute_action(:frameit, Fastlane::Actions::FrameitAction, [{}])
         end
       end
-      describe "override gradle step" do
-        it "handle overriding of step_name in gradle action" do
-          allow(Fastlane::Actions).to receive(:execute_action).with('gradle build')
-
-          @ff.runner.execute_action(:gradle, Fastlane::Actions::GradleAction, [{ task: "assembleDebug", step_name: "gradle build" }])
-        end
-        it "handle overriding of task name when no step_name given to gradle action" do
-          allow(Fastlane::Actions).to receive(:execute_action).with('assembleDebug')
-
-          @ff.runner.execute_action(:gradle, Fastlane::Actions::GradleAction, [{ task: "assembleDebug" }])
-        end
-      end
     end
   end
 end
