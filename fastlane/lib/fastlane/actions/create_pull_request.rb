@@ -90,11 +90,11 @@ module Fastlane
       def self.add_reviewers(params, number)
         payload = {}
         if params[:reviewers]
-            payload["reviewers"] = params[:reviewers]
+          payload["reviewers"] = params[:reviewers]
         end
 
         if params[:team_reviewers]
-            payload["team_reviewers"] = params[:team_reviewers]
+          payload["team_reviewers"] = params[:team_reviewers]
         end
         GithubApiAction.run(
           server_url: params[:api_url],
