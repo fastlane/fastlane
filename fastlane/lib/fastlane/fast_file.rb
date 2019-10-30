@@ -261,9 +261,9 @@ module Fastlane
 
     # @param url [String] The git URL to clone the repository from
     # @param branch [String] The branch to checkout in the repository
-    # @param path [String] The path to the Fastfile
+    # @param paths [String] The path to the Fastfile
     # @param version [String, Array] Version requirement for repo tags
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil)
+    def import_from_git(url: nil, branch: 'HEAD', paths: ['fastlane/Fastfile'], version: nil)
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
@@ -292,23 +292,24 @@ module Fastlane
             UI.user_error!("No tag found matching #{version.inspect}") if checkout_param.nil?
           end
 
-          Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{path.shellescape}")
-
           # We also want to check out all the local actions of this fastlane setup
-          containing = path.split(File::SEPARATOR)[0..-2]
-          containing = "." if containing.count == 0
-          actions_folder = File.join(containing, "actions")
-          begin
-            Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{actions_folder.shellescape}")
-          rescue
-            # We don't care about a failure here, as local actions are optional
+          paths.each do |path|
+            Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{path.shellescape}")
+
+            containing = path.split(File::SEPARATOR)[0..-2]
+            containing = "." if containing.count == 0
+            actions_folder = File.join(containing, "actions")
+            begin
+              Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{actions_folder.shellescape}")
+            rescue
+              # We don't care about a failure here, as local actions are optional
+            end
+
+            return_value = import(File.join(clone_folder, path))
+
+#             return return_value
           end
-
-          return_value = import(File.join(clone_folder, path))
-
           action_completed('import_from_git', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
-
-          return return_value
         end
       end
     end
