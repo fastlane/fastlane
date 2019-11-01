@@ -69,8 +69,9 @@ module Frameit
   module Devices
     GOOGLE_PIXEL_3 = Frameit::Device.new("google-pixel-3", "Google Pixel 3", 7, [[1080, 2160], [2160, 1080]], 443, Color::JUST_BLACK, Platform::ANDROID)
     GOOGLE_PIXEL_3_XL = Frameit::Device.new("google-pixel-3-xl", "Google Pixel 3 XL", 7, [[1440, 2960], [2960, 1440]], 523, Color::JUST_BLACK, Platform::ANDROID)
-    GOOGLE_PIXEL_4 = Frameit::Device.new("google-pixel-4", "Google Pixel 4", 8, [[1080, 2280], [2280, 1080]], 444, Color::JUST_BLACK, Platform::ANDROID)
-    GOOGLE_PIXEL_4_XL = Frameit::Device.new("google-pixel-4-xl", "Google Pixel 4 XL", 8, [[1440, 3040], [3040, 1440]], 537, Color::JUST_BLACK, Platform::ANDROID)
+    # Google Pixel 4's priority should be higher than Samsung Galaxy S10+ (priority 8):
+    GOOGLE_PIXEL_4 = Frameit::Device.new("google-pixel-4", "Google Pixel 4", 9, [[1080, 2280], [2280, 1080]], 444, Color::JUST_BLACK, Platform::ANDROID)
+    GOOGLE_PIXEL_4_XL = Frameit::Device.new("google-pixel-4-xl", "Google Pixel 4 XL", 9, [[1440, 3040], [3040, 1440]], 537, Color::JUST_BLACK, Platform::ANDROID)
     HTC_ONE_A9 = Frameit::Device.new("htc-one-a9", "HTC One A9", 6, [[1080, 1920], [1920, 1080]], 441, Color::BLACK, Platform::ANDROID)
     HTC_ONE_M8 = Frameit::Device.new("htc-one-m8", "HTC One M8", 3, [[1080, 1920], [1920, 1080]], 441, Color::BLACK, Platform::ANDROID)
     HUAWEI_P8 = Frameit::Device.new("huawei-p8", "Huawei P8", 5, [[1080, 1920], [1920, 1080]], 424, Color::BLACK, Platform::ANDROID)
@@ -103,9 +104,9 @@ module Frameit
     IPHONE_8 = Frameit::Device.new("iphone-8", "Apple iPhone 8", 6, [[750, 1334], [1334, 750]], 326, Color::SPACE_GRAY)
     IPHONE_8_PLUS = Frameit::Device.new("iphone-8-plus", "Apple iPhone 8 Plus", 6, [[1080, 1920], [1920, 1080]], 401, Color::SPACE_GRAY)
     IPHONE_X = Frameit::Device.new("iphone-X", "Apple iPhone X", 7, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_58, :use_legacy_iphonex)
-    IPHONE_XS = Frameit::Device.new("iphone-XS", "Apple iPhone XS", 8, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_58)
-    IPHONE_XR = Frameit::Device.new("iphone-XR", "Apple iPhone XR", 8, [[828, 1792], [1792, 828]], 326, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_61)
-    IPHONE_XS_MAX = Frameit::Device.new("iphone-XS-Max", "Apple iPhone XS Max", 8, [[1242, 2688], [2688, 1242]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_65)
+    IPHONE_XS = Frameit::Device.new("iphone-XS", "Apple iPhone XS", 8, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_58, :use_legacy_iphonexs)
+    IPHONE_XR = Frameit::Device.new("iphone-XR", "Apple iPhone XR", 8, [[828, 1792], [1792, 828]], 326, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_61, :use_legacy_iphonexr)
+    IPHONE_XS_MAX = Frameit::Device.new("iphone-XS-Max", "Apple iPhone XS Max", 8, [[1242, 2688], [2688, 1242]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_65, :use_legacy_iphonexsmax)
     IPHONE_11 = Frameit::Device.new("iphone-11", "Apple iPhone 11", 9, [[828, 1792], [1792, 828]], 326, Color::BLACK, Platform::IOS)
     IPHONE_11_PRO = Frameit::Device.new("iphone-11-pro", "Apple iPhone 11 Pro", 9, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS)
     IPHONE_11_PRO_MAX = Frameit::Device.new("iphone11-pro-max", "Apple iPhone 11 Pro Max", 9, [[1242, 2688], [2688, 1242]], 458, Color::SPACE_GRAY, Platform::IOS)
@@ -117,7 +118,7 @@ module Frameit
     # this is 1st or 2nd gen of iPad Pro 12.9:
     IPAD_PRO = Frameit::Device.new("ipad-pro", "Apple iPad Pro", 3, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO)
     # 3rd generation:
-    IPAD_PRO_12_9 = Frameit::Device.new("ipadPro129", "Apple iPad Pro 13\"", 4, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO_12_9)
+    IPAD_PRO_12_9 = Frameit::Device.new("ipadPro129", "Apple iPad Pro (12.9-inch) (3rd generation)", 4, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO_12_9)
     # iPad Pro (10.5-inch) is not in frameit-frames repo, but must be included so that we are backward compatible with PR #15373
     # priority must be lower so that users who didn't copy the frame to their frameit frames folder will not get an error
     # ID and formatted name must be exactly as specified so that device.detect_device() will select this device if the filename includes them

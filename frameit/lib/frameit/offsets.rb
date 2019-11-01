@@ -19,7 +19,9 @@ module Frameit
     end
 
     def self.sanitize_device_name(basename)
+      # this should be the same as frames_generator's sanitize_device_name (except stripping colors):
       basename = basename.gsub("Apple", "")
+      basename = basename.gsub("-", " ")
       basename.strip.to_s
     end
   end
