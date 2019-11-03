@@ -331,12 +331,12 @@ module Supply
       track_release = AndroidPublisher::TrackRelease.new(
         name: Supply.config[:version_name],
         release_notes: [],
-        status: Supply::Tracks::COMPLETED,
+        status: Supply::ReleaseStatus::COMPLETED,
         version_codes: apk_version_codes
       )
 
       if Supply.config[:rollout]
-        track_release.status = Supply::Tracks::IN_PROGRESS
+        track_release.status = Supply::ReleaseStatus::IN_PROGRESS
         track_release.user_fraction = Supply.config[:rollout].to_f
       end
 
