@@ -38,13 +38,13 @@ module Supply
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:release_status),
                                      default_value_dynamic: true,
                                      verify_block: proc do |value|
-                                      UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::RELEASE_STATUS.include?(value)
+                                      UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::ReleaseStatus::ALL.include?(value)
                                     end),
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
-                                     description: "The track of the application to use. The default available tracks are: #{Supply::DEFAULT_TRACKS.join(', ')}",
-                                     default_value: DEFAULT_TRACK,
+                                     description: "The track of the application to use. The default available tracks are: #{Supply::Tracks::DEFAULTS.join(', ')}",
+                                     default_value: Supply::Tracks::DEFAULT,
                                      type: String),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
@@ -208,7 +208,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track_promote_to,
                                      env_name: "SUPPLY_TRACK_PROMOTE_TO",
                                      optional: true,
-                                     description: "The track to promote to. The default available tracks are: #{Supply::DEFAULT_TRACKS.join(', ')}"),
+                                     description: "The track to promote to. The default available tracks are: #{Supply::Tracks::DEFAULTS.join(', ')}"),
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,
