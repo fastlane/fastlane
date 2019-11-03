@@ -105,8 +105,8 @@ module Supply
       release = releases.first
       if release
         completed = Supply.config[:rollout].to_f == 1
-        release.send("user_fraction=", completed ? nil : Supply.config[:rollout])
-        release.send("status=", 'completed') if completed
+        release.user_fraction = completed ? nil : Supply.config[:rollout]
+        release.status = Supply::ReleaseStatus::COMPLETED if completed
 
         track.releases.delete_if { |r| !r.version_codes.include?(Supply.config[:version_code]) } if completed
       else
@@ -331,12 +331,12 @@ module Supply
       track_release = AndroidPublisher::TrackRelease.new(
         name: Supply.config[:version_name],
         release_notes: [],
-        status: "completed",
+        status: Supply::Tracks::COMPLETED,
         version_codes: apk_version_codes
       )
 
       if Supply.config[:rollout]
-        track_release.status = "inProgress"
+        track_release.status = Supply::Tracks::IN_PROGRESS
         track_release.user_fraction = Supply.config[:rollout].to_f
       end
 
@@ -356,13 +356,13 @@ module Supply
       max_apk_version_code = apk_version_codes.max
       max_tracks_version_code = nil
 
-      tracks = Supply::DEFAULT_TRACKS
+      tracks = Supply::Tracks::DEFAULTS
       config_track_index = tracks.index(Supply.config[:track])
 
       # Custom "closed" tracks are now allowed (https://support.google.com/googleplay/android-developer/answer/3131213)
       # Custom tracks have an equal level with alpha (alpha is considered a closed track as well)
       # If a track index is not found, we will assume is a custom track so an alpha index is given
-      config_track_index = tracks.index("alpha") unless config_track_index
+      config_track_index = tracks.index(Supply::Tracks::ALPHA) unless config_track_index
 
       tracks.each_index do |track_index|
         track = tracks[track_index]

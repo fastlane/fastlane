@@ -25,11 +25,25 @@ module Supply
   CHANGELOGS_FOLDER_NAME = "changelogs"
 
   # https://developers.google.com/android-publisher/#publishing
-  DEFAULT_TRACKS = %w(production beta alpha internal)
-  DEFAULT_TRACK = DEFAULT_TRACKS[0]
+  module Tracks
+    PRODUCTION = "production"
+    BETA = "beta"
+    ALPHA = "alpha"
+    INTERNAL = "internal"
+
+    DEFAULTS = [PRODUCTION, BETA, ALPHA, INTERNAL]
+    DEFAULT = PRODUCTION
+  end
 
   # https://developers.google.com/android-publisher/api-ref/edits/tracks
-  RELEASE_STATUS = %w(completed draft halted inProgress)
+  module ReleaseStatus
+    COMPLETED = "completed"
+    DRAFT = "draft"
+    HALTED = "halted"
+    IN_PROGRESS = "inProgress"
+
+    ALL = [COMPLETED, DRAFT, HALTED, IN_PROGRESS]
+  end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
