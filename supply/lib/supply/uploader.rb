@@ -145,7 +145,8 @@ module Supply
         UI.user_error!("Cannot promote from track '#{Supply.config[:track]}' - track doesn't exist")
       end
 
-      releases = track_from.releases.select do |release|
+      releases = track_from.releases
+      releases = releases.select do |release|
         release.version_codes.include?(Supply.config[:version_code])
       end if Supply.config[:version_code].to_s != ""
 
@@ -190,24 +191,6 @@ module Supply
     def upload_changelogs(release_notes, release, track)
       release.release_notes = release_notes
       client.upload_changelogs(track)
-    end
-
-    def upload_changelogs_DEPRECATED(language)
-      client.apks_version_codes.each do |apk_version_code|
-        upload_changelog(language, apk_version_code)
-      end
-      client.aab_version_codes.each do |aab_version_code|
-        upload_changelog(language, aab_version_code)
-      end
-    end
-
-    def upload_changelog_DEPRECATED(language, version_code)
-      path = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME, "#{version_code}.txt")
-      if File.exist?(path)
-        UI.message("Updating changelog for code version '#{version_code}' and language '#{language}'...")
-        apk_listing = ApkListing.new(File.read(path, encoding: 'UTF-8'), language, version_code)
-        client.update_apk_listing_for_language(apk_listing)
-      end
     end
 
     def upload_metadata(language, listing)
@@ -285,14 +268,6 @@ module Supply
       aab_paths.each do |aab_path|
         UI.message("Preparing aab at path '#{aab_path}' for upload...")
         bundle_version_code = client.upload_bundle(aab_path)
-
-        # if metadata_path
-        #   all_languages.each do |language|
-        #     next if language.start_with?('.') # e.g. . or .. or hidden folders
-        #     upload_changelog(language, bundle_version_code)
-        #   end
-        # end
-
         aab_version_codes.push(bundle_version_code)
       end
 
@@ -331,13 +306,6 @@ module Supply
         end
 
         upload_obbs(apk_path, apk_version_code)
-
-        # if metadata_path
-        #   all_languages.each do |language|
-        #     next if language.start_with?('.') # e.g. . or .. or hidden folders
-        #     upload_changelog(language, apk_version_code)
-        #   end
-        # end
       else
         UI.message("No apk file found, you can pass the path to your apk using the `apk` option")
       end
@@ -388,7 +356,7 @@ module Supply
       max_apk_version_code = apk_version_codes.max
       max_tracks_version_code = nil
 
-      tracks = Supply::AVAILABLE_TRACKS
+      tracks = Supply::DEFAULT_TRACKS
       config_track_index = tracks.index(Supply.config[:track])
 
       # Custom "closed" tracks are now allowed (https://support.google.com/googleplay/android-developer/answer/3131213)

@@ -239,7 +239,7 @@ module Supply
     def release_listings(version)
       ensure_active_edit!
 
-      # 'rollout' track returned by AndroidPublisherV3 doesn't have 'releases'.
+      # Verify that tracks have releases
       filtered_tracks = tracks.select { |t| !t.releases.nil? && t.releases.any? { |r| r.name == Supply.config[:version_name] } }
       
       if filtered_tracks.length > 1
@@ -357,7 +357,6 @@ module Supply
     end
 
     # Get a list of all tracks - returns the list
-    # Available values for tracknames = ["production", "rollout", "beta", "alpha", "internal"]
     def tracks(*tracknames)
       ensure_active_edit!
 
@@ -379,33 +378,6 @@ module Supply
           current_edit.id,
           track_name,
           track_object
-        )
-      end
-    end
-
-    # Updates the track for the provided version code(s)
-    def update_track_DEPRECATED(track, rollout, apk_version_code)
-      ensure_active_edit!
-
-      track_version_codes = apk_version_code.kind_of?(Array) ? apk_version_code : [apk_version_code]
-
-      # This change happened on 2018-04-24
-      # rollout cannot be sent on any other track besides "rollout"
-      # https://github.com/fastlane/fastlane/issues/12372
-      rollout = nil unless track == "rollout"
-
-      track_body = AndroidPublisher::Track.new({
-        track: track,
-        user_fraction: rollout,
-        version_codes: track_version_codes
-      })
-
-      call_google_api do
-        client.update_track(
-          current_package_name,
-          current_edit.id,
-          track,
-          track_body
         )
       end
     end
