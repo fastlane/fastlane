@@ -253,14 +253,15 @@ module Supply
         end
       end
 
-      if filtered_tracks.length == 0
+      filtered_track = filtered_tracks.first
+      if filtered_track.nil?
         UI.user_error!("Unable to find version '#{version}' for '#{current_package_name}' in all tracks. Please double check the version number.")
         return nil
       else
-        UI.message("Found '#{version}' in '#{filtered_tracks[0].track}' track.")
+        UI.message("Found '#{version}' in '#{filtered_track.track}' track.")
       end
 
-      filtered_release = filtered_tracks.map(&:releases).flatten.select { |r| r.name == version }[0]
+      filtered_release = filtered_track.releases.first { |r| r.name == version }
 
       # Since we can release on Alpha/Beta without release notes.
       if filtered_release.release_notes.nil?
@@ -269,7 +270,7 @@ module Supply
       end
 
       return filtered_release.release_notes.map do |row|
-        Supply::ReleaseListing.new(filtered_tracks[0], filtered_release.name, filtered_release.version_codes, row.language, row.text)
+        Supply::ReleaseListing.new(filtered_track, filtered_release.name, filtered_release.version_codes, row.language, row.text)
       end
     end
 
