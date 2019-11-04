@@ -331,7 +331,7 @@ module Supply
       track_release = AndroidPublisher::TrackRelease.new(
         name: Supply.config[:version_name],
         release_notes: [],
-        status: Supply::ReleaseStatus::COMPLETED,
+        status: Supply.config[:release_status] || Supply::ReleaseStatus::COMPLETED,
         version_codes: apk_version_codes
       )
 
