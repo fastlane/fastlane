@@ -465,20 +465,23 @@ module Supply
         )
       end
 
-      images = []
       urls = (result.images || []).map(&:url)
-      urls.each do |url|
-        url_params = url.match("=.*")
-        if !url_params.nil? && url_params.length == 1
-          UI.verbose("Initial URL received: '#{url}'")
-          url = url.gsub(url_params.to_s, "") # Remove everything after '=' (if present). This ensures webp is converted to png/jpg (https://www.howtogeek.com/325864/how-to-save-googles-webp-images-as-jpeg-or-png/)
-          UI.verbose("Removed params ('#{url_params}') from the URL")
-          UI.verbose("URL after removing params: '#{url}'")
-        end
+      images = urls.map do |url|
+        uri = URI.parse(url)
+        clean_url = [
+          uri.scheme,
+          uri.userinfo,
+          uri.host,
+          uri.port,
+          uri.path
+        ].join
 
-        url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
+        UI.verbose("Initial URL received: '#{url}'")
+        UI.verbose("Removed params ('#{uri.query}') from the URL")
+        UI.verbose("URL after removing params: '#{clean_url}'")
 
-        images << url
+        full_url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
+        full_url
       end
 
       return images
