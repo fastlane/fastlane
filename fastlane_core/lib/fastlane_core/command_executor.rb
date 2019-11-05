@@ -56,7 +56,6 @@ module FastlaneCore
         begin
 
           status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
-            begin
               if pid_created
                 pid_created.call(pid)
               end
