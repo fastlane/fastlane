@@ -24,6 +24,9 @@
 # Where should the resulting screenshots be stored?
 # output_directory("./screenshots")
 
+# Where should the resulting videos be stored?
+# video_output_directory "./videos"
+
 # remove the '#' to clear all previously generated screenshots before creating new ones
 # clear_previous_screenshots(true)
 
