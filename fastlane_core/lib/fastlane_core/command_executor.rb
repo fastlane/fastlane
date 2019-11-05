@@ -40,7 +40,7 @@ module FastlaneCore
 
       #def execute(command: nil, print_all: false, print_command: true, pid_created: nil, error: nil, prefix: nil, loading: nil)
 
-      def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil, suppress_output: false)
+      def execute(command: nil, print_all: false, print_command: true, pid_created: nil, error: nil, prefix: nil, loading: nil, suppress_output: false)
 
         print_all = true if FastlaneCore::Globals.verbose?
         prefix ||= {}
