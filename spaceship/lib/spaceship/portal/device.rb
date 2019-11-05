@@ -9,7 +9,7 @@ module Spaceship
       #   "XJXGVS46MW"
       attr_accessor :id
 
-      # @return (String) The name of the device
+      # @return (String) The name of the device, must be 50 characters or less.
       # @example
       #   "Felix Krause's iPhone 6"
       attr_accessor :name
@@ -148,12 +148,13 @@ module Spaceship
             raise "You cannot create a device without a device_id (UDID) and name"
           end
 
+          raise "Device name must be 50 characters or less. \"#{name}\" has a #{name.length} character length." if name.length > 50
+
           # Find the device by UDID, raise an exception if it already exists
           existing = self.find_by_udid(udid, mac: mac)
           return existing if existing
 
           # It is valid to have the same name for multiple devices
-
           device = client.create_device!(name, udid, mac: mac)
 
           # Update self with the new device

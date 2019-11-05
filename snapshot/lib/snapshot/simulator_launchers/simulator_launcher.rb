@@ -50,7 +50,7 @@ module Snapshot
             language = language[0]
           end
 
-          # Clear logs so subsequent xcodebuild executions dont append to old ones
+          # Clear logs so subsequent xcodebuild executions don't append to old ones
           log_path = xcodebuild_log_path(language: language, locale: locale)
           File.delete(log_path) if File.exist?(log_path)
 
@@ -152,6 +152,15 @@ module Snapshot
     def retry_tests(retries, command, language, locale, launch_args, devices)
       UI.important("Retrying on devices: #{devices.join(', ')}")
       UI.important("Number of retries remaining: #{launcher_config.number_of_retries - retries - 1}")
+
+      # Make sure all needed directories exist for next retry
+      # `copy_screenshots` in `cleanup_after_failure` can delete some needed directories
+      # https://github.com/fastlane/fastlane/issues/10786
+      prepare_directories_for_launch(language: language, locale: locale, launch_arguments: launch_args)
+
+      # Clear errors so a successful retry isn't reported as an over failure
+      self.collected_errors = []
+
       execute(retries + 1, command: command, language: language, locale: locale, launch_args: launch_args, devices: devices)
     end
 
@@ -181,7 +190,7 @@ module Snapshot
           hash[name] = ["No tests were executed"]
         else
           tests = Array(summary.data.first[:tests])
-          hash[name] = tests.map { |test| Array(test[:failures]).map { |failure| failure[:failure_message] } }.flatten
+          hash[name] = tests.flat_map { |test| Array(test[:failures]).map { |failure| failure[:failure_message] } }
         end
       end
     end

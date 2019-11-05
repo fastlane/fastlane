@@ -168,15 +168,14 @@ module Fastlane
       #####################################################
 
       def self.description
-        'Upload your app to Appaloosa Store'
+        'Upload your app to [Appaloosa Store](https://www.appaloosa-store.com/)'
       end
 
       def self.details
         [
-          "Appaloosa is a private mobile application store. This action ",
-          "offers a quick deployment on the platform. You can create an ",
-          "account, push to your existing account, or manage your user ",
-          "groups. We accept iOS and Android applications."
+          "Appaloosa is a private mobile application store. This action offers a quick deployment on the platform.",
+          "You can create an account, push to your existing account, or manage your user groups.",
+          "We accept iOS and Android applications."
         ].join("\n")
       end
 
@@ -186,6 +185,7 @@ module Fastlane
                                        env_name: 'FL_APPALOOSA_BINARY',
                                        description: 'Binary path. Optional for ipa if you use the `ipa` or `xcodebuild` action',
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find ipa || apk file at path '#{value}'") unless File.exist?(value)
                                        end),
@@ -204,7 +204,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :screenshots,
                                        env_name: 'FL_APPALOOSA_SCREENSHOTS',
                                        description: 'Add some screenshots application to your store or hit [enter]',
-                                       default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]),
+                                       default_value: Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :locale,
                                        env_name: 'FL_APPALOOSA_LOCALE',
                                        description: 'Select the folder locale for your screenshots',

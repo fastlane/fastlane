@@ -10,8 +10,17 @@ module Fastlane
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--verbose" if params[:verbose]
         cmd << params[:command] if package_commands.include?(params[:command])
+        if params[:xcconfig]
+          cmd << "--xcconfig-overrides #{params[:xcconfig]}"
+        end
+        if params[:xcpretty_output]
+          cmd += ["2>&1", "|", "xcpretty", "--#{params[:xcpretty_output]}"]
+          cmd = %w(set -o pipefail &&) + cmd
+        end
 
-        sh(cmd.join(" "))
+        FastlaneCore::CommandExecutor.execute(command: cmd.join(" "),
+                                              print_all: true,
+                                              print_command: true)
       end
 
       #####################################################
@@ -39,6 +48,10 @@ module Fastlane
                                        env_name: "FL_SPM_PACKAGE_PATH",
                                        description: "Change working directory before any other operation",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :xcconfig,
+                                       env_name: "FL_SPM_XCCONFIG",
+                                       description: "Use xcconfig file to override swift package generate-xcodeproj defaults",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :configuration,
                                        short_option: "-c",
                                        env_name: "FL_SPM_CONFIGURATION",
@@ -46,6 +59,13 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid configuration: (debug|release)") unless valid_configurations.include?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :xcpretty_output,
+                                       env_name: "FL_SPM_XCPRETTY_OUTPUT",
+                                       description: "Specifies the output type for xcpretty. eg. 'test', or 'simple'",
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Please pass a valid xcpretty output type: (#{xcpretty_output_types.join('|')})") unless xcpretty_output_types.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        short_option: "-v",
@@ -57,7 +77,7 @@ module Fastlane
       end
 
       def self.authors
-        ["Flávio Caetano (@fjcaetano)"]
+        ["fjcaetano", "nxtstep"]
       end
 
       def self.is_supported?(platform)
@@ -71,6 +91,10 @@ module Fastlane
             command: "build",
             build_path: "./build",
             configuration: "release"
+          )',
+          'spm(
+            command: "generate-xcodeproj",
+            xcconfig: "Package.xcconfig"
           )'
         ]
       end
@@ -84,11 +108,15 @@ module Fastlane
       end
 
       def self.package_commands
-        %w(clean reset update)
+        %w(clean reset update resolve generate-xcodeproj init)
       end
 
       def self.valid_configurations
         %w(debug release)
+      end
+
+      def self.xcpretty_output_types
+        %w(simple test knock tap)
       end
     end
   end

@@ -18,10 +18,10 @@ module Produce
     def create_new_app
       application = fetch_application
       if application
-        UI.success("[iTC] App '#{Produce.config[:app_identifier]}' already exists (#{application.apple_id}), nothing to do on iTunes Connect")
+        UI.success("App '#{Produce.config[:app_identifier]}' already exists (#{application.apple_id}), nothing to do on App Store Connect")
         # Nothing to do here
       else
-        UI.success("Creating new app '#{Produce.config[:app_name]}' on iTunes Connect")
+        UI.success("Creating new app '#{Produce.config[:app_name]}' on App Store Connect")
 
         Produce.config[:bundle_identifier_suffix] = '' unless wildcard_bundle?
         generated_app = Spaceship::Tunes::Application.create!(name: Produce.config[:app_name],
@@ -39,11 +39,11 @@ module Produce
         counter = 0
         while application.nil?
           counter += 1
-          UI.crash!("Couldn't find newly created app on iTunes Connect - please check the website for more information") if counter == 200
+          UI.crash!("Couldn't find newly created app on App Store Connect - please check the website for more information") if counter == 200
 
-          # Since 2016-08-10 iTunes Connect takes some time to actually list the newly created application
+          # Since 2016-08-10 App Store Connect takes some time to actually list the newly created application
           # We have no choice but to poll to see if the newly created app is already available
-          UI.message("Waiting for the newly created application to be available on iTunes Connect...")
+          UI.message("Waiting for the newly created application to be available on App Store Connect...")
           sleep(15)
           application = fetch_application
         end
@@ -53,7 +53,7 @@ module Produce
         UI.message("Ensuring version number")
         application.ensure_version!(Produce.config[:app_version], platform: Produce.config[:platform]) if Produce.config[:app_version]
 
-        UI.success("Successfully created new app '#{Produce.config[:app_name]}' on iTunes Connect with ID #{application.apple_id}")
+        UI.success("Successfully created new app '#{Produce.config[:app_name]}' on App Store Connect with ID #{application.apple_id}")
       end
 
       return Spaceship::Tunes::Application.find(@full_bundle_identifier, mac: Produce.config[:platform] == "osx").apple_id

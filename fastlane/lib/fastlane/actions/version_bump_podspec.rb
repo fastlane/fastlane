@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      PODSPEC_VERSION_NUMBER = :PODSPEC_VERSION_NUMBER
+      PODSPEC_VERSION_NUMBER ||= :PODSPEC_VERSION_NUMBER
     end
 
     class VersionBumpPodspecAction < Action
@@ -36,9 +36,9 @@ module Fastlane
       def self.details
         [
           "You can use this action to manipulate any 'version' variable contained in a ruby file.",
-          "For example, you can use it to bump the version of a cocoapods' podspec file.",
-          "It also supports versions that are not semantic: 1.4.14.4.1",
-          "For such versions there is an option to change appendix (4.1)"
+          "For example, you can use it to bump the version of a CocoaPods' podspec file.",
+          "It also supports versions that are not semantic: `1.4.14.4.1`.",
+          "For such versions, there is an option to change the appendix (e.g. `4.1`)."
         ].join("\n")
       end
 
@@ -49,6 +49,7 @@ module Fastlane
                                        description: "You must specify the path to the podspec file to update",
                                        code_gen_sensitive: true,
                                        default_value: Dir["*.podspec"].last,
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a path to the `version_bump_podspec` action") if value.length == 0
                                        end),
@@ -70,6 +71,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :require_variable_prefix,
                                        env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_REQUIRE_VARIABLE_PREFIX",
                                        description: "true by default, this is used for non CocoaPods version bumps only",
+                                       type: Boolean,
                                        default_value: true)
         ]
       end

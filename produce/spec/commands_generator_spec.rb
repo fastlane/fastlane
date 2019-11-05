@@ -2,6 +2,7 @@ require 'produce/commands_generator'
 require 'produce/service'
 require 'produce/group'
 require 'produce/merchant'
+require 'produce/cloud_container'
 
 describe Produce::CommandsGenerator do
   let(:available_options) { Produce::Options.available_options }
@@ -161,6 +162,76 @@ describe Produce::CommandsGenerator do
       expected_options = FastlaneCore::Configuration.create(available_options, { app_identifier: 'your.awesome.App' })
 
       expect_group_associate_with(['group1.example.app', 'group2.example.app'])
+
+      Produce::CommandsGenerator.start
+
+      expect(Produce.config[:app_identifier]).to eq('your.awesome.App')
+    end
+  end
+
+  describe ":cloud_container option handling" do
+    def expect_cloud_container_create_with(container_name, container_identifier)
+      fake_container = "fake_container"
+      expect(Produce::CloudContainer).to receive(:new).and_return(fake_container)
+      expect(fake_container).to receive(:create) do |options, args|
+        expect(options.container_name).to eq(container_name)
+        expect(options.container_identifier).to eq(container_identifier)
+        expect(args).to eq([])
+      end
+    end
+
+    it "can use the username short flag from tool options" do
+      stub_commander_runner_args(['cloud_container', '-u', 'me@it.com', '-g', 'iCloud.com.example.app', '-n', 'Example iCloud Container'])
+
+      expected_options = FastlaneCore::Configuration.create(available_options, { username: 'me@it.com' })
+
+      expect_cloud_container_create_with('Example iCloud Container', 'iCloud.com.example.app')
+
+      Produce::CommandsGenerator.start
+
+      expect(Produce.config[:username]).to eq('me@it.com')
+    end
+
+    it "can use the app_identifier flag from tool options" do
+      stub_commander_runner_args(['cloud_container', '--app_identifier', 'your.awesome.App', '-g', 'iCloud.com.example.app', '-n', 'Example iCloud Container'])
+
+      expected_options = FastlaneCore::Configuration.create(available_options, { app_identifier: 'your.awesome.App' })
+
+      expect_cloud_container_create_with('Example iCloud Container', 'iCloud.com.example.app')
+
+      Produce::CommandsGenerator.start
+
+      expect(Produce.config[:app_identifier]).to eq('your.awesome.App')
+    end
+  end
+
+  describe ":associate_cloud_container option handling" do
+    def expect_cloud_container_associate_with(container_ids)
+      fake_container = "fake_container"
+      expect(Produce::CloudContainer).to receive(:new).and_return(fake_container)
+      expect(fake_container).to receive(:associate) do |options, args|
+        expect(args).to eq(container_ids)
+      end
+    end
+
+    it "can use the username short flag from tool options" do
+      stub_commander_runner_args(['associate_cloud_container', '-u', 'me@it.com', 'iCloud.com.example.app1', 'iCloud.com.example.app2'])
+
+      expected_options = FastlaneCore::Configuration.create(available_options, { username: 'me@it.com' })
+
+      expect_cloud_container_associate_with(['iCloud.com.example.app1', 'iCloud.com.example.app2'])
+
+      Produce::CommandsGenerator.start
+
+      expect(Produce.config[:username]).to eq('me@it.com')
+    end
+
+    it "can use the app_identifier flag from tool options" do
+      stub_commander_runner_args(['associate_cloud_container', '--app_identifier', 'your.awesome.App', 'iCloud.com.example.app1', 'iCloud.com.example.app2'])
+
+      expected_options = FastlaneCore::Configuration.create(available_options, { app_identifier: 'your.awesome.App' })
+
+      expect_cloud_container_associate_with(['iCloud.com.example.app1', 'iCloud.com.example.app2'])
 
       Produce::CommandsGenerator.start
 

@@ -19,9 +19,15 @@ module Fastlane
         "Defines a default platform to not have to specify the platform"
       end
 
+      def self.output
+        [
+          ['DEFAULT_PLATFORM', 'The default platform']
+        ]
+      end
+
       def self.example_code
         [
-          'default_platform :android'
+          'default_platform(:android)'
         ]
       end
 

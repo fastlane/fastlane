@@ -1,9 +1,5 @@
 module Fastlane
   module Actions
-    module SharedValues
-      SLATHER_CUSTOM_VALUE = :SLATHER_CUSTOM_VALUE
-    end
-
     class SlatherAction < Action
       # https://github.com/SlatherOrg/slather/blob/v2.4.2/lib/slather/command/coverage_command.rb
       ARGS_MAP = {
@@ -34,6 +30,7 @@ module Fastlane
           workspace: '--workspace',
           binary_file: '--binary-file',
           binary_basename: '--binary-basename',
+          arch: '--arch',
           source_files: '--source-files',
           decimals: '--decimals'
       }.freeze
@@ -74,6 +71,17 @@ module Fastlane
         else
           UI.user_error!("You have to provide a project with `:proj` or use a .slather.yml")
         end
+
+        # for backwards compatibility when :binary_file type was Boolean
+        if params[:binary_file] == true || params[:binary_file] == false
+          params[:binary_file] = nil
+        end
+
+        # :binary_file validation was skipped for backwards compatibility with Boolean. If a
+        # Boolean was passed in, it has now been removed. Revalidate :binary_file
+        binary_file_options = available_options.find { |a| a.key == :binary_file }
+        binary_file_options.skip_type_validation = false
+        binary_file_options.verify!(params[:binary_file])
       end
 
       def self.build_command(params)
@@ -110,10 +118,10 @@ module Fastlane
       end
 
       def self.details
-        return <<-eos
-Slather works with multiple code coverage formats including Xcode7 code coverage.
-Slather is available at https://github.com/SlatherOrg/slather
-        eos
+        [
+          "Slather works with multiple code coverage formats, including Xcode 7 code coverage.",
+          "Slather is available at [https://github.com/SlatherOrg/slather](https://github.com/SlatherOrg/slather)."
+        ].join("\n")
       end
 
       def self.available_options
@@ -126,7 +134,7 @@ Slather is available at https://github.com/SlatherOrg/slather
                                        env_name: "FL_SLATHER_PROJ", # The name of the environment variable
                                        description: "The project file that slather looks at", # a short description of this parameter
                                        verify_block: proc do |value|
-                                         UI.user_error!("No project file specified, pass using `proj: 'Project.xcodeproj'`") unless value and !value.empty?
+                                         UI.user_error!("No project file specified, pass using `proj: 'Project.xcodeproj'`") unless value && !value.empty?
                                        end,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :workspace,
@@ -255,8 +263,13 @@ Slather is available at https://github.com/SlatherOrg/slather
           FastlaneCore::ConfigItem.new(key: :binary_file,
                                        env_name: "FL_SLATHER_BINARY_FILE",
                                        description: "Binary file name to be used for code coverage",
-                                       is_string: false,
-                                       default_value: false),
+                                       type: Array,
+                                       skip_type_validation: true, # skipping validation for backwards compatibility with Boolean type
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :arch,
+                                       env_name: "FL_SLATHER_ARCH",
+                                       description: "Specify which architecture the binary file is in. Needed for universal binaries",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: "FL_SLATHER_SOURCE_FILES",
                                        description: "A Dir.glob compatible pattern used to limit the lookup to specific source files. Ignored in gcov mode",

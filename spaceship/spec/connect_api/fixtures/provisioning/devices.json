@@ -1,0 +1,52 @@
+{
+    "data" : [ {
+      "type" : "devices",
+      "id" : "123456789",
+      "attributes" : {
+        "addedDate" : "2018-10-10T01:43:27.000+0000",
+        "serialNumber" : null,
+        "description" : null,
+        "platform" : "IOS",
+        "name" : "Josh's iPhone",
+        "deviceClass" : "IPHONE",
+        "model" : "iPhone 8",
+        "udid" : "184098239048390489012849018",
+        "platformName" : "iOS",
+        "responseId" : "03514686-0a76-401e-80d5-7f23845fcd16",
+        "status" : "ENABLED",
+        "devicePlatformLabel" : "iPhone"
+      },
+      "links" : {
+        "self" : "https://developer.apple.com:443/services-account/v1/devices/123456789"
+      }
+    }, {
+      "type" : "devices",
+      "id" : "987654321",
+      "attributes" : {
+        "addedDate" : "2018-11-23T16:22:00.000+0000",
+        "serialNumber" : null,
+        "description" : null,
+        "platform" : "IOS",
+        "name" : "Someone's Apple TV 1",
+        "deviceClass" : "APPLE_TV",
+        "model" : "Apple TV (4th generation)",
+        "udid" : "5843758273957239847298374982",
+        "platformName" : "iOS",
+        "responseId" : "03514686-0a76-401e-80d5-7f23845fcd16",
+        "status" : "ENABLED",
+        "devicePlatformLabel" : "Apple TV"
+      },
+      "links" : {
+        "self" : "https://developer.apple.com:443/services-account/v1/devices/987654321"
+      }
+    } ],
+    "links" : {
+      "self" : "https://developer.apple.com:443/services-account/v1/devices?sort=name&limit=1000"
+    },
+    "meta" : {
+      "paging" : {
+        "total" : 2,
+        "limit" : 1000
+      }
+    }
+  }

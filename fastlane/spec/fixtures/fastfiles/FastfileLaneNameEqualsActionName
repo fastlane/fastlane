@@ -1,3 +1,7 @@
 lane :cocoapods do
-  
+  "laneResult"
+end
+
+lane :test_lane do
+  cocoapods
 end

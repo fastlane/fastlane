@@ -19,7 +19,8 @@ module Fastlane
       command_executor: nil,
       return_value_processor: nil,
       connection_timeout: 5,
-      stay_alive: false
+      stay_alive: false,
+      port: 2000
     )
       if return_value_processor.nil?
         return_value_processor = JSONReturnValueProcessor.new
@@ -29,6 +30,7 @@ module Fastlane
       @return_value_processor = return_value_processor
       @connection_timeout = connection_timeout.to_i
       @stay_alive = stay_alive
+      @port = port.to_i
     end
 
     # this is the public API, don't call anything else
@@ -135,7 +137,7 @@ module Fastlane
     end
 
     def listen
-      @server = TCPServer.open('localhost', 2000) # Socket to listen on port 2000
+      @server = TCPServer.open('localhost', @port) # Socket to listen on port 2000
       UI.verbose("Waiting for #{@connection_timeout} seconds for a connection from FastlaneRunner")
 
       # set thread local to ready so we can check it
@@ -194,11 +196,18 @@ module Fastlane
           return_value: closure_arg,
           return_value_type: :string # always assume string for closure error_callback
         )
-        closure_arg = ', "closure_argument_value": ' + closure_arg
       end
 
       Thread.current[:exception] = nil
-      return '{"payload":{"status":"ready_for_next", "return_object":' + return_object + closure_arg + '}}'
+
+      payload = {
+        payload: {
+          status: "ready_for_next",
+          return_object: return_object,
+          closure_argument_value: closure_arg
+        }
+      }
+      return JSON.generate(payload)
     rescue StandardError => e
       Thread.current[:exception] = e
 
@@ -210,7 +219,14 @@ module Fastlane
         exception_array << "cause: #{e.class}"
         exception_array << e.backtrace
       end
-      return "{\"payload\":{\"status\":\"failure\",\"failure_information\":#{exception_array.flatten}}}"
+
+      payload = {
+        payload: {
+          status: "failure",
+          failure_information: exception_array.flatten
+        }
+      }
+      return JSON.generate(payload)
     end
   end
 end

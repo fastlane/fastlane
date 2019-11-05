@@ -50,7 +50,8 @@ describe Fastlane do
               list_enabled_rules: true,
               enable_clang_static_analyzer: true,
               enable_global_analysis: true,
-              allow_duplicated_violations: true
+              allow_duplicated_violations: true,
+              extra_arg: '-Wno-everything'
             )
           end").runner.execute(:test)
 
@@ -65,19 +66,21 @@ describe Fastlane do
         expect(result).to include(' -enable-clang-static-analyzer ')
         expect(result).to include(' -enable-global-analysis ')
         expect(result).to include(' -allow-duplicated-violations ')
+        expect(result).to include(' -extra-arg=-Wno-everything ')
       end
 
       it "works with single quote in rule name" do
+        rule = "CoveredSwitchStatementsDon'tNeedDefault"
         result = Fastlane::FastFile.new.parse("lane :test do
             oclint(
               compile_commands: './fastlane/spec/fixtures/oclint/compile_commands.json',
-              enable_rules: [\"CoveredSwitchStatementsDon'tNeedDefault\"],
-              disable_rules: [\"CoveredSwitchStatementsDon'tNeedDefault\"]
+              enable_rules: [\"#{rule}\"],
+              disable_rules: [\"#{rule}\"]
             )
           end").runner.execute(:test)
 
-        expect(result).to include(" -rule CoveredSwitchStatementsDon\\'tNeedDefault ")
-        expect(result).to include(" -disable-rule CoveredSwitchStatementsDon\\'tNeedDefault ")
+        expect(result).to include(" -rule #{rule.shellescape} ")
+        expect(result).to include(" -disable-rule #{rule.shellescape} ")
       end
 
       it "works with select regex" do

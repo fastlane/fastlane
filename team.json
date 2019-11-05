@@ -1,8 +1,7 @@
 {
   "KrauseFx": {
     "name": "Felix Krause",
-    "twitter": "KrauseFx",
-    "slogan": "Professional iOS Code Signing Issue Resolver"
+    "twitter": "KrauseFx"
   },
   "taquitos": {
     "name": "Joshua Liebowitz",
@@ -55,9 +54,9 @@
     "name": "Fumiya Nakamura",
     "twitter": "nafu003"
   },
-  "DanToml": {
+  "endocrimes": {
     "name": "Danielle Tomlinson",
-    "twitter": "DanToml"
+    "twitter": "endocrimes"
   },
   "lmirosevic": {
     "name": "Luka Mirosevic",
@@ -70,5 +69,13 @@
   "snatchev": {
     "name": "Stefan Natchev",
     "twitter": "snatchev"
+  },
+  "minuscorp": {
+    "name": "Jorge Revuelta H",
+    "twitter": "minuscorp"
+  },
+  "armcburney": {
+    "name": "Andrew McBurney",
+    "twitter": "armcburney"
   }
 }

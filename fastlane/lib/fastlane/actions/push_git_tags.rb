@@ -5,9 +5,14 @@ module Fastlane
         command = [
           'git',
           'push',
-          params[:remote],
-          params[:tag] || '--tags'
+          params[:remote]
         ]
+
+        if params[:tag]
+          command << "refs/tags/#{params[:tag]}"
+        else
+          command << '--tags'
+        end
 
         # optionally add the force component
         command << '--force' if params[:force]
@@ -29,7 +34,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_PUSH_GIT_FORCE",
-                                       description: "Force push to remote. Defaults to false",
+                                       description: "Force push to remote",
                                        is_string: false,
                                        default_value: false,
                                        optional: true),

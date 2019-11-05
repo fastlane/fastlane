@@ -3,7 +3,6 @@
 //  FastlaneSwiftRunner
 //
 //  Created by Joshua Liebowitz on 8/26/17.
-//  Copyright © 2017 Joshua Liebowitz. All rights reserved.
 //
 
 //
@@ -23,7 +22,7 @@ class MainProcess {
     var thread: Thread!
     
     @objc func connectToFastlaneAndRunLane() {
-        runner.startSocketThread()
+        runner.startSocketThread(port: argumentProcessor.port)
         
         let completedRun = Fastfile.runLane(named: argumentProcessor.currentLane, parameters: argumentProcessor.laneParameters())
         if completedRun {
@@ -50,3 +49,4 @@ while (!process.doneRunningLane && (RunLoop.current.run(mode: RunLoopMode.defaul
 // Please don't remove the lines below
 // They are used to detect outdated files
 // FastlaneRunnerAPIVersion [0.9.2]
+

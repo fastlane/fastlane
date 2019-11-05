@@ -35,14 +35,42 @@ describe Spaceship::Client do
       end
 
       it "set custom Team ID" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([
+                                                                                       { 'teamId' => 'XXXXXXXXXX', 'currentTeamMember' => { 'teamMemberId' => '' } },
+                                                                                       { 'teamId' => 'ABCDEF', 'currentTeamMember' => { 'teamMemberId' => '' } }
+                                                                                     ])
+
         team_id = "ABCDEF"
-        subject.team_id = team_id
+        subject.select_team(team_id: team_id)
         expect(subject.team_id).to eq(team_id)
       end
 
       it "shows a warning when user is in multiple teams and didn't call select_team" do
         PortalStubbing.adp_stub_multiple_teams
         expect(subject.team_id).to eq("SecondTeam")
+      end
+    end
+
+    describe '#team_name' do
+      it 'returns the default team_name' do
+        expect(subject.team_name).to eq('SpaceShip')
+      end
+
+      it "returns team_name from selected team_id" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([
+                                                                                       { 'teamId' => 'XXXXXXXXXX', 'name' => 'SpaceShip', 'currentTeamMember' => { 'teamMemberId' => '' } },
+                                                                                       { 'teamId' => 'ABCDEF', 'name' => 'PirateShip', 'currentTeamMember' => { 'teamMemberId' => '' } }
+                                                                                     ])
+
+        team_id = "ABCDEF"
+        subject.select_team(team_id: team_id)
+        expect(subject.team_id).to eq(team_id)
+        expect(subject.team_name).to eq('PirateShip')
+      end
+
+      it "return nil if no teams" do
+        allow_any_instance_of(Spaceship::PortalClient).to receive(:teams).and_return([])
+        expect(subject.team_name).to eq(nil)
       end
     end
 
@@ -121,11 +149,11 @@ describe Spaceship::Client do
         expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
       end
 
-      it 'should make a request create an explicit app id with no push feature' do
+      it 'should make a request create an explicit app id with push feature' do
         payload = {}
         payload[Spaceship.app_service.push_notification.on.service_id] = Spaceship.app_service.push_notification.on
         response = subject.create_app!(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app', enable_services: payload)
-        expect(response['enabledFeatures']).to_not(include("push"))
+        expect(response['enabledFeatures']).to(include("push"))
         expect(response['identifier']).to eq('tools.fastlane.spaceship.some-explicit-app')
       end
     end
@@ -282,6 +310,34 @@ describe Spaceship::Client do
       it 'makes a revoke request and returns the revoked certificate' do
         response = subject.revoke_certificate!('XC5PH8DAAA', 'R58UK2EAAA')
         expect(response.first.keys).to include('certificateId', 'certificateType', 'certificate')
+      end
+    end
+
+    describe '#fetch_program_license_agreement_messages' do
+      it 'makes a request to fetch all Program License Agreement warnings from Olympus' do
+        # Stub the GET request that the method will make
+        PortalStubbing.adp_stub_fetch_program_license_agreement_messages
+
+        response = subject.fetch_program_license_agreement_messages
+
+        # The method should make a GET request to this URL:
+        expect(a_request(:get, 'https://appstoreconnect.apple.com/olympus/v1/contractMessages')).to have_been_made
+
+        # The method should just return the "message" key's value(s) in an array.
+
+        expected_first_message = "<b>Review the updated Paid Applications \
+Schedule.</b><br />In order to update your existing apps, create \
+new in-app purchases, and submit new apps to the App Store, the \
+user with the Legal role (Team Agent) must review and accept the \
+Paid Applications Schedule (Schedule 2 to the Apple Developer \
+Program License Agreement) in the Agreements, Tax, and Banking \
+module.<br /><br /> To accept this agreement, they must have \
+already accepted the latest version of the Apple Developer \
+Program License Agreement in their <a href=\"\
+http://developer.apple.com/membercenter/index.action\">account on \
+the developer website<a/>.<br />"
+
+        expect(response.first).to eq(expected_first_message)
       end
     end
   end

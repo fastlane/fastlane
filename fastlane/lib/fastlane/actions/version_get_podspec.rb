@@ -1,5 +1,9 @@
 module Fastlane
   module Actions
+    module SharedValues
+      PODSPEC_VERSION_NUMBER ||= :PODSPEC_VERSION_NUMBER # originally defined in VersionBumpPodspecAction
+    end
+
     class VersionGetPodspecAction < Action
       def self.run(params)
         podspec_path = params[:path]
@@ -27,12 +31,14 @@ module Fastlane
                                        is_string: true,
                                        code_gen_sensitive: true,
                                        default_value: Dir["*.podspec"].last,
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a path to the `version_get_podspec` action") if value.length == 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :require_variable_prefix,
                                        env_name: "FL_VERSION_BUMP_PODSPEC_VERSION_REQUIRE_VARIABLE_PREFIX",
                                        description: "true by default, this is used for non CocoaPods version bumps only",
+                                       is_string: false,
                                        default_value: true)
         ]
       end

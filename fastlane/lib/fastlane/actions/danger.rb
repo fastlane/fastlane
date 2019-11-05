@@ -18,6 +18,7 @@ module Fastlane
         cmd << "--dangerfile=#{dangerfile}" if dangerfile
         cmd << "--fail-on-errors=true" if params[:fail_on_errors]
         cmd << "--new-comment" if params[:new_comment]
+        cmd << "--remove-previous-comments" if params[:remove_previous_comments]
         cmd << "--base=#{base}" if base
         cmd << "--head=#{head}" if head
         cmd << "pr #{pr}" if pr
@@ -34,7 +35,7 @@ module Fastlane
       def self.details
         [
           "Formalize your Pull Request etiquette.",
-          "More information: https://github.com/danger/danger"
+          "More information: [https://github.com/danger/danger](https://github.com/danger/danger)."
         ].join("\n")
       end
 
@@ -75,6 +76,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :new_comment,
                                        env_name: "FL_DANGER_NEW_COMMENT",
                                        description: "Makes Danger post a new comment instead of editing its previous one",
+                                       is_string: false,
+                                       optional: true,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :remove_previous_comments,
+                                       env_name: "FL_DANGER_REMOVE_PREVIOUS_COMMENT",
+                                       description: "Makes Danger remove all previous comment and create a new one in the end of the list",
                                        is_string: false,
                                        optional: true,
                                        default_value: false),

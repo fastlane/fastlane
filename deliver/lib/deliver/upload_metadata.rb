@@ -10,7 +10,7 @@ module Deliver
     NON_LOCALISED_VERSION_VALUES = [:copyright]
 
     # Localised app details values
-    LOCALISED_APP_VALUES = [:name, :subtitle, :privacy_url]
+    LOCALISED_APP_VALUES = [:name, :subtitle, :privacy_url, :apple_tv_privacy_policy]
 
     # Non localized app details values
     NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
@@ -46,10 +46,10 @@ module Deliver
     }
 
     # Localized app details values, that are editable in live state
-    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url, :promotional_text]
+    LOCALISED_LIVE_VALUES = [:description, :release_notes, :support_url, :marketing_url, :promotional_text, :privacy_url]
 
     # Non localized app details values, that are editable in live state
-    NON_LOCALISED_LIVE_VALUES = [:privacy_url]
+    NON_LOCALISED_LIVE_VALUES = [:copyright]
 
     # Directory name it contains trade representative contact information
     TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR = "trade_representative_contact_information"
@@ -81,7 +81,7 @@ module Deliver
         non_localised_options = NON_LOCALISED_LIVE_VALUES
 
         if v.nil?
-          UI.message("Couldn't find live version, editing the current version on iTunes Connect instead")
+          UI.message("Couldn't find live version, editing the current version on App Store Connect instead")
           v = app.edit_version(platform: options[:platform])
           # we don't want to update the localised_options and non_localised_options
           # as we also check for `options[:edit_live]` at other areas in the code
@@ -94,6 +94,7 @@ module Deliver
         non_localised_options = (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES)
       end
 
+      individual = options[:individual_metadata_items] || []
       localised_options.each do |key|
         current = options[key]
         next unless current
@@ -106,8 +107,12 @@ module Deliver
         current.each do |language, value|
           next unless value.to_s.length > 0
           strip_value = value.to_s.strip
-          v.send(key)[language] = strip_value if LOCALISED_VERSION_VALUES.include?(key)
-          details.send(key)[language] = strip_value if LOCALISED_APP_VALUES.include?(key)
+          if individual.include?(key.to_s)
+            upload_individual_item(app, v, language, key, strip_value)
+          else
+            v.send(key)[language] = strip_value if LOCALISED_VERSION_VALUES.include?(key)
+            details.send(key)[language] = strip_value if LOCALISED_APP_VALUES.include?(key)
+          end
         end
       end
 
@@ -125,22 +130,43 @@ module Deliver
       set_trade_representative_contact_information(v, options)
       set_review_information(v, options)
       set_app_rating(v, options)
+      v.ratings_reset = options[:reset_ratings] unless options[:reset_ratings].nil?
 
-      Helper.show_loading_indicator("Uploading metadata to iTunes Connect")
+      set_review_attachment_file(v, options)
+
+      Helper.show_loading_indicator("Uploading metadata to App Store Connect")
       v.save!
       Helper.hide_loading_indicator
       begin
         details.save!
-        UI.success("Successfully uploaded set of metadata to iTunes Connect")
+        UI.success("Successfully uploaded set of metadata to App Store Connect")
       rescue Spaceship::TunesClient::ITunesConnectError => e
         # This makes sure that we log invalid app names as user errors
         # If another string needs to be checked here we should
         # figure out a more generic way to handle these cases.
         if e.message.include?('App Name cannot be longer than 50 characters') || e.message.include?('The app name you entered is already being used')
+          UI.error("Error in app name.  Try using 'individual_metadata_items' to identify the problem language.")
           UI.user_error!(e.message)
         else
           raise e
         end
+      end
+    end
+
+    # Uploads metadata individually by language to help identify exactly which items have issues
+    def upload_individual_item(app, version, language, key, value)
+      details = app.details
+      version.send(key)[language] = value if LOCALISED_VERSION_VALUES.include?(key)
+      details.send(key)[language] = value if LOCALISED_APP_VALUES.include?(key)
+      Helper.show_loading_indicator("Uploading #{language} #{key} to App Store Connect")
+      version.save!
+      Helper.hide_loading_indicator
+      begin
+        details.save!
+        UI.success("Successfully uploaded #{language} #{key} to App Store Connect")
+      rescue Spaceship::TunesClient::ITunesConnectError => e
+        UI.error("Error in #{language} #{key}: \n#{value}")
+        UI.error(e.message) # Don't use user_error to allow all values to get checked
       end
     end
 
@@ -226,7 +252,7 @@ module Deliver
       # Collect all languages we need
       # We only care about languages from user provided values
       # as the other languages are on iTC already anyway
-      v = options[:app].edit_version
+      v = options[:app].edit_version(platform: options[:platform])
       UI.user_error!("Could not find a version to edit for app '#{options[:app].name}', the app metadata is read-only currently") unless v
 
       enabled_languages = options[:languages] || []
@@ -341,6 +367,11 @@ module Deliver
         v.send("#{key}=", info[option_name].to_s.chomp) if info[option_name]
       end
       v.review_user_needed = (v.review_demo_user.to_s.chomp + v.review_demo_password.to_s.chomp).length > 0
+    end
+
+    def set_review_attachment_file(v, options)
+      return unless options[:app_review_attachment_file]
+      v.upload_review_attachment!(options[:app_review_attachment_file])
     end
 
     def set_app_rating(v, options)

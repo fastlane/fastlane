@@ -15,7 +15,9 @@ module Fastlane
         # We want the last 7000 characters, instead of the first 7000, as the error is at the bottom
         start_index = [message.length - 7000, 0].max
         message = message[start_index..-1]
-        message
+        # We want line breaks to be shown on slack output so we replace
+        # input non-interpreted line break with interpreted line break
+        message.gsub('\n', "\n")
       end
 
       def self.run(options)
@@ -23,6 +25,8 @@ module Fastlane
 
         options[:message] = self.trim_message(options[:message].to_s || '')
         options[:message] = Slack::Notifier::Util::LinkFormatter.format(options[:message])
+
+        options[:pretext] = options[:pretext].gsub('\n', "\n") unless options[:pretext].nil?
 
         if options[:channel].to_s.length > 0
           channel = options[:channel]
@@ -33,6 +37,8 @@ module Fastlane
 
         notifier = Slack::Notifier.new(options[:slack_url], channel: channel, username: username)
 
+        link_names = options[:link_names]
+
         icon_url = options[:use_webhook_configured_username_and_icon] ? nil : options[:icon_url]
 
         slack_attachment = generate_slack_attachments(options)
@@ -40,11 +46,11 @@ module Fastlane
         return [notifier, slack_attachment] if Helper.test? # tests will verify the slack attachments and other properties
 
         begin
-          results = notifier.ping('', icon_url: icon_url, attachments: [slack_attachment])
+          results = notifier.ping('', link_names: link_names, icon_url: icon_url, attachments: [slack_attachment])
         rescue => exception
           UI.error("Exception: #{exception}")
         ensure
-          result = results.first
+          result = results.first if results
           if !result.nil? && result.code.to_i == 200
             UI.success('Successfully sent Slack notification')
           else
@@ -60,7 +66,7 @@ module Fastlane
       end
 
       def self.description
-        "Send a success/error message to your Slack group"
+        "Send a success/error message to your [Slack](https://slack.com) group"
       end
 
       def self.available_options
@@ -68,6 +74,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_SLACK_MESSAGE",
                                        description: "The message that should be displayed on Slack. This supports the standard Slack markup language",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :pretext,
+                                       env_name: "FL_SLACK_PRETEXT",
+                                       description: "This is optional text that appears above the message attachment block. This supports the standard Slack markup language",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :channel,
                                        env_name: "FL_SLACK_CHANNEL",
@@ -124,6 +134,12 @@ module Fastlane
                                        description: "Should an error sending the slack notification cause a failure? (true/false)",
                                        optional: true,
                                        default_value: true,
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :link_names,
+                                       env_name: "FL_SLACK_LINK_NAMES",
+                                       description: "Find and link channel names and usernames (true/false)",
+                                       optional: true,
+                                       default_value: false,
                                        is_string: false)
         ]
       end
@@ -144,7 +160,7 @@ module Fastlane
               "Built by" => "Jenkins",
             },
             default_payloads: [:git_branch, :git_author], # Optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads.
-                                                          # Don\'t add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit_message`, `last_git_commit_hash`.
+                                                          # Don\'t add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit`, `last_git_commit_hash`.
             attachment_properties: { # Optional, lets you specify any other properties available for attachments in the slack API (see https://api.slack.com/docs/attachments).
                                      # This hash is deep merged with the existing properties set using the other properties above. This allows your own fields properties to be appended to the existing fields that were created using the `payload` property for instance.
               thumb_url: "http://example.com/path/to/thumb.png",
@@ -172,11 +188,12 @@ module Fastlane
 
       def self.generate_slack_attachments(options)
         color = (options[:success] ? 'good' : 'danger')
-        should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].join(" ").include?(payload_name.to_s) }
+        should_add_payload = ->(payload_name) { options[:default_payloads].nil? || options[:default_payloads].map(&:to_sym).include?(payload_name.to_sym) }
 
         slack_attachment = {
           fallback: options[:message],
           text: options[:message],
+          pretext: options[:pretext],
           color: color,
           mrkdwn_in: ["pretext", "text", "fields", "message"],
           fields: []

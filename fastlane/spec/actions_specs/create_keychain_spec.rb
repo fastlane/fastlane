@@ -1,7 +1,19 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Create keychain Integration" do
-      it "works with name and password" do
+      it "works with name and password, when keychain doesn't exist" do
+        allow(Fastlane::Actions::CreateKeychainAction).to receive(:list_keychains).and_return(
+          # first time
+          [File.expand_path('~/Library/Keychains/login.keychain-db')],
+          # after creation
+          [File.expand_path('~/Library/Keychains/login.keychain-db'), File.expand_path('~/Library/Keychains/test.keychain')]
+        )
+
+        allow(Fastlane::Actions::CreateKeychainAction).to receive(:resolved_keychain_path).and_return(
+          nil,
+          File.expand_path('~/Library/Keychains/test.keychain')
+        )
+
         result = Fastlane::FastFile.new.parse("lane :test do
           create_keychain ({
             name: 'test.keychain',
@@ -21,16 +33,41 @@ describe Fastlane do
         expect(result[2]).to end_with(File.expand_path('~/Library/Keychains/test.keychain').to_s)
       end
 
-      it "works with name and password that contain spaces or `\"`" do
+      it "works with name and password, when keychain already exist" do
+        allow(Fastlane::Actions::CreateKeychainAction).to receive(:list_keychains).and_return(
+          [File.expand_path('~/Library/Keychains/login.keychain-db'), File.expand_path('~/Library/Keychains/test.keychain')]
+        )
+
+        allow(Fastlane::Actions::CreateKeychainAction).to receive(:resolved_keychain_path).and_return(
+          File.expand_path('~/Library/Keychains/test.keychain')
+        )
+
         result = Fastlane::FastFile.new.parse("lane :test do
           create_keychain ({
             name: 'test.keychain',
-            password: '\"test password\"',
+            password: 'testpassword',
+          })
+        end").runner.execute(:test)
+
+        expect(result.size).to eq(1)
+        expect(result[0]).to start_with('security set-keychain-settings')
+        expect(result[0]).to include('-t 300')
+        expect(result[0]).to_not(include('-l'))
+        expect(result[0]).to_not(include('-u'))
+        expect(result[0]).to include('~/Library/Keychains/test.keychain')
+      end
+
+      it "works with name and password that contain spaces or `\"`" do
+        password = "\"test password\""
+        result = Fastlane::FastFile.new.parse("lane :test do
+          create_keychain ({
+            name: 'test.keychain',
+            password: '#{password}',
           })
         end").runner.execute(:test)
 
         expect(result.size).to eq(3)
-        expect(result[0]).to eq(%(security create-keychain -p \\\"test\\ password\\\" ~/Library/Keychains/test.keychain))
+        expect(result[0]).to eq(%(security create-keychain -p #{password.shellescape} ~/Library/Keychains/test.keychain))
       end
 
       it "works with keychain-settings and name and password" do

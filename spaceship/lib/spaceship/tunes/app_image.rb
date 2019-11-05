@@ -2,7 +2,7 @@ require_relative 'tunes_base'
 
 module Spaceship
   module Tunes
-    # Represents an image hosted on iTunes Connect. Used for icons, screenshots, etc
+    # Represents an image hosted on App Store Connect. Used for icons, screenshots, etc
     class AppImage < TunesBase
       HOST_URL = "https://is1-ssl.mzstatic.com/image/thumb"
 

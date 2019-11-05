@@ -1,4 +1,5 @@
 require_relative '../client'
+require_relative '../tunes/display_family'
 require_relative 'utilities'
 
 module Spaceship
@@ -19,6 +20,10 @@ module Spaceship
 
     def upload_screenshot(app_version, upload_file, content_provider_id, sso_token_for_image, device, is_messages)
       upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: screenshot_picture_type(device, is_messages))
+    end
+
+    def upload_purchase_merch_screenshot(app_id, upload_file, content_provider_id, sso_token_for_image)
+      upload_file(app_id: app_id, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: 'MZPFT.MerchandisingIAPIcon')
     end
 
     def upload_purchase_review_screenshot(app_id, upload_file, content_provider_id, sso_token_for_image)
@@ -43,6 +48,10 @@ module Spaceship
 
     def upload_trailer_preview(app_version, upload_file, content_provider_id, sso_token_for_image, device)
       upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/image', content_provider_id: content_provider_id, sso_token: sso_token_for_image, du_validation_rule_set: screenshot_picture_type(device, nil))
+    end
+
+    def upload_app_review_attachment(app_version, upload_file, content_provider_id, sso_token_for_attachment)
+      upload_file(app_version: app_version, upload_file: upload_file, path: '/upload/app-resolution-file', content_provider_id: content_provider_id, sso_token: sso_token_for_attachment)
     end
 
     def get_picture_type(upload_file)
@@ -89,59 +98,23 @@ module Spaceship
         req.headers['Connection'] = "keep-alive"
       end
 
-      if r.status == 500 and r.body.include?("Server Error")
+      if r.status == 500 && r.body.include?("Server Error")
         return upload_file(app_version: app_version, upload_file: upload_file, path: path, content_provider_id: content_provider_id, sso_token: sso_token, du_validation_rule_set: du_validation_rule_set, app_id: app_id)
       end
 
       parse_upload_response(r)
     end
 
-    # You can find this by uploading an image in iTunes connect
-    # then look for the X-Apple-Upload-Validation-RuleSets value
     def picture_type_map
-      # rubocop:enable Layout/ExtraSpacing
-      {
-        watch:        "MZPFT.SortedN27ScreenShot",
-        ipad:         "MZPFT.SortedTabletScreenShot",
-        ipadPro:      "MZPFT.SortedJ99ScreenShot",
-        ipad105:      "MZPFT.SortedJ207ScreenShot",
-        iphone6:      "MZPFT.SortedN61ScreenShot",
-        iphone6Plus:  "MZPFT.SortedN56ScreenShot",
-        iphone58:     "MZPFT.SortedD22ScreenShot",
-        iphone4:      "MZPFT.SortedN41ScreenShot",
-        iphone35:     "MZPFT.SortedScreenShot",
-        appleTV:      "MZPFT.SortedATVScreenShot",
-        desktop:      "MZPFT.SortedDesktopScreenShot"
-      }
+      Spaceship::Tunes::DisplayFamily.all.map { |v| [v.name.to_sym, v.picture_type] }.to_h
     end
 
     def messages_picture_type_map
-      # rubocop:enable Layout/ExtraSpacing
-      {
-        ipad:         "MZPFT.SortedTabletMessagesScreenShot",
-        ipadPro:      "MZPFT.SortedJ99MessagesScreenShot",
-        ipad105:      "MZPFT.SortedJ207MessagesScreenShot",
-        iphone6:      "MZPFT.SortedN61MessagesScreenShot",
-        iphone6Plus:  "MZPFT.SortedN56MessagesScreenShot",
-        iphone58:     "MZPFT.SortedD22MessagesScreenShot",
-        iphone4:      "MZPFT.SortedN41MessagesScreenShot"
-      }
+      Spaceship::Tunes::DisplayFamily.all.select(&:messages_supported?).map { |v| [v.name.to_sym, v.messages_picture_type] }.to_h
     end
 
     def device_resolution_map
-      # rubocop:enable Layout/ExtraSpacing
-      {
-        watch:        [[312, 390]],
-        ipad:         [[1024, 748], [1024, 768], [2048, 1496], [2048, 1536], [768, 1004], [768, 1024], [1536, 2008], [1536, 2048]],
-        ipadPro:      [[2048, 2732], [2732, 2048]],
-        ipad105:      [[1668, 2224], [2224, 1668]],
-        iphone6:      [[750, 1334], [1334, 750]],
-        iphone6Plus:  [[1242, 2208], [2208, 1242]],
-        iphone4:      [[640, 1096], [640, 1136], [1136, 600], [1136, 640]],
-        iphone35:     [[640, 960], [640, 920], [960, 600], [960, 640]],
-        appleTV:      [[1920, 1080]],
-        desktop:      [[1280, 800], [1440, 900], [2560, 1600], [2880, 1800]]
-      }
+      Spaceship::Tunes::DisplayFamily.all.map { |v| [v.name.to_sym, v.screenshot_resolutions] }.to_h
     end
 
     def screenshot_picture_type(device, is_messages)

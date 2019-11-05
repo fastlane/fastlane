@@ -13,12 +13,18 @@ module Spaceship::TestFlight
     # See `Spaceship::TestFlight::Build#reload`
 
     def self.all(app_id: nil, platform: nil, retry_count: 3)
-      data = client.get_build_trains(app_id: app_id, platform: platform)
-      trains = {}
+      filter_platform = Spaceship::ConnectAPI::Platform.map(platform) if platform
+      connect_builds = Spaceship::ConnectAPI::Build.all(
+        app_id: app_id,
+        sort: "uploadedDate",
+        platform: filter_platform
+      )
 
-      data.each do |train_version|
-        builds_data = client.get_builds_for_train(app_id: app_id, platform: platform, train_version: train_version, retry_count: retry_count)
-        trains[train_version] = builds_data.map { |attrs| Spaceship::TestFlight::Build.new(attrs) }
+      trains = {}
+      connect_builds.each do |connect_build|
+        train_version = connect_build.app_version
+        trains[train_version] ||= []
+        trains[train_version] << connect_build.to_testflight_build
       end
 
       self.new(trains)

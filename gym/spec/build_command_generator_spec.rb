@@ -196,10 +196,57 @@ describe Gym do
       end
     end
 
-    describe "Analyze Build Time Example" do
+    describe "Result Bundle Path Example" do
       it "uses the correct build command with the example project", requires_xcodebuild: true do
         log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
+        options = { project: "./gym/examples/standard/Example.xcodeproj", scheme: 'Example', result_bundle: true,
+          result_bundle_path: "result_bundle" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::BuildCommandGenerator.generate
+        expect(result).to eq([
+                               "set -o pipefail &&",
+                               "xcodebuild",
+                               "-scheme Example",
+                               "-project ./gym/examples/standard/Example.xcodeproj",
+                               "-destination 'generic/platform=iOS'",
+                               "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                               "-resultBundlePath 'result_bundle'",
+                               :archive,
+                               "| tee #{log_path.shellescape}",
+                               "| xcpretty"
+                             ])
+      end
+
+      it "does not use result_bundle_path if result_bundle is false", requires_xcodebuild: true do
+        log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+
+        options = { project: "./gym/examples/standard/Example.xcodeproj", scheme: 'Example', result_bundle: false,
+          result_bundle_path: "result_bundle" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::BuildCommandGenerator.generate
+        expect(result).to eq([
+                               "set -o pipefail &&",
+                               "xcodebuild",
+                               "-scheme Example",
+                               "-project ./gym/examples/standard/Example.xcodeproj",
+                               "-destination 'generic/platform=iOS'",
+                               "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                               :archive,
+                               "| tee #{log_path.shellescape}",
+                               "| xcpretty"
+                             ])
+      end
+    end
+
+    describe "Analyze Build Time Example" do
+      before do
+        @log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+      end
+
+      it "uses the correct build command with the example project when option is enabled", requires_xcodebuild: true do
         options = { project: "./gym/examples/standard/Example.xcodeproj", analyze_build_time: true, scheme: 'Example' }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
@@ -213,10 +260,35 @@ describe Gym do
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                                "OTHER_SWIFT_FLAGS=\"-Xfrontend -debug-time-function-bodies\"",
                                :archive,
-                               "| tee #{log_path.shellescape}",
-                               "| grep .[0-9]ms | grep -v ^0.[0-9]ms | sort -nr > culprits.txt",
+                               "| tee #{@log_path.shellescape}",
                                "| xcpretty"
                              ])
+
+        result = Gym::BuildCommandGenerator.post_build
+        expect(result).to eq([
+                               "grep -E '^[0-9.]+ms' #{@log_path.shellescape} | grep -vE '^0\.[0-9]' | sort -nr > culprits.txt"
+                             ])
+      end
+
+      it "uses the correct build command with the example project when option is disabled", requires_xcodebuild: true do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", analyze_build_time: false, scheme: 'Example' }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::BuildCommandGenerator.generate
+        expect(result).to eq([
+                               "set -o pipefail &&",
+                               "xcodebuild",
+                               "-scheme Example",
+                               "-project ./gym/examples/standard/Example.xcodeproj",
+                               "-destination 'generic/platform=iOS'",
+                               "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                               :archive,
+                               "| tee #{@log_path.shellescape}",
+                               "| xcpretty"
+                             ])
+
+        result = Gym::BuildCommandGenerator.post_build
+        expect(result).to be_empty
       end
     end
   end

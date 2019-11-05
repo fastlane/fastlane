@@ -28,7 +28,7 @@ module Fastlane
       self.append_lane([
                          "desc \"Submit a new Beta Build to Crashlytics Beta\"",
                          "lane :beta do",
-                         "  gradle(task: \"assembleRelease\")",
+                         "  gradle(task: \"clean assembleRelease\")",
                          "  crashlytics",
                          "",
                          "  # sh \"your_script.sh\"",
@@ -39,7 +39,7 @@ module Fastlane
       self.append_lane([
                          "desc \"Deploy a new version to the Google Play\"",
                          "lane :deploy do",
-                         "  gradle(task: \"assembleRelease\")",
+                         "  gradle(task: \"clean assembleRelease\")",
                          "  upload_to_play_store",
                          "end"
                        ])
@@ -55,7 +55,7 @@ module Fastlane
 
       self.package_name = UI.input("Package Name (com.krausefx.app): ")
       puts("")
-      puts("To automatically upload builds and metadata to Google Play, fastlane needs a service action json secret file".yellow)
+      puts("To automatically upload builds and metadata to Google Play, fastlane needs a service account json secret file".yellow)
       puts("Follow the Setup Guide on how to get the Json file: https://docs.fastlane.tools/actions/supply/".yellow)
       puts("Feel free to press Enter at any time in order to skip providing pieces of information when asked")
       self.json_key_file = UI.input("Path to the json secret file: ")

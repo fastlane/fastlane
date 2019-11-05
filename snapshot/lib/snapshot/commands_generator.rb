@@ -50,18 +50,16 @@ module Snapshot
           path = Snapshot::Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
           is_swift_fastfile = args.include?("swift")
           Snapshot::Setup.create(path, is_swift_fastfile: is_swift_fastfile)
-          # We do this outside of `Setup`, as it shouldn't be part of `fastlane init`
-          puts("More information: https://docs.fastlane.tools/getting-started/ios/screenshots/".green)
         end
       end
 
       command :update do |c|
         c.syntax = 'fastlane snapshot update'
         c.description = "Updates your SnapshotHelper.swift to the latest version"
-
+        c.option('--force', 'Disables confirmation prompts')
         c.action do |args, options|
           require 'snapshot/update'
-          Snapshot::Update.new.update
+          Snapshot::Update.new.update(force: options.force)
         end
       end
 

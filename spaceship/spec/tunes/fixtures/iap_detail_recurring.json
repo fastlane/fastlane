@@ -1,0 +1,163 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "id": "3121394238",
+    "adamId": "1195137657",
+    "appAdamIds": ["1173658173"],
+    "familyId": null,
+    "addOnType": "recurring",
+    "isNewsSubscription": false,
+    "isReplaced": false,
+    "replacementAdamId": null,
+    "referenceName": {
+      "value": "created by spaceship",
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null,
+      "maxLength": 64,
+      "minLength": 2
+    },
+    "productId": {
+      "value": "x.a.a.b.b.c.d.x.y.z",
+      "isEditable": false,
+      "isRequired": true,
+      "errorKeys": null,
+      "maxLength": 100,
+      "minLength": 2
+    },
+    "clearedForSale": {
+      "value": true,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "pricingDurationType": null,
+    "pricingIntervals": [{
+      "value": {
+        "tierStem": "1",
+        "priceTierEffectiveDate": null,
+        "priceTierEndDate": null,
+        "country": "WW",
+        "grandfathered": null
+      },
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }],
+    "ungrandfatheredIntervals": null,
+    "freeTrialDurationType": null,
+    "bonusPeriodDurationType": null,
+    "versions": [{
+      "id": "95811535",
+      "details": {
+        "value": [{
+          "value": {
+            "id": "101363436",
+            "name": {
+              "value": "test name german1",
+              "isEditable": true,
+              "isRequired": true,
+              "errorKeys": null,
+              "maxLength": 75,
+              "minLength": 2
+            },
+            "description": {
+              "value": "German has at least 10 characters",
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null,
+              "maxLength": 255,
+              "minLength": 10
+            },
+            "publicationName": null,
+            "localeCode": "de-DE",
+            "status": "proposed"
+          },
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null,
+          "isDeletable": true
+        }, {
+          "value": {
+            "id": "101363435",
+            "name": {
+              "value": "test name danish",
+              "isEditable": true,
+              "isRequired": true,
+              "errorKeys": null,
+              "maxLength": 75,
+              "minLength": 2
+            },
+            "description": {
+              "value": "German has at least 10 characters",
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null,
+              "maxLength": 255,
+              "minLength": 10
+            },
+            "publicationName": null,
+            "localeCode": "da",
+            "status": "proposed"
+          },
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null,
+          "isDeletable": true
+        }, {
+          "value": {
+            "id": "101363434",
+            "name": {
+              "value": "Edit It",
+              "isEditable": true,
+              "isRequired": true,
+              "errorKeys": null,
+              "maxLength": 75,
+              "minLength": 2
+            },
+            "description": {
+              "value": "Description has at least 10 characters",
+              "isEditable": true,
+              "isRequired": false,
+              "errorKeys": null,
+              "maxLength": 255,
+              "minLength": 10
+            },
+            "publicationName": null,
+            "localeCode": "en-US",
+            "status": "proposed"
+          },
+          "isEditable": true,
+          "isRequired": false,
+          "errorKeys": null,
+          "isDeletable": true
+        }],
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null
+      },
+      "contentHosting": null,
+      "contentHostingData": null,
+      "reviewNotes": {
+        "value": "Review Notes with atleast 10 characters",
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 4000,
+        "minLength": 2
+      },
+      "status": "readyToSubmit",
+      "canBeSubmitted": true
+    }],
+    "missingRequiredPrivacyPolicyData": false,
+    "missingRequiredFamilyDetail": false
+  },
+  "messages": {
+    "warn": null,
+    "error": null,
+    "info": null
+  },
+  "statusCode": "SUCCESS"
+}

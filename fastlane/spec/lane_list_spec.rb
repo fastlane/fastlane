@@ -36,5 +36,32 @@ describe Fastlane do
       result = Fastlane::LaneList.generate_json(nil)
       expect(result).to eq({})
     end
+
+    describe "#lane_name_from_swift_line" do
+      let(:testLane) { "func testLane() {" }
+      let(:testLaneWithOptions) { "func testLane(withOptions: [String: String]?) {" }
+      let(:testNoLane) { "func test() {" }
+      let(:testNoLaneWithOptions) { "func test(withOptions: [String: String]?) {" }
+
+      it "finds lane name without options" do
+        name = Fastlane::LaneList.lane_name_from_swift_line(potential_lane_line: testLane)
+        expect(name).to eq("testLane")
+      end
+
+      it "finds lane name with options" do
+        name = Fastlane::LaneList.lane_name_from_swift_line(potential_lane_line: testLaneWithOptions)
+        expect(name).to eq("testLane")
+      end
+
+      it "doesn't find lane name without options" do
+        name = Fastlane::LaneList.lane_name_from_swift_line(potential_lane_line: testNoLane)
+        expect(name).to eq(nil)
+      end
+
+      it "doesn't find lane name with options" do
+        name = Fastlane::LaneList.lane_name_from_swift_line(potential_lane_line: testNoLaneWithOptions)
+        expect(name).to eq(nil)
+      end
+    end
   end
 end

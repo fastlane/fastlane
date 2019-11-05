@@ -3,7 +3,6 @@
 //  appTests
 //
 //  Created by Felix Krause on 01/10/15.
-//  Copyright © 2015 Felix Krause. All rights reserved.
 //
 
 #import <XCTest/XCTest.h>

@@ -238,6 +238,38 @@ describe FastlaneCore do
       )
     end
 
+    it "properly parses the simctl output with unavailable devices and generates Device objects for all simulators" do
+      response = "response"
+      simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode10BootedUnavailable')
+      expect(response).to receive(:read).and_return(simctl_output)
+      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+      thing = {}
+      expect(thing).to receive(:read).and_return("line\n")
+      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
+
+      devices = FastlaneCore::DeviceManager.simulators
+      expect(devices.count).to eq(3)
+
+      expect(devices[0]).to have_attributes(
+        name: "iPhone 5s", os_type: "iOS", os_version: "12.0",
+        udid: "238C6D64-8720-4BFF-9DE9-FFBB9A1375D4",
+        state: "Shutdown",
+        is_simulator: true
+      )
+      expect(devices[1]).to have_attributes(
+        name: "iPhone 6", os_type: "iOS", os_version: "12.0",
+        udid: "C68031AE-E525-4065-9DB6-0D4450326BDA",
+        state: "Shutdown",
+        is_simulator: true
+      )
+      expect(devices[2]).to have_attributes(
+        name: "Apple Watch Series 2 - 38mm", os_type: "watchOS", os_version: "5.0",
+        udid: "34144812-F701-4A49-9210-4A226FE5E0A9",
+        state: "Shutdown",
+        is_simulator: true
+      )
+    end
+
     it "properly parses system_profiler and instruments output and generates Device objects for iOS" do
       response = "response"
       expect(response).to receive(:read).and_return(@system_profiler_output)
@@ -247,11 +279,18 @@ describe FastlaneCore do
       expect(Open3).to receive(:popen3).with("instruments -s devices").and_yield(nil, response, nil, nil)
 
       devices = FastlaneCore::DeviceManager.connected_devices('iOS')
-      expect(devices.count).to eq(1)
+      expect(devices.count).to eq(2)
 
       expect(devices[0]).to have_attributes(
         name: "Matthew's iPhone", os_type: "iOS", os_version: "9.3",
         udid: "f0f9f44e7c2dafbae53d1a83fe27c37418ffffff",
+        state: "Booted",
+        is_simulator: false
+      )
+
+      expect(devices[1]).to have_attributes(
+        name: "iPhone XS Max", os_type: "iOS", os_version: "12.0",
+        udid: "00008020-0006302A0CFFFFFF",
         state: "Booted",
         is_simulator: false
       )
@@ -318,7 +357,7 @@ describe FastlaneCore do
       allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
       devices = FastlaneCore::DeviceManager.all('iOS')
-      expect(devices.count).to eq(7)
+      expect(devices.count).to eq(8)
 
       expect(devices[0]).to have_attributes(
         name: "Matthew's iPhone", os_type: "iOS", os_version: "9.3",
@@ -327,24 +366,30 @@ describe FastlaneCore do
         is_simulator: false
       )
       expect(devices[1]).to have_attributes(
+        name: "iPhone XS Max", os_type: "iOS", os_version: "12.0",
+        udid: "00008020-0006302A0CFFFFFF",
+        state: "Booted",
+        is_simulator: false
+      )
+      expect(devices[2]).to have_attributes(
         name: "iPhone 4s", os_type: "iOS", os_version: "8.1",
         udid: "DBABD2A2-0144-44B0-8F93-263EB656FC13",
         state: "Shutdown",
         is_simulator: true
       )
-      expect(devices[2]).to have_attributes(
+      expect(devices[3]).to have_attributes(
         name: "iPhone 5", os_type: "iOS", os_version: "8.1",
         udid: "0D80C781-8702-4156-855E-A9B737FF92D3",
         state: "Booted",
         is_simulator: true
       )
-      expect(devices[3]).to have_attributes(
+      expect(devices[4]).to have_attributes(
         name: "iPhone 6s Plus", os_type: "iOS", os_version: "9.1",
         udid: "BB65C267-FAE9-4CB7-AE31-A5D9BA393AF0",
         state: "Shutdown",
         is_simulator: true
       )
-      expect(devices[4]).to have_attributes(
+      expect(devices[5]).to have_attributes(
         name: "iPad Air", os_type: "iOS", os_version: "9.1",
         udid: "B61CB41D-354B-4991-992A-80AFFF1062E6",
         state: "Shutdown",

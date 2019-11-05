@@ -38,11 +38,11 @@ module Fastlane
 
       def self.details
         [
-          "[Please use the badge fastlane plugin instead: https://github.com/HazAT/fastlane-plugin-badge]",
+          "Please use the [badge plugin](https://github.com/HazAT/fastlane-plugin-badge) instead.",
           "This action will add a light/dark badge onto your app icon.",
-          "You can also provide your custom badge/overlay or add an shield for more customization more info:",
-          "https://github.com/HazAT/badge",
-          "**Note** If you want to reset the badge back to default you can use `sh 'git checkout -- <path>/Assets.xcassets/'`"
+          "You can also provide your custom badge/overlay or add a shield for more customization.",
+          "More info: [https://github.com/HazAT/badge](https://github.com/HazAT/badge)",
+          "**Note**: If you want to reset the badge back to default, you can use `sh 'git checkout -- <path>/Assets.xcassets/'`."
         ].join("\n")
       end
 
@@ -74,7 +74,7 @@ module Fastlane
                                        description: "Add your custom overlay/badge image",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("custom should be a valid file path") unless value and File.exist?(value)
+                                         UI.user_error!("custom should be a valid file path") unless value && File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :no_badge,
                                        env_name: "FL_BADGE_NO_BADGE",

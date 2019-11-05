@@ -5,30 +5,33 @@ module Fastlane
       def self.run(params)
         validate(params)
 
-        cmd = ["carthage"]
+        cmd = [params[:executable]]
         command_name = params[:command]
         cmd << command_name
 
         if command_name == "archive" && params[:frameworks].count > 0
           cmd.concat(params[:frameworks])
-        elsif (command_name == "update" || command_name == "build") && params[:dependencies].count > 0
-          cmd.concat(params[:dependencies])
+        # "update", "build" and "bootstrap" are the only commands that support "--derived-data" parameter
+        elsif ["update", "build", "bootstrap"].include?(command_name)
+          cmd.concat(params[:dependencies]) if params[:dependencies].count > 0
+          cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
         end
 
         cmd << "--output #{params[:output]}" if params[:output]
         cmd << "--use-ssh" if params[:use_ssh]
         cmd << "--use-submodules" if params[:use_submodules]
         cmd << "--no-use-binaries" if params[:use_binaries] == false
+        cmd << "--no-checkout" if params[:no_checkout] == true
         cmd << "--no-build" if params[:no_build] == true
         cmd << "--no-skip-current" if params[:no_skip_current] == true
         cmd << "--verbose" if params[:verbose] == true
         cmd << "--platform #{params[:platform]}" if params[:platform]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
-        cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
         cmd << "--toolchain #{params[:toolchain]}" if params[:toolchain]
         cmd << "--project-directory #{params[:project_directory]}" if params[:project_directory]
         cmd << "--cache-builds" if params[:cache_builds]
         cmd << "--new-resolver" if params[:new_resolver]
+        cmd << "--log-path #{params[:log_path]}" if params[:log_path]
 
         Actions.sh(cmd.join(' '))
       end
@@ -41,6 +44,10 @@ module Fastlane
         end
         if command_name != "archive" && params[:output]
           UI.user_error!("Output option is available only for 'archive' command.")
+        end
+
+        if params[:log_path] && !%w(build bootstrap update).include?(command_name)
+          UI.user_error!("Log path option is available only for 'build', 'bootstrap', and 'update' command.")
         end
       end
 
@@ -66,7 +73,7 @@ module Fastlane
                                          UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :dependencies,
-                                       description: "Carthage dependencies to update or build",
+                                       description: "Carthage dependencies to update, build or bootstrap",
                                        default_value: [],
                                        is_string: false,
                                        type: Array),
@@ -85,6 +92,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :use_binaries,
                                        env_name: "FL_CARTHAGE_USE_BINARIES",
                                        description: "Check out dependency repositories even when prebuilt frameworks exist",
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :no_checkout,
+                                       env_name: "FL_CARTHAGE_NO_CHECKOUT",
+                                       description: "When bootstrapping Carthage do not checkout",
                                        is_string: false,
                                        type: Boolean,
                                        optional: true),
@@ -158,7 +171,15 @@ module Fastlane
                                        description: "Use new resolver when resolving dependency graph",
                                        is_string: false,
                                        optional: true,
-                                       type: Boolean)
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :log_path,
+                                       env_name: "FL_CARTHAGE_LOG_PATH",
+                                       description: "Path to the xcode build output",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :executable,
+                                       env_name: "FL_CARTHAGE_EXECUTABLE",
+                                       description: "Path to the `carthage` executable on your machine",
+                                       default_value: 'carthage')
         ]
       end
 
@@ -169,7 +190,7 @@ module Fastlane
             frameworks: ["MyFramework1", "MyFramework2"],   # Specify which frameworks to archive (only for the archive command)
             output: "MyFrameworkBundle.framework.zip",      # Specify the output archive name (only for the archive command)
             command: "bootstrap",                           # One of: build, bootstrap, update, archive. (default: bootstrap)
-            dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update or build (only for update and build commands)
+            dependencies: ["Alamofire", "Notice"],          # Specify which dependencies to update or build (only for update, build and bootstrap commands)
             use_ssh: false,                                 # Use SSH for downloading GitHub repositories.
             use_submodules: false,                          # Add dependencies as Git submodules.
             use_binaries: true,                             # Check out dependency repositories even when prebuilt frameworks exist
@@ -180,7 +201,8 @@ module Fastlane
             configuration: "Release",                       # Build configuration to use when building
             cache_builds: true,                             # By default Carthage will rebuild a dependency regardless of whether its the same resolved version as before.
             toolchain: "com.apple.dt.toolchain.Swift_2_3",  # Specify the xcodebuild toolchain
-            new_resolver: false                             # Use the new resolver to resolve depdendency graph
+            new_resolver: false,                            # Use the new resolver to resolve depdendency graph
+            log_path: "carthage.log"                        # Path to the xcode build output
           )'
         ]
       end

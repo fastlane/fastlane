@@ -18,8 +18,14 @@ module Fastlane
 
         Dir.chdir(File.expand_path("..", params[:path])) do # required to properly zip
           zip_options = params[:verbose] ? "r" : "rq"
+          zip_options += "y" if params[:symlinks]
 
-          Actions.sh("zip -#{zip_options} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}")
+          if params[:password]
+            password_option = "-P '#{params[:password]}'"
+            Actions.sh("zip -#{zip_options} #{password_option} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}")
+          else
+            Actions.sh("zip -#{zip_options} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}")
+          end
         end
 
         UI.success("Successfully generated zip file at path '#{File.expand_path(absolute_output_path)}'")
@@ -32,9 +38,6 @@ module Fastlane
 
       def self.description
         "Compress a file or folder to a zip"
-      end
-
-      def self.details
       end
 
       def self.available_options
@@ -53,7 +56,18 @@ module Fastlane
                                        env_name: "FL_ZIP_VERBOSE",
                                        description: "Enable verbose output of zipped file",
                                        default_value: true,
-                                       optional: true)
+                                       type: Boolean,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :password,
+                                       env_name: "FL_ZIP_PASSWORD",
+                                       description: "Encrypt the contents of the zip archive using a password",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :symlinks,
+                                       env_name: "FL_ZIP_SYMLINKS",
+                                       description: "Store symbolic links as such in the zip archive",
+                                       optional: true,
+                                       type: Boolean,
+                                       default_value: false)
         ]
       end
 
@@ -68,6 +82,12 @@ module Fastlane
             path: "MyApp.app",
             output_path: "Latest.app.zip",
             verbose: false
+          )',
+          'zip(
+            path: "MyApp.app",
+            output_path: "Latest.app.zip",
+            verbose: false,
+            symlinks: true
           )'
         ]
       end

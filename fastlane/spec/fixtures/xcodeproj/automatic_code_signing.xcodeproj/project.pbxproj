@@ -392,12 +392,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				INFOPLIST_FILE = demo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = demo.test.demo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fastlane.mindera.cosigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = 1337;
+				PROVISIONING_PROFILE_SPECIFIER = Mindera;
 			};
 			name = Debug;
 		};
@@ -405,25 +409,31 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				INFOPLIST_FILE = demo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = demo.test.demo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fastlane.mindera.cosigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = 1337;
+				PROVISIONING_PROFILE_SPECIFIER = Mindera;
 			};
 			name = Release;
 		};
 		77C503131DD3175E00AC8FF0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				INFOPLIST_FILE = today/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = demo.test.demo.today;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fastlane.mindera.cosigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = 1337;
+				PROVISIONING_PROFILE_SPECIFIER = Mindera;
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -431,13 +441,16 @@
 		77C503141DD3175E00AC8FF0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				INFOPLIST_FILE = today/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = demo.test.demo.today;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fastlane.mindera.cosigner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = 1337;
+				PROVISIONING_PROFILE_SPECIFIER = Mindera;
 				SKIP_INSTALL = YES;
 			};
 			name = Release;

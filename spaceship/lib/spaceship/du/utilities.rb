@@ -8,14 +8,32 @@ module Spaceship
     # Supports all formats required by DU-UTC right now (video, images and json)
     # @param path (String) the path to the file
     def content_type(path)
-      path = path.downcase
-      return 'image/jpeg' if path.end_with?('.jpg')
-      return 'image/jpeg' if path.end_with?('.jpeg')
-      return 'image/png' if path.end_with?('.png')
-      return 'application/json' if path.end_with?('.geojson')
-      return 'video/quicktime' if path.end_with?('.mov')
-      return 'video/mp4' if path.end_with?('.m4v')
-      return 'video/mp4' if path.end_with?('.mp4')
+      supported_file_types = {
+        '.jpg' => 'image/jpeg',
+        '.jpeg' => 'image/jpeg',
+        '.png' => 'image/png',
+        '.geojson' => 'application/json',
+        '.mov' => 'video/quicktime',
+        '.m4v' => 'video/mp4',
+        '.mp4' => 'video/mp4',
+        '.txt' => 'text/plain',
+        '.pdf' => 'application/pdf',
+        '.doc' => 'application/msword',
+        '.docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.rtf' => 'application/rtf',
+        '.pages' => 'application/x-iwork-pages-sffpages',
+        '.xls' => 'application/vnd.ms-excel',
+        '.xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.numbers' => 'application/x-iwork-numbers-sffnumbers',
+        '.rar' => 'application/x-rar-compressed',
+        '.plist' => 'application/xml',
+        '.crash' => 'text/x-apport',
+        '.avi' => 'video/x-msvideo',
+        '.zip' => 'application/zip'
+      }
+
+      extension = File.extname(path.downcase)
+      return supported_file_types[extension] if supported_file_types[extension]
       raise "Unknown content-type for file #{path}"
     end
 
@@ -40,7 +58,7 @@ module Spaceship
     # @param video_path (String) the path to the video file
     # @param timestamp (String) the `ffmpeg` timestamp format (e.g. 00.00)
     # @param dimensions (Array) the dimension of the screenshot to generate
-    # @return the path to the TempFile containing the generated screenshot
+    # @return the TempFile containing the generated screenshot
     def grab_video_preview(video_path, timestamp, dimensions)
       width, height = dimensions
       require 'tempfile'
@@ -50,7 +68,7 @@ module Spaceship
       # puts "COMMAND: #{command}"
       `#{command}`
       raise "Failed to grab screenshot at #{timestamp} from #{video_path} (using #{command})" unless $CHILD_STATUS.to_i == 0
-      tmp.path
+      tmp
     end
 
     # identifies the resolution of a video using `ffmpeg`

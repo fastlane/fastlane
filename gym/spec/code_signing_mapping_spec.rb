@@ -34,6 +34,22 @@ describe Gym::CodeSigningMapping do
       csm = Gym::CodeSigningMapping.new(project: project)
       expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match AppStore family.wwdc.app", "family.wwdc.app.watchkitapp" => "match AppStore family.wwdc.app.watchkitapp", "family.wwdc.app.watchkitapp.watchkitextension" => "match AppStore family.wwdc.app.watchkitappextension" })
     end
+
+    it "detects the build configuration from selected scheme", requires_xcode: true do
+      workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
+      project = FastlaneCore::Project.new({ workspace: workspace_path })
+      csm = Gym::CodeSigningMapping.new(project: project)
+      Gym.config[:scheme] = "Example (Debug)"
+      expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match Development family.wwdc.app", "family.wwdc.app.watchkitapp" => "match Development family.wwdc.app.watchkitapp", "family.wwdc.app.watchkitapp.watchkitextension" => "match Development family.wwdc.app.watchkitappextension" })
+    end
+
+    it "detects the build configuration from selected scheme of a project based on inheritance for resolve xcconfigs", requires_xcode: true do
+      workspace_path = "gym/spec/fixtures/projects/projectBasedOnInheritance/ExampleWithInheritedXcconfig.xcworkspace"
+      project = FastlaneCore::Project.new({ workspace: workspace_path })
+      csm = Gym::CodeSigningMapping.new(project: project)
+      Gym.config[:scheme] = "Target A"
+      expect(csm.detect_project_profile_mapping).to eq({ "com.targeta.release" => "release-targeta", "com.targetb.release" => "release-targetb" })
+    end
   end
 
   describe "#detect_project_profile_mapping_for_tv_os" do

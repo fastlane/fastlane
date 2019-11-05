@@ -1,4 +1,5 @@
 describe Spaceship::Tunes::IAPSubscriptionPricingTier do
+  before { TunesStubbing.itc_stub_iap }
   before { Spaceship::Tunes.login }
 
   let(:client)        { Spaceship::AppVersion.client }
@@ -19,7 +20,7 @@ describe Spaceship::Tunes::IAPSubscriptionPricingTier do
     end
 
     describe "Subscription Pricing Tier Info" do
-      subject { pricing_tiers.map(&:pricing_info).flatten }
+      subject { pricing_tiers.flat_map(&:pricing_info) }
 
       it "correctly creates all 155 pricing infos for each country" do
         expect(subject).to all(be_an(Spaceship::Tunes::IAPSubscriptionPricingInfo))

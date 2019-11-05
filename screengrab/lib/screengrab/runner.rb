@@ -136,9 +136,13 @@ module Screengrab
     end
 
     def determine_external_screenshots_path(device_serial)
-      device_ext_storage = run_adb_command("adb -s #{device_serial} shell echo \\$EXTERNAL_STORAGE",
+      # macOS evaluates $foo in `echo $foo` before executing the command,
+      # Windows doesn't - hence the double backslash vs. single backslash
+      command = Helper.windows? ? "shell echo \$EXTERNAL_STORAGE " : "shell echo \\$EXTERNAL_STORAGE"
+      device_ext_storage = run_adb_command("adb -s #{device_serial} #{command}",
                                            print_all: true,
                                            print_command: true)
+      device_ext_storage = device_ext_storage.strip
       File.join(device_ext_storage, @config[:app_package_name], 'screengrab')
     end
 
@@ -178,28 +182,34 @@ module Screengrab
 
     def install_apks(device_serial, app_apk_path, tests_apk_path)
       UI.message('Installing app APK')
-      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{app_apk_path.shellescape}",
+      apk_install_output = run_adb_command("adb -s #{device_serial} install -t -r #{app_apk_path.shellescape}",
                                            print_all: true,
                                            print_command: true)
       UI.user_error!("App APK could not be installed") if apk_install_output.include?("Failure [")
 
       UI.message('Installing tests APK')
-      apk_install_output = run_adb_command("adb -s #{device_serial} install -r #{tests_apk_path.shellescape}",
+      apk_install_output = run_adb_command("adb -s #{device_serial} install -t -r #{tests_apk_path.shellescape}",
                                            print_all: true,
                                            print_command: true)
       UI.user_error!("Tests APK could not be installed") if apk_install_output.include?("Failure [")
     end
 
     def uninstall_apks(device_serial, app_package_name, tests_package_name)
-      UI.message('Uninstalling app APK')
-      run_adb_command("adb -s #{device_serial} uninstall #{app_package_name}",
-                      print_all: true,
-                      print_command: true)
+      packages = installed_packages(device_serial)
 
-      UI.message('Uninstalling tests APK')
-      run_adb_command("adb -s #{device_serial} uninstall #{tests_package_name}",
-                      print_all: true,
-                      print_command: true)
+      if packages.include?(app_package_name.to_s)
+        UI.message('Uninstalling app APK')
+        run_adb_command("adb -s #{device_serial} uninstall #{app_package_name}",
+                        print_all: true,
+                        print_command: true)
+      end
+
+      if packages.include?(tests_package_name.to_s)
+        UI.message('Uninstalling tests APK')
+        run_adb_command("adb -s #{device_serial} uninstall #{tests_package_name}",
+                        print_all: true,
+                        print_command: true)
+      end
     end
 
     def grant_permissions(device_serial)
@@ -347,8 +357,17 @@ module Screengrab
       # We can safely ignore that and treat it as if it returned 'No such file'
     end
 
+    # Return an array of packages that are installed on the device
+    def installed_packages(device_serial)
+      packages = run_adb_command("adb -s #{device_serial} shell pm list packages",
+                                 print_all: true,
+                                 print_command: true)
+      packages.split("\n").map { |package| package.gsub("package:", "") }
+    end
+
     def run_adb_command(command, print_all: false, print_command: false)
-      output = @executor.execute(command: command,
+      adb_path = @android_env.adb_path.chomp("adb")
+      output = @executor.execute(command: adb_path + command,
                                  print_all: print_all,
                                  print_command: print_command) || ''
       output.lines.reject do |line|

@@ -22,7 +22,15 @@ module Fastlane
         end
 
         commands = []
-        commands << Fastlane::Actions.sh("security create-keychain -p #{escaped_password} #{keychain_path}", log: false)
+
+        if !exists?(keychain_path)
+          commands << Fastlane::Actions.sh("security create-keychain -p #{escaped_password} #{keychain_path}", log: false)
+        elsif params[:require_create]
+          UI.abort_with_message!("`require_create` option passed, but found keychain '#{keychain_path}', failing create_keychain action")
+        else
+          UI.important("Found keychain '#{keychain_path}', creation skipped")
+          UI.important("If creating a new Keychain DB is required please set the `require_create` option true to cause the action to fail")
+        end
 
         if params[:default_keychain]
           # if there is no default keychain - setting the original will fail - silent this error
@@ -44,16 +52,47 @@ module Fastlane
         commands << Fastlane::Actions.sh(command, log: false)
 
         if params[:add_to_search_list]
-          keychains = Action.sh("security list-keychains -d user").shellsplit
-          keychains << File.expand_path(keychain_path)
-          commands << Fastlane::Actions.sh("security list-keychains -s #{keychains.shelljoin}", log: false)
+          keychains = list_keychains
+          expanded_path = resolved_keychain_path(keychain_path)
+          if keychains.include?(expanded_path)
+            UI.important("Found keychain '#{expanded_path}' in list-keychains, adding to search list skipped")
+          else
+            keychains << expanded_path
+            commands << Fastlane::Actions.sh("security list-keychains -s #{keychains.shelljoin}", log: false)
+          end
         end
 
         commands
       end
 
+      def self.list_keychains
+        Action.sh("security list-keychains -d user").shellsplit
+      end
+
+      def self.exists?(keychain_path)
+        !resolved_keychain_path(keychain_path).nil?
+      end
+
+      # returns the expanded and resolved path for the keychain, or nil if not found
+      def self.resolved_keychain_path(keychain_path)
+        keychain_path = File.expand_path(keychain_path)
+
+        # Creating Keychains using the security
+        # CLI appends `-db` to the file name.
+        ["#{keychain_path}-db", keychain_path].each do |path|
+          return path if File.exist?(path)
+        end
+        nil
+      end
+
       def self.description
         "Create a new Keychain"
+      end
+
+      def self.output
+        [
+          ['ORIGINAL_DEFAULT_KEYCHAIN', 'The path to the default keychain']
+        ]
       end
 
       def self.available_options
@@ -98,7 +137,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :add_to_search_list,
                                        description: 'Add keychain to search list',
                                        is_string: false,
-                                       default_value: true)
+                                       default_value: true),
+          FastlaneCore::ConfigItem.new(key: :require_create,
+                                       description: 'Fail the action if the Keychain already exists',
+                                       is_string: false,
+                                       default_value: false)
         ]
       end
 

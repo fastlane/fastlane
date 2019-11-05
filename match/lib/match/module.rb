@@ -1,13 +1,19 @@
 require 'fastlane_core/helper'
+require 'fastlane/boolean'
 
 module Match
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
+  Boolean = Fastlane::Boolean
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
-  DESCRIPTION = "Easily sync your certificates and profiles across your team using git"
+  DESCRIPTION = "Easily sync your certificates and profiles across your team"
 
   def self.environments
     return %w(appstore adhoc development enterprise)
+  end
+
+  def self.storage_modes
+    return %w(git google_cloud)
   end
 
   def self.profile_type_sym(type)

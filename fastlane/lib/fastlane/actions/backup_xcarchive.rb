@@ -68,6 +68,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :xcarchive,
                                        description: 'Path to your xcarchive file. Optional if you use the `xcodebuild` action',
                                        default_value: Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE],
+                                       default_value_dynamic: true,
                                        optional: false,
                                        env_name: 'BACKUP_XCARCHIVE_ARCHIVE',
                                        verify_block: proc do |value|
@@ -81,17 +82,18 @@ module Fastlane
                                          UI.user_error!("Couldn't find the destination folder at '#{value}'") if !Helper.test? && !File.directory?(value) && !File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :zip,
-                                       description: 'Enable compression of the archive. Default value `true`',
+                                       description: 'Enable compression of the archive',
                                        is_string: false,
                                        default_value: true,
                                        optional: true,
                                        env_name: 'BACKUP_XCARCHIVE_ZIP'),
           FastlaneCore::ConfigItem.new(key: :zip_filename,
                                        description: 'Filename of the compressed archive. Will be appended by `.xcarchive.zip`. Default value is the output xcarchive filename',
+                                       default_value_dynamic: true,
                                        optional: true,
                                        env_name: 'BACKUP_XCARCHIVE_ZIP_FILENAME'),
           FastlaneCore::ConfigItem.new(key: :versioned,
-                                       description: 'Create a versioned (date and app version) subfolder where to put the archive. Default value `true`',
+                                       description: 'Create a versioned (date and app version) subfolder where to put the archive',
                                        is_string: false,
                                        default_value: true,
                                        optional: true,
@@ -117,9 +119,10 @@ module Fastlane
         [
           'backup_xcarchive(
             xcarchive: "/path/to/file.xcarchive", # Optional if you use the `xcodebuild` action
-            destination: "/somewhere/else/file.xcarchive", # Where the backup should be created
+            destination: "/somewhere/else/", # Where the backup should be created
+            zip_filename: "file.xcarchive", # The name of the backup file
             zip: false, # Enable compression of the archive. Defaults to `true`.
-            versioned: true # Create a versioned (date and app version) subfolder where to put the archive. Default value `true`
+            versioned: true # Create a versioned (date and app version) subfolder where to put the archive
           )'
         ]
       end

@@ -61,8 +61,10 @@ module Fastlane
       end
 
       def self.details
-        "Unlocks the given keychain file and adds it to the keychain search list\n" \
-        "Keychains can be replaced with `add_to_search_list: :replace`"
+        [
+          "Unlocks the given keychain file and adds it to the keychain search list.",
+          "Keychains can be replaced with `add_to_search_list: :replace`."
+        ].join("\n")
       end
 
       def self.available_options
@@ -70,6 +72,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_UNLOCK_KEYCHAIN_PATH",
                                        description: "Path to the keychain file",
+                                       default_value: "login",
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_UNLOCK_KEYCHAIN_PASSWORD",
