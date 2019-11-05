@@ -3,18 +3,20 @@ require_relative 'module'
 module Match
   # Generate missing resources
   class Generator
-    def self.generate_certificate(params, cert_type)
+    def self.generate_certificate(params, cert_type, working_directory)
       require 'cert/runner'
       require 'cert/options'
 
-      output_path = File.join(params[:workspace], "certs", cert_type.to_s)
+      output_path = File.join(working_directory, "certs", cert_type.to_s)
 
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
         development: params[:type] == "development",
+        generate_apple_certs: params[:generate_apple_certs],
         output_path: output_path,
         force: true, # we don't need a certificate without its private key, we only care about a new certificate
         username: params[:username],
         team_id: params[:team_id],
+        team_name: params[:team_name],
         keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name]),
         keychain_password: params[:keychain_password]
       })
@@ -32,7 +34,7 @@ module Match
       end
 
       # We don't care about the signing request
-      Dir[File.join(params[:workspace], "**", "*.certSigningRequest")].each { |path| File.delete(path) }
+      Dir[File.join(working_directory, "**", "*.certSigningRequest")].each { |path| File.delete(path) }
 
       # we need to return the path
       # Inside this directory, there is the `.p12` file and the `.cer` file with the same name, but different extension
@@ -40,7 +42,7 @@ module Match
     end
 
     # @return (String) The UUID of the newly generated profile
-    def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil, app_identifier: nil)
+    def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil, app_identifier: nil, force: true, working_directory: nil)
       require 'sigh/manager'
       require 'sigh/options'
 
@@ -56,13 +58,14 @@ module Match
 
       values = {
         app_identifier: app_identifier,
-        output_path: File.join(params[:workspace], "profiles", prov_type.to_s),
+        output_path: File.join(working_directory, "profiles", prov_type.to_s),
         username: params[:username],
-        force: true,
+        force: force,
         cert_id: certificate_id,
         provisioning_name: profile_name,
         ignore_profiles_with_different_name: true,
         team_id: params[:team_id],
+        team_name: params[:team_name],
         template_name: params[:template_name]
       }
 

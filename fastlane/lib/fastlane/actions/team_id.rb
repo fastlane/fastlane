@@ -30,7 +30,7 @@ module Fastlane
 
       def self.example_code
         [
-          'team_id "Q2CBPK58CA"'
+          'team_id("Q2CBPK58CA")'
         ]
       end
 

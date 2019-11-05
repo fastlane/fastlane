@@ -193,12 +193,14 @@ module Spaceship
         # Create a new object based on a hash.
         # This is used to create a new object based on the server response.
         def factory(attrs)
-          # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited', 'direct']
+          # available values of `distributionMethod` at this point: ['adhoc', 'store', 'limited', 'direct', 'inhouse']
           klass = case attrs['distributionMethod']
                   when 'limited'
                     Development
                   when 'store'
                     AppStore
+                  when 'adhoc'
+                    AdHoc
                   when 'inhouse'
                     InHouse
                   when 'direct'
@@ -262,7 +264,7 @@ module Spaceship
           app = Spaceship::Portal::App.find(bundle_id, mac: mac)
           raise "Could not find app with bundle id '#{bundle_id}'" unless app
 
-          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? and sub_platform != 'tvOS'
+          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? && sub_platform != 'tvOS'
 
           # Fill in sensible default values
           name ||= [bundle_id, self.pretty_type].join(' ')
@@ -278,8 +280,8 @@ module Spaceship
           # Fix https://github.com/KrauseFx/fastlane/issues/349
           certificate_parameter = certificate_parameter.first if certificate_parameter.count == 1
 
-          if devices.nil? or devices.count == 0
-            if self == Development or self == AdHoc
+          if devices.nil? || devices.count == 0
+            if self == Development || self == AdHoc
               # For Development and AdHoc we usually want all compatible devices by default
               if mac
                 devices = Spaceship::Portal::Device.all_macs
@@ -326,22 +328,7 @@ module Spaceship
           end
 
           return profiles if self == ProvisioningProfile
-
-          # To distinguish between AppStore and AdHoc profiles, we need to send
-          # a details request (see `profile_details`). This is an expensive operation
-          # which we can't do for every single provisioning profile
-          # Instead we'll treat App Store profiles the same way as Ad Hoc profiles
-          # Spaceship::Portal::ProvisioningProfile::AdHoc.all will return the same array as
-          # Spaceship::Portal::ProvisioningProfile::AppStore.all, containing only AppStore
-          # profiles. To determine if it's an Ad Hoc profile, you can use the
-          # is_adhoc? method on the profile.
-          klass = self
-          klass = AppStore if self == AdHoc
-
-          # only return the profiles that match the class
-          return profiles.select do |profile|
-            profile.class == klass
-          end
+          return profiles.select { |profile| profile.class == self }
         end
 
         # @return (Array) Returns all profiles registered for this account
@@ -364,7 +351,7 @@ module Spaceship
         #   This may also contain invalid or expired profiles
         def find_by_bundle_id(bundle_id: nil, mac: false, sub_platform: nil)
           raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
-          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? and sub_platform != 'tvOS'
+          raise "Invalid sub_platform #{sub_platform}, valid values are tvOS" if !sub_platform.nil? && sub_platform != 'tvOS'
           find_tvos_profiles = sub_platform == 'tvOS'
           all(mac: mac).find_all do |profile|
             profile.app.bundle_id == bundle_id && profile.tvos? == find_tvos_profiles
@@ -445,7 +432,7 @@ module Spaceship
             if self.kind_of?(Development)
               self.certificates = [Spaceship::Portal::Certificate::MacDevelopment.all.first]
             elsif self.kind_of?(Direct)
-              self.certificates = [Spaceship::Portal::Certificate::DeveloperIDApplication.all.first]
+              self.certificates = [Spaceship::Portal::Certificate::DeveloperIdApplication.all.first]
             else
               self.certificates = [Spaceship::Portal::Certificate::MacAppDistribution.all.first]
             end
@@ -470,7 +457,7 @@ module Spaceship
             devices.map(&:id),
             mac: mac?,
             sub_platform: tvos? ? 'tvOS' : nil,
-            template_name: template_name
+            template_name: is_template_profile ? template.purpose_name : nil
           )
         end
 
@@ -543,14 +530,6 @@ module Spaceship
         end
 
         App.set_client(client).new(app_attributes)
-      end
-
-      # @return (Bool) Is this current provisioning profile adhoc?
-      #                AppStore and AdHoc profiles are the same except that AdHoc has devices
-      def is_adhoc?
-        return false unless self.kind_of?(AppStore) || self.kind_of?(AdHoc)
-
-        return devices.count > 0
       end
 
       # This is an expensive operation as it triggers a new request

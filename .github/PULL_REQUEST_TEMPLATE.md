@@ -9,7 +9,11 @@
 ### Motivation and Context
 <!-- Why is this change required? What problem does it solve? -->
 <!-- If it fixes an open issue, please link to the issue here. -->
-<!-- Please describe in detail how you tested your changes. -->
 
 ### Description
-<!-- Describe your changes in detail -->
+<!-- Describe your changes in detail. -->
+<!-- Please describe in detail how you tested your changes. -->
+
+### Testing Steps
+<!-- Optional: steps, commands, or code used to test your changes. -->
+<!-- Providing these will reduce the time needed for testing and review by the fastlane team. -->

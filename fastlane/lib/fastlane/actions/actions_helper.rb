@@ -77,7 +77,7 @@ module Fastlane
     # rubocop:enable Style/AccessorMethodName
 
     # Returns the class ref to the action based on the action name
-    # Returns nil if the action is not aailable
+    # Returns nil if the action is not available
     def self.action_class_ref(action_name)
       class_name = action_name.to_s.fastlane_class + 'Action'
       class_ref = nil
@@ -105,14 +105,26 @@ module Fastlane
     def self.load_external_actions(path)
       UI.user_error!("You need to pass a valid path") unless File.exist?(path)
 
+      class_refs = []
       Dir[File.expand_path('*.rb', path)].each do |file|
-        require file
+        begin
+          require file
+        rescue SyntaxError => ex
+          content = File.read(file, encoding: "utf-8")
+          ex.to_s.lines
+            .collect { |error| error.match(/#{file}:(\d+):(.*)/) }
+            .reject(&:nil?)
+            .each { |error| UI.content_error(content, error[1]) }
+          UI.user_error!("Syntax error in #{File.basename(file)}")
+          next
+        end
 
         file_name = File.basename(file).gsub('.rb', '')
 
         class_name = file_name.fastlane_class + 'Action'
         begin
           class_ref = Fastlane::Actions.const_get(class_name)
+          class_refs << class_ref
 
           if class_ref.respond_to?(:run)
             UI.success("Successfully loaded custom action '#{file}'.") if FastlaneCore::Globals.verbose?
@@ -129,6 +141,8 @@ module Fastlane
         end
       end
       Actions.reset_aliases
+
+      return class_refs
     end
 
     def self.formerly_bundled_actions

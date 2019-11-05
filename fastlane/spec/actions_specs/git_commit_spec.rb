@@ -26,7 +26,7 @@ describe Fastlane do
           git_commit(path: ['./fastlane/*.md', './LICENSE'], message: 'message')
         end").runner.execute(:test)
 
-        expect(result).to eq("git commit -m message ./fastlane/\\*.md ./LICENSE")
+        expect(result).to eq("git commit -m message #{'./fastlane/*.md'.shellescape} ./LICENSE")
       end
 
       it "generates the correct git command with shell-escaped-paths" do
@@ -38,10 +38,38 @@ describe Fastlane do
       end
 
       it "generates the correct git command with a shell-escaped message" do
+        message = "message with 'quotes' (and parens)"
         result = Fastlane::FastFile.new.parse("lane :test do
-          git_commit(path: './fastlane/README.md', message: \"message with 'quotes' (and parens)\")
+          git_commit(path: './fastlane/README.md', message: \"#{message}\")
         end").runner.execute(:test)
-        expect(result).to eq("git commit -m message\\ with\\ \\'quotes\\'\\ \\(and\\ parens\\) ./fastlane/README.md")
+        expect(result).to eq("git commit -m #{message.shellescape} ./fastlane/README.md")
+      end
+
+      it "generates the correct git command when configured to skip git hooks" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          git_commit(path: './fastlane/README.md', message: 'message', skip_git_hooks: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("git commit -m message ./fastlane/README.md --no-verify")
+      end
+
+      it "generates the correct git command when configured to allow nothing to commit and there are changes to commit" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          git_commit(path: './fastlane/README.md', message: 'message', allow_nothing_to_commit: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("git commit -m message ./fastlane/README.md")
+      end
+
+      it "does not generate the git command when configured to allow nothing to commit and there are no changes to commit" do
+        allow(Fastlane::Actions).to receive(:sh)
+          .with("git status --porcelain")
+          .and_return("")
+        result = Fastlane::FastFile.new.parse("lane :test do
+          git_commit(path: './fastlane/README.md', message: 'message', allow_nothing_to_commit: true)
+        end").runner.execute(:test)
+
+        expect(result).to be_nil
       end
     end
   end

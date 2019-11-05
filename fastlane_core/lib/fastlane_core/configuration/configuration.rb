@@ -120,7 +120,7 @@ module FastlaneCore
           index = @available_options.find_index { |item| item.key == conflicting_option_key }
           conflicting_option = @available_options[index]
 
-          # ignore conflicts because because value of conflict option is nil
+          # ignore conflicts because value of conflict option is nil
           next if @values[conflicting_option.key].nil?
 
           if current.conflict_block
@@ -211,15 +211,16 @@ module FastlaneCore
     # if 'ask' is true and the value is not present, the user will be prompted to provide a value
     # rubocop:disable Metrics/PerceivedComplexity
     def fetch(key, ask: true)
-      UI.user_error!("Key '#{key}' must be a symbol. Example :app_id.") unless key.kind_of?(Symbol)
+      UI.crash!("Key '#{key}' must be a symbol. Example :app_id.") unless key.kind_of?(Symbol)
 
       option = verify_options_key!(key)
 
       # Same order as https://docs.fastlane.tools/advanced/#priorities-of-parameters-and-options
-      value = if @values.key?(key) and !@values[key].nil?
+      value = if @values.key?(key) && !@values[key].nil?
                 @values[key]
-              elsif option.env_name and !ENV[option.env_name].nil?
-                ENV[option.env_name].dup
+              elsif option.env_name && !ENV[option.env_name].nil?
+                # verify! before using (see https://github.com/fastlane/fastlane/issues/14449)
+                ENV[option.env_name].dup if option.verify!(option.auto_convert_value(ENV[option.env_name]))
               elsif self.config_file_options.key?(key)
                 self.config_file_options[key]
               else
@@ -227,11 +228,11 @@ module FastlaneCore
               end
 
       value = option.auto_convert_value(value)
-      value = nil if value.nil? and !option.string? # by default boolean flags are false
-      return value unless value.nil? and !option.optional and ask
+      value = nil if value.nil? && !option.string? # by default boolean flags are false
+      return value unless value.nil? && !option.optional && ask
 
       # fallback to asking
-      if Helper.test? or !UI.interactive?
+      if Helper.test? || !UI.interactive?
         # Since we don't want to be asked on tests, we'll just call the verify block with no value
         # to raise the exception that is shown when the user passes an invalid value
         set(key, '')
@@ -263,7 +264,7 @@ module FastlaneCore
     # Overwrites or sets a new value for a given key
     # @param key [Symbol] Must be a symbol
     def set(key, value)
-      UI.user_error!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of?(Symbol)
+      UI.crash!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of?(Symbol)
       option = option_for_key(key)
 
       unless option

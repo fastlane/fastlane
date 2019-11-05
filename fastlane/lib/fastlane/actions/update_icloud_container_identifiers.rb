@@ -56,7 +56,7 @@ module Fastlane
                                        description: "The path to the entitlement file which contains the iCloud container identifiers",
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a path to an entitlements file. ") unless value.include?(".entitlements")
-                                         UI.user_error!("Could not find entitlements file") if !File.exist?(value) and !Helper.test?
+                                         UI.user_error!("Could not find entitlements file") if !File.exist?(value) && !Helper.test?
                                        end),
           FastlaneCore::ConfigItem.new(key: :icloud_container_identifiers,
                                        env_name: "FL_UPDATE_ICLOUD_CONTAINER_IDENTIFIERS_IDENTIFIERS",
@@ -69,7 +69,9 @@ module Fastlane
       end
 
       def self.output
-        ['UPDATE_ICLOUD_CONTAINER_IDENTIFIERS', 'The new iCloud Container Identifiers']
+        [
+          ['UPDATE_ICLOUD_CONTAINER_IDENTIFIERS', 'The new iCloud Container Identifiers']
+        ]
       end
 
       def self.authors

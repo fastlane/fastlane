@@ -1,0 +1,139 @@
+{
+    "data" : [ {
+      "type" : "betaGroups",
+      "id" : "123456789",
+      "attributes" : {
+        "name" : "App Store Connect Users",
+        "createdDate" : "2018-04-15T18:13:40Z",
+        "isInternalGroup" : false,
+        "publicLinkEnabled" : true,
+        "publicLinkId" : "abcd1234",
+        "publicLinkLimitEnabled" : true,
+        "publicLinkLimit" : 10,
+        "publicLink" : "https://testflight.apple.com/join/abcd1234"
+      },
+      "relationships" : {
+        "app" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/123456789/relationships/app",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/123456789/app"
+          }
+        },
+        "builds" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/123456789/relationships/builds",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/123456789/builds"
+          }
+        },
+        "betaTesters" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/123456789/relationships/betaTesters",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/123456789/betaTesters"
+          }
+        },
+        "betaBuildMetrics" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/123456789/relationships/betaBuildMetrics",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/123456789/betaBuildMetrics"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/123456789"
+      }
+    }, {
+      "type" : "betaGroups",
+      "id" : "987654321",
+      "attributes" : {
+        "name" : "Testing Group",
+        "createdDate" : "2018-03-27T10:54:53Z",
+        "isInternalGroup" : false,
+        "publicLinkEnabled" : false,
+        "publicLinkId" : null,
+        "publicLinkLimitEnabled" : false,
+        "publicLinkLimit" : null,
+        "publicLink" : null
+      },
+      "relationships" : {
+        "app" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/987654321/relationships/app",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/987654321/app"
+          }
+        },
+        "builds" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/987654321/relationships/builds",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/987654321/builds"
+          }
+        },
+        "betaTesters" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/987654321/relationships/betaTesters",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/987654321/betaTesters"
+          }
+        },
+        "betaBuildMetrics" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/987654321/relationships/betaBuildMetrics",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/987654321/betaBuildMetrics"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/987654321"
+      }
+    }, {
+      "type" : "betaGroups",
+      "id" : "111222333",
+      "attributes" : {
+        "name" : "Spacey Group",
+        "createdDate" : "2018-04-15T18:13:40Z",
+        "isInternalGroup" : false,
+        "publicLinkEnabled" : true,
+        "publicLinkId" : "abcd1234",
+        "publicLinkLimitEnabled" : true,
+        "publicLinkLimit" : 10,
+        "publicLink" : "https://testflight.apple.com/join/abcd1234"
+      },
+      "relationships" : {
+        "app" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/111222333/relationships/app",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/111222333/app"
+          }
+        },
+        "builds" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/111222333/relationships/builds",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/111222333/builds"
+          }
+        },
+        "betaTesters" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/111222333/relationships/betaTesters",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/111222333/betaTesters"
+          }
+        },
+        "betaBuildMetrics" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/111222333/relationships/betaBuildMetrics",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/111222333/betaBuildMetrics"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups/111222333"
+      }
+    } ],
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/betaGroups?limit=3&filter%5Bapp%5D=1358899889",
+      "next" : "https://appstoreconnect.apple.com/iris/v1/betaGroups?cursor=Aw.LiYF2g&limit=3&filter%5Bapp%5D=1358899889"
+    },
+    "meta" : {
+      "paging" : {
+        "total" : 6,
+        "limit" : 3
+      }
+    }
+  }

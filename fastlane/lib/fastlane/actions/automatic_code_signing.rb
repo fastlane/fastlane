@@ -17,8 +17,17 @@ module Fastlane
         end
 
         target_dictionary = project.targets.map { |f| { name: f.name, uuid: f.uuid, build_configuration_list: f.build_configuration_list } }
+        target_attributes = project.root_object.attributes["TargetAttributes"]
         changed_targets = []
-        project.root_object.attributes["TargetAttributes"].each do |target, sett|
+
+        # make sure TargetAttributes exist for all targets
+        target_dictionary.each do |props|
+          unless target_attributes.key?(props[:uuid])
+            target_attributes[props[:uuid]] = {}
+          end
+        end
+
+        target_attributes.each do |target, sett|
           found_target = target_dictionary.detect { |h| h[:uuid] == target }
           if params[:targets]
             # get target name
@@ -35,10 +44,19 @@ module Fastlane
 
           if params[:team_id]
             sett["DevelopmentTeam"] = params[:team_id]
+            build_configuration_list.set_setting("DEVELOPMENT_TEAM", params[:team_id])
             UI.important("Set Team id to: #{params[:team_id]} for target: #{found_target[:name]}")
           end
           if params[:code_sign_identity]
             build_configuration_list.set_setting("CODE_SIGN_IDENTITY", params[:code_sign_identity])
+
+            # We also need to update the value if it was overridden for a specific SDK
+            build_configuration_list.build_configurations.each do |build_configuration|
+              codesign_build_settings_keys = build_configuration.build_settings.keys.select { |key| key.to_s.match(/CODE_SIGN_IDENTITY.*/) }
+              codesign_build_settings_keys.each do |setting|
+                build_configuration_list.set_setting(setting, params[:code_sign_identity])
+              end
+            end
             UI.important("Set Code Sign identity to: #{params[:code_sign_identity]} for target: #{found_target[:name]}")
           end
           if params[:profile_name]
@@ -99,6 +117,7 @@ module Fastlane
                                        description: "Path to your Xcode project",
                                        code_gen_sensitive: true,
                                        default_value: Dir['*.xcodeproj'].first,
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Path is invalid") unless File.exist?(File.expand_path(value))
                                        end),
@@ -120,7 +139,7 @@ module Fastlane
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :code_sign_identity,
                                        env_name: "FL_CODE_SIGN_IDENTITY",
-                                       description: "Code signing identity type (iPhone Development, iPhone Distribution)",
+                                       description: "Code signing identity type (iPhone Developer, iPhone Distribution)",
                                        optional: true,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :profile_name,
@@ -162,11 +181,11 @@ module Fastlane
             team_id: "XXXX"
           )',
           '# Only specific targets
-            disable_automatic_code_signing(
-              path: "demo-project/demo/demo.xcodeproj",
-              use_automatic_signing: false,
-              targets: ["demo"]
-            )
+          disable_automatic_code_signing(
+            path: "demo-project/demo/demo.xcodeproj",
+            use_automatic_signing: false,
+            targets: ["demo"]
+          )
           ',
           ' # via generic action
           automatic_code_signing(

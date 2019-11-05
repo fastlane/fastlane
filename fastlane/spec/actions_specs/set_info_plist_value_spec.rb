@@ -16,6 +16,10 @@ describe Fastlane do
           set_info_plist_value(path: '#{plist_path}', key: 'CFBundleIdentifier', value: '#{new_value}')
         end").runner.execute(:test)
 
+        Fastlane::FastFile.new.parse("lane :test do
+          set_info_plist_value(path: '#{plist_path}', key: 'CFBundleIdentifier', value: '#{new_value}')
+        end").runner.execute(:test)
+
         value = Fastlane::FastFile.new.parse("lane :test do
           get_info_plist_value(path: '#{plist_path}', key: 'CFBundleIdentifier')
         end").runner.execute(:test)

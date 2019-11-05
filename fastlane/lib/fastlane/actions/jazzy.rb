@@ -16,9 +16,6 @@ module Fastlane
         "Generate docs using Jazzy"
       end
 
-      def self.details
-      end
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(

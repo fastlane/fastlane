@@ -23,7 +23,7 @@ module Spaceship
     def initialize(user = nil, password = nil)
       @client = PortalClient.new
 
-      if user or password
+      if user || password
         @client.login(user, password)
       end
     end
@@ -58,10 +58,13 @@ module Spaceship
     # so that the user can use the environment variable `FASTLANE_TEAM_ID`
     # for future user.
     #
+    # @param team_id (String) (optional): The ID of a Developer Portal team
+    # @param team_name (String) (optional): The name of a Developer Portal team
+    #
     # @return (String) The ID of the select team. You also get the value if
     #   the user is only in one team.
-    def select_team
-      @client.select_team
+    def select_team(team_id: nil, team_name: nil)
+      @client.select_team(team_id: team_id, team_name: team_name)
     end
 
     #####################################################

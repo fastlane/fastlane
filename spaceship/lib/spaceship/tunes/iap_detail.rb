@@ -30,6 +30,10 @@ module Spaceship
       # @return (Bool) Cleared for sale flag
       attr_accessor :cleared_for_sale
 
+      # @return (Hash) app store promotion image (optional)
+      attr_accessor :merch_screenshot
+
+      # @return (Hash) app review screenshot (required)
       attr_accessor :review_screenshot
 
       # @return (String) the notes for the review team
@@ -37,6 +41,10 @@ module Spaceship
 
       # @return (Hash) subscription pricing target
       attr_accessor :subscription_price_target
+
+      # @return (Hash) Relevant only for recurring subscriptions. Holds pricing related data, such
+      # as subscription pricing, intro offers, etc.
+      attr_accessor :raw_pricing_data
 
       attr_mapping({
         'adamId' => :purchase_id,
@@ -47,6 +55,15 @@ module Spaceship
         'freeTrialDurationType.value' => :subscription_free_trial,
         'clearedForSale.value' => :cleared_for_sale
       })
+
+      def setup
+        @raw_pricing_data = @raw_data["pricingData"]
+        @raw_data.delete("pricingData")
+
+        if @raw_pricing_data
+          @raw_data.set(["pricingIntervals"], @raw_pricing_data["subscriptions"])
+        end
+      end
 
       # @return (Hash) Hash of languages
       # @example: {
@@ -91,19 +108,10 @@ module Spaceship
 
       # transforms user-set intervals to iTC ones
       def pricing_intervals=(value = [])
-        new_intervals = []
-        value.each do |current_interval|
-          new_intervals << {
-            "value" =>   {
-              "tierStem" =>  current_interval[:tier],
-              "priceTierEndDate" =>  current_interval[:end_date],
-              "priceTierEffectiveDate" =>  current_interval[:begin_date],
-              "grandfathered" =>  current_interval[:grandfathered],
-              "country" => current_interval[:country]
-            }
-          }
-        end
-        raw_data.set(["pricingIntervals"], new_intervals)
+        raw_pricing_intervals =
+          client.transform_to_raw_pricing_intervals(application.apple_id, self.purchase_id, value)
+        raw_data.set(["pricingIntervals"], raw_pricing_intervals)
+        @raw_pricing_data["subscriptions"] = raw_pricing_intervals if @raw_pricing_data
       end
 
       # @return (Array) pricing intervals
@@ -117,7 +125,7 @@ module Spaceship
       #    }
       #  ]
       def pricing_intervals
-        @pricing_intervals ||= raw_data["pricingIntervals"].map do |interval|
+        @pricing_intervals ||= (raw_data["pricingIntervals"] || @raw_pricing_data["subscriptions"] || []).map do |interval|
           {
             tier: interval["value"]["tierStem"].to_i,
             begin_date: interval["value"]["priceTierEffectiveDate"],
@@ -136,6 +144,12 @@ module Spaceship
       # @return (String) Human Readable status of the purchase
       def status
         Tunes::IAPStatus.get_from_string(raw_data["versions"].first["status"])
+      end
+
+      # @return (Hash) Hash containing existing promotional image data
+      def merch_screenshot
+        return nil unless raw_data && raw_data["versions"] && raw_data["versions"].first && raw_data["versions"].first["merch"] && raw_data["versions"].first["merch"]["images"].first["image"]["value"]
+        raw_data["versions"].first["merch"]["images"].first["image"]["value"]
       end
 
       # @return (Hash) Hash containing existing review screenshot data
@@ -161,37 +175,19 @@ module Spaceship
         raw_data.set(["versions"], [{ reviewNotes: { value: @review_notes }, contentHosting: raw_data['versions'].first['contentHosting'], "details" => { "value" => versions_array }, id: raw_data["versions"].first["id"], reviewScreenshot: { "value" => review_screenshot } }])
 
         # transform pricingDetails
-        intervals_array = []
-        pricing_intervals.each do |interval|
-          intervals_array << {
-            "value" =>  {
-              "tierStem" =>  interval[:tier],
-              "priceTierEffectiveDate" =>  interval[:begin_date],
-              "priceTierEndDate" =>  interval[:end_date],
-              "country" =>  interval[:country] || "WW",
-              "grandfathered" =>  interval[:grandfathered]
-            }
-          }
+        raw_pricing_intervals =
+          client.transform_to_raw_pricing_intervals(application.apple_id,
+                                                    self.purchase_id, pricing_intervals,
+                                                    subscription_price_target)
+        raw_data.set(["pricingIntervals"], raw_pricing_intervals)
+        @raw_pricing_data["subscriptions"] = raw_pricing_intervals if @raw_pricing_data
+
+        if @merch_screenshot
+          # Upload App Store Promotional image (Optional)
+          upload_file = UploadFile.from_path(@merch_screenshot)
+          merch_data = client.upload_purchase_merch_screenshot(application.apple_id, upload_file)
+          raw_data["versions"][0]["merch"] = merch_data
         end
-
-        if subscription_price_target
-          intervals_array = []
-          pricing_calculator = client.iap_subscription_pricing_target(app_id: application.apple_id, purchase_id: purchase_id, currency: subscription_price_target[:currency], tier: subscription_price_target[:tier])
-          pricing_calculator.each do |language_code, value|
-            intervals_array << {
-              value: {
-                tierStem: value["tierStem"],
-                priceTierEffectiveDate: value["priceTierEffectiveDate"],
-                priceTierEndDate: value["priceTierEndDate"],
-                country: language_code,
-                grandfathered: { value: "FUTURE_NONE" }
-              }
-            }
-          end
-
-        end
-
-        raw_data.set(["pricingIntervals"], intervals_array)
 
         if @review_screenshot
           # Upload Screenshot
@@ -201,6 +197,12 @@ module Spaceship
         end
         # Update the Purchase
         client.update_iap!(app_id: application.apple_id, purchase_id: self.purchase_id, data: raw_data)
+
+        # Update pricing for a recurring subscription.
+        if raw_data["addOnType"] == Spaceship::Tunes::IAPType::RECURRING
+          client.update_recurring_iap_pricing!(app_id: application.apple_id, purchase_id: self.purchase_id,
+                                               pricing_intervals: raw_data["pricingIntervals"])
+        end
       end
 
       # Deletes In-App-Purchase

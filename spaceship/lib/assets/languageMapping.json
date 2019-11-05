@@ -1,5 +1,17 @@
 [
     {
+        "locale": "ar-SA",
+        "name": "Arabic",
+        "game-center": false,
+        "itc_locale": "ar-SA"        
+    },
+    {
+        "locale": "ca-ES",
+        "name": "Catalan",
+        "game-center": false,
+        "itc_locale": "ca"        
+    },
+    {
         "locale": "cmn-Hans",
         "name": "Simplified Chinese",
         "game-center": true,
@@ -10,6 +22,12 @@
         "name": "Traditional Chinese",
         "game-center": true,
         "itc_locale": "zh-Hant"
+    },
+    {
+        "locale": "cs-CZ",
+        "name": "Czech",
+        "game-center": false,
+        "itc_locale": "cs"        
     },
     {
         "locale": "da-DK",
@@ -108,6 +126,30 @@
         "itc_locale": "el"
     },
     {
+        "locale": "he",
+        "name": "Hebrew",
+        "game-center": false,
+        "itc_locale": "he"        
+    },
+    {
+        "locale": "hi-IN",
+        "name": "Hindi",
+        "game-center": false,
+        "itc_locale": "hi"        
+    },
+    {
+        "locale": "hr-HR",
+        "name": "Croatian",
+        "game-center": false,
+        "itc_locale": "hr"        
+    },
+    {
+        "locale": "hu-HU",
+        "name": "Hungarian",
+        "game-center": false,
+        "itc_locale": "hu"        
+    },
+    {
         "locale": "id-ID",
         "name": "Indonesian",
         "game-center": true,
@@ -162,6 +204,12 @@
         "itc_locale": "no"
     },
     {
+        "locale": "pl-PL",
+        "name": "Polish",
+        "game-center": false,
+        "itc_locale": "pl"        
+    },
+    {
         "locale": "pt-BR",
         "name": "Brazilian Portuguese",
         "game-center": true
@@ -173,6 +221,12 @@
         "alternatives": [
             "pt"
         ]
+    },
+    {
+        "locale": "ro-RO",
+        "name": "Romanian",
+        "game-center": false,
+        "itc_locale": "ro"        
     },
     {
         "locale": "ru-RU",
@@ -202,6 +256,12 @@
         ]
     },
     {
+        "locale": "sk-SK",
+        "name": "Slovak",
+        "game-center": false,
+        "itc_locale": "sk"        
+    },
+    {
         "locale": "sv-SE",
         "name": "Swedish",
         "game-center": true,
@@ -227,6 +287,12 @@
             "tr"
         ],
         "itc_locale": "tr"
+    },
+    {
+        "locale": "uk-UA",
+        "name": "Ukrainian",
+        "game-center": false,
+        "itc_locale": "uk"        
     },
     {
         "locale": "vi-VI",

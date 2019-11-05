@@ -19,16 +19,14 @@ module Fastlane
       end
 
       def self.details
-        [
-          "Fetches device list via adb, e.g. run an adb command on all connected devices."
-        ].join("\n")
+        "Fetches device list via adb, e.g. run an adb command on all connected devices."
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :adb_path,
                                        env_name: "FL_ADB_PATH",
-                                       description: "The path to your `adb` binary",
+                                       description: "The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT environment variable is set)",
                                        is_string: true,
                                        optional: true,
                                        default_value: "adb")

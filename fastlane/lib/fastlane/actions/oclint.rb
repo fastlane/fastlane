@@ -8,7 +8,7 @@ module Fastlane
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         oclint_path = params[:oclint_path]
-        if `which #{oclint_path}`.to_s.empty? and !Helper.test?
+        if `which #{oclint_path}`.to_s.empty? && !Helper.test?
           UI.user_error!("You have to install oclint or provide path to oclint binary. Fore more details: ") + "http://docs.oclint.org/en/stable/intro/installation.html".yellow
         end
 
@@ -80,6 +80,8 @@ module Fastlane
         oclint_args << "-enable-global-analysis" if params[:enable_global_analysis]
         oclint_args << "-allow-duplicated-violations" if params[:allow_duplicated_violations]
         oclint_args << "-p #{compile_commands_dir.shellescape}"
+
+        oclint_args << "-extra-arg=#{params[:extra_arg]}" if params[:extra_arg]
 
         command = [
           command_prefix,
@@ -204,7 +206,11 @@ module Fastlane
                                        env_name: "FL_OCLINT_ALLOW_DUPLICATED_VIOLATIONS",
                                        description: "Allow duplicated violations in the OCLint report",
                                        is_string: false,
-                                       default_value: false)
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :extra_arg,
+                                       env_name: 'FL_OCLINT_EXTRA_ARG',
+                                       description: 'Additional argument to append to the compiler command line',
+                                       optional: true)
         ]
       end
       # rubocop:enable Metrics/PerceivedComplexity
@@ -224,7 +230,7 @@ module Fastlane
       end
 
       def self.details
-        "Run the static analyzer tool [OCLint](http://oclint.org) for your project. You need to have a `compile_commands.json` file in your _fastlane_ directory or pass a path to your file"
+        "Run the static analyzer tool [OCLint](http://oclint.org) for your project. You need to have a `compile_commands.json` file in your _fastlane_ directory or pass a path to your file."
       end
 
       def self.example_code
@@ -249,7 +255,8 @@ module Fastlane
             list_enabled_rules: true,             # List enabled rules
             enable_clang_static_analyzer: true,   # Enable Clang Static Analyzer, and integrate results into OCLint report
             enable_global_analysis: true,         # Compile every source, and analyze across global contexts (depends on number of source files, could results in high memory load)
-            allow_duplicated_violations: true     # Allow duplicated violations in the OCLint report
+            allow_duplicated_violations: true,    # Allow duplicated violations in the OCLint report
+            extra_arg: "-Wno-everything"          # Additional argument to append to the compiler command line
           )'
         ]
       end

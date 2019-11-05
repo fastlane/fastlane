@@ -1,5 +1,4 @@
 require "securerandom"
-
 require_relative '../client'
 require_relative '../du/du_client'
 require_relative '../du/upload_file'
@@ -11,7 +10,6 @@ require_relative 'iap_subscription_pricing_tier'
 require_relative 'pricing_tier'
 require_relative 'territory'
 require_relative 'user_detail'
-
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -36,8 +34,12 @@ module Spaceship
             'iphone6' => [1334, 750],
             'iphone6Plus' => [2208, 1242],
             'iphone58' => [2436, 1125],
+            'iphone65' => [2688, 1242],
             'ipad' => [1024, 768],
-            'ipadPro' => [2732, 2048]
+            'ipad105' => [2224, 1668],
+            'ipadPro' => [2732, 2048],
+            'ipadPro11' => [2388, 1668],
+            'ipadPro129' => [2732, 2048]
         }
 
         r = resolutions[device]
@@ -51,20 +53,23 @@ module Spaceship
     #####################################################
 
     def self.hostname
-      "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/"
+      "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/"
     end
 
     # Shows a team selection for the user in the terminal. This should not be
     # called on CI systems
-    def select_team
-      t_id = (ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
-      t_name = (ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
+    #
+    # @param team_id (String) (optional): The ID of an App Store Connect team
+    # @param team_name (String) (optional): The name of an App Store Connect team
+    def select_team(team_id: nil, team_name: nil)
+      t_id = (team_id || ENV['FASTLANE_ITC_TEAM_ID'] || '').strip
+      t_name = (team_name || ENV['FASTLANE_ITC_TEAM_NAME'] || '').strip
 
       if t_name.length > 0 && t_id.length.zero? # we prefer IDs over names, they are unique
-        puts("Looking for iTunes Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
+        puts("Looking for App Store Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
 
         teams.each do |t|
-          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name.downcase).zero?
+          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name).zero?
         end
 
         puts("Could not find team with name '#{t_name}', trying to fallback to default team") if t_id.length.zero?
@@ -73,18 +78,18 @@ module Spaceship
       t_id = teams.first['contentProvider']['contentProviderId'].to_s if teams.count == 1
 
       if t_id.length > 0
-        puts("Looking for iTunes Connect Team with ID #{t_id}") if Spaceship::Globals.verbose?
+        puts("Looking for App Store Connect Team with ID #{t_id}") if Spaceship::Globals.verbose?
 
         # actually set the team id here
         self.team_id = t_id
-        return
+        return self.team_id
       end
 
       # user didn't specify a team... #thisiswhywecanthavenicethings
       loop do
-        puts("Multiple #{'iTunes Connect teams'.yellow} found, please enter the number of the team you want to use: ")
+        puts("Multiple #{'App Store Connect teams'.yellow} found, please enter the number of the team you want to use: ")
         if ENV["FASTLANE_HIDE_TEAM_INFORMATION"].to_s.length == 0
-          puts("Note: to automatically choose the team, provide either the iTunes Connect Team ID, or the Team Name in your fastlane/Appfile:")
+          puts("Note: to automatically choose the team, provide either the App Store Connect Team ID, or the Team Name in your fastlane/Appfile:")
           puts("Alternatively you can pass the team name or team ID using the `FASTLANE_ITC_TEAM_ID` or `FASTLANE_ITC_TEAM_NAME` environment variable")
           first_team = teams.first["contentProvider"]
           puts("")
@@ -102,9 +107,9 @@ module Spaceship
         end
 
         unless Spaceship::Client::UserInterface.interactive?
-          puts("Multiple teams found on iTunes Connect, Your Terminal is running in non-interactive mode! Cannot continue from here.")
+          puts("Multiple teams found on App Store Connect, Your Terminal is running in non-interactive mode! Cannot continue from here.")
           puts("Please check that you set FASTLANE_ITC_TEAM_ID or FASTLANE_ITC_TEAM_NAME to the right value.")
-          raise "Multiple iTunes Connect Teams found; unable to choose, terminal not ineractive!"
+          raise "Multiple App Store Connect Teams found; unable to choose, terminal not interactive!"
         end
 
         selected = ($stdin.gets || '').strip.to_i - 1
@@ -112,7 +117,7 @@ module Spaceship
 
         if team_to_use
           self.team_id = team_to_use['contentProvider']['contentProviderId'].to_s # actually set the team id here
-          break
+          return self.team_id
         end
       end
     end
@@ -158,14 +163,13 @@ module Spaceship
       return unless raw.kind_of?(Hash)
 
       data = raw['data'] || raw # sometimes it's with data, sometimes it isn't
-      error_keys_to_check = [
-        "sectionErrorKeys",
-        "sectionInfoKeys",
-        "sectionWarningKeys",
-        "validationErrors"
-      ]
-      errors_in_data = fetch_errors_in_data(data_section: data, keys: error_keys_to_check)
-      errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_keys_to_check)
+
+      error_keys = ["sectionErrorKeys", "validationErrors", "serviceErrors"]
+      info_keys = ["sectionInfoKeys", "sectionWarningKeys"]
+      error_and_info_keys_to_check = error_keys + info_keys
+
+      errors_in_data = fetch_errors_in_data(data_section: data, keys: error_and_info_keys_to_check)
+      errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_and_info_keys_to_check)
 
       # If we have any errors or "info" we need to treat them as warnings or errors
       if errors_in_data.count == 0 && errors_in_version_info.count == 0
@@ -182,7 +186,7 @@ module Spaceship
           hash.each do |key, value|
             errors += handle_response_hash.call(value, current_language)
 
-            next unless key == 'errorKeys' and value.kind_of?(Array) and value.count > 0
+            next unless key == 'errorKeys' && value.kind_of?(Array) && value.count > 0
             # Prepend the error with the language so it's easier to understand for the user
             errors += value.collect do |current_error_message|
               current_language ? "[#{current_language}]: #{current_error_message}" : current_error_message
@@ -200,7 +204,6 @@ module Spaceship
       errors = handle_response_hash.call(data)
 
       # Search at data level, as well as "versionInfo" level for errors
-      error_keys = ["sectionErrorKeys", "validationErrors"]
       errors_in_data = fetch_errors_in_data(data_section: data, keys: error_keys)
       errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_keys)
 
@@ -215,12 +218,12 @@ module Spaceship
 
       if errors.count > 0 # they are separated by `.` by default
         # Sample `error` content: [["Forbidden"]]
-        if errors.count == 1 and errors.first == "You haven't made any changes."
+        if errors.count == 1 && errors.first == "You haven't made any changes."
           # This is a special error which we really don't care about
-        elsif errors.count == 1 and errors.first.include?("try again later")
+        elsif errors.count == 1 && errors.first.include?("try again later")
           raise ITunesConnectTemporaryError.new, errors.first
-        elsif errors.count == 1 and errors.first.include?("Forbidden")
-          raise_insuffient_permission_error!
+        elsif errors.count == 1 && errors.first.include?("Forbidden")
+          raise_insufficient_permission_error!
         elsif flaky_api_call
           raise ITunesConnectPotentialServerError.new, errors.join(' ')
         else
@@ -229,7 +232,6 @@ module Spaceship
       end
 
       # Search at data level, as well as "versionInfo" level for info and warnings
-      info_keys = ["sectionInfoKeys", "sectionWarningKeys"]
       info_in_data = fetch_errors_in_data(data_section: data, keys: info_keys)
       info_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: info_keys)
 
@@ -259,6 +261,11 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    def bundle_details(app_id)
+      r = request(:get, "ra/appbundles/metadetail/#{app_id}")
+      parse_response(r, 'data')
+    end
+
     def update_app_details!(app_id, data)
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/details")
@@ -269,7 +276,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    # Creates a new application on iTunes Connect
+    # Creates a new application on App Store Connect
     # @param name (String): The name of your app as it will appear on the App Store.
     #   This can't be longer than 255 characters.
     # @param primary_language (String): If localized app information isn't available in an
@@ -333,9 +340,41 @@ module Spaceship
       handle_itc_response(data)
     end
 
+    def get_available_bundle_ids(platform: nil)
+      platform ||= "ios"
+      r = request(:get, "ra/apps/create/v2/?platformString=#{platform}")
+      data = parse_response(r, 'data')
+      return data['bundleIds'].keys
+    end
+
     def get_resolution_center(app_id, platform)
       r = request(:get, "ra/apps/#{app_id}/platforms/#{platform}/resolutionCenter?v=latest")
       parse_response(r, 'data')
+    end
+
+    def post_resolution_center(app_id, platform, thread_id, version_id, version_number, from, message_body)
+      r = request(:post) do |req|
+        req.url("ra/apps/#{app_id}/platforms/#{platform}/resolutionCenter")
+        req.body = {
+          appNotes: {
+            threads: [{
+              id: thread_id,
+              versionId: version_id,
+              version: version_number,
+              messages: [{
+                from: from,
+                date: DateTime.now.strftime('%Q'),
+                body: message_body,
+                tokens: []
+              }]
+            }]
+          }
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
     end
 
     def get_ratings(app_id, platform, version_id = '', storefront = '')
@@ -349,10 +388,13 @@ module Spaceship
       parse_response(r, 'data')
     end
 
-    def get_reviews(app_id, platform, storefront, version_id)
+    def get_reviews(app_id, platform, storefront, version_id, upto_date = nil)
       index = 0
       per_page = 100 # apple default
       all_reviews = []
+
+      upto_date = Time.parse(upto_date) unless upto_date.nil?
+
       loop do
         rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews?"
         rating_url << "sort=REVIEW_SORT_ORDER_MOST_RECENT"
@@ -362,12 +404,24 @@ module Spaceship
 
         r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
+
+        # The following lines throw errors when there are no reviews so exit out of the loop before them if the app has no reviews
+        break if all_reviews.count == 0
+
+        last_review_date = Time.at(all_reviews[-1]['value']['lastModified'] / 1000)
+
+        if upto_date && last_review_date < upto_date
+          all_reviews = all_reviews.select { |review| Time.at(review['value']['lastModified'] / 1000) > upto_date }
+          break
+        end
+
         if all_reviews.count < parse_response(r, 'data')['reviewCount']
           index += per_page
         else
           break
         end
       end
+
       all_reviews
     end
 
@@ -510,12 +564,41 @@ module Spaceship
     end
 
     #####################################################
+    # @!group AppAnalytics
+    #####################################################
+
+    def time_series_analytics(app_ids, measures, start_time, end_time, frequency, view_by)
+      data = {
+        adamId: app_ids,
+        dimensionFilters: [],
+        endTime: end_time,
+        frequency: frequency,
+        group: group_for_view_by(view_by, measures),
+        measures: measures,
+        startTime: start_time
+      }
+
+      r = request(:post) do |req|
+        req.url("https://analytics.itunes.apple.com/analytics/api/v1/data/time-series")
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-By'] = 'analytics.itunes.apple.com'
+      end
+
+      data = parse_response(r)
+    end
+
+    #####################################################
     # @!group Pricing
     #####################################################
 
     def update_price_tier!(app_id, price_tier)
       r = request(:get, "ra/apps/#{app_id}/pricing/intervals")
       data = parse_response(r, 'data')
+
+      # preOrder isn't needed for for the request and has some
+      # values that can cause a failure (invalid dates) so we are removing it
+      data.delete('preOrder')
 
       first_price = (data["pricingIntervalsFieldTO"]["value"] || []).count == 0 # first price
       data["pricingIntervalsFieldTO"]["value"] ||= []
@@ -542,6 +625,51 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
+    end
+
+    def transform_to_raw_pricing_intervals(app_id = nil, purchase_id = nil, pricing_intervals = nil, subscription_price_target = nil)
+      intervals_array = []
+      if pricing_intervals
+        intervals_array = pricing_intervals.map do |interval|
+          {
+            "value" =>  {
+              "tierStem" =>  interval[:tier],
+              "priceTierEffectiveDate" =>  interval[:begin_date],
+              "priceTierEndDate" =>  interval[:end_date],
+              "country" =>  interval[:country] || "WW",
+              "grandfathered" =>  interval[:grandfathered]
+            }
+          }
+        end
+      end
+
+      if subscription_price_target
+        pricing_calculator = iap_subscription_pricing_target(app_id: app_id, purchase_id: purchase_id, currency: subscription_price_target[:currency], tier: subscription_price_target[:tier])
+        intervals_array = pricing_calculator.map do |language_code, value|
+          existing_interval =
+            if pricing_intervals
+              pricing_intervals.find { |interval| interval[:country] == language_code }
+            end
+          grandfathered =
+            if existing_interval
+              existing_interval[:grandfathered].clone
+            else
+              { "value" => "FUTURE_NONE" }
+            end
+
+          {
+            "value" => {
+              "tierStem" => value["tierStem"],
+              "priceTierEffectiveDate" => value["priceTierEffectiveDate"],
+              "priceTierEndDate" => value["priceTierEndDate"],
+              "country" => language_code,
+              "grandfathered" => grandfathered
+            }
+          }
+        end
+      end
+
+      intervals_array
     end
 
     def price_tier(app_id)
@@ -602,6 +730,20 @@ module Spaceship
       data["countries"] = availability.territories.map { |territory| { 'code' => territory.code } }
       data["theWorld"] = availability.include_future_territories.nil? ? true : availability.include_future_territories
 
+      # InitializespreOrder (if needed)
+      data["preOrder"] ||= {}
+
+      # Sets app_available_date to nil if cleared_for_preorder if false
+      # This is need for apps that have never set either of these before
+      # API will error out if cleared_for_preorder is false and app_available_date has a date
+      cleared_for_preorder = availability.cleared_for_preorder
+      app_available_date = cleared_for_preorder ? availability.app_available_date : nil
+      data["b2bAppEnabled"] = availability.b2b_app_enabled
+      data["educationalDiscount"] = availability.educational_discount
+      data["preOrder"]["clearedForPreOrder"] = { "value" => cleared_for_preorder, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
+      data["preOrder"]["appAvailableDate"] = { "value" => app_available_date, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
+      data["b2bUsers"] = availability.b2b_app_enabled ? availability.b2b_users.map { |user| { "value" => { "add" => user.add, "delete" => user.delete, "dsUsername" => user.ds_username } } } : []
+      data["b2bOrganizations"] = availability.b2b_app_enabled ? availability.b2b_organizations.map { |org| { "value" => { "type" => org.type, "depCustomerId" => org.dep_customer_id, "organizationId" => org.dep_organization_id, "name" => org.name } } } : []
       # send the changes back to Apple
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/pricing/intervals")
@@ -672,6 +814,35 @@ module Spaceship
       raise "upload_image is required" unless upload_image
 
       du_client.upload_watch_icon(app_version, upload_image, content_provider_id, sso_token_for_image)
+    end
+
+    # Uploads an In-App-Purchase Promotional image
+    # @param upload_image (UploadFile): The icon to upload
+    # @return [JSON] the image data, ready to be added to an In-App-Purchase
+    def upload_purchase_merch_screenshot(app_id, upload_image)
+      data = du_client.upload_purchase_merch_screenshot(app_id, upload_image, content_provider_id, sso_token_for_image)
+      {
+        "images" => [
+          {
+            "id" => nil,
+            "image" => {
+              "value" => {
+                "assetToken" => data["token"],
+                "originalFileName" => upload_image.file_name,
+                "height" => data["height"],
+                "width" => data["width"],
+                "checksum" => data["md5"]
+              },
+              "isEditable" => true,
+              "isREquired" => false,
+              "errorKeys" => nil
+            },
+            "status" => "proposed"
+          }
+        ],
+        "showByDefault" => true,
+        "isActive" => false
+      }
     end
 
     # Uploads an In-App-Purchase Review screenshot
@@ -756,6 +927,21 @@ module Spaceship
       du_client.upload_trailer_preview(app_version, upload_trailer_preview, content_provider_id, sso_token_for_image, device)
     end
 
+    #####################################################
+    # @!review attachment file
+    #####################################################
+    # Uploads a attachment file
+    # @param app_version (AppVersion): The version of your app(must be edit version)
+    # @param upload_attachment_file (file): File to upload
+    # @return [JSON] the response
+    def upload_app_review_attachment(app_version, upload_attachment_file)
+      raise "app_version is required" unless app_version
+      raise "app_version must be live version" if app_version.is_live?
+      raise "upload_attachment_file is required" unless upload_attachment_file
+
+      du_client.upload_app_review_attachment(app_version, upload_attachment_file, content_provider_id, sso_token_for_image)
+    end
+
     # Fetches the App Version Reference information from ITC
     # @return [AppVersionRef] the response
     def ref_data
@@ -805,13 +991,13 @@ module Spaceship
       if retry_error_messages.any? { |message| ex.to_s.include?(message) }
         tries -= 1
         if tries > 0
-          logger.warn("Received temporary server error from iTunes Connect. Retrying the request...")
+          logger.warn("Received temporary server error from App Store Connect. Retrying the request...")
           sleep(3) unless Object.const_defined?("SpecHelper")
           retry
         end
       end
 
-      raise Spaceship::Client::UnexpectedResponse, "Temporary iTunes Connect error: #{ex}"
+      raise Spaceship::Client::UnexpectedResponse, "Temporary App Store Connect error: #{ex}"
     end
     # rubocop:enable Metrics/BlockNesting
 
@@ -999,12 +1185,15 @@ module Spaceship
 
       handle_itc_response(r.body)
 
-      # iTunes Connect still returns a success status code even the submission
-      # was failed because of Ad ID info.  This checks for any section error
-      # keys in returned adIdInfo and prints them out.
+      # App Store Connect still returns a success status code even the submission
+      # was failed because of Ad ID Info / Export Compliance. This checks for any section error
+      # keys in returned adIdInfo / exportCompliance and prints them out.
       ad_id_error_keys = r.body.fetch('data').fetch('adIdInfo').fetch('sectionErrorKeys')
+      export_error_keys = r.body.fetch('data').fetch('exportCompliance').fetch('sectionErrorKeys')
       if ad_id_error_keys.any?
         raise "Something wrong with your Ad ID information: #{ad_id_error_keys}."
+      elsif export_error_keys.any?
+        raise "Something wrong with your Export Compliance: #{export_error_keys}"
       elsif r.body.fetch('messages').fetch('info').last == "Successful POST"
         # success
       else
@@ -1024,6 +1213,24 @@ module Spaceship
 
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/versions/#{version}/releaseToStore")
+        req.headers['Content-Type'] = 'application/json'
+        req.body = app_id.to_s
+      end
+
+      handle_itc_response(r.body)
+      parse_response(r, 'data')
+    end
+
+    #####################################################
+    # @!group release to all users
+    #####################################################
+
+    def release_to_all_users!(app_id, version)
+      raise "app_id is required" unless app_id
+      raise "version is required" unless version
+
+      r = request(:post) do |req|
+        req.url("ra/apps/#{app_id}/versions/#{version}/phasedRelease/state/COMPLETE")
         req.headers['Content-Type'] = 'application/json'
         req.body = app_id.to_s
       end
@@ -1058,6 +1265,12 @@ module Spaceship
     def load_iap(app_id: nil, purchase_id: nil)
       r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}")
       parse_response(r, 'data')
+    end
+
+    # Submit the In-App-Purchase for review
+    def submit_iap!(app_id: nil, purchase_id: nil)
+      r = request(:post, "ra/apps/#{app_id}/iaps/#{purchase_id}/submission")
+      handle_itc_response(r)
     end
 
     # Loads the full In-App-Purchases-Family
@@ -1103,6 +1316,24 @@ module Spaceship
       end
     end
 
+    def update_recurring_iap_pricing!(app_id: nil, purchase_id: nil, pricing_intervals: nil)
+      with_tunes_retry do
+        r = request(:post) do |req|
+          pricing_data = {}
+          req.url("ra/apps/#{app_id}/iaps/#{purchase_id}/pricing/subscriptions")
+          pricing_data["subscriptions"] = pricing_intervals
+          req.body = pricing_data.to_json
+          req.headers['Content-Type'] = 'application/json'
+        end
+        handle_itc_response(r.body)
+      end
+    end
+
+    def load_recurring_iap_pricing(app_id: nil, purchase_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/#{purchase_id}/pricing")
+      parse_response(r, 'data')
+    end
+
     def create_iap_family(app_id: nil, name: nil, product_id: nil, reference_name: nil, versions: [])
       r = request(:get, "ra/apps/#{app_id}/iaps/family/template")
       data = parse_response(r, 'data')
@@ -1127,7 +1358,7 @@ module Spaceship
     end
 
     # Creates an In-App-Purchases
-    def create_iap!(app_id: nil, type: nil, versions: nil, reference_name: nil, product_id: nil, cleared_for_sale: true, review_notes: nil, review_screenshot: nil, pricing_intervals: nil, family_id: nil, subscription_duration: nil, subscription_free_trial: nil)
+    def create_iap!(app_id: nil, type: nil, versions: nil, reference_name: nil, product_id: nil, cleared_for_sale: true, merch_screenshot: nil, review_notes: nil, review_screenshot: nil, pricing_intervals: nil, family_id: nil, subscription_duration: nil, subscription_free_trial: nil)
       # Load IAP Template based on Type
       type ||= "consumable"
       r = request(:get, "ra/apps/#{app_id}/iaps/#{type}/template")
@@ -1170,6 +1401,13 @@ module Spaceship
       end
       data["versions"][0]["details"]["value"] = versions_array
       data['versions'][0]["reviewNotes"] = { value: review_notes }
+
+      if merch_screenshot
+        # Upload App Store Promotional image (Optional)
+        upload_file = UploadFile.from_path(merch_screenshot)
+        merch_data = upload_purchase_merch_screenshot(app_id, upload_file)
+        data["versions"][0]["merch"] = merch_data
+      end
 
       if review_screenshot
         # Upload Screenshot:
@@ -1303,20 +1541,22 @@ module Spaceship
     def with_tunes_retry(tries = 5, potential_server_error_tries = 3, &_block)
       return yield
     rescue Spaceship::TunesClient::ITunesConnectTemporaryError => ex
+      seconds_to_sleep = 60
       unless (tries -= 1).zero?
-        msg = "iTunes Connect temporary error received: '#{ex.message}'. Retrying after 60 seconds (remaining: #{tries})..."
+        msg = "App Store Connect temporary error received: '#{ex.message}'. Retrying after #{seconds_to_sleep} seconds (remaining: #{tries})..."
         puts(msg)
         logger.warn(msg)
-        sleep(60) unless Object.const_defined?("SpecHelper")
+        sleep(seconds_to_sleep) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
     rescue Spaceship::TunesClient::ITunesConnectPotentialServerError => ex
+      seconds_to_sleep = 10
       unless (potential_server_error_tries -= 1).zero?
-        msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{tries})..."
+        msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{potential_server_error_tries})..."
         puts(msg)
         logger.warn(msg)
-        sleep(10) unless Object.const_defined?("SpecHelper")
+        sleep(seconds_to_sleep) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex
@@ -1341,6 +1581,21 @@ module Spaceship
     # the ssoTokenForVideo found in the AppVersionRef instance
     def sso_token_for_video
       @sso_token_for_video ||= ref_data.sso_token_for_video
+    end
+
+    # generates group hash used in the analytics time_series API.
+    # Using rank=DESCENDING and limit=3 as this is what the App Store Connect analytics dashboard uses.
+    def group_for_view_by(view_by, measures)
+      if view_by.nil? || measures.nil?
+        return nil
+      else
+        return {
+          metric: measures.first,
+          dimension: view_by,
+          rank: "DESCENDING",
+          limit: 3
+        }
+      end
     end
 
     def update_tester_from_app!(tester, app_id, testing)

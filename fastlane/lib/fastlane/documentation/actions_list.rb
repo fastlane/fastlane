@@ -21,7 +21,7 @@ module Fastlane
         end
 
         if action < Action
-          current << action.description if action.description
+          current << action.description.to_s.remove_markdown if action.description
 
           authors = Array(action.author || action.authors)
           current << authors.first.green if authors.count == 1
@@ -64,7 +64,7 @@ module Fastlane
         if Fastlane::Actions.is_deprecated?(action)
           puts("==========================================".deprecated)
           puts("This action (#{filter}) is deprecated".deprecated)
-          puts(action.deprecated_notes.to_s.deprecated) if action.deprecated_notes
+          puts(action.deprecated_notes.to_s.remove_markdown.deprecated) if action.deprecated_notes
           puts("==========================================\n".deprecated)
         end
 
@@ -107,12 +107,18 @@ module Fastlane
       rows = []
 
       if action.description
-        rows << [action.description]
+        description = action.description.to_s.remove_markdown
+        rows << [description]
         rows << [' ']
       end
 
       if action.details
-        rows << [action.details]
+        details = action.details.to_s.remove_markdown
+        details.split("\n").each do |detail|
+          row = detail.empty? ? ' ' : detail
+          rows << [row]
+        end
+
         rows << [' ']
       end
 
@@ -135,6 +141,7 @@ module Fastlane
       else
         puts("No available options".yellow)
       end
+      puts("* = default value is dependent on the user's system")
       puts("")
     end
 
@@ -190,7 +197,7 @@ module Fastlane
       if options.kind_of?(Array)
         options.each do |current|
           if current.kind_of?(FastlaneCore::ConfigItem)
-            rows << [current.key.to_s.yellow, current.description, current.env_name, current.default_value]
+            rows << [current.key.to_s.yellow, current.deprecated ? current.description.red : current.description, current.env_name, current.help_default_value]
           elsif current.kind_of?(Array)
             # Legacy actions that don't use the new config manager
             UI.user_error!("Invalid number of elements in this row: #{current}. Must be 2 or 3") unless [2, 3].include?(current.count)

@@ -42,6 +42,8 @@ module Spaceship
         'status' => :status
       )
 
+      alias app_id website_id # must be after attr_mapping
+
       class << self
         # @param mac [Bool] Fetches Mac website push if true
         # @return (Array) Returns all website push available for this account

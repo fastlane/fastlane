@@ -9,7 +9,8 @@ module Fastlane
         :issuer,
         :json_key,
         :json_key_data,
-        :root_url
+        :root_url,
+        :timeout
       ]
 
       def self.run(params)
@@ -31,7 +32,7 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://docs.fastlane.tools/actions/supply/"
+        "More information: [https://docs.fastlane.tools/actions/supply/](https://docs.fastlane.tools/actions/supply/)"
       end
 
       def self.available_options

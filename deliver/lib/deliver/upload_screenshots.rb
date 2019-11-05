@@ -5,7 +5,7 @@ require_relative 'module'
 require_relative 'loader'
 
 module Deliver
-  # upload screenshots to iTunes Connect
+  # upload screenshots to App Store Connect
   class UploadScreenshots
     def upload(options, screenshots)
       return if options[:skip_screenshots]
@@ -42,7 +42,7 @@ module Deliver
         Helper.show_loading_indicator("Activating #{lng_text} #{enabled_languages.join(', ')}...")
         v.save!
         # This refreshes the app version from iTC after enabling a localization
-        v = app.edit_version
+        v = app.edit_version(platform: options[:platform])
         Helper.hide_loading_indicator
       end
 
@@ -55,7 +55,7 @@ module Deliver
 
           index = indized[screenshot.language][screenshot.formatted_name]
 
-          if index > 5
+          if index > 10
             UI.error("Too many screenshots found for device '#{screenshot.formatted_name}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
             next
           end
@@ -75,7 +75,7 @@ module Deliver
         v = app.edit_version
         Helper.hide_loading_indicator
       end
-      UI.success("Successfully uploaded screenshots to iTunes Connect")
+      UI.success("Successfully uploaded screenshots to App Store Connect")
     end
 
     def collect_screenshots(options)
@@ -87,7 +87,7 @@ module Deliver
       screenshots = []
       extensions = '{png,jpg,jpeg}'
 
-      available_languages = Spaceship::Tunes.client.available_languages.each_with_object({}) do |lang, lang_hash|
+      available_languages = UploadScreenshots.available_languages.each_with_object({}) do |lang, lang_hash|
         lang_hash[lang.downcase] = lang
       end
 
@@ -103,9 +103,9 @@ module Deliver
         files = Dir.glob(File.join(lng_folder, "*.#{extensions}"), File::FNM_CASEFOLD).sort
         next if files.count == 0
 
-        prefer_framed = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}"), File::FNM_CASEFOLD).count > 0
+        framed_screenshots_found = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}"), File::FNM_CASEFOLD).count > 0
 
-        UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃") if prefer_framed
+        UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃") if framed_screenshots_found
 
         language_dir_name = File.basename(lng_folder)
 
@@ -119,7 +119,7 @@ module Deliver
           is_framed = file_path.downcase.include?("_framed.")
           is_watch = file_path.downcase.include?("watch")
 
-          if prefer_framed && !is_framed && !is_watch
+          if framed_screenshots_found && !is_framed && !is_watch
             UI.important("🏃 Skipping screenshot file: #{file_path}")
             next
           end
@@ -128,7 +128,31 @@ module Deliver
         end
       end
 
+      # Checking if the device type exists in spaceship
+      # Ex: iPhone 6.1 inch isn't supported in App Store Connect but need
+      # to have it in there for frameit support
+      unaccepted_device_shown = false
+      screenshots.select! do |screenshot|
+        exists = !screenshot.device_type.nil?
+        unless exists
+          UI.important("Unaccepted device screenshots are detected! 🚫 Screenshot file will be skipped. 🏃") unless unaccepted_device_shown
+          unaccepted_device_shown = true
+
+          UI.important("🏃 Skipping screenshot file: #{screenshot.path} - Not an accepted App Store Connect device...")
+        end
+        exists
+      end
+
       return screenshots
+    end
+
+    # helper method so Spaceship::Tunes.client.available_languages is easier to test
+    def self.available_languages
+      if Helper.test?
+        FastlaneCore::Languages::ALL_LANGUAGES
+      else
+        Spaceship::Tunes.client.available_languages
+      end
     end
   end
 end

@@ -60,4 +60,17 @@ describe Cert::CommandsGenerator do
       expect(Cert.config[:output_path]).to eq('output/path')
     end
   end
+
+  describe ":filename option handling" do
+    it "can use the filename flag from tool options" do
+      stub_commander_runner_args(['-q', 'cert_name'])
+
+      # launch takes no params, but we want to expect the call and prevent
+      # actual execution of the method
+      expect(runner).to receive(:launch)
+
+      Cert::CommandsGenerator.start
+      expect(Cert.config[:filename]).to eq('cert_name')
+    end
+  end
 end

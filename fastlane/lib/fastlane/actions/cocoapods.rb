@@ -14,18 +14,20 @@ module Fastlane
           cmd << ["cd '#{podfile_folder}' &&"]
         end
 
-        cmd << ['bundle exec'] if params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+        cmd << ['bundle exec'] if use_bundle_exec?(params)
         cmd << ['pod install']
 
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
+        cmd << '--clean-install' if params[:clean_install] && pod_version.to_f >= 1.7
         cmd << '--repo-update' if params[:repo_update]
         cmd << '--silent' if params[:silent]
         cmd << '--verbose' if params[:verbose]
         cmd << '--no-ansi' unless params[:ansi]
+        cmd << '--deployment' if params[:deployment]
 
         Actions.sh(cmd.join(' '), error_callback: lambda { |result|
-          if params[:try_repo_update_on_error]
+          if !params[:repo_update] && params[:try_repo_update_on_error]
             cmd << '--repo-update'
             Actions.sh(cmd.join(' '), error_callback: lambda { |retry_result|
               call_error_callback(params, retry_result)
@@ -34,6 +36,14 @@ module Fastlane
             call_error_callback(params, result)
           end
         })
+      end
+
+      def self.use_bundle_exec?(params)
+        params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
+      end
+
+      def self.pod_version
+        use_bundle_exec?(params) ? `bundle exec pod --version` : `pod --version`
       end
 
       def self.call_error_callback(params, result)
@@ -52,22 +62,16 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :clean,
-                                       env_name: "FL_COCOAPODS_CLEAN",
-                                       description: "Remove SCM directories",
-                                       is_string: false,
-                                       default_value: true),
-          FastlaneCore::ConfigItem.new(key: :integrate,
-                                       env_name: "FL_COCOAPODS_INTEGRATE",
-                                       description: "Integrate the Pods libraries into the Xcode project(s)",
-                                       is_string: false,
-                                       default_value: true),
           FastlaneCore::ConfigItem.new(key: :repo_update,
                                        env_name: "FL_COCOAPODS_REPO_UPDATE",
-                                       description: "Run `pod repo update` before install",
+                                       description: "Add `--repo-update` flag to `pod install` command",
                                        is_string: false,
-                                       default_value: false,
-                                       conflicting_options: [:try_repo_update_on_error]),
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :clean_install,
+                                       env_name: "FL_COCOAPODS_CLEAN_INSTALL",
+                                       description: "Execute a full pod installation ignoring the content of the project cache",
+                                       is_string: false,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :silent,
                                        env_name: "FL_COCOAPODS_SILENT",
                                        description: "Execute command without logging output",
@@ -107,8 +111,29 @@ module Fastlane
                                        description: 'Retry with --repo-update if action was finished with error',
                                        optional: true,
                                        is_string: false,
-                                       type: Boolean,
-                                       conflicting_options: [:repo_update])
+                                       default_value: false,
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :deployment,
+                                       env_name: "FL_COCOAPODS_DEPLOYMENT",
+                                       description: 'Disallow any changes to the Podfile or the Podfile.lock during installation',
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: false,
+                                       type: Boolean),
+
+          # Deprecated
+          FastlaneCore::ConfigItem.new(key: :clean,
+                                       env_name: "FL_COCOAPODS_CLEAN",
+                                       description: "(Option renamed as clean_install) Remove SCM directories",
+                                       deprecated: true,
+                                       is_string: false,
+                                       default_value: true),
+          FastlaneCore::ConfigItem.new(key: :integrate,
+                                       env_name: "FL_COCOAPODS_INTEGRATE",
+                                       description: "(Option removed from cocoapods) Integrate the Pods libraries into the Xcode project(s)",
+                                       deprecated: true,
+                                       is_string: false,
+                                       default_value: true)
         ]
         # Please don't add a version parameter to the `cocoapods` action. If you need to specify a version when running
         # `cocoapods`, please start using a Gemfile and lock the version there

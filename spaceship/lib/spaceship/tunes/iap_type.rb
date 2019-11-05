@@ -21,7 +21,7 @@ module Spaceship
       # A product that allows users to purchase a service with a limited duration.
       READABLE_NON_RENEWING_SUBSCRIPTION = "Non-Renewing Subscription"
 
-      # Get the iap type matching based on a string (given by iTunes Connect)
+      # Get the iap type matching based on a string (given by App Store Connect)
       def self.get_from_string(text)
         mapping = {
           'ITC.addons.type.consumable' => READABLE_CONSUMABLE,

@@ -1,84 +1,211 @@
 protocol DeliverfileProtocol: class {
+
+  /// Your Apple ID Username
   var username: String { get }
+
+  /// The bundle identifier of your app
   var appIdentifier: String? { get }
-  var app: String { get }
-  var editLive: Bool { get }
-  var ipa: String? { get }
-  var pkg: String? { get }
-  var platform: String { get }
-  var metadataPath: String? { get }
-  var screenshotsPath: String? { get }
-  var skipBinaryUpload: Bool { get }
-  var useLiveVersion: Bool { get }
-  var skipScreenshots: Bool { get }
+
+  /// The version that should be edited or created
   var appVersion: String? { get }
-  var skipMetadata: Bool { get }
-  var skipAppVersionUpdate: Bool { get }
-  var force: Bool { get }
-  var submitForReview: Bool { get }
-  var automaticRelease: Bool { get }
-  var autoReleaseDate: String? { get }
-  var phasedRelease: Bool { get }
-  var priceTier: String? { get }
+
+  /// Path to your ipa file
+  var ipa: String? { get }
+
+  /// Path to your pkg file
+  var pkg: String? { get }
+
+  /// If set the given build number (already uploaded to iTC) will be used instead of the current built one
   var buildNumber: String? { get }
-  var appRatingConfigPath: String? { get }
-  var submissionInformation: String? { get }
-  var teamId: String? { get }
-  var teamName: String? { get }
-  var devPortalTeamId: String? { get }
-  var devPortalTeamName: String? { get }
-  var itcProvider: String? { get }
+
+  /// The platform to use (optional)
+  var platform: String { get }
+
+  /// Modify live metadata, this option disables ipa upload and screenshot upload
+  var editLive: Bool { get }
+
+  /// Force usage of live version rather than edit version
+  var useLiveVersion: Bool { get }
+
+  /// Path to the folder containing the metadata files
+  var metadataPath: String? { get }
+
+  /// Path to the folder containing the screenshots
+  var screenshotsPath: String? { get }
+
+  /// Skip uploading an ipa or pkg to App Store Connect
+  var skipBinaryUpload: Bool { get }
+
+  /// Don't upload the screenshots
+  var skipScreenshots: Bool { get }
+
+  /// Don't upload the metadata (e.g. title, description). This will still upload screenshots
+  var skipMetadata: Bool { get }
+
+  /// Don't update app version for submission
+  var skipAppVersionUpdate: Bool { get }
+
+  /// Skip the HTML report file verification
+  var force: Bool { get }
+
+  /// Clear all previously uploaded screenshots before uploading the new ones
   var overwriteScreenshots: Bool { get }
+
+  /// Submit the new version for Review after uploading everything
+  var submitForReview: Bool { get }
+
+  /// Rejects the previously submitted build if it's in a state where it's possible
+  var rejectIfPossible: Bool { get }
+
+  /// Should the app be automatically released once it's approved?
+  var automaticRelease: Bool { get }
+
+  /// Date in milliseconds for automatically releasing on pending approval
+  var autoReleaseDate: String? { get }
+
+  /// Enable the phased release feature of iTC
+  var phasedRelease: Bool { get }
+
+  /// Reset the summary rating when you release a new version of the application
+  var resetRatings: Bool { get }
+
+  /// The price tier of this application
+  var priceTier: String? { get }
+
+  /// Path to the app rating's config
+  var appRatingConfigPath: String? { get }
+
+  /// Extra information for the submission (e.g. compliance specifications, IDFA settings)
+  var submissionInformation: String? { get }
+
+  /// The ID of your App Store Connect team if you're in multiple teams
+  var teamId: String? { get }
+
+  /// The name of your App Store Connect team if you're in multiple teams
+  var teamName: String? { get }
+
+  /// The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
+  var devPortalTeamId: String? { get }
+
+  /// The name of your Developer Portal team if you're in multiple teams
+  var devPortalTeamName: String? { get }
+
+  /// The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+  var itcProvider: String? { get }
+
+  /// Run precheck before submitting to app review
   var runPrecheckBeforeSubmit: Bool { get }
+
+  /// The default precheck rule level unless otherwise configured
   var precheckDefaultRuleLevel: String { get }
+
+  /// An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
+  var individualMetadataItems: [String] { get }
+
+  /// Metadata: The path to the app icon
   var appIcon: String? { get }
+
+  /// Metadata: The path to the Apple Watch app icon
   var appleWatchAppIcon: String? { get }
+
+  /// Metadata: The copyright notice
   var copyright: String? { get }
+
+  /// Metadata: The english name of the primary category (e.g. `Business`, `Books`)
   var primaryCategory: String? { get }
+
+  /// Metadata: The english name of the secondary category (e.g. `Business`, `Books`)
   var secondaryCategory: String? { get }
+
+  /// Metadata: The english name of the primary first sub category (e.g. `Educational`, `Puzzle`)
   var primaryFirstSubCategory: String? { get }
+
+  /// Metadata: The english name of the primary second sub category (e.g. `Educational`, `Puzzle`)
   var primarySecondSubCategory: String? { get }
+
+  /// Metadata: The english name of the secondary first sub category (e.g. `Educational`, `Puzzle`)
   var secondaryFirstSubCategory: String? { get }
+
+  /// Metadata: The english name of the secondary second sub category (e.g. `Educational`, `Puzzle`)
   var secondarySecondSubCategory: String? { get }
+
+  /// Metadata: A hash containing the trade representative contact information
   var tradeRepresentativeContactInformation: [String : Any]? { get }
+
+  /// Metadata: A hash containing the review information
   var appReviewInformation: [String : Any]? { get }
+
+  /// Metadata: Path to the app review attachment file
+  var appReviewAttachmentFile: String? { get }
+
+  /// Metadata: The localised app description
   var description: String? { get }
+
+  /// Metadata: The localised app name
   var name: String? { get }
+
+  /// Metadata: The localised app subtitle
   var subtitle: [String : Any]? { get }
+
+  /// Metadata: An array of localised keywords
   var keywords: [String : Any]? { get }
+
+  /// Metadata: An array of localised promotional texts
   var promotionalText: [String : Any]? { get }
+
+  /// Metadata: Localised release notes for this version
   var releaseNotes: String? { get }
+
+  /// Metadata: Localised privacy url
   var privacyUrl: String? { get }
+
+  /// Metadata: Localised Apple TV privacy policy text
+  var appleTvPrivacyPolicy: String? { get }
+
+  /// Metadata: Localised support url
   var supportUrl: String? { get }
+
+  /// Metadata: Localised marketing url
   var marketingUrl: String? { get }
+
+  /// Metadata: List of languages to activate
   var languages: [String]? { get }
+
+  /// Ignore errors when invalid languages are found in metadata and screenshot directories
   var ignoreLanguageDirectoryValidation: Bool { get }
+
+  /// Should precheck check in-app purchases?
   var precheckIncludeInAppPurchases: Bool { get }
+
+  /// The (spaceship) app ID of the app you want to use/modify
+  var app: String { get }
 }
 
 extension DeliverfileProtocol {
   var username: String { return "" }
   var appIdentifier: String? { return nil }
-  var app: String { return "" }
-  var editLive: Bool { return false }
+  var appVersion: String? { return nil }
   var ipa: String? { return nil }
   var pkg: String? { return nil }
+  var buildNumber: String? { return nil }
   var platform: String { return "ios" }
+  var editLive: Bool { return false }
+  var useLiveVersion: Bool { return false }
   var metadataPath: String? { return nil }
   var screenshotsPath: String? { return nil }
   var skipBinaryUpload: Bool { return false }
-  var useLiveVersion: Bool { return false }
   var skipScreenshots: Bool { return false }
-  var appVersion: String? { return nil }
   var skipMetadata: Bool { return false }
   var skipAppVersionUpdate: Bool { return false }
   var force: Bool { return false }
+  var overwriteScreenshots: Bool { return false }
   var submitForReview: Bool { return false }
+  var rejectIfPossible: Bool { return false }
   var automaticRelease: Bool { return false }
   var autoReleaseDate: String? { return nil }
   var phasedRelease: Bool { return false }
+  var resetRatings: Bool { return false }
   var priceTier: String? { return nil }
-  var buildNumber: String? { return nil }
   var appRatingConfigPath: String? { return nil }
   var submissionInformation: String? { return nil }
   var teamId: String? { return nil }
@@ -86,9 +213,9 @@ extension DeliverfileProtocol {
   var devPortalTeamId: String? { return nil }
   var devPortalTeamName: String? { return nil }
   var itcProvider: String? { return nil }
-  var overwriteScreenshots: Bool { return false }
   var runPrecheckBeforeSubmit: Bool { return true }
   var precheckDefaultRuleLevel: String { return "warn" }
+  var individualMetadataItems: [String] { return [] }
   var appIcon: String? { return nil }
   var appleWatchAppIcon: String? { return nil }
   var copyright: String? { return nil }
@@ -100,6 +227,7 @@ extension DeliverfileProtocol {
   var secondarySecondSubCategory: String? { return nil }
   var tradeRepresentativeContactInformation: [String : Any]? { return nil }
   var appReviewInformation: [String : Any]? { return nil }
+  var appReviewAttachmentFile: String? { return nil }
   var description: String? { return nil }
   var name: String? { return nil }
   var subtitle: [String : Any]? { return nil }
@@ -107,13 +235,15 @@ extension DeliverfileProtocol {
   var promotionalText: [String : Any]? { return nil }
   var releaseNotes: String? { return nil }
   var privacyUrl: String? { return nil }
+  var appleTvPrivacyPolicy: String? { return nil }
   var supportUrl: String? { return nil }
   var marketingUrl: String? { return nil }
   var languages: [String]? { return nil }
   var ignoreLanguageDirectoryValidation: Bool { return false }
   var precheckIncludeInAppPurchases: Bool { return true }
+  var app: String { return "" }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.18]

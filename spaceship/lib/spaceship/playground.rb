@@ -33,12 +33,12 @@ module Spaceship
 
     def run
       begin
-        puts("Logging into to iTunes Connect (#{@username})...")
+        puts("Logging into to App Store Connect (#{@username})...")
         Spaceship::Tunes.login(@username)
-        puts("Successfully logged in to iTunes Connect".green)
+        puts("Successfully logged in to App Store Connect".green)
         puts("")
       rescue
-        puts("Could not login to iTunes Connect...".red)
+        puts("Could not login to App Store Connect...".red)
       end
       begin
         puts("Logging into the Developer Portal (#{@username})...")

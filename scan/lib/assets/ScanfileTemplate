@@ -6,8 +6,11 @@
 
 # Remove the # in front of the line to enable the option
 
-# scheme "Example"
+# scheme("Example")
 
-# open_report true
+# open_report(true)
 
-# clean true
+# clean(true)
+
+# Enable skip_build to skip debug builds for faster test performance
+skip_build(true)

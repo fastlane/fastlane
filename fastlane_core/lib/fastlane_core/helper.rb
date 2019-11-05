@@ -72,7 +72,7 @@ module FastlaneCore
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS'].each do |current|
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS'].each do |current|
         return true if ENV.key?(current)
       end
       return false
@@ -193,22 +193,40 @@ module FastlaneCore
 
     # @return the full path to the iTMSTransporter executable
     def self.transporter_path
-      return File.join(self.itms_path, 'bin', 'iTMSTransporter')
+      return File.join(self.itms_path, 'bin', 'iTMSTransporter') unless Helper.windows?
+      return File.join(self.itms_path, 'iTMSTransporter')
     end
 
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
       return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
-      return '' unless self.mac? # so tests work on Linux and Windows too
 
-      [
-        "../Applications/Application Loader.app/Contents/MacOS/itms",
-        "../Applications/Application Loader.app/Contents/itms"
-      ].each do |path|
-        result = File.expand_path(File.join(self.xcode_path, path))
-        return result if File.exist?(result)
+      if self.mac?
+        # First check for manually install iTMSTransporter
+        user_local_itms_path = "/usr/local/itms"
+        return user_local_itms_path if File.exist?(user_local_itms_path)
+
+        # Then check for iTMSTransporter in the Xcode path
+        [
+          "../Applications/Application Loader.app/Contents/MacOS/itms",
+          "../Applications/Application Loader.app/Contents/itms",
+          "../SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms" # For Xcode 11
+        ].each do |path|
+          result = File.expand_path(File.join(self.xcode_path, path))
+          return result if File.exist?(result)
+        end
+        UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
+      elsif self.windows?
+        [
+          "C:/Program Files (x86)/itms"
+        ].each do |path|
+          return path if File.exist?(path)
+        end
+        UI.user_error!("Could not find transporter at usual locations. Please use environment variable `FASTLANE_ITUNES_TRANSPORTER_PATH` to specify your installation path.")
+      else
+        # not Mac or Windows
+        return ''
       end
-      UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
     end
 
     # keychain
@@ -264,6 +282,43 @@ module FastlaneCore
     # removes ANSI colors from string
     def self.strip_ansi_colors(str)
       str.gsub(/\e\[([;\d]+)?m/, '')
+    end
+
+    # Zips directory
+    def self.zip_directory(path, output_path, contents_only: false, overwrite: false, print: true)
+      if overwrite
+        overwrite_command = " && rm -f '#{output_path}'"
+      else
+        overwrite_command = ""
+      end
+
+      if contents_only
+        command = "cd '#{path}'#{overwrite_command} && zip -r '#{output_path}' *"
+      else
+        containing_path = File.expand_path("..", path)
+        contents_path = File.basename(path)
+
+        command = "cd '#{containing_path}'#{overwrite_command} && zip -r '#{output_path}' '#{contents_path}'"
+      end
+
+      UI.command(command) unless print
+      Helper.backticks(command, print: print)
+    end
+
+    # Executes the provided block after adjusting the ENV to have the
+    # provided keys and values set as defined in hash. After the block
+    # completes, restores the ENV to its previous state.
+    def self.with_env_values(hash, &block)
+      old_vals = ENV.select { |k, v| hash.include?(k) }
+      hash.each do |k, v|
+        ENV[k] = hash[k]
+      end
+      yield
+    ensure
+      hash.each do |k, v|
+        ENV.delete(k) unless old_vals.include?(k)
+        ENV[k] = old_vals[k]
+      end
     end
 
     # loading indicator
@@ -342,7 +397,7 @@ module FastlaneCore
     def self.gem_path(gem_name)
       UI.deprecated('`Helper.gem_path` is deprecated. Use the `ROOT` constant from the appropriate tool module instead.')
 
-      if !Helper.test? and Gem::Specification.find_all_by_name(gem_name).any?
+      if !Helper.test? && Gem::Specification.find_all_by_name(gem_name).any?
         return Gem::Specification.find_by_name(gem_name).gem_dir
       else
         return './'

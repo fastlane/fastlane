@@ -1,6 +1,7 @@
 require 'openssl'
 
 require_relative 'app'
+require_relative 'website_push'
 
 module Spaceship
   module Portal
@@ -88,6 +89,12 @@ module Spaceship
       # Certs are not associated with apps
       #####################################################
 
+      # An Apple development code signing certificate used for development environment
+      class AppleDevelopment < Certificate; end
+
+      # An Apple distribution code signing certificate used for distribution environment
+      class AppleDistribution < Certificate; end
+
       # A development code signing certificate used for development environment
       class Development < Certificate; end
 
@@ -107,10 +114,10 @@ module Spaceship
       class MacInstallerDistribution < Certificate; end
 
       # A Mac Developer ID signing certificate for building .app bundles
-      class DeveloperIDApplication < Certificate; end
+      class DeveloperIdApplication < Certificate; end
 
       # A Mac Developer ID signing certificate for building .pkg installers
-      class DeveloperIDInstaller < Certificate; end
+      class DeveloperIdInstaller < Certificate; end
 
       #####################################################
       # Certs that are specific for one app
@@ -127,7 +134,11 @@ module Spaceship
       class ProductionPush < PushCertificate; end
 
       # A push notification certificate for websites
-      class WebsitePush < PushCertificate; end
+      class WebsitePush < PushCertificate
+        def self.portal_type
+          Spaceship::Portal::WebsitePush
+        end
+      end
 
       # A push notification certificate for the VOIP environment
       class VoipPush < PushCertificate; end
@@ -138,11 +149,19 @@ module Spaceship
       # ApplePay certificate
       class ApplePay < Certificate; end
 
+      # ApplePayMerchantIdentity certificate
+      class ApplePayMerchantIdentity < Certificate; end
+
       # A Mac push notification certificate for development environment
       class MacDevelopmentPush < PushCertificate; end
 
       # A Mac push notification certificate for production environment
       class MacProductionPush < PushCertificate; end
+
+      APPLE_CERTIFICATE_TYPE_IDS = {
+        "83Q87W3TGH" => AppleDevelopment,
+        "WXV89964HE" => AppleDistribution
+      }
 
       IOS_CERTIFICATE_TYPE_IDS = {
         "5QPB9NHCEI" => Development,
@@ -154,7 +173,8 @@ module Spaceship
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
         "E5D663CMZW" => VoipPush,
-        "4APLUP237T" => ApplePay
+        "4APLUP237T" => ApplePay,
+        "MD8Q2VRT6A" => ApplePayMerchantIdentity
       }
 
       OLDER_IOS_CERTIFICATE_TYPES = [
@@ -171,14 +191,16 @@ module Spaceship
         "749Y1QAGU7" => MacDevelopment,
         "HXZEUKP0FP" => MacAppDistribution,
         "2PQI8IDXNH" => MacInstallerDistribution,
-        "OYVN2GW35E" => DeveloperIDInstaller,
-        "W0EURJRMC5" => DeveloperIDApplication,
+        "OYVN2GW35E" => DeveloperIdInstaller,
+        "W0EURJRMC5" => DeveloperIdApplication,
         "CDZ7EMXIZ1" => MacProductionPush,
         "HQ4KP3I34R" => MacDevelopmentPush,
-        "DIVN2GW3XT" => DeveloperIDApplication
+        "DIVN2GW3XT" => DeveloperIdApplication
       }
 
-      CERTIFICATE_TYPE_IDS = IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)
+      CERTIFICATE_TYPE_IDS = APPLE_CERTIFICATE_TYPE_IDS
+                             .merge(IOS_CERTIFICATE_TYPE_IDS)
+                             .merge(MAC_CERTIFICATE_TYPE_IDS)
 
       # Class methods
       class << self
@@ -250,6 +272,7 @@ module Spaceship
         def all(mac: false)
           if self == Certificate # are we the base-class?
             type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
+            type_ids = APPLE_CERTIFICATE_TYPE_IDS.merge(type_ids)
             types = type_ids.keys
             types += OLDER_IOS_CERTIFICATE_TYPES unless mac
           else
@@ -289,7 +312,7 @@ module Spaceship
 
           # look up the app_id by the bundle_id
           if bundle_id
-            app = Spaceship::Portal::App.set_client(client).find(bundle_id)
+            app = portal_type.set_client(client).find(bundle_id)
             raise "Could not find app with bundle id '#{bundle_id}'" unless app
             app_id = app.app_id
           end
@@ -302,6 +325,12 @@ module Spaceship
           # munge the response to make it work for the factory
           response['certificateTypeDisplayId'] = response['certificateType']['certificateTypeDisplayId']
           self.new(response)
+        end
+
+        # Default portal class to use when finding by bundle_id
+        # @return (Class): The class this type of certificate belongs to
+        def portal_type
+          Spaceship::Portal::App
         end
       end
 

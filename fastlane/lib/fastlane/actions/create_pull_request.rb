@@ -33,9 +33,53 @@ module Fastlane
           html_url = json['html_url']
           UI.success("Successfully created pull request ##{number}. You can see it at '#{html_url}'")
 
+          # Add labels to pull request
+          add_labels(params, number) if params[:labels]
+
+          # Add assignees to pull request
+          add_assignees(params, number) if params[:assignees]
+
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
           return html_url
         end
+      end
+
+      def self.add_labels(params, number)
+        payload = {
+          'labels' => params[:labels]
+        }
+        GithubApiAction.run(
+          server_url: params[:api_url],
+          api_token: params[:api_token],
+          http_method: 'PATCH',
+          path: "repos/#{params[:repo]}/issues/#{number}",
+          body: payload,
+          error_handlers: {
+            '*' => proc do |result|
+              UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")
+              return nil
+            end
+          }
+        )
+      end
+
+      def self.add_assignees(params, number)
+        payload = {
+          'assignees' => params[:assignees]
+        }
+        GithubApiAction.run(
+          server_url: params[:api_url],
+          api_token: params[:api_token],
+          http_method: 'POST',
+          path: "repos/#{params[:repo]}/issues/#{number}/assignees",
+          body: payload,
+          error_handlers: {
+            '*' => proc do |result|
+              UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")
+              return nil
+            end
+          }
+        )
       end
 
       #####################################################
@@ -46,6 +90,12 @@ module Fastlane
         "This will create a new pull request on GitHub"
       end
 
+      def self.output
+        [
+          ['CREATE_PULL_REQUEST_HTML_URL', 'The HTML URL to the created pull request']
+        ]
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :api_token,
@@ -54,6 +104,7 @@ module Fastlane
                                        sensitive: true,
                                        code_gen_sensitive: true,
                                        default_value: ENV["GITHUB_API_TOKEN"],
+                                       default_value_dynamic: true,
                                        is_string: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :repo,
@@ -71,12 +122,18 @@ module Fastlane
                                        description: "The contents of the pull request",
                                        is_string: true,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :labels,
+                                       env_name: "GITHUB_PULL_REQUEST_LABELS",
+                                       description: "The labels for the pull request",
+                                       type: Array,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :head,
                                        env_name: "GITHUB_PULL_REQUEST_HEAD",
                                        description: "The name of the branch where your changes are implemented (defaults to the current branch name)",
                                        is_string: true,
                                        code_gen_sensitive: true,
                                        default_value: Actions.git_branch,
+                                       default_value_dynamic: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :base,
                                        env_name: "GITHUB_PULL_REQUEST_BASE",
@@ -90,12 +147,17 @@ module Fastlane
                                        is_string: true,
                                        code_gen_default_value: 'https://api.github.com',
                                        default_value: 'https://api.github.com',
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :assignees,
+                                       env_name: "GITHUB_PULL_REQUEST_ASSIGNEES",
+                                       description: "The assignees for the pull request",
+                                       type: Array,
                                        optional: true)
         ]
       end
 
       def self.author
-        ["seei", "tommeier"]
+        ["seei", "tommeier", "marumemomo"]
       end
 
       def self.is_supported?(platform)
@@ -103,13 +165,13 @@ module Fastlane
       end
 
       def self.return_value
-        "The parsed JSON when successful"
+        "The pull request URL when successful"
       end
 
       def self.example_code
         [
           'create_pull_request(
-            api_token: ENV["GITHUB_TOKEN"],
+            api_token: "secret",                # optional, defaults to ENV["GITHUB_API_TOKEN"]
             repo: "fastlane/fastlane",
             title: "Amazing new feature",
             head: "my-feature",                 # optional, defaults to current branch name

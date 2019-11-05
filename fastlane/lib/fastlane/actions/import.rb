@@ -15,8 +15,8 @@ module Fastlane
 
       def self.details
         [
-          "This is useful if you have shared lanes across multiple apps and you want to store a Fastfile",
-          "in a separate folder. The path must be relative to the Fastfile this is called from."
+          "This is useful if you have shared lanes across multiple apps and you want to store a Fastfile in a separate folder.",
+          "The path must be relative to the Fastfile this is called from."
         ].join("\n")
       end
 
@@ -37,7 +37,7 @@ module Fastlane
 
       def self.example_code
         [
-          'import "./path/to/other/Fastfile"'
+          'import("./path/to/other/Fastfile")'
         ]
       end
 

@@ -4,7 +4,8 @@ describe Spaceship::TestFlight::Group do
   let(:mock_client) { double('MockClient') }
 
   before do
-    Spaceship::TestFlight::Base.client = mock_client
+    allow(Spaceship::TestFlight::Base).to receive(:client).and_return(mock_client)
+    allow(mock_client).to receive(:team_id).and_return('')
   end
 
   context 'attr_mapping' do
@@ -87,6 +88,13 @@ describe Spaceship::TestFlight::Group do
       end
     end
 
+    context '.delete!' do
+      it 'removes a group for correct parameters' do
+        expect(mock_client).to receive(:delete_group_for_app).with(app_id: 'app-id', group_id: 2)
+        Spaceship::TestFlight::Group.delete!(app_id: 'app-id', group_name: 'Group 2')
+      end
+    end
+
     context '.default_external_group' do
       it 'returns the default external group' do
         group = Spaceship::TestFlight::Group.default_external_group(app_id: 'app-id')
@@ -135,6 +143,28 @@ describe Spaceship::TestFlight::Group do
       it 'returns default_external_group' do
         expect(group).to receive(:is_default_external_group).and_call_original
         expect(group.default_external_group?).to be(true)
+      end
+    end
+
+    context '#builds' do
+      before do
+        mock_client_response(:builds_for_group, with: { app_id: 1, group_id: 2 }) do
+          [
+            {
+              id: 1,
+              appAdamId: 10,
+              trainVersion: '1.0',
+              uploadDate: '2017-01-01T12:00:00.000+0000',
+              externalState: 'testflight.build.state.export.compliance.missing'
+            }
+          ]
+        end
+      end
+
+      it 'gets the builds for this group via client' do
+        expect(mock_client).to receive(:builds_for_group).with(app_id: 1, group_id: 2)
+        builds = group.builds
+        expect(builds.size).to eq(1)
       end
     end
   end

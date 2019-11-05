@@ -47,8 +47,10 @@ module Fastlane
         end
 
         if self.gray_list.include?(name.to_sym)
+          UI.error("------------------------------------------------")
           UI.error("Lane name '#{name}' should not be used because it is the name of a fastlane tool")
           UI.error("It is recommended to not use '#{name}' as the name of your lane")
+          UI.error("------------------------------------------------")
           # We still allow it, because we're nice
           # Otherwise we might break existing setups
           return
@@ -86,7 +88,9 @@ module Fastlane
       def ensure_name_not_conflicts(name)
         # First, check if there is a predefined method in the actions folder
         return unless Actions.action_class_ref(name)
-        UI.important("Name of the lane '#{name}' is already taken by the action named '#{name}'")
+        UI.error("------------------------------------------------")
+        UI.error("Name of the lane '#{name}' is already taken by the action named '#{name}'")
+        UI.error("------------------------------------------------")
       end
     end
   end

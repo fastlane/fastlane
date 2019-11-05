@@ -15,6 +15,7 @@ module Fastlane
       :production,
       :source_control,
       :notifications,
+      :app_store_connect,
       :misc,
       :deprecated # This should be the last item
     ]
@@ -23,6 +24,7 @@ module Fastlane
       :string,
       :array_of_strings,
       :hash_of_strings,
+      :hash,
       :bool,
       :int
     ]
@@ -45,7 +47,7 @@ module Fastlane
     end
 
     def self.details
-      nil # this is your change to provide a more detailed description of this action
+      nil # this is your chance to provide a more detailed description of this action
     end
 
     def self.available_options
@@ -132,7 +134,7 @@ module Fastlane
       UI.user_error!("To call another action from an action use `other_action.#{method_sym}` instead")
     end
 
-    # When shelling out from the actoin, should we use `bundle exec`?
+    # When shelling out from the action, should we use `bundle exec`?
     def self.shell_out_should_use_bundle_exec?
       return File.exist?('Gemfile') && !Helper.contained_fastlane?
     end
@@ -149,5 +151,48 @@ module Fastlane
     def self.deprecated_notes
       nil
     end
+  end
+end
+
+class String
+  def markdown_preserve_newlines
+    self.gsub(/(\n|$)/, '|\1') # prepend new lines with "|" so the erb template knows *not* to replace them with "<br>"s
+  end
+
+  def markdown_sample(is_first = false)
+    self.markdown_clean_heredoc!
+    self.markdown_details(is_first)
+  end
+
+  def markdown_list(is_first = false)
+    self.markdown_clean_heredoc!
+    self.gsub!(/^/, "- ") # add list dashes
+    self.prepend(">") unless is_first # the empty line that will be added breaks the quote
+    self.markdown_details(is_first)
+  end
+
+  def markdown_details(is_first)
+    self.prepend("\n") unless is_first
+    self << "\n>" # continue the quote
+    self.markdown_preserve_newlines
+  end
+
+  def markdown_clean_heredoc!
+    self.chomp! # remove the last new line added by the heredoc
+    self.dedent! # remove the leading whitespace (similar to the squigly heredoc `<<~`)
+  end
+
+  def dedent!
+    first_line_indent = self.match(/^\s*/)[0]
+
+    self.gsub!(/^#{first_line_indent}/, "")
+  end
+
+  def remove_markdown
+    string = self.gsub(/^>/, "") # remove Markdown quotes
+    string = string.gsub(/\[http[^\]]+\]\(([^)]+)\)/, '\1 🔗') # remove Markdown links
+    string = string.gsub(/\[([^\]]+)\]\(([^\)]+)\)/, '"\1" (\2 🔗)') # remove Markdown links with custom text
+    string = string.gsub("|", "") # remove new line preserve markers
+    return string
   end
 end

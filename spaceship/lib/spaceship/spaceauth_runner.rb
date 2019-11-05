@@ -14,17 +14,19 @@ module Spaceship
 
     def run
       begin
-        puts("Logging into to iTunes Connect (#{@username})...")
+        puts("Logging into to App Store Connect (#{@username})...")
         Spaceship::Tunes.login(@username)
-        puts("Successfully logged in to iTunes Connect".green)
+        puts("Successfully logged in to App Store Connect".green)
         puts("")
-      rescue
-        puts("Could not login to iTunes Connect".red)
+      rescue => ex
+        puts("Could not login to App Store Connect".red)
         puts("Please check your credentials and try again.".yellow)
-        puts("This could be an issue with iTunes Connect,".yellow)
+        puts("This could be an issue with App Store Connect,".yellow)
         puts("Please try unsetting the FASTLANE_SESSION environment variable".yellow)
-        puts("and re-run `fastlane spaceauth`".yellow)
-        raise "Problem connecting to iTunes Connect"
+        puts("(if it is set) and re-run `fastlane spaceauth`".yellow)
+        puts("")
+        puts("Exception type: #{ex.class}")
+        raise ex
       end
 
       itc_cookie_content = Spaceship::Tunes.client.store_cookie
@@ -44,7 +46,7 @@ module Spaceship
 
       # We remove all the un-needed cookies
       cookies.select! do |cookie|
-        cookie.name.start_with?("DES5") || cookie.name == 'dqsid'
+        cookie.name.start_with?("myacinfo") || cookie.name == "dqsid" || cookie.name.start_with?("DES")
       end
 
       yaml = cookies.to_yaml.gsub("\n", "\\n")
@@ -57,6 +59,16 @@ module Spaceship
       puts("")
       puts("Example:")
       puts("export FASTLANE_SESSION='#{yaml}'".cyan.underline)
+
+      if mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true)
+        require 'open3'
+        Open3.popen3('pbcopy') { |input, _, _| input << yaml }
+        puts("Successfully copied text into your clipboard 🎨".green)
+      end
+    end
+
+    def mac?
+      (/darwin/ =~ RUBY_PLATFORM) != nil
     end
   end
 end

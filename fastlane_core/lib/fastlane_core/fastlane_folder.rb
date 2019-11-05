@@ -21,6 +21,7 @@ module FastlaneCore
     end
 
     def self.swift?
+      return false unless self.fastfile_path
       return self.fastfile_path.downcase.end_with?(".swift")
     end
 

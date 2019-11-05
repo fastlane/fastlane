@@ -11,7 +11,6 @@ module Fastlane
       # since at this point we haven't yet loaded commander
       # however we do want to log verbose information in the PluginManager
       FastlaneCore::Globals.verbose = true if ARGV.include?("--verbose")
-      FastlaneCore::Globals.capture_output = true  if ARGV.include?("--capture_output")
       if ARGV.include?("--capture_output")
         FastlaneCore::Globals.verbose = true
         FastlaneCore::Globals.capture_output = true
@@ -44,7 +43,7 @@ module Fastlane
       Fastlane::PluginUpdateManager.show_update_status
       if FastlaneCore::Globals.capture_output?
         if $stdout.respond_to?(:string)
-          # Sometimes you can get NoMethodError: undefined method `string' for #<IO:<STDOUT>> when runing with FastlaneRunner (swift)
+          # Sometimes you can get NoMethodError: undefined method `string' for #<IO:<STDOUT>> when running with FastlaneRunner (swift)
           FastlaneCore::Globals.captured_output = Helper.strip_ansi_colors($stdout.string)
         end
         $stdout = STDOUT
@@ -102,6 +101,7 @@ module Fastlane
         c.description = 'Run a specific lane. Pass the lane name and optionally the platform first.'
         c.option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
         c.option('--disable_runner_upgrades', 'Prevents fastlane from attempting to update FastlaneRunner swift project')
+        c.option('--swift_server_port INT', 'Set specific port to communicate between fastlane and FastlaneRunner')
 
         c.action do |args, options|
           if ensure_fastfile
@@ -116,18 +116,14 @@ module Fastlane
 
         c.option('-u STRING', '--user STRING', String, 'iOS projects only: Your Apple ID')
 
-        # CrashlyticsBetaCommandLineHandler.apply_options(c)
-
         c.action do |args, options|
-          # if args[0] == 'beta'
-          #   beta_info = CrashlyticsBetaCommandLineHandler.info_from_options(options)
-          #   Fastlane::CrashlyticsBeta.new(beta_info, Fastlane::CrashlyticsBetaUi.new).run
-          # else
           is_swift_fastfile = args.include?("swift")
           Fastlane::Setup.start(user: options.user, is_swift_fastfile: is_swift_fastfile)
-          # end
         end
       end
+
+      # Creating alias for mapping "swift init" to "init swift"
+      alias_command(:'swift init', :init, 'swift')
 
       command :new_action do |c|
         c.syntax = 'fastlane new_action'
@@ -330,6 +326,22 @@ module Fastlane
         c.action do |args, options|
           search_query = args.last
           PluginSearch.print_plugins(search_query: search_query)
+        end
+      end
+
+      #####################################################
+      # @!group Swift
+      #####################################################
+
+      if FastlaneCore::FastlaneFolder.swift?
+        command :generate_swift do |c|
+          c.syntax = 'fastlane generate_swift'
+          c.description = 'Generates additional Swift APIs for plugins and local actions'
+
+          c.action do |args, options|
+            SwiftActionsAPIGenerator.new(target_output_path: FastlaneCore::FastlaneFolder.swift_folder_path).generate_swift
+            SwiftPluginsAPIGenerator.new(target_output_path: FastlaneCore::FastlaneFolder.swift_folder_path).generate_swift
+          end
         end
       end
 

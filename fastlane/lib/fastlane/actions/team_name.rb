@@ -30,7 +30,7 @@ module Fastlane
 
       def self.example_code
         [
-          'team_name "Felix Krause"'
+          'team_name("Felix Krause")'
         ]
       end
 

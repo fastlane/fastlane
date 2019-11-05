@@ -2,9 +2,9 @@ require 'spaceship'
 require_relative 'module'
 
 module Match
-  # Ensures the certificate and profiles are also available on iTunes Connect
+  # Ensures the certificate and profiles are also available on App Store Connect
   class SpaceshipEnsure
-    def initialize(user)
+    def initialize(user, team_id, team_name)
       # We'll try to manually fetch the password
       # to tell the user that a password is optional
       require 'credentials_manager/account_manager'
@@ -20,7 +20,12 @@ module Match
 
       UI.message("Verifying that the certificate and profile are still valid on the Dev Portal...")
       Spaceship.login(user)
-      Spaceship.select_team
+      Spaceship.select_team(team_id: team_id, team_name: team_name)
+    end
+
+    # The team ID of the currently logged in team
+    def team_id
+      return Spaceship.client.team_id
     end
 
     def bundle_identifier_exists(username: nil, app_identifier: nil)
@@ -46,7 +51,7 @@ module Match
       end
       return if found
 
-      UI.error("Certificate '#{certificate_id}' (stored in your git repo) is not available on the Developer Portal")
+      UI.error("Certificate '#{certificate_id}' (stored in your storage) is not available on the Developer Portal")
       UI.error("for the user #{username}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
       UI.error("Git repository. This might be caused by revoking the certificate on the Dev Portal")
@@ -59,11 +64,8 @@ module Match
       end
 
       unless found
-        UI.error("Provisioning profile '#{uuid}' is not available on the Developer Portal")
-        UI.error("for the user #{username}")
-        UI.error("Make sure to use the same user and team every time you run 'match' for this")
-        UI.error("Git repository. This might be caused by deleting the provisioning profile on the Dev Portal")
-        UI.user_error!("To reset the provisioning profiles of your Apple account, you can use the `fastlane match nuke` feature, more information on https://docs.fastlane.tools/actions/match/")
+        UI.error("Provisioning profile '#{uuid}' is not available on the Developer Portal for the user #{username}, fixing this now for you 🔨")
+        return false
       end
 
       if found.valid?
