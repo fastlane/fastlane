@@ -1,7 +1,7 @@
 module Supply
   class Setup
     def perform_download
-      UI.message("🕗  Downloading metadata, images, screenshots ...")
+      UI.message("🕗  Downloading metadata, images, screenshots...")
 
       if File.exist?(metadata_path)
         UI.important("Metadata already exists at path '#{metadata_path}'")
@@ -15,8 +15,13 @@ module Supply
         download_images(listing)
       end
 
-      if Supply.config[:version_name].nil?
-        Supply.config[:version_name] = client.latest_version.name
+      if Supply.config[:version_name].to_s == ""
+        latest_version = client.latest_version
+        if latest_version
+          Supply.config[:version_name] = latest_version.name
+        else
+          UI.user_error!("Could not find the latest version to download metadata, images, and screenshots from")
+        end
       end
       
       client.release_listings(Supply.config[:version_name]).each do |release_listing|
@@ -66,10 +71,10 @@ module Supply
 
           image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
           urls.each do |url|
-            if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
+            if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images
               file_path = "#{path}.#{FastImage.type(url)}"
-            else # SCREENSHOT_TYPES go under their respective folders.
-              file_path = "#{path}/#{image_counter}_#{listing.language}.#{FastImage.type(url)}"
+            else # SCREENSHOT_TYPES are stored in locale/images/<screensho_types>
+              file_path = File.join(path, "#{image_counter}_#{listing.language}.#{FastImage.type(url)}")
             end
 
             File.binwrite(file_path, Net::HTTP.get(URI.parse(url)))
