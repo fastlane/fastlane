@@ -78,7 +78,7 @@ module Supply
     end
 
     def fetch_track_and_release!(track, version_code)
-      tracks = @client.tracks(track)
+      tracks = client.tracks(track)
       return nil, nil if tracks.empty?
 
       track = tracks.first
@@ -131,7 +131,7 @@ module Supply
     end
 
     def promote_track
-      track_from = @client.tracks(Supply.config[:track]).first
+      track_from = client.tracks(Supply.config[:track]).first
       unless track_from
         UI.user_error!("Cannot promote from track '#{Supply.config[:track]}' - track doesn't exist")
       end
@@ -150,7 +150,7 @@ module Supply
       end
 
       release = track_from.releases.first
-      track_to = @client.tracks(Supply.config[:track_promote_to]).first
+      track_to = client.tracks(Supply.config[:track_promote_to]).first
 
       if track_to
         # Its okay to set releases to an array containing the newest release
@@ -333,7 +333,7 @@ module Supply
         track_release.user_fraction = Supply.config[:rollout].to_f
       end
 
-      tracks = @client.tracks(Supply.config[:track])
+      tracks = client.tracks(Supply.config[:track])
       track = tracks.first
       if track
         # Its okay to set releases to an array containing the newest release

@@ -205,7 +205,7 @@ module Supply
     def apks_version_codes
       ensure_active_edit!
 
-      result = call_google_api { client.list_apks(current_package_name, current_edit.id) }
+      result = call_google_api { client.list_edit_apks(current_package_name, current_edit.id) }
 
       return Array(result.apks).map(&:version_code)
     end
@@ -217,23 +217,6 @@ module Supply
       result = call_google_api { client.list_edit_bundles(current_package_name, current_edit.id) }
 
       return Array(result.bundles).map(&:version_code)
-    end
-
-    # Get a list of all apk listings (changelogs) - returns the list
-    def apk_listings(apk_version_code)
-      ensure_active_edit!
-
-      result = call_google_api do
-        client.list_apk_listings(
-          current_package_name,
-          current_edit.id,
-          apk_version_code
-        )
-      end
-
-      return (result.listings || []).map do |row|
-        ApkListing.new(row.recent_changes, row.language, apk_version_code)
-      end
     end
 
     def release_listings(version)
@@ -409,25 +392,6 @@ module Supply
           self.current_edit.id,
           Supply.config[:track],
           track
-        )
-      end
-    end
-
-    def update_apk_listing_for_language(apk_listing)
-      ensure_active_edit!
-
-      apk_listing_object = AndroidPublisher::ApkListing.new({
-        language: apk_listing.language,
-        recent_changes: apk_listing.recent_changes
-      })
-
-      call_google_api do
-        client.update_apk_listing(
-          current_package_name,
-          current_edit.id,
-          apk_listing.apk_version_code,
-          apk_listing.language,
-          apk_listing_object
         )
       end
     end
