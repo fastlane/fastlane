@@ -100,6 +100,7 @@ module Supply
         release.user_fraction = completed ? nil : Supply.config[:rollout]
         release.status = Supply::ReleaseStatus::COMPLETED if completed
 
+        # Deleted other version codes if completed because only allowed on completed version in a release
         track.releases.delete_if { |r| !r.version_codes.include?(Supply.config[:version_code]) } if completed
       else
         UI.user_error!("Unable to find version code '#{Supply.config[:version_code]}' in track '#{Supply.config[:track]}'")
@@ -152,6 +153,8 @@ module Supply
       track_to = @client.tracks(Supply.config[:track_promote_to]).first
 
       if track_to
+        # Its okay to set releases to an array containing the newest release
+        # Google Play will keep previous releases there this release is a partial rollout
         track_to.releases = [release]
       else
         track_to = AndroidPublisher::Track.new(
@@ -164,7 +167,7 @@ module Supply
     end
 
     def upload_changelog(language, version_name)
-      UI.user_error!("Cannot find changelog - no version name found from uploaded APk/AAB") unless version_name
+      UI.user_error!("Cannot find changelog because no version name given - please specify :version_name") unless version_name
 
       path = File.join(Supply.config[:metadata_path], language, Supply::CHANGELOGS_FOLDER_NAME, "#{version_name}.txt")
       changelog_text = ''
@@ -318,12 +321,10 @@ module Supply
       return if apk_version_codes.empty?
 
       UI.message("Updating track '#{Supply.config[:track]}'...")
-      check_superseded_tracks(apk_version_codes) if Supply.config[:check_superseded_tracks]
 
       track_release = AndroidPublisher::TrackRelease.new(
         name: Supply.config[:version_name],
-        release_notes: [],
-        status: Supply.config[:release_status] || Supply::ReleaseStatus::COMPLETED,
+        status: Supply.config[:release_status],
         version_codes: apk_version_codes
       )
 
@@ -332,53 +333,21 @@ module Supply
         track_release.user_fraction = Supply.config[:rollout].to_f
       end
 
-      track = AndroidPublisher::Track.new(
-        track: Supply.config[:track],
-        releases: [track_release]
-      )
+
+      tracks = @client.tracks(Supply.config[:track])
+      track = tracks.first
+      if track
+        # Its okay to set releases to an array containing the newest release
+        # Google Play will keep previous releases there this release is a partial rollout
+        track.releases = [track_release]
+      else
+        track = AndroidPublisher::Track.new(
+          track: Supply.config[:track],
+          releases: [track_release]
+        )
+      end
 
       client.update_track(Supply.config[:track], track)
-    end
-
-    # Remove any version codes that is:
-    #  - Lesser than the greatest of any later (i.e. production) track
-    #  - Or lesser than the currently being uploaded if it's in an earlier (i.e. alpha) track
-    def check_superseded_tracks(apk_version_codes)
-      UI.message("Checking superseded tracks, uploading '#{apk_version_codes}' to '#{Supply.config[:track]}'...")
-      max_apk_version_code = apk_version_codes.max
-      max_tracks_version_code = nil
-
-      tracks = Supply::Tracks::DEFAULTS
-      config_track_index = tracks.index(Supply.config[:track])
-
-      # Custom "closed" tracks are now allowed (https://support.google.com/googleplay/android-developer/answer/3131213)
-      # Custom tracks have an equal level with alpha (alpha is considered a closed track as well)
-      # If a track index is not found, we will assume is a custom track so an alpha index is given
-      config_track_index = tracks.index(Supply::Tracks::ALPHA) unless config_track_index
-
-      tracks.each_index do |track_index|
-        track = tracks[track_index]
-        track_version_codes = client.track_version_codes(track).sort
-        UI.verbose("Found '#{track_version_codes}' on track '#{track}'")
-
-        next if track_index.eql?(config_track_index)
-        next if track_version_codes.empty?
-
-        if max_tracks_version_code.nil?
-          max_tracks_version_code = track_version_codes.max
-        end
-
-        removed_version_codes = track_version_codes.take_while do |v|
-          v < max_tracks_version_code || (v < max_apk_version_code && track_index > config_track_index)
-        end
-
-        next if removed_version_codes.empty?
-
-        keep_version_codes = track_version_codes - removed_version_codes
-        max_tracks_version_code = keep_version_codes[0] unless keep_version_codes.empty?
-        client.update_track(track, 1.0, keep_version_codes)
-        UI.message("Superseded track '#{track}', removed '#{removed_version_codes}'")
-      end
     end
 
     # returns only language directories from metadata_path

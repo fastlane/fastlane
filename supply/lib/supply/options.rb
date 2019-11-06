@@ -32,7 +32,7 @@ module Supply
                                      short_option: "-e",
                                      optional: true,
                                      description: "Release status (used when uploading new apks/aabs) - valid values are #{Supply::ReleaseStatus::ALL.join(', ')}",
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:release_status),
+                                     default_value: Supply::ReleaseStatus::COMPLETED,
                                      default_value_dynamic: true,
                                      verify_block: proc do |value|
                                       UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::ReleaseStatus::ALL.include?(value)
@@ -247,6 +247,7 @@ module Supply
                                      env_name: "SUPPLY_CHECK_SUPERSEDED_TRACKS",
                                      optional: true,
                                      description: "Check the other tracks for superseded versions and disable them",
+                                     deprecated: "Google Play does this automatically now",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :timeout,
@@ -259,7 +260,7 @@ module Supply
                                      env_name: "SUPPLY_DEACTIVATE_ON_PROMOTE",
                                      optional: true,
                                      description: "When promoting to a new track, deactivate the binary in the origin track",
-                                     deprecated: "No longer allowed with Android Publisher V3",
+                                     deprecated: "Google Play does this automatically now",
                                      is_string: false,
                                      default_value: true),
         FastlaneCore::ConfigItem.new(key: :version_codes_to_retain,
