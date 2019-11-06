@@ -23,7 +23,7 @@ module Supply
           UI.user_error!("Could not find the latest version to download metadata, images, and screenshots from")
         end
       end
-      
+
       client.release_listings(Supply.config[:version_name]).each do |release_listing|
         store_release_listing(release_listing)
       end

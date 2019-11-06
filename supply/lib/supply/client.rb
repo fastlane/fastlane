@@ -241,7 +241,7 @@ module Supply
 
       # Verify that tracks have releases
       filtered_tracks = tracks.select { |t| !t.releases.nil? && t.releases.any? { |r| r.name == Supply.config[:version_name] } }
-      
+
       if filtered_tracks.length > 1
         # Production track takes precedence if version is present in multiple tracks
         # E.g.: A release might've been promoted from Alpha/Beta track. This means the release will be present in two or more tracks
@@ -275,13 +275,13 @@ module Supply
     end
 
     def latest_version
-      latest_version = tracks.select { |t| t.track == Supply::Tracks::DEFAULT }.map(&:releases).flatten.max_by { |r| r.name }
+      latest_version = tracks.select { |t| t.track == Supply::Tracks::DEFAULT }.map(&:releases).flatten.max_by(&:name)
 
       # Check if user specified '--track' option if version information from 'production' track is nil
       if latest_version.nil? && Supply.config[:track] == Supply::Tracks::DEFAULT
         UI.user_error!(%(Unable to find latest version information from "#{Supply::Tracks::DEFAULT}" track. Please specify track information by using the '--track' option.))
       else
-        latest_version = tracks.select { |t| t.track == Supply.config[:track] }.map(&:releases).flatten.max_by { |r| r.name }
+        latest_version = tracks.select { |t| t.track == Supply.config[:track] }.map(&:releases).flatten.max_by(&:name)
       end
 
       return latest_version
@@ -393,7 +393,7 @@ module Supply
           current_edit.id,
           track
         )
-        return result.releases.flat_map { |release| release.version_codes } || []
+        return result.releases.flat_map(&:version_codes) || []
       rescue Google::Apis::ClientError => e
         return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
         raise
@@ -403,7 +403,7 @@ module Supply
     def upload_changelogs(track)
       ensure_active_edit!
 
-      result = call_google_api do
+      call_google_api do
         client.update_edit_track(
           current_package_name,
           self.current_edit.id,

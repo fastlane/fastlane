@@ -35,8 +35,8 @@ module Supply
                                      default_value: Supply::ReleaseStatus::COMPLETED,
                                      default_value_dynamic: true,
                                      verify_block: proc do |value|
-                                      UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::ReleaseStatus::ALL.include?(value)
-                                    end),
+                                                     UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::ReleaseStatus::ALL.include?(value)
+                                                   end),
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
@@ -268,7 +268,7 @@ module Supply
                                      type: Array,
                                      description: "An array of version codes to retain when publishing a new APK",
                                      verify_block: proc do |version_codes|
-                                      version_codes = version_codes.map(&:to_i)
+                                       version_codes = version_codes.map(&:to_i)
                                        UI.user_error!("Could not evaluate array from '#{version_codes}'") unless version_codes.kind_of?(Array)
                                        version_codes.each do |version_code|
                                          UI.user_error!("Version code '#{version_code}' is not an integer") if version_code == 0

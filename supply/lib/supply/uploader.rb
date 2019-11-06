@@ -14,11 +14,9 @@ module Supply
 
       apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
 
-
       # Only update tracks if we have version codes
       # Updating a track with empty version codes can completely clear out a track
       update_track(apk_version_codes) unless apk_version_codes.empty?
-
 
       if !Supply.config[:rollout].nil? && Supply.config[:version_code].to_s != "" && Supply.config[:track].to_s != ""
         update_rollout
@@ -42,8 +40,8 @@ module Supply
     def perform_upload_meta(version_codes)
       client.begin_edit(package_name: Supply.config[:package_name])
 
-      if ((!Supply.config[:skip_upload_metadata] || !Supply.config[:skip_upload_images] || !Supply.config[:skip_upload_changelogs] || !Supply.config[:skip_upload_screenshots]) && metadata_path)
-        version_codes = [Supply.config[:version_code]] if version_codes.empty? 
+      if (!Supply.config[:skip_upload_metadata] || !Supply.config[:skip_upload_images] || !Supply.config[:skip_upload_changelogs] || !Supply.config[:skip_upload_screenshots]) && metadata_path
+        version_codes = [Supply.config[:version_code]] if version_codes.empty?
         version_codes.each do |version_code|
           UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
@@ -57,7 +55,7 @@ module Supply
             UI.message("Preparing to upload for language '#{language}'...")
 
             listing = client.listing_for_language(language)
-            
+
             upload_metadata(language, listing) unless Supply.config[:skip_upload_metadata]
             upload_images(language) unless Supply.config[:skip_upload_images]
             upload_screenshots(language) unless Supply.config[:skip_upload_screenshots]
@@ -139,9 +137,11 @@ module Supply
       end
 
       releases = track_from.releases
-      releases = releases.select do |release|
-        release.version_codes.include?(Supply.config[:version_code])
-      end if Supply.config[:version_code].to_s != ""
+      if Supply.config[:version_code].to_s != ""
+        releases = releases.select do |release|
+          release.version_codes.include?(Supply.config[:version_code])
+        end
+      end
 
       if releases.size == 0
         UI.user_error!("Track '#{Supply.config[:track]}' doesn't have any releases")
@@ -332,7 +332,6 @@ module Supply
         track_release.status = Supply::ReleaseStatus::IN_PROGRESS
         track_release.user_fraction = Supply.config[:rollout].to_f
       end
-
 
       tracks = @client.tracks(Supply.config[:track])
       track = tracks.first
