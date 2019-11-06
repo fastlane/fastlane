@@ -47,7 +47,8 @@ module Supply
         version_codes.each do |version_code|
           UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
-          track, release = fetch_track_and_release(version_code)
+          track, release = fetch_track_and_release!(Supply.config[:track], version_code)
+          UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
           UI.user_error!("Coult not find release for version code '#{version_code}' to update changelog") unless release
 
           release_notes = []
@@ -63,7 +64,7 @@ module Supply
             release_notes << upload_changelog(language, release.name) unless Supply.config[:skip_upload_changelogs]
           end
 
-          upload_changelogs(release_notes, release, track) unless Supply.config[:skip_upload_changelogs]
+          upload_changelogs(release_notes, release, track) unless release_notes.empty?
         end
       end
 
@@ -78,9 +79,9 @@ module Supply
       end
     end
 
-    def fetch_track_and_release(version_code)
-      tracks = @client.tracks(Supply.config[:track])
-      UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") if tracks.length == 0
+    def fetch_track_and_release!(track, version_code)
+      tracks = @client.tracks(track)
+      return nil, nil if tracks.empty?
 
       track = tracks.first
       release = track.releases.first { |r| r.version_codes.include?(version_code) }
@@ -91,18 +92,9 @@ module Supply
     def update_rollout
       UI.message("Updating #{Supply.config[:version_code]}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
 
-      tracks = @client.tracks(Supply.config[:track])
-      UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") if tracks.length == 0
+      track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code])
+      UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
 
-      track = tracks.first
-      releases = track.releases.select { |r| r.version_codes.include?(Supply.config[:version_code]) }
-
-      version_codes = Supply.config
-      if Supply.config[:version_code]
-        releases = releases.select { |r| r.version_codes.include?(Supply.config[:version_code]) }
-      end
-
-      release = releases.first
       if release
         completed = Supply.config[:rollout].to_f == 1
         release.user_fraction = completed ? nil : Supply.config[:rollout]
