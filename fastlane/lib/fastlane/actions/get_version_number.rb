@@ -18,12 +18,18 @@ module Fastlane
         plist_file = get_plist!(folder, target, configuration)
         version_number = get_version_number_from_plist!(plist_file)
 
-        # Get from build settings if needed (ex: $(MARKETING_VERSION) is default in Xcode 11)
+        # Get from build settings (or project settings) if needed (ex: $(MARKETING_VERSION) is default in Xcode 11)
         if version_number =~ /\$\(([\w\-]+)\)/
-          version_number = get_version_number_from_build_settings!(target, $1, configuration)
+          version_number = get_version_number_from_build_settings!(target, $1, configuration) || get_version_number_from_build_settings!(project, $1, configuration)
+
         # ${MARKETING_VERSION} also works
         elsif version_number =~ /\$\{([\w\-]+)\}/
-          version_number = get_version_number_from_build_settings!(target, $1, configuration)
+          version_number = get_version_number_from_build_settings!(target, $1, configuration) || get_version_number_from_build_settings!(project, $1, configuration)
+        end
+
+        # Error out if version_number is not set
+        if version_number.nil?
+          UI.user_error!("Unable to find Xcode build setting: #{$1}")
         end
 
         # Store the number in the shared hash
@@ -81,7 +87,7 @@ module Fastlane
           end
         end
 
-        UI.user_error!("Unable to find Xcode build setting: #{variable}")
+        return nil
       end
 
       def self.get_plist!(folder, target, configuration = nil)

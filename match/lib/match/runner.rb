@@ -39,6 +39,7 @@ module Match
         clone_branch_directly: params[:clone_branch_directly],
         git_basic_authorization: params[:git_basic_authorization],
         type: params[:type].to_s,
+        generate_apple_certs: params[:generate_apple_certs],
         platform: params[:platform].to_s,
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
         google_cloud_keys_file: params[:google_cloud_keys_file].to_s,

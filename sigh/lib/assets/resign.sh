@@ -474,7 +474,7 @@ function resign {
         log "Profile app identifier prefix is '$APP_IDENTIFIER_PREFIX'"
     fi
 
-    # Set new app identifer prefix if such entry exists in plist file
+    # Set new app identifier prefix if such entry exists in plist file
     PlistBuddy -c "Set :AppIdentifierPrefix $APP_IDENTIFIER_PREFIX." "$APP_PATH/Info.plist" 2>/dev/null
 
     TEAM_IDENTIFIER=$(PlistBuddy -c "Print :Entitlements:com.apple.developer.team-identifier" "$TEMP_DIR/profile.plist" | tr -d '\n')
@@ -690,7 +690,7 @@ function resign {
         # Get the old and new app identifier (prefix)
         APP_ID_KEY="application-identifier"
         # Extract just the identifier from the value
-        # Use the fact that we are after some identifer, which is always at the start of the string
+        # Use the fact that we are after some identifier, which is always at the start of the string
         OLD_APP_ID=$(PlistBuddy -c "Print $APP_ID_KEY" "$APP_ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
         NEW_APP_ID=$(PlistBuddy -c "Print $APP_ID_KEY" "$PROFILE_ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
 

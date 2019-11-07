@@ -35,7 +35,7 @@ module Spaceship
 
       def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
         resps = Spaceship::ConnectAPI.get_bundle_ids(filter: filter, includes: includes).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def self.get(bundle_id_id: nil, includes: nil)
