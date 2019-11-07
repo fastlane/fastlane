@@ -129,7 +129,7 @@ module Snapshot
                                                 cleanup_after_failure(devices, language, locale, launch_args, return_code)
 
                                                 # no exception raised... that means we need to retry
-                                                UI.error("Caught error... #{return_code}")
+                                                UI.error("Caught error (A)... #{return_code}")
 
                                                 self.current_number_of_retries_due_to_failing_simulator += 1
                                                 if self.current_number_of_retries_due_to_failing_simulator < 20 && return_code != 65
@@ -162,12 +162,15 @@ module Snapshot
                                               loading: "Recording audio...",
                                                 error: proc do |output, return_code|
                                                          ErrorHandler.handle_test_error(output, return_code)
-                                                         UI.error "Caught error... #{return_code}"
-                                                         UI.error "Caught output... #{output}"
+                                                         UI.error "Caught error (B)... #{return_code}"
+                                                         UI.error "Caught output (C)... #{output}"
                                                        end)
       end
 
       Thread.new do
+
+        UI.message("xcrun simctl io #{device_udid} recordVideo #{folder}/#{name}.mp4",)
+
         FastlaneCore::CommandExecutor.execute(command: "xcrun simctl io #{device_udid} recordVideo #{folder}/#{name}.mp4",
                                             print_all: true,
                                         print_command: true,
@@ -177,8 +180,8 @@ module Snapshot
                                                        end,
                                                 error: proc do |output, return_code|
                                                          ErrorHandler.handle_test_error(output, return_code)
-                                                         UI.error "Caught error... #{return_code}"
-                                                         UI.error "Caught output... #{output}"
+                                                         UI.error "Caught error (D)... #{return_code}"
+                                                         UI.error "Caught output (E)... #{output}"
                                                        end)
       end
     end
@@ -188,23 +191,28 @@ module Snapshot
       pid = @recording_pid[device_udid]
       return if pid.nil?
       device = device.gsub(/[^0-9A-Za-z.\-]/, '_')
- +    name = name.gsub(/[^0-9A-Za-z.\-]/, '_')
- +    folder = File.join(Snapshot.config[:video_output_directory], dir_name, device)
+      name = name.gsub(/[^0-9A-Za-z.\-]/, '_')
+      folder = File.join(Snapshot.config[:video_output_directory], dir_name, device)
 
-      UI.message("stop_recording")
+      UI.message("stop_recording - About to kill process #{pid}")
       Process.kill("SIGINT", pid)
+      UI.message("stop_recording - Process killed")
       @recording_pid[device_udid] = nil
+      UI.message("stop_recording - Recording pid for device reset")
 
       sleep(5)
+      UI.message("stop_recording - About to run stop audio script")
       FastlaneCore::CommandExecutor.execute(command: "sh /Users/jm/Dropbox/Code_ObjC/STT_V2_HD/fastlane/Promo/process-stop-audio-record.sh #{name} #{folder}/#{name}.mp4 #{folder}/#{name}-video.mp4",
                                           print_all: true,
                                       print_command: true,
                                             loading: "Processing audio / video operations...",
                                               error: proc do |output, return_code|
                                                        ErrorHandler.handle_test_error(output, return_code)
-                                                       UI.error "Caught error... #{return_code}"
-                                                       UI.error "Caught output... #{output}"
+                                                       UI.error "Caught error (F)... #{return_code}"
+                                                       UI.error "Caught output (G)... #{output}"
                                                      end)
+
+      UI.message("stop_recording - ended")
 
     end
 

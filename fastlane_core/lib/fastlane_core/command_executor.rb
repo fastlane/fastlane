@@ -38,8 +38,6 @@ module FastlaneCore
       # @param suppress_output [Boolean] Should we print the command's output?
       # @return [String] All the output as string
 
-      #def execute(command: nil, print_all: false, print_command: true, pid_created: nil, error: nil, prefix: nil, loading: nil)
-
       def execute(command: nil, print_all: false, print_command: true, pid_created: nil, error: nil, prefix: nil, loading: nil, suppress_output: false)
 
         print_all = true if FastlaneCore::Globals.verbose?
@@ -54,14 +52,15 @@ module FastlaneCore
         end
 
         begin
-
           status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
-              if pid_created
-                pid_created.call(pid)
-              end
-              command_stdout.each do |l|
-                line = l.strip # strip so that \n gets removed
-                output << line
+
+            if pid_created
+              pid_created.call(pid)
+            end
+
+            command_stdout.each do |l|
+              line = l.chomp
+              output << line
 
               next unless print_all
 
@@ -72,6 +71,14 @@ module FastlaneCore
 
               UI.command_output(line) unless suppress_output
             end
+
+            #rescue Errno::EIO
+              # This is expected on some linux systems, that indicates that the subcommand finished
+              # and we kept trying to read, ignore it
+            #ensure
+              Process.wait(pid)
+            #end
+
           end
         rescue => ex
           # FastlanePty adds exit_status on to StandardError so every error will have a status code
