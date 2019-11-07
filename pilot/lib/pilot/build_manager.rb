@@ -39,9 +39,10 @@ module Pilot
 
       UI.success("Successfully uploaded the new binary to App Store Connect")
 
-      if config[:skip_waiting_for_build_processing]
+      # We will fully skip waiting for build processing *only* if no changelog is supplied
+      # Otherwise we will (at least) partially wait until the build appears so the changelog can be set.
+      if config[:skip_waiting_for_build_processing] && config[:changelog].nil?
         UI.important("Skip waiting for build processing")
-        UI.important("This means that no changelog will be set and no build will be distributed to testers")
         return
       end
 
@@ -84,7 +85,19 @@ module Pilot
       platform = fetch_app_platform
       app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
       app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.id, platform: platform, app_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], return_spaceship_testflight_build: false)
+
+      # We only need complete processing of the build if it is going to be submitted for review and/or distributed externally
+      requires_full_processing = config[:skip_submission] == false || config[:distribute_external]
+
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(
+        app_id: app.id,
+        platform: platform,
+        app_version: app_version,
+        build_version: app_build,
+        poll_interval: config[:wait_processing_interval],
+        requires_full_processing: requires_full_processing,
+        return_spaceship_testflight_build: false
+      )
 
       unless latest_build.app_version == app_version && latest_build.version == app_build
         UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.app_version} - #{latest_build.version}.")
