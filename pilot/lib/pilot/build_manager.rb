@@ -40,17 +40,24 @@ module Pilot
       UI.success("Successfully uploaded the new binary to App Store Connect")
 
       # We will fully skip waiting for build processing *only* if no changelog is supplied
-      # Otherwise we will (at least) partially wait until the build appears so the changelog can be set.
-      if config[:skip_waiting_for_build_processing] && config[:changelog].nil?
-        UI.important("Skip waiting for build processing")
-        return
+      # Otherwise we may partially wait until the build appears so the changelog can be set, and then bail.
+      skip_full_processing = false
+      if config[:skip_waiting_for_build_processing]
+        if config[:changelog].nil?
+          UI.important("`skip_waiting_for_build_processing` used, and no `changelog` supplied - skipping waiting for build processing")
+          return
+        else
+          skip_full_processing = true
+        end
       end
 
       # Calling login again here is needed if login was not called during 'start'
       login unless should_login_in_start
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      latest_build = wait_for_build_processing_to_be_complete
+      UI.message("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the rest of the processing steps.")
+
+      latest_build = wait_for_build_processing_to_be_complete(skip_full_processing)
       distribute(options, build: latest_build)
     end
 
@@ -81,13 +88,10 @@ module Pilot
       end
     end
 
-    def wait_for_build_processing_to_be_complete
+    def wait_for_build_processing_to_be_complete(skip_full_processing)
       platform = fetch_app_platform
       app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
       app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
-
-      # We only need complete processing of the build if it is going to be submitted for review and/or distributed externally
-      requires_full_processing = config[:skip_submission] == false || config[:distribute_external]
 
       latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(
         app_id: app.id,
@@ -95,7 +99,7 @@ module Pilot
         app_version: app_version,
         build_version: app_build,
         poll_interval: config[:wait_processing_interval],
-        requires_full_processing: requires_full_processing,
+        skip_full_processing: skip_full_processing,
         return_spaceship_testflight_build: false
       )
 
