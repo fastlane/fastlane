@@ -223,7 +223,7 @@ module Supply
       ensure_active_edit!
 
       # Verify that tracks have releases
-      filtered_tracks = tracks.select { |t| !t.releases.nil? && t.releases.any? { |r| r.name == Supply.config[:version_name] } }
+      filtered_tracks = tracks.select { |t| !t.releases.nil? && t.releases.any? { |r| r.name == version } }
 
       if filtered_tracks.length > 1
         # Production track takes precedence if version is present in multiple tracks
@@ -257,14 +257,14 @@ module Supply
       end
     end
 
-    def latest_version
+    def latest_version(track)
       latest_version = tracks.select { |t| t.track == Supply::Tracks::DEFAULT }.map(&:releases).flatten.max_by(&:name)
 
       # Check if user specified '--track' option if version information from 'production' track is nil
-      if latest_version.nil? && Supply.config[:track] == Supply::Tracks::DEFAULT
+      if latest_version.nil? && track == Supply::Tracks::DEFAULT
         UI.user_error!(%(Unable to find latest version information from "#{Supply::Tracks::DEFAULT}" track. Please specify track information by using the '--track' option.))
       else
-        latest_version = tracks.select { |t| t.track == Supply.config[:track] }.map(&:releases).flatten.max_by(&:name)
+        latest_version = tracks.select { |t| t.track == track }.map(&:releases).flatten.max_by(&:name)
       end
 
       return latest_version
@@ -383,14 +383,14 @@ module Supply
       end
     end
 
-    def upload_changelogs(track)
+    def upload_changelogs(track, track_name)
       ensure_active_edit!
 
       call_google_api do
         client.update_edit_track(
           current_package_name,
           self.current_edit.id,
-          Supply.config[:track],
+          track_name,
           track
         )
       end

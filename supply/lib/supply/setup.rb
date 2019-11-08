@@ -16,7 +16,7 @@ module Supply
       end
 
       if Supply.config[:version_name].to_s == ""
-        latest_version = client.latest_version
+        latest_version = client.latest_version(Supply.config[:track])
         if latest_version
           Supply.config[:version_name] = latest_version.name
         else

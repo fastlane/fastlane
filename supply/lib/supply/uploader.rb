@@ -185,7 +185,7 @@ module Supply
 
     def upload_changelogs(release_notes, release, track)
       release.release_notes = release_notes
-      client.upload_changelogs(track)
+      client.upload_changelogs(track, Supply.config[:track])
     end
 
     def upload_metadata(language, listing)
