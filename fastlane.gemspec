@@ -97,7 +97,9 @@ Gem::Specification.new do |spec|
   # https://github.com/fastlane/fastlane/pull/15483
   if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4')
     spec.add_dependency('signet', '<= 0.11') # Because yeah
-    STDERR.puts("WARNING: Locking to a potentially insecure version of 'signet' because you are using a version of Ruby which is marked as End-Of-Life. Please upgrade your Ruby installation to 2.4 or later")
+    spec.add_dependency('google-cloud-env', '1.2.1')
+    spec.add_dependency('google-cloud-core', '1.3.2')
+    STDERR.puts("WARNING: Locking to a potentially insecure version of 'signet', 'google-cloud-env', and 'google-cloud-core' because you are using a version of Ruby which is marked as End-Of-Life. Please upgrade your Ruby installation to 2.4 or later")
   end
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
