@@ -44,7 +44,7 @@ module Pilot
       skip_full_processing = false
       if config[:skip_waiting_for_build_processing]
         if config[:changelog].nil?
-          UI.important("`skip_waiting_for_build_processing` used, and no `changelog` supplied - skipping waiting for build processing")
+          UI.important("`skip_waiting_for_build_processing` used and no `changelog` supplied - skipping waiting for build processing")
           return
         else
           skip_full_processing = true
@@ -55,7 +55,7 @@ module Pilot
       login unless should_login_in_start
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      UI.message("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the rest of the processing steps.")
+      UI.message("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps.")
 
       latest_build = wait_for_build_processing_to_be_complete(skip_full_processing)
       distribute(options, build: latest_build)
