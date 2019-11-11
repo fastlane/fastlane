@@ -18,7 +18,7 @@ module Supply
       # Updating a track with empty version codes can completely clear out a track
       update_track(apk_version_codes) unless apk_version_codes.empty?
 
-      if !Supply.config[:rollout].nil? && Supply.config[:version_code].to_s != "" && Supply.config[:track].to_s != ""
+      if !Supply.config[:rollout].nil? && Supply.config[:track].to_s != ""
         update_rollout
       end
 
@@ -77,31 +77,39 @@ module Supply
       end
     end
 
-    def fetch_track_and_release!(track, version_code)
+    def fetch_track_and_release!(track, version_code, status = nil)
       tracks = client.tracks(track)
       return nil, nil if tracks.empty?
 
       track = tracks.first
-      release = track.releases.first { |r| r.version_codes.include?(version_code) }
+      releases = track.releases
+      releases = releases.select { |r| r.status == status } if status
+
+      if releases.size > 1
+        UI.user_error!("More than one release found in this track. Please specify with the :version_code option to select a release.")
+      end
+
+      release = releases.first { |r| r.version_codes.include?(version_code) }
 
       return track, release
     end
 
     def update_rollout
-      UI.message("Updating #{Supply.config[:version_code]}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
+      track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code], Supply::ReleaseStatus::IN_PROGRESS)
+      version_code = release.version_codes.first
 
-      track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code])
+      UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
       UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
 
-      if release
+      if track && release
         completed = Supply.config[:rollout].to_f == 1
         release.user_fraction = completed ? nil : Supply.config[:rollout]
         release.status = Supply::ReleaseStatus::COMPLETED if completed
 
         # Deleted other version codes if completed because only allowed on completed version in a release
-        track.releases.delete_if { |r| !r.version_codes.include?(Supply.config[:version_code]) } if completed
+        track.releases.delete_if { |r| !(r.version_codes || []).include?(version_code) } if completed
       else
-        UI.user_error!("Unable to find version code '#{Supply.config[:version_code]}' in track '#{Supply.config[:track]}'")
+        UI.user_error!("Unable to find version to rollout in track '#{Supply.config[:track]}'")
       end
 
       client.update_track(Supply.config[:track], track)
@@ -172,9 +180,8 @@ module Supply
       path = File.join(Supply.config[:metadata_path], language, Supply::CHANGELOGS_FOLDER_NAME, "#{version_name}.txt")
       changelog_text = ''
       if File.exist?(path)
+        UI.message("Updating changelog for '#{version_name}' and language '#{language}'...")
         changelog_text = File.read(path, encoding: 'UTF-8')
-      else
-        UI.user_error!(%(Cannot update changelog for '#{language}', as the path '#{path}' does not exist.))
       end
 
       AndroidPublisher::LocalizedText.new({
