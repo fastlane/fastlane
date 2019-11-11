@@ -1,4 +1,5 @@
 module Supply
+  # rubocop:disable Metrics/ClassLength
   class Uploader
     def perform_upload
       FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], mask_keys: [:json_key_data], title: "Summary for supply #{Fastlane::VERSION}")
@@ -47,7 +48,7 @@ module Supply
 
           track, release = fetch_track_and_release!(Supply.config[:track], version_code)
           UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
-          UI.user_error!("Coult not find release for version code '#{version_code}' to update changelog") unless release
+          UI.user_error!("Could not find release for version code '#{version_code}' to update changelog") unless release
 
           release_notes = []
           all_languages.each do |language|
@@ -84,14 +85,13 @@ module Supply
       track = tracks.first
       releases = track.releases
       releases = releases.select { |r| r.status == status } if status
+      releases = releases.select { |r| r.version_codes.map(&:to_s).include?(version_code.to_s) }
 
       if releases.size > 1
         UI.user_error!("More than one release found in this track. Please specify with the :version_code option to select a release.")
       end
 
-      release = releases.first { |r| r.version_codes.include?(version_code) }
-
-      return track, release
+      return track, releases.first
     end
 
     def update_rollout
@@ -107,7 +107,7 @@ module Supply
         release.status = Supply::ReleaseStatus::COMPLETED if completed
 
         # Deleted other version codes if completed because only allowed on completed version in a release
-        track.releases.delete_if { |r| !(r.version_codes || []).include?(version_code) } if completed
+        track.releases.delete_if { |r| !(r.version_codes || []).map(&:to_s).include?(version_code) } if completed
       else
         UI.user_error!("Unable to find version to rollout in track '#{Supply.config[:track]}'")
       end
@@ -129,7 +129,7 @@ module Supply
         UI.user_error!("Cannot provide both apk(s) and aab - use `skip_upload_apk`, `skip_upload_aab`, or  make sure to remove any existing .apk or .aab files that are no longer needed")
       end
 
-      if Supply.config[:release_status] == 'draft' && Supply.config[:rollout]
+      if Supply.config[:release_status] == Supply::ReleaseStatus::DRAFT && Supply.config[:rollout]
         UI.user_error!(%(Cannot specify rollout percentage when the release status is set to 'draft'))
       end
 
@@ -147,7 +147,7 @@ module Supply
       releases = track_from.releases
       if Supply.config[:version_code].to_s != ""
         releases = releases.select do |release|
-          release.version_codes.include?(Supply.config[:version_code])
+          release.version_codes.include?(Supply.config[:version_code].to_s)
         end
       end
 
@@ -182,6 +182,8 @@ module Supply
       if File.exist?(path)
         UI.message("Updating changelog for '#{version_name}' and language '#{language}'...")
         changelog_text = File.read(path, encoding: 'UTF-8')
+      else
+        UI.message("Could not find changelog for '#{version_name}' and language '#{language}' at path #{path}...")
       end
 
       AndroidPublisher::LocalizedText.new({
@@ -421,4 +423,5 @@ module Supply
       end
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
