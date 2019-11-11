@@ -20,7 +20,10 @@ module Fastlane
 
         Supply.config = params
 
-        Supply::Reader.new.track_version_codes
+        # AndroidpublisherV3 returns version codes as array of strings
+        # even though version codes need to be integers
+        # https://github.com/fastlane/fastlane/issues/15622
+        (Supply::Reader.new.track_version_codes || []).flat_map(&:to_i)
       end
 
       #####################################################
