@@ -23,7 +23,8 @@ module Fastlane
         # AndroidpublisherV3 returns version codes as array of strings
         # even though version codes need to be integers
         # https://github.com/fastlane/fastlane/issues/15622
-        (Supply::Reader.new.track_version_codes || []).flat_map(&:to_i)
+        version_codes = Supply::Reader.new.track_version_codes || []
+        return version_codes.compact.map(&:to_i)
       end
 
       #####################################################
