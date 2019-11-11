@@ -96,7 +96,7 @@ Gem::Specification.new do |spec|
   # 'gem install' does not respect Ruby versions and would try installing 0.12 on Ruby 2.3 or less
   # https://github.com/fastlane/fastlane/pull/15483
   if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4')
-    spec.add_dependency('signet', '<= 0.11') # Because yeah
+    spec.add_dependency('signet', '<= 0.11')
     spec.add_dependency('google-cloud-env', '1.2.1')
     spec.add_dependency('google-cloud-core', '1.3.2')
     STDERR.puts("WARNING: Locking to a potentially insecure version of 'signet', 'google-cloud-env', and 'google-cloud-core' because you are using a version of Ruby which is marked as End-Of-Life. Please upgrade your Ruby installation to 2.4 or later")
