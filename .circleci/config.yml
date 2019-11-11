@@ -170,7 +170,7 @@ jobs:
 
   "Validate Documentation":
     docker:
-      - image: circleci/ruby:2.3
+      - image: circleci/ruby:2.4
     steps:
       - checkout
 
