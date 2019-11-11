@@ -295,6 +295,7 @@ CrossPlatform/ForkUsage:
 Lint/IsStringUsage:
   Include:
     - 'gym/**/*'
+    - 'supply/**/*'
 
 # ( ) for method calls
 Style/MethodCallWithArgsParentheses:
