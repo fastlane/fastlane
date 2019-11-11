@@ -24,6 +24,7 @@ module Supply
                                      env_name: "SUPPLY_VERSION_CODE",
                                      short_option: "-C",
                                      optional: true,
+                                     type: Integer,
                                      description: "Version code (used when updating rollout or promoting specific versions)",
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:version_code),
                                      default_value_dynamic: true),
