@@ -147,7 +147,7 @@ module Supply
       releases = track_from.releases
       if Supply.config[:version_code].to_s != ""
         releases = releases.select do |release|
-          release.version_codes.include?(Supply.config[:version_code])
+          release.version_codes.include?(Supply.config[:version_code].to_s)
         end
       end
 
