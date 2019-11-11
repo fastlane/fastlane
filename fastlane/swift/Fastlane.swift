@@ -6698,7 +6698,7 @@ func ssh(username: String,
 */
 func supply(packageName: String,
             versionName: String? = nil,
-            versionCode: String? = nil,
+            versionCode: Int? = nil,
             releaseStatus: String = "completed",
             track: String = "production",
             rollout: String? = nil,
@@ -7720,7 +7720,7 @@ func uploadToAppStore(username: String,
 */
 func uploadToPlayStore(packageName: String,
                        versionName: String? = nil,
-                       versionCode: String? = nil,
+                       versionCode: Int? = nil,
                        releaseStatus: String = "completed",
                        track: String = "production",
                        rollout: String? = nil,
@@ -8326,4 +8326,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.62]
+// FastlaneRunnerAPIVersion [0.9.63]
