@@ -141,7 +141,7 @@ module Screengrab
         FastlaneCore::ConfigItem.new(key: :adb_host,
                                      env_name: 'SCREENGRAB_ADB_HOST',
                                      description: "Configure the host used by adb to connect, allows running on remote devices farm",
-                                     default_value: "localhost")
+                                     optional: true)
       ]
     end
   end

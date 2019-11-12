@@ -62,7 +62,7 @@ module Screengrab
 
       # Root is needed to access device paths at /data
       if @config[:use_adb_root]
-        run_adb_command("adb root", print_all: false, print_command: true)
+        run_adb_command("root", print_all: false, print_command: true)
       end
 
       clear_device_previous_screenshots(device_serial, device_screenshots_paths)
