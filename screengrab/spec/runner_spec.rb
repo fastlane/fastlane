@@ -90,7 +90,7 @@ describe Screengrab::Runner do
         end
         it 'sets appendTimestamp as false' do
           expect(mock_executor).to receive(:execute)
-            .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp false \\\n/android.support.test.runner.AndroidJUnitRunner"))
+            .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp false \\\n/androidx.test.runner.AndroidJUnitRunner"))
           @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
         end
       end
@@ -105,7 +105,7 @@ describe Screengrab::Runner do
         end
         it 'should set appendTimestamp by default' do
           expect(mock_executor).to receive(:execute)
-            .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp true \\\n/android.support.test.runner.AndroidJUnitRunner"))
+            .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp true \\\n/androidx.test.runner.AndroidJUnitRunner"))
           @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
         end
       end
