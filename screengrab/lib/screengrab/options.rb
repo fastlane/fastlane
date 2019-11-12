@@ -132,6 +132,11 @@ module Screengrab
                                      env_name: 'SCREENGRAB_REINSTALL_APP',
                                      description: "Enabling this option will automatically uninstall the application before running it",
                                      default_value: false,
+                                     type: Boolean),
+        FastlaneCore::ConfigItem.new(key: :use_timestamp_suffix,
+                                     env_name: 'SCREENGRAB_USE_TIMESTAMP_SUFFIX',
+                                     description: "Add timestamp suffix to screenshot filename",
+                                     default_value: true,
                                      type: Boolean)
       ]
     end

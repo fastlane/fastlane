@@ -33,10 +33,11 @@ describe Screengrab::Runner do
         config[:launch_arguments] = ["username hjanuschka", "build_type x500"]
         config[:locales] = %w(en-US)
         config[:ending_locale] = 'en-US'
+        config[:use_timestamp_suffix] = true
       end
       it 'sets custom launch_arguments' do
         expect(mock_executor).to receive(:execute)
-          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e username hjanuschka -e build_type x500 \\\n/"))
+          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp true \\\n-e username hjanuschka -e build_type x500 \\\n/"))
         @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, config[:launch_arguments])
       end
     end
@@ -74,6 +75,38 @@ describe Screengrab::Runner do
 
             @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
           end
+        end
+      end
+    end
+
+    context 'when using use_timestamp_suffix' do
+      context 'when set to false' do
+        before do
+          @runner = Screengrab::Runner.new(
+            mock_executor,
+            FastlaneCore::Configuration.create(Screengrab::Options.available_options, { use_timestamp_suffix: false }),
+            mock_android_environment
+          )
+        end
+        it 'sets appendTimestamp as false' do
+          expect(mock_executor).to receive(:execute)
+            .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp false \\\n/androidx.test.runner.AndroidJUnitRunner"))
+          @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
+        end
+      end
+
+      context 'use_timestamp_suffix is not specified' do
+        before do
+          @runner = Screengrab::Runner.new(
+            mock_executor,
+            FastlaneCore::Configuration.create(Screengrab::Options.available_options, {}),
+            mock_android_environment
+          )
+        end
+        it 'should set appendTimestamp by default' do
+          expect(mock_executor).to receive(:execute)
+            .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp true \\\n/androidx.test.runner.AndroidJUnitRunner"))
+          @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
         end
       end
     end
