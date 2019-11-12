@@ -76,7 +76,7 @@ module Screengrab
         FastlaneCore::ConfigItem.new(key: :test_instrumentation_runner,
                                      env_name: 'SCREENGRAB_TEST_INSTRUMENTATION_RUNNER',
                                      optional: true,
-                                     default_value: 'android.support.test.runner.AndroidJUnitRunner',
+                                     default_value: 'androidx.test.runner.AndroidJUnitRunner',
                                      description: "The fully qualified class name of your test instrumentation runner"),
         FastlaneCore::ConfigItem.new(key: :ending_locale,
                                      env_name: 'SCREENGRAB_ENDING_LOCALE',
