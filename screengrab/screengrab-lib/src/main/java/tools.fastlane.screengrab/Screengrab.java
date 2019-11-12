@@ -22,15 +22,14 @@
 package tools.fastlane.screengrab;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
-import java.util.HashMap;
 import java.util.regex.Pattern;
 
 public class Screengrab {
     private static final Pattern TAG_PATTERN = Pattern.compile("[a-zA-Z0-9_-]+");
 
-    private static ScreenshotStrategy defaultScreenshotStrategy = new DecorViewScreenshotStrategy();
+    private static ScreenshotStrategy defaultScreenshotStrategy = new UiAutomatorScreenshotStrategy();
 
     /**
      * @return The default {@link ScreenshotStrategy} used in {@link #screenshot(String)} invocations

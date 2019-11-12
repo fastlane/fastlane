@@ -26,10 +26,12 @@ sudo gem install fastlane
 
 ##### Gradle dependency
 ```java
-androidTestCompile('tools.fastlane:screengrab:x.x.x')
+androidTestImplementation 'tools.fastlane:screengrab:x.x.x'
 ```
 
 The latest version is [ ![Download](https://api.bintray.com/packages/fastlane/fastlane/screengrab/images/download.svg) ](https://bintray.com/fastlane/fastlane/screengrab/_latestVersion)
+
+As of Screengrab version 2.0.0, all Android test dependencies are AndroidX dependencies. This means a device with API 18+, Android 4.3 or greater is required. If you wish to capture screenshots with an older Android OS, then you must use a 1.x.x version.
 
 ##### Configuring your Manifest Permissions
 
@@ -82,10 +84,10 @@ As of _screengrab_ 0.5.0, you can specify different strategies to control the wa
 * Multi-window situations are correctly captured (dialogs, etc.)
 * Works on Android N
 
-However, UI Automator requires a device with **API level >= 18**, so it is not yet the default strategy. To enable it for all screenshots by default, make the following call before your tests run:
+UI Automator is the default strategy. However, UI Automator requires a device with **API level >= 18**. If you need to grab screenshots on an older Android version, use the latest 1.x.x version of this library and set the DecorView ScreenshotStrategy.
 
 ```java
-Screengrab.setDefaultScreenshotStrategy(new UiAutomatorScreenshotStrategy());
+Screengrab.setDefaultScreenshotStrategy(new DecorViewScreenshotStrategy());
 ```
 
 ## Improved screenshot capture with Falcon

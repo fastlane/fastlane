@@ -66,8 +66,8 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
         File directory = null;
 
         if (Build.VERSION.SDK_INT >= 21) {
-            File externalDir = new File(Environment.getExternalStorageDirectory(), getDirectoryName(context, locale));
-            directory = initializeDirectory(externalDir);
+            File internalDir = new File(context.getFilesDir(), getDirectoryName(context, locale));
+            directory = initializeDirectory(internalDir);
         }
 
         // We can only try this fall-back before Android N, since N makes Context.MODE_WORLD_READABLE
