@@ -3,8 +3,7 @@ package tools.fastlane.screengrab;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
-import android.os.Environment;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 import android.util.Log;
 
 import java.io.BufferedOutputStream;
