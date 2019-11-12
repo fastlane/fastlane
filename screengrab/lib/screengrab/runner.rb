@@ -57,8 +57,11 @@ module Screengrab
 
       device_screenshots_paths = [
         determine_external_screenshots_path(device_serial),
-        determine_internal_screenshots_path
-      ]
+        determine_internal_screenshots_paths
+      ].flatten
+
+      # Root is needed to access device paths at /data
+      run_adb_command("adb root", print_all: false, print_command: true)
 
       clear_device_previous_screenshots(device_serial, device_screenshots_paths)
 
@@ -146,8 +149,11 @@ module Screengrab
       File.join(device_ext_storage, @config[:app_package_name], 'screengrab')
     end
 
-    def determine_internal_screenshots_path
-      "/data/data/#{@config[:app_package_name]}/app_screengrab"
+    def determine_internal_screenshots_paths
+      [
+        "/data/data/#{@config[:app_package_name]}/app_screengrab",
+        "/data/user/0/#{@config[:app_package_name]}/files/#{@config[:app_package_name]}/screengrab//en-US/images/screenshots"
+      ]
     end
 
     def clear_device_previous_screenshots(device_serial, device_screenshots_paths)
@@ -281,6 +287,7 @@ module Screengrab
 
       # Make a temp directory into which to pull the screenshots before they are moved to their final location.
       # This makes directory cleanup easier, as the temp directory will be removed when the block completes.
+
       Dir.mktmpdir do |tempdir|
         device_screenshots_paths.each do |device_path|
           if_device_path_exists(device_serial, device_path) do |path|
