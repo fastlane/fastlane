@@ -57,7 +57,7 @@ module Screengrab
 
       device_screenshots_paths = [
         determine_external_screenshots_path(device_serial),
-        determine_internal_screenshots_paths
+        determine_internal_screenshots_paths(@config[:app_package_name], @config[:locales])
       ].flatten
 
       # Root is needed to access device paths at /data
@@ -149,11 +149,12 @@ module Screengrab
       File.join(device_ext_storage, @config[:app_package_name], 'screengrab')
     end
 
-    def determine_internal_screenshots_paths
-      [
-        "/data/data/#{@config[:app_package_name]}/app_screengrab",
-        "/data/user/0/#{@config[:app_package_name]}/files/#{@config[:app_package_name]}/screengrab//en-US/images/screenshots"
-      ]
+    def determine_internal_screenshots_paths(app_package_name, locales)
+      locale_paths = locales.map do |locale|
+        "/data/user/0/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots"
+      end
+
+      return ["/data/data/#{app_package_name}/app_screengrab"] + locale_paths
     end
 
     def clear_device_previous_screenshots(device_serial, device_screenshots_paths)
