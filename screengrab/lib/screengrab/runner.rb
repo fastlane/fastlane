@@ -264,6 +264,7 @@ module Screengrab
       instrument_command = ["adb -s #{device_serial} shell am instrument --no-window-animation -w",
                             "-e testLocale #{locale.tr('-', '_')}",
                             "-e endingLocale #{@config[:ending_locale].tr('-', '_')}"]
+      instrument_command << "-e appendTimestamp #{@config[:use_timestamp_suffix]}"
       instrument_command << "-e class #{test_classes_to_use.join(',')}" if test_classes_to_use
       instrument_command << "-e package #{test_packages_to_use.join(',')}" if test_packages_to_use
       instrument_command << launch_arguments.map { |item| '-e ' + item }.join(' ') if launch_arguments
