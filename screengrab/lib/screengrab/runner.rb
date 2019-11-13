@@ -72,6 +72,8 @@ module Screengrab
 
       validate_apk(app_apk_path)
 
+      enable_clean_status_bar(device_serial, app_apk_path)
+
       run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, @config[:launch_arguments])
 
       number_of_screenshots = pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
@@ -227,11 +229,7 @@ module Screengrab
                       print_all: true,
                       print_command: true)
 
-      device_api_version = run_adb_command("-s #{device_serial} shell getprop ro.build.version.sdk",
-                                           print_all: true,
-                                           print_command: true).to_i
-
-      if device_api_version >= 23
+      if device_api_version(device_serial) >= 23
         UI.message('Granting the permissions necessary to access device external storage')
         run_adb_command("-s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.WRITE_EXTERNAL_STORAGE",
                         print_all: true,
@@ -387,6 +385,35 @@ module Screengrab
         # Debug/Warning output from ADB}
         line.start_with?('adb: ')
       end.join('') # Lines retain their newline chars
+    end
+
+    def device_api_version(device_serial)
+      run_adb_command("-s #{device_serial} shell getprop ro.build.version.sdk",
+                      print_all: true, print_command: true).to_i
+    end
+
+    def enable_clean_status_bar(device_serial, app_apk_path)
+      return unless device_api_version(device_serial) >= 23
+
+      # Check if the app wants to use the clean status bar feature
+      badging_dump = @executor.execute(command: "#{@android_env.aapt_path} dump badging #{app_apk_path}",
+                                       print_all: true, print_command: true)
+      return unless badging_dump.include?('uses-feature: name=\'tools.fastlane.screengrab.cleanstatusbar\'')
+
+      UI.message('Enabling clean status bar')
+
+      # Make sure the app requests the DUMP permission
+      unless badging_dump.include?('uses-permission: name=\'android.permission.DUMP\'')
+        UI.user_error!("The clean status bar feature requires the android.permission.DUMP permission but it could not be found in your app APK")
+      end
+
+      # Grant the DUMP permission
+      run_adb_command("-s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.DUMP",
+                      print_all: true, print_command: true)
+
+      # Enable the SystemUI demo mode
+      run_adb_command("-s #{device_serial} shell settings put global sysui_demo_allowed 1",
+                      print_all: true, print_command: true)
     end
   end
 end
