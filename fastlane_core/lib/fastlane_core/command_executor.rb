@@ -53,6 +53,8 @@ module FastlaneCore
 
         begin
           status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
+           begin 
+            UI.message("execute - pid #{pid} pid_created #{pid_created} command #{command}")
 
             if pid_created
               pid_created.call(pid)
@@ -72,12 +74,14 @@ module FastlaneCore
               UI.command_output(line) unless suppress_output
             end
 
-            #rescue Errno::EIO
+            rescue Errno::EIO
               # This is expected on some linux systems, that indicates that the subcommand finished
               # and we kept trying to read, ignore it
-            #ensure
+            ensure
+              UI.message("execute - before wait")
               Process.wait(pid)
-            #end
+              UI.message("execute - after wait")
+            end
 
           end
         rescue => ex
