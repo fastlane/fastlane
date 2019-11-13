@@ -1,6 +1,6 @@
 package tools.fastlane.screengrab.cleanstatusbar;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public enum IconVisibility {
 

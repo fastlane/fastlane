@@ -388,7 +388,7 @@ module Screengrab
     end
 
     def device_api_version(device_serial)
-      run_adb_command("adb -s #{device_serial} shell getprop ro.build.version.sdk",
+      run_adb_command("-s #{device_serial} shell getprop ro.build.version.sdk",
                       print_all: true, print_command: true).to_i
     end
 
@@ -408,11 +408,11 @@ module Screengrab
       end
 
       # Grant the DUMP permission
-      run_adb_command("adb -s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.DUMP",
+      run_adb_command("-s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.DUMP",
                       print_all: true, print_command: true)
 
       # Enable the SystemUI demo mode
-      run_adb_command("adb -s #{device_serial} shell settings put global sysui_demo_allowed 1",
+      run_adb_command("-s #{device_serial} shell settings put global sysui_demo_allowed 1",
                       print_all: true, print_command: true)
     end
   end

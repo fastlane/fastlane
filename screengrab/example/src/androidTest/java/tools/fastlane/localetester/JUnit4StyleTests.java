@@ -37,7 +37,7 @@ public class JUnit4StyleTests {
         Screengrab.setDefaultScreenshotStrategy(new UiAutomatorScreenshotStrategy());
 
         new CleanStatusBar()
-                .setMobileNetworkDataType(MobileDataType.LTE)
+                .setMobileNetworkDataType(MobileDataType.THREEG)
                 .setBluetoothState(BluetoothState.DISCONNECTED)
                 .enable();
     }
