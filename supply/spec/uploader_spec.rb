@@ -182,9 +182,14 @@ describe Supply do
         allow(client).to receive(:track_version_codes).and_return(version_codes)
         allow(client).to receive(:update_track).with(config[:track], 0.1, nil)
         allow(client).to receive(:update_track).with(config[:track_promote_to], 0.1, version_codes)
+
+        allow(release).to receive(:status).and_return(Supply::ReleaseStatus::COMPLETED)
       end
 
       it 'should only update track once' do
+        expect(release).to receive(:status=).with(Supply::ReleaseStatus::COMPLETED)
+        expect(release).to receive(:user_fraction=).with(nil)
+
         expect(client).not_to(receive(:update_track).with(config[:track], anything))
         expect(client).to receive(:update_track).with(config[:track_promote_to], track).once
         subject
