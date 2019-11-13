@@ -19,11 +19,11 @@ module Supply
       # Updating a track with empty version codes can completely clear out a track
       update_track(apk_version_codes) unless apk_version_codes.empty?
 
-      if !Supply.config[:rollout].nil? && Supply.config[:track].to_s != ""
+      if Supply.config[:track_promote_to]
+        promote_track
+      elsif !Supply.config[:rollout].nil? && Supply.config[:track].to_s != ""
         update_rollout
       end
-
-      promote_track if Supply.config[:track_promote_to]
 
       if Supply.config[:validate_only]
         UI.message("Validating all track and release changes with Google Play...")
@@ -42,7 +42,12 @@ module Supply
       client.begin_edit(package_name: Supply.config[:package_name])
 
       if (!Supply.config[:skip_upload_metadata] || !Supply.config[:skip_upload_images] || !Supply.config[:skip_upload_changelogs] || !Supply.config[:skip_upload_screenshots]) && metadata_path
+        # Use version code from config if version codes is empty and no nil or empty string
         version_codes = [Supply.config[:version_code]] if version_codes.empty?
+        version_codes = version_codes.reject do |version_code|
+          version_codes.to_s == ""
+        end
+
         version_codes.each do |version_code|
           UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
@@ -84,8 +89,9 @@ module Supply
 
       track = tracks.first
       releases = track.releases
+
       releases = releases.select { |r| r.status == status } if status
-      releases = releases.select { |r| r.version_codes.map(&:to_s).include?(version_code.to_s) }
+      releases = releases.select { |r| r.version_codes.map(&:to_s).include?(version_code.to_s) } if version_code
 
       if releases.size > 1
         UI.user_error!("More than one release found in this track. Please specify with the :version_code option to select a release.")
@@ -96,10 +102,12 @@ module Supply
 
     def update_rollout
       track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code], Supply::ReleaseStatus::IN_PROGRESS)
+      UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
+      UI.user_error!("Unable to find the requested release on track - '#{Supply.config[:track]}'") unless release
+
       version_code = release.version_codes.first
 
       UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
-      UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
 
       if track && release
         completed = Supply.config[:rollout].to_f == 1
@@ -149,6 +157,10 @@ module Supply
         releases = releases.select do |release|
           release.version_codes.include?(Supply.config[:version_code].to_s)
         end
+      else
+        releases = releases.select do |release|
+          release.status == Supply::ReleaseStatus::COMPLETED
+        end
       end
 
       if releases.size == 0
@@ -157,8 +169,16 @@ module Supply
         UI.user_error!("Track '#{Supply.config[:track]}' has more than one release - use :version_code to filter the release to promote")
       end
 
-      release = track_from.releases.first
+      release = releases.first
       track_to = client.tracks(Supply.config[:track_promote_to]).first
+
+      if Supply.config[:rollout]
+        release.status = Supply::ReleaseStatus::IN_PROGRESS
+        release.user_fraction = Supply.config[:rollout]
+      else
+        release.status = Supply::ReleaseStatus::COMPLETED
+        release.user_fraction = nil
+      end
 
       if track_to
         # Its okay to set releases to an array containing the newest release
