@@ -137,7 +137,11 @@ module Screengrab
                                      env_name: 'SCREENGRAB_USE_TIMESTAMP_SUFFIX',
                                      description: "Add timestamp suffix to screenshot filename",
                                      default_value: true,
-                                     type: Boolean)
+                                     type: Boolean),
+        FastlaneCore::ConfigItem.new(key: :adb_host,
+                                     env_name: 'SCREENGRAB_ADB_HOST',
+                                     description: "Configure the host used by adb to connect, allows running on remote devices farm",
+                                     optional: true)
       ]
     end
   end
