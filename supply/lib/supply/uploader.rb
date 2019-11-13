@@ -25,7 +25,6 @@ module Supply
         update_rollout
       end
 
-
       if Supply.config[:validate_only]
         UI.message("Validating all track and release changes with Google Play...")
         client.validate_current_edit!
@@ -45,8 +44,8 @@ module Supply
       if (!Supply.config[:skip_upload_metadata] || !Supply.config[:skip_upload_images] || !Supply.config[:skip_upload_changelogs] || !Supply.config[:skip_upload_screenshots]) && metadata_path
         # Use version code from config if version codes is empty and no nil or empty string
         version_codes = [Supply.config[:version_code]] if version_codes.empty?
-        version_codes = version_codes.select do |version_code|
-          version_codes.to_s != "" 
+        version_codes = version_codes.reject do |version_code|
+          version_codes.to_s == ""
         end
 
         version_codes.each do |version_code|
