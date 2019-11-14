@@ -347,7 +347,7 @@ module Fastlane
           elsif default_value.kind_of?(Hash)
             # we can't handle default values for Hashes, yet
             # see method parameters for similar behavior
-            default_value = "[:]"
+            #default_value = "[:]"
           else
             default_value = "\"#{default_value}\""
           end
