@@ -168,7 +168,7 @@ jobs:
           command: bundle exec danger || echo "danger failed"
           when: always # Run this even when tests fail
 
-  "Validate Fastlane.swift Generation":
+  "Validate Swift Generation":
     macos:
       xcode: "11.0.0"
     environment:
