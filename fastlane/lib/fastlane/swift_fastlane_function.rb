@@ -147,6 +147,7 @@ module Fastlane
         unless default_value.nil?
           if type == "[String : Any]"
             # we can't handle default values for Hashes, yet
+            # see method swift_default_implementations for similar behavior
             default_value = "[:]"
           elsif type != "Bool" && type != "[String]" && type != "Int" && type != "((String) -> Void)"
             default_value = "\"#{default_value}\""
@@ -343,6 +344,10 @@ module Fastlane
         unless default_value.nil?
           if type == "Bool" || type == "[String]" || type == "Int" || default_value.kind_of?(Array)
             default_value = default_value.to_s
+          elsif default_value.kind_of?(Hash)
+            # we can't handle default values for Hashes, yet
+            # see method parameters for similar behavior
+            default_value = "[:]"
           else
             default_value = "\"#{default_value}\""
           end
@@ -364,6 +369,10 @@ module Fastlane
 
         if type == "[String]"
           default_value ||= "[]"
+        end
+
+        if type == "[String : Any]"
+          default_value ||= "[:]"
         end
 
         "  var #{var_for_parameter_name}: #{type} { return #{default_value} }"
