@@ -18,11 +18,15 @@ module Spaceship
       # @return (Intger) amount of linked in-app purchases of this family (read-only)
       attr_accessor :iap_count
 
+      # @return (Array) of all in-app purchase family details
+      attr_accessor :family_details
+
       attr_mapping({
         'id' => :family_id,
         'name.value' => :name,
         'activeAddOns' => :linked_iaps,
-        'totalActiveAddOns' => :iap_count
+        'totalActiveAddOns' => :iap_count,
+        'details.value' => :family_details
       })
 
       def versions=(value = {})
@@ -60,6 +64,8 @@ module Spaceship
 
       # modify existing family
       def save!
+        # Details ID is required for live subscriptions. Update will fail if it's not provided
+        details_id = raw_data["details"]["value"].first["value"]["id"]
         # Transform localization versions back to original format.
         versions_array = []
         versions.each do |language_code, value|
@@ -67,7 +73,8 @@ module Spaceship
                                "value" => {
                                  "subscriptionName" => { "value" => value[:subscription_name] },
                                  "name" => { "value" => value[:name] },
-                                 "localeCode" => { "value" => language_code.to_s }
+                                 "localeCode" => { "value" => language_code.to_s },
+                                 "id" => details_id
                                }
                             }
         end
