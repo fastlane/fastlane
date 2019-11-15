@@ -1210,12 +1210,17 @@ func bundleInstall(binstubs: String? = nil,
    - launchArguments: Additional launch arguments
    - testInstrumentationRunner: The fully qualified class name of your test instrumentation runner
    - endingLocale: Return the device to this locale after running tests
+   - useAdbRoot: Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
    - appApkPath: The path to the APK for the app under test
    - testsApkPath: The path to the APK for the the tests bundle
    - specificDevice: Use the device or emulator with the given serial number or qualifier
    - deviceType: Type of device used for screenshots. Matches Google Play Types (phone, sevenInch, tenInch, tv, wear)
    - exitOnTestFailure: Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
+   - useTimestampSuffix: Add timestamp suffix to screenshot filename
+   - adbHost: Configure the host used by adb to connect, allows running on remote devices farm
+   - cleanStatusBar: Enabling this option will clean the status bar
+   - cleanStatusBarConfig: Specifies the configuration for the clean status bar
 */
 func captureAndroidScreenshots(androidHome: String? = nil,
                                buildToolsVersion: String? = nil,
@@ -1228,14 +1233,19 @@ func captureAndroidScreenshots(androidHome: String? = nil,
                                useTestsInPackages: [String]? = nil,
                                useTestsInClasses: [String]? = nil,
                                launchArguments: [String]? = nil,
-                               testInstrumentationRunner: String = "android.support.test.runner.AndroidJUnitRunner",
+                               testInstrumentationRunner: String = "androidx.test.runner.AndroidJUnitRunner",
                                endingLocale: String = "en-US",
+                               useAdbRoot: Bool = false,
                                appApkPath: String? = nil,
                                testsApkPath: String? = nil,
                                specificDevice: String? = nil,
                                deviceType: String = "phone",
                                exitOnTestFailure: Bool = true,
-                               reinstallApp: Bool = false) {
+                               reinstallApp: Bool = false,
+                               useTimestampSuffix: Bool = true,
+                               adbHost: String? = nil,
+                               cleanStatusBar: Bool = false,
+                               cleanStatusBarConfig: [String : Any] = [:]) {
   let command = RubyCommand(commandID: "", methodName: "capture_android_screenshots", className: nil, args: [RubyCommand.Argument(name: "android_home", value: androidHome),
                                                                                                              RubyCommand.Argument(name: "build_tools_version", value: buildToolsVersion),
                                                                                                              RubyCommand.Argument(name: "locales", value: locales),
@@ -1249,12 +1259,17 @@ func captureAndroidScreenshots(androidHome: String? = nil,
                                                                                                              RubyCommand.Argument(name: "launch_arguments", value: launchArguments),
                                                                                                              RubyCommand.Argument(name: "test_instrumentation_runner", value: testInstrumentationRunner),
                                                                                                              RubyCommand.Argument(name: "ending_locale", value: endingLocale),
+                                                                                                             RubyCommand.Argument(name: "use_adb_root", value: useAdbRoot),
                                                                                                              RubyCommand.Argument(name: "app_apk_path", value: appApkPath),
                                                                                                              RubyCommand.Argument(name: "tests_apk_path", value: testsApkPath),
                                                                                                              RubyCommand.Argument(name: "specific_device", value: specificDevice),
                                                                                                              RubyCommand.Argument(name: "device_type", value: deviceType),
                                                                                                              RubyCommand.Argument(name: "exit_on_test_failure", value: exitOnTestFailure),
-                                                                                                             RubyCommand.Argument(name: "reinstall_app", value: reinstallApp)])
+                                                                                                             RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
+                                                                                                             RubyCommand.Argument(name: "use_timestamp_suffix", value: useTimestampSuffix),
+                                                                                                             RubyCommand.Argument(name: "adb_host", value: adbHost),
+                                                                                                             RubyCommand.Argument(name: "clean_status_bar", value: cleanStatusBar),
+                                                                                                             RubyCommand.Argument(name: "clean_status_bar_config", value: cleanStatusBarConfig)])
   _ = runner.executeCommand(command)
 }
 
@@ -5791,12 +5806,17 @@ func scp(username: String,
    - launchArguments: Additional launch arguments
    - testInstrumentationRunner: The fully qualified class name of your test instrumentation runner
    - endingLocale: Return the device to this locale after running tests
+   - useAdbRoot: Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
    - appApkPath: The path to the APK for the app under test
    - testsApkPath: The path to the APK for the the tests bundle
    - specificDevice: Use the device or emulator with the given serial number or qualifier
    - deviceType: Type of device used for screenshots. Matches Google Play Types (phone, sevenInch, tenInch, tv, wear)
    - exitOnTestFailure: Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
+   - useTimestampSuffix: Add timestamp suffix to screenshot filename
+   - adbHost: Configure the host used by adb to connect, allows running on remote devices farm
+   - cleanStatusBar: Enabling this option will clean the status bar
+   - cleanStatusBarConfig: Specifies the configuration for the clean status bar
 */
 func screengrab(androidHome: Any? = screengrabfile.androidHome,
                 buildToolsVersion: Any? = screengrabfile.buildToolsVersion,
@@ -5811,12 +5831,17 @@ func screengrab(androidHome: Any? = screengrabfile.androidHome,
                 launchArguments: [String]? = screengrabfile.launchArguments,
                 testInstrumentationRunner: Any = screengrabfile.testInstrumentationRunner,
                 endingLocale: Any = screengrabfile.endingLocale,
+                useAdbRoot: Bool = screengrabfile.useAdbRoot,
                 appApkPath: Any? = screengrabfile.appApkPath,
                 testsApkPath: Any? = screengrabfile.testsApkPath,
                 specificDevice: Any? = screengrabfile.specificDevice,
                 deviceType: Any = screengrabfile.deviceType,
                 exitOnTestFailure: Bool = screengrabfile.exitOnTestFailure,
-                reinstallApp: Bool = screengrabfile.reinstallApp) {
+                reinstallApp: Bool = screengrabfile.reinstallApp,
+                useTimestampSuffix: Bool = screengrabfile.useTimestampSuffix,
+                adbHost: Any? = screengrabfile.adbHost,
+                cleanStatusBar: Bool = screengrabfile.cleanStatusBar,
+                cleanStatusBarConfig: [String : Any] = screengrabfile.cleanStatusBarConfig) {
   let command = RubyCommand(commandID: "", methodName: "screengrab", className: nil, args: [RubyCommand.Argument(name: "android_home", value: androidHome),
                                                                                             RubyCommand.Argument(name: "build_tools_version", value: buildToolsVersion),
                                                                                             RubyCommand.Argument(name: "locales", value: locales),
@@ -5830,12 +5855,17 @@ func screengrab(androidHome: Any? = screengrabfile.androidHome,
                                                                                             RubyCommand.Argument(name: "launch_arguments", value: launchArguments),
                                                                                             RubyCommand.Argument(name: "test_instrumentation_runner", value: testInstrumentationRunner),
                                                                                             RubyCommand.Argument(name: "ending_locale", value: endingLocale),
+                                                                                            RubyCommand.Argument(name: "use_adb_root", value: useAdbRoot),
                                                                                             RubyCommand.Argument(name: "app_apk_path", value: appApkPath),
                                                                                             RubyCommand.Argument(name: "tests_apk_path", value: testsApkPath),
                                                                                             RubyCommand.Argument(name: "specific_device", value: specificDevice),
                                                                                             RubyCommand.Argument(name: "device_type", value: deviceType),
                                                                                             RubyCommand.Argument(name: "exit_on_test_failure", value: exitOnTestFailure),
-                                                                                            RubyCommand.Argument(name: "reinstall_app", value: reinstallApp)])
+                                                                                            RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
+                                                                                            RubyCommand.Argument(name: "use_timestamp_suffix", value: useTimestampSuffix),
+                                                                                            RubyCommand.Argument(name: "adb_host", value: adbHost),
+                                                                                            RubyCommand.Argument(name: "clean_status_bar", value: cleanStatusBar),
+                                                                                            RubyCommand.Argument(name: "clean_status_bar_config", value: cleanStatusBarConfig)])
   _ = runner.executeCommand(command)
 }
 
@@ -8326,4 +8356,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.63]
+// FastlaneRunnerAPIVersion [0.9.64]
