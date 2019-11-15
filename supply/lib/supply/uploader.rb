@@ -65,7 +65,7 @@ module Supply
             upload_metadata(language, listing) unless Supply.config[:skip_upload_metadata]
             upload_images(language) unless Supply.config[:skip_upload_images]
             upload_screenshots(language) unless Supply.config[:skip_upload_screenshots]
-            release_notes << upload_changelog(language, release.name) unless Supply.config[:skip_upload_changelogs]
+            release_notes << upload_changelog(language, version_code) unless Supply.config[:skip_upload_changelogs]
           end
 
           upload_changelogs(release_notes, release, track) unless release_notes.empty?
@@ -194,16 +194,16 @@ module Supply
       client.update_track(Supply.config[:track_promote_to], track_to)
     end
 
-    def upload_changelog(language, version_name)
-      UI.user_error!("Cannot find changelog because no version name given - please specify :version_name") unless version_name
+    def upload_changelog(language, version_code)
+      UI.user_error!("Cannot find changelog because no version code given - please specify :version_code") unless version_code
 
-      path = File.join(Supply.config[:metadata_path], language, Supply::CHANGELOGS_FOLDER_NAME, "#{version_name}.txt")
+      path = File.join(Supply.config[:metadata_path], language, Supply::CHANGELOGS_FOLDER_NAME, "#{version_code}.txt")
       changelog_text = ''
       if File.exist?(path)
-        UI.message("Updating changelog for '#{version_name}' and language '#{language}'...")
+        UI.message("Updating changelog for '#{version_code}' and language '#{language}'...")
         changelog_text = File.read(path, encoding: 'UTF-8')
       else
-        UI.message("Could not find changelog for '#{version_name}' and language '#{language}' at path #{path}...")
+        UI.message("Could not find changelog for '#{version_code}' and language '#{language}' at path #{path}...")
       end
 
       AndroidPublisher::LocalizedText.new({
