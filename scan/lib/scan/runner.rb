@@ -67,7 +67,7 @@ module Scan
                                               error: proc do |error_output|
                                                 begin
                                                   exit_status = $?.exitstatus
-                                                  ErrorHandler.handle_build_error(error_output)
+                                                  ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
                                                 rescue => ex
                                                   SlackPoster.new.run({
                                                     build_errors: 1

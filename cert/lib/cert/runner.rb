@@ -134,19 +134,25 @@ module Cert
 
     # The kind of certificate we're interested in
     def certificate_type
-      case Cert.config[:platform].to_s
-      when 'ios', 'tvos'
-        cert_type = Spaceship.certificate.production
-        cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
-        cert_type = Spaceship.certificate.development if Cert.config[:development]
+      # Check if apple certs (Xcode 11 and later) should be used
+      if Cert.config[:generate_apple_certs]
+        cert_type = Spaceship.certificate.apple_distribution
+        cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house? # Enterprise doesn't use Apple Distribution
+        cert_type = Spaceship.certificate.apple_development if Cert.config[:development]
+      else
+        case Cert.config[:platform].to_s
+        when 'ios', 'tvos'
+          cert_type = Spaceship.certificate.production
+          cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
+          cert_type = Spaceship.certificate.development if Cert.config[:development]
 
-      when 'macos'
-        cert_type = Spaceship.certificate.mac_app_distribution
-        cert_type = Spaceship.certificate.mac_development if Cert.config[:development]
-
+        when 'macos'
+          cert_type = Spaceship.certificate.mac_app_distribution
+          cert_type = Spaceship.certificate.mac_development if Cert.config[:development]
+        end
       end
 
-      cert_type
+      return cert_type
     end
 
     def create_certificate

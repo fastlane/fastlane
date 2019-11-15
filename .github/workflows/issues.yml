@@ -11,4 +11,4 @@ jobs:
     - uses: actions/checkout@master
     - uses: fastlane/github-actions/fastlane-env-reminder@latest
       with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        repo-token: "${{ secrets.BOT_GITHUB_TOKEN }}"
