@@ -28,11 +28,7 @@ public abstract class Chmod {
     private static final Chmod INSTANCE;
 
     static {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            INSTANCE = new Java6Chmod();
-        } else {
-            INSTANCE = new Java5Chmod();
-        }
+        INSTANCE = new Java6Chmod();
     }
 
     public static void chmodPlusR(File file) {
