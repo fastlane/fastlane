@@ -17,7 +17,7 @@ module Fastlane
       end
       FastlaneCore::Swag.show_loader
 
-      # has to be checked here - in case we wan't to troubleshoot plugin related issues
+      # has to be checked here - in case we want to troubleshoot plugin related issues
       if ARGV.include?("--troubleshoot")
         self.confirm_troubleshoot
       end
