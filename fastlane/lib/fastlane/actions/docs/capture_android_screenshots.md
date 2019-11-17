@@ -26,10 +26,12 @@ sudo gem install fastlane
 
 ##### Gradle dependency
 ```java
-androidTestCompile('tools.fastlane:screengrab:x.x.x')
+androidTestImplementation 'tools.fastlane:screengrab:x.x.x'
 ```
 
 The latest version is [ ![Download](https://api.bintray.com/packages/fastlane/fastlane/screengrab/images/download.svg) ](https://bintray.com/fastlane/fastlane/screengrab/_latestVersion)
+
+As of Screengrab version 2.0.0, all Android test dependencies are AndroidX dependencies. This means a device with API 18+, Android 4.3 or greater is required. If you wish to capture screenshots with an older Android OS, then you must use a 1.x.x version.
 
 ##### Configuring your Manifest Permissions
 
@@ -82,10 +84,10 @@ As of _screengrab_ 0.5.0, you can specify different strategies to control the wa
 * Multi-window situations are correctly captured (dialogs, etc.)
 * Works on Android N
 
-However, UI Automator requires a device with **API level >= 18**, so it is not yet the default strategy. To enable it for all screenshots by default, make the following call before your tests run:
+UI Automator is the default strategy. However, UI Automator requires a device with **API level >= 18**. If you need to grab screenshots on an older Android version, use the latest 1.x.x version of this library and set the DecorView ScreenshotStrategy.
 
 ```java
-Screengrab.setDefaultScreenshotStrategy(new UiAutomatorScreenshotStrategy());
+Screengrab.setDefaultScreenshotStrategy(new DecorViewScreenshotStrategy());
 ```
 
 ## Improved screenshot capture with Falcon
@@ -169,7 +171,39 @@ If you're having trouble getting your device unlocked and the screen activated t
 
 ## Clean Status Bar
 
-You can use [QuickDemo](https://github.com/PSPDFKit-labs/QuickDemo) to clean up the status bar for your screenshots.
+Screengrab can clean your status bar to make your screenshots even more beautiful.  
+Note: the clean status bar feature is only supported on devices with *API level >= 23*.
+
+To use the clean status bar feature add the following lines to your src/debug/AndroidManifest.xml
+```xml
+<!-- Indicates the use of the clean status bar feature -->
+<uses-feature android:name="tools.fastlane.screengrab.cleanstatusbar"/>
+<!-- Allows for changing the status bar -->
+<uses-permission android:name="android.permission.DUMP"/>
+```
+
+After that you can enable and disable the clean status bar at any moment during your tests.  
+In most cases you probably want to do this in the @BeforeClass and @AfterClass methods.
+```java
+@BeforeClass
+public static void beforeAll() {
+    CleanStatusBar.enableWithDefaults();
+}
+
+@AfterClass
+public static void afterAll() {
+    CleanStatusBar.disable();
+}
+```
+
+Have a look at the methods of the `CleanStatusBar` class to customize the status bar even more.  
+You could for example show the Bluetooth icon and the LTE text.
+```java
+new CleanStatusBar()
+    .setBluetoothState(BluetoothState.DISCONNECTED)
+    .setMobileNetworkDataType(MobileDataType.LTE)
+    .enable();
+```
 
 # Advanced _screengrab_
 

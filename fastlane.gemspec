@@ -15,26 +15,26 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Kohki Miki",
-                        "Felix Krause",
-                        "Fumiya Nakamura",
-                        "Danielle Tomlinson",
-                        "Stefan Natchev",
-                        "Helmut Januschka",
-                        "Maksym Grebenets",
-                        "Josh Holtz",
-                        "Manu Wallner",
-                        "Aaron Brager",
-                        "Matthew Ellis",
-                        "Jérôme Lacoste",
-                        "Iulian Onofrei",
-                        "Jorge Revuelta H",
-                        "Andrew McBurney",
+  spec.authors       = ["Danielle Tomlinson",
                         "Jimmy Dee",
+                        "Helmut Januschka",
                         "Olivier Halligon",
                         "Joshua Liebowitz",
+                        "Josh Holtz",
+                        "Manu Wallner",
+                        "Jan Piotrowski",
+                        "Kohki Miki",
+                        "Stefan Natchev",
+                        "Jorge Revuelta H",
+                        "Fumiya Nakamura",
+                        "Jérôme Lacoste",
+                        "Felix Krause",
+                        "Maksym Grebenets",
+                        "Iulian Onofrei",
+                        "Matthew Ellis",
+                        "Aaron Brager",
                         "Luka Mirosevic",
-                        "Jan Piotrowski"]
+                        "Andrew McBurney"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -96,8 +96,10 @@ Gem::Specification.new do |spec|
   # 'gem install' does not respect Ruby versions and would try installing 0.12 on Ruby 2.3 or less
   # https://github.com/fastlane/fastlane/pull/15483
   if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4')
-    spec.add_dependency('signet', '<= 0.11') # Because yeah
-    STDERR.puts("WARNING: Locking to a potentially insecure version of 'signet' because you are using a version of Ruby which is marked as End-Of-Life. Please upgrade your Ruby installation to 2.4 or later")
+    spec.add_dependency('signet', '<= 0.11')
+    spec.add_dependency('google-cloud-env', '1.2.1')
+    spec.add_dependency('google-cloud-core', '1.3.2')
+    STDERR.puts("WARNING: Locking to a potentially insecure version of 'signet', 'google-cloud-env', and 'google-cloud-core' because you are using a version of Ruby which is marked as End-Of-Life. Please upgrade your Ruby installation to 2.4 or later")
   end
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.

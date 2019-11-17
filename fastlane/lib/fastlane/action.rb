@@ -134,7 +134,7 @@ module Fastlane
       UI.user_error!("To call another action from an action use `other_action.#{method_sym}` instead")
     end
 
-    # When shelling out from the actoin, should we use `bundle exec`?
+    # When shelling out from the action, should we use `bundle exec`?
     def self.shell_out_should_use_bundle_exec?
       return File.exist?('Gemfile') && !Helper.contained_fastlane?
     end
