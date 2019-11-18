@@ -4,6 +4,7 @@ describe Spaceship do
     let(:password) { 'so_secret' }
     let(:spaceship1) { Spaceship::Launcher.new }
     let(:spaceship2) { Spaceship::Launcher.new }
+    let(:certificate) { Spaceship::Certificate.all.first }
 
     before do
       spaceship1.login(username, password)
@@ -59,10 +60,22 @@ describe Spaceship do
         Spaceship::Certificate.set_client(nil)
         Spaceship::ProvisioningProfile.set_client(nil)
       end
+
       it "shouldn't fail if provisioning_profile is invoked before app and device" do
         clean_launcher = Spaceship::Launcher.new
         clean_launcher.login(username, password)
         expect(clean_launcher.provisioning_profile.all.count).to eq(7)
+      end
+
+      it "shouldn't fail if provisioning_profile creation is invoked before app and device" do
+        clean_launcher = Spaceship::Launcher.new
+        clean_launcher.login(username, password)
+
+        expect do
+          clean_launcher.provisioning_profile.ad_hoc.create!(
+            bundle_id: 'net.sunapps.1', certificate: certificate, name: 'Delete Me'
+          )
+        end.to_not(raise_error)
       end
 
       it "shouldn't fail if trying to create new apns_certificate before app is invoked" do

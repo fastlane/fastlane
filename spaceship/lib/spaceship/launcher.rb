@@ -73,27 +73,50 @@ module Spaceship
 
     # @return (Class) Access the apps for this spaceship
     def app
+      set_common_client
       Spaceship::Portal::App.set_client(@client)
     end
 
     # @return (Class) Access the app groups for this spaceship
     def app_group
+      set_common_client
       Spaceship::Portal::AppGroup.set_client(@client)
     end
 
     # @return (Class) Access the devices for this spaceship
     def device
+      set_common_client
       Spaceship::Portal::Device.set_client(@client)
     end
 
     # @return (Class) Access the certificates for this spaceship
     def certificate
+      set_common_client
       Spaceship::Portal::Certificate.set_client(@client)
     end
 
     # @return (Class) Access the provisioning profiles for this spaceship
     def provisioning_profile
+      set_common_client
       Spaceship::Portal::ProvisioningProfile.set_client(@client)
+    end
+
+    private
+
+    def set_common_client
+      Spaceship::Portal::AppGroup.set_client(@client)
+      Spaceship::Portal::App.set_client(@client)
+      Spaceship::Portal::Certificate.set_client(@client)
+      Spaceship::Portal::CloudContainer.set_client(@client)
+      Spaceship::Portal::Device.set_client(@client)
+      Spaceship::Portal::Invite.set_client(@client)
+      Spaceship::Portal::Key.set_client(@client)
+      Spaceship::Portal::Merchant.set_client(@client)
+      Spaceship::Portal::Passbook.set_client(@client)
+      Spaceship::Portal::Person.set_client(@client)
+      Spaceship::Portal::Persons.set_client(@client)
+      Spaceship::Portal::ProvisioningProfile.set_client(@client)
+      Spaceship::Portal::WebsitePush.set_client(@client)
     end
   end
 end
