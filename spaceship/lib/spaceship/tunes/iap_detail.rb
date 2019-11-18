@@ -100,7 +100,8 @@ module Spaceship
             "value" =>   {
               "name" =>  { "value" => current_version[:name] },
               "description" =>  { "value" => current_version[:description] },
-              "localeCode" =>  language.to_s
+              "localeCode" => language.to_s,
+              "id" => current_version[:id]
             }
           }
         end
@@ -163,7 +164,6 @@ module Spaceship
       # Saves the current In-App-Purchase
       def save!
         # Transform localization versions back to original format.
-        details_id = raw_data["versions"].first["details"].first.last.first["value"]["id"]
         versions_array = []
         versions.each do |language, value|
           versions_array << {
@@ -171,7 +171,7 @@ module Spaceship
                       "description" => { "value" => value[:description] },
                       "name" => { "value" => value[:name] },
                       "localeCode" => language.to_s,
-                      "id" => details_id
+                      "id" => value[:id]
                     }
           }
         end
