@@ -110,7 +110,6 @@ module Spaceship
       Spaceship::Portal::CloudContainer.set_client(@client)
       Spaceship::Portal::Device.set_client(@client)
       Spaceship::Portal::Invite.set_client(@client)
-      Spaceship::Portal::Key.set_client(@client)
       Spaceship::Portal::Merchant.set_client(@client)
       Spaceship::Portal::Passbook.set_client(@client)
       Spaceship::Portal::Person.set_client(@client)
