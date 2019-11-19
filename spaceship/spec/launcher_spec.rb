@@ -70,6 +70,10 @@ describe Spaceship do
       it "shouldn't fail if provisioning_profile creation is invoked before app and device" do
         clean_launcher = Spaceship::Launcher.new
         clean_launcher.login(username, password)
+        
+        expect(clean_launcher.client).to receive(:create_provisioning_profile!).with('Delete Me', 'adhoc', '2UMR2S6PAA', "XC5PH8DAAA", ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], mac: false, sub_platform: nil, template_name: nil) do
+          JSON.parse(PortalStubbing.adp_read_fixture_file('create_profile_success.json'))
+        end
 
         expect do
           clean_launcher.provisioning_profile.ad_hoc.create!(
