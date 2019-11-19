@@ -141,16 +141,7 @@ module Screengrab
         FastlaneCore::ConfigItem.new(key: :adb_host,
                                      env_name: 'SCREENGRAB_ADB_HOST',
                                      description: "Configure the host used by adb to connect, allows running on remote devices farm",
-                                     optional: true),
-        FastlaneCore::ConfigItem.new(key: :clean_status_bar,
-                                     env_name: 'SCREENGRAB_CLEAN_STATUS_BAR',
-                                     description: "Enabling this option will clean the status bar",
-                                     default_value: false,
-                                     type: Boolean),
-        FastlaneCore::ConfigItem.new(key: :clean_status_bar_config,
-                                     description: "Specifies the configuration for the clean status bar",
-                                     default_value: {},
-                                     type: Hash)
+                                     optional: true)
       ]
     end
   end
