@@ -103,7 +103,7 @@ module Fastlane
         # Give a helpful message in case there were no new apks or aabs. Remember we're only running this code when assembling, in which case we certainly expect there to be an apk or aab
         UI.message('Couldn\'t find any new signed apk files...') if new_apks.empty? && new_aabs.empty?
 
-        # Display a gradle task name in fastlane summary to make it easy to understand the content of this step
+        # Display a task name in fastlane summary to make it easy to understand the content of 'gradle' step
         print_task_name_in_summary(params, gradle_task)
 
         return result
