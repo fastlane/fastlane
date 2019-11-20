@@ -15,14 +15,18 @@ module Supply
 
       apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
 
-      # Only update tracks if we have version codes
-      # Updating a track with empty version codes can completely clear out a track
-      update_track(apk_version_codes) unless apk_version_codes.empty?
-
-      if Supply.config[:track_promote_to]
-        promote_track
-      elsif !Supply.config[:rollout].nil? && Supply.config[:track].to_s != ""
-        update_rollout
+      if !apk_version_codes.empty?
+        # Only update tracks if we have version codes
+        # update_track handle setting rollout if needed
+        # Updating a track with empty version codes can completely clear out a track
+        update_track(apk_version_codes)
+      else
+        # Only promote or rollout if we don't have version codes
+        if Supply.config[:track_promote_to]
+          promote_track
+        elsif !Supply.config[:rollout].nil? && Supply.config[:track].to_s != ""
+          update_rollout
+        end
       end
 
       if Supply.config[:validate_only]
@@ -358,8 +362,11 @@ module Supply
       )
 
       if Supply.config[:rollout]
-        track_release.status = Supply::ReleaseStatus::IN_PROGRESS
-        track_release.user_fraction = Supply.config[:rollout].to_f
+        rollout = Supply.config[:rollout].to_f
+        if rollout > 0 && rollout < 1
+          track_release.status = Supply::ReleaseStatus::IN_PROGRESS
+          track_release.user_fraction = rollout
+        end
       end
 
       tracks = client.tracks(Supply.config[:track])
