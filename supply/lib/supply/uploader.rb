@@ -19,7 +19,7 @@ module Supply
         # Only update tracks if we have version codes
         # update_track handle setting rollout if needed
         # Updating a track with empty version codes can completely clear out a track
-        update_track(apk_version_codes) unless apk_version_codes.empty?
+        update_track(apk_version_codes)
       else
         # Only promote or rollout if we don't have version codes
         if Supply.config[:track_promote_to]
