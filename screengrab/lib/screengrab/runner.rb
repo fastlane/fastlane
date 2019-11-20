@@ -395,6 +395,11 @@ module Screengrab
     def enable_clean_status_bar(device_serial, app_apk_path)
       return unless device_api_version(device_serial) >= 23
 
+      unless @android_env.aapt_path
+        UI.error("The `aapt` command could not be found, so status bar could not be cleaned. Make sure android_home is configured for screengrab or ANDROID_HOME is set in the environment")
+        return
+      end
+
       # Check if the app wants to use the clean status bar feature
       badging_dump = @executor.execute(command: "#{@android_env.aapt_path} dump badging #{app_apk_path}",
                                        print_all: true, print_command: true)
