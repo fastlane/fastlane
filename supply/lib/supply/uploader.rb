@@ -29,22 +29,20 @@ module Supply
         end
       end
 
+      perform_upload_meta(apk_version_codes)
+
       if Supply.config[:validate_only]
-        UI.message("Validating all track and release changes with Google Play...")
+        UI.message("Validating all changes with Google Play...")
         client.validate_current_edit!
         UI.success("Successfully validated the upload to Google Play")
       else
-        UI.message("Uploading all track and release changes to Google Play...")
+        UI.message("Uploading all changes to Google Play...")
         client.commit_current_edit!
         UI.success("Successfully finished the upload to Google Play")
       end
-
-      perform_upload_meta(apk_version_codes)
     end
 
     def perform_upload_meta(version_codes)
-      client.begin_edit(package_name: Supply.config[:package_name])
-
       if (!Supply.config[:skip_upload_metadata] || !Supply.config[:skip_upload_images] || !Supply.config[:skip_upload_changelogs] || !Supply.config[:skip_upload_screenshots]) && metadata_path
         # Use version code from config if version codes is empty and no nil or empty string
         version_codes = [Supply.config[:version_code]] if version_codes.empty?
@@ -74,16 +72,6 @@ module Supply
 
           upload_changelogs(release_notes, release, track) unless release_notes.empty?
         end
-      end
-
-      if Supply.config[:validate_only]
-        UI.message("Validating all meta changes with Google Play...")
-        client.validate_current_edit!
-        UI.success("Successfully validated the upload to Google Play")
-      else
-        UI.message("Uploading all meta changes to Google Play...")
-        client.commit_current_edit!
-        UI.success("Successfully finished the upload to Google Play")
       end
     end
 
