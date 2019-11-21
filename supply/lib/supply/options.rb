@@ -43,7 +43,10 @@ module Supply
                                      env_name: "SUPPLY_TRACK",
                                      description: "The track of the application to use. The default available tracks are: #{Supply::Tracks::DEFAULTS.join(', ')}",
                                      default_value: Supply::Tracks::DEFAULT,
-                                     type: String),
+                                     type: String,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("'rollout' is no longer a valid track name - please use 'production' instead") if value.casecmp('rollout').zero?
+                                     end),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
                                      description: "The percentage of the user fraction when uploading to the rollout track",
@@ -208,7 +211,10 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track_promote_to,
                                      env_name: "SUPPLY_TRACK_PROMOTE_TO",
                                      optional: true,
-                                     description: "The track to promote to. The default available tracks are: #{Supply::Tracks::DEFAULTS.join(', ')}"),
+                                     description: "The track to promote to. The default available tracks are: #{Supply::Tracks::DEFAULTS.join(', ')}",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("'rollout' is no longer a valid track name - please use 'production' instead") if value.casecmp('rollout').zero?
+                                     end),
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,
