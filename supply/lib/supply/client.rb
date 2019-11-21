@@ -310,6 +310,20 @@ module Supply
       return result_upload.version_code
     end
 
+    def upload_apk_interanl_app_sharing(path_to_apk)
+      ensure_active_edit!
+
+      result_upload = call_google_api do
+        client.uploadapk_internalappsharingartifact(
+          current_package_name,
+          upload_source: path_to_apk,
+          content_type: "application/octet-stream"
+        )
+      end
+
+      return result_upload.download_url
+    end
+
     def upload_mapping(path_to_mapping, apk_version_code)
       ensure_active_edit!
 
@@ -338,6 +352,20 @@ module Supply
       end
 
       return result_upload.version_code
+    end
+
+    def upload_bundle_interanl_app_sharing(path_to_aab)
+      ensure_active_edit!
+
+      result_upload = call_google_api do
+        client.uploadbundle_internalappsharingartifact(
+          current_package_name,
+          upload_source: path_to_aab,
+          content_type: "application/octet-stream"
+        )
+      end
+
+      return result_upload.download_url
     end
 
     # Get a list of all tracks - returns the list

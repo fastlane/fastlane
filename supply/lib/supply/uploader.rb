@@ -9,11 +9,15 @@ module Supply
       verify_config!
 
       apk_version_codes = []
-      apk_version_codes.concat(upload_apks) unless Supply.config[:skip_upload_apk]
-      apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
+      apk_version_codes.concat(upload_apks) unless Supply.config[:skip_upload_apk] || Supply.config[:upload_apk_internal_app_sharing]
+      apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab] || Supply.config[:upload_aab_internal_app_sharing]
       upload_mapping(apk_version_codes)
 
       apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
+
+      download_urls = []
+      download_urls.concat(upload_apks_interanl_app_sharing) if Supply.config[:upload_apk_internal_app_sharing]
+      download_urls.concat(upload_bundles_interanl_app_sharing) if Supply.config[:upload_aab_internal_app_sharing]
 
       if !apk_version_codes.empty?
         # Only update tracks if we have version codes
@@ -29,8 +33,6 @@ module Supply
         end
       end
 
-      perform_upload_meta(apk_version_codes)
-
       if Supply.config[:validate_only]
         UI.message("Validating all changes with Google Play...")
         client.validate_current_edit!
@@ -39,6 +41,14 @@ module Supply
         UI.message("Uploading all changes to Google Play...")
         client.commit_current_edit!
         UI.success("Successfully finished the upload to Google Play")
+      end
+
+      if !download_urls.empty?
+        download_urls.each do |url|
+          UI.success("download link : #{url}")
+        end
+      else
+        perform_upload_meta(apk_version_codes)
       end
     end
 
@@ -265,6 +275,20 @@ module Supply
       return apk_version_codes
     end
 
+    def upload_apks_interanl_app_sharing
+      apk_paths = [Supply.config[:apk]] unless (apk_paths = Supply.config[:apk_paths])
+      apk_paths.compact!
+
+      download_urls = []
+
+      apk_paths.each do |apk_path|
+        UI.message("Preparing aab at path '#{apk_path}' for internal app sharing...")
+        download_urls.push(client.upload_apk_interanl_app_sharing(apk_path))
+      end
+
+      return download_urls
+    end
+
     def upload_mapping(apk_version_codes)
       mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
       mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
@@ -288,6 +312,21 @@ module Supply
       end
 
       return aab_version_codes
+    end
+
+    def upload_bundles_interanl_app_sharing
+      aab_paths = [Supply.config[:aab]] unless (aab_paths = Supply.config[:aab_paths])
+      return [] unless aab_paths
+      aab_paths.compact!
+
+      download_urls = []
+
+      aab_paths.each do |aab_path|
+        UI.message("Preparing aab at path '#{aab_path}' for internal app sharing...")
+        download_urls.push(client.upload_bundle_interanl_app_sharing(aab_path))
+      end
+
+      return download_urls
     end
 
     private
