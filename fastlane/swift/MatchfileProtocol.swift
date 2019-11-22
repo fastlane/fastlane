@@ -91,7 +91,7 @@ protocol MatchfileProtocol: class {
 extension MatchfileProtocol {
   var type: String { return "development" }
   var readonly: Bool { return false }
-  var generateAppleCerts: Bool { return false }
+  var generateAppleCerts: Bool { return true }
   var skipProvisioningProfiles: Bool { return false }
   var appIdentifier: [String] { return [] }
   var username: String { return "" }
@@ -122,4 +122,4 @@ extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.10]
+// FastlaneRunnerAPIVersion [0.9.11]
