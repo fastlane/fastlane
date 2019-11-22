@@ -1219,8 +1219,6 @@ func bundleInstall(binstubs: String? = nil,
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - useTimestampSuffix: Add timestamp suffix to screenshot filename
    - adbHost: Configure the host used by adb to connect, allows running on remote devices farm
-   - cleanStatusBar: Enabling this option will clean the status bar
-   - cleanStatusBarConfig: Specifies the configuration for the clean status bar
 */
 func captureAndroidScreenshots(androidHome: String? = nil,
                                buildToolsVersion: String? = nil,
@@ -1243,9 +1241,7 @@ func captureAndroidScreenshots(androidHome: String? = nil,
                                exitOnTestFailure: Bool = true,
                                reinstallApp: Bool = false,
                                useTimestampSuffix: Bool = true,
-                               adbHost: String? = nil,
-                               cleanStatusBar: Bool = false,
-                               cleanStatusBarConfig: [String : Any] = [:]) {
+                               adbHost: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "capture_android_screenshots", className: nil, args: [RubyCommand.Argument(name: "android_home", value: androidHome),
                                                                                                              RubyCommand.Argument(name: "build_tools_version", value: buildToolsVersion),
                                                                                                              RubyCommand.Argument(name: "locales", value: locales),
@@ -1267,9 +1263,7 @@ func captureAndroidScreenshots(androidHome: String? = nil,
                                                                                                              RubyCommand.Argument(name: "exit_on_test_failure", value: exitOnTestFailure),
                                                                                                              RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                                              RubyCommand.Argument(name: "use_timestamp_suffix", value: useTimestampSuffix),
-                                                                                                             RubyCommand.Argument(name: "adb_host", value: adbHost),
-                                                                                                             RubyCommand.Argument(name: "clean_status_bar", value: cleanStatusBar),
-                                                                                                             RubyCommand.Argument(name: "clean_status_bar_config", value: cleanStatusBarConfig)])
+                                                                                                             RubyCommand.Argument(name: "adb_host", value: adbHost)])
   _ = runner.executeCommand(command)
 }
 
@@ -1582,7 +1576,7 @@ func carthage(command: String = "bootstrap",
 */
 func cert(development: Bool = false,
           force: Bool = false,
-          generateAppleCerts: Bool = false,
+          generateAppleCerts: Bool = true,
           username: String,
           teamId: String? = nil,
           teamName: String? = nil,
@@ -2583,7 +2577,7 @@ func downloadDsyms(username: String,
 func downloadFromPlayStore(packageName: String,
                            versionName: String? = nil,
                            track: String = "production",
-                           metadataPath: String? = nil,
+                           metadataPath: String = "./metadata",
                            key: String? = nil,
                            issuer: String? = nil,
                            jsonKey: String? = nil,
@@ -2635,8 +2629,8 @@ func echo(message: String? = nil) {
 /**
  Raises an exception if not using `bundle exec` to run fastlane
 
- This action will check if you are using bundle exec to run fastlane.
- You can put it into `before_all` and make sure that fastlane is run using `bundle exec fastlane` command.
+ This action will check if you are using `bundle exec` to run fastlane.
+ You can put it into `before_all` to make sure that fastlane is ran using the `bundle exec fastlane` command.
 */
 func ensureBundleExec() {
   let command = RubyCommand(commandID: "", methodName: "ensure_bundle_exec", className: nil, args: [])
@@ -2954,7 +2948,7 @@ func getBuildNumberRepository(useHgRevisionNumber: Bool = false) {
 */
 func getCertificates(development: Bool = false,
                      force: Bool = false,
-                     generateAppleCerts: Bool = false,
+                     generateAppleCerts: Bool = true,
                      username: String,
                      teamId: String? = nil,
                      teamName: String? = nil,
@@ -5338,7 +5332,7 @@ func rubocop() {
  Verifies the minimum ruby version required
 
  Add this to your `Fastfile` to require a certain version of _ruby_.
- Put it at the top of your `Fastfile to ensure that _fastlane_ is executed appropriately.
+ Put it at the top of your `Fastfile` to ensure that _fastlane_ is executed appropriately.
 */
 func rubyVersion() {
   let command = RubyCommand(commandID: "", methodName: "ruby_version", className: nil, args: [])
@@ -5815,8 +5809,6 @@ func scp(username: String,
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - useTimestampSuffix: Add timestamp suffix to screenshot filename
    - adbHost: Configure the host used by adb to connect, allows running on remote devices farm
-   - cleanStatusBar: Enabling this option will clean the status bar
-   - cleanStatusBarConfig: Specifies the configuration for the clean status bar
 */
 func screengrab(androidHome: Any? = screengrabfile.androidHome,
                 buildToolsVersion: Any? = screengrabfile.buildToolsVersion,
@@ -5839,9 +5831,7 @@ func screengrab(androidHome: Any? = screengrabfile.androidHome,
                 exitOnTestFailure: Bool = screengrabfile.exitOnTestFailure,
                 reinstallApp: Bool = screengrabfile.reinstallApp,
                 useTimestampSuffix: Bool = screengrabfile.useTimestampSuffix,
-                adbHost: Any? = screengrabfile.adbHost,
-                cleanStatusBar: Bool = screengrabfile.cleanStatusBar,
-                cleanStatusBarConfig: [String : Any] = screengrabfile.cleanStatusBarConfig) {
+                adbHost: Any? = screengrabfile.adbHost) {
   let command = RubyCommand(commandID: "", methodName: "screengrab", className: nil, args: [RubyCommand.Argument(name: "android_home", value: androidHome),
                                                                                             RubyCommand.Argument(name: "build_tools_version", value: buildToolsVersion),
                                                                                             RubyCommand.Argument(name: "locales", value: locales),
@@ -5863,9 +5853,7 @@ func screengrab(androidHome: Any? = screengrabfile.androidHome,
                                                                                             RubyCommand.Argument(name: "exit_on_test_failure", value: exitOnTestFailure),
                                                                                             RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                             RubyCommand.Argument(name: "use_timestamp_suffix", value: useTimestampSuffix),
-                                                                                            RubyCommand.Argument(name: "adb_host", value: adbHost),
-                                                                                            RubyCommand.Argument(name: "clean_status_bar", value: cleanStatusBar),
-                                                                                            RubyCommand.Argument(name: "clean_status_bar_config", value: cleanStatusBarConfig)])
+                                                                                            RubyCommand.Argument(name: "adb_host", value: adbHost)])
   _ = runner.executeCommand(command)
 }
 
@@ -6732,7 +6720,7 @@ func supply(packageName: String,
             releaseStatus: String = "completed",
             track: String = "production",
             rollout: String? = nil,
-            metadataPath: String? = nil,
+            metadataPath: String = "./metadata",
             key: String? = nil,
             issuer: String? = nil,
             jsonKey: String? = nil,
@@ -6879,7 +6867,7 @@ func swiftlint(mode: Any = "lint",
 */
 func syncCodeSigning(type: String = "development",
                      readonly: Bool = false,
-                     generateAppleCerts: Bool = false,
+                     generateAppleCerts: Bool = true,
                      skipProvisioningProfiles: Bool = false,
                      appIdentifier: [String],
                      username: String,
@@ -6969,6 +6957,7 @@ func teamName() {
    - autoUpdate: Allows an easy upgrade of all users to the current version. To enable set to 'on'
    - notify: Send email to testers
    - options: Array of options (shake,video_only_wifi,anonymous)
+   - custom: Array of custom options. Contact support@testfairy.com for more information
    - timeout: Request timeout in seconds
 
  You can retrieve your API key on [your settings page](https://free.testfairy.com/settings/)
@@ -6984,6 +6973,7 @@ func testfairy(apiKey: String,
                autoUpdate: String = "off",
                notify: String = "off",
                options: [String] = [],
+               custom: String = "",
                timeout: Int? = nil) {
   let command = RubyCommand(commandID: "", methodName: "testfairy", className: nil, args: [RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                            RubyCommand.Argument(name: "ipa", value: ipa),
@@ -6996,6 +6986,7 @@ func testfairy(apiKey: String,
                                                                                            RubyCommand.Argument(name: "auto_update", value: autoUpdate),
                                                                                            RubyCommand.Argument(name: "notify", value: notify),
                                                                                            RubyCommand.Argument(name: "options", value: options),
+                                                                                           RubyCommand.Argument(name: "custom", value: custom),
                                                                                            RubyCommand.Argument(name: "timeout", value: timeout)])
   _ = runner.executeCommand(command)
 }
@@ -7754,7 +7745,7 @@ func uploadToPlayStore(packageName: String,
                        releaseStatus: String = "completed",
                        track: String = "production",
                        rollout: String? = nil,
-                       metadataPath: String? = nil,
+                       metadataPath: String = "./metadata",
                        key: String? = nil,
                        issuer: String? = nil,
                        jsonKey: String? = nil,
@@ -8211,7 +8202,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-10.3.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-11.2.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -8356,4 +8347,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.64]
+// FastlaneRunnerAPIVersion [0.9.65]

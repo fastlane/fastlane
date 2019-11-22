@@ -65,12 +65,6 @@ protocol ScreengrabfileProtocol: class {
 
   /// Configure the host used by adb to connect, allows running on remote devices farm
   var adbHost: String? { get }
-
-  /// Enabling this option will clean the status bar
-  var cleanStatusBar: Bool { get }
-
-  /// Specifies the configuration for the clean status bar
-  var cleanStatusBarConfig: [String : Any] { get }
 }
 
 extension ScreengrabfileProtocol {
@@ -96,10 +90,8 @@ extension ScreengrabfileProtocol {
   var reinstallApp: Bool { return false }
   var useTimestampSuffix: Bool { return true }
   var adbHost: String? { return nil }
-  var cleanStatusBar: Bool { return false }
-  var cleanStatusBarConfig: [String : Any] { return [:] }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.12]
+// FastlaneRunnerAPIVersion [0.9.13]
