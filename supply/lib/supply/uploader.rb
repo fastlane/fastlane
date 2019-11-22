@@ -282,7 +282,7 @@ module Supply
       download_urls = []
 
       apk_paths.each do |apk_path|
-        UI.message("Preparing aab at path '#{apk_path}' for internal app sharing...")
+        UI.message("Preparing apk at path '#{apk_path}' for internal app sharing...")
         download_urls.push(client.upload_apk_interanl_app_sharing(apk_path))
       end
 
