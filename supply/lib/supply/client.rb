@@ -310,7 +310,7 @@ module Supply
       return result_upload.version_code
     end
 
-    def upload_apk_interanl_app_sharing(path_to_apk)
+    def upload_apk_internal_app_sharing(path_to_apk)
       ensure_active_edit!
 
       result_upload = call_google_api do
@@ -354,7 +354,7 @@ module Supply
       return result_upload.version_code
     end
 
-    def upload_bundle_interanl_app_sharing(path_to_aab)
+    def upload_bundle_internal_app_sharing(path_to_aab)
       ensure_active_edit!
 
       result_upload = call_google_api do
