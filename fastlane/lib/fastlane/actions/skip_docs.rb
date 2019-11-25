@@ -5,7 +5,7 @@ module Fastlane
         ENV["FASTLANE_SKIP_DOCS"] = "1"
       end
 
-      def self.step_text
+      def self.step_text(params)
         nil
       end
 

@@ -41,7 +41,7 @@ module Fastlane
       end
 
       # We don't want to show this as step
-      def self.step_text
+      def self.step_text(params)
         nil
       end
 

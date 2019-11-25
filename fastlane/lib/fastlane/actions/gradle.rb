@@ -103,9 +103,6 @@ module Fastlane
         # Give a helpful message in case there were no new apks or aabs. Remember we're only running this code when assembling, in which case we certainly expect there to be an apk or aab
         UI.message('Couldn\'t find any new signed apk files...') if new_apks.empty? && new_aabs.empty?
 
-        # Display a task name in fastlane summary to make it easy to understand the content of 'gradle' step
-        print_task_name_in_summary(params, gradle_task)
-
         return result
       end
       # rubocop:enable Metrics/PerceivedComplexity
@@ -120,9 +117,17 @@ module Fastlane
         gradle_task
       end
 
-      def self.print_task_name_in_summary(params, gradle_task)
+      def self.step_text(params)
         if params[:print_task_name_in_summary]
-          Actions.executed_actions << { name: gradle_task }
+          task = params[:task]
+          flavor = params[:flavor]
+          build_type = params[:build_type]
+
+          gradle_task = [task, flavor, build_type].join
+
+          return gradle_task
+        else
+          super(params)
         end
       end
 
