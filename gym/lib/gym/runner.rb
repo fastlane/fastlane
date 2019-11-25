@@ -183,7 +183,7 @@ module Gym
               end
             end
             if symbol_map_path.nil?
-              possible_symbol_map_path = File.join(bcsymbolmaps_directory, "#{uuid}.plist")
+              possible_symbol_map_path = File.join(bcsymbolmaps_directory, "#{uuid}.bcsymbolmap")
               if File.exist?(possible_symbol_map_path)
                 symbol_map_path = possible_symbol_map_path.shellescape
               end
