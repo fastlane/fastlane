@@ -1,5 +1,17 @@
 describe Fastlane::Helper::AdbHelper do
   describe "#load_all_devices" do
+    context 'adb host' do
+      it 'no host specified' do
+        devices = Fastlane::Helper::AdbHelper.new
+        expect(devices.host_option).to eq(nil)
+      end
+
+      it 'host specified' do
+        devices = Fastlane::Helper::AdbHelper.new(adb_host: 'device_farm')
+        expect(devices.host_option).to eq("-H device_farm")
+      end
+    end
+
     context 'no devices' do
       it 'does not find any active devices' do
         adb_response = strip_heredoc(<<-ADB_OUTPUT)

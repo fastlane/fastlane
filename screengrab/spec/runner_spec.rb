@@ -226,16 +226,17 @@ describe Screengrab::Runner do
 
       expect(@runner.run_adb_command("test").lines.any? { |line| line.start_with?('adb: ') }).to eq(false)
     end
+  end
 
+  describe :select_device do
     it 'connects to host if specified' do
       config[:adb_host] = "device_farm"
-      adb_response = strip_heredoc(<<-ADB_OUTPUT)
-            List of devices attached
-            e1dbf228               device usb:1-1.2 product:a33gdd model:SM_A300H device:a33g
 
-          ADB_OUTPUT
+      mock_helper = double('mock helper')
+      device = Fastlane::Helper::AdbDevice.new(serial: 'e1dbf228')
 
-      mock_adb_response_for_command("adb -H device_farm devices -l", adb_response)
+      expect(Fastlane::Helper::AdbHelper).to receive(:new).with(adb_host: 'device_farm').and_return(mock_helper)
+      expect(mock_helper).to receive(:load_all_devices).and_return([device])
 
       expect(@runner.select_device).to eq('e1dbf228')
     end
