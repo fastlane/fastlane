@@ -1,5 +1,6 @@
 require 'fastlane_core/print_table'
 require 'fastlane_core/command_executor'
+require 'fastlane/helper/adb_helper'
 require_relative 'reports_generator'
 require_relative 'module'
 
@@ -84,35 +85,26 @@ module Screengrab
     end
 
     def select_device
-      devices = run_adb_command("devices -l", print_all: true, print_command: true).split("\n")
-      # the first output by adb devices is "List of devices attached" so remove that and any adb startup output
-      devices.reject! do |device|
-        [
-          'server is out of date',    # The adb server is out of date and must be restarted
-          'unauthorized',             # The device has not yet accepted ADB control
-          'offline',                  # The device is offline, skip it
-          '* daemon',                 # Messages printed when the daemon is starting up
-          'List of devices attached', # Header of table for data we want
-          "doesn't match this client" # Message printed when there is an ADB client/server version mismatch
-        ].any? { |status| device.include?(status) }
-      end
+      adb = Fastlane::Helper::AdbHelper.new(adb_host: @config[:adb_host])
+      devices = adb.load_all_devices
 
       UI.user_error!('There are no connected and authorized devices or emulators') if devices.empty?
 
-      devices.select! { |d| d.include?(@config[:specific_device]) } if @config[:specific_device]
+      specific_device = @config[:specific_device]
+      if specific_device
+        devices.select! do |d|
+          d.serial.include?(specific_device)
+        end
+      end
 
-      UI.user_error!("No connected devices matched your criteria: #{@config[:specific_device]}") if devices.empty?
+      UI.user_error!("No connected devices matched your criteria: #{specific_device}") if devices.empty?
 
       if devices.length > 1
         UI.important("Multiple connected devices, selecting the first one")
         UI.important("To specify which connected device to use, use the -s (specific_device) config option")
       end
 
-      # grab the serial number. the lines of output can look like these:
-      # 00c22d4d84aec525       device usb:2148663295X product:bullhead model:Nexus_5X device:bullhead
-      # 192.168.1.100:5555       device usb:2148663295X product:bullhead model:Nexus_5X device:genymotion
-      # emulator-5554       device usb:2148663295X product:bullhead model:Nexus_5X device:emulator
-      devices[0].match(/^\S+/)[0]
+      devices.first.serial
     end
 
     def select_app_apk(discovered_apk_paths)
