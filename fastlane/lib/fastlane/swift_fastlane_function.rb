@@ -96,7 +96,7 @@ module Fastlane
       elsif type_override == Boolean
         return "Bool"
       elsif type_override == :string_callback
-        return "((String) -> Void)"
+        return "@escaping (String) -> Void"
       else
         return default_type
       end
@@ -104,7 +104,7 @@ module Fastlane
 
     def override_default_value_if_not_correct_type(param_name: nil, param_type: nil, default_value: nil)
       return "[]" if param_type == "[String]" && default_value == ""
-      return "{_ in }" if param_type == "((String) -> Void)"
+      return "{_ in }" if param_type == "@escaping (String) -> Void"
 
       return default_value
     end
@@ -119,7 +119,7 @@ module Fastlane
 
       optional_specifier = ""
       # if we are optional and don't have a default value, we'll need to use ?
-      optional_specifier = "?" if (optional && default_value.nil?) && type != "((String) -> Void)"
+      optional_specifier = "?" if (optional && default_value.nil?) && type != "@escaping (String) -> Void"
 
       # If we have a default value of true or false, we can infer it is a Bool
       if default_value.class == FalseClass
@@ -149,7 +149,7 @@ module Fastlane
             # we can't handle default values for Hashes, yet
             # see method swift_default_implementations for similar behavior
             default_value = "[:]"
-          elsif type != "Bool" && type != "[String]" && type != "Int" && type != "((String) -> Void)"
+          elsif type != "Bool" && type != "[String]" && type != "Int" && type != "@escaping (String) -> Void"
             default_value = "\"#{default_value}\""
           end
         end
