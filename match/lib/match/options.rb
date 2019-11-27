@@ -127,6 +127,12 @@ module Match
                                      description: "Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64",
                                      optional: true,
                                      default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :git_bearer_authorization,
+                                     env_name: "MATCH_GIT_BEARER_AUTHORIZATION",
+                                     sensitive: true,
+                                     description: "Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64",
+                                     optional: true,
+                                     default_value: nil),
 
         # Storage: Google Cloud
         FastlaneCore::ConfigItem.new(key: :google_cloud_bucket_name,
