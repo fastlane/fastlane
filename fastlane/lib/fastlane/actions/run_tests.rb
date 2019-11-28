@@ -14,7 +14,6 @@ module Fastlane
 
         begin
           destination = values[:destination] # save destination value which can be later overridden
-          Scan.config = values # we set this here to auto-detect missing values, which we need later on
           unless values[:derived_data_path].to_s.empty?
             plist_files_before = test_summary_filenames(values[:derived_data_path])
           end
