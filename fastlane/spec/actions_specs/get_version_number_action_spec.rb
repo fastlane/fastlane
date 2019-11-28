@@ -118,6 +118,13 @@ describe Fastlane do
         expect(result).to eq("1.5.9")
       end
 
+      it "gets the correct version when info-plist is relative path", requires_xcodeproj: true do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          get_version_number(xcodeproj: '#{path}', target: 'TargetRelativePath')
+        end").runner.execute(:test)
+        expect(result).to eq("3.37.0")
+      end
+
       it "raises if one target and specified wrong target name", requires_xcodeproj: true do
         allow_any_instance_of(Xcodeproj::Project).to receive(:targets).and_wrap_original do |m, *args|
           [m.call(*args).first]
