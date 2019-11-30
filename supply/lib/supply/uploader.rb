@@ -197,7 +197,7 @@ module Supply
       else
         default_changelog_path = File.join(Supply.config[:metadata_path], language, Supply::CHANGELOGS_FOLDER_NAME, "default.txt")
         if File.exist?(default_changelog_path)
-          UI.message("Updating default changelog for '#{version_code}' and language '#{language}'...")
+          UI.message("Updating changelog for '#{version_code}' and language '#{language}' to default changelog...")
           changelog_text = File.read(default_changelog_path, encoding: 'UTF-8')
         else
           UI.message("Could not find changelog for '#{version_code}' and language '#{language}' at path #{path}...")
