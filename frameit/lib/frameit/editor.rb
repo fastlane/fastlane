@@ -262,6 +262,7 @@ module Frameit
       left_space = (background.width / 2.0 - image.width / 2.0).round
 
       @image = background.composite(image, "png") do |c|
+        c.colorspace(image.data["colorspace"])
         c.compose("Over")
         c.geometry("+#{left_space}+#{device_top(background)}")
       end
