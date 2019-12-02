@@ -214,7 +214,7 @@ module FastlaneCore
       end
 
       def disable_slide_to_type
-        UI.message("Disabling 'Slide to Type' #{self} :: #{self.udid}")
+        UI.message("Disabling 'Slide to Type' #{self}")
 
         plist_buddy = '/usr/libexec/PlistBuddy'
         plist_buddy_cmd = "-c \"Add :KeyboardContinuousPathEnabled bool false\""
