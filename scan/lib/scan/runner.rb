@@ -26,12 +26,17 @@ module Scan
       force_quit_simulator_processes if Scan.config[:force_quit_simulator]
 
       if Scan.config[:reset_simulator]
-        puts "Testing puts"
-        UI.message("Logging")
         Scan.devices.each do |device|
           FastlaneCore::Simulator.reset(udid: device.udid)
         end
       end
+
+      if Scan.config[:disable_slide_to_type]
+        Scan.devices.each do |device|
+          UI.message("ATLogger => Device ID #{device.udid}")
+        end
+      end
+
 
       # We call this method, to be sure that all other simulators are killed
       # And a correct one is freshly launched. Switching between multiple simulator
