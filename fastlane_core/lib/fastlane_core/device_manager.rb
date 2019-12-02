@@ -214,7 +214,20 @@ module FastlaneCore
       end
 
       def disable_slide_to_type
-        UI.message("Disabling 'Slide to Type' #{self}")
+        UI.message("Disabling 'Slide to Type' #{self} :: #{self.udid}")
+
+        logfile_src = File.expand_path("~/Library/Logs/CoreSimulator/#{self.udid}/data/Library/Preferences")
+        puts logfile_src
+
+        # go to the simulator preferences
+        ## /Users/{USERNAME}/Library/Developer/CoreSimulator/Devices/{UUID}/data/Library/Preferences
+
+        # Create a new file called: com.apple.keyboard.ContinuousPath.plist
+
+        # Add the following:
+        ## Key: KeyboardContinuousPathEnabled
+        ## Type: Boolean
+        ## Value: NO
       end
     end
   end
