@@ -26,8 +26,6 @@ module Scan
       force_quit_simulator_processes if Scan.config[:force_quit_simulator]
 
       if Scan.config[:reset_simulator]
-        puts "Testing puts"
-        UI.message("Logging")
         Scan.devices.each do |device|
           FastlaneCore::Simulator.reset(udid: device.udid)
         end
