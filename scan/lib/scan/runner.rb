@@ -33,7 +33,7 @@ module Scan
 
       if Scan.config[:disable_slide_to_type]
         Scan.devices.each do |device|
-          UI.message("ATLogger => Device ID #{device.udid}")
+          FastlaneCore::Simulator.disable_slide_to_type(udid: device.udid)
         end
       end
 

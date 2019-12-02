@@ -212,6 +212,10 @@ module FastlaneCore
         `xcrun simctl delete #{self.udid}`
         return
       end
+
+      def disable_slide_to_type
+        UI.message("Disabling 'Slide to Type' #{self}")
+      end
     end
   end
 
@@ -246,6 +250,13 @@ module FastlaneCore
       def delete_all_by_version(os_version: nil)
         return false unless os_version
         all.select { |device| device.os_version == os_version }.each(&:delete)
+      end
+
+      # Disable 'Slide to Type' by UDID or name and OS version
+      # Latter is useful when combined with -destination option of xcodebuild
+      def disable_slide_to_type(udid: nil, name: nil, os_version: nil)
+        match = all.detect { |device| device.udid == udid || device.name == name && device.os_version == os_version }
+        match.disable_slide_to_type if match
       end
 
       def clear_cache
