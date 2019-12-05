@@ -20,7 +20,7 @@ module Fastlane
           end
 
           values[:destination] = destination # restore destination value
-          Scan::Manager.new.work(values) 
+          Scan::Manager.new.work(values)
 
           zip_build_products_path = Scan.cache[:zip_build_products_path]
           Actions.lane_context[SharedValues::SCAN_ZIP_BUILD_PRODUCTS_PATH] = zip_build_products_path if zip_build_products_path
