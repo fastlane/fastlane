@@ -14,12 +14,13 @@ module Fastlane
 
         begin
           destination = values[:destination] # save destination value which can be later overridden
+          Scan.config = values if values[:derived_data_path].to_s.empty? # we set this here to auto-detect missing values, which we need later on
           unless values[:derived_data_path].to_s.empty?
             plist_files_before = test_summary_filenames(values[:derived_data_path])
           end
 
           values[:destination] = destination # restore destination value
-          Scan::Manager.new.work(values)
+          Scan::Manager.new.work(values) 
 
           zip_build_products_path = Scan.cache[:zip_build_products_path]
           Actions.lane_context[SharedValues::SCAN_ZIP_BUILD_PRODUCTS_PATH] = zip_build_products_path if zip_build_products_path
@@ -65,7 +66,17 @@ module Fastlane
                                        env_name: "SCAN_FAIL_BUILD",
                                        description: "Should this step stop the build if the tests fail? Set this to false if you're using trainer",
                                        is_string: false,
-                                       default_value: true)
+                                       default_value: true),
+          FastlaneCore::ConfigItem.new(key: :app_name,
+                                       env_name: "SCAN_APP_NAME",
+                                       optional: true,
+                                       description: "Name of the target which is being build or tested",
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :deployment_target_version,
+                                       env_name: "SCAN_DEPLOYMENT_TARGET_VERSION",
+                                       optional: true,
+                                       description: "Target version of the app being build or tested. Used to filter out simulator version",
+                                       is_string: true)
         ]
       end
 
