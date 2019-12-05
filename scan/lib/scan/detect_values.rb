@@ -215,11 +215,11 @@ module Scan
         Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]
       end
     end
-    
+
     # get deployment target version
     def self.get_deployment_target_version(deployment_target_key)
       Scan.config[:deployment_target_version] || Scan.project.build_settings(key: deployment_target_key) || '0'
     end
-    
+
   end
 end
