@@ -78,9 +78,7 @@ module FastlaneCore
               # This is expected on some linux systems, that indicates that the subcommand finished
               # and we kept trying to read, ignore it
             ensure
-              UI.message("execute - before wait")
               Process.wait(pid)
-              UI.message("execute - after wait")
             end
 
           end

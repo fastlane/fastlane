@@ -122,7 +122,6 @@ module Snapshot
       FileUtils.mkdir_p(language_folder)
 
       Thread.new do
-        sleep(0.5)
         FastlaneCore::CommandExecutor.execute(command: "sh /Users/jm/Dropbox/Code_ObjC/STT_V2_HD/fastlane/Promo/process-start-audio-record.sh",
                                             print_all: true,
                                         print_command: true,
@@ -134,8 +133,9 @@ module Snapshot
                                                        end)
       end
 
+      sleep(0.5)
       Thread.new do
-        FastlaneCore::CommandExecutor.execute(command: "xcrun simctl io booted recordVideo #{language_folder}/#{name}.mp4",
+        FastlaneCore::CommandExecutor.execute(command: "xcrun simctl io booted recordVideo --codec=h264 #{language_folder}/#{name}.mp4",
                                             print_all: true,
                                         print_command: true,
                                               loading: "Recording video...",
@@ -158,7 +158,7 @@ module Snapshot
       Process.kill("SIGINT", @recording_pid)
       @recording_pid = nil
 
-      sleep(5)
+      sleep(0.5)
       FastlaneCore::CommandExecutor.execute(command: "sh /Users/jm/Dropbox/Code_ObjC/STT_V2_HD/fastlane/Promo/process-stop-audio-record.sh #{name} #{folder}/#{name}.mp4 #{folder}/#{name}-video.mp4",
                                           print_all: true,
                                       print_command: true,

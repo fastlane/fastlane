@@ -155,8 +155,6 @@ module Snapshot
       FileUtils.mkdir_p(folder)
 
       Thread.new do
-        #sleep(0.5)
-        sleep(2.0)
         FastlaneCore::CommandExecutor.execute(command: "sh /Users/jm/Dropbox/Code_ObjC/STT_V2_HD/fastlane/Promo/process-start-audio-record.sh",
                                             print_all: true,
                                         print_command: true,
@@ -168,11 +166,22 @@ module Snapshot
                                                        end)
       end
 
+      FastlaneCore::CommandExecutor.execute(command: "rm #{folder}/#{name}.mp4",
+                                          print_all: true,
+                                      print_command: true,
+                                            loading: "Erase recorded video",
+                                              error: proc do |output, return_code|
+                                                       ErrorHandler.handle_test_error(output, return_code)
+                                                       UI.error "Caught error (H)... #{return_code}"
+                                                       UI.error "Caught output (I)... #{output}"
+                                                     end)
+
+
+      sleep(0.5)
       Thread.new do
 
         UI.message("xcrun simctl io #{device_udid} recordVideo #{folder}/#{name}.mp4")
-        #sleep(3.0)
-        FastlaneCore::CommandExecutor.execute(command: "xcrun simctl io #{device_udid} recordVideo #{folder}/#{name}.mp4",
+        FastlaneCore::CommandExecutor.execute(command: "xcrun simctl io #{device_udid} recordVideo --codec=h264 #{folder}/#{name}.mp4",
                                             print_all: true,
                                         print_command: true,
                                               loading: "Recording video...",
@@ -195,29 +204,9 @@ module Snapshot
       name = name.gsub(/[^0-9A-Za-z.\-]/, '_')
       folder = File.join(Snapshot.config[:video_output_directory], dir_name, device)
 
-      #UI.message("stop_recording - Before sleep")
-
-      #sleep(7.0)
-
-      #UI.message("stop_recording - Sleep 7 seconds")
-
       UI.message("stop_recording - About to kill process #{pid}")
       Process.kill("SIGINT", pid)
-      #Process.kill("SIGSTOP", pid)
-      #Process.kill("QUIT", pid)
 
-      #FastlaneCore::CommandExecutor.execute(command: "kill #{pid}",
-      #                                    print_all: true,
-      #                                print_command: true,
-      #                                      loading: "Kill Process..",
-      #                                        error: proc do |output, return_code|
-      #                                                 ErrorHandler.handle_test_error(output, return_code)
-      #                                                 UI.error "Caught error (H)... #{return_code}"
-      #                                                 UI.error "Caught output (I)... #{output}"
-      #                                               end)
-
-
-      UI.message("stop_recording - Process killed")
       @recording_pid[device_udid] = nil
       UI.message("stop_recording - Recording pid for device reset")
 
