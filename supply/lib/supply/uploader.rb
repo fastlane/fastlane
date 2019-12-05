@@ -15,32 +15,34 @@ module Supply
 
       apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
 
-      # Only update tracks if we have version codes
-      # Updating a track with empty version codes can completely clear out a track
-      update_track(apk_version_codes) unless apk_version_codes.empty?
-
-      if Supply.config[:track_promote_to]
-        promote_track
-      elsif !Supply.config[:rollout].nil? && Supply.config[:track].to_s != ""
-        update_rollout
-      end
-
-      if Supply.config[:validate_only]
-        UI.message("Validating all track and release changes with Google Play...")
-        client.validate_current_edit!
-        UI.success("Successfully validated the upload to Google Play")
+      if !apk_version_codes.empty?
+        # Only update tracks if we have version codes
+        # update_track handle setting rollout if needed
+        # Updating a track with empty version codes can completely clear out a track
+        update_track(apk_version_codes)
       else
-        UI.message("Uploading all track and release changes to Google Play...")
-        client.commit_current_edit!
-        UI.success("Successfully finished the upload to Google Play")
+        # Only promote or rollout if we don't have version codes
+        if Supply.config[:track_promote_to]
+          promote_track
+        elsif !Supply.config[:rollout].nil? && Supply.config[:track].to_s != ""
+          update_rollout
+        end
       end
 
       perform_upload_meta(apk_version_codes)
+
+      if Supply.config[:validate_only]
+        UI.message("Validating all changes with Google Play...")
+        client.validate_current_edit!
+        UI.success("Successfully validated the upload to Google Play")
+      else
+        UI.message("Uploading all changes to Google Play...")
+        client.commit_current_edit!
+        UI.success("Successfully finished the upload to Google Play")
+      end
     end
 
     def perform_upload_meta(version_codes)
-      client.begin_edit(package_name: Supply.config[:package_name])
-
       if (!Supply.config[:skip_upload_metadata] || !Supply.config[:skip_upload_images] || !Supply.config[:skip_upload_changelogs] || !Supply.config[:skip_upload_screenshots]) && metadata_path
         # Use version code from config if version codes is empty and no nil or empty string
         version_codes = [Supply.config[:version_code]] if version_codes.empty?
@@ -65,21 +67,11 @@ module Supply
             upload_metadata(language, listing) unless Supply.config[:skip_upload_metadata]
             upload_images(language) unless Supply.config[:skip_upload_images]
             upload_screenshots(language) unless Supply.config[:skip_upload_screenshots]
-            release_notes << upload_changelog(language, release.name) unless Supply.config[:skip_upload_changelogs]
+            release_notes << upload_changelog(language, version_code) unless Supply.config[:skip_upload_changelogs]
           end
 
           upload_changelogs(release_notes, release, track) unless release_notes.empty?
         end
-      end
-
-      if Supply.config[:validate_only]
-        UI.message("Validating all meta changes with Google Play...")
-        client.validate_current_edit!
-        UI.success("Successfully validated the upload to Google Play")
-      else
-        UI.message("Uploading all meta changes to Google Play...")
-        client.commit_current_edit!
-        UI.success("Successfully finished the upload to Google Play")
       end
     end
 
@@ -194,16 +186,16 @@ module Supply
       client.update_track(Supply.config[:track_promote_to], track_to)
     end
 
-    def upload_changelog(language, version_name)
-      UI.user_error!("Cannot find changelog because no version name given - please specify :version_name") unless version_name
+    def upload_changelog(language, version_code)
+      UI.user_error!("Cannot find changelog because no version code given - please specify :version_code") unless version_code
 
-      path = File.join(Supply.config[:metadata_path], language, Supply::CHANGELOGS_FOLDER_NAME, "#{version_name}.txt")
+      path = File.join(Supply.config[:metadata_path], language, Supply::CHANGELOGS_FOLDER_NAME, "#{version_code}.txt")
       changelog_text = ''
       if File.exist?(path)
-        UI.message("Updating changelog for '#{version_name}' and language '#{language}'...")
+        UI.message("Updating changelog for '#{version_code}' and language '#{language}'...")
         changelog_text = File.read(path, encoding: 'UTF-8')
       else
-        UI.message("Could not find changelog for '#{version_name}' and language '#{language}' at path #{path}...")
+        UI.message("Could not find changelog for '#{version_code}' and language '#{language}' at path #{path}...")
       end
 
       AndroidPublisher::LocalizedText.new({
@@ -358,8 +350,11 @@ module Supply
       )
 
       if Supply.config[:rollout]
-        track_release.status = Supply::ReleaseStatus::IN_PROGRESS
-        track_release.user_fraction = Supply.config[:rollout].to_f
+        rollout = Supply.config[:rollout].to_f
+        if rollout > 0 && rollout < 1
+          track_release.status = Supply::ReleaseStatus::IN_PROGRESS
+          track_release.user_fraction = rollout
+        end
       end
 
       tracks = client.tracks(Supply.config[:track])

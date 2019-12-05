@@ -142,8 +142,8 @@ module Fastlane
           # Let's tell the user how to use `bundle exec`
           # We show this warning no matter if the command is slow or not
           UI.important("fastlane detected a Gemfile in the current directory")
-          UI.important("however it seems like you don't use `bundle exec`")
-          UI.important("to launch fastlane faster, please use")
+          UI.important("However, it seems like you didn't use `bundle exec`")
+          UI.important("To launch fastlane faster, please use")
           UI.message("")
           UI.command "bundle exec fastlane #{ARGV.join(' ')}"
           UI.message("")
