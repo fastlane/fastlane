@@ -315,7 +315,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :app_name,
                                     env_name: "SCAN_APP_NAME",
                                     optional: true,
-                                    description: "Name of the target which is being build or tested",
+                                    description: "App name to use in slack message and logfile name",
                                     is_string: true),
         FastlaneCore::ConfigItem.new(key: :deployment_target_version,
                                     env_name: "SCAN_DEPLOYMENT_TARGET_VERSION",
