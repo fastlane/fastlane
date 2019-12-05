@@ -216,9 +216,9 @@ module Scan
       end
     end
     
-    #get deployment target version
+    # get deployment target version
     def self.get_deployment_target_version(deployment_target_key)
-       Scan.config[:deployment_target_version] || Scan.project.build_settings(key: deployment_target_key) || '0'
+      Scan.config[:deployment_target_version] || Scan.project.build_settings(key: deployment_target_key) || '0'
     end
     
   end
