@@ -310,7 +310,7 @@ module Scan
                                      verify_block: proc do |value|
                                        UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
-        
+
         # build settings
         FastlaneCore::ConfigItem.new(key: :app_name,
                                     env_name: "SCAN_APP_NAME",
@@ -322,7 +322,7 @@ module Scan
                                     optional: true,
                                     description: "Target version of the app being build or tested. Used to filter out simulator version",
                                     is_string: true),
-        
+
         # slack
         FastlaneCore::ConfigItem.new(key: :slack_url,
                                      short_option: "-i",
