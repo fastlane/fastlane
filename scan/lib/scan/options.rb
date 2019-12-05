@@ -311,17 +311,17 @@ module Scan
                                        UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
         
-        #build settings
+        # build settings
         FastlaneCore::ConfigItem.new(key: :app_name,
-               env_name: "SCAN_APP_NAME",
-               optional: true,
-               description: "Name of the target which is being build or tested",
-               is_string: true),
+                                    env_name: "SCAN_APP_NAME",
+                                    optional: true,
+                                    description: "Name of the target which is being build or tested",
+                                    is_string: true),
         FastlaneCore::ConfigItem.new(key: :deployment_target_version,
-              env_name: "SCAN_DEPLOYMENT_TARGET_VERSION",
-              optional: true,
-              description: "Target version of the app being build or tested. Used to filter out simulator version",
-              is_string: true),
+                                    env_name: "SCAN_DEPLOYMENT_TARGET_VERSION",
+                                    optional: true,
+                                    description: "Target version of the app being build or tested. Used to filter out simulator version",
+                                    is_string: true),
         
         # slack
         FastlaneCore::ConfigItem.new(key: :slack_url,
