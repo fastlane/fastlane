@@ -146,7 +146,7 @@ module Screengrab
         "/data/user/0/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots"
       end
 
-      return ["/data/data/#{app_package_name}/app_screengrab"] + locale_paths
+      return ["/data/data/#{app_package_name}/screengrab"] + locale_paths
     end
 
     def clear_device_previous_screenshots(device_serial, device_screenshots_paths)
