@@ -43,6 +43,9 @@ module Fastlane
           version_array = current_version.split(".").map(&:to_i)
 
           case params[:bump_type]
+          when "bump"
+            version_array[-1] = version_array[-1] + 1
+            next_version_number = version_array.join(".")
           when "patch"
             UI.user_error!(version_token_error) if version_array.count < 3
             version_array[2] = version_array[2] + 1
@@ -109,9 +112,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :bump_type,
                                        env_name: "FL_VERSION_NUMBER_BUMP_TYPE",
                                        description: "The type of this version bump. Available: patch, minor, major",
-                                       default_value: "patch",
+                                       default_value: "bump",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['patch', 'minor', 'major'].include?(value)
+                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['bump', 'patch', 'minor', 'major'].include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_NUMBER_VERSION_NUMBER",
@@ -148,7 +151,7 @@ module Fastlane
 
       def self.example_code
         [
-          'increment_version_number # Automatically increment patch version number',
+          'increment_version_number # Automatically increment version number',
           'increment_version_number(
             bump_type: "patch" # Automatically increment patch version number
           )',
