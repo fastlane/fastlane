@@ -43,7 +43,7 @@ module Fastlane
           "Use the `xcversion` action if you want to select an Xcode:",
           "- Based on a version specifier or",
           "- You don't have known, stable paths, as may happen in a CI environment."
-        ]
+        ].join("\n")
       end
 
       def self.author
