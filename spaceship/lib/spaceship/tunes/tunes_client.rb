@@ -784,11 +784,8 @@ module Spaceship
     end
 
     def available_languages
-      r = request(:get, "ra/apps/storePreview/regionCountryLanguage")
-      response = parse_response(r, 'data')
-      response.flat_map { |region| region["storeFronts"] }
-              .flat_map { |storefront| storefront["supportedLocaleCodes"] }
-              .uniq
+      r = request(:get, "ra/ref")
+      parse_response(r, 'data')['detailLocales']
     end
 
     #####################################################
