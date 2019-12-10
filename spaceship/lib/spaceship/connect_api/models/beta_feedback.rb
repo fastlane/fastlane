@@ -24,7 +24,6 @@ module Spaceship
       attr_accessor :screen_width
       attr_accessor :screen_height
 
-
       attr_mapping({
         "timestamp" => "timestamp",
         "comment" => "comment",
@@ -61,7 +60,6 @@ module Spaceship
       def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
         return Spaceship::ConnectAPI.get_feedback(filter: filter, includes: includes)
       end
-      
     end
   end
 end
