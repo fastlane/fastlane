@@ -16,7 +16,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :pattern,
-                                       description: "Pattern to filter tags when looking for last one. Limit tags to ones matching given shell glob. If pattern lacks ?, *, or [, /* at the end is implied",
+                                       description: "Pattern to filter tags when looking for last one. Limit tags to ones matching given shell glob. If pattern lacks ?, *, or [, * at the end is implied",
                                        default_value: nil,
                                        optional: true)
         ]
