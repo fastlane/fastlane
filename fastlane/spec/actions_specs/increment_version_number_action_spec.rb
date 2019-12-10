@@ -1,16 +1,22 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Increment Version Number Integration" do
-      it "increments all targets' patch version number (from 1.0.0 to 1.0.1)" do
-        expect(Fastlane::Actions).to receive(:sh)
-          .with(/agvtool what-marketing-version/, any_args)
-          .once
-          .and_return("1.0.0")
-        Fastlane::FastFile.new.parse("lane :test do
-          increment_version_number
-        end").runner.execute(:test)
+      {
+          "1" => "2",
+          "1.1" => "1.2",
+          "1.1.1" => "1.1.2"
+      }.each do |from_version, to_version|
+        it "increments all targets' version number from #{from_version} to #{to_version}" do
+          expect(Fastlane::Actions).to receive(:sh)
+            .with(/agvtool what-marketing-version/, any_args)
+            .once
+            .and_return(from_version)
+          Fastlane::FastFile.new.parse("lane :test do
+            increment_version_number
+          end").runner.execute(:test)
 
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version 1.0.1/)
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version #{to_version}/)
+        end
       end
 
       ["1.0", "10"].each do |version|
@@ -22,7 +28,7 @@ describe Fastlane do
 
           expect do
             Fastlane::FastFile.new.parse("lane :test do
-              increment_version_number
+              increment_version_number(bump_type: 'patch')
             end").runner.execute(:test)
           end.to raise_error("Can't increment version")
         end
