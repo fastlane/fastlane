@@ -217,6 +217,8 @@ jobs:
       - run:
           name: Setup Build
           command: |
+            gem update --system
+            gem install bundler
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
       - save_cache:
           key: v1-ubuntu-gems-{{ checksum "Gemfile" }}

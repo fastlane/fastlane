@@ -48,6 +48,9 @@ protocol MatchfileProtocol: class {
   /// Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
   var gitBasicAuthorization: String? { get }
 
+  /// Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64
+  var gitBearerAuthorization: String? { get }
+
   /// Name of the Google Cloud Storage bucket to use
   var googleCloudBucketName: String? { get }
 
