@@ -38,7 +38,12 @@ module Fastlane
       end
 
       def self.details
-        "Select and build with the Xcode installed at the provided path. Use the `xcversion` action if you want to select an Xcode based on a version specifier or you don't have known, stable paths as may happen in a CI environment."
+        [
+          "Select and build with the Xcode installed at the provided path.",
+          "Use the `xcversion` action if you want to select an Xcode:",
+          "- Based on a version specifier or",
+          "- You don't have known, stable paths, as may happen in a CI environment."
+        ].join("\n")
       end
 
       def self.author
