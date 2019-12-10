@@ -111,6 +111,25 @@ match
 
 You can find more information about GitHub basic authentication and personal token generation here: [https://developer.github.com/v3/auth/#basic-authentication](https://developer.github.com/v3/auth/#basic-authentication)
 
+##### Git Storage on Azure Devops
+
+If you're running a pipeline on Azure Devops and using git storage in a another repository on the same project, you might want to use `bearer` token authentication.
+
+Using parameter:
+
+```
+match(git_bearer_authorization: '<YOUR TOKEN>')
+```
+
+Using environment variable:
+
+```
+ENV['MATCH_GIT_BEARER_AUTHORIZATION'] = '<YOUR TOKEN>'
+match
+```
+
+You can find more information about this use case here: [https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#authorize-access-to-your-repositories](https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#authorize-access-to-your-repositories)
+
 #### Google Cloud Storage
 
 Use [Google Cloud Storage](https://cloud.google.com/storage/) for a fully hosted solution for your code signing identities. Certificates are stored on Google Cloud, encrypted using Google managed keys. Everything will be stored on your Google account, inside a storage bucket you provide. You can also directly access the files using the web console.
