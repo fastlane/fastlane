@@ -24,6 +24,10 @@ module Spaceship
       attr_accessor :screen_width
       attr_accessor :screen_height
 
+      attr_accessor :build
+      attr_accessor :tester
+      attr_accessor :screenshots
+
       attr_mapping({
         "timestamp" => "timestamp",
         "comment" => "comment",
@@ -46,6 +50,8 @@ module Spaceship
         "screenWidth" => "screen_width",
         "screenHeight" => "screen_height",
 
+        "build" => "build",
+        "tester" => "tester",
         "screenshots" => "screenshots"
       })
 
@@ -57,8 +63,8 @@ module Spaceship
       # API
       #
 
-      def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
-        return Spaceship::ConnectAPI.get_feedback(filter: filter, includes: includes)
+      def self.all(filter: {}, includes: "tester,build,screenshots", limit: nil, sort: nil)
+        return Spaceship::ConnectAPI.get_beta_feedback(filter: filter, includes: includes, limit: limit, sort: sort)
       end
     end
   end

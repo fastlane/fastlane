@@ -322,7 +322,7 @@ module Spaceship
       # betaFeedbacks (private API as of end 2019)
       #
 
-      def get_feedback(filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_beta_feedback(filter: {}, includes: nil, limit: nil, sort: nil)
         params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
         Client.instance.get("betaFeedbacks", params)
       end
