@@ -23,7 +23,6 @@ jobs:
           command: |
             mkdir -p ~/test-reports
             echo "2.3" > .ruby-version
-            gem update --system
             brew untap caskroom/versions
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
@@ -83,7 +82,6 @@ jobs:
           command: |
             mkdir -p ~/test-reports
             echo "2.5" > .ruby-version
-            gem update --system
             brew untap caskroom/versions
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
@@ -190,7 +188,6 @@ jobs:
           command: |
             mkdir -p ~/test-reports
             echo "2.5" > .ruby-version
-            gem update --system
             brew untap caskroom/versions
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
