@@ -108,6 +108,7 @@ extension MatchfileProtocol {
   var shallowClone: Bool { return false }
   var cloneBranchDirectly: Bool { return false }
   var gitBasicAuthorization: String? { return nil }
+  var gitBearerAuthorization: String? { return nil }
   var googleCloudBucketName: String? { return nil }
   var googleCloudKeysFile: String? { return nil }
   var googleCloudProjectId: String? { return nil }
@@ -125,4 +126,4 @@ extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.11]
+// FastlaneRunnerAPIVersion [0.9.12]
