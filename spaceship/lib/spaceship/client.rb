@@ -571,7 +571,7 @@ module Spaceship
         end
       rescue => ex
         puts(ex.to_s)
-        puts("Continuing with other login methods")
+        puts("Continuing with normal login.")
       end
       return false
     end
