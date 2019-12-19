@@ -24,7 +24,7 @@ module Fastlane
         Spaceship::Tunes.select_team(team_id: params[:team_id], team_name: params[:team_name])
         UI.message("Login successful")
 
-        app = Spaceship::Tunes::Application.find(params[:app_identifier])
+        app = Spaceship::Tunes::Application.find(params[:app_identifier], mac: params[:platform] == "osx")
         UI.user_error!("Could not find an app on App Store Connect with app_identifier: #{params[:app_identifier]}") unless app
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
