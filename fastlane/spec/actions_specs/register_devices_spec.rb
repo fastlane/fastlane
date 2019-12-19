@@ -7,6 +7,12 @@ describe Fastlane do
       let(:devices_file_without_platform) do
         File.absolute_path('./fastlane/spec/fixtures/actions/register_devices/devices-list-without-platform.txt')
       end
+      let(:devices_file_with_spaces) do
+        File.absolute_path('./fastlane/spec/fixtures/actions/register_devices/devices-list-with-spaces.txt')
+      end
+      let(:devices_file_with_too_many_columns) do
+        File.absolute_path('./fastlane/spec/fixtures/actions/register_devices/devices-list-with-too-many-columns.txt')
+      end
 
       let(:existing_device) { double }
       let(:fake_devices) { [existing_device] }
@@ -86,6 +92,32 @@ describe Fastlane do
               platform: 'mac'
             )
           end").runner.execute(:test)
+      end
+
+      describe "displays error messages" do
+        it "raises when csv has spaces" do
+          expect do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                register_devices(
+                  username: 'test@test.com',
+                  devices_file: '#{devices_file_with_spaces}',
+                  platform: 'mac'
+                )
+              end").runner.execute(:test)
+          end.to raise_error("Invalid device line, ensure you are using tabs (NOT spaces). See Apple's sample/spec here: https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip")
+        end
+
+        it "raises when csv too many columns" do
+          expect do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                register_devices(
+                  username: 'test@test.com',
+                  devices_file: '#{devices_file_with_too_many_columns}',
+                  platform: 'mac'
+                )
+              end").runner.execute(:test)
+          end.to raise_error("Invalid device line, please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)")
+        end
       end
     end
   end

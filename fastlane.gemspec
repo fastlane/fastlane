@@ -15,26 +15,26 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Josh Holtz",
-                        "Olivier Halligon",
+  spec.authors       = ["Jorge Revuelta H",
                         "Joshua Liebowitz",
-                        "Aaron Brager",
-                        "Andrew McBurney",
-                        "Kohki Miki",
-                        "Manu Wallner",
-                        "Felix Krause",
-                        "Luka Mirosevic",
-                        "Stefan Natchev",
-                        "Iulian Onofrei",
+                        "Josh Holtz",
                         "Danielle Tomlinson",
-                        "Jimmy Dee",
-                        "Jérôme Lacoste",
-                        "Jan Piotrowski",
+                        "Kohki Miki",
+                        "Luka Mirosevic",
+                        "Iulian Onofrei",
+                        "Stefan Natchev",
+                        "Maksym Grebenets",
+                        "Manu Wallner",
+                        "Aaron Brager",
                         "Matthew Ellis",
+                        "Felix Krause",
+                        "Jan Piotrowski",
+                        "Jérôme Lacoste",
                         "Helmut Januschka",
                         "Fumiya Nakamura",
-                        "Maksym Grebenets",
-                        "Jorge Revuelta H"]
+                        "Andrew McBurney",
+                        "Olivier Halligon",
+                        "Jimmy Dee"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -74,7 +74,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('babosa', '>= 1.0.2', "< 2.0.0")
   spec.add_dependency('colored') # colored terminal output
   spec.add_dependency('commander-fastlane', '>= 4.4.6', '< 5.0.0') # CLI parser
-  spec.add_dependency('excon', '>= 0.45.0', '< 1.0.0') # Great HTTP Client
+  spec.add_dependency('excon', '>= 0.71.0', '< 1.0.0') # Great HTTP Client
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
   spec.add_dependency('faraday', '~> 0.17') # Used for deploygate, hockey and testfairy actions
   spec.add_dependency('faraday_middleware', '~> 0.13.1') # same as faraday

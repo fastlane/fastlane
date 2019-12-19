@@ -2577,7 +2577,7 @@ func downloadDsyms(username: String,
 func downloadFromPlayStore(packageName: String,
                            versionName: String? = nil,
                            track: String = "production",
-                           metadataPath: String = "./metadata",
+                           metadataPath: String? = nil,
                            key: String? = nil,
                            issuer: String? = nil,
                            jsonKey: String? = nil,
@@ -3878,7 +3878,7 @@ func importCertificate(certificatePath: String,
  This action will increment the version number.
  You first have to set up your Xcode project, if you haven't done it already: [https://developer.apple.com/library/ios/qa/qa1827/_index.html](https://developer.apple.com/library/ios/qa/qa1827/_index.html).
 */
-@discardableResult func incrementVersionNumber(bumpType: String = "patch",
+@discardableResult func incrementVersionNumber(bumpType: String = "bump",
                                                versionNumber: String? = nil,
                                                xcodeproj: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "increment_version_number", className: nil, args: [RubyCommand.Argument(name: "bump_type", value: bumpType),
@@ -4266,6 +4266,7 @@ func match(type: Any = matchfile.type,
            shallowClone: Bool = matchfile.shallowClone,
            cloneBranchDirectly: Bool = matchfile.cloneBranchDirectly,
            gitBasicAuthorization: Any? = matchfile.gitBasicAuthorization,
+           gitBearerAuthorization: Any? = matchfile.gitBearerAuthorization,
            googleCloudBucketName: Any? = matchfile.googleCloudBucketName,
            googleCloudKeysFile: Any? = matchfile.googleCloudKeysFile,
            googleCloudProjectId: Any? = matchfile.googleCloudProjectId,
@@ -6722,7 +6723,7 @@ func supply(packageName: String,
             releaseStatus: String = "completed",
             track: String = "production",
             rollout: String? = nil,
-            metadataPath: String = "./metadata",
+            metadataPath: String? = nil,
             key: String? = nil,
             issuer: String? = nil,
             jsonKey: String? = nil,
@@ -6884,6 +6885,7 @@ func syncCodeSigning(type: String = "development",
                      shallowClone: Bool = false,
                      cloneBranchDirectly: Bool = false,
                      gitBasicAuthorization: String? = nil,
+                     gitBearerAuthorization: String? = nil,
                      googleCloudBucketName: String? = nil,
                      googleCloudKeysFile: String? = nil,
                      googleCloudProjectId: String? = nil,
@@ -7749,7 +7751,7 @@ func uploadToPlayStore(packageName: String,
                        releaseStatus: String = "completed",
                        track: String = "production",
                        rollout: String? = nil,
-                       metadataPath: String = "./metadata",
+                       metadataPath: String? = nil,
                        key: String? = nil,
                        issuer: String? = nil,
                        jsonKey: String? = nil,
@@ -8091,7 +8093,10 @@ func xcexport() {
 /**
  Change the xcode-path to use. Useful for beta versions of Xcode
 
- Select and build with the Xcode installed at the provided path. Use the `xcversion` action if you want to select an Xcode based on a version specifier or you don't have known, stable paths as may happen in a CI environment.
+ Select and build with the Xcode installed at the provided path.
+ Use the `xcversion` action if you want to select an Xcode:
+ - Based on a version specifier or
+ - You don't have known, stable paths, as may happen in a CI environment.
 */
 func xcodeSelect() {
   let command = RubyCommand(commandID: "", methodName: "xcode_select", className: nil, args: [])
@@ -8206,7 +8211,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-11.2.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-11.2.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -8351,4 +8356,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.65]
+// FastlaneRunnerAPIVersion [0.9.66]
