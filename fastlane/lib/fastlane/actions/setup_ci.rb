@@ -37,7 +37,8 @@ module Fastlane
           unlock: true,
           timeout: 3600,
           lock_when_sleeps: true,
-          password: ""
+          password: "",
+          add_to_search_list: true
         )
 
         UI.message("Enabling match readonly mode.")
