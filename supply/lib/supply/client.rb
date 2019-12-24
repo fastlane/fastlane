@@ -310,6 +310,19 @@ module Supply
       return result_upload.version_code
     end
 
+    def upload_apk_to_internal_app_sharing(package_name, path_to_apk)
+      # NOTE: This Google API is a little different. It doesn't require an active edit.
+      result_upload = call_google_api do
+        client.uploadapk_internalappsharingartifact(
+          package_name,
+          upload_source: path_to_apk,
+          content_type: "application/octet-stream"
+        )
+      end
+
+      return result_upload.download_url
+    end
+
     def upload_mapping(path_to_mapping, apk_version_code)
       ensure_active_edit!
 
@@ -338,6 +351,19 @@ module Supply
       end
 
       return result_upload.version_code
+    end
+
+    def upload_bundle_to_internal_app_sharing(package_name, path_to_aab)
+      # NOTE: This Google API is a little different. It doesn't require an active edit.
+      result_upload = call_google_api do
+        client.uploadbundle_internalappsharingartifact(
+          package_name,
+          upload_source: path_to_aab,
+          content_type: "application/octet-stream"
+        )
+      end
+
+      return result_upload.download_url
     end
 
     # Get a list of all tracks - returns the list
