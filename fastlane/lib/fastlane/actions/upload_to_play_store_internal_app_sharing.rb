@@ -54,9 +54,6 @@ module Fastlane
         options.delete_if { |option| options_to_keep.include?(option.key) == false }
       end
 
-      def self.output
-      end
-
       def self.return_value
         "Returns a string containing the download URL for the uploaded APK/AAB (or array of strings if multiple were uploaded)."
       end
