@@ -45,113 +45,13 @@ module Fastlane
       end
 
       def self.available_options
-        @options ||= [
-          FastlaneCore::ConfigItem.new(key: :package_name,
-                                       env_name: "SUPPLY_PACKAGE_NAME",
-                                       short_option: "-p",
-                                       description: "The package name of the application to use",
-                                       code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:package_name),
-                                       default_value_dynamic: true),
-          FastlaneCore::ConfigItem.new(key: :json_key,
-                                       env_name: "SUPPLY_JSON_KEY",
-                                       short_option: "-j",
-                                       conflicting_options: [:json_key_data],
-                                       description: "The path to a file containing service account JSON, used to authenticate with Google",
-                                       code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
-                                       default_value_dynamic: true,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Could not find service account json file at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
-                                         UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :json_key_data,
-                                       env_name: "SUPPLY_JSON_KEY_DATA",
-                                       short_option: "-c",
-                                       description: "The raw service account JSON data used to authenticate with Google",
-                                       conflicting_options: [:json_key],
-                                       code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
-                                       default_value_dynamic: true,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         begin
-                                           JSON.parse(value)
-                                         rescue JSON::ParserError
-                                           UI.user_error!("Could not parse service account json: JSON::ParseError")
-                                         end
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :apk,
-                                       env_name: "SUPPLY_APK",
-                                       short_option: "-b",
-                                       description: "Path to the APK file to upload",
-                                       conflicting_options: [:apk_paths, :aab, :aab_paths],
-                                       code_gen_sensitive: true,
-                                       default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-Release.apk")].last,
-                                       default_value_dynamic: true,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Could not find apk file at path '#{value}'") unless File.exist?(value)
-                                         UI.user_error!("apk file is not an apk") unless value.end_with?('.apk')
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :apk_paths,
-                                       env_name: "SUPPLY_APK_PATHS",
-                                       short_option: "-u",
-                                       description: "An array of paths to APK files to upload",
-                                       conflicting_options: [:apk, :aab, :aab_paths],
-                                       code_gen_sensitive: true,
-                                       type: Array,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
-                                         value.each do |path|
-                                           UI.user_error!("Could not find apk file at path '#{path}'") unless File.exist?(path)
-                                           UI.user_error!("file at path '#{path}' is not an apk") unless path.end_with?('.apk')
-                                         end
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :aab,
-                                       env_name: "SUPPLY_AAB",
-                                       short_option: "-f",
-                                       description: "Path to the AAB file to upload",
-                                       conflicting_options: [:apk, :apk_paths, :aab_paths],
-                                       code_gen_sensitive: true,
-                                       default_value: Dir["*.aab"].last || Dir[File.join("app", "build", "outputs", "bundle", "release", "bundle.aab")].last,
-                                       default_value_dynamic: true,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Could not find aab file at path '#{value}'") unless File.exist?(value)
-                                         UI.user_error!("aab file is not an aab") unless value.end_with?('.aab')
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :aab_paths,
-                                       env_name: "SUPPLY_AAB_PATHS",
-                                       short_option: "-z",
-                                       description: "An array of paths to AAB files to upload",
-                                       conflicting_options: [:apk, :apk_paths, :aab],
-                                       code_gen_sensitive: true,
-                                       type: Array,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
-                                         value.each do |path|
-                                           UI.user_error!("Could not find aab file at path '#{path}'") unless File.exist?(path)
-                                           UI.user_error!("file at path '#{path}' is not an aab") unless path.end_with?('.aab')
-                                         end
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :timeout,
-                                       env_name: "SUPPLY_TIMEOUT",
-                                       optional: true,
-                                       description: "Timeout for read, open, and send (in seconds)",
-                                       type: Integer,
-                                       default_value: 300), # 5 minutes
-          FastlaneCore::ConfigItem.new(key: :root_url,
-                                       env_name: "SUPPLY_ROOT_URL",
-                                       description: "Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/",
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Could not parse URL '#{value}'") unless value =~ URI.regexp
-                                       end)
-        ]
+        require 'supply'
+        require 'supply/options'
+        options = Supply::Options.available_options.clone
+
+        # remove all the unnecessary (for this action) options
+        options_to_keep = [:package_name, :apk, :apk_paths, :aab, :aab_paths, :json_key, :json_key_data, :root_url, :timeout]
+        options.delete_if { |option| options_to_keep.include?(option.key) == false }
       end
 
       def self.output
