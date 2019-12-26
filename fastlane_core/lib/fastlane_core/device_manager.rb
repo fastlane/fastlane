@@ -214,6 +214,9 @@ module FastlaneCore
       end
 
       def disable_slide_to_type
+        return unless is_simulator
+        return unless os_type == "iOS"
+        return unless Gem::Version.new(os_version) >= Gem::Version.new('13.0')
         UI.message("Disabling 'Slide to Type' #{self}")
 
         plist_buddy = '/usr/libexec/PlistBuddy'
