@@ -446,5 +446,40 @@ describe FastlaneCore do
         is_simulator: true
       )
     end
+
+    describe FastlaneCore::DeviceManager::Device do
+      it "slide to type gets disabled if iOS 13.0 or greater" do
+        device = FastlaneCore::DeviceManager::Device.new(os_type: "iOS", os_version: "13.0", is_simulator: true)
+
+        expect(UI).to receive(:message).with("Disabling 'Slide to Type' #{device}")
+        expect(FastlaneCore::Helper).to receive(:backticks).times.once
+
+        device.disable_slide_to_type
+      end
+
+      it "bypass slide to type disabling if less than iOS 13.0" do
+        device = FastlaneCore::DeviceManager::Device.new(os_type: "iOS", os_version: "12.4", is_simulator: true)
+
+        expect(FastlaneCore::Helper).to_not(receive(:backticks))
+
+        device.disable_slide_to_type
+      end
+
+      it "bypass slide to type disabling if not a simulator" do
+        device = FastlaneCore::DeviceManager::Device.new(os_type: "iOS", os_version: "13.0", is_simulator: false)
+
+        expect(FastlaneCore::Helper).to_not(receive(:backticks))
+
+        device.disable_slide_to_type
+      end
+
+      it "bypass slide to type disabling if not iOS" do
+        device = FastlaneCore::DeviceManager::Device.new(os_type: "somethingelse", os_version: "13.0", is_simulator: true)
+
+        expect(FastlaneCore::Helper).to_not(receive(:backticks))
+
+        device.disable_slide_to_type
+      end
+    end
   end
 end

@@ -212,6 +212,19 @@ module FastlaneCore
         `xcrun simctl delete #{self.udid}`
         return
       end
+
+      def disable_slide_to_type
+        return unless is_simulator
+        return unless os_type == "iOS"
+        return unless Gem::Version.new(os_version) >= Gem::Version.new('13.0')
+        UI.message("Disabling 'Slide to Type' #{self}")
+
+        plist_buddy = '/usr/libexec/PlistBuddy'
+        plist_buddy_cmd = "-c \"Add :KeyboardContinuousPathEnabled bool false\""
+        plist_path = File.expand_path("~/Library/Developer/CoreSimulator/Devices/#{self.udid}/data/Library/Preferences/com.apple.keyboard.ContinuousPath.plist")
+
+        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path}")
+      end
     end
   end
 
@@ -246,6 +259,13 @@ module FastlaneCore
       def delete_all_by_version(os_version: nil)
         return false unless os_version
         all.select { |device| device.os_version == os_version }.each(&:delete)
+      end
+
+      # Disable 'Slide to Type' by UDID or name and OS version
+      # Latter is useful when combined with -destination option of xcodebuild
+      def disable_slide_to_type(udid: nil, name: nil, os_version: nil)
+        match = all.detect { |device| device.udid == udid || device.name == name && device.os_version == os_version }
+        match.disable_slide_to_type if match
       end
 
       def clear_cache
