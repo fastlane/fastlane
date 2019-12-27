@@ -32,6 +32,11 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.ci?).to be(false)
       end
 
+      it "returns true when building in CircleCI" do
+        stub_const('ENV', { 'CIRCLECI' => true })
+        expect(FastlaneCore::Helper.ci?).to be(true)
+      end
+
       it "returns true when building in Jenkins" do
         stub_const('ENV', { 'JENKINS_URL' => 'http://fake.jenkins.url' })
         expect(FastlaneCore::Helper.ci?).to be(true)
@@ -72,6 +77,18 @@ describe FastlaneCore do
       it "returns true when building in Azure DevOps (VSTS) " do
         stub_const('ENV', { 'TF_BUILD' => true })
         expect(FastlaneCore::Helper.ci?).to be(true)
+      end
+    end
+
+    describe "#is_circle_ci?" do
+      it "returns true when building in CircleCI" do
+        stub_const('ENV', { 'CIRCLECI' => true })
+        expect(FastlaneCore::Helper.ci?).to be(true)
+      end
+
+      it "returns false when not building in a known CI environment" do
+        stub_const('ENV', {})
+        expect(FastlaneCore::Helper.ci?).to be(false)
       end
     end
 

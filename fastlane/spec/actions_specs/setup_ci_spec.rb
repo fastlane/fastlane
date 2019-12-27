@@ -1,5 +1,30 @@
 describe Fastlane do
   describe Fastlane::Actions::SetupCiAction do
+    describe "#run" do
+      context "when it should run" do
+        before do
+          stub_const("ENV", { "CI" => "anything" })
+          allow(Fastlane::Actions::CreateKeychainAction).to receive(:run).and_return(nil)
+        end
+
+        it "calls setup_keychain after setup_output_paths if :provider is set to circleci" do
+          # Message is asserted in reverse order, hence output of setup_output_paths is expected last
+          expect(Fastlane::UI).to receive(:message).with("Enabling match readonly mode.")
+          expect(Fastlane::UI).to receive(:message).with("Creating temporary keychain: \"fastlane_tmp_keychain\".")
+          expect(Fastlane::UI).to receive(:message).with("Skipping Log Path setup as FL_OUTPUT_DIR is unset")
+
+          described_class.run(provider: "circleci")
+        end
+
+        it "calls setup_keychain if no provider is be detected" do
+          expect(Fastlane::UI).to receive(:message).with("Enabling match readonly mode.")
+          expect(Fastlane::UI).to receive(:message).with("Creating temporary keychain: \"fastlane_tmp_keychain\".")
+
+          described_class.run(force: true)
+        end
+      end
+    end
+
     describe "#should_run" do
       context "when running on CI" do
         before do
@@ -26,6 +51,37 @@ describe Fastlane do
 
         it "returns true when :force is set" do
           expect(described_class.should_run?(force: true)).to eql(true)
+        end
+      end
+    end
+
+    describe "#detect_provider" do
+      context "when running on CircleCI" do
+        before do
+          stub_const("ENV", { "CIRCLECI" => "anything" })
+        end
+
+        it "returns circleci when :provider is not set" do
+          expect(described_class.detect_provider({})).to eql("circleci")
+        end
+
+        it "returns github when :provider is set to github" do
+          expect(described_class.detect_provider(provider: "github")).to eql("github")
+        end
+      end
+
+      context "when not running on CircleCI" do
+        before do
+          # Unset environment to ensure CIRCLECI is not set even if the test suite is run on CircleCI
+          stub_const("ENV", {})
+        end
+
+        it "returns nil when :provider is not set" do
+          expect(described_class.detect_provider({})).to eql(nil)
+        end
+
+        it "returns github when :provider is set to github" do
+          expect(described_class.detect_provider(provider: "github")).to eql("github")
         end
       end
     end
