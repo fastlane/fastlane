@@ -57,8 +57,9 @@ describe Deliver::SubmitForReview do
         # Stub Time.now to return current time on first call and 6 minutes later on second
         before { allow(Time).to receive(:now).and_return(time_now, (time_now + 60 * 6)) }
         it 'throws a UI error' do
-          allow(fake_app).to receive(:latest_version).and_return(fake_version)
-          allow(fake_version).to receive(:candidate_builds).and_return([])
+          allow(fake_app).to receive(:tunes_all_builds_for_train)
+            .with(train: "1.2.3")
+            .and_return([])
           expect do
             review_submitter.wait_for_build(fake_app, "1.2.3")
           end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find any available candidate builds on App Store Connect to submit")
@@ -71,8 +72,9 @@ describe Deliver::SubmitForReview do
         let(:fake_builds) { make_fake_builds(1) }
 
         it 'finds the one build' do
-          allow(fake_app).to receive(:latest_version).and_return(fake_version)
-          allow(fake_version).to receive(:candidate_builds).and_return(fake_builds)
+          allow(fake_app).to receive(:tunes_all_builds_for_train)
+            .with(train: "1.2.3")
+            .and_return(fake_builds)
           only_build = fake_builds.first
           expect(review_submitter.wait_for_build(fake_app, "1.2.3")).to eq(only_build)
         end
@@ -136,8 +138,9 @@ describe Deliver::SubmitForReview do
         end
 
         it 'does not find the one build until the candidate is corrected' do
-          allow(fake_app).to receive(:latest_version).and_return(fake_version)
-          allow(fake_version).to receive(:candidate_builds).and_return(fake_builds_with_trimmed_zero, fake_builds_with_trimmed_zero, fake_builds)
+          allow(fake_app).to receive(:tunes_all_builds_for_train)
+            .with(train: "1.02.3")
+            .and_return(fake_builds_with_trimmed_zero, fake_builds_with_trimmed_zero, fake_builds)
           allow(review_submitter).to receive(:sleep)
           expect(review_submitter.wait_for_build(fake_app, "1.02.3")).to equal(fake_builds.first)
         end
