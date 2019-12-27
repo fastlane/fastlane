@@ -155,10 +155,12 @@ module Pilot
         end
       end
 
-      # Meta can be uploaded for a build still in processing so
-      # Returning before distribute if skip_waiting_for_build_processing
-      # because can't distribute an app that is still processing
-      return if options[:skip_waiting_for_build_processing] && !build.ready_for_internal_testing?
+      if !build.ready_for_internal_testing? && options[:skip_waiting_for_build_processing]
+        # Meta can be uploaded for a build still in processing
+        # Returning before distribute if skip_waiting_for_build_processing
+        # because can't distribute an app that is still processing
+        return
+      end
 
       distribute_build(build, options)
       type = options[:distribute_external] ? 'External' : 'Internal'
