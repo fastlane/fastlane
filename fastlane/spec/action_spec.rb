@@ -5,6 +5,11 @@ describe Fastlane do
         expect(Fastlane::Actions::IpaAction.action_name).to eq('ipa')
         expect(Fastlane::Actions::IncrementBuildNumberAction.action_name).to eq('increment_build_number')
       end
+
+      it "only removes the last occurrence of Action" do
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
+        expect(Fastlane::Actions::ActionFromActionAction.action_name).to eq('action_from_action')
+      end
     end
 
     describe "Easy access to the lane context" do
@@ -74,7 +79,7 @@ describe Fastlane do
           pwd: Dir.pwd
         }
         expect(ff.runner.execute(:something, :ios)).to eq(response)
-        expect(Fastlane::Actions.executed_actions.map { |a| a[:name] }).to eq(['from'])
+        expect(Fastlane::Actions.executed_actions.map { |a| a[:name] }).to eq(['action_from_action'])
       end
 
       it "shows only actions called from Fastfile" do
@@ -83,7 +88,7 @@ describe Fastlane do
         Fastlane::Actions.executed_actions.clear
 
         ff.runner.execute(:something, :ios)
-        expect(Fastlane::Actions.executed_actions.map { |a| a[:name] }).to eq(['from', 'example'])
+        expect(Fastlane::Actions.executed_actions.map { |a| a[:name] }).to eq(['action_from_action', 'example_action'])
       end
 
       it "shows an appropriate error message when trying to directly call an action" do
