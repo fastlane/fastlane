@@ -39,6 +39,9 @@ protocol ScreengrabfileProtocol: class {
   /// Return the device to this locale after running tests
   var endingLocale: String { get }
 
+  /// Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
+  var useAdbRoot: Bool { get }
+
   /// The path to the APK for the app under test
   var appApkPath: String? { get }
 
@@ -56,6 +59,12 @@ protocol ScreengrabfileProtocol: class {
 
   /// Enabling this option will automatically uninstall the application before running it
   var reinstallApp: Bool { get }
+
+  /// Add timestamp suffix to screenshot filename
+  var useTimestampSuffix: Bool { get }
+
+  /// Configure the host used by adb to connect, allows running on remote devices farm
+  var adbHost: String? { get }
 }
 
 extension ScreengrabfileProtocol {
@@ -70,16 +79,19 @@ extension ScreengrabfileProtocol {
   var useTestsInPackages: [String]? { return nil }
   var useTestsInClasses: [String]? { return nil }
   var launchArguments: [String]? { return nil }
-  var testInstrumentationRunner: String { return "android.support.test.runner.AndroidJUnitRunner" }
+  var testInstrumentationRunner: String { return "androidx.test.runner.AndroidJUnitRunner" }
   var endingLocale: String { return "en-US" }
+  var useAdbRoot: Bool { return false }
   var appApkPath: String? { return nil }
   var testsApkPath: String? { return nil }
   var specificDevice: String? { return nil }
   var deviceType: String { return "phone" }
   var exitOnTestFailure: Bool { return true }
   var reinstallApp: Bool { return false }
+  var useTimestampSuffix: Bool { return true }
+  var adbHost: String? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.11]
+// FastlaneRunnerAPIVersion [0.9.13]

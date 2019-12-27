@@ -38,6 +38,7 @@ module Match
         git_user_email: params[:git_user_email],
         clone_branch_directly: params[:clone_branch_directly],
         git_basic_authorization: params[:git_basic_authorization],
+        git_bearer_authorization: params[:git_bearer_authorization],
         type: params[:type].to_s,
         generate_apple_certs: params[:generate_apple_certs],
         platform: params[:platform].to_s,

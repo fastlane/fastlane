@@ -48,6 +48,9 @@ protocol MatchfileProtocol: class {
   /// Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
   var gitBasicAuthorization: String? { get }
 
+  /// Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64
+  var gitBearerAuthorization: String? { get }
+
   /// Name of the Google Cloud Storage bucket to use
   var googleCloudBucketName: String? { get }
 
@@ -105,6 +108,7 @@ extension MatchfileProtocol {
   var shallowClone: Bool { return false }
   var cloneBranchDirectly: Bool { return false }
   var gitBasicAuthorization: String? { return nil }
+  var gitBearerAuthorization: String? { return nil }
   var googleCloudBucketName: String? { return nil }
   var googleCloudKeysFile: String? { return nil }
   var googleCloudProjectId: String? { return nil }
@@ -122,4 +126,4 @@ extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.9]
+// FastlaneRunnerAPIVersion [0.9.12]

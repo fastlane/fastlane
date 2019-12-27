@@ -1210,12 +1210,15 @@ func bundleInstall(binstubs: String? = nil,
    - launchArguments: Additional launch arguments
    - testInstrumentationRunner: The fully qualified class name of your test instrumentation runner
    - endingLocale: Return the device to this locale after running tests
+   - useAdbRoot: Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
    - appApkPath: The path to the APK for the app under test
    - testsApkPath: The path to the APK for the the tests bundle
    - specificDevice: Use the device or emulator with the given serial number or qualifier
    - deviceType: Type of device used for screenshots. Matches Google Play Types (phone, sevenInch, tenInch, tv, wear)
    - exitOnTestFailure: Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
+   - useTimestampSuffix: Add timestamp suffix to screenshot filename
+   - adbHost: Configure the host used by adb to connect, allows running on remote devices farm
 */
 func captureAndroidScreenshots(androidHome: String? = nil,
                                buildToolsVersion: String? = nil,
@@ -1228,14 +1231,17 @@ func captureAndroidScreenshots(androidHome: String? = nil,
                                useTestsInPackages: [String]? = nil,
                                useTestsInClasses: [String]? = nil,
                                launchArguments: [String]? = nil,
-                               testInstrumentationRunner: String = "android.support.test.runner.AndroidJUnitRunner",
+                               testInstrumentationRunner: String = "androidx.test.runner.AndroidJUnitRunner",
                                endingLocale: String = "en-US",
+                               useAdbRoot: Bool = false,
                                appApkPath: String? = nil,
                                testsApkPath: String? = nil,
                                specificDevice: String? = nil,
                                deviceType: String = "phone",
                                exitOnTestFailure: Bool = true,
-                               reinstallApp: Bool = false) {
+                               reinstallApp: Bool = false,
+                               useTimestampSuffix: Bool = true,
+                               adbHost: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "capture_android_screenshots", className: nil, args: [RubyCommand.Argument(name: "android_home", value: androidHome),
                                                                                                              RubyCommand.Argument(name: "build_tools_version", value: buildToolsVersion),
                                                                                                              RubyCommand.Argument(name: "locales", value: locales),
@@ -1249,12 +1255,15 @@ func captureAndroidScreenshots(androidHome: String? = nil,
                                                                                                              RubyCommand.Argument(name: "launch_arguments", value: launchArguments),
                                                                                                              RubyCommand.Argument(name: "test_instrumentation_runner", value: testInstrumentationRunner),
                                                                                                              RubyCommand.Argument(name: "ending_locale", value: endingLocale),
+                                                                                                             RubyCommand.Argument(name: "use_adb_root", value: useAdbRoot),
                                                                                                              RubyCommand.Argument(name: "app_apk_path", value: appApkPath),
                                                                                                              RubyCommand.Argument(name: "tests_apk_path", value: testsApkPath),
                                                                                                              RubyCommand.Argument(name: "specific_device", value: specificDevice),
                                                                                                              RubyCommand.Argument(name: "device_type", value: deviceType),
                                                                                                              RubyCommand.Argument(name: "exit_on_test_failure", value: exitOnTestFailure),
-                                                                                                             RubyCommand.Argument(name: "reinstall_app", value: reinstallApp)])
+                                                                                                             RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
+                                                                                                             RubyCommand.Argument(name: "use_timestamp_suffix", value: useTimestampSuffix),
+                                                                                                             RubyCommand.Argument(name: "adb_host", value: adbHost)])
   _ = runner.executeCommand(command)
 }
 
@@ -2505,7 +2514,7 @@ func download(url: String) {
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - platform: The app platform for dSYMs you wish to download (ios, appletvos)
-   - version: The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs or 'live' to download only the live verion dSYMs
+   - version: The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs or 'live' to download only the live version dSYMs
    - buildNumber: The app build_number for dSYMs you wish to download
    - minVersion: The minimum app version for dSYMs you wish to download
    - outputDirectory: Where to save the download dSYMs, defaults to the current path
@@ -2553,6 +2562,8 @@ func downloadDsyms(username: String,
 
  - parameters:
    - packageName: The package name of the application to use
+   - versionName: Version name (used when uploading new apks/aabs) - defaults to 'versionName' in build.gradle or AndroidManifest.xml
+   - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal
    - metadataPath: Path to the directory containing the metadata files
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
    - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
@@ -2564,7 +2575,9 @@ func downloadDsyms(username: String,
  More information: https://docs.fastlane.tools/actions/download_from_play_store/
 */
 func downloadFromPlayStore(packageName: String,
-                           metadataPath: String = "./metadata",
+                           versionName: String? = nil,
+                           track: String = "production",
+                           metadataPath: String? = nil,
                            key: String? = nil,
                            issuer: String? = nil,
                            jsonKey: String? = nil,
@@ -2572,6 +2585,8 @@ func downloadFromPlayStore(packageName: String,
                            rootUrl: String? = nil,
                            timeout: Int = 300) {
   let command = RubyCommand(commandID: "", methodName: "download_from_play_store", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
+                                                                                                          RubyCommand.Argument(name: "version_name", value: versionName),
+                                                                                                          RubyCommand.Argument(name: "track", value: track),
                                                                                                           RubyCommand.Argument(name: "metadata_path", value: metadataPath),
                                                                                                           RubyCommand.Argument(name: "key", value: key),
                                                                                                           RubyCommand.Argument(name: "issuer", value: issuer),
@@ -2614,8 +2629,8 @@ func echo(message: String? = nil) {
 /**
  Raises an exception if not using `bundle exec` to run fastlane
 
- This action will check if you are using bundle exec to run fastlane.
- You can put it into `before_all` and make sure that fastlane is run using `bundle exec fastlane` command.
+ This action will check if you are using `bundle exec` to run fastlane.
+ You can put it into `before_all` to make sure that fastlane is ran using the `bundle exec fastlane` command.
 */
 func ensureBundleExec() {
   let command = RubyCommand(commandID: "", methodName: "ensure_bundle_exec", className: nil, args: [])
@@ -3366,7 +3381,7 @@ func githubApi(serverUrl: String = "https://api.github.com",
 
  - parameters:
    - packageName: The package name of the application to use
-   - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal, rollout
+   - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
    - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
    - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
@@ -3863,7 +3878,7 @@ func importCertificate(certificatePath: String,
  This action will increment the version number.
  You first have to set up your Xcode project, if you haven't done it already: [https://developer.apple.com/library/ios/qa/qa1827/_index.html](https://developer.apple.com/library/ios/qa/qa1827/_index.html).
 */
-@discardableResult func incrementVersionNumber(bumpType: String = "patch",
+@discardableResult func incrementVersionNumber(bumpType: String = "bump",
                                                versionNumber: String? = nil,
                                                xcodeproj: String? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "increment_version_number", className: nil, args: [RubyCommand.Argument(name: "bump_type", value: bumpType),
@@ -4218,6 +4233,7 @@ func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - shallowClone: Make a shallow clone of the repository (truncate the history to 1 revision)
    - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
    - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
+   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
    - googleCloudProjectId: ID of the Google Cloud project to use for authentication
@@ -4250,6 +4266,7 @@ func match(type: Any = matchfile.type,
            shallowClone: Bool = matchfile.shallowClone,
            cloneBranchDirectly: Bool = matchfile.cloneBranchDirectly,
            gitBasicAuthorization: Any? = matchfile.gitBasicAuthorization,
+           gitBearerAuthorization: Any? = matchfile.gitBearerAuthorization,
            googleCloudBucketName: Any? = matchfile.googleCloudBucketName,
            googleCloudKeysFile: Any? = matchfile.googleCloudKeysFile,
            googleCloudProjectId: Any? = matchfile.googleCloudProjectId,
@@ -4279,6 +4296,7 @@ func match(type: Any = matchfile.type,
                                                                                        RubyCommand.Argument(name: "shallow_clone", value: shallowClone),
                                                                                        RubyCommand.Argument(name: "clone_branch_directly", value: cloneBranchDirectly),
                                                                                        RubyCommand.Argument(name: "git_basic_authorization", value: gitBasicAuthorization),
+                                                                                       RubyCommand.Argument(name: "git_bearer_authorization", value: gitBearerAuthorization),
                                                                                        RubyCommand.Argument(name: "google_cloud_bucket_name", value: googleCloudBucketName),
                                                                                        RubyCommand.Argument(name: "google_cloud_keys_file", value: googleCloudKeysFile),
                                                                                        RubyCommand.Argument(name: "google_cloud_project_id", value: googleCloudProjectId),
@@ -5317,7 +5335,7 @@ func rubocop() {
  Verifies the minimum ruby version required
 
  Add this to your `Fastfile` to require a certain version of _ruby_.
- Put it at the top of your `Fastfile to ensure that _fastlane_ is executed appropriately.
+ Put it at the top of your `Fastfile` to ensure that _fastlane_ is executed appropriately.
 */
 func rubyVersion() {
   let command = RubyCommand(commandID: "", methodName: "ruby_version", className: nil, args: [])
@@ -5785,12 +5803,15 @@ func scp(username: String,
    - launchArguments: Additional launch arguments
    - testInstrumentationRunner: The fully qualified class name of your test instrumentation runner
    - endingLocale: Return the device to this locale after running tests
+   - useAdbRoot: Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
    - appApkPath: The path to the APK for the app under test
    - testsApkPath: The path to the APK for the the tests bundle
    - specificDevice: Use the device or emulator with the given serial number or qualifier
    - deviceType: Type of device used for screenshots. Matches Google Play Types (phone, sevenInch, tenInch, tv, wear)
    - exitOnTestFailure: Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
+   - useTimestampSuffix: Add timestamp suffix to screenshot filename
+   - adbHost: Configure the host used by adb to connect, allows running on remote devices farm
 */
 func screengrab(androidHome: Any? = screengrabfile.androidHome,
                 buildToolsVersion: Any? = screengrabfile.buildToolsVersion,
@@ -5805,12 +5826,15 @@ func screengrab(androidHome: Any? = screengrabfile.androidHome,
                 launchArguments: [String]? = screengrabfile.launchArguments,
                 testInstrumentationRunner: Any = screengrabfile.testInstrumentationRunner,
                 endingLocale: Any = screengrabfile.endingLocale,
+                useAdbRoot: Bool = screengrabfile.useAdbRoot,
                 appApkPath: Any? = screengrabfile.appApkPath,
                 testsApkPath: Any? = screengrabfile.testsApkPath,
                 specificDevice: Any? = screengrabfile.specificDevice,
                 deviceType: Any = screengrabfile.deviceType,
                 exitOnTestFailure: Bool = screengrabfile.exitOnTestFailure,
-                reinstallApp: Bool = screengrabfile.reinstallApp) {
+                reinstallApp: Bool = screengrabfile.reinstallApp,
+                useTimestampSuffix: Bool = screengrabfile.useTimestampSuffix,
+                adbHost: Any? = screengrabfile.adbHost) {
   let command = RubyCommand(commandID: "", methodName: "screengrab", className: nil, args: [RubyCommand.Argument(name: "android_home", value: androidHome),
                                                                                             RubyCommand.Argument(name: "build_tools_version", value: buildToolsVersion),
                                                                                             RubyCommand.Argument(name: "locales", value: locales),
@@ -5824,12 +5848,15 @@ func screengrab(androidHome: Any? = screengrabfile.androidHome,
                                                                                             RubyCommand.Argument(name: "launch_arguments", value: launchArguments),
                                                                                             RubyCommand.Argument(name: "test_instrumentation_runner", value: testInstrumentationRunner),
                                                                                             RubyCommand.Argument(name: "ending_locale", value: endingLocale),
+                                                                                            RubyCommand.Argument(name: "use_adb_root", value: useAdbRoot),
                                                                                             RubyCommand.Argument(name: "app_apk_path", value: appApkPath),
                                                                                             RubyCommand.Argument(name: "tests_apk_path", value: testsApkPath),
                                                                                             RubyCommand.Argument(name: "specific_device", value: specificDevice),
                                                                                             RubyCommand.Argument(name: "device_type", value: deviceType),
                                                                                             RubyCommand.Argument(name: "exit_on_test_failure", value: exitOnTestFailure),
-                                                                                            RubyCommand.Argument(name: "reinstall_app", value: reinstallApp)])
+                                                                                            RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
+                                                                                            RubyCommand.Argument(name: "use_timestamp_suffix", value: useTimestampSuffix),
+                                                                                            RubyCommand.Argument(name: "adb_host", value: adbHost)])
   _ = runner.executeCommand(command)
 }
 
@@ -6654,7 +6681,10 @@ func ssh(username: String,
 
  - parameters:
    - packageName: The package name of the application to use
-   - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal, rollout
+   - versionName: Version name (used when uploading new apks/aabs) - defaults to 'versionName' in build.gradle or AndroidManifest.xml
+   - versionCode: Version code (used when updating rollout or promoting specific versions)
+   - releaseStatus: Release status (used when uploading new apks/aabs) - valid values are completed, draft, halted, inProgress
+   - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal
    - rollout: The percentage of the user fraction when uploading to the rollout track
    - metadataPath: Path to the directory containing the metadata files
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
@@ -6667,17 +6697,18 @@ func ssh(username: String,
    - aabPaths: An array of paths to AAB files to upload
    - skipUploadApk: Whether to skip uploading APK
    - skipUploadAab: Whether to skip uploading AAB
-   - skipUploadMetadata: Whether to skip uploading metadata
+   - skipUploadMetadata: Whether to skip uploading metadata, changelogs not included
+   - skipUploadChangelogs: Whether to skip uploading changelogs
    - skipUploadImages: Whether to skip uploading images, screenshots not included
    - skipUploadScreenshots: Whether to skip uploading SCREENSHOTS
-   - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal, rollout
+   - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal
    - validateOnly: Only validate changes with Google Play rather than actually publish
    - mapping: Path to the mapping file to upload
    - mappingPaths: An array of paths to mapping files to upload
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
-   - checkSupersededTracks: Check the other tracks for superseded versions and disable them
+   - checkSupersededTracks: **DEPRECATED!** Google Play does this automatically now - Check the other tracks for superseded versions and disable them
    - timeout: Timeout for read, open, and send (in seconds)
-   - deactivateOnPromote: When promoting to a new track, deactivate the binary in the origin track
+   - deactivateOnPromote: **DEPRECATED!** Google Play does this automatically now - When promoting to a new track, deactivate the binary in the origin track
    - versionCodesToRetain: An array of version codes to retain when publishing a new APK
    - obbMainReferencesVersion: References version of 'main' expansion file
    - obbMainFileSize: Size of 'main' expansion file in bytes
@@ -6687,9 +6718,12 @@ func ssh(username: String,
  More information: https://docs.fastlane.tools/actions/supply/
 */
 func supply(packageName: String,
+            versionName: String? = nil,
+            versionCode: Int? = nil,
+            releaseStatus: String = "completed",
             track: String = "production",
             rollout: String? = nil,
-            metadataPath: String = "./metadata",
+            metadataPath: String? = nil,
             key: String? = nil,
             issuer: String? = nil,
             jsonKey: String? = nil,
@@ -6701,6 +6735,7 @@ func supply(packageName: String,
             skipUploadApk: Bool = false,
             skipUploadAab: Bool = false,
             skipUploadMetadata: Bool = false,
+            skipUploadChangelogs: Bool = false,
             skipUploadImages: Bool = false,
             skipUploadScreenshots: Bool = false,
             trackPromoteTo: String? = nil,
@@ -6717,6 +6752,9 @@ func supply(packageName: String,
             obbPatchReferencesVersion: String? = nil,
             obbPatchFileSize: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "supply", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
+                                                                                        RubyCommand.Argument(name: "version_name", value: versionName),
+                                                                                        RubyCommand.Argument(name: "version_code", value: versionCode),
+                                                                                        RubyCommand.Argument(name: "release_status", value: releaseStatus),
                                                                                         RubyCommand.Argument(name: "track", value: track),
                                                                                         RubyCommand.Argument(name: "rollout", value: rollout),
                                                                                         RubyCommand.Argument(name: "metadata_path", value: metadataPath),
@@ -6731,6 +6769,7 @@ func supply(packageName: String,
                                                                                         RubyCommand.Argument(name: "skip_upload_apk", value: skipUploadApk),
                                                                                         RubyCommand.Argument(name: "skip_upload_aab", value: skipUploadAab),
                                                                                         RubyCommand.Argument(name: "skip_upload_metadata", value: skipUploadMetadata),
+                                                                                        RubyCommand.Argument(name: "skip_upload_changelogs", value: skipUploadChangelogs),
                                                                                         RubyCommand.Argument(name: "skip_upload_images", value: skipUploadImages),
                                                                                         RubyCommand.Argument(name: "skip_upload_screenshots", value: skipUploadScreenshots),
                                                                                         RubyCommand.Argument(name: "track_promote_to", value: trackPromoteTo),
@@ -6813,6 +6852,7 @@ func swiftlint(mode: Any = "lint",
    - shallowClone: Make a shallow clone of the repository (truncate the history to 1 revision)
    - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
    - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
+   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
    - googleCloudProjectId: ID of the Google Cloud project to use for authentication
@@ -6845,6 +6885,7 @@ func syncCodeSigning(type: String = "development",
                      shallowClone: Bool = false,
                      cloneBranchDirectly: Bool = false,
                      gitBasicAuthorization: String? = nil,
+                     gitBearerAuthorization: String? = nil,
                      googleCloudBucketName: String? = nil,
                      googleCloudKeysFile: String? = nil,
                      googleCloudProjectId: String? = nil,
@@ -6874,6 +6915,7 @@ func syncCodeSigning(type: String = "development",
                                                                                                    RubyCommand.Argument(name: "shallow_clone", value: shallowClone),
                                                                                                    RubyCommand.Argument(name: "clone_branch_directly", value: cloneBranchDirectly),
                                                                                                    RubyCommand.Argument(name: "git_basic_authorization", value: gitBasicAuthorization),
+                                                                                                   RubyCommand.Argument(name: "git_bearer_authorization", value: gitBearerAuthorization),
                                                                                                    RubyCommand.Argument(name: "google_cloud_bucket_name", value: googleCloudBucketName),
                                                                                                    RubyCommand.Argument(name: "google_cloud_keys_file", value: googleCloudKeysFile),
                                                                                                    RubyCommand.Argument(name: "google_cloud_project_id", value: googleCloudProjectId),
@@ -6921,6 +6963,7 @@ func teamName() {
    - autoUpdate: Allows an easy upgrade of all users to the current version. To enable set to 'on'
    - notify: Send email to testers
    - options: Array of options (shake,video_only_wifi,anonymous)
+   - custom: Array of custom options. Contact support@testfairy.com for more information
    - timeout: Request timeout in seconds
 
  You can retrieve your API key on [your settings page](https://free.testfairy.com/settings/)
@@ -6936,6 +6979,7 @@ func testfairy(apiKey: String,
                autoUpdate: String = "off",
                notify: String = "off",
                options: [String] = [],
+               custom: String = "",
                timeout: Int? = nil) {
   let command = RubyCommand(commandID: "", methodName: "testfairy", className: nil, args: [RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                            RubyCommand.Argument(name: "ipa", value: ipa),
@@ -6948,6 +6992,7 @@ func testfairy(apiKey: String,
                                                                                            RubyCommand.Argument(name: "auto_update", value: autoUpdate),
                                                                                            RubyCommand.Argument(name: "notify", value: notify),
                                                                                            RubyCommand.Argument(name: "options", value: options),
+                                                                                           RubyCommand.Argument(name: "custom", value: custom),
                                                                                            RubyCommand.Argument(name: "timeout", value: timeout)])
   _ = runner.executeCommand(command)
 }
@@ -7664,7 +7709,10 @@ func uploadToAppStore(username: String,
 
  - parameters:
    - packageName: The package name of the application to use
-   - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal, rollout
+   - versionName: Version name (used when uploading new apks/aabs) - defaults to 'versionName' in build.gradle or AndroidManifest.xml
+   - versionCode: Version code (used when updating rollout or promoting specific versions)
+   - releaseStatus: Release status (used when uploading new apks/aabs) - valid values are completed, draft, halted, inProgress
+   - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal
    - rollout: The percentage of the user fraction when uploading to the rollout track
    - metadataPath: Path to the directory containing the metadata files
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
@@ -7677,17 +7725,18 @@ func uploadToAppStore(username: String,
    - aabPaths: An array of paths to AAB files to upload
    - skipUploadApk: Whether to skip uploading APK
    - skipUploadAab: Whether to skip uploading AAB
-   - skipUploadMetadata: Whether to skip uploading metadata
+   - skipUploadMetadata: Whether to skip uploading metadata, changelogs not included
+   - skipUploadChangelogs: Whether to skip uploading changelogs
    - skipUploadImages: Whether to skip uploading images, screenshots not included
    - skipUploadScreenshots: Whether to skip uploading SCREENSHOTS
-   - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal, rollout
+   - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal
    - validateOnly: Only validate changes with Google Play rather than actually publish
    - mapping: Path to the mapping file to upload
    - mappingPaths: An array of paths to mapping files to upload
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
-   - checkSupersededTracks: Check the other tracks for superseded versions and disable them
+   - checkSupersededTracks: **DEPRECATED!** Google Play does this automatically now - Check the other tracks for superseded versions and disable them
    - timeout: Timeout for read, open, and send (in seconds)
-   - deactivateOnPromote: When promoting to a new track, deactivate the binary in the origin track
+   - deactivateOnPromote: **DEPRECATED!** Google Play does this automatically now - When promoting to a new track, deactivate the binary in the origin track
    - versionCodesToRetain: An array of version codes to retain when publishing a new APK
    - obbMainReferencesVersion: References version of 'main' expansion file
    - obbMainFileSize: Size of 'main' expansion file in bytes
@@ -7697,9 +7746,12 @@ func uploadToAppStore(username: String,
  More information: https://docs.fastlane.tools/actions/supply/
 */
 func uploadToPlayStore(packageName: String,
+                       versionName: String? = nil,
+                       versionCode: Int? = nil,
+                       releaseStatus: String = "completed",
                        track: String = "production",
                        rollout: String? = nil,
-                       metadataPath: String = "./metadata",
+                       metadataPath: String? = nil,
                        key: String? = nil,
                        issuer: String? = nil,
                        jsonKey: String? = nil,
@@ -7711,6 +7763,7 @@ func uploadToPlayStore(packageName: String,
                        skipUploadApk: Bool = false,
                        skipUploadAab: Bool = false,
                        skipUploadMetadata: Bool = false,
+                       skipUploadChangelogs: Bool = false,
                        skipUploadImages: Bool = false,
                        skipUploadScreenshots: Bool = false,
                        trackPromoteTo: String? = nil,
@@ -7727,6 +7780,9 @@ func uploadToPlayStore(packageName: String,
                        obbPatchReferencesVersion: String? = nil,
                        obbPatchFileSize: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "upload_to_play_store", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
+                                                                                                      RubyCommand.Argument(name: "version_name", value: versionName),
+                                                                                                      RubyCommand.Argument(name: "version_code", value: versionCode),
+                                                                                                      RubyCommand.Argument(name: "release_status", value: releaseStatus),
                                                                                                       RubyCommand.Argument(name: "track", value: track),
                                                                                                       RubyCommand.Argument(name: "rollout", value: rollout),
                                                                                                       RubyCommand.Argument(name: "metadata_path", value: metadataPath),
@@ -7741,6 +7797,7 @@ func uploadToPlayStore(packageName: String,
                                                                                                       RubyCommand.Argument(name: "skip_upload_apk", value: skipUploadApk),
                                                                                                       RubyCommand.Argument(name: "skip_upload_aab", value: skipUploadAab),
                                                                                                       RubyCommand.Argument(name: "skip_upload_metadata", value: skipUploadMetadata),
+                                                                                                      RubyCommand.Argument(name: "skip_upload_changelogs", value: skipUploadChangelogs),
                                                                                                       RubyCommand.Argument(name: "skip_upload_images", value: skipUploadImages),
                                                                                                       RubyCommand.Argument(name: "skip_upload_screenshots", value: skipUploadScreenshots),
                                                                                                       RubyCommand.Argument(name: "track_promote_to", value: trackPromoteTo),
@@ -8036,7 +8093,10 @@ func xcexport() {
 /**
  Change the xcode-path to use. Useful for beta versions of Xcode
 
- Select and build with the Xcode installed at the provided path. Use the `xcversion` action if you want to select an Xcode based on a version specifier or you don't have known, stable paths as may happen in a CI environment.
+ Select and build with the Xcode installed at the provided path.
+ Use the `xcversion` action if you want to select an Xcode:
+ - Based on a version specifier or
+ - You don't have known, stable paths, as may happen in a CI environment.
 */
 func xcodeSelect() {
   let command = RubyCommand(commandID: "", methodName: "xcode_select", className: nil, args: [])
@@ -8151,7 +8211,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-11.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-11.2.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -8296,4 +8356,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.61]
+// FastlaneRunnerAPIVersion [0.9.66]

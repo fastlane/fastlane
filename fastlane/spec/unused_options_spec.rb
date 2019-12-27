@@ -58,6 +58,7 @@ describe Fastlane do
           sync_code_signing
           upload_to_app_store
           upload_to_play_store
+          upload_to_play_store_internal_app_sharing
           upload_to_testflight
           puts
           println

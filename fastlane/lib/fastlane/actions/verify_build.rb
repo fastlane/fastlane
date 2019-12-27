@@ -92,7 +92,7 @@ module Fastlane
 
       def self.evaulate(params, values)
         if params[:provisioning_type]
-          UI.user_error!("Mismatched provisioning_type. Required: '#{params[:provisioning_type]}''; Found: '#{values['provisioning_type']}'") unless params[:provisioning_type] == values['provisioning_type']
+          UI.user_error!("Mismatched provisioning_type. Required: '#{params[:provisioning_type]}'; Found: '#{values['provisioning_type']}'") unless params[:provisioning_type] == values['provisioning_type']
         end
         if params[:provisioning_uuid]
           UI.user_error!("Mismatched provisioning_uuid. Required: '#{params[:provisioning_uuid]}'; Found: '#{values['provisioning_uuid']}'") unless params[:provisioning_uuid] == values['provisioning_uuid']
