@@ -41,13 +41,13 @@ module Pilot
 
       # We will fully skip waiting for build processing *only* if no changelog is supplied
       # Otherwise we may partially wait until the build appears so the changelog can be set, and then bail.
-      skip_full_processing = false
+      return_when_build_appears = false
       if config[:skip_waiting_for_build_processing]
         if config[:changelog].nil?
           UI.important("`skip_waiting_for_build_processing` used and no `changelog` supplied - skipping waiting for build processing")
           return
         else
-          skip_full_processing = true
+          return_when_build_appears = true
         end
       end
 
@@ -57,7 +57,7 @@ module Pilot
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
       UI.message("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps.")
 
-      latest_build = wait_for_build_processing_to_be_complete(skip_full_processing)
+      latest_build = wait_for_build_processing_to_be_complete(return_when_build_appears)
       distribute(options, build: latest_build)
     end
 
@@ -88,7 +88,7 @@ module Pilot
       end
     end
 
-    def wait_for_build_processing_to_be_complete(skip_full_processing)
+    def wait_for_build_processing_to_be_complete(return_when_build_appears = false)
       platform = fetch_app_platform
       app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
       app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
@@ -99,7 +99,7 @@ module Pilot
         app_version: app_version,
         build_version: app_build,
         poll_interval: config[:wait_processing_interval],
-        skip_full_processing: skip_full_processing,
+        return_when_build_appears: return_when_build_appears,
         return_spaceship_testflight_build: false
       )
 
@@ -154,6 +154,12 @@ module Pilot
           UI.success("Deleted beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
         end
       end
+
+      # Meta can be uploaded for a build still in processing so
+      # Returning before distribute if skip_waiting_for_build_processing
+      # because can't distribute an app that is still processing
+      return if options[:skip_waiting_for_build_processing] && !build.ready_for_internal_testing?
+
       distribute_build(build, options)
       type = options[:distribute_external] ? 'External' : 'Internal'
       UI.success("Successfully distributed build to #{type} testers 🚀")

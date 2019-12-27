@@ -47,6 +47,10 @@ module Spaceship
       #
       # Helpers
       #
+      #
+      def ready_for_internal_testing?
+        return internal_build_state == InternalState::READY_FOR_BETA_TESTING
+      end
 
       def ready_for_beta_submission?
         return external_build_state == ExternalState::READY_FOR_BETA_SUBMISSION
