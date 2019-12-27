@@ -78,6 +78,11 @@ module Spaceship
         return processing_state != ProcessingState::PROCESSING
       end
 
+      def ready_for_internal_testing?
+        raise "No build_beta_detail included" unless build_beta_detail
+        return build_beta_detail.ready_for_internal_testing?
+      end
+
       def ready_for_beta_submission?
         raise "No build_beta_detail included" unless build_beta_detail
         return build_beta_detail.ready_for_beta_submission?
