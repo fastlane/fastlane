@@ -10,6 +10,7 @@ module Spaceship
       attr_accessor :external_build_state
 
       module InternalState
+        PROCESSING = "PROCESSING"
         PROCESSING_EXCEPTION = "PROCESSING_EXCEPTION"
         MISSING_EXPORT_COMPLIANCE = "MISSING_EXPORT_COMPLIANCE"
         READY_FOR_BETA_TESTING = "READY_FOR_BETA_TESTING"
