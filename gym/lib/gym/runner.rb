@@ -18,6 +18,9 @@ module Gym
         build_app
       end
       verify_archive unless Gym.config[:skip_archive]
+
+      return nil if Gym.config[:skip_archive]
+
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
       if Gym.project.ios? || Gym.project.tvos?
@@ -97,9 +100,11 @@ module Gym
                                                 ErrorHandler.handle_build_error(output)
                                               end)
 
-      mark_archive_as_built_by_gym(BuildCommandGenerator.archive_path)
-      UI.success("Successfully stored the archive. You can find it in the Xcode Organizer.") unless Gym.config[:archive_path].nil?
-      UI.verbose("Stored the archive in: " + BuildCommandGenerator.archive_path)
+      unless Gym.config[:skip_archive]
+        mark_archive_as_built_by_gym(BuildCommandGenerator.archive_path)
+        UI.success("Successfully stored the archive. You can find it in the Xcode Organizer.") unless Gym.config[:archive_path].nil?
+        UI.verbose("Stored the archive in: " + BuildCommandGenerator.archive_path)
+      end
 
       post_build_app
     end
