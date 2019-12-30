@@ -2146,6 +2146,8 @@ func createKeychain(name: String? = nil,
    - base: The name of the branch you want your changes pulled into (defaults to `master`)
    - apiUrl: The URL of GitHub API - used when the Enterprise (default to `https://api.github.com`)
    - assignees: The assignees for the pull request
+   - reviewers: The reviewers (slug) for the pull request
+   - teamReviewers: The team reviewers (slug) for the pull request
 
  - returns: The pull request URL when successful
 */
@@ -2157,7 +2159,9 @@ func createPullRequest(apiToken: String,
                        head: String? = nil,
                        base: String = "master",
                        apiUrl: String = "https://api.github.com",
-                       assignees: [String]? = nil) {
+                       assignees: [String]? = nil,
+                       reviewers: [String]? = nil,
+                       teamReviewers: [String]? = nil) {
   let command = RubyCommand(commandID: "", methodName: "create_pull_request", className: nil, args: [RubyCommand.Argument(name: "api_token", value: apiToken),
                                                                                                      RubyCommand.Argument(name: "repo", value: repo),
                                                                                                      RubyCommand.Argument(name: "title", value: title),
@@ -2166,7 +2170,9 @@ func createPullRequest(apiToken: String,
                                                                                                      RubyCommand.Argument(name: "head", value: head),
                                                                                                      RubyCommand.Argument(name: "base", value: base),
                                                                                                      RubyCommand.Argument(name: "api_url", value: apiUrl),
-                                                                                                     RubyCommand.Argument(name: "assignees", value: assignees)])
+                                                                                                     RubyCommand.Argument(name: "assignees", value: assignees),
+                                                                                                     RubyCommand.Argument(name: "reviewers", value: reviewers),
+                                                                                                     RubyCommand.Argument(name: "team_reviewers", value: teamReviewers)])
   _ = runner.executeCommand(command)
 }
 
@@ -4077,10 +4083,13 @@ func jira(url: String,
 /**
  Get the most recent git tag
 
+ - parameter pattern: Pattern to filter tags when looking for last one. Limit tags to ones matching given shell glob. If pattern lacks ?, *, or [, * at the end is implied
+
  If you are using this action on a **shallow clone**, *the default with some CI systems like Bamboo*, you need to ensure that you have also pulled all the git tags appropriately. Assuming your git repo has the correct remote set you can issue `sh('git fetch --tags')`.
+ Pattern parameter allows you to filter to a subset of tags.
 */
-@discardableResult func lastGitTag() -> String {
-  let command = RubyCommand(commandID: "", methodName: "last_git_tag", className: nil, args: [])
+@discardableResult func lastGitTag(pattern: String? = nil) -> String {
+  let command = RubyCommand(commandID: "", methodName: "last_git_tag", className: nil, args: [RubyCommand.Argument(name: "pattern", value: pattern)])
   return runner.executeCommand(command)
 }
 
@@ -4667,7 +4676,7 @@ func pem(development: Bool = false,
    - localizedBuildInfo: Localized beta app test info for what's new
    - changelog: Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
-   - skipWaitingForBuildProcessing: Don't wait for the build to process. If set to true, the changelog won't be set, `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan)
+   - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers?
@@ -5354,6 +5363,7 @@ func rubyVersion() {
    - skipDetectDevices: Should skip auto detecting of devices if none were specified
    - forceQuitSimulator: Enabling this option will automatically killall Simulator processes before the run
    - resetSimulator: Enabling this option will automatically erase the simulator before running the application
+   - disableSlideToType: Enabling this option will disable the simulator from showing the 'Slide to type' prompt
    - prelaunchSimulator: Enabling this option will launch the first simulator prior to calling any xcodebuild command
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
@@ -5411,6 +5421,7 @@ func runTests(workspace: String? = nil,
               skipDetectDevices: Bool = false,
               forceQuitSimulator: Bool = false,
               resetSimulator: Bool = false,
+              disableSlideToType: Bool = true,
               prelaunchSimulator: Bool? = nil,
               reinstallApp: Bool = false,
               appIdentifier: String? = nil,
@@ -5465,6 +5476,7 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "skip_detect_devices", value: skipDetectDevices),
                                                                                            RubyCommand.Argument(name: "force_quit_simulator", value: forceQuitSimulator),
                                                                                            RubyCommand.Argument(name: "reset_simulator", value: resetSimulator),
+                                                                                           RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
                                                                                            RubyCommand.Argument(name: "prelaunch_simulator", value: prelaunchSimulator),
                                                                                            RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                            RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
@@ -5600,6 +5612,7 @@ func say(text: Any,
    - skipDetectDevices: Should skip auto detecting of devices if none were specified
    - forceQuitSimulator: Enabling this option will automatically killall Simulator processes before the run
    - resetSimulator: Enabling this option will automatically erase the simulator before running the application
+   - disableSlideToType: Enabling this option will disable the simulator from showing the 'Slide to type' prompt
    - prelaunchSimulator: Enabling this option will launch the first simulator prior to calling any xcodebuild command
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
@@ -5657,6 +5670,7 @@ func scan(workspace: Any? = scanfile.workspace,
           skipDetectDevices: Bool = scanfile.skipDetectDevices,
           forceQuitSimulator: Bool = scanfile.forceQuitSimulator,
           resetSimulator: Bool = scanfile.resetSimulator,
+          disableSlideToType: Bool = scanfile.disableSlideToType,
           prelaunchSimulator: Bool? = scanfile.prelaunchSimulator,
           reinstallApp: Bool = scanfile.reinstallApp,
           appIdentifier: Any? = scanfile.appIdentifier,
@@ -5711,6 +5725,7 @@ func scan(workspace: Any? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "skip_detect_devices", value: skipDetectDevices),
                                                                                       RubyCommand.Argument(name: "force_quit_simulator", value: forceQuitSimulator),
                                                                                       RubyCommand.Argument(name: "reset_simulator", value: resetSimulator),
+                                                                                      RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
                                                                                       RubyCommand.Argument(name: "prelaunch_simulator", value: prelaunchSimulator),
                                                                                       RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                       RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
@@ -6006,7 +6021,7 @@ func setPodKey(useBundleExec: Bool = true,
 
  - parameters:
    - force: Force setup, even if not executed by CI
-   - provider: CI provider
+   - provider: CI provider. If none is set, the provider is detected automatically
 
  - Creates a new temporary keychain for use with match|
  - Switches match to `readonly` mode to not create new profiles/cert on CI|
@@ -7014,7 +7029,7 @@ func testfairy(apiKey: String,
    - localizedBuildInfo: Localized beta app test info for what's new
    - changelog: Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
-   - skipWaitingForBuildProcessing: Don't wait for the build to process. If set to true, the changelog won't be set, `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan)
+   - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers?
@@ -7817,6 +7832,45 @@ func uploadToPlayStore(packageName: String,
 }
 
 /**
+ Upload binaries to Google Play Internal App Sharing (via _supply_)
+
+ - parameters:
+   - packageName: The package name of the application to use
+   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
+   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - apk: Path to the APK file to upload
+   - apkPaths: An array of paths to APK files to upload
+   - aab: Path to the AAB file to upload
+   - aabPaths: An array of paths to AAB files to upload
+   - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
+   - timeout: Timeout for read, open, and send (in seconds)
+
+ - returns: Returns a string containing the download URL for the uploaded APK/AAB (or array of strings if multiple were uploaded).
+
+ More information: https://docs.fastlane.tools/actions/upload_to_play_store_internal_app_sharing/
+*/
+func uploadToPlayStoreInternalAppSharing(packageName: String,
+                                         jsonKey: String? = nil,
+                                         jsonKeyData: String? = nil,
+                                         apk: String? = nil,
+                                         apkPaths: [String]? = nil,
+                                         aab: String? = nil,
+                                         aabPaths: [String]? = nil,
+                                         rootUrl: String? = nil,
+                                         timeout: Int = 300) {
+  let command = RubyCommand(commandID: "", methodName: "upload_to_play_store_internal_app_sharing", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
+                                                                                                                           RubyCommand.Argument(name: "json_key", value: jsonKey),
+                                                                                                                           RubyCommand.Argument(name: "json_key_data", value: jsonKeyData),
+                                                                                                                           RubyCommand.Argument(name: "apk", value: apk),
+                                                                                                                           RubyCommand.Argument(name: "apk_paths", value: apkPaths),
+                                                                                                                           RubyCommand.Argument(name: "aab", value: aab),
+                                                                                                                           RubyCommand.Argument(name: "aab_paths", value: aabPaths),
+                                                                                                                           RubyCommand.Argument(name: "root_url", value: rootUrl),
+                                                                                                                           RubyCommand.Argument(name: "timeout", value: timeout)])
+  _ = runner.executeCommand(command)
+}
+
+/**
  Upload new binary to App Store Connect for TestFlight beta testing (via _pilot_)
 
  - parameters:
@@ -7833,7 +7887,7 @@ func uploadToPlayStore(packageName: String,
    - localizedBuildInfo: Localized beta app test info for what's new
    - changelog: Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
-   - skipWaitingForBuildProcessing: Don't wait for the build to process. If set to true, the changelog won't be set, `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan)
+   - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers?
@@ -8211,7 +8265,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-11.2.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-11.3.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -8356,4 +8410,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.66]
+// FastlaneRunnerAPIVersion [0.9.67]
