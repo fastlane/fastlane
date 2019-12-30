@@ -24,6 +24,9 @@ protocol ScanfileProtocol: class {
   /// Enabling this option will automatically erase the simulator before running the application
   var resetSimulator: Bool { get }
 
+  /// Enabling this option will disable the simulator from showing the 'Slide to type' prompt
+  var disableSlideToType: Bool { get }
+
   /// Enabling this option will launch the first simulator prior to calling any xcodebuild command
   var prelaunchSimulator: Bool? { get }
 
@@ -172,6 +175,7 @@ extension ScanfileProtocol {
   var skipDetectDevices: Bool { return false }
   var forceQuitSimulator: Bool { return false }
   var resetSimulator: Bool { return false }
+  var disableSlideToType: Bool { return true }
   var prelaunchSimulator: Bool? { return nil }
   var reinstallApp: Bool { return false }
   var appIdentifier: String? { return nil }
@@ -222,4 +226,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.22]
+// FastlaneRunnerAPIVersion [0.9.23]
