@@ -400,7 +400,7 @@ module Spaceship
         rating_url << "sort=REVIEW_SORT_ORDER_MOST_RECENT"
         rating_url << "&index=#{index}"
         rating_url << "&storefront=#{storefront}" unless storefront.empty?
-        rating_url << "&version_id=#{version_id}" unless version_id.empty?
+        rating_url << "&versionId=#{version_id}" unless version_id.empty?
 
         r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
