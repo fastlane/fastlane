@@ -17,6 +17,7 @@ module Fastlane
     end
 
     class GradleAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         task = params[:task]
         flavor = params[:flavor]
@@ -104,6 +105,7 @@ module Fastlane
 
         return result
       end
+      # rubocop:enable Metrics/PerceivedComplexity
 
       def self.gradle_task(task, flavor, build_type, tasks)
         gradle_task = [task, flavor, build_type].join
