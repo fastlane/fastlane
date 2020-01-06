@@ -57,7 +57,7 @@ module Fastlane
         "Sets/gets env vars for Fastlane.swift. Don't use in ruby, use `ENV[key] = val`"
       end
 
-      def self.step_text(params)
+      def self.step_text
         nil
       end
 
