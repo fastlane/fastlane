@@ -246,7 +246,8 @@ module Fastlane
           # If another action is calling this action, we shouldn't show it in the summary
           # A nil value for action_name will hide it from the summary
           unless from_action
-            action_name = step_name || class_ref.step_text(configurations)
+            action_name = step_name
+            action_name ||= class_ref.method(:step_text).arity == 1 ? class_ref.step_text(configurations) : class_ref.step_text
           end
 
           Actions.execute_action(action_name) do

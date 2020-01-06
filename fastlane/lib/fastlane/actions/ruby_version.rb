@@ -19,7 +19,7 @@ module Fastlane
         UI.message("Your ruby version #{RUBY_VERSION} matches the minimum requirement of #{defined_version}  ✅")
       end
 
-      def self.step_text(params)
+      def self.step_text
         "Verifying Ruby version"
       end
 

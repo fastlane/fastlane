@@ -20,7 +20,7 @@ module Fastlane
         UI.message("Your fastlane version #{Fastlane::VERSION} matches the minimum requirement of #{defined_version}  ✅")
       end
 
-      def self.step_text(params)
+      def self.step_text
         "Verifying fastlane version"
       end
 
