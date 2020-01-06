@@ -245,12 +245,21 @@ module Pilot
     end
 
     def self.truncate_changelog(changelog)
-      max_changelog_length = 4000
-      if changelog && changelog.length > max_changelog_length
-        original_length = changelog.length
-        bottom_message = "..."
-        changelog = "#{changelog[0...max_changelog_length - bottom_message.length]}#{bottom_message}"
-        UI.important("Changelog has been truncated since it exceeds Apple's #{max_changelog_length} character limit. It currently contains #{original_length} characters.")
+      max_changelog_bytes = 4000
+      if changelog
+        changelog_bytes = changelog.unpack('C*').length
+        if changelog_bytes > max_changelog_bytes
+          UI.important("Changelog will be truncated since it exceeds Apple's #{max_changelog_bytes}-byte limit. It currently contains #{changelog_bytes} bytes.")
+          new_changelog = ''
+          new_changelog_bytes = 0
+          max_changelog_bytes -= 3 # Will append '...' later.
+          changelog.chars.each do |char|
+            new_changelog_bytes += char.unpack('C*').length
+            break if new_changelog_bytes >= max_changelog_bytes
+            new_changelog += char
+          end
+          changelog = new_changelog + '...'
+        end
       end
       changelog
     end
