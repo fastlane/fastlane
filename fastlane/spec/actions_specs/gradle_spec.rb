@@ -156,7 +156,7 @@ describe Fastlane do
       end
 
       describe "the step name displayed in fastlane summary" do
-        it "a gradle task name is displayed when print_task_name_in_summary is true" do
+        it "a gradle task name is displayed" do
           task_name = 'assembleWorldDominationRelease'
 
           Fastlane::FastFile.new.parse("lane :build do
@@ -167,24 +167,18 @@ describe Fastlane do
           expect(last_action[:name]).to eq(task_name)
         end
 
-        it "'gradle' is displayed when print_task_name_in_summary is false" do
+        it "a gradle tasks name is displayed" do
+          task_name_1 = 'assembleWorldDominationRelease'
+          task_name_2 = 'assemblePlanB'
+
+          task_name = "#{task_name_1} #{task_name_2}"
+
           Fastlane::FastFile.new.parse("lane :build do
-            gradle(task: 'assembleWorldDominationRelease', gradle_path: './README.md', print_task_name_in_summary: false)
+            gradle(tasks: ['#{task_name_1}', '#{task_name_2}'], gradle_path: './README.md')
           end").runner.execute(:build)
 
           last_action = Fastlane::Actions.executed_actions.last
-          expect(last_action[:name]).to eq('gradle')
-        end
-
-        it "the name which user sets is displayed when print_task_name_in_summary is false and step_name is set" do
-          step_name = 'gradle_build_step'
-
-          Fastlane::FastFile.new.parse("lane :build do
-            gradle(task: 'assembleWorldDominationRelease', gradle_path: './README.md', print_task_name_in_summary: false, step_name: '#{step_name}')
-          end").runner.execute(:build)
-
-          last_action = Fastlane::Actions.executed_actions.last
-          expect(last_action[:name]).to eq(step_name)
+          expect(last_action[:name]).to eq(task_name)
         end
       end
     end

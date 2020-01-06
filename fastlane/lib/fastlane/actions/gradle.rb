@@ -118,17 +118,14 @@ module Fastlane
       end
 
       def self.step_text(params)
-        if params[:print_task_name_in_summary]
-          task = params[:task]
-          flavor = params[:flavor]
-          build_type = params[:build_type]
+        task = params[:task]
+        flavor = params[:flavor]
+        build_type = params[:build_type]
+        tasks = params[:tasks]
 
-          gradle_task = [task, flavor, build_type].join
+        gradle_task = gradle_task(task, flavor, build_type, tasks)
 
-          return gradle_task
-        else
-          super(params)
-        end
+        return gradle_task
       end
 
       #####################################################
@@ -206,11 +203,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :print_command_output,
                                        env_name: 'FL_GRADLE_PRINT_COMMAND_OUTPUT',
                                        description: 'Control whether the output produced by given Gradle command is printed while running (true/false)',
-                                       is_string: false,
-                                       default_value: true),
-          FastlaneCore::ConfigItem.new(key: :print_task_name_in_summary,
-                                       env_name: 'FL_GRADLE_PRINT_TASK_NAME_IN_SUMMARY',
-                                       description: 'Display the gradle task name instead of `gradle` in fastlane summary. If you want to display `gradle` or step_name which you set in summary, please set this option to `false`.(true/false)',
                                        is_string: false,
                                        default_value: true)
         ]
