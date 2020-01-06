@@ -119,6 +119,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('pry-stack_explorer')
   spec.add_development_dependency('yard', '~> 0.9.11')
   spec.add_development_dependency('webmock', '~> 2.3.2')
+  spec.add_development_dependency('hashdiff', '< 0.4.0') # Locked under 0.4.0 until webmock bumped up to 3.6.0 or greater - HashDiff was changed to Hashdiff
   spec.add_development_dependency('coveralls', '~> 0.8.13')
   spec.add_development_dependency('rubocop', Fastlane::RUBOCOP_REQUIREMENT)
   spec.add_development_dependency('rubocop-require_tools', '>= 0.1.2')

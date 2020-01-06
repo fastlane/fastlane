@@ -40,7 +40,7 @@ module Spaceship
         client.create_iap_family(app_id: self.application.apple_id, name: name, product_id: product_id, reference_name: reference_name, versions: versions_array)
       end
 
-      # returns a list of all families
+      # returns a list of all available subscription groups/families of the current In-App-Purchase
       def all
         r = client.iap_families(app_id: self.application.apple_id)
         return_families = []
@@ -51,6 +51,17 @@ module Spaceship
           return_families << loaded_family
         end
         return_families
+      end
+
+      # find a specific family
+      # @param family_id (String) Family Id
+      def find(family_id)
+        all.each do |family|
+          if family.family_id == family_id
+            return family
+          end
+        end
+        return nil
       end
     end
   end

@@ -627,7 +627,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def transform_to_raw_pricing_intervals(app_id = nil, purchase_id = nil, pricing_intervals = nil, subscription_price_target = nil)
+    def transform_to_raw_pricing_intervals(app_id = nil, purchase_id = nil, pricing_intervals = 5, subscription_price_target = nil)
       intervals_array = []
       if pricing_intervals
         intervals_array = pricing_intervals.map do |interval|
