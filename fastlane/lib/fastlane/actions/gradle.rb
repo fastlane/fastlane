@@ -117,6 +117,17 @@ module Fastlane
         gradle_task
       end
 
+      def self.step_text(params)
+        task = params[:task]
+        flavor = params[:flavor]
+        build_type = params[:build_type]
+        tasks = params[:tasks]
+
+        gradle_task = gradle_task(task, flavor, build_type, tasks)
+
+        return gradle_task
+      end
+
       #####################################################
       # @!group Documentation
       #####################################################

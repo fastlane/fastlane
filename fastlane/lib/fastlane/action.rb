@@ -110,7 +110,7 @@ module Fastlane
 
     # Is printed out in the Steps: output in the terminal
     # Return nil if you don't want any logging in the terminal/JUnit Report
-    def self.step_text
+    def self.step_text(params)
       self.action_name
     end
 
