@@ -160,31 +160,45 @@ module Gym
           dwarfdump_command << "dwarfdump"
           dwarfdump_command << "--uuid #{dsym.shellescape}"
 
+          # Extract uuids
           dwarfdump_result = Helper.backticks(dwarfdump_command.join(" "), print: false)
           architecture_infos = dwarfdump_result.split("\n")
-          architecture_uuids = architecture_infos.map do |info|
-            info_array = info.split(" ")
+          architecture_infos.each do |info|
+            info_array = info.split(" ", 4)
             uuid = info_array[1]
+            dwarf_file_path = info_array[3]
 
             if uuid.nil? || !uuid.match(uuid_regex)
-              nil
-            else
-              uuid
+              next
             end
-          end
 
-          architecture_uuids = architecture_uuids.reject(&:nil?)
-
-          symbol_map_paths = architecture_uuids.map do |uuid|
-            "#{bcsymbolmaps_directory.shellescape}/#{uuid}.bcsymbolmap"
-          end
-
-          symbol_map_paths << bcsymbolmaps_directory.shellescape if symbol_map_paths.empty?
-
-          symbol_map_paths.each do |path|
+            # Find bcsymbolmap file to be used:
+            #  - if a <uuid>.plist file exists, we will extract uuid of bcsymbolmap and use it
+            #  - if a <uuid>.bcsymbolmap file exists, we will use it
+            #  - otherwise let dsymutil figure it out
+            symbol_map_path = nil
+            split_dwarf_file_path = File.split(dwarf_file_path)
+            dsym_plist_file_path = File.join(split_dwarf_file_path[0], "..", "#{uuid}.plist")
+            if File.exist?(dsym_plist_file_path)
+              dsym_plist = Plist.parse_xml(dsym_plist_file_path)
+              original_uuid = dsym_plist['DBGOriginalUUID']
+              possible_symbol_map_path = "#{bcsymbolmaps_directory}/#{original_uuid}.bcsymbolmap"
+              if File.exist?(possible_symbol_map_path)
+                symbol_map_path = possible_symbol_map_path.shellescape
+              end
+            end
+            if symbol_map_path.nil?
+              possible_symbol_map_path = File.join(bcsymbolmaps_directory, "#{uuid}.bcsymbolmap")
+              if File.exist?(possible_symbol_map_path)
+                symbol_map_path = possible_symbol_map_path.shellescape
+              end
+            end
+            if symbol_map_path.nil?
+              symbol_map_path = bcsymbolmaps_directory.shellescape
+            end
             command = []
             command << "dsymutil"
-            command << "--symbol-map #{path}"
+            command << "--symbol-map #{symbol_map_path}"
             command << dsym.shellescape
             Helper.backticks(command.join(" "), print: !Gym.config[:silent])
           end
