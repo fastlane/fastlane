@@ -129,6 +129,12 @@ protocol ScanfileProtocol: class {
   /// Use an extra XCCONFIG file to build your app
   var xcconfig: String? { get }
 
+  /// App name to use in slack message and logfile name
+  var appName: String? { get }
+
+  /// Target version of the app being build or tested. Used to filter out simulator version
+  var deploymentTargetVersion: String? { get }
+
   /// Create an Incoming WebHook for your Slack group to post results there
   var slackUrl: String? { get }
 
@@ -210,6 +216,8 @@ extension ScanfileProtocol {
   var configuration: String? { return nil }
   var xcargs: String? { return nil }
   var xcconfig: String? { return nil }
+  var appName: String? { return nil }
+  var deploymentTargetVersion: String? { return nil }
   var slackUrl: String? { return nil }
   var slackChannel: String? { return nil }
   var slackMessage: String? { return nil }
@@ -226,4 +234,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.23]
+// FastlaneRunnerAPIVersion [0.9.24]

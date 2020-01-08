@@ -829,6 +829,7 @@ func buildAndUploadToAppetize(xcodebuild: [String : Any] = [:],
    - task: The gradle task you want to execute, e.g. `assemble`, `bundle` or `test`. For tasks such as `assembleMyFlavorRelease` you should use gradle(task: 'assemble', flavor: 'Myflavor', build_type: 'Release')
    - flavor: The flavor that you want the task for, e.g. `MyFlavor`. If you are running the `assemble` task in a multi-flavor project, and you rely on Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] then you must specify a flavor here or else this value will be undefined
    - buildType: The build type that you want the task for, e.g. `Release`. Useful for some tasks such as `assemble`
+   - tasks: The multiple gradle tasks that you want to execute, e.g. `[assembleDebug, bundleDebug]`
    - flags: All parameter flags you want to pass to the gradle command, e.g. `--exitcode --xml file.xml`
    - projectDir: The root directory of the gradle project
    - gradlePath: The path to your `gradlew`. If you specify a relative path, it is assumed to be relative to the `project_dir`
@@ -842,9 +843,10 @@ func buildAndUploadToAppetize(xcodebuild: [String : Any] = [:],
 
  Run `./gradlew tasks` to get a list of all available gradle tasks for your project
 */
-func buildAndroidApp(task: String,
+func buildAndroidApp(task: String? = nil,
                      flavor: String? = nil,
                      buildType: String? = nil,
+                     tasks: [String]? = nil,
                      flags: String? = nil,
                      projectDir: String = ".",
                      gradlePath: String? = nil,
@@ -856,6 +858,7 @@ func buildAndroidApp(task: String,
   let command = RubyCommand(commandID: "", methodName: "build_android_app", className: nil, args: [RubyCommand.Argument(name: "task", value: task),
                                                                                                    RubyCommand.Argument(name: "flavor", value: flavor),
                                                                                                    RubyCommand.Argument(name: "build_type", value: buildType),
+                                                                                                   RubyCommand.Argument(name: "tasks", value: tasks),
                                                                                                    RubyCommand.Argument(name: "flags", value: flags),
                                                                                                    RubyCommand.Argument(name: "project_dir", value: projectDir),
                                                                                                    RubyCommand.Argument(name: "gradle_path", value: gradlePath),
@@ -2583,7 +2586,7 @@ func downloadDsyms(username: String,
 func downloadFromPlayStore(packageName: String,
                            versionName: String? = nil,
                            track: String = "production",
-                           metadataPath: String? = nil,
+                           metadataPath: String = "./metadata",
                            key: String? = nil,
                            issuer: String? = nil,
                            jsonKey: String? = nil,
@@ -3425,6 +3428,7 @@ func googlePlayTrackVersionCodes(packageName: String,
    - task: The gradle task you want to execute, e.g. `assemble`, `bundle` or `test`. For tasks such as `assembleMyFlavorRelease` you should use gradle(task: 'assemble', flavor: 'Myflavor', build_type: 'Release')
    - flavor: The flavor that you want the task for, e.g. `MyFlavor`. If you are running the `assemble` task in a multi-flavor project, and you rely on Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] then you must specify a flavor here or else this value will be undefined
    - buildType: The build type that you want the task for, e.g. `Release`. Useful for some tasks such as `assemble`
+   - tasks: The multiple gradle tasks that you want to execute, e.g. `[assembleDebug, bundleDebug]`
    - flags: All parameter flags you want to pass to the gradle command, e.g. `--exitcode --xml file.xml`
    - projectDir: The root directory of the gradle project
    - gradlePath: The path to your `gradlew`. If you specify a relative path, it is assumed to be relative to the `project_dir`
@@ -3438,9 +3442,10 @@ func googlePlayTrackVersionCodes(packageName: String,
 
  Run `./gradlew tasks` to get a list of all available gradle tasks for your project
 */
-func gradle(task: String,
+func gradle(task: String? = nil,
             flavor: String? = nil,
             buildType: String? = nil,
+            tasks: [String]? = nil,
             flags: String? = nil,
             projectDir: String = ".",
             gradlePath: String? = nil,
@@ -3452,6 +3457,7 @@ func gradle(task: String,
   let command = RubyCommand(commandID: "", methodName: "gradle", className: nil, args: [RubyCommand.Argument(name: "task", value: task),
                                                                                         RubyCommand.Argument(name: "flavor", value: flavor),
                                                                                         RubyCommand.Argument(name: "build_type", value: buildType),
+                                                                                        RubyCommand.Argument(name: "tasks", value: tasks),
                                                                                         RubyCommand.Argument(name: "flags", value: flags),
                                                                                         RubyCommand.Argument(name: "project_dir", value: projectDir),
                                                                                         RubyCommand.Argument(name: "gradle_path", value: gradlePath),
@@ -5398,6 +5404,8 @@ func rubyVersion() {
    - configuration: The configuration to use when building the app. Defaults to 'Release'
    - xcargs: Pass additional arguments to xcodebuild. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
    - xcconfig: Use an extra XCCONFIG file to build your app
+   - appName: App name to use in slack message and logfile name
+   - deploymentTargetVersion: Target version of the app being build or tested. Used to filter out simulator version
    - slackUrl: Create an Incoming WebHook for your Slack group to post results there
    - slackChannel: #channel or @username
    - slackMessage: The message included with each message posted to slack
@@ -5456,6 +5464,8 @@ func runTests(workspace: String? = nil,
               configuration: String? = nil,
               xcargs: String? = nil,
               xcconfig: String? = nil,
+              appName: String? = nil,
+              deploymentTargetVersion: String? = nil,
               slackUrl: String? = nil,
               slackChannel: String? = nil,
               slackMessage: String? = nil,
@@ -5511,6 +5521,8 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "configuration", value: configuration),
                                                                                            RubyCommand.Argument(name: "xcargs", value: xcargs),
                                                                                            RubyCommand.Argument(name: "xcconfig", value: xcconfig),
+                                                                                           RubyCommand.Argument(name: "app_name", value: appName),
+                                                                                           RubyCommand.Argument(name: "deployment_target_version", value: deploymentTargetVersion),
                                                                                            RubyCommand.Argument(name: "slack_url", value: slackUrl),
                                                                                            RubyCommand.Argument(name: "slack_channel", value: slackChannel),
                                                                                            RubyCommand.Argument(name: "slack_message", value: slackMessage),
@@ -5647,6 +5659,8 @@ func say(text: Any,
    - configuration: The configuration to use when building the app. Defaults to 'Release'
    - xcargs: Pass additional arguments to xcodebuild. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
    - xcconfig: Use an extra XCCONFIG file to build your app
+   - appName: App name to use in slack message and logfile name
+   - deploymentTargetVersion: Target version of the app being build or tested. Used to filter out simulator version
    - slackUrl: Create an Incoming WebHook for your Slack group to post results there
    - slackChannel: #channel or @username
    - slackMessage: The message included with each message posted to slack
@@ -5705,6 +5719,8 @@ func scan(workspace: Any? = scanfile.workspace,
           configuration: Any? = scanfile.configuration,
           xcargs: Any? = scanfile.xcargs,
           xcconfig: Any? = scanfile.xcconfig,
+          appName: Any? = scanfile.appName,
+          deploymentTargetVersion: Any? = scanfile.deploymentTargetVersion,
           slackUrl: Any? = scanfile.slackUrl,
           slackChannel: Any? = scanfile.slackChannel,
           slackMessage: Any? = scanfile.slackMessage,
@@ -5760,6 +5776,8 @@ func scan(workspace: Any? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "configuration", value: configuration),
                                                                                       RubyCommand.Argument(name: "xcargs", value: xcargs),
                                                                                       RubyCommand.Argument(name: "xcconfig", value: xcconfig),
+                                                                                      RubyCommand.Argument(name: "app_name", value: appName),
+                                                                                      RubyCommand.Argument(name: "deployment_target_version", value: deploymentTargetVersion),
                                                                                       RubyCommand.Argument(name: "slack_url", value: slackUrl),
                                                                                       RubyCommand.Argument(name: "slack_channel", value: slackChannel),
                                                                                       RubyCommand.Argument(name: "slack_message", value: slackMessage),
@@ -6738,7 +6756,7 @@ func supply(packageName: String,
             releaseStatus: String = "completed",
             track: String = "production",
             rollout: String? = nil,
-            metadataPath: String? = nil,
+            metadataPath: String = "./metadata",
             key: String? = nil,
             issuer: String? = nil,
             jsonKey: String? = nil,
@@ -7766,7 +7784,7 @@ func uploadToPlayStore(packageName: String,
                        releaseStatus: String = "completed",
                        track: String = "production",
                        rollout: String? = nil,
-                       metadataPath: String? = nil,
+                       metadataPath: String = "./metadata",
                        key: String? = nil,
                        issuer: String? = nil,
                        jsonKey: String? = nil,
@@ -8265,7 +8283,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-11.3.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-11.2.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -8410,4 +8428,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.67]
+// FastlaneRunnerAPIVersion [0.9.68]
