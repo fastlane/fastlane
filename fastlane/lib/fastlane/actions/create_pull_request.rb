@@ -183,7 +183,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :milestone,
                                        env_name: "GITHUB_PULL_REQUEST_MILESTONE",
-                                       description: "The milestone for the pull request",
+                                       description: "The milestone ID (Integer) for the pull request",
                                        type: Numeric,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :head,
