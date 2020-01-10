@@ -67,14 +67,14 @@ describe Fastlane do
             ).to_return(status: 201, body: "", headers: {})
 
           stub_request(:patch, "https://api.github.com/repos/fastlane/fastlane/issues/#{number}").
-              with(
-                  body: '{"milestone":42}',
-                  headers: {
-                      'Authorization' => 'Basic MTIzNDU2Nzg5',
-                      'Host' => 'api.github.com:443',
-                      'User-Agent' => 'fastlane-github_api'
-                  }
-              ).to_return(status: 201, body: "", headers: {})
+            with(
+              body: '{"milestone":42}',
+              headers: {
+                  'Authorization' => 'Basic MTIzNDU2Nzg5',
+                  'Host' => 'api.github.com:443',
+                  'User-Agent' => 'fastlane-github_api'
+              }
+            ).to_return(status: 201, body: "", headers: {})
         end
 
         it 'correctly submits to github' do

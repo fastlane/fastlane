@@ -121,17 +121,17 @@ module Fastlane
         end
 
         GithubApiAction.run(
-            server_url: params[:api_url],
-            api_token: params[:api_token],
-            http_method: 'PATCH',
-            path: "repos/#{params[:repo]}/issues/#{number}",
-            body: payload,
-            error_handlers: {
-                '*' => proc do |result|
-                  UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")
-                  return nil
-                end
-            }
+          server_url: params[:api_url],
+          api_token: params[:api_token],
+          http_method: 'PATCH',
+          path: "repos/#{params[:repo]}/issues/#{number}",
+          body: payload,
+          error_handlers: {
+              '*' => proc do |result|
+                UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")
+                return nil
+              end
+          }
         )
       end
 
