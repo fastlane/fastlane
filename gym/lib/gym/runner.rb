@@ -23,7 +23,7 @@ module Gym
 
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
-      if Gym.project.ios? || Gym.project.tvos?
+      if false && Gym.project.ios? || Gym.project.tvos?
         fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
         return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
 
@@ -264,17 +264,11 @@ module Gym
         return
       end
 
-      application_cert = Gym.config[:mac_app_distribution_cert_name]
       installation_cert = Gym.config[:mac_app_installer_cert_name]
-
-      UI.user_error!("Option `mac_app_distribution_cert_name` is required for signing and packaging a mac app") unless application_cert
       UI.user_error!("Option `mac_app_installer_cert_name` is required for signing and packaging a mac app") unless installation_cert
 
       plist_path = Gym.project.build_settings(key: "INFOPLIST_FILE")
-      entitlements_path = Gym.project.build_settings(key: "CODE_SIGN_ENTITLEMENTS")
-
       UI.crash!("Cannot find Info.plist file for project at '#{plist_path}'") unless File.exist?(plist_path)
-      UI.crash!("Cannot find entitlements file for project at '#{entitlements_path}'") unless File.exist?(entitlements_path)
 
       # Generates names and paths
       exe_name = File.basename(app_path)
@@ -282,14 +276,6 @@ module Gym
       pkg_path = File.join(Gym.config[:output_directory], pkg_name)
 
       File.delete(pkg_path) if File.exist?(pkg_path)
-
-      # Generates command for signing for distribution
-      codesign_commands = []
-      codesign_commands << "codesign"
-      codesign_commands << "--entitlements #{entitlements_path.shellescape}"
-      codesign_commands << "-f -v"
-      codesign_commands << "-s \"#{application_cert}\""
-      codesign_commands << "\"#{app_path}\""
 
       # Generates command for making package signing for installation
       productbuild_commands = []
@@ -300,21 +286,9 @@ module Gym
       productbuild_commands << "--product \"#{plist_path}\""
       productbuild_commands << "\"#{pkg_path}\""
 
-      codesign_command = codesign_commands.join(' ')
-      productbuild_command = productbuild_commands.join(' ')
-
-      # Signs application for distribution
-      print_command(codesign_command, "Generated Codesign Command") if FastlaneCore::Globals.verbose?
-      FastlaneCore::CommandExecutor.execute(command: codesign_command,
-                                          print_all: false,
-                                      print_command: !Gym.config[:silent],
-                                              error: proc do |output|
-                                                ErrorHandler.handle_package_error(output)
-                                              end)
-
       # Generates package and signs for installation
-      print_command(productbuild_command, "Generated Productbuild Command") if FastlaneCore::Globals.verbose?
-      FastlaneCore::CommandExecutor.execute(command: productbuild_command,
+      print_command(productbuild_commands, "Generated Productbuild Command") if FastlaneCore::Globals.verbose?
+      FastlaneCore::CommandExecutor.execute(command: productbuild_commands,
                                           print_all: false,
                                       print_command: !Gym.config[:silent],
                                               error: proc do |output|
