@@ -349,7 +349,7 @@ module Match
           UI.message("\t\t 1. Click on your bucket to open it".cyan)
           UI.message("\t\t 2. Click 'Permissions'".cyan)
           UI.message("\t\t 3. Click 'Add members'".cyan)
-          UI.message("\t\t 4. Enter the email of your service account".cyan)
+          UI.message("\t\t 4. Enter the *email of your service account* (not your own email)".cyan)
           UI.message("\t\t 5. Set the role to 'Storage Admin'".cyan)
           UI.message("\t\t 6. Click 'Save'".cyan)
           UI.message("")
