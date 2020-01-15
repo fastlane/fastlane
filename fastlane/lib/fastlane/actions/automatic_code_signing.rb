@@ -3,7 +3,7 @@ module Fastlane
   module Actions
     class AutomaticCodeSigningAction < Action
       def self.run(params)
-        FastlaneCore::PrintTable.print_values(config: params, title: "Summary for Automatic Codesigning")
+        FastlaneCore::PrintTable.print_values(config: params, title: "Summary for Codesigning")
         path = params[:path]
         path = File.join(File.expand_path(path), "project.pbxproj")
 
