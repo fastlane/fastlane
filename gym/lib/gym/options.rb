@@ -139,6 +139,15 @@ module Gym
                                      description: "Build without codesigning",
                                      type: Boolean,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :catalyst_platform,
+                                     env_name: "GYM_CATALYST_PLATFORM",
+                                     description: "Platform to build when using a Catalyst enabled app. Valid values are: ios, macos",
+                                     type: String,
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       av = %w(ios macos)
+                                       UI.user_error!("Unsupported export_method '#{value}', must be: #{av}") unless av.include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :mac_app_installer_cert_name,
                                      env_name: "GYM_MAC_APP_INSTALLER_CERT_NAME",
                                      description: "Full name of Mac Installer Distribution Certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`",
