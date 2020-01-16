@@ -80,7 +80,7 @@ module Fastlane
         if absolute_output_path.include?(".ipa")
           Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = absolute_output_path
           ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_output_path # for deliver
-        elsif absolute_output_path.include?(".app")
+        elsif absolute_output_path.include?(".pkg")
           Actions.lane_context[SharedValues::PKG_OUTPUT_PATH] = absolute_output_path
           ENV[SharedValues::PKG_OUTPUT_PATH.to_s] = absolute_output_path # for deliver
         end
