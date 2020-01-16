@@ -8,6 +8,7 @@ module Fastlane
     end
 
     class BuildIosAppAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(values)
         require 'gym'
 
@@ -70,7 +71,9 @@ module Fastlane
         end
 
         absolute_output_path = File.expand_path(gym_output_path)
-        absolute_dsym_path = absolute_output_path.gsub(".ipa", ".app.dSYM.zip")
+
+        absolute_dsym_path = absolute_output_path.gsub(".ipa", ".app.dSYM.zip") if File.extname(absolute_output_path) == ".ipa"
+        absolute_dsym_path = absolute_output_path.gsub(".pkg", ".dSYM.zip") if File.extname(absolute_output_path) == ".pkg"
 
         # This might be the mac app path, so we don't want to set it here
         # https://github.com/fastlane/fastlane/issues/5757
@@ -88,6 +91,7 @@ module Fastlane
 
         return absolute_output_path
       end
+      # rubocop:enable Metrics/PerceivedComplexity
 
       def self.description
         "Easily build and sign your app (via _gym_)"

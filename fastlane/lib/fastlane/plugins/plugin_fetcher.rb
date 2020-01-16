@@ -23,20 +23,10 @@ module Fastlane
         page += 1
       end
 
-      #      puts "COUNT: #{plugins.size}"
-
-      #      plugins.each do |plugin|
-      #        if plugin.full_name.include?("flutter")
-      #          puts "plugin: #{plugin}"
-      #        end
-      #      end
-
       return plugins if search_query.to_s.length == 0
       plugins.keep_if do |current|
         current.full_name.include?(search_query) or current.info.include?(search_query)
       end
-
-      #      puts "KEEP COUNT: #{plugins.size}"
 
       return plugins
     end
