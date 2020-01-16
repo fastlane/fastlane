@@ -52,7 +52,7 @@ module Gym
         compress_and_move_dsym
         if Gym.project.mac_app?
           path = copy_mac_app
-          path = build_mac_pkg(path) unless Gym.config[:skip_package_pkg]
+          path = package_mac_app(path) unless Gym.config[:skip_package_pkg]
           return path
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
@@ -271,7 +271,7 @@ module Gym
       app_path
     end
 
-    def build_mac_pkg(app_path)
+    def package_mac_app(app_path)
       if Gym.config[:export_method] != 'app-store'
         UI.message('Skipping packing of Mac app since `export_method` is not `app-store`')
         return
