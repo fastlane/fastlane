@@ -23,23 +23,19 @@ module Gym
 
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
-      # Determine platform to package
-      is_ios = Gym.project.ios? || Gym.project.tvos?
-      is_mac = Gym.project.mac?
-
+      # Determine platform to archive
       if Gym.project.mac_catalyst?
         catalyst_platform = Gym.config[:catalyst_platform]
-        if catalyst_platform == 'ios'
-          is_ios = true
-          is_mac = false
-        elsif catalyst_platform == 'macos'
-          is_ios = false
-          is_mac = true
-        else
-          UI.user_error!(":catalyst_platform is a required option when building a Catalyst app. Valid values: ios, macos")
-        end
+        UI.user_error!(":catalyst_platform is a required option when building a Catalyst app. Valid values: ios, macos") if catalyst_platform.nil?
+
+        is_ios = catalyst_platform == 'ios'
+        is_mac = catalyst_platform == 'macos'
+      else
+        is_ios = Gym.project.ios? || Gym.project.tvos?
+        is_mac = Gym.project.mac?
       end
 
+      # Archive
       if is_ios
         fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
         return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
@@ -56,7 +52,7 @@ module Gym
         compress_and_move_dsym
         if Gym.project.mac_app?
           path = copy_mac_app
-          path = build_mac_pkg(path)
+          path = build_mac_pkg(path) unless Gym.config[:skip_package_pkg]
           return path
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?

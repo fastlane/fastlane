@@ -33,6 +33,7 @@ module Gym
       detect_selected_provisioning_profiles # we can only do that *after* we have the platform
       detect_configuration
       detect_toolchain
+      detect_third_party_installer
 
       config[:output_name] ||= Gym.project.app_name
 
@@ -100,6 +101,28 @@ module Gym
       end
     end
 
+    # Detects name of a "3rd Party Mac Developer Installer" cert for the configured team id
+    def self.detect_third_party_installer
+      team_id = Gym.config[:export_team_id] || Gym.project.build_settings(key: "DEVELOPMENT_TEAM")
+      return if team_id.nil?
+
+      prefix = "3rd Party Mac Developer Installer: "
+      output = Helper.backticks("security find-certificate -a -c \"#{prefix}\"", print: false)
+
+      # Find matches, filter by team_id, prepend prefix for full cert name
+      certs = output.scan(/"(?:#{prefix})(.*)"/)
+      certs = certs.flatten.uniq.select do |cert|
+        cert.include?(team_id)
+      end.map do |cert|
+        prefix + cert
+      end
+
+      if certs.first
+        UI.verbose("Detected installer certificate to use: #{certs.first}")
+        Gym.config[:mac_app_installer_cert_name] = certs.first
+      end
+    end
+
     def self.detect_scheme
       Gym.project.select_scheme
     end
@@ -112,10 +135,10 @@ module Gym
     def self.detect_platform
       return if Gym.config[:destination]
       platform = if Gym.project.mac_catalyst?
-                   catalyst_platform = Gym.config[:catalyst_platform]
-                   if catalyst_platform == 'ios'
+                   case Gym.config[:catalyst_platform]
+                   when 'ios'
                      "iOS"
-                   elsif catalyst_platform == 'macos'
+                   when 'macos'
                      "macOS"
                    else
                      UI.user_error!(":catalyst_platform is a required option when building a Catalyst app. Valid values: ios, macos")

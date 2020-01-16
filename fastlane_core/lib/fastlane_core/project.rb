@@ -262,7 +262,7 @@ module FastlaneCore
     end
 
     def mac_app?
-      (application? && build_settings(key: "PLATFORM_NAME") == "macosx") || mac_catalyst?
+      (application? && (build_settings(key: "PLATFORM_NAME") == "macosx" || mac_catalyst?))
     end
 
     def mac_library?
@@ -271,6 +271,10 @@ module FastlaneCore
 
     def mac_framework?
       (framework? && build_settings(key: "PLATFORM_NAME") == "macosx")
+    end
+
+    def mac_catalyst?
+      build_settings(key: "SUPPORTS_MACCATALYST") == "YES"
     end
 
     def command_line_tool?
@@ -287,10 +291,6 @@ module FastlaneCore
 
     def ios?
       supported_platforms.include?(:iOS)
-    end
-
-    def mac_catalyst?
-      build_settings(key: "SUPPORTS_MACCATALYST") == "YES"
     end
 
     def supported_platforms
