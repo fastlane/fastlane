@@ -85,9 +85,9 @@ module Fastlane
           ENV[SharedValues::PKG_OUTPUT_PATH.to_s] = absolute_output_path # for deliver
         end
 
-        Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path if File.exist?(absolute_dsym_path)
+        Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path if absolute_dsym_path && File.exist?(absolute_dsym_path)
         Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE] = Gym::BuildCommandGenerator.archive_path
-        ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path if File.exist?(absolute_dsym_path)
+        ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path if absolute_dsym_path && File.exist?(absolute_dsym_path)
 
         return absolute_output_path
       end
