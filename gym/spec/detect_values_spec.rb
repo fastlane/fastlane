@@ -38,7 +38,7 @@ describe Gym do
       end
     end
 
-    describe '#detect_third_party_installer' do
+    describe '#detect_third_party_installer', :stuff, requires_xcodebuild: true do
       let(:team_name) { "Some Team Name" }
       let(:team_id) { "123456789" }
 
