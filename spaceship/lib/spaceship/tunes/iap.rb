@@ -105,17 +105,6 @@ module Spaceship
         end
       end
 
-      # find a specific product
-      # @param product_id (String) Product Id
-      def find(product_id)
-        all.each do |product|
-          if product.product_id == product_id
-            return product
-          end
-        end
-        return nil
-      end
-
       # return all available In-App-Purchase's of current app
       # this is not paged inside iTC-API so if you have a lot if IAP's (2k+)
       # it might take some time to load, same as it takes when you load the list via App Store Connect
@@ -130,6 +119,17 @@ module Spaceship
           return_iaps << loaded_iap
         end
         return_iaps
+      end
+
+      # find a specific product
+      # @param product_id (String) Product Id
+      def find(product_id)
+        all.each do |product|
+          if product.product_id == product_id
+            return product
+          end
+        end
+        return nil
       end
 
       private

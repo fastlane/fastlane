@@ -81,6 +81,11 @@ module Scan
                                      description: "Enabling this option will automatically erase the simulator before running the application",
                                      default_value: false,
                                      type: Boolean),
+        FastlaneCore::ConfigItem.new(key: :disable_slide_to_type,
+                                     env_name: 'SCAN_DISABLE_SLIDE_TO_TYPE',
+                                     description: "Enabling this option will disable the simulator from showing the 'Slide to type' prompt",
+                                     default_value: true,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :prelaunch_simulator,
                                      env_name: 'SCAN_PRELAUNCH_SIMULATOR',
                                      description: "Enabling this option will launch the first simulator prior to calling any xcodebuild command",
@@ -310,6 +315,18 @@ module Scan
                                      verify_block: proc do |value|
                                        UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
+
+        # build settings
+        FastlaneCore::ConfigItem.new(key: :app_name,
+                                    env_name: "SCAN_APP_NAME",
+                                    optional: true,
+                                    description: "App name to use in slack message and logfile name",
+                                    is_string: true),
+        FastlaneCore::ConfigItem.new(key: :deployment_target_version,
+                                    env_name: "SCAN_DEPLOYMENT_TARGET_VERSION",
+                                    optional: true,
+                                    description: "Target version of the app being build or tested. Used to filter out simulator version",
+                                    is_string: true),
 
         # slack
         FastlaneCore::ConfigItem.new(key: :slack_url,

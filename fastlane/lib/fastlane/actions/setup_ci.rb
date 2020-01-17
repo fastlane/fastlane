@@ -7,17 +7,20 @@ module Fastlane
           return
         end
 
-        case params[:provider]
-        when 'travis'
-          setup_keychain
+        case detect_provider(params)
         when 'circleci'
-          setup_keychain
           setup_output_paths
         end
+
+        setup_keychain
       end
 
       def self.should_run?(params)
         Helper.ci? || params[:force]
+      end
+
+      def self.detect_provider(params)
+        params[:provider] || (Helper.is_circle_ci? ? 'circleci' : nil)
       end
 
       def self.setup_keychain
@@ -37,7 +40,8 @@ module Fastlane
           unlock: true,
           timeout: 3600,
           lock_when_sleeps: true,
-          password: ""
+          password: "",
+          add_to_search_list: true
         )
 
         UI.message("Enabling match readonly mode.")
@@ -87,18 +91,20 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :provider,
                                        env_name: "FL_SETUP_CI_PROVIDER",
-                                       description: "CI provider",
+                                       description: "CI provider. If none is set, the provider is detected automatically",
                                        is_string: true,
                                        default_value: false,
                                        verify_block: proc do |value|
                                          value = value.to_s
+                                         # Validate both 'travis' and 'circleci' for backwards compatibility, even
+                                         # though only the latter receives special treatment by this action
                                          UI.user_error!("A given CI provider '#{value}' is not supported. Available CI providers: 'travis', 'circleci'") unless ["travis", "circleci"].include?(value)
                                        end)
         ]
       end
 
       def self.authors
-        ["mollyIV"]
+        ["mollyIV", "svenmuennich"]
       end
 
       def self.is_supported?(platform)
@@ -108,7 +114,7 @@ module Fastlane
       def self.example_code
         [
           'setup_ci(
-            provider: "travis"
+            provider: "circleci"
           )'
         ]
       end

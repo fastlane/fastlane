@@ -120,7 +120,7 @@ module Scan
 
     # Store the raw file
     def xcodebuild_log_path
-      file_name = "#{Scan.project.app_name}-#{Scan.config[:scheme]}.log"
+      file_name = "#{Scan.config[:app_name] || Scan.project.app_name}-#{Scan.config[:scheme]}.log"
       containing = File.expand_path(Scan.config[:buildlog_path])
       FileUtils.mkdir_p(containing)
 
