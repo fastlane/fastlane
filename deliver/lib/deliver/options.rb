@@ -149,7 +149,7 @@ module Deliver
 
         # release
         FastlaneCore::ConfigItem.new(key: :automatic_release,
-                                     description: "Should the app be automatically released once it's approved? Can not be used together with `auto_release_date`)",
+                                     description: "Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :auto_release_date,
