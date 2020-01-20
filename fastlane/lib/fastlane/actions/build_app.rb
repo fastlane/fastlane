@@ -141,7 +141,7 @@ module Fastlane
             sdk: "iOS 11.1"                  # use SDK as the name or path of the base SDK when building the project.
           )',
           'gym              # alias for "build_app"',
-          'build_ios_app    # alias for "build_app"'
+          'build_ios_app    # alias for "build_app"',
           'build_mac_app    # alias for "build_app"'
         ]
       end
