@@ -82,7 +82,7 @@ module Gym
 
       unless Gym.config[:skip_profile_detection]
         mapping_object = CodeSigningMapping.new(project: Gym.project)
-        hash_to_use = mapping_object.merge_profile_mapping(secondary_mapping: hash_to_use,
+        hash_to_use = mapping_object.merge_profile_mapping(primary_mapping: hash_to_use,
                                                            export_method: Gym.config[:export_method])
       end
 
@@ -150,7 +150,6 @@ module Gym
                  else
                    "iOS"
                  end
-
       Gym.config[:destination] = "generic/platform=#{platform}"
     end
 

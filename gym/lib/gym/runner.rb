@@ -50,8 +50,10 @@ module Gym
       elsif is_mac
         path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
-        if Gym.project.mac_app?
-          copy_mac_app
+        if Gym.project.mac_app? || Gym.project.mac_catalyst?
+          path = copy_mac_app
+          return path if Gym.config[:skip_package_pkg]
+
           package_app
           path = move_pkg
           return path

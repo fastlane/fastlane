@@ -182,7 +182,9 @@ module Gym
           hash[:signingStyle] = 'manual'
         end
 
-        hash[:installerSigningCertificate] = Gym.config[:mac_app_installer_cert_name] if Gym.config[:mac_app_installer_cert_name]
+        if Gym.config[:mac_app_installer_cert_name] && (Gym.project.mac? || Gym.config[:catalyst_platform] == "macos")
+          hash[:installerSigningCertificate] = Gym.config[:mac_app_installer_cert_name]
+        end
 
         hash[:teamID] = Gym.config[:export_team_id] if Gym.config[:export_team_id]
 

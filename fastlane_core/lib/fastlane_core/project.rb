@@ -262,7 +262,7 @@ module FastlaneCore
     end
 
     def mac_app?
-      (application? && (build_settings(key: "PLATFORM_NAME") == "macosx" || mac_catalyst?))
+      (application? && build_settings(key: "PLATFORM_NAME") == "macosx")
     end
 
     def mac_library?
@@ -282,7 +282,7 @@ module FastlaneCore
     end
 
     def mac?
-      supported_platforms.include?(:macOS) || mac_catalyst?
+      supported_platforms.include?(:macOS)
     end
 
     def tvos?
