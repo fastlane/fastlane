@@ -27,6 +27,11 @@ module Match
                                          UI.user_error!("Unsupported environment #{value}, must be in #{Match.environments.join(', ')}")
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :mac_installer_distribution,
+                                     env_name: "MATCH_MAC_INSTALLER_DISTRIBUTION",
+                                     description: "Create Mac Installer Distribution certificate",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :readonly,
                                      env_name: "MATCH_READONLY",
                                      description: "Only fetch existing certificates and profiles, don't generate new ones",

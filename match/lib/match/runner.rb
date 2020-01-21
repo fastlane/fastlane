@@ -18,6 +18,7 @@ module Match
 
     attr_accessor :storage
 
+    # rubocop:disable Metrics/PerceivedComplexity
     def run(params)
       self.files_to_commit = []
 
@@ -85,7 +86,13 @@ module Match
 
       # Certificate
       cert_id = fetch_certificate(params: params, working_directory: storage.working_directory)
-      spaceship.certificate_exists(username: params[:username], certificate_id: cert_id) if spaceship
+      spaceship.certificate_exists(username: params[:username], certificate_id: cert_id, platform: params[:platform]) if spaceship
+
+      # Mac Installer Distribution Certificate
+      if params[:mac_installer_distribution]
+        installer_cert_id = fetch_certificate(params: params, working_directory: storage.working_directory, mac_installer_distribution: params[:mac_installer_distribution])
+        spaceship.certificate_exists(username: params[:username], certificate_id: installer_cert_id, platform: params[:platform]) if spaceship
+      end
 
       # Provisioning Profiles
       unless params[:skip_provisioning_profiles]
@@ -119,6 +126,7 @@ module Match
     ensure
       storage.clear_changes if storage
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     # Used when creating a new certificate or profile
     def prefixed_working_directory
@@ -133,8 +141,8 @@ module Match
       end
     end
 
-    def fetch_certificate(params: nil, working_directory: nil)
-      cert_type = Match.cert_type_sym(params[:type])
+    def fetch_certificate(params: nil, working_directory: nil, mac_installer_distribution: false)
+      cert_type = Match.cert_type_sym(params[:type], mac_installer_distribution: mac_installer_distribution)
 
       certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.p12")]
@@ -142,7 +150,7 @@ module Match
       if certs.count == 0 || keys.count == 0
         UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory)
+        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory, mac_installer_distribution: mac_installer_distribution)
         private_key_path = cert_path.gsub(".cer", ".p12")
 
         self.files_to_commit << cert_path

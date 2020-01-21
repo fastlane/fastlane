@@ -10,6 +10,7 @@ module FastlaneCore
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
       ids = installed_identies(in_keychain: in_keychain)
+      ids += installed_third_party_installers(in_keychain: in_keychain)
       finger_print = sha1_fingerprint(path)
 
       return ids.include?(finger_print)
@@ -47,8 +48,29 @@ module FastlaneCore
       return ids
     end
 
+    def self.installed_third_party_installers(in_keychain: nil)
+      available = self.list_available_third_party_mac_installer(in_keychain: in_keychain)
+
+      ids = []
+      available.split("\n").each do |current|
+        begin
+          (ids << current.match(/SHA-1 hash: ([[:xdigit:]]*)/)[1])
+        rescue
+          # the last line does not match
+        end
+      end
+
+      return ids
+    end
+
     def self.list_available_identities(in_keychain: nil)
       commands = ['security find-identity -v -p codesigning']
+      commands << in_keychain if in_keychain
+      `#{commands.join(' ')}`
+    end
+
+    def self.list_available_third_party_mac_installer(in_keychain: nil)
+      commands = ['security find-certificate -Z -a -c "3rd Party Mac Developer Installer"']
       commands << in_keychain if in_keychain
       `#{commands.join(' ')}`
     end

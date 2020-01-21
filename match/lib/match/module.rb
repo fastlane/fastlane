@@ -20,7 +20,8 @@ module Match
     return type.to_sym
   end
 
-  def self.cert_type_sym(type)
+  def self.cert_type_sym(type, mac_installer_distribution: false)
+    return :mac_installer_distribution if mac_installer_distribution
     return :enterprise if type == "enterprise"
     return :development if type == "development"
     return :distribution if ["adhoc", "appstore", "distribution"].include?(type)

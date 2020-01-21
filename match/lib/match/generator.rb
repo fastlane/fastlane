@@ -3,7 +3,7 @@ require_relative 'module'
 module Match
   # Generate missing resources
   class Generator
-    def self.generate_certificate(params, cert_type, working_directory)
+    def self.generate_certificate(params, cert_type, working_directory, mac_installer_distribution: false)
       require 'cert/runner'
       require 'cert/options'
 
@@ -11,6 +11,7 @@ module Match
 
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
         development: params[:type] == "development",
+        mac_installer_distribution: mac_installer_distribution,
         generate_apple_certs: params[:generate_apple_certs],
         output_path: output_path,
         force: true, # we don't need a certificate without its private key, we only care about a new certificate

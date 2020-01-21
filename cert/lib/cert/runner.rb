@@ -134,6 +134,10 @@ module Cert
 
     # The kind of certificate we're interested in
     def certificate_type
+      if Cert.config[:mac_installer_distribution]
+        return Spaceship.certificate.mac_installer_distribution
+      end
+
       # Check if apple certs (Xcode 11 and later) should be used
       if Cert.config[:generate_apple_certs]
         cert_type = Spaceship.certificate.apple_distribution

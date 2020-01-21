@@ -45,8 +45,8 @@ module Match
       UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")
     end
 
-    def certificate_exists(username: nil, certificate_id: nil)
-      found = Spaceship.certificate.all.find do |cert|
+    def certificate_exists(username: nil, certificate_id: nil, platform: nil)
+      found = Spaceship.certificate.all(mac: platform == "macos").find do |cert|
         cert.id == certificate_id
       end
       return if found
