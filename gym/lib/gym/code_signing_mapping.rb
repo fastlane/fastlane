@@ -20,6 +20,12 @@ module Gym
       final_mapping = Hash[final_mapping.map { |k, v| [k.to_sym, v] }]
       secondary_mapping = Hash[secondary_mapping.map { |k, v| [k.to_sym, v] }]
 
+      if project && project.mac_catalyst?
+        secondary_mapping.dup.each do |k, v|
+          secondary_mapping["maccatalyst.#{k}".to_sym] = v
+        end
+      end
+
       # Now it's time to merge the (potentially) existing mapping
       #   (e.g. coming from `provisioningProfiles` of the `export_options` or from previous match calls)
       # with the secondary hash we just created (or was provided as parameter).

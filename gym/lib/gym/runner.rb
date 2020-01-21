@@ -51,8 +51,9 @@ module Gym
         path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
         if Gym.project.mac_app?
-          path = copy_mac_app
-          path = package_mac_app(path) unless Gym.config[:skip_package_pkg]
+          copy_mac_app
+          package_app
+          path = move_pkg
           return path
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
@@ -240,6 +241,17 @@ module Gym
       ipa_path
     end
 
+    # Moves over the binary and dsym file to the output directory
+    # @return (String) The path to the resulting pkg file
+    def move_pkg
+      FileUtils.mv(PackageCommandGenerator.pkg_path, File.expand_path(Gym.config[:output_directory]), force: true)
+      pkg_path = File.expand_path(File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.pkg_path)))
+
+      UI.success("Successfully exported and signed the pkg file:")
+      UI.message(pkg_path)
+      pkg_path
+    end
+
     # copys framework from temp folder:
 
     def copy_files_from_path(path)
@@ -269,50 +281,6 @@ module Gym
       UI.success("Successfully exported the .app file:")
       UI.message(app_path)
       app_path
-    end
-
-    def package_mac_app(app_path)
-      if Gym.config[:export_method] != 'app-store'
-        UI.message('Skipping packing of Mac app since `export_method` is not `app-store`')
-        return
-      end
-
-      installation_cert = Gym.config[:mac_app_installer_cert_name]
-      UI.user_error!("Option `mac_app_installer_cert_name` is required for signing and packaging a mac app") unless installation_cert
-
-      plist_path = Gym.project.build_settings(key: "INFOPLIST_FILE")
-      UI.crash!("Cannot find Info.plist file for project at '#{plist_path}'") unless File.exist?(plist_path)
-
-      # Generates names and paths
-      exe_name = File.basename(app_path)
-      pkg_name = "#{exe_name}.pkg"
-      pkg_path = File.join(Gym.config[:output_directory], pkg_name)
-
-      File.delete(pkg_path) if File.exist?(pkg_path)
-
-      # Generates command for making package signing for installation
-      productbuild_commands = []
-      productbuild_commands << "productbuild"
-      productbuild_commands << "--component \"#{app_path}\""
-      productbuild_commands << "/Applications"
-      productbuild_commands << "--sign \"#{installation_cert}\""
-      productbuild_commands << "--product \"#{plist_path}\""
-      productbuild_commands << "\"#{pkg_path}\""
-
-      # Generates package and signs for installation
-      print_command(productbuild_commands, "Generated Productbuild Command") if FastlaneCore::Globals.verbose?
-      FastlaneCore::CommandExecutor.execute(command: productbuild_commands,
-                                          print_all: false,
-                                      print_command: !Gym.config[:silent],
-                                              error: proc do |output|
-                                                ErrorHandler.handle_package_error(output)
-                                              end)
-
-      UI.crash!("Couldn't find package at '#{pkg_path}'") unless File.exist?(pkg_path)
-      UI.success("Successfully exported the .pkg file:")
-      UI.message(pkg_path)
-
-      pkg_path
     end
 
     # Move the manifest.plist if exists into the output directory

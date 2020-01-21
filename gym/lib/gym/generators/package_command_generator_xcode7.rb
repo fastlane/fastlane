@@ -79,6 +79,28 @@ module Gym
         Gym.cache[:ipa_path]
       end
 
+      def pkg_path
+        unless Gym.cache[:pkg_path]
+          path = Dir[File.join(temporary_output_path, "*.pkg")].last
+          # We need to process generic PKG
+          if path
+            # Try to find PKG file in the output directory, used when app thinning was not set
+            Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
+            FileUtils.mv(path, Gym.cache[:pkg_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:pkg_path]).downcase).zero?
+          elsif Dir.exist?(apps_path)
+            # Try to find "generic" PKG file inside "Apps" folder, used when app thinning was set
+            files = Dir[File.join(apps_path, "*.pkg")]
+            # Generic PKG file doesn't have suffix so its name is the shortest
+            path = files.min_by(&:length)
+            Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
+            FileUtils.cp(path, Gym.cache[:pkg_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:pkg_path]).downcase).zero?
+          else
+            ErrorHandler.handle_empty_archive unless path
+          end
+        end
+        Gym.cache[:pkg_path]
+      end
+
       # The path the the dsym file for this app. Might be nil
       def dsym_path
         Dir[BuildCommandGenerator.archive_path + "/**/*.app.dSYM"].last
@@ -159,6 +181,8 @@ module Gym
         if Helper.xcode_at_least?("9.0") && hash[:provisioningProfiles]
           hash[:signingStyle] = 'manual'
         end
+
+        hash[:installerSigningCertificate] = Gym.config[:mac_app_installer_cert_name] if Gym.config[:mac_app_installer_cert_name]
 
         hash[:teamID] = Gym.config[:export_team_id] if Gym.config[:export_team_id]
 

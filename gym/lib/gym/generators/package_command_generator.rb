@@ -25,6 +25,10 @@ module Gym
         generator.ipa_path
       end
 
+      def pkg_path
+        generator.pkg_path
+      end
+
       def dsym_path
         generator.dsym_path
       end
