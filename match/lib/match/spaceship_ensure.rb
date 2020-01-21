@@ -58,9 +58,16 @@ module Match
       UI.user_error!("To reset the certificates of your Apple account, you can use the `fastlane match nuke` feature, more information on https://docs.fastlane.tools/actions/match/")
     end
 
-    def profile_exists(username: nil, uuid: nil)
-      found = Spaceship.provisioning_profile.all.find do |profile|
+    def profile_exists(username: nil, uuid: nil, platform: nil)
+      is_mac = platform == "macos"
+      found = Spaceship.provisioning_profile.all(mac: is_mac).find do |profile|
         profile.uuid == uuid
+      end
+
+      if !found && is_mac
+        found = Spaceship.provisioning_profile.all(mac: false).find do |profile|
+          profile.uuid == uuid
+        end
       end
 
       unless found

@@ -196,13 +196,15 @@ module Match
       prov_type = Match.profile_type_sym(params[:type])
 
       names = [Match::Generator.profile_type_name(prov_type), app_identifier]
-      if params[:platform].to_s != :ios.to_s
+      if params[:platform].to_s == :tvos.to_s
         names.push(params[:platform])
       end
 
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
       base_dir = File.join(prefixed_working_directory, "profiles", prov_type.to_s)
-      profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
+
+      extension = params[:platform].to_s == :macos.to_s ? ".provisionprofile" : ".mobileprovision"
+      profiles = Dir[File.join(base_dir, "#{profile_name}#{extension}")]
       if Helper.mac?
         keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
       end
@@ -254,7 +256,7 @@ module Match
         FileUtils.cp(profile, params[:output_path])
       end
 
-      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
+      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid, platform: params[:platform])
         # This profile is invalid, let's remove the local file and generate a new one
         File.delete(profile)
         # This method will be called again, no need to modify `files_to_commit`
