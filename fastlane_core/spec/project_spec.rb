@@ -505,6 +505,15 @@ describe FastlaneCore do
         command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
       end
+
+      it 'generates an xcodebuild -resolvePackageDependencies command with a custom resolving path' do
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          cloned_source_packages_path: "./path/to/resolve"
+        })
+        command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -clonedSourcePackagesDirPath ./path/to/resolve"
+        expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+      end
     end
 
     describe "#project_paths" do
