@@ -400,7 +400,7 @@ module Scan
                                     optional: true,
                                     default_value: "env NSUnbufferedIO=YES xcodebuild"),
         FastlaneCore::ConfigItem.new(key: :cloned_source_packages_path,
-                                    env_name: "GYM_CLONED_SOURCE_PACKAGES_PATH",
+                                    env_name: "SCAN_CLONED_SOURCE_PACKAGES_PATH",
                                     description: "Sets a custom path for Swift Package Manager dependencies",
                                     type: String,
                                     optional: true)
