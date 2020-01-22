@@ -514,6 +514,16 @@ describe FastlaneCore do
         command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -clonedSourcePackagesDirPath ./path/to/resolve"
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
       end
+
+      it 'build_settings() should not add SPM path if Xcode < 11' do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          cloned_source_packages_path: "./path/to/resolve"
+        })
+        command = "xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
     end
 
     describe "#project_paths" do
