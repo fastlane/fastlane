@@ -221,6 +221,12 @@ module Snapshot
                                      env_name: "SNAPSHOT_EXECUTE_CONCURRENT_SIMULATORS",
                                      description: "Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9",
                                      default_value: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :disable_slide_to_type,
+                                     env_name: "SNAPSHOT_DISABLE_SLIDE_TO_TYPE",
+                                     description: "Disable the simulator from showing the 'Slide to type' prompt",
+                                     default_value: false,
+                                     optional: true,
                                      is_string: false)
       ]
     end
