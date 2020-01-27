@@ -64,12 +64,17 @@ module FastlaneCore
     end
 
     def self.list_available_identities(in_keychain: nil)
+      # -v  Show valid identities only (default is to show all identities)
+      # -p  Specify policy to evaluate
       commands = ['security find-identity -v -p codesigning']
       commands << in_keychain if in_keychain
       `#{commands.join(' ')}`
     end
 
     def self.list_available_third_party_mac_installer(in_keychain: nil)
+      # -Z  Print SHA-256 (and SHA-1) hash of the certificate
+      # -a  Find all matching certificates, not just the first one
+      # -c  Match on "name" when searching (optional)
       commands = ['security find-certificate -Z -a -c "3rd Party Mac Developer Installer"']
       commands << in_keychain if in_keychain
       `#{commands.join(' ')}`

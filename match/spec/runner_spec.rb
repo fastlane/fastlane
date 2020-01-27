@@ -64,7 +64,7 @@ describe Match do
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
           allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
           allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
-          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory).and_return(cert_path)
+          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, mac_installer_distribution: false).and_return(cert_path)
           expect(Match::Generator).to receive(:generate_provisioning_profile).with(params: config,
                                                                                 prov_type: :appstore,
                                                                            certificate_id: "something",
@@ -279,7 +279,7 @@ describe Match do
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
           allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
           allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
-          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory).and_return(cert_path)
+          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, mac_installer_distribution: false).and_return(cert_path)
           expect(Match::Generator).to_not(receive(:generate_provisioning_profile))
           expect(FastlaneCore::ProvisioningProfile).to_not(receive(:install))
           expect(fake_storage).to receive(:save_changes!).with(
