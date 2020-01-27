@@ -11,6 +11,7 @@ module Snapshot
     attr_accessor :dark_mode
     attr_accessor :reinstall_app
     attr_accessor :app_identifier
+    attr_accessor :disable_slide_to_type
 
     # xcode 8
     attr_accessor :number_of_retries
@@ -41,6 +42,7 @@ module Snapshot
       @output_simulator_logs = snapshot_config[:output_simulator_logs]
       @output_directory = snapshot_config[:output_directory]
       @concurrent_simulators = snapshot_config[:concurrent_simulators]
+      @disable_slide_to_type = snapshot_config[:disable_slide_to_type]
 
       launch_arguments = Array(snapshot_config[:launch_arguments])
       # if more than 1 set of arguments, use a tuple with an index

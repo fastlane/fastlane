@@ -67,6 +67,9 @@ module Snapshot
           # no need to reinstall if device has been erased
           uninstall_app(type)
         end
+        if launcher_config.disable_slide_to_type
+          disable_slide_to_type(type)
+        end
       end
     end
 
@@ -136,6 +139,14 @@ module Snapshot
         UI.message("Setting interface style #{device_type} (UserInterfaceStyleMode=#{dark_mode})")
         plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/com.apple.uikitservices.userInterfaceStyleMode.plist"
         File.write(plist_path, Plist::Emit.dump(plist))
+      end
+    end
+
+    def disable_slide_to_type(device_type)
+      device_udid = TestCommandGenerator.device_udid(device_type)
+      if device_udid
+        UI.message("Disabling slide to type on #{device_type}")
+        FastlaneCore::Simulator.disable_slide_to_type(udid: device_udid)
       end
     end
 
