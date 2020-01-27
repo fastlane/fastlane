@@ -15,11 +15,15 @@ module Cert
                                      description: "Create a development certificate instead of a distribution one",
                                      type: Boolean,
                                      default_value: false),
-        FastlaneCore::ConfigItem.new(key: :mac_installer_distribution,
-                                     env_name: "CERT_MAC_INSTALLER_DISTRIBUTION",
-                                     description: "Create Mac Installer Distribution certificate (takes precedence over :development)",
-                                     type: Boolean,
-                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :type,
+                                     env_name: "CERT_TYPE",
+                                     description: "Create specific certificate type (takes precedence over :development)",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       value = value.to_s
+                                       types = %w(mac_installer_distribution developer_id_installer developer_id_application)
+                                       UI.user_error!("Unsupported types, must be: #{types}") unless types.include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "CERT_FORCE",
                                      description: "Create a certificate even if an existing certificate exists",

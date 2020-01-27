@@ -89,8 +89,9 @@ module Match
       spaceship.certificate_exists(username: params[:username], certificate_id: cert_id, platform: params[:platform]) if spaceship
 
       # Mac Installer Distribution Certificate
-      if params[:mac_installer_distribution]
-        installer_cert_id = fetch_certificate(params: params, working_directory: storage.working_directory, mac_installer_distribution: params[:mac_installer_distribution])
+      additional_cert_types = params[:additional_cert_types] || []
+      additional_cert_types.each do |additional_cert_type|
+        installer_cert_id = fetch_certificate(params: params, working_directory: storage.working_directory, specific_cert_type: additional_cert_type)
         spaceship.certificate_exists(username: params[:username], certificate_id: installer_cert_id, platform: params[:platform]) if spaceship
       end
 
@@ -141,8 +142,8 @@ module Match
       end
     end
 
-    def fetch_certificate(params: nil, working_directory: nil, mac_installer_distribution: false)
-      cert_type = Match.cert_type_sym(params[:type], mac_installer_distribution: mac_installer_distribution)
+    def fetch_certificate(params: nil, working_directory: nil, specific_cert_type: nil)
+      cert_type = Match.cert_type_sym(specific_cert_type || params[:type])
 
       certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.p12")]
@@ -150,7 +151,7 @@ module Match
       if certs.count == 0 || keys.count == 0
         UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory, mac_installer_distribution: mac_installer_distribution)
+        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory, specific_cert_type: specific_cert_type)
         private_key_path = cert_path.gsub(".cer", ".p12")
 
         self.files_to_commit << cert_path

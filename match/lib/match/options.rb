@@ -26,11 +26,15 @@ module Match
                                          UI.user_error!("Unsupported environment #{value}, must be in #{Match.environments.join(', ')}")
                                        end
                                      end),
-        FastlaneCore::ConfigItem.new(key: :mac_installer_distribution,
-                                     env_name: "MATCH_MAC_INSTALLER_DISTRIBUTION",
-                                     description: "Create Mac Installer Distribution certificate",
-                                     type: Boolean,
-                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :additional_cert_types,
+                                     env_name: "CERT_TYPE",
+                                     description: "Create specific certificate type (takes precedence over :development)",
+                                     optional: true,
+                                     type: Array,
+                                     verify_block: proc do |values|
+                                       types = %w(mac_installer_distribution developer_id_installer)
+                                       UI.user_error!("Unsupported types, must be: #{types}") unless (values - types).empty?
+                                     end),
         FastlaneCore::ConfigItem.new(key: :readonly,
                                      env_name: "MATCH_READONLY",
                                      description: "Only fetch existing certificates and profiles, don't generate new ones",

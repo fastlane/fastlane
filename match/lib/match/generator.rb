@@ -3,15 +3,19 @@ require_relative 'module'
 module Match
   # Generate missing resources
   class Generator
-    def self.generate_certificate(params, cert_type, working_directory, mac_installer_distribution: false)
+    def self.generate_certificate(params, cert_type, working_directory, specific_cert_type: nil)
       require 'cert/runner'
       require 'cert/options'
 
       output_path = File.join(working_directory, "certs", cert_type.to_s)
 
+      if cert_type.to_sym == :developer_id_application
+        specific_cert_type = cert_type
+      end
+
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
         development: params[:type] == "development",
-        mac_installer_distribution: mac_installer_distribution,
+        type: specific_cert_type,
         generate_apple_certs: params[:generate_apple_certs],
         output_path: output_path,
         force: true, # we don't need a certificate without its private key, we only care about a new certificate
@@ -71,8 +75,14 @@ module Match
       }
 
       values[:platform] = params[:platform]
-      values[:adhoc] = true if prov_type == :adhoc
-      values[:development] = true if prov_type == :development
+      
+      if params[:type] == "developer_id"
+        values[:developer_id] = true
+      elsif prov_type == :adhoc
+        values[:adhoc] = true
+      elsif prov_type == :development
+        values[:development] = true
+      end
 
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, values)
 
@@ -83,6 +93,7 @@ module Match
 
     # @return the name of the provisioning profile type
     def self.profile_type_name(type)
+      return "Developer ID" if type == :developer_id
       return "Development" if type == :development
       return "AdHoc" if type == :adhoc
       return "AppStore" if type == :appstore
