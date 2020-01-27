@@ -91,7 +91,7 @@ module Gym
 
       # Catalyst projects will always have an "iphoneos" sdkroot
       # Need to force a same platform when trying to build as macos
-      if Gym.project.mac_catalyst? && Gym.config[:catalyst_platform] == "macos"
+      if Gym.building_mac_catalyst_for_mac?
         return true
       end
 
@@ -119,12 +119,9 @@ module Gym
       return configuration
     end
 
-    # rubocop:disable Metrics/PerceivedComplexity
     def detect_project_profile_mapping
       provisioning_profile_mapping = {}
       specified_configuration = detect_configuration_for_archive
-
-      is_building_mac_catalyst = Gym.project.mac_catalyst? && Gym.config[:catalyst_platform] == "macos"
 
       self.project.project_paths.each do |project_path|
         UI.verbose("Parsing project file '#{project_path}' to find selected provisioning profiles")
@@ -149,7 +146,7 @@ module Gym
               #
               # There are other platform filters besides "[sdk=macosx*]" that we could use but
               # this is the default that Xcode will use so this will also be our default
-              sdk_specifier = is_building_mac_catalyst ? "[sdk=macosx*]" : ""
+              sdk_specifier = Gym.building_mac_catalyst_for_mac? ? "[sdk=macosx*]" : ""
 
               # Look for sdk specific bundle identifier (if set) and fallback to general configuration if none
               bundle_identifier = build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER#{sdk_specifier}", target)
@@ -158,7 +155,7 @@ module Gym
 
               # Xcode prefixes "maccatalyst." if building a Catalyst app for mac and
               # if DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER is set to YES
-              if is_building_mac_catalyst && build_configuration.resolve_build_setting("DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER", target) == "YES"
+              if Gym.building_mac_catalyst_for_mac? && build_configuration.resolve_build_setting("DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER", target) == "YES"
                 bundle_identifier = "maccatalyst.#{bundle_identifier}"
               end
 

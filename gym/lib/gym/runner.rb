@@ -24,16 +24,8 @@ module Gym
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
       # Determine platform to archive
-      if Gym.project.mac_catalyst?
-        catalyst_platform = Gym.config[:catalyst_platform]
-        UI.user_error!(":catalyst_platform is a required option when building a Catalyst app. Valid values: ios, macos") if catalyst_platform.nil?
-
-        is_ios = catalyst_platform == 'ios'
-        is_mac = catalyst_platform == 'macos'
-      else
-        is_ios = Gym.project.ios? || Gym.project.tvos?
-        is_mac = Gym.project.mac?
-      end
+      is_mac = Gym.project.mac? || Gym.building_mac_catalyst_for_mac?
+      is_ios = !is_mac && (Gym.project.ios? || Gym.project.tvos?)
 
       # Archive
       if is_ios
@@ -50,7 +42,7 @@ module Gym
       elsif is_mac
         path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
-        if Gym.project.mac_app? || Gym.project.mac_catalyst?
+        if Gym.project.mac_app? || Gym.building_mac_catalyst_for_mac?
           path = copy_mac_app
           return path if Gym.config[:skip_package_pkg]
 

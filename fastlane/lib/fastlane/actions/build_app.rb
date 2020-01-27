@@ -72,8 +72,8 @@ module Fastlane
 
         absolute_output_path = File.expand_path(gym_output_path)
 
-        absolute_dsym_path = absolute_output_path.gsub(".ipa", ".app.dSYM.zip") if File.extname(absolute_output_path) == ".ipa"
-        absolute_dsym_path = absolute_output_path.gsub(".pkg", ".dSYM.zip") if File.extname(absolute_output_path) == ".pkg"
+        absolute_dsym_path = absolute_output_path.gsub(/.ipa$/, ".app.dSYM.zip") if File.extname(absolute_output_path) == ".ipa"
+        absolute_dsym_path = absolute_output_path.gsub(/.pkg$/, ".dSYM.zip") if File.extname(absolute_output_path) == ".pkg"
 
         # This might be the mac app path, so we don't want to set it here
         # https://github.com/fastlane/fastlane/issues/5757
@@ -141,8 +141,8 @@ module Fastlane
             sdk: "iOS 11.1"                  # use SDK as the name or path of the base SDK when building the project.
           )',
           'gym              # alias for "build_app"',
-          'build_ios_app    # alias for "build_app"',
-          'build_mac_app    # alias for "build_app"'
+          'build_ios_app    # alias for "build_app (only iOS options)"',
+          'build_mac_app    # alias for "build_app (only macOS options)"'
         ]
       end
 

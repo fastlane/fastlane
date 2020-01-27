@@ -103,6 +103,8 @@ module Gym
 
     # Detects name of a "3rd Party Mac Developer Installer" cert for the configured team id
     def self.detect_third_party_installer
+      return if Gym.config[:mac_app_installer_cert_name]
+
       team_id = Gym.config[:export_team_id] || Gym.project.build_settings(key: "DEVELOPMENT_TEAM")
       return if team_id.nil?
 
@@ -134,16 +136,7 @@ module Gym
     # Is it an iOS device or a Mac?
     def self.detect_platform
       return if Gym.config[:destination]
-      platform = if Gym.project.mac_catalyst?
-                   case Gym.config[:catalyst_platform]
-                   when 'ios'
-                     "iOS"
-                   when 'macos'
-                     "macOS"
-                   else
-                     UI.user_error!(":catalyst_platform is a required option when building a Catalyst app. Valid values: ios, macos")
-                   end
-                 elsif Gym.project.mac?
+      platform = if Gym.project.mac? || Gym.building_mac_catalyst_for_mac?
                    min_xcode8? ? "macOS" : "OS X"
                  elsif Gym.project.tvos?
                    "tvOS"

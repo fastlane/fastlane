@@ -273,7 +273,7 @@ module FastlaneCore
       (framework? && build_settings(key: "PLATFORM_NAME") == "macosx")
     end
 
-    def mac_catalyst?
+    def supports_mac_catalyst?
       build_settings(key: "SUPPORTS_MACCATALYST") == "YES"
     end
 
