@@ -80,7 +80,7 @@ module Match
       # Verify the App ID (as we don't want 'match' to fail at a later point)
       if spaceship
         app_identifiers.each do |app_identifier|
-          spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier)
+          spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier, platform: params[:platform])
         end
       end
 

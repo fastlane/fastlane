@@ -28,8 +28,8 @@ module Match
       return Spaceship.client.team_id
     end
 
-    def bundle_identifier_exists(username: nil, app_identifier: nil)
-      found = Spaceship.app.find(app_identifier)
+    def bundle_identifier_exists(username: nil, app_identifier: nil, platform: nil)
+      found = Spaceship.app.find(app_identifier, mac: platform == "macos")
       return if found
 
       require 'sigh/runner'
