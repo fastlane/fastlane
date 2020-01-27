@@ -75,7 +75,7 @@ module Match
       }
 
       values[:platform] = params[:platform]
-      
+
       if params[:type] == "developer_id"
         values[:developer_id] = true
       elsif prov_type == :adhoc
