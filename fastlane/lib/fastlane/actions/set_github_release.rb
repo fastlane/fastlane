@@ -241,7 +241,7 @@ module Fastlane
       end
 
       def self.return_type
-        :hash_of_strings
+        :hash
       end
 
       def self.authors
