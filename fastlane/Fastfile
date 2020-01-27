@@ -386,7 +386,7 @@ lane :update_docs do |options|
   end
 
   template_path = File.expand_path("./assets/render_plugin.md.erb")
-  clone_docs(debug: debug, version: version) do
+  clone_docs(debug: debug) do
     plugin_scores_cache_path = File.expand_path("./plugin_scores_cache.yml")
     docs_path = generate_markdown_docs(target_path: ".")
     yml_path = File.expand_path("./mkdocs.yml")
