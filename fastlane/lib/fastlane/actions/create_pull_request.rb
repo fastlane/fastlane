@@ -43,6 +43,9 @@ module Fastlane
           # Add reviewers to pull request
           add_reviewers(params, number) if params[:reviewers] || params[:team_reviewers]
 
+          # Add a milestone to pull request
+          add_milestone(params, number) if params[:milestone]
+
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_NUMBER] = number
           return html_url
@@ -111,6 +114,27 @@ module Fastlane
         )
       end
 
+      def self.add_milestone(params, number)
+        payload = {}
+        if params[:milestone]
+          payload["milestone"] = params[:milestone]
+        end
+
+        GithubApiAction.run(
+          server_url: params[:api_url],
+          api_token: params[:api_token],
+          http_method: 'PATCH',
+          path: "repos/#{params[:repo]}/issues/#{number}",
+          body: payload,
+          error_handlers: {
+              '*' => proc do |result|
+                UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")
+                return nil
+              end
+          }
+        )
+      end
+
       #####################################################
       # @!group Documentation
       #####################################################
@@ -156,6 +180,11 @@ module Fastlane
                                        env_name: "GITHUB_PULL_REQUEST_LABELS",
                                        description: "The labels for the pull request",
                                        type: Array,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :milestone,
+                                       env_name: "GITHUB_PULL_REQUEST_MILESTONE",
+                                       description: "The milestone ID (Integer) for the pull request",
+                                       type: Numeric,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :head,
                                        env_name: "GITHUB_PULL_REQUEST_HEAD",
