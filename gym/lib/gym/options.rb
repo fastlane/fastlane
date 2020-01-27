@@ -258,7 +258,7 @@ module Gym
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :cloned_source_packages_path,
                                      env_name: "GYM_CLONED_SOURCE_PACKAGES_PATH",
-                                     description: "Sets a custom path Swift Package Manager dependencies",
+                                     description: "Sets a custom path for Swift Package Manager dependencies",
                                      type: String,
                                      optional: true)
       ]
