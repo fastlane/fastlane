@@ -327,7 +327,8 @@ describe FastlaneCore do
       it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos on Xcode >= 8.3" do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
-        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
+        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
         command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2> /dev/null"
         expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: false }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
@@ -336,7 +337,8 @@ describe FastlaneCore do
       it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos on Xcode < 8.3" do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
-        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
+        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(false)
         command = "xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2> /dev/null"
         expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: false }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
@@ -493,6 +495,36 @@ describe FastlaneCore do
           xcconfig: "/path/to/some.xcconfig"
         })
         command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -xcconfig /path/to/some.xcconfig"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
+    end
+
+    describe 'xcodebuild command for SwiftPM', requires_xcode: true do
+      it 'generates an xcodebuild -resolvePackageDependencies command with Xcode >= 11' do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+        project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
+        command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+        expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+      end
+
+      it 'generates an xcodebuild -resolvePackageDependencies command with a custom resolving path with Xcode >= 11' do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          cloned_source_packages_path: "./path/to/resolve"
+        })
+        command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -clonedSourcePackagesDirPath ./path/to/resolve"
+        expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+      end
+
+      it 'build_settings() should not add SPM path if Xcode < 11' do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
+        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          cloned_source_packages_path: "./path/to/resolve"
+        })
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
         expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
       end
     end
