@@ -398,7 +398,12 @@ module Scan
                                     description: "Allows for override of the default `xcodebuild` command",
                                     type: String,
                                     optional: true,
-                                    default_value: "env NSUnbufferedIO=YES xcodebuild")
+                                    default_value: "env NSUnbufferedIO=YES xcodebuild"),
+        FastlaneCore::ConfigItem.new(key: :cloned_source_packages_path,
+                                    env_name: "SCAN_CLONED_SOURCE_PACKAGES_PATH",
+                                    description: "Sets a custom path for Swift Package Manager dependencies",
+                                    type: String,
+                                    optional: true)
 
       ]
     end
