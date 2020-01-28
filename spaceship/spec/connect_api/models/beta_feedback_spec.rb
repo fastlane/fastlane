@@ -46,4 +46,11 @@ describe Spaceship::ConnectAPI::BetaFeedback do
       expect(model.screenshots.first.image_assets.first["height"]).to eq(4032)
     end
   end
+
+  it "deletes a feedback" do
+    response = Spaceship::ConnectAPI.get_beta_feedback
+    feedback = response.first
+    expect(Spaceship::ConnectAPI).to receive(:delete_beta_feedback).with(feedback_id: feedback.id)
+    feedback.delete!
+  end
 end
