@@ -8,7 +8,6 @@ module Fastlane
     end
 
     class BuildAppAction < Action
-      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(values)
         require 'gym'
 
@@ -72,22 +71,27 @@ module Fastlane
 
         absolute_output_path = File.expand_path(gym_output_path)
 
-        absolute_dsym_path = absolute_output_path.gsub(/.ipa$/, ".app.dSYM.zip") if File.extname(absolute_output_path) == ".ipa"
-        absolute_dsym_path = absolute_output_path.gsub(/.pkg$/, ".dSYM.zip") if File.extname(absolute_output_path) == ".pkg"
+        # Binary path
+        if File.extname(absolute_output_path) == ".ipa"
+          absolute_dsym_path = absolute_output_path.gsub(/.ipa$/, ".app.dSYM.zip")
 
-        # This might be the mac app path, so we don't want to set it here
-        # https://github.com/fastlane/fastlane/issues/5757
-        if absolute_output_path.include?(".ipa")
           Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] = absolute_output_path
           ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_output_path # for deliver
-        elsif absolute_output_path.include?(".pkg")
+        elsif File.extname(absolute_output_path) == ".pkg"
+          absolute_dsym_path = absolute_output_path.gsub(/.pkg$/, ".dSYM.zip")
+
           Actions.lane_context[SharedValues::PKG_OUTPUT_PATH] = absolute_output_path
           ENV[SharedValues::PKG_OUTPUT_PATH.to_s] = absolute_output_path # for deliver
         end
 
-        Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path if absolute_dsym_path && File.exist?(absolute_dsym_path)
+        # xcarchive path
         Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE] = Gym::BuildCommandGenerator.archive_path
-        ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path if absolute_dsym_path && File.exist?(absolute_dsym_path)
+
+        # dSYM path
+        if absolute_dsym_path && File.exist?(absolute_dsym_path)
+          Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = absolute_dsym_path
+          ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path
+        end
 
         return absolute_output_path
       end

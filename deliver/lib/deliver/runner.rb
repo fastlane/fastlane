@@ -146,8 +146,10 @@ module Deliver
 
       # 2020-01-27
       # Only verify platform if if both ipa and pkg exists (for backwards support)
-      upload_ipa = ["ios", "appletvos"].include?(options[:platform]) if options[:ipa] && options[:pkg]
-      upload_pkg = options[:platform] == "osx" if options[:ipa] && options[:pkg]
+      if upload_ipa && upload_pkg
+        upload_ipa = ["ios", "appletvos"].include?(options[:platform])
+        upload_pkg = options[:platform] == "osx"
+      end
 
       if upload_ipa
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
