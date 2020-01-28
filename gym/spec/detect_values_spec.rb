@@ -110,40 +110,40 @@ eos
         options = { project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-        mac_app_installer_cert_name = Gym.config[:mac_app_installer_cert_name]
-        expect(mac_app_installer_cert_name).to eq(nil)
+        installer_cert_name = Gym.config[:installer_cert_name]
+        expect(installer_cert_name).to eq(nil)
       end
 
       describe "using export_team_id" do
-        let(:options) { { project: "./gym/examples/multipleSchemes/Example.xcodeproj", export_team_id: team_id } }
+        let(:options) { { project: "./gym/examples/multipleSchemes/Example.xcodeproj", export_team_id: team_id, export_method: "app-store" } }
 
         it "finds installer cert from list with 2 matching and 1 non-matching" do
           expect(FastlaneCore::Helper).to receive(:backticks).with("security find-certificate -a -c \"3rd Party Mac Developer Installer: \"", print: false).and_return(output_2_matching_1_nonmatching)
           Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-          mac_app_installer_cert_name = Gym.config[:mac_app_installer_cert_name]
-          expect(mac_app_installer_cert_name).to eq("3rd Party Mac Developer Installer: #{team_name} (#{team_id})")
+          installer_cert_name = Gym.config[:installer_cert_name]
+          expect(installer_cert_name).to eq("3rd Party Mac Developer Installer: #{team_name} (#{team_id})")
         end
 
         it "does not find installer cert from list with 1 non-matching" do
           expect(FastlaneCore::Helper).to receive(:backticks).with("security find-certificate -a -c \"3rd Party Mac Developer Installer: \"", print: false).and_return(output_1_nonmatching)
           Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-          mac_app_installer_cert_name = Gym.config[:mac_app_installer_cert_name]
-          expect(mac_app_installer_cert_name).to eq(nil)
+          installer_cert_name = Gym.config[:installer_cert_name]
+          expect(installer_cert_name).to eq(nil)
         end
 
         it "does not installer cert from empty list" do
           expect(FastlaneCore::Helper).to receive(:backticks).with("security find-certificate -a -c \"3rd Party Mac Developer Installer: \"", print: false).and_return(output_none)
           Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-          mac_app_installer_cert_name = Gym.config[:mac_app_installer_cert_name]
-          expect(mac_app_installer_cert_name).to eq(nil)
+          installer_cert_name = Gym.config[:installer_cert_name]
+          expect(installer_cert_name).to eq(nil)
         end
       end
 
       describe "using DEVELOPMENT_TEAM builds setting" do
-        let(:options) { { project: "./gym/examples/multipleSchemes/Example.xcodeproj" } }
+        let(:options) { { project: "./gym/examples/multipleSchemes/Example.xcodeproj", export_method: "app-store" } }
 
         before do
           allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).with(anything).and_call_original
@@ -154,24 +154,24 @@ eos
           expect(FastlaneCore::Helper).to receive(:backticks).with("security find-certificate -a -c \"3rd Party Mac Developer Installer: \"", print: false).and_return(output_2_matching_1_nonmatching)
           Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-          mac_app_installer_cert_name = Gym.config[:mac_app_installer_cert_name]
-          expect(mac_app_installer_cert_name).to eq("3rd Party Mac Developer Installer: #{team_name} (#{team_id})")
+          installer_cert_name = Gym.config[:installer_cert_name]
+          expect(installer_cert_name).to eq("3rd Party Mac Developer Installer: #{team_name} (#{team_id})")
         end
 
         it "does not find installer cert from list with 1 non-matching" do
           expect(FastlaneCore::Helper).to receive(:backticks).with("security find-certificate -a -c \"3rd Party Mac Developer Installer: \"", print: false).and_return(output_1_nonmatching)
           Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-          mac_app_installer_cert_name = Gym.config[:mac_app_installer_cert_name]
-          expect(mac_app_installer_cert_name).to eq(nil)
+          installer_cert_name = Gym.config[:installer_cert_name]
+          expect(installer_cert_name).to eq(nil)
         end
 
         it "does not installer cert from empty list" do
           expect(FastlaneCore::Helper).to receive(:backticks).with("security find-certificate -a -c \"3rd Party Mac Developer Installer: \"", print: false).and_return(output_none)
           Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-          mac_app_installer_cert_name = Gym.config[:mac_app_installer_cert_name]
-          expect(mac_app_installer_cert_name).to eq(nil)
+          installer_cert_name = Gym.config[:installer_cert_name]
+          expect(installer_cert_name).to eq(nil)
         end
       end
     end

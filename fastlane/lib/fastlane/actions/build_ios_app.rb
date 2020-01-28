@@ -7,7 +7,7 @@ module Fastlane
         :pkg,
         :skip_package_pkg,
         :catalyst_platform,
-        :mac_app_installer_cert_name
+        :installer_cert_name
       ]
 
       def self.run(params)
