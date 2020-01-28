@@ -3,7 +3,7 @@ module Fastlane
   module Actions
     class UpdateCodeSigningSettingsAction < Action
       def self.run(params)
-        FastlaneCore::PrintTable.print_values(config: params, title: "Summary for codesigning settings")
+        FastlaneCore::PrintTable.print_values(config: params, title: "Summary for code signing settings")
         path = params[:path]
         path = File.join(File.expand_path(path), "project.pbxproj")
 
@@ -167,7 +167,6 @@ module Fastlane
             path: "demo-project/demo/demo.xcodeproj",
             use_automatic_signing: true
           )'
-
         ]
       end
 
