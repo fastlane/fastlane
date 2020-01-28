@@ -1,11 +1,9 @@
 require 'xcodeproj'
 module Fastlane
   module Actions
-    class AutomaticCodeSigningAction < Action
+    class UpdateCodeSigningSettingsAction < Action
       def self.run(params)
-        UI.important("The `automatic_code_signing` action has been deprecated,")
-        UI.important("Please use `update_code_signing_settings` action instead.")
-        FastlaneCore::PrintTable.print_values(config: params, title: "Summary for Automatic Codesigning")
+        FastlaneCore::PrintTable.print_values(config: params, title: "Summary for codesigning settings")
         path = params[:path]
         path = File.join(File.expand_path(path), "project.pbxproj")
 
@@ -96,14 +94,6 @@ module Fastlane
         params[:use_automatic_signing]
       end
 
-      def self.alias_used(action_alias, params)
-        params[:use_automatic_signing] = true if action_alias == "enable_automatic_code_signing"
-      end
-
-      def self.aliases
-        ["enable_automatic_code_signing", "disable_automatic_code_signing"]
-      end
-
       def self.description
         "Configures Xcode's Codesigning options"
       end
@@ -167,34 +157,13 @@ module Fastlane
 
       def self.example_code
         [
-          '# enable automatic code signing
-          enable_automatic_code_signing',
-          'enable_automatic_code_signing(
-            path: "demo-project/demo/demo.xcodeproj"
-          )',
-          '# disable automatic code signing
-          disable_automatic_code_signing',
-          'disable_automatic_code_signing(
-            path: "demo-project/demo/demo.xcodeproj"
-          )',
-          '# also set team id
-          disable_automatic_code_signing(
-            path: "demo-project/demo/demo.xcodeproj",
-            team_id: "XXXX"
-          )',
-          '# Only specific targets
-          disable_automatic_code_signing(
-            path: "demo-project/demo/demo.xcodeproj",
-            use_automatic_signing: false,
-            targets: ["demo"]
-          )
-          ',
-          ' # via generic action
-          automatic_code_signing(
+          ' # manual code signing
+          update_code_signing_settings(
             path: "demo-project/demo/demo.xcodeproj",
             use_automatic_signing: false
           )',
-          'automatic_code_signing(
+          ' # auto code signing
+          update_code_signing_settings(
             path: "demo-project/demo/demo.xcodeproj",
             use_automatic_signing: true
           )'
@@ -204,11 +173,6 @@ module Fastlane
 
       def self.category
         :code_signing
-        :deprecated
-      end
-
-      def self.deprecated_notes
-        "Please use `update_code_signing_settings` action instead."
       end
 
       def self.return_value
@@ -216,7 +180,7 @@ module Fastlane
       end
 
       def self.authors
-        ["mathiasAichinger", "hjanuschka", "p4checo", "portellaa", "aeons"]
+        ["mathiasAichinger", "hjanuschka", "p4checo", "portellaa", "aeons", "att55"]
       end
 
       def self.is_supported?(platform)
