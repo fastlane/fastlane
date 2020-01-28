@@ -121,7 +121,7 @@ module Match
       end
 
       # Gets the main and additional cert types
-      cert_types += (params[:additional_cert_types] || []).each do |ct|
+      cert_types += (params[:additional_cert_types] || []).map do |ct|
         Match.cert_type_sym(ct)
       end
 
@@ -266,24 +266,33 @@ module Match
       case type.to_sym
       when :mac_installer_distribution
         return [Spaceship.certificate.mac_installer_distribution]
+      when :distribution
+        return [Spaceship.certificate.production, Spaceship.certificate.apple_distribution]
+      when :development
+        return [Spaceship.certificate.development, Spaceship.certificate.apple_development]
+      when :enterprise
+        return [Spaceship.certificate.in_house]
+      else
+        raise "Unknown type '#{type}'"
       end
-
-      {
-        distribution: [Spaceship.certificate.production, Spaceship.certificate.apple_distribution],
-        development:  [Spaceship.certificate.development, Spaceship.certificate.apple_development],
-        enterprise:   [Spaceship.certificate.in_house]
-      }[type] ||= raise "Unknown type '#{type}'"
     end
 
     # The kind of provisioning profile we're interested in
     def profile_type(prov_type)
-      {
-        appstore:     Spaceship.provisioning_profile.app_store,
-        development:  Spaceship.provisioning_profile.development,
-        enterprise:   Spaceship.provisioning_profile.in_house,
-        adhoc:        Spaceship.provisioning_profile.ad_hoc,
-        developer_id: Spaceship.provisioning_profile.direct
-      }[prov_type] ||= raise "Unknown provisioning type '#{prov_type}'"
+      case prov_type.to_sym
+      when :appstore
+        return Spaceship.provisioning_profile.app_store
+      when :development
+        return Spaceship.provisioning_profile.development
+      when :enterprise
+        return Spaceship.provisioning_profile.in_house
+      when :adhoc
+        return Spaceship.provisioning_profile.ad_hoc
+      when :developer_id
+        return Spaceship.provisioning_profile.direct
+      else
+        raise "Unknown provisioning type '#{prov_type}'"
+      end
     end
   end
 end

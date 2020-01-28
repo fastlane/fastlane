@@ -86,14 +86,17 @@ module Match
 
       # Certificate
       cert_id = fetch_certificate(params: params, working_directory: storage.working_directory)
-      spaceship.certificate_exists(username: params[:username], certificate_id: cert_id, platform: params[:platform]) if spaceship
+      # spaceship.certificate_exists(username: params[:username], certificate_id: cert_id, platform: params[:platform]) if spaceship
 
       # Mac Installer Distribution Certificate
       additional_cert_types = params[:additional_cert_types] || []
-      additional_cert_types.each do |additional_cert_type|
-        installer_cert_id = fetch_certificate(params: params, working_directory: storage.working_directory, specific_cert_type: additional_cert_type)
-        spaceship.certificate_exists(username: params[:username], certificate_id: installer_cert_id, platform: params[:platform]) if spaceship
-      end
+      cert_ids = additional_cert_types.map do |additional_cert_type|
+        fetch_certificate(params: params, working_directory: storage.working_directory, specific_cert_type: additional_cert_type)
+        # spaceship.certificate_exists(username: params[:username], certificate_id: installer_cert_id, platform: params[:platform]) if spaceship
+      end || []
+
+      cert_ids << cert_id
+      spaceship.certificates_exists(username: params[:username], certificate_ids: cert_ids, platform: params[:platform]) if spaceship
 
       # Provisioning Profiles
       unless params[:skip_provisioning_profiles]

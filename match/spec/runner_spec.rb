@@ -83,7 +83,7 @@ describe Match do
           spaceship = "spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
-          expect(spaceship).to receive(:certificate_exists).and_return(true)
+          expect(spaceship).to receive(:certificates_exists).and_return(true)
           expect(spaceship).to receive(:profile_exists).and_return(true)
           expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 
@@ -157,7 +157,7 @@ describe Match do
           spaceship = "spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
-          expect(spaceship).to receive(:certificate_exists).and_return(true)
+          expect(spaceship).to receive(:certificates_exists).and_return(true)
           expect(spaceship).to receive(:profile_exists).and_return(true)
           expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 
@@ -292,7 +292,7 @@ describe Match do
           spaceship = "spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
-          expect(spaceship).to receive(:certificate_exists).and_return(true)
+          expect(spaceship).to receive(:certificates_exists).and_return(true)
           expect(spaceship).to_not(receive(:profile_exists))
           expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 

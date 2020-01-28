@@ -45,13 +45,15 @@ module Match
       UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")
     end
 
-    def certificate_exists(username: nil, certificate_id: nil, platform: nil)
-      found = Spaceship.certificate.all(mac: platform == "macos").find do |cert|
-        cert.id == certificate_id
+    def certificates_exists(username: nil, certificate_ids: [], platform: nil)
+      Spaceship.certificate.all(mac: platform == "macos").each do |cert|
+        certificate_ids.delete(cert.id)
       end
-      return if found
+      return if certificate_ids.empty?
 
-      UI.error("Certificate '#{certificate_id}' (stored in your storage) is not available on the Developer Portal")
+      certificate_ids.each do |certificate_id|
+        UI.error("Certificate '#{certificate_id}' (stored in your storage) is not available on the Developer Portal")
+      end
       UI.error("for the user #{username}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
       UI.error("Git repository. This might be caused by revoking the certificate on the Dev Portal")
