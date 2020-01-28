@@ -9,6 +9,7 @@ module Match
 
       output_path = File.join(working_directory, "certs", cert_type.to_s)
 
+      # Mapping match option to cert option for "Developer ID Application"
       if cert_type.to_sym == :developer_id_application
         specific_cert_type = cert_type
       end
@@ -76,6 +77,7 @@ module Match
 
       values[:platform] = params[:platform]
 
+      # These options are all conflicting so can only set one
       if params[:type] == "developer_id"
         values[:developer_id] = true
       elsif prov_type == :adhoc

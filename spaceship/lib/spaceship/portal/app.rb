@@ -112,7 +112,7 @@ module Spaceship
             app if app.bundle_id.casecmp(bundle_id) == 0
           end
 
-          # Find catalyst enabled mac apps
+          # Find catalyst enabled mac apps (look for mac first and then iOS)
           if !found_app && mac
             found_app = all(mac: false).find do |app|
               app if app.bundle_id.casecmp(bundle_id) == 0

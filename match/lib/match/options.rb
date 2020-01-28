@@ -27,8 +27,8 @@ module Match
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :additional_cert_types,
-                                     env_name: "CERT_TYPE",
-                                     description: "Create specific certificate type (takes precedence over :development)",
+                                     env_name: "MATCH_ADDITIONAL_CERT_TYPES",
+                                     description: "Create additional cert types needed for macOS installers (valid values: mac_installer_distribution, developer_id_installer)",
                                      optional: true,
                                      type: Array,
                                      verify_block: proc do |values|

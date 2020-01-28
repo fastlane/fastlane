@@ -113,16 +113,19 @@ module Match
         UI.user_error!("Enterprise account nuke cancelled") unless UI.confirm("Do you really want to nuke your Enterprise account?")
       end
 
+      # Get all iOS and macOS profile
       self.profiles = []
       prov_types.each do |prov_type|
         self.profiles += profile_type(prov_type).all(mac: false)
         self.profiles += profile_type(prov_type).all(mac: true)
       end
 
+      # Gets the main and additional cert types
       cert_types += (params[:additional_cert_types] || []).each do |ct|
         Match.cert_type_sym(ct)
       end
 
+      # Gets all the certs form the cert types
       self.certs = []
       self.certs += cert_types.map do |ct|
         certificate_type(ct).flat_map do |cert|
@@ -130,6 +133,7 @@ module Match
         end
       end.flatten
 
+      # Finds all the .cer and .p12 files in the file storage
       certs = []
       keys = []
       cert_types.each do |ct|
@@ -137,6 +141,7 @@ module Match
         keys += Dir[File.join(self.storage.working_directory, "**", ct.to_s, "*.p12")]
       end
 
+      # Finds all the iOS and macOS profofiles in the file storage
       profiles = []
       prov_types.each do |prov_type|
         profiles += Dir[File.join(self.storage.working_directory, "**", prov_type.to_s, "*.mobileprovision")]

@@ -64,6 +64,7 @@ module Match
         profile.uuid == uuid
       end
 
+      # Look for iOS after looking for macOS (needed for Catalyst apps)
       if !found && is_mac
         found = Spaceship.provisioning_profile.all(mac: false).find do |profile|
           profile.uuid == uuid
