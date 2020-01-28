@@ -11,7 +11,7 @@ module Match
 
       # Mapping match option to cert option for "Developer ID Application"
       if cert_type.to_sym == :developer_id_application
-        specific_cert_type = cert_type
+        specific_cert_type = cert_type.to_s
       end
 
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
@@ -95,7 +95,7 @@ module Match
 
     # @return the name of the provisioning profile type
     def self.profile_type_name(type)
-      return "Developer ID" if type == :developer_id
+      return "Direct" if type == :developer_id
       return "Development" if type == :development
       return "AdHoc" if type == :adhoc
       return "AppStore" if type == :appstore
