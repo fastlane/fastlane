@@ -93,10 +93,11 @@ module Match
     def prepare_list
       UI.message("Fetching certificates and profiles...")
       cert_type = Match.cert_type_sym(type)
+      cert_types = [cert_type]
 
       prov_types = []
       prov_types = [:development] if cert_type == :development
-      prov_types = [:appstore, :adhoc] if cert_type == :distribution
+      prov_types = [:appstore, :adhoc, :developer_id] if cert_type == :distribution
       prov_types = [:enterprise] if cert_type == :enterprise
 
       Spaceship.login(params[:username])
@@ -112,17 +113,39 @@ module Match
         UI.user_error!("Enterprise account nuke cancelled") unless UI.confirm("Do you really want to nuke your Enterprise account?")
       end
 
-      self.certs = certificate_type(cert_type).flat_map(&:all)
+      # Get all iOS and macOS profile
       self.profiles = []
       prov_types.each do |prov_type|
-        self.profiles += profile_type(prov_type).all
+        self.profiles += profile_type(prov_type).all(mac: false)
+        self.profiles += profile_type(prov_type).all(mac: true)
       end
 
-      certs = Dir[File.join(self.storage.working_directory, "**", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(self.storage.working_directory, "**", cert_type.to_s, "*.p12")]
+      # Gets the main and additional cert types
+      cert_types += (params[:additional_cert_types] || []).map do |ct|
+        Match.cert_type_sym(ct)
+      end
+
+      # Gets all the certs form the cert types
+      self.certs = []
+      self.certs += cert_types.map do |ct|
+        certificate_type(ct).flat_map do |cert|
+          cert.all(mac: false) + cert.all(mac: true)
+        end
+      end.flatten
+
+      # Finds all the .cer and .p12 files in the file storage
+      certs = []
+      keys = []
+      cert_types.each do |ct|
+        certs += Dir[File.join(self.storage.working_directory, "**", ct.to_s, "*.cer")]
+        keys += Dir[File.join(self.storage.working_directory, "**", ct.to_s, "*.p12")]
+      end
+
+      # Finds all the iOS and macOS profofiles in the file storage
       profiles = []
       prov_types.each do |prov_type|
         profiles += Dir[File.join(self.storage.working_directory, "**", prov_type.to_s, "*.mobileprovision")]
+        profiles += Dir[File.join(self.storage.working_directory, "**", prov_type.to_s, "*.provisionprofile")]
       end
 
       self.files = certs + keys + profiles
@@ -240,21 +263,36 @@ module Match
 
     # The kind of certificate we're interested in
     def certificate_type(type)
-      {
-        distribution: [Spaceship.certificate.production, Spaceship.certificate.apple_distribution],
-        development:  [Spaceship.certificate.development, Spaceship.certificate.apple_development],
-        enterprise:   [Spaceship.certificate.in_house]
-      }[type] ||= raise "Unknown type '#{type}'"
+      case type.to_sym
+      when :mac_installer_distribution
+        return [Spaceship.certificate.mac_installer_distribution]
+      when :distribution
+        return [Spaceship.certificate.production, Spaceship.certificate.apple_distribution]
+      when :development
+        return [Spaceship.certificate.development, Spaceship.certificate.apple_development]
+      when :enterprise
+        return [Spaceship.certificate.in_house]
+      else
+        raise "Unknown type '#{type}'"
+      end
     end
 
     # The kind of provisioning profile we're interested in
     def profile_type(prov_type)
-      {
-        appstore:    Spaceship.provisioning_profile.app_store,
-        development: Spaceship.provisioning_profile.development,
-        enterprise:  Spaceship.provisioning_profile.in_house,
-        adhoc:       Spaceship.provisioning_profile.ad_hoc
-      }[prov_type] ||= raise "Unknown provisioning type '#{prov_type}'"
+      case prov_type.to_sym
+      when :appstore
+        return Spaceship.provisioning_profile.app_store
+      when :development
+        return Spaceship.provisioning_profile.development
+      when :enterprise
+        return Spaceship.provisioning_profile.in_house
+      when :adhoc
+        return Spaceship.provisioning_profile.ad_hoc
+      when :developer_id
+        return Spaceship.provisioning_profile.direct
+      else
+        raise "Unknown provisioning type '#{prov_type}'"
+      end
     end
   end
 end

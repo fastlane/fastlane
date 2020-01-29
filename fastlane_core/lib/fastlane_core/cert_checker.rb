@@ -10,6 +10,7 @@ module FastlaneCore
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
       ids = installed_identies(in_keychain: in_keychain)
+      ids += installed_installers(in_keychain: in_keychain)
       finger_print = sha1_fingerprint(path)
 
       return ids.include?(finger_print)
@@ -47,8 +48,35 @@ module FastlaneCore
       return ids
     end
 
+    def self.installed_installers(in_keychain: nil)
+      available = self.list_available_third_party_mac_installer(in_keychain: in_keychain)
+      available += self.list_available_developer_id_installer(in_keychain: in_keychain)
+
+      return available.scan(/^SHA-1 hash: ([[:xdigit:]]+)$/).flatten
+    end
+
     def self.list_available_identities(in_keychain: nil)
+      # -v  Show valid identities only (default is to show all identities)
+      # -p  Specify policy to evaluate
       commands = ['security find-identity -v -p codesigning']
+      commands << in_keychain if in_keychain
+      `#{commands.join(' ')}`
+    end
+
+    def self.list_available_third_party_mac_installer(in_keychain: nil)
+      # -Z  Print SHA-256 (and SHA-1) hash of the certificate
+      # -a  Find all matching certificates, not just the first one
+      # -c  Match on "name" when searching (optional)
+      commands = ['security find-certificate -Z -a -c "3rd Party Mac Developer Installer"']
+      commands << in_keychain if in_keychain
+      `#{commands.join(' ')}`
+    end
+
+    def self.list_available_developer_id_installer(in_keychain: nil)
+      # -Z  Print SHA-256 (and SHA-1) hash of the certificate
+      # -a  Find all matching certificates, not just the first one
+      # -c  Match on "name" when searching (optional)
+      commands = ['security find-certificate -Z -a -c "Developer ID Installer"']
       commands << in_keychain if in_keychain
       `#{commands.join(' ')}`
     end

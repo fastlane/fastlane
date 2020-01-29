@@ -13,12 +13,21 @@ module Cert
         FastlaneCore::ConfigItem.new(key: :development,
                                      env_name: "CERT_DEVELOPMENT",
                                      description: "Create a development certificate instead of a distribution one",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :type,
+                                     env_name: "CERT_TYPE",
+                                     description: "Create specific certificate type (takes precedence over :development)",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       value = value.to_s
+                                       types = %w(mac_installer_distribution developer_id_installer developer_id_application)
+                                       UI.user_error!("Unsupported types, must be: #{types}") unless types.include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "CERT_FORCE",
                                      description: "Create a certificate even if an existing certificate exists",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :generate_apple_certs,
                                      env_name: "CERT_GENERATE_APPLE_CERTS",
@@ -58,8 +67,7 @@ module Cert
                                      short_option: "-q",
                                      env_name: "CERT_FILE_NAME",
                                      optional: true,
-                                     description: "The filename of certificate to store",
-                                     is_string: true),
+                                     description: "The filename of certificate to store"),
         FastlaneCore::ConfigItem.new(key: :output_path,
                                      short_option: "-o",
                                      env_name: "CERT_OUTPUT_PATH",
@@ -85,7 +93,6 @@ module Cert
         FastlaneCore::ConfigItem.new(key: :platform,
                                      env_name: "CERT_PLATFORM",
                                      description: "Set the provisioning profile's platform (ios, macos)",
-                                     is_string: false,
                                      default_value: "ios",
                                      verify_block: proc do |value|
                                        value = value.to_s
