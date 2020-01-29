@@ -1,7 +1,10 @@
 protocol MatchfileProtocol: class {
 
-  /// Define the profile type, can be appstore, adhoc, development, enterprise
+  /// Define the profile type, can be appstore, adhoc, development, enterprise, developer_id
   var type: String { get }
+
+  /// Create additional cert types needed for macOS installers (valid values: mac_installer_distribution, developer_id_installer)
+  var additionalCertTypes: [String]? { get }
 
   /// Only fetch existing certificates and profiles, don't generate new ones
   var readonly: Bool { get }
@@ -78,7 +81,7 @@ protocol MatchfileProtocol: class {
   /// Skip generation of a README.md for the created git repository
   var skipDocs: Bool { get }
 
-  /// Set the provisioning profile's platform to work with (i.e. ios, tvos)
+  /// Set the provisioning profile's platform to work with (i.e. ios, tvos, macos)
   var platform: String { get }
 
   /// The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
@@ -93,6 +96,7 @@ protocol MatchfileProtocol: class {
 
 extension MatchfileProtocol {
   var type: String { return "development" }
+  var additionalCertTypes: [String]? { return nil }
   var readonly: Bool { return false }
   var generateAppleCerts: Bool { return true }
   var skipProvisioningProfiles: Bool { return false }
@@ -126,4 +130,4 @@ extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.12]
+// FastlaneRunnerAPIVersion [0.9.13]
