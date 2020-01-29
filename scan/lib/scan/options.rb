@@ -254,6 +254,11 @@ module Scan
                                      default_value: false),
 
         # concurrency
+        FastlaneCore::ConfigItem.new(key: :concurrent_workers,
+                                     type: Integer,
+                                     env_name: "SCAN_CONCURRENT_WORKERS",
+                                     description: "Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :max_concurrent_simulators,
                                      type: Integer,
                                      env_name: "SCAN_MAX_CONCURRENT_SIMULATORS",
