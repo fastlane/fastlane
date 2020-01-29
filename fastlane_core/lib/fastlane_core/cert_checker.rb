@@ -52,16 +52,7 @@ module FastlaneCore
       available = self.list_available_third_party_mac_installer(in_keychain: in_keychain)
       available += self.list_available_developer_id_installer(in_keychain: in_keychain)
 
-      ids = []
-      available.split("\n").each do |current|
-        begin
-          (ids << current.match(/SHA-1 hash: ([[:xdigit:]]*)/)[1])
-        rescue
-          # the last line does not match
-        end
-      end
-
-      return ids
+      return available.scan(/^SHA-1 hash: ([[:xdigit:]]+)$/).flatten
     end
 
     def self.list_available_identities(in_keychain: nil)
