@@ -85,6 +85,11 @@ module Gym
                                      description: "Should we skip packaging the ipa?",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_package_pkg,
+                                     env_name: "GYM_SKIP_PACKAGE_PKG",
+                                     description: "Should we skip packaging the pkg?",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :include_symbols,
                                      short_option: "-m",
                                      env_name: "GYM_INCLUDE_SYMBOLS",
@@ -138,6 +143,20 @@ module Gym
                                      env_name: "GYM_SKIP_CODESIGNING",
                                      description: "Build without codesigning",
                                      type: Boolean,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :catalyst_platform,
+                                     env_name: "GYM_CATALYST_PLATFORM",
+                                     description: "Platform to build when using a Catalyst enabled app. Valid values are: ios, macos",
+                                     type: String,
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       av = %w(ios macos)
+                                       UI.user_error!("Unsupported export_method '#{value}', must be: #{av}") unless av.include?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :installer_cert_name,
+                                     env_name: "GYM_INSTALLER_CERT_NAME",
+                                     description: "Full name of 3rd Party Mac Developer Installer or Deveoper ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`",
+                                     type: String,
                                      optional: true),
         # Very optional
         FastlaneCore::ConfigItem.new(key: :build_path,
