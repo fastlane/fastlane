@@ -168,6 +168,9 @@ protocol ScanfileProtocol: class {
   /// Allows for override of the default `xcodebuild` command
   var xcodebuildCommand: String { get }
 
+  /// Sets a custom path for Swift Package Manager dependencies
+  var clonedSourcePackagesPath: String? { get }
+
   /// Should this step stop the build if the tests fail? Set this to false if you're using trainer
   var failBuild: Bool { get }
 }
@@ -229,9 +232,10 @@ extension ScanfileProtocol {
   var destination: String? { return nil }
   var customReportFileName: String? { return nil }
   var xcodebuildCommand: String { return "env NSUnbufferedIO=YES xcodebuild" }
+  var clonedSourcePackagesPath: String? { return nil }
   var failBuild: Bool { return true }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.24]
+// FastlaneRunnerAPIVersion [0.9.25]
