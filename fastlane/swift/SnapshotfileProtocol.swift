@@ -101,6 +101,12 @@ protocol SnapshotfileProtocol: class {
 
   /// Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
   var concurrentSimulators: Bool { get }
+
+  /// Disable the simulator from showing the 'Slide to type' prompt
+  var disableSlideToType: Bool { get }
+
+  /// Sets a custom path for Swift Package Manager dependencies
+  var clonedSourcePackagesPath: String? { get }
 }
 
 extension SnapshotfileProtocol {
@@ -138,8 +144,10 @@ extension SnapshotfileProtocol {
   var testTargetName: String? { return nil }
   var namespaceLogFiles: String? { return nil }
   var concurrentSimulators: Bool { return true }
+  var disableSlideToType: Bool { return false }
+  var clonedSourcePackagesPath: String? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.6]
+// FastlaneRunnerAPIVersion [0.9.7]

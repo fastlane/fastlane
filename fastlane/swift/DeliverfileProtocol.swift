@@ -57,10 +57,10 @@ protocol DeliverfileProtocol: class {
   /// Rejects the previously submitted build if it's in a state where it's possible
   var rejectIfPossible: Bool { get }
 
-  /// Should the app be automatically released once it's approved?
+  /// Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
   var automaticRelease: Bool { get }
 
-  /// Date in milliseconds for automatically releasing on pending approval
+  /// Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)
   var autoReleaseDate: String? { get }
 
   /// Enable the phased release feature of iTC
@@ -246,4 +246,4 @@ extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.18]
+// FastlaneRunnerAPIVersion [0.9.19]

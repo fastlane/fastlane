@@ -18,4 +18,4 @@ class Screengrabfile: ScreengrabfileProtocol {
 
 
 
-// Generated with fastlane 2.140.0
+// Generated with fastlane 2.141.0
