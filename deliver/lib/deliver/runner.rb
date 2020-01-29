@@ -140,14 +140,25 @@ module Deliver
     # Upload the binary to App Store Connect
     def upload_binary
       UI.message("Uploading binary to App Store Connect")
-      if options[:ipa]
+
+      upload_ipa = options[:ipa]
+      upload_pkg = options[:pkg]
+
+      # 2020-01-27
+      # Only verify platform if if both ipa and pkg exists (for backwards support)
+      if upload_ipa && upload_pkg
+        upload_ipa = ["ios", "appletvos"].include?(options[:platform])
+        upload_pkg = options[:platform] == "osx"
+      end
+
+      if upload_ipa
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: options[:app].apple_id,
           ipa_path: options[:ipa],
           package_path: "/tmp",
           platform: options[:platform]
         )
-      elsif options[:pkg]
+      elsif upload_pkg
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: options[:app].apple_id,
           pkg_path: options[:pkg],

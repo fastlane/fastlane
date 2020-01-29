@@ -33,6 +33,7 @@ module Gym
       detect_selected_provisioning_profiles # we can only do that *after* we have the platform
       detect_configuration
       detect_toolchain
+      detect_third_party_installer
 
       config[:output_name] ||= Gym.project.app_name
 
@@ -100,6 +101,38 @@ module Gym
       end
     end
 
+    # Detects name of a "3rd Party Mac Developer Installer" cert for the configured team id
+    def self.detect_third_party_installer
+      return if Gym.config[:installer_cert_name]
+
+      team_id = Gym.config[:export_team_id] || Gym.project.build_settings(key: "DEVELOPMENT_TEAM")
+      return if team_id.nil?
+
+      case Gym.config[:export_method]
+      when "app-store"
+        prefix = "3rd Party Mac Developer Installer: "
+      when "developer-id"
+        prefix = "Developer ID Installer: "
+      else
+        return
+      end
+
+      output = Helper.backticks("security find-certificate -a -c \"#{prefix}\"", print: false)
+
+      # Find matches, filter by team_id, prepend prefix for full cert name
+      certs = output.scan(/"(?:#{prefix})(.*)"/)
+      certs = certs.flatten.uniq.select do |cert|
+        cert.include?(team_id)
+      end.map do |cert|
+        prefix + cert
+      end
+
+      if certs.first
+        UI.verbose("Detected installer certificate to use: #{certs.first}")
+        Gym.config[:installer_cert_name] = certs.first
+      end
+    end
+
     def self.detect_scheme
       Gym.project.select_scheme
     end
@@ -111,14 +144,13 @@ module Gym
     # Is it an iOS device or a Mac?
     def self.detect_platform
       return if Gym.config[:destination]
-      platform = if Gym.project.mac?
+      platform = if Gym.project.mac? || Gym.building_mac_catalyst_for_mac?
                    min_xcode8? ? "macOS" : "OS X"
                  elsif Gym.project.tvos?
                    "tvOS"
                  else
                    "iOS"
                  end
-
       Gym.config[:destination] = "generic/platform=#{platform}"
     end
 

@@ -24,6 +24,14 @@ module Gym
       # Import all the fixes
       require 'gym/xcodebuild_fixes/generic_archive_fix'
     end
+
+    def building_mac_catalyst_for_ios?
+      Gym.project.supports_mac_catalyst? && Gym.config[:catalyst_platform] == "ios"
+    end
+
+    def building_mac_catalyst_for_mac?
+      Gym.project.supports_mac_catalyst? && Gym.config[:catalyst_platform] == "macos"
+    end
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore

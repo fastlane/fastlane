@@ -23,7 +23,12 @@ module Gym
 
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
-      if Gym.project.ios? || Gym.project.tvos?
+      # Determine platform to archive
+      is_mac = Gym.project.mac? || Gym.building_mac_catalyst_for_mac?
+      is_ios = !is_mac && (Gym.project.ios? || Gym.project.tvos?)
+
+      # Archive
+      if is_ios
         fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
         return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
 
@@ -34,11 +39,15 @@ module Gym
         move_app_thinning
         move_app_thinning_size_report
         move_apps_folder
-      elsif Gym.project.mac?
+      elsif is_mac
         path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
-        if Gym.project.mac_app?
-          copy_mac_app
+        if Gym.project.mac_app? || Gym.building_mac_catalyst_for_mac?
+          path = copy_mac_app
+          return path if Gym.config[:skip_package_pkg]
+
+          package_app
+          path = move_pkg
           return path
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
@@ -226,6 +235,17 @@ module Gym
       ipa_path
     end
 
+    # Moves over the binary and dsym file to the output directory
+    # @return (String) The path to the resulting pkg file
+    def move_pkg
+      FileUtils.mv(PackageCommandGenerator.pkg_path, File.expand_path(Gym.config[:output_directory]), force: true)
+      pkg_path = File.expand_path(File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.pkg_path)))
+
+      UI.success("Successfully exported and signed the pkg file:")
+      UI.message(pkg_path)
+      pkg_path
+    end
+
     # copys framework from temp folder:
 
     def copy_files_from_path(path)
@@ -248,6 +268,7 @@ module Gym
     def copy_mac_app
       exe_name = Gym.project.build_settings(key: "EXECUTABLE_NAME")
       app_path = File.join(BuildCommandGenerator.archive_path, "Products/Applications/#{exe_name}.app")
+
       UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless File.exist?(app_path)
       FileUtils.cp_r(app_path, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
       app_path = File.join(Gym.config[:output_directory], File.basename(app_path))

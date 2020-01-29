@@ -11,6 +11,7 @@ module Fastlane
           config.load_configuration_file("Deliverfile")
           config[:screenshots_path] = Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] if Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
           config[:ipa] = Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] if Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+          config[:pkg] = Actions.lane_context[SharedValues::PKG_OUTPUT_PATH] if Actions.lane_context[SharedValues::PKG_OUTPUT_PATH]
 
           return config if Helper.test?
           Deliver::Runner.new(config).run
