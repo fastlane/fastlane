@@ -203,7 +203,6 @@ module Fastlane
       end
 
       def self.category
-        :code_signing
         :deprecated
       end
 
