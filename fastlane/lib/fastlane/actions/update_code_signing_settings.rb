@@ -159,13 +159,13 @@ module Fastlane
         [
           ' # manual code signing
           update_code_signing_settings(
-            path: "demo-project/demo/demo.xcodeproj",
-            use_automatic_signing: false
+            use_automatic_signing: false,
+            path: "demo-project/demo/demo.xcodeproj"
           )',
-          ' # auto code signing
+          ' # automatic code signing
           update_code_signing_settings(
-            path: "demo-project/demo/demo.xcodeproj",
             use_automatic_signing: true
+            path: "demo-project/demo/demo.xcodeproj",
           )'
         ]
       end
