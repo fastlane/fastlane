@@ -164,8 +164,8 @@ module Fastlane
           )',
           ' # automatic code signing
           update_code_signing_settings(
-            use_automatic_signing: true
-            path: "demo-project/demo/demo.xcodeproj",
+            use_automatic_signing: true,
+            path: "demo-project/demo/demo.xcodeproj"
           )'
         ]
       end
