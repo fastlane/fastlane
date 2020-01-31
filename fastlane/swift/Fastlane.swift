@@ -3631,6 +3631,42 @@ func googlePlayTrackVersionCodes(packageName: String,
 }
 
 /**
+ Retrieves release names for a Google Play track
+
+ - parameters:
+   - packageName: The package name of the application to use
+   - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal
+   - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
+   - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
+   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
+   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
+   - timeout: Timeout for read, open, and send (in seconds)
+
+ - returns: Array of strings representing the release names for the given Google Play track
+
+ More information: [https://docs.fastlane.tools/actions/supply/](https://docs.fastlane.tools/actions/supply/)
+*/
+func googlePlayTrackReleaseNames(packageName: String,
+                                 track: String = "production",
+                                 key: String? = nil,
+                                 issuer: String? = nil,
+                                 jsonKey: String? = nil,
+                                 jsonKeyData: String? = nil,
+                                 rootUrl: String? = nil,
+                                 timeout: Int = 300) {
+  let command = RubyCommand(commandID: "", methodName: "google_play_track_release_names", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
+                                                                                                                 RubyCommand.Argument(name: "track", value: track),
+                                                                                                                 RubyCommand.Argument(name: "key", value: key),
+                                                                                                                 RubyCommand.Argument(name: "issuer", value: issuer),
+                                                                                                                 RubyCommand.Argument(name: "json_key", value: jsonKey),
+                                                                                                                 RubyCommand.Argument(name: "json_key_data", value: jsonKeyData),
+                                                                                                                 RubyCommand.Argument(name: "root_url", value: rootUrl),
+                                                                                                                 RubyCommand.Argument(name: "timeout", value: timeout)])
+  _ = runner.executeCommand(command)
+}
+
+/**
  All gradle related actions, including building and testing your Android app
 
  - parameters:
