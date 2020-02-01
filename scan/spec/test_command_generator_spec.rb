@@ -228,6 +228,20 @@ describe Scan do
       end
     end
 
+    describe "Test Concurrent Workers" do
+      before do
+        options = { project: "./scan/examples/standard/app.xcodeproj", concurrent_workers: 4 }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      end
+
+      it "uses the correct number of concurrent workers", requires_xcodebuild: true do
+        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+        result = @test_command_generator.generate
+        expect(result).to include("-parallel-testing-worker-count 4")
+      end
+    end
+
     describe "Test Max Concurrent Simulators" do
       before do
         options = { project: "./scan/examples/standard/app.xcodeproj", max_concurrent_simulators: 3 }
