@@ -27,7 +27,7 @@ module Scan
       UI.user_error!("No project/workspace found")
     end
 
-    def options
+    def options # rubocop:disable Metrics/PerceivedComplexity
       config = Scan.config
 
       options = []
@@ -37,6 +37,7 @@ module Scan
       options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
       options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
       options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
+      options << "-parallel-testing-worker-count #{config[:concurrent_workers]}" if config[:concurrent_workers]
       options << "-maximum-concurrent-test-simulator-destinations #{config[:max_concurrent_simulators]}" if config[:max_concurrent_simulators]
       options << "-disable-concurrent-testing" if config[:disable_concurrent_testing]
       options << "-enableCodeCoverage #{config[:code_coverage] ? 'YES' : 'NO'}" unless config[:code_coverage].nil?
