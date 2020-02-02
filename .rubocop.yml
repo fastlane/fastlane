@@ -187,7 +187,8 @@ Style/AndOr:
 # Configuration parameters: CountComments.
 Metrics/ClassLength:
   Max: 320
-
+  Exclude:
+   - 'supply/lib/supply/client.rb'
 
 # Configuration parameters: AllowURI, URISchemes.
 Metrics/LineLength:
