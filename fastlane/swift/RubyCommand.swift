@@ -49,7 +49,7 @@ struct RubyCommand: RubyCommandable {
                     let typeJson: String
                     if let type = type {
                         typeJson = ", \"value_type\" : \"\(type.typeString)\""
-                    }else {
+                    } else {
                         typeJson = ""
                     }
 
