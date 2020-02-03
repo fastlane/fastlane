@@ -174,6 +174,10 @@ module Fastlane
       def self.is_supported?(platform)
         platform == :mac
       end
+
+      def self.category
+        :code_signing
+      end
     end
   end
 end
