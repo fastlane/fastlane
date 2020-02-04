@@ -15,6 +15,9 @@ module Fastlane
         end
         if params[:xcpretty_output]
           cmd += ["2>&1", "|", "xcpretty", "--#{params[:xcpretty_output]}"]
+          if params[:xcpretty_args]
+            cmd << (params[:xcpretty_args]).to_s
+          end
           cmd = %w(set -o pipefail &&) + cmd
         end
 
@@ -67,6 +70,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid xcpretty output type: (#{xcpretty_output_types.join('|')})") unless xcpretty_output_types.include?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :xcpretty_args,
+                                       env_name: "FL_SPM_XCPRETTY_ARGS",
+                                       description: "Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf'), requires xcpretty_output to be specified also",
+                                       type: String,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        short_option: "-v",
                                        env_name: "FL_SPM_VERBOSE",
