@@ -52,7 +52,7 @@ module Fastlane
       def load_all_devices
         self.devices = []
 
-        command = [adb_path.shellescape, host_option, "devices -l"].compact.join(" ")
+        command = [adb_path, host_option, "devices -l"].compact.join(" ")
         output = Actions.sh(command, log: false)
         output.split("\n").each do |line|
           if (result = line.match(/^(\S+)(\s+)(device )/))
