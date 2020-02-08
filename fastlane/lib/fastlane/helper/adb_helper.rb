@@ -35,7 +35,7 @@ module Fastlane
       # Run a certain action
       def trigger(command: nil, serial: nil)
         android_serial = serial != "" ? "ANDROID_SERIAL=#{serial}" : nil
-        command = [android_serial, adb_path.shellescape, host_option, command].compact.join(" ").strip
+        command = [android_serial, File.expand_path(adb_path).shellescape, host_option, command].compact.join(" ").strip
         Action.sh(command)
       end
 
@@ -52,7 +52,7 @@ module Fastlane
       def load_all_devices
         self.devices = []
 
-        command = [adb_path, host_option, "devices -l"].compact.join(" ")
+        command = [File.expand_path(adb_path).shellescape, host_option, "devices -l"].compact.join(" ")
         output = Actions.sh(command, log: false)
         output.split("\n").each do |line|
           if (result = line.match(/^(\S+)(\s+)(device )/))
