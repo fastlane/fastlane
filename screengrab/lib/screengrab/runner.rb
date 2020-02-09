@@ -73,8 +73,6 @@ module Screengrab
 
       validate_apk(app_apk_path)
 
-      enable_clean_status_bar(device_serial, app_apk_path)
-
       run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, @config[:launch_arguments])
 
       number_of_screenshots = pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
@@ -236,6 +234,7 @@ module Screengrab
       unless @config[:reinstall_app]
         install_apks(device_serial, app_apk_path, tests_apk_path)
         grant_permissions(device_serial)
+        enable_clean_status_bar(device_serial, app_apk_path)
       end
 
       @config[:locales].each do |locale|
@@ -243,6 +242,7 @@ module Screengrab
           uninstall_apks(device_serial, @config[:app_package_name], @config[:tests_package_name])
           install_apks(device_serial, app_apk_path, tests_apk_path)
           grant_permissions(device_serial)
+          enable_clean_status_bar(device_serial, app_apk_path)
         end
         run_tests_for_locale(locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
       end
