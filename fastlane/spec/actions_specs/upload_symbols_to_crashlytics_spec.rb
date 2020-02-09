@@ -19,6 +19,27 @@ describe Fastlane do
         end").runner.execute(:test)
       end
 
+      it "uploads dSYM files with app_id" do
+        binary_path = './spec/fixtures/screenshots/screenshot1.png'
+        dsym_path = './spec/fixtures/dSYM/Themoji.dSYM'
+        app_id = '0:000000000000:ios:0f0000000ff0ff0'
+
+        command = []
+        command << File.expand_path(File.join("fastlane", binary_path)).shellescape
+        command << "-ai #{app_id}"
+        command << "-p ios"
+        command << File.expand_path(File.join("fastlane", dsym_path)).shellescape
+
+        expect(Fastlane::Actions).to receive(:sh).with(command.join(" "), log: false)
+
+        Fastlane::FastFile.new.parse("lane :test do
+          upload_symbols_to_crashlytics(
+            dsym_path: 'fastlane/#{dsym_path}',
+            app_id: '#{app_id}',
+            binary_path: 'fastlane/#{binary_path}')
+        end").runner.execute(:test)
+      end
+
       it "uploads dSYM files with api_token" do
         binary_path = './spec/fixtures/screenshots/screenshot1.png'
         dsym_path = './spec/fixtures/dSYM/Themoji.dSYM'
