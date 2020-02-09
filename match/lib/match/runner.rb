@@ -18,6 +18,7 @@ module Match
 
     attr_accessor :storage
 
+    # rubocop:disable Metrics/PerceivedComplexity
     def run(params)
       self.files_to_commit = []
 
@@ -38,6 +39,7 @@ module Match
         git_user_email: params[:git_user_email],
         clone_branch_directly: params[:clone_branch_directly],
         git_basic_authorization: params[:git_basic_authorization],
+        git_bearer_authorization: params[:git_bearer_authorization],
         type: params[:type].to_s,
         generate_apple_certs: params[:generate_apple_certs],
         platform: params[:platform].to_s,
@@ -78,13 +80,21 @@ module Match
       # Verify the App ID (as we don't want 'match' to fail at a later point)
       if spaceship
         app_identifiers.each do |app_identifier|
-          spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier)
+          spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier, platform: params[:platform])
         end
       end
 
       # Certificate
       cert_id = fetch_certificate(params: params, working_directory: storage.working_directory)
-      spaceship.certificate_exists(username: params[:username], certificate_id: cert_id) if spaceship
+
+      # Mac Installer Distribution Certificate
+      additional_cert_types = params[:additional_cert_types] || []
+      cert_ids = additional_cert_types.map do |additional_cert_type|
+        fetch_certificate(params: params, working_directory: storage.working_directory, specific_cert_type: additional_cert_type)
+      end
+
+      cert_ids << cert_id
+      spaceship.certificates_exists(username: params[:username], certificate_ids: cert_ids, platform: params[:platform]) if spaceship
 
       # Provisioning Profiles
       unless params[:skip_provisioning_profiles]
@@ -118,6 +128,7 @@ module Match
     ensure
       storage.clear_changes if storage
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     # Used when creating a new certificate or profile
     def prefixed_working_directory
@@ -132,8 +143,8 @@ module Match
       end
     end
 
-    def fetch_certificate(params: nil, working_directory: nil)
-      cert_type = Match.cert_type_sym(params[:type])
+    def fetch_certificate(params: nil, working_directory: nil, specific_cert_type: nil)
+      cert_type = Match.cert_type_sym(specific_cert_type || params[:type])
 
       certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.p12")]
@@ -141,7 +152,7 @@ module Match
       if certs.count == 0 || keys.count == 0
         UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
-        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory)
+        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory, specific_cert_type: specific_cert_type)
         private_key_path = cert_path.gsub(".cer", ".p12")
 
         self.files_to_commit << cert_path
@@ -195,13 +206,15 @@ module Match
       prov_type = Match.profile_type_sym(params[:type])
 
       names = [Match::Generator.profile_type_name(prov_type), app_identifier]
-      if params[:platform].to_s != :ios.to_s
+      if params[:platform].to_s == :tvos.to_s
         names.push(params[:platform])
       end
 
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
       base_dir = File.join(prefixed_working_directory, "profiles", prov_type.to_s)
-      profiles = Dir[File.join(base_dir, "#{profile_name}.mobileprovision")]
+
+      extension = params[:platform].to_s == :macos.to_s ? ".provisionprofile" : ".mobileprovision"
+      profiles = Dir[File.join(base_dir, "#{profile_name}#{extension}")]
       if Helper.mac?
         keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
       end
@@ -253,7 +266,7 @@ module Match
         FileUtils.cp(profile, params[:output_path])
       end
 
-      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid)
+      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid, platform: params[:platform])
         # This profile is invalid, let's remove the local file and generate a new one
         File.delete(profile)
         # This method will be called again, no need to modify `files_to_commit`

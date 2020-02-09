@@ -91,7 +91,7 @@ module Fastlane
       end
 
       def self.get_plist!(folder, target, configuration = nil)
-        plist_files = target.resolved_build_setting("INFOPLIST_FILE")
+        plist_files = target.resolved_build_setting("INFOPLIST_FILE", true)
         plist_files_count = plist_files.values.compact.uniq.count
 
         # Get plist file for specified configuration
@@ -113,7 +113,12 @@ module Fastlane
           plist_file.gsub!("$(SRCROOT)/", "")
         end
 
-        plist_file = File.absolute_path(File.join(folder, plist_file))
+        # plist_file can be `Relative` or `Absolute` path.
+        # Make to `Absolute` path when plist_file is `Relative` path
+        unless File.exist?(plist_file)
+          plist_file = File.absolute_path(File.join(folder, plist_file))
+        end
+
         UI.user_error!("Cannot find plist file: #{plist_file}") unless File.exist?(plist_file)
 
         plist_file

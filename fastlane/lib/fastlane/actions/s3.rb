@@ -434,8 +434,8 @@ module Fastlane
             access_key: ENV["S3_ACCESS_KEY"],               # Required from user.
             secret_access_key: ENV["S3_SECRET_ACCESS_KEY"], # Required from user.
             bucket: ENV["S3_BUCKET"],                       # Required from user.
-            ipa: "AppName.ipa",                             # Optional is you use `ipa` to build
-            dsym: "AppName.app.dSYM.zip",                   # Optional is you use `ipa` to build
+            ipa: "AppName.ipa",                             # Optional if you use `ipa` to build
+            dsym: "AppName.app.dSYM.zip",                   # Optional if you use `ipa` to build
             path: "v{CFBundleShortVersionString}_b{CFBundleVersion}/", # This is actually the default.
             upload_metadata: true,                          # Upload version.json, plist and HTML. Set to false to skip uploading of these files.
             version_file_name: "app_version.json",          # Name of the file to upload to S3. Defaults to "version.json"

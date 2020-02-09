@@ -19,7 +19,6 @@ module Match
         FastlaneCore::ConfigItem.new(key: :type,
                                      env_name: "MATCH_TYPE",
                                      description: "Define the profile type, can be #{Match.environments.join(', ')}",
-                                     is_string: true,
                                      short_option: "-y",
                                      default_value: 'development',
                                      verify_block: proc do |value|
@@ -27,10 +26,19 @@ module Match
                                          UI.user_error!("Unsupported environment #{value}, must be in #{Match.environments.join(', ')}")
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :additional_cert_types,
+                                     env_name: "MATCH_ADDITIONAL_CERT_TYPES",
+                                     description: "Create additional cert types needed for macOS installers (valid values: mac_installer_distribution, developer_id_installer)",
+                                     optional: true,
+                                     type: Array,
+                                     verify_block: proc do |values|
+                                       types = %w(mac_installer_distribution developer_id_installer)
+                                       UI.user_error!("Unsupported types, must be: #{types}") unless (values - types).empty?
+                                     end),
         FastlaneCore::ConfigItem.new(key: :readonly,
                                      env_name: "MATCH_READONLY",
                                      description: "Only fetch existing certificates and profiles, don't generate new ones",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :generate_apple_certs,
                                      env_name: "MATCH_GENERATE_APPLE_CERTS",
@@ -41,7 +49,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :skip_provisioning_profiles,
                                      env_name: "MATCH_SKIP_PROVISIONING_PROFILES",
                                      description: "Skip syncing provisioning profiles",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
 
         # app
@@ -49,7 +57,6 @@ module Match
                                      short_option: "-a",
                                      env_name: "MATCH_APP_IDENTIFIER",
                                      description: "The bundle identifier(s) of your app (comma-separated)",
-                                     is_string: false,
                                      type: Array, # we actually allow String and Array here
                                      skip_type_validation: true,
                                      code_gen_sensitive: true,
@@ -82,7 +89,6 @@ module Match
         FastlaneCore::ConfigItem.new(key: :storage_mode,
                                      env_name: "MATCH_STORAGE_MODE",
                                      description: "Define where you want to store your certificates",
-                                     is_string: true,
                                      short_option: "-q",
                                      default_value: 'git',
                                      verify_block: proc do |value|
@@ -114,17 +120,25 @@ module Match
         FastlaneCore::ConfigItem.new(key: :shallow_clone,
                                      env_name: "MATCH_SHALLOW_CLONE",
                                      description: "Make a shallow clone of the repository (truncate the history to 1 revision)",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :clone_branch_directly,
                                      env_name: "MATCH_CLONE_BRANCH_DIRECTLY",
                                      description: "Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :git_basic_authorization,
                                      env_name: "MATCH_GIT_BASIC_AUTHORIZATION",
                                      sensitive: true,
                                      description: "Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64",
+                                     conflicting_options: [:git_bearer_authorization],
+                                     optional: true,
+                                     default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :git_bearer_authorization,
+                                     env_name: "MATCH_GIT_BEARER_AUTHORIZATION",
+                                     sensitive: true,
+                                     description: "Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64",
+                                     conflicting_options: [:git_basic_authorization],
                                      optional: true,
                                      default_value: nil),
 
@@ -162,32 +176,31 @@ module Match
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "MATCH_FORCE",
                                      description: "Renew the provisioning profiles every time you run match",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force_for_new_devices,
                                      env_name: "MATCH_FORCE_FOR_NEW_DEVICES",
                                      description: "Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile type 'appstore'",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_confirmation,
                                      env_name: "MATCH_SKIP_CONFIRMATION",
                                      description: "Disables confirmation prompts during nuke, answering them with yes",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_docs,
                                      env_name: "MATCH_SKIP_DOCS",
                                      description: "Skip generation of a README.md for the created git repository",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :platform,
                                      short_option: '-o',
                                      env_name: "MATCH_PLATFORM",
-                                     description: "Set the provisioning profile's platform to work with (i.e. ios, tvos)",
-                                     is_string: false,
+                                     description: "Set the provisioning profile's platform to work with (i.e. ios, tvos, macos)",
                                      default_value: "ios",
                                      verify_block: proc do |value|
                                        value = value.to_s
-                                       pt = %w(tvos ios)
+                                       pt = %w(tvos ios macos)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :template_name,
@@ -204,7 +217,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :verbose,
                                      env_name: "MATCH_VERBOSE",
                                      description: "Print out extra information and all commands",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false,
                                      verify_block: proc do |value|
                                        FastlaneCore::Globals.verbose = true if value

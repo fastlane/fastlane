@@ -51,6 +51,7 @@ module Gym
 
         buildactions = []
         buildactions << :clean if config[:clean]
+        buildactions << :build if config[:skip_archive]
         buildactions << :archive unless config[:skip_archive]
 
         buildactions

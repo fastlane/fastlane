@@ -323,6 +323,28 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
     end
 
+    describe "betaFeedbacks" do
+      context 'get_beta_feedbacks' do
+        let(:path) { "betaFeedbacks" }
+        let(:app_id) { "123456789" }
+        let(:default_params) { {} }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params.merge(default_params))
+          expect(client).to receive(:request).with(:get).and_yield(req_mock)
+          Spaceship::ConnectAPI.get_beta_feedback
+        end
+
+        it 'succeeds with filter' do
+          params = { filter: { "build.app" => app_id } }
+          req_mock = test_request_params(path, params.merge(default_params))
+          expect(client).to receive(:request).with(:get).and_yield(req_mock)
+          Spaceship::ConnectAPI.get_beta_feedback(params)
+        end
+      end
+    end
+
     describe "betaGroups" do
       context 'get_beta_groups' do
         let(:path) { "betaGroups" }

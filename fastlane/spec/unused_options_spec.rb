@@ -44,6 +44,7 @@ describe Fastlane do
           build_app
           build_android_app
           build_ios_app
+          build_mac_app
           capture_screenshots
           capture_android_screenshots
           capture_ios_screenshots
@@ -58,6 +59,7 @@ describe Fastlane do
           sync_code_signing
           upload_to_app_store
           upload_to_play_store
+          upload_to_play_store_internal_app_sharing
           upload_to_testflight
           puts
           println

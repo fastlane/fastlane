@@ -15,26 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Josh Holtz",
+  spec.authors       = ["Jorge Revuelta H",
+                        "Maksym Grebenets",
                         "Olivier Halligon",
-                        "Joshua Liebowitz",
-                        "Aaron Brager",
+                        "Daniel Jankowski",
+                        "Fumiya Nakamura",
+                        "Josh Holtz",
                         "Andrew McBurney",
-                        "Kohki Miki",
-                        "Manu Wallner",
-                        "Felix Krause",
-                        "Luka Mirosevic",
-                        "Stefan Natchev",
                         "Iulian Onofrei",
+                        "Kohki Miki",
+                        "Joshua Liebowitz",
+                        "Max Ott",
+                        "Stefan Natchev",
+                        "Jérôme Lacoste",
+                        "Aaron Brager",
+                        "Jan Piotrowski",
                         "Danielle Tomlinson",
                         "Jimmy Dee",
-                        "Jérôme Lacoste",
-                        "Jan Piotrowski",
+                        "Manu Wallner",
+                        "Luka Mirosevic",
+                        "Felix Krause",
                         "Matthew Ellis",
-                        "Helmut Januschka",
-                        "Fumiya Nakamura",
-                        "Maksym Grebenets",
-                        "Jorge Revuelta H"]
+                        "Helmut Januschka"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -74,7 +76,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('babosa', '>= 1.0.2', "< 2.0.0")
   spec.add_dependency('colored') # colored terminal output
   spec.add_dependency('commander-fastlane', '>= 4.4.6', '< 5.0.0') # CLI parser
-  spec.add_dependency('excon', '>= 0.45.0', '< 1.0.0') # Great HTTP Client
+  spec.add_dependency('excon', '>= 0.71.0', '< 1.0.0') # Great HTTP Client
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
   spec.add_dependency('faraday', '~> 0.17') # Used for deploygate, hockey and testfairy actions
   spec.add_dependency('faraday_middleware', '~> 0.13.1') # same as faraday
@@ -104,7 +106,7 @@ Gem::Specification.new do |spec|
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
-  spec.add_dependency('google-api-client', '>= 0.21.2', '< 0.24.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-api-client', '>= 0.29.2', '< 0.37.0') # Google API Client to access Play Publishing API
   spec.add_dependency('google-cloud-storage', '>= 1.15.0', '< 2.0.0') # Access Google Cloud Storage for match
 
   spec.add_dependency('emoji_regex', '>= 0.1', '< 2.0') # Used to scan for Emoji in the changelog
@@ -119,6 +121,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('pry-stack_explorer')
   spec.add_development_dependency('yard', '~> 0.9.11')
   spec.add_development_dependency('webmock', '~> 2.3.2')
+  spec.add_development_dependency('hashdiff', '< 0.4.0') # Locked under 0.4.0 until webmock bumped up to 3.6.0 or greater - HashDiff was changed to Hashdiff
   spec.add_development_dependency('coveralls', '~> 0.8.13')
   spec.add_development_dependency('rubocop', Fastlane::RUBOCOP_REQUIREMENT)
   spec.add_development_dependency('rubocop-require_tools', '>= 0.1.2')

@@ -134,6 +134,53 @@ describe Fastlane do
 
         expect(result).to eq("#{File.expand_path('README.md').shellescape} assembleWorldDominationRelease -p .")
       end
+
+      it "supports multiple tasks" do
+        result = Fastlane::FastFile.new.parse("lane :build do
+          gradle(tasks: ['assembleDebug', 'bundleDebug'], gradle_path: './README.md')
+        end").runner.execute(:build)
+
+        expect(result).to eq("#{File.expand_path('README.md').shellescape} assembleDebug bundleDebug -p .")
+      end
+
+      it "a task or tasks are required" do
+        expect do
+          result = Fastlane::FastFile.new.parse("lane :build do
+            gradle(gradle_path: './README.md')
+          end").runner.execute(:build)
+        end.to(
+          raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+            expect(error.message).to match('Please pass a gradle task or tasks')
+          end
+        )
+      end
+
+      describe "the step name displayed in fastlane summary" do
+        it "a gradle task name is displayed" do
+          task_name = 'assembleWorldDominationRelease'
+
+          Fastlane::FastFile.new.parse("lane :build do
+            gradle(task: '#{task_name}', gradle_path: './README.md')
+          end").runner.execute(:build)
+
+          last_action = Fastlane::Actions.executed_actions.last
+          expect(last_action[:name]).to eq(task_name)
+        end
+
+        it "a gradle tasks name is displayed" do
+          task_name_1 = 'assembleWorldDominationRelease'
+          task_name_2 = 'assemblePlanB'
+
+          task_name = "#{task_name_1} #{task_name_2}"
+
+          Fastlane::FastFile.new.parse("lane :build do
+            gradle(tasks: ['#{task_name_1}', '#{task_name_2}'], gradle_path: './README.md')
+          end").runner.execute(:build)
+
+          last_action = Fastlane::Actions.executed_actions.last
+          expect(last_action[:name]).to eq(task_name)
+        end
+      end
     end
   end
 end
