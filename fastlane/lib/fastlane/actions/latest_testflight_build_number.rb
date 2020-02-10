@@ -4,12 +4,17 @@ module Fastlane
   module Actions
     module SharedValues
       LATEST_TESTFLIGHT_BUILD_NUMBER = :LATEST_TESTFLIGHT_BUILD_NUMBER
+      LATEST_TESTFLIGHT_VERSION = :LATEST_TESTFLIGHT_VERSION
     end
 
     class LatestTestflightBuildNumberAction < Action
       def self.run(params)
-        build_number = AppStoreBuildNumberAction.run(params)
-        Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER] = build_number
+        AppStoreBuildNumberAction.run(params)
+        build_nr = Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER]
+        build_v = Actions.lane_context[SharedValues::LATEST_VERSION]
+        Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER] = build_nr
+        Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION] = build_v
+        return build_nr
       end
 
       #####################################################
@@ -93,7 +98,8 @@ module Fastlane
 
       def self.output
         [
-          ['LATEST_TESTFLIGHT_BUILD_NUMBER', 'The latest build number of the latest version of the app uploaded to TestFlight']
+          ['LATEST_TESTFLIGHT_BUILD_NUMBER', 'The latest build number of the latest version of the app uploaded to TestFlight'],
+          ['LATEST_TESTFLIGHT_VERSION', 'The version of the latest build number']
         ]
       end
 
