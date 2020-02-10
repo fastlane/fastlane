@@ -34,7 +34,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :branch,
                                        env_name: "FL_ENSURE_GIT_BRANCH_NAME",
-                                       description: "The branch that should be checked for. String that can be either the full name of the branch or a regex to match",
+                                       description: "The branch that should be checked for. String that can be either the full name of the branch or a regex e.g. `^feature\/.*$` to match",
                                        is_string: true,
                                        default_value: 'master')
         ]
