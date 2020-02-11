@@ -481,12 +481,16 @@ module Pilot
     end
 
     def update_build_beta_details(build, info)
-      build_beta_detail = build.build_beta_detail
-
       attributes = {}
       attributes[:autoNotifyEnabled] = info[:auto_notify_enabled] if info.key?(:auto_notify_enabled)
-
-      Spaceship::ConnectAPI.patch_build_beta_details(build_beta_details_id: build_beta_detail.id, attributes: attributes)
+      build_beta_detail = build.build_beta_detail
+      if build_beta_detail
+        Spaceship::ConnectAPI.patch_build_beta_details(build_beta_details_id: build_beta_detail.id, attributes: attributes)
+      else
+        if attributes[:autoNotifyEnabled]
+          UI.important("Unable to auto notify testers as the build did include beta detail information")
+        end
+      end
     end
   end
   # rubocop:enable Metrics/ClassLength
