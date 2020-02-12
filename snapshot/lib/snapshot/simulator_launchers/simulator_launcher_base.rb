@@ -53,6 +53,7 @@ module Snapshot
 
       Fixes::SimulatorZoomFix.patch
       Fixes::HardwareKeyboardFix.patch
+      Fixes::SharedPasteboardFix.patch
 
       device_types.each do |type|
         if launcher_config.erase_simulator || launcher_config.localize_simulator || !launcher_config.dark_mode.nil?
