@@ -3,7 +3,7 @@ describe Fastlane do
     describe "adb" do
       it "generates a valid command" do
         result = Fastlane::FastFile.new.parse("lane :test do
-          adb(command: 'test', adb_path: './fastlane/README.md')
+          adb(command: 'test', adb_path: './README.md')
         end").runner.execute(:test)
 
         expect(result).to eq("#{File.expand_path('./fastlane/README.md')} test")
@@ -11,7 +11,7 @@ describe Fastlane do
 
       it "generates a valid command for commands with multiple parts" do
         result = Fastlane::FastFile.new.parse("lane :test do
-          adb(command: 'test command with multiple parts', adb_path: './fastlane/README.md')
+          adb(command: 'test command with multiple parts', adb_path: './README.md')
         end").runner.execute(:test)
 
         expect(result).to eq("#{File.expand_path('./fastlane/README.md')} test command with multiple parts")
@@ -19,7 +19,7 @@ describe Fastlane do
 
       it "generates a valid command when a non-empty serial is passed" do
         result = Fastlane::FastFile.new.parse("lane :test do
-          adb(command: 'test command with non-empty serial', adb_path: './fastlane/README.md', serial: 'emulator-1234')
+          adb(command: 'test command with non-empty serial', adb_path: './README.md', serial: 'emulator-1234')
         end").runner.execute(:test)
 
         expect(result).to eq("ANDROID_SERIAL=emulator-1234 #{File.expand_path('./fastlane/README.md')} test command with non-empty serial")
@@ -27,7 +27,7 @@ describe Fastlane do
 
       it "generates a valid command when an empty serial is passed" do
         result = Fastlane::FastFile.new.parse("lane :test do
-          adb(command: 'test command with empty serial', adb_path: './fastlane/README.md', serial: '')
+          adb(command: 'test command with empty serial', adb_path: './README.md', serial: '')
         end").runner.execute(:test)
 
         expect(result).to eq("#{File.expand_path('./fastlane/README.md')} test command with empty serial")
