@@ -39,7 +39,7 @@ describe Fastlane do
           adb(command: 'test')
         end").runner.execute(:test)
 
-        expect(result).to eq("/usr/local/android-sdk/platform-tools/adb test")
+        expect(result).to eq("#{File.expand_path('/usr/local/android-sdk/platform-tools/adb')} test")
       end
 
       it "picks up path from ANDROID_HOME environment variable and handles path that has to be made safe" do
@@ -49,7 +49,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         path = "/usr/local/android-sdk/with space/platform-tools/adb".shellescape
-        expect(result).to eq("#{path} test")
+        expect(result).to eq("#{File.expand_path(path)} test")
       end
 
       it "picks up path from ANDROID_SDK_ROOT environment variable" do
@@ -58,7 +58,7 @@ describe Fastlane do
           adb(command: 'test')
         end").runner.execute(:test)
 
-        expect(result).to eq("/usr/local/android-sdk/platform-tools/adb test")
+        expect(result).to eq("#{File.expand_path('/usr/local/android-sdk/platform-tools/adb')} test")
       end
 
       it "picks up path from ANDROID_SDK environment variable" do
@@ -67,7 +67,7 @@ describe Fastlane do
           adb(command: 'test')
         end").runner.execute(:test)
 
-        expect(result).to eq("/usr/local/android-sdk/platform-tools/adb test")
+        expect(result).to eq("#{File.expand_path('/usr/local/android-sdk/platform-tools/adb')} test")
       end
     end
   end
