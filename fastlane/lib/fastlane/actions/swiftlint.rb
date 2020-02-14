@@ -36,7 +36,8 @@ module Fastlane
         begin
           Actions.sh(command)
         rescue
-          handle_swiftlint_error(params[:ignore_exit_status], $?.exitstatus)
+          handle_swiftlint_error(params[:ignore_exit_status], $?.exitstatus
+          raise if params[:raise_if_swiftlint_error]
         end
       end
 
@@ -106,6 +107,13 @@ module Fastlane
                                        is_string: false,
                                        type: Boolean,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :raise_if_swiftlint_error,
+                                       description: "Raises an error if swiftlint fails, so you can fail CI/CD jobs if necessary \
+                                                    (true/false)",
+                                       default_value: false,
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :reporter,
                                        description: 'Choose output reporter',
                                        is_string: true,
@@ -161,7 +169,9 @@ module Fastlane
               "AppDelegate.swift",
               "path/to/project/Model.swift"
             ],
+            raise_if_swiftlint_error: true,      # Allow fastlane to return raise an error if swiftlint fails
             ignore_exit_status: true              # Allow fastlane to continue even if SwiftLint returns a non-zero exit status
+
           )'
         ]
       end
