@@ -36,7 +36,7 @@ module Fastlane
         begin
           Actions.sh(command)
         rescue
-          handle_swiftlint_error(params[:ignore_exit_status], $?.exitstatus
+          handle_swiftlint_error(params[:ignore_exit_status], $?.exitstatus)
           raise if params[:raise_if_swiftlint_error]
         end
       end
