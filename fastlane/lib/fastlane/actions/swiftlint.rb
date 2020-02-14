@@ -169,7 +169,7 @@ module Fastlane
               "AppDelegate.swift",
               "path/to/project/Model.swift"
             ],
-            raise_if_swiftlint_error: true,      # Allow fastlane to return raise an error if swiftlint fails
+            raise_if_swiftlint_error: true,      # Allow fastlane to raise an error if swiftlint fails
             ignore_exit_status: true              # Allow fastlane to continue even if SwiftLint returns a non-zero exit status
 
           )'
