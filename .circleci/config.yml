@@ -119,7 +119,7 @@ jobs:
     environment:
       _RUBY_VERSION: '2.6'
 
-  'tests_ubuntu':
+  'Execute tests on Ubuntu':
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'C.UTF-8'
@@ -155,32 +155,27 @@ jobs:
           when: always  # Run this even when tests fail
 
   "Validate Fastlane.swift Generation":
+    <<: *tests_macos
     macos:
-      xcode: "11.0.0"
+      xcode: '11.0.0'
     environment:
-      CIRCLE_TEST_REPORTS: ~/test-reports
-      LC_ALL: en_US.UTF-8
-      LANG: en_US.UTF-8
-    shell: /bin/bash --login -eo pipefail
+      _RUBY_VERSION: '2.5'
     steps:
       - *cache_restore_git
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
       - *cache_restore_homebrew
-
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            echo "2.5" > .ruby-version
+            echo ${_RUBY_VERSION} > .ruby-version
             brew untap caskroom/versions
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-
       - *cache_save_homebrew
       - *cache_save_bundler
-
       - run: bundle exec fastlane generate_swift_api
 
   "Validate Documentation":
@@ -249,7 +244,7 @@ workflows:
       - 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)'
       - 'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)'
       - 'Execute tests on macOS (Xcode 11.3.0, Ruby 2.6)'
-      - 'tests_ubuntu'
+      - 'Execute tests on Ubuntu'
 
       - "Validate Fastlane.swift Generation"
       - "Validate Documentation"
