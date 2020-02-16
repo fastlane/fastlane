@@ -77,7 +77,7 @@ module Screengrab
 
       ReportsGenerator.new.generate
 
-      UI.success("Captured #{number_of_screenshots} screenshots! 📷✨")
+      UI.success("Captured #{number_of_screenshots} new screenshots! 📷✨")
     end
 
     def select_device
