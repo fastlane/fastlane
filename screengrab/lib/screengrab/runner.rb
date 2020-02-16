@@ -309,7 +309,8 @@ module Screengrab
 
       # Because we can't guarantee the screenshot output directory will be empty when we pull, we determine
       # success based on whether there are more screenshots there than when we started.
-      if starting_screenshot_count == ending_screenshot_count
+      # This is only applicable though when `clear_previous_screenshots` is set to `true`.
+      if starting_screenshot_count == ending_screenshot_count && @config[:clear_previous_screenshots]
         UI.error("Make sure you've used Screengrab.screenshot() in your tests and that your expected tests are being run.")
         UI.abort_with_message!("No screenshots were detected 📷❌")
       end
