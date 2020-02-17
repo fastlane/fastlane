@@ -25,11 +25,11 @@ module Gym
 
       # Determine platform to archive
       is_mac = Gym.project.mac? || Gym.building_mac_catalyst_for_mac?
-      is_ios = !is_mac && (Gym.project.ios? || Gym.project.tvos?)
+      is_ios = !is_mac && (Gym.project.ios? || Gym.project.tvos? || Gym.project.watchos?)
 
       # Archive
       if is_ios
-        fix_generic_archive # See https://github.com/fastlane/fastlane/pull/4325
+        fix_generic_archive unless Gym.project.watchos? # See https://github.com/fastlane/fastlane/pull/4325
         return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
 
         package_app
