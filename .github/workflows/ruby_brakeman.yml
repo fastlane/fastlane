@@ -1,0 +1,34 @@
+---
+
+name: CodeCheck | RUBY
+on:
+  pull_request
+
+jobs:
+  brakeman:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby:
+          - '2.3.x'
+          - '2.4.x'
+          - '2.5.x'
+          - '2.6.x'
+    name: brakeman
+    steps:
+      - name: repo checkout
+        uses: actions/checkout@v1
+
+      - name: setup ruby ${{ matrix.ruby }}
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: "${{ matrix.ruby }}"
+          architecture: 'x64'
+
+      - name: install deps
+        run: gem install brakeman
+
+      - name: do check
+        run: brakeman
+
+...
