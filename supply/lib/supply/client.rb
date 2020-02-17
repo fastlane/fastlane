@@ -4,6 +4,7 @@ AndroidPublisher = Google::Apis::AndroidpublisherV3
 
 require 'net/http'
 
+# rubocop:disable Metrics/ClassLength
 module Supply
   class AbstractGoogleServiceClient
     SCOPE = nil
@@ -411,7 +412,7 @@ module Supply
     end
 
     # Get list of release names for track
-    def track_release_names(track)
+    def track_releases(track)
       ensure_active_edit!
 
       begin
@@ -420,7 +421,7 @@ module Supply
           current_edit.id,
           track
         )
-        return result.releases.map(&:name) || []
+        return result.releases || []
       rescue Google::Apis::ClientError => e
         return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
         raise
@@ -546,3 +547,4 @@ module Supply
     end
   end
 end
+# rubocop:enable Metrics/ClassLength

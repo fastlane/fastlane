@@ -20,7 +20,7 @@ module Supply
       track = Supply.config[:track]
 
       client.begin_edit(package_name: Supply.config[:package_name])
-      release_names = client.track_release_names(track)
+      release_names = client.track_releases(track).map(&:name)
       client.abort_current_edit
 
       if release_names.empty?
