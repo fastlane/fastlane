@@ -1,0 +1,19 @@
+---
+
+name: rubocop
+
+on:
+  pull_request
+
+jobs:
+  rubocop:
+    runs-on: "${{ matrix.os }}"
+    steps:
+      - name: repo checkout
+        uses: actions/checkout@v1
+
+      - name: rubocop
+        uses: |
+          andrewmcodes/rubocop-linter-action@v3.0.0
+
+...
