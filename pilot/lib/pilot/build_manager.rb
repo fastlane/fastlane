@@ -490,7 +490,7 @@ module Pilot
         Spaceship::ConnectAPI.patch_build_beta_details(build_beta_details_id: build_beta_detail.id, attributes: attributes)
       else
         if attributes[:autoNotifyEnabled]
-          UI.important("Unable to auto notify testers as the build did not include beta detail information - this is likely a temporary issue on Testflight.")
+          UI.important("Unable to auto notify testers as the build did not include beta detail information - this is likely a temporary issue on TestFlight.")
         end
       end
     end
