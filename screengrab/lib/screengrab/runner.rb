@@ -73,13 +73,11 @@ module Screengrab
 
       validate_apk(app_apk_path)
 
-      run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, @config[:launch_arguments])
-
-      number_of_screenshots = pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
+      number_of_screenshots = run_tests(device_type_dir_name, device_screenshots_paths, device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, @config[:launch_arguments])
 
       ReportsGenerator.new.generate
 
-      UI.success("Captured #{number_of_screenshots} screenshots! 📷✨")
+      UI.success("Captured #{number_of_screenshots} new screenshots! 📷✨")
     end
 
     def select_device
@@ -230,12 +228,14 @@ module Screengrab
       end
     end
 
-    def run_tests(device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, launch_arguments)
+    def run_tests(device_type_dir_name, device_screenshots_paths, device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, launch_arguments)
       unless @config[:reinstall_app]
         install_apks(device_serial, app_apk_path, tests_apk_path)
         grant_permissions(device_serial)
         enable_clean_status_bar(device_serial, app_apk_path)
       end
+
+      number_of_screenshots = 0
 
       @config[:locales].each do |locale|
         if @config[:reinstall_app]
@@ -244,11 +244,13 @@ module Screengrab
           grant_permissions(device_serial)
           enable_clean_status_bar(device_serial, app_apk_path)
         end
-        run_tests_for_locale(locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
+        number_of_screenshots += run_tests_for_locale(device_type_dir_name, device_screenshots_paths, locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
       end
+
+      number_of_screenshots
     end
 
-    def run_tests_for_locale(locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
+    def run_tests_for_locale(device_type_dir_name, device_screenshots_paths, locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
       UI.message("Running tests for locale: #{locale}")
 
       instrument_command = ["-s #{device_serial} shell am instrument --no-window-animation -w",
@@ -271,10 +273,12 @@ module Screengrab
           UI.error("Tests failed")
         end
       end
+
+      pull_screenshots_from_device(locale, device_serial, device_screenshots_paths, device_type_dir_name)
     end
 
-    def pull_screenshots_from_device(device_serial, device_screenshots_paths, device_type_dir_name)
-      UI.message("Pulling captured screenshots from the device")
+    def pull_screenshots_from_device(locale, device_serial, device_screenshots_paths, device_type_dir_name)
+      UI.message("Pulling captured screenshots for locale #{locale} from the device")
       starting_screenshot_count = screenshot_file_names_in(@config[:output_directory], device_type_dir_name).length
 
       UI.verbose("Starting screenshot count is: #{starting_screenshot_count}")
@@ -296,7 +300,7 @@ module Screengrab
         #
         # Therefore, we'll move the pulled screenshots from their genericly named folder to one named by the
         # user provided device_type option value to match the directory structure that supply expects
-        move_pulled_screenshots(tempdir, device_type_dir_name)
+        move_pulled_screenshots(locale, tempdir, device_type_dir_name)
       end
 
       ending_screenshot_count = screenshot_file_names_in(@config[:output_directory], device_type_dir_name).length
@@ -305,7 +309,8 @@ module Screengrab
 
       # Because we can't guarantee the screenshot output directory will be empty when we pull, we determine
       # success based on whether there are more screenshots there than when we started.
-      if starting_screenshot_count == ending_screenshot_count
+      # This is only applicable though when `clear_previous_screenshots` is set to `true`.
+      if starting_screenshot_count == ending_screenshot_count && @config[:clear_previous_screenshots]
         UI.error("Make sure you've used Screengrab.screenshot() in your tests and that your expected tests are being run.")
         UI.abort_with_message!("No screenshots were detected 📷❌")
       end
@@ -313,7 +318,7 @@ module Screengrab
       ending_screenshot_count - starting_screenshot_count
     end
 
-    def move_pulled_screenshots(pull_dir, device_type_dir_name)
+    def move_pulled_screenshots(locale, pull_dir, device_type_dir_name)
       # Glob pattern that finds the pulled screenshots directory for each locale
       # Possible matches:
       #   [pull_dir]/en-US/images/screenshots
@@ -337,7 +342,7 @@ module Screengrab
         # specific name, as expected by supply
         #
         # (Moved to: fastlane/metadata/android/en-US/images/phoneScreenshots)
-        dest_dir = File.join(File.dirname(dest_dir), device_type_dir_name)
+        dest_dir = File.join(File.dirname(dest_dir), locale, 'images', device_type_dir_name)
 
         FileUtils.mkdir_p(dest_dir)
         FileUtils.cp_r(src_screenshots, dest_dir)

@@ -36,9 +36,12 @@ describe Screengrab::Runner do
         config[:use_timestamp_suffix] = true
       end
       it 'sets custom launch_arguments' do
+        # Don't actually try to pull screenshot from device
+        allow(@runner).to receive(:pull_screenshots_from_device)
+
         expect(mock_executor).to receive(:execute)
           .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp true \\\n-e username hjanuschka -e build_type x500 \\\n/"))
-        @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, config[:launch_arguments])
+        @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, config[:launch_arguments])
       end
     end
 
@@ -59,9 +62,12 @@ describe Screengrab::Runner do
           end
 
           it 'prints an error and exits the program' do
+            # Don't actually try to pull screenshot from device
+            allow(@runner).to receive(:pull_screenshots_from_device)
+
             expect(ui).to receive(:test_failure!).with("Tests failed for locale en-US on device #{device_serial}").and_call_original
 
-            expect { @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil) }.to raise_fastlane_test_failure
+            expect { @runner.run_tests_for_locale('devie', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil) }.to raise_fastlane_test_failure
           end
         end
 
@@ -71,9 +77,12 @@ describe Screengrab::Runner do
           end
 
           it 'prints an error and does not exit the program' do
+            # Don't actually try to pull screenshot from device
+            allow(@runner).to receive(:pull_screenshots_from_device)
+
             expect(ui).to receive(:error).with("Tests failed").and_call_original
 
-            @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
+            @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
           end
         end
       end
@@ -89,9 +98,12 @@ describe Screengrab::Runner do
           )
         end
         it 'sets appendTimestamp as false' do
+          # Don't actually try to pull screenshot from device
+          allow(@runner).to receive(:pull_screenshots_from_device)
+
           expect(mock_executor).to receive(:execute)
             .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp false \\\n/androidx.test.runner.AndroidJUnitRunner"))
-          @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
+          @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
         end
       end
 
@@ -104,9 +116,12 @@ describe Screengrab::Runner do
           )
         end
         it 'should set appendTimestamp by default' do
+          # Don't actually try to pull screenshot from device
+          allow(@runner).to receive(:pull_screenshots_from_device)
+
           expect(mock_executor).to receive(:execute)
             .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp true \\\n/androidx.test.runner.AndroidJUnitRunner"))
-          @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
+          @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
         end
       end
     end
