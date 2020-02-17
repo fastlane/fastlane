@@ -160,7 +160,7 @@ module Fastlane
                                        env_name: 'FL_NOTARIZE_PRINT_LOG',
                                        description: 'Whether to print notarization log file, listing issues on failure and warnings on success',
                                        optional: true,
-                                       default_value: true,
+                                       default_value: false,
                                        type: Boolean),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: 'FL_NOTARIZE_VERBOSE',
