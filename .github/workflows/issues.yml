@@ -1,6 +1,7 @@
 ---
 
 name: Processing issues
+
 on:
   issues:
     types: [opened]

@@ -1,3 +1,7 @@
+---
+
+name: tags
+
 on:
   push:
     tags: 'v*'
@@ -8,8 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: mislav/bump-homebrew-formula-action@v1.4
-        if: "!contains(github.ref, '-')" # skip prereleases
+        if: "!contains(github.ref, '-')"  # skip prereleases
         with:
           formula-name: fastlane
         env:
           COMMITTER_TOKEN: ${{ secrets.HOMEBREW_COMMITTER_TOKEN }}
+
+...

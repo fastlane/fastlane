@@ -1,0 +1,39 @@
+---
+
+name: rake
+
+on:
+  pull_request
+
+jobs:
+  strategy:
+    matrix:
+      os:
+        - 'ubuntu-latest'
+        - 'macos-latest'
+      ruby:
+        - '2.4.x'
+        - '2.5.x'
+        - '2.6.x'
+  rake:
+    runs-on: "${{ matrix.os }}"
+    steps:
+      - name: repo checkout
+        uses: actions/checkout@v1
+
+      - name: setup ruby ${{ matrix.ruby }}
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: "${{ matrix.ruby }}"
+          architecture: 'x64'
+
+      - name: install deps
+        run: |
+          gem install bundler
+          bundle install --jobs 4 --retry 3
+
+      - name: do check
+        run: |
+          bundle exec rake
+
+...
