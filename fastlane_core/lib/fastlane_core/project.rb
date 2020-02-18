@@ -294,6 +294,10 @@ module FastlaneCore
       supported_platforms.include?(:iOS)
     end
 
+    def watchos?
+      supported_platforms.include?(:watchOS)
+    end
+
     def supported_platforms
       supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS")
       if supported_platforms.nil?

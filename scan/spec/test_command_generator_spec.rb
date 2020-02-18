@@ -252,7 +252,7 @@ describe Scan do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
         result = @test_command_generator.generate
-        expect(result).to include("-maximum-concurrent-test-simulator-destinations 3")
+        expect(result).to include("-maximum-concurrent-test-simulator-destinations 3") if FastlaneCore::Helper.xcode_at_least?(10)
       end
     end
 
@@ -266,7 +266,7 @@ describe Scan do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
         result = @test_command_generator.generate
-        expect(result).to include("-disable-concurrent-testing")
+        expect(result).to include("-disable-concurrent-testing") if FastlaneCore::Helper.xcode_at_least?(10)
       end
     end
 

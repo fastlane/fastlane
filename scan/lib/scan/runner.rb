@@ -25,15 +25,17 @@ module Scan
     def test_app
       force_quit_simulator_processes if Scan.config[:force_quit_simulator]
 
-      if Scan.config[:reset_simulator]
-        Scan.devices.each do |device|
-          FastlaneCore::Simulator.reset(udid: device.udid)
+      if Scan.devices
+        if Scan.config[:reset_simulator]
+          Scan.devices.each do |device|
+            FastlaneCore::Simulator.reset(udid: device.udid)
+          end
         end
-      end
 
-      if Scan.config[:disable_slide_to_type]
-        Scan.devices.each do |device|
-          FastlaneCore::Simulator.disable_slide_to_type(udid: device.udid)
+        if Scan.config[:disable_slide_to_type]
+          Scan.devices.each do |device|
+            FastlaneCore::Simulator.disable_slide_to_type(udid: device.udid)
+          end
         end
       end
 

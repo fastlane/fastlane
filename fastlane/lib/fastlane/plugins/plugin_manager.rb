@@ -373,7 +373,7 @@ module Fastlane
       # (a plugin may contain any number of actions)
       version_number = Fastlane::ActionCollector.determine_version(gem_name)
       references = Fastlane.const_get(module_name).all_classes.collect do |path|
-        next unless File.dirname(path).end_with?("/actions") # we only want to match actions
+        next unless File.dirname(path).include?("/actions") # we only want to match actions
 
         File.basename(path).gsub("_action", "").gsub(".rb", "").to_sym # the _action is optional
       end

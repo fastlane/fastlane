@@ -56,170 +56,126 @@ aliases:
 version: 2
 
 jobs:
-  "Execute tests on macOS (Xcode 9.0.1, Ruby 2.3)":
+  'Execute tests on macOS (Xcode 9.0.1, Ruby 2.3)': &tests_macos  # define alias
     macos:
-      xcode: "9.0.1"
+      xcode: '9.0.1'
     environment:
-      CIRCLE_TEST_REPORTS: ~/test-reports
-      LC_ALL: en_US.UTF-8
-      LANG: en_US.UTF-8
-    shell: /bin/bash --login -eo pipefail
+      CIRCLE_TEST_REPORTS: '~/test-reports'
+      LC_ALL: 'en_US.UTF-8'
+      LANG: 'en_US.UTF-8'
+      _RUBY_VERSION: '2.3'
+    shell: '/bin/bash --login -eo pipefail'
     steps:
       - *cache_restore_git
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
       - *cache_restore_homebrew
-
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            echo "2.3" > .ruby-version
-            brew untap caskroom/versions
+            echo ${_RUBY_VERSION} > .ruby-version
+            brew untap caskroom/versions || true
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-
+      - run:
+          name: debug | build environment
+          command: |
+            ruby -v
       - *cache_save_homebrew
       - *cache_save_bundler
-
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
-
       - *cache_restore_rubocop
-
       - run: bundle exec fastlane execute_tests
-
       - *cache_save_rubocop
-
       - store_test_results:
           path: ~/test-reports
       - store_artifacts:
           path: ~/test-reports/rspec
           destination: test-reports
-
       - run:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always  # Run this even when tests fail
-
-  "Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)":
+  'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)':
+    <<: *tests_macos
     macos:
-      xcode: "11.0.0"
+      xcode: '10.2.1'
     environment:
-      CIRCLE_TEST_REPORTS: ~/test-reports
-      LC_ALL: en_US.UTF-8
-      LANG: en_US.UTF-8
-    shell: /bin/bash --login -eo pipefail
-    steps:
-      - *cache_restore_git
-      - checkout
-      - *cache_save_git
-      - *cache_restore_bundler
-      - *cache_restore_homebrew
-
-      - run:
-          name: Setup Build
-          command: |
-            mkdir -p ~/test-reports
-            echo "2.5" > .ruby-version
-            brew untap caskroom/versions
-            brew install shellcheck
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-
-      - *cache_save_homebrew
-      - *cache_save_bundler
-
-      - run:
-          name: Check PR Metadata
-          command: bundle exec danger || echo "danger failed"
-
-      - *cache_restore_rubocop
-
-      - run: bundle exec fastlane execute_tests
-
-      - *cache_save_rubocop
-      - store_test_results:
-          path: ~/test-reports
-      - store_artifacts:
-          path: ~/test-reports/rspec
-          destination: test-reports
-
-      - run:
-          name: Post Test Results to GitHub
-          command: bundle exec danger || echo "danger failed"
-          when: always  # Run this even when tests fail
-
-  "Execute tests on Ubuntu":
+      _RUBY_VERSION: '2.4'
+  'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)':
+    <<: *tests_macos
+    macos:
+      xcode: '11.0.0'
     environment:
-      CIRCLE_TEST_REPORTS: ~/test-reports
-      LC_ALL: C.UTF-8
-      LANG: C.UTF-8
+      _RUBY_VERSION: '2.5'
+  'Execute tests on macOS (Xcode 11.3.0, Ruby 2.6)':
+    <<: *tests_macos
+    macos:
+      xcode: '11.3.0'
+    environment:
+      _RUBY_VERSION: '2.6'
+
+  'Execute tests on Ubuntu':
+    environment:
+      CIRCLE_TEST_REPORTS: '~/test-reports'
+      LC_ALL: 'C.UTF-8'
+      LANG: 'C.UTF-8'
       FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
     docker:
-      - image: fastlanetools/ci:0.1.0
+      - image: 'fastlanetools/ci:0.1.0'
     steps:
       - *cache_restore_git
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
-
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
       - *cache_save_bundler
-
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
-
       - *cache_restore_rubocop
-
       - run: bundle exec fastlane execute_tests
-
       - *cache_save_rubocop
-
       - store_test_results:
           path: ~/test-reports
       - store_artifacts:
           path: ~/test-reports/rspec
           destination: test-reports
-
       - run:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always  # Run this even when tests fail
 
   "Validate Fastlane.swift Generation":
+    <<: *tests_macos
     macos:
-      xcode: "11.0.0"
+      xcode: '11.0.0'
     environment:
-      CIRCLE_TEST_REPORTS: ~/test-reports
-      LC_ALL: en_US.UTF-8
-      LANG: en_US.UTF-8
-    shell: /bin/bash --login -eo pipefail
+      _RUBY_VERSION: '2.5'
     steps:
       - *cache_restore_git
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
       - *cache_restore_homebrew
-
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            echo "2.5" > .ruby-version
+            echo ${_RUBY_VERSION} > .ruby-version
             brew untap caskroom/versions
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-
       - *cache_save_homebrew
       - *cache_save_bundler
-
       - run: bundle exec fastlane generate_swift_api
 
   "Validate Documentation":
@@ -284,12 +240,17 @@ workflows:
   version: 2
   build:
     jobs:
-      - "Execute tests on macOS (Xcode 9.0.1, Ruby 2.3)"
-      - "Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)"
-      - "Execute tests on Ubuntu"
+      - 'Execute tests on macOS (Xcode 9.0.1, Ruby 2.3)'
+      - 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)'
+      - 'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)'
+      - 'Execute tests on macOS (Xcode 11.3.0, Ruby 2.6)'
+      - 'Execute tests on Ubuntu'
+
       - "Validate Fastlane.swift Generation"
       - "Validate Documentation"
+
       - "Lint Source Code"
+
       - "Execute modules load up tests"
 
 ...

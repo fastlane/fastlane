@@ -5,6 +5,7 @@ require_relative '../test_command_generator'
 require_relative '../collector'
 require_relative '../fixes/hardware_keyboard_fix'
 require_relative '../fixes/simulator_zoom_fix'
+require_relative '../fixes/simulator_shared_pasteboard'
 
 module Snapshot
   class SimulatorLauncherBase
@@ -53,6 +54,7 @@ module Snapshot
 
       Fixes::SimulatorZoomFix.patch
       Fixes::HardwareKeyboardFix.patch
+      Fixes::SharedPasteboardFix.patch
 
       device_types.each do |type|
         if launcher_config.erase_simulator || launcher_config.localize_simulator || !launcher_config.dark_mode.nil?

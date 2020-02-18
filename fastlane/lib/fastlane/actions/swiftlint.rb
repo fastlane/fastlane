@@ -37,6 +37,7 @@ module Fastlane
           Actions.sh(command)
         rescue
           handle_swiftlint_error(params[:ignore_exit_status], $?.exitstatus)
+          raise if params[:raise_if_swiftlint_error]
         end
       end
 
@@ -106,10 +107,22 @@ module Fastlane
                                        is_string: false,
                                        type: Boolean,
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :reporter,
-                                       description: 'Choose output reporter',
-                                       is_string: true,
+          FastlaneCore::ConfigItem.new(key: :raise_if_swiftlint_error,
+                                       description: "Raises an error if swiftlint fails, so you can fail CI/CD jobs if necessary \
+                                                    (true/false)",
+                                       default_value: false,
+                                       is_string: false,
+                                       type: Boolean,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :reporter,
+                                       description: "Choose output reporter. Available: xcode, json, csv, checkstyle, junit, html, \
+                                                     emoji, sonarqube, markdown, github-actions-logging",
+                                       is_string: true,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         available = ['xcode', 'json', 'csv', 'checkstyle', 'junit', 'html', 'emoji', 'sonarqube', 'markdown', 'github-actions-logging']
+                                         UI.user_error!("Available values are '#{available.join("', '")}'") unless available.include?(value)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :quiet,
                                        description: "Don't print status logs like 'Linting <file>' & 'Done linting'",
                                        default_value: false,
@@ -161,7 +174,9 @@ module Fastlane
               "AppDelegate.swift",
               "path/to/project/Model.swift"
             ],
+            raise_if_swiftlint_error: true,      # Allow fastlane to raise an error if swiftlint fails
             ignore_exit_status: true              # Allow fastlane to continue even if SwiftLint returns a non-zero exit status
+
           )'
         ]
       end
