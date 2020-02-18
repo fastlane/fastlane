@@ -4,6 +4,7 @@ module Fastlane
       def self.run(params)
         Actions.verify_gem!('xcode-install')
         required_version = params[:version]
+        strict = params[:strict]
 
         if required_version.to_s.length == 0
           # The user didn't provide an Xcode version, let's see
@@ -30,14 +31,36 @@ module Fastlane
           UI.user_error!("Invalid version number provided, make sure it's valid: #{ex}")
         end
 
-        if selected_version == required_version
-          UI.success("Selected Xcode version is correct: #{selected_version}")
+        if strict == true
+          if selected_version == required_version
+            success(selected_version)
+          else
+            error(selected_version, required_version)
+          end
         else
-          UI.message("Selected Xcode version is not correct: #{selected_version}. You expected #{required_version}.")
-          UI.message("To correct this, use: `xcode_select(version: #{required_version})`.")
+          required_version_numbers = required_version.to_s.split(".")
+          selected_version_numbers = selected_version.to_s.split(".")
 
-          UI.user_error!("Selected Xcode version doesn't match your requirement.\nExpected: Xcode #{required_version}\nActual: Xcode #{selected_version}\n")
+          required_version_numbers.each_with_index do |required_version_number, index|
+            selected_version_number = selected_version_numbers[index]
+            next unless required_version_number != selected_version_number
+            error(selected_version, required_version)
+            break
+          end
+
+          success(selected_version)
         end
+      end
+
+      def self.success(selected_version)
+        UI.success("Selected Xcode version is correct: #{selected_version}")
+      end
+
+      def self.error(selected_version, required_version)
+        UI.message("Selected Xcode version is not correct: #{selected_version}. You expected #{required_version}.")
+        UI.message("To correct this, use: `xcode_select(version: #{required_version})`.")
+
+        UI.user_error!("Selected Xcode version doesn't match your requirement.\nExpected: Xcode #{required_version}\nActual: Xcode #{selected_version}\n")
       end
 
       #####################################################
@@ -52,7 +75,8 @@ module Fastlane
         [
           "If building your app requires a specific version of Xcode, you can invoke this command before using gym.",
           "For example, to ensure that a beta version of Xcode is not accidentally selected to build, which would make uploading to TestFlight fail.",
-          "You can either manually provide a specific version using `version: ` or you make use of the `.xcode-version` file."
+          "You can either manually provide a specific version using `version: ` or you make use of the `.xcode-version` file.",
+          "Using the `strict` parameter, you can either verify the full set of version numbers strictly (i.e. `11.3.1`) or only a subset of them (i.e. `11.3` or `11`)."
         ].join("\n")
       end
 
@@ -62,7 +86,11 @@ module Fastlane
                                        env_name: "FL_ENSURE_XCODE_VERSION",
                                        description: "Xcode version to verify that is selected",
                                        is_string: true,
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :strict,
+                                       description: "Should the version be verified strictly (all 3 version numbers), or matching only the given version numbers (i.e. `11.3` == `11.3.x`)",
+                                       type: Boolean,
+                                       default_value: true)
         ]
       end
 
