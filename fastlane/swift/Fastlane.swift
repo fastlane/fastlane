@@ -2832,7 +2832,7 @@ func ensureEnvVars(envVars: [String]) {
 /**
  Raises an exception if not on a specific git branch
 
- - parameter branch: The branch that should be checked for. String that can be either the full name of the branch or a regex to match
+ - parameter branch: The branch that should be checked for. String that can be either the full name of the branch or a regex e.g. `^feature/.*$` to match
 
  This action will check if your git repo is checked out to a specific branch.
  You may only want to make releases from a specific branch, so `ensure_git_branch` will stop a lane if it was accidentally executed on an incorrect branch.
@@ -2892,14 +2892,19 @@ func ensureNoDebugCode(text: String,
 /**
  Ensure the right version of Xcode is used
 
- - parameter version: Xcode version to verify that is selected
+ - parameters:
+   - version: Xcode version to verify that is selected
+   - strict: Should the version be verified strictly (all 3 version numbers), or matching only the given version numbers (i.e. `11.3` == `11.3.x`)
 
  If building your app requires a specific version of Xcode, you can invoke this command before using gym.
  For example, to ensure that a beta version of Xcode is not accidentally selected to build, which would make uploading to TestFlight fail.
  You can either manually provide a specific version using `version: ` or you make use of the `.xcode-version` file.
+ Using the `strict` parameter, you can either verify the full set of version numbers strictly (i.e. `11.3.1`) or only a subset of them (i.e. `11.3` or `11`).
 */
-func ensureXcodeVersion(version: String? = nil) {
-  let command = RubyCommand(commandID: "", methodName: "ensure_xcode_version", className: nil, args: [RubyCommand.Argument(name: "version", value: version)])
+func ensureXcodeVersion(version: String? = nil,
+                        strict: Bool = true) {
+  let command = RubyCommand(commandID: "", methodName: "ensure_xcode_version", className: nil, args: [RubyCommand.Argument(name: "version", value: version),
+                                                                                                      RubyCommand.Argument(name: "strict", value: strict)])
   _ = runner.executeCommand(command)
 }
 
@@ -4613,6 +4618,35 @@ func nexusUpload(file: String,
 }
 
 /**
+ Notarizes a macOS app
+
+ - parameters:
+   - package: Path to package to notarize, e.g. .app bundle or disk image
+   - tryEarlyStapling: Whether to try early stapling while the notarization request is in progress
+   - bundleId: Bundle identifier to uniquely identify the package
+   - username: Apple ID username
+   - ascProvider: Provider short name for accounts associated with multiple providers
+   - printLog: Whether to print notarization log file, listing issues on failure and warnings on success
+   - verbose: Whether to log requests
+*/
+func notarize(package: String,
+              tryEarlyStapling: Bool = false,
+              bundleId: String? = nil,
+              username: String,
+              ascProvider: String? = nil,
+              printLog: Bool = false,
+              verbose: Bool = false) {
+  let command = RubyCommand(commandID: "", methodName: "notarize", className: nil, args: [RubyCommand.Argument(name: "package", value: package),
+                                                                                          RubyCommand.Argument(name: "try_early_stapling", value: tryEarlyStapling),
+                                                                                          RubyCommand.Argument(name: "bundle_id", value: bundleId),
+                                                                                          RubyCommand.Argument(name: "username", value: username),
+                                                                                          RubyCommand.Argument(name: "asc_provider", value: ascProvider),
+                                                                                          RubyCommand.Argument(name: "print_log", value: printLog),
+                                                                                          RubyCommand.Argument(name: "verbose", value: verbose)])
+  _ = runner.executeCommand(command)
+}
+
+/**
  Display a macOS notification with custom message and title
 
  - parameters:
@@ -5584,6 +5618,7 @@ func rubyVersion() {
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
+   - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
    - maxConcurrentSimulators: Constrain the number of simulator devices on which to test concurrently. Equivalent to -maximum-concurrent-test-simulator-destinations
    - disableConcurrentTesting: Do not run test bundles in parallel on the specified destinations. Testing will occur on each destination serially. Equivalent to -disable-concurrent-testing
    - skipBuild: Should debug build be skipped before test build?
@@ -5645,6 +5680,7 @@ func runTests(workspace: String? = nil,
               shouldZipBuildProducts: Bool = false,
               resultBundle: Bool = false,
               useClangReportName: Bool = false,
+              concurrentWorkers: Int? = nil,
               maxConcurrentSimulators: Int? = nil,
               disableConcurrentTesting: Bool = false,
               skipBuild: Bool = false,
@@ -5703,6 +5739,7 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
                                                                                            RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                            RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
+                                                                                           RubyCommand.Argument(name: "concurrent_workers", value: concurrentWorkers),
                                                                                            RubyCommand.Argument(name: "max_concurrent_simulators", value: maxConcurrentSimulators),
                                                                                            RubyCommand.Argument(name: "disable_concurrent_testing", value: disableConcurrentTesting),
                                                                                            RubyCommand.Argument(name: "skip_build", value: skipBuild),
@@ -5842,6 +5879,7 @@ func say(text: Any,
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
+   - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
    - maxConcurrentSimulators: Constrain the number of simulator devices on which to test concurrently. Equivalent to -maximum-concurrent-test-simulator-destinations
    - disableConcurrentTesting: Do not run test bundles in parallel on the specified destinations. Testing will occur on each destination serially. Equivalent to -disable-concurrent-testing
    - skipBuild: Should debug build be skipped before test build?
@@ -5903,6 +5941,7 @@ func scan(workspace: Any? = scanfile.workspace,
           shouldZipBuildProducts: Bool = scanfile.shouldZipBuildProducts,
           resultBundle: Bool = scanfile.resultBundle,
           useClangReportName: Bool = scanfile.useClangReportName,
+          concurrentWorkers: Int? = scanfile.concurrentWorkers,
           maxConcurrentSimulators: Int? = scanfile.maxConcurrentSimulators,
           disableConcurrentTesting: Bool = scanfile.disableConcurrentTesting,
           skipBuild: Bool = scanfile.skipBuild,
@@ -5961,6 +6000,7 @@ func scan(workspace: Any? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
                                                                                       RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                       RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
+                                                                                      RubyCommand.Argument(name: "concurrent_workers", value: concurrentWorkers),
                                                                                       RubyCommand.Argument(name: "max_concurrent_simulators", value: maxConcurrentSimulators),
                                                                                       RubyCommand.Argument(name: "disable_concurrent_testing", value: disableConcurrentTesting),
                                                                                       RubyCommand.Argument(name: "skip_build", value: skipBuild),
@@ -6863,6 +6903,7 @@ func splunkmint(dsym: String? = nil,
    - xcconfig: Use xcconfig file to override swift package generate-xcodeproj defaults
    - configuration: Build with configuration (debug|release) [default: debug]
    - xcprettyOutput: Specifies the output type for xcpretty. eg. 'test', or 'simple'
+   - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf'), requires xcpretty_output to be specified also
    - verbose: Increase verbosity of informational output
 */
 func spm(command: String = "build",
@@ -6871,6 +6912,7 @@ func spm(command: String = "build",
          xcconfig: String? = nil,
          configuration: String? = nil,
          xcprettyOutput: String? = nil,
+         xcprettyArgs: String? = nil,
          verbose: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "spm", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
                                                                                      RubyCommand.Argument(name: "build_path", value: buildPath),
@@ -6878,6 +6920,7 @@ func spm(command: String = "build",
                                                                                      RubyCommand.Argument(name: "xcconfig", value: xcconfig),
                                                                                      RubyCommand.Argument(name: "configuration", value: configuration),
                                                                                      RubyCommand.Argument(name: "xcpretty_output", value: xcprettyOutput),
+                                                                                     RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                      RubyCommand.Argument(name: "verbose", value: verbose)])
   _ = runner.executeCommand(command)
 }
@@ -7033,7 +7076,8 @@ func supply(packageName: String,
    - strict: Fail on warnings? (true/false)
    - files: List of files to process
    - ignoreExitStatus: Ignore the exit status of the SwiftLint command, so that serious violations                                                     don't fail the build (true/false)
-   - reporter: Choose output reporter
+   - raiseIfSwiftlintError: Raises an error if swiftlint fails, so you can fail CI/CD jobs if necessary                                                     (true/false)
+   - reporter: Choose output reporter. Available: xcode, json, csv, checkstyle, junit, html,                                                      emoji, sonarqube, markdown, github-actions-logging
    - quiet: Don't print status logs like 'Linting <file>' & 'Done linting'
    - executable: Path to the `swiftlint` executable on your machine
    - format: Format code when mode is :autocorrect
@@ -7046,6 +7090,7 @@ func swiftlint(mode: Any = "lint",
                strict: Bool = false,
                files: Any? = nil,
                ignoreExitStatus: Bool = false,
+               raiseIfSwiftlintError: Bool = false,
                reporter: String? = nil,
                quiet: Bool = false,
                executable: String? = nil,
@@ -7058,6 +7103,7 @@ func swiftlint(mode: Any = "lint",
                                                                                            RubyCommand.Argument(name: "strict", value: strict),
                                                                                            RubyCommand.Argument(name: "files", value: files),
                                                                                            RubyCommand.Argument(name: "ignore_exit_status", value: ignoreExitStatus),
+                                                                                           RubyCommand.Argument(name: "raise_if_swiftlint_error", value: raiseIfSwiftlintError),
                                                                                            RubyCommand.Argument(name: "reporter", value: reporter),
                                                                                            RubyCommand.Argument(name: "quiet", value: quiet),
                                                                                            RubyCommand.Argument(name: "executable", value: executable),
@@ -7690,6 +7736,7 @@ func updateUrlSchemes(path: String,
    - dsymPaths: Paths to the DSYM files or zips to upload
    - apiToken: Crashlytics API Key
    - gspPath: Path to GoogleService-Info.plist
+   - appId: Firebase Crashlytics APP ID
    - binaryPath: The path to the upload-symbols file of the Fabric app
    - platform: The platform of the app (ios, appletvos, mac)
    - dsymWorkerThreads: The number of threads to use for simultaneous dSYM upload
@@ -7700,6 +7747,7 @@ func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji
                                 dsymPaths: [String]? = nil,
                                 apiToken: String? = nil,
                                 gspPath: String? = nil,
+                                appId: String? = nil,
                                 binaryPath: String? = nil,
                                 platform: String = "ios",
                                 dsymWorkerThreads: Int = 1) {
@@ -7707,6 +7755,7 @@ func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji
                                                                                                                RubyCommand.Argument(name: "dsym_paths", value: dsymPaths),
                                                                                                                RubyCommand.Argument(name: "api_token", value: apiToken),
                                                                                                                RubyCommand.Argument(name: "gsp_path", value: gspPath),
+                                                                                                               RubyCommand.Argument(name: "app_id", value: appId),
                                                                                                                RubyCommand.Argument(name: "binary_path", value: binaryPath),
                                                                                                                RubyCommand.Argument(name: "platform", value: platform),
                                                                                                                RubyCommand.Argument(name: "dsym_worker_threads", value: dsymWorkerThreads)])
@@ -8632,4 +8681,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.69]
+// FastlaneRunnerAPIVersion [0.9.70]
