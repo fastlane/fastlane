@@ -134,6 +134,19 @@ module Cert
 
     # The kind of certificate we're interested in
     def certificate_type
+      if Cert.config[:type]
+        case Cert.config[:type].to_sym
+        when :mac_installer_distribution
+          return Spaceship.certificate.mac_installer_distribution
+        when :developer_id_application
+          return Spaceship.certificate.developer_id_application
+        when :developer_id_installer
+          return Spaceship.certificate.developer_id_installer
+        else
+          UI.user_error("Unaccepted value for :type - #{Cert.config[:type]}")
+        end
+      end
+
       # Check if apple certs (Xcode 11 and later) should be used
       if Cert.config[:generate_apple_certs]
         cert_type = Spaceship.certificate.apple_distribution

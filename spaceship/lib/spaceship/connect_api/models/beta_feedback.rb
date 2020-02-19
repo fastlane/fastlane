@@ -66,6 +66,10 @@ module Spaceship
       def self.all(filter: {}, includes: "tester,build,screenshots", limit: nil, sort: nil)
         return Spaceship::ConnectAPI.get_beta_feedback(filter: filter, includes: includes, limit: limit, sort: sort)
       end
+
+      def delete!
+        return Spaceship::ConnectAPI.delete_beta_feedback(feedback_id: self.id)
+      end
     end
   end
 end

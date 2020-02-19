@@ -254,6 +254,11 @@ module Scan
                                      default_value: false),
 
         # concurrency
+        FastlaneCore::ConfigItem.new(key: :concurrent_workers,
+                                     type: Integer,
+                                     env_name: "SCAN_CONCURRENT_WORKERS",
+                                     description: "Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :max_concurrent_simulators,
                                      type: Integer,
                                      env_name: "SCAN_MAX_CONCURRENT_SIMULATORS",
@@ -398,7 +403,12 @@ module Scan
                                     description: "Allows for override of the default `xcodebuild` command",
                                     type: String,
                                     optional: true,
-                                    default_value: "env NSUnbufferedIO=YES xcodebuild")
+                                    default_value: "env NSUnbufferedIO=YES xcodebuild"),
+        FastlaneCore::ConfigItem.new(key: :cloned_source_packages_path,
+                                    env_name: "SCAN_CLONED_SOURCE_PACKAGES_PATH",
+                                    description: "Sets a custom path for Swift Package Manager dependencies",
+                                    type: String,
+                                    optional: true)
 
       ]
     end

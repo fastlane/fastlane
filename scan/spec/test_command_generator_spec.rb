@@ -67,6 +67,7 @@ describe Scan do
     allow(rt_response).to receive(:read).and_return("no\n")
     allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, rt_response, nil, nil)
 
+    allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
     allow(FastlaneCore::CommandExecutor).to receive(:execute).with(command: "sw_vers -productVersion", print_all: false, print_command: false).and_return('10.12.1')
 
     allow(Scan).to receive(:project).and_return(@project)
@@ -227,6 +228,20 @@ describe Scan do
       end
     end
 
+    describe "Test Concurrent Workers" do
+      before do
+        options = { project: "./scan/examples/standard/app.xcodeproj", concurrent_workers: 4 }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      end
+
+      it "uses the correct number of concurrent workers", requires_xcodebuild: true do
+        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+        result = @test_command_generator.generate
+        expect(result).to include("-parallel-testing-worker-count 4")
+      end
+    end
+
     describe "Test Max Concurrent Simulators" do
       before do
         options = { project: "./scan/examples/standard/app.xcodeproj", max_concurrent_simulators: 3 }
@@ -237,7 +252,7 @@ describe Scan do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
         result = @test_command_generator.generate
-        expect(result).to include("-maximum-concurrent-test-simulator-destinations 3")
+        expect(result).to include("-maximum-concurrent-test-simulator-destinations 3") if FastlaneCore::Helper.xcode_at_least?(10)
       end
     end
 
@@ -251,7 +266,7 @@ describe Scan do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
         result = @test_command_generator.generate
-        expect(result).to include("-disable-concurrent-testing")
+        expect(result).to include("-disable-concurrent-testing") if FastlaneCore::Helper.xcode_at_least?(10)
       end
     end
 

@@ -30,6 +30,9 @@ protocol GymfileProtocol: class {
   /// Should we skip packaging the ipa?
   var skipPackageIpa: Bool { get }
 
+  /// Should we skip packaging the pkg?
+  var skipPackagePkg: Bool { get }
+
   /// Should the ipa file include symbols?
   var includeSymbols: Bool? { get }
 
@@ -53,6 +56,12 @@ protocol GymfileProtocol: class {
 
   /// Build without codesigning
   var skipCodesigning: Bool? { get }
+
+  /// Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
+  var catalystPlatform: String? { get }
+
+  /// Full name of 3rd Party Mac Developer Installer or Deveoper ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`
+  var installerCertName: String? { get }
 
   /// The directory in which the archive should be stored in
   var buildPath: String? { get }
@@ -119,6 +128,9 @@ protocol GymfileProtocol: class {
 
   /// Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
   var skipProfileDetection: Bool { get }
+
+  /// Sets a custom path for Swift Package Manager dependencies
+  var clonedSourcePackagesPath: String? { get }
 }
 
 extension GymfileProtocol {
@@ -132,6 +144,7 @@ extension GymfileProtocol {
   var silent: Bool { return false }
   var codesigningIdentity: String? { return nil }
   var skipPackageIpa: Bool { return false }
+  var skipPackagePkg: Bool { return false }
   var includeSymbols: Bool? { return nil }
   var includeBitcode: Bool? { return nil }
   var exportMethod: String? { return nil }
@@ -140,6 +153,8 @@ extension GymfileProtocol {
   var skipBuildArchive: Bool? { return nil }
   var skipArchive: Bool? { return nil }
   var skipCodesigning: Bool? { return nil }
+  var catalystPlatform: String? { return nil }
+  var installerCertName: String? { return nil }
   var buildPath: String? { return nil }
   var archivePath: String? { return nil }
   var derivedDataPath: String? { return nil }
@@ -162,8 +177,9 @@ extension GymfileProtocol {
   var analyzeBuildTime: Bool? { return nil }
   var xcprettyUtf: Bool? { return nil }
   var skipProfileDetection: Bool { return false }
+  var clonedSourcePackagesPath: String? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.17]
+// FastlaneRunnerAPIVersion [0.9.18]

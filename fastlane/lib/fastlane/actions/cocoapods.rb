@@ -19,7 +19,7 @@ module Fastlane
 
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
-        cmd << '--clean-install' if params[:clean_install] && pod_version.to_f >= 1.7
+        cmd << '--clean-install' if params[:clean_install] && pod_version(params).to_f >= 1.7
         cmd << '--repo-update' if params[:repo_update]
         cmd << '--silent' if params[:silent]
         cmd << '--verbose' if params[:verbose]
@@ -42,7 +42,7 @@ module Fastlane
         params[:use_bundle_exec] && shell_out_should_use_bundle_exec?
       end
 
-      def self.pod_version
+      def self.pod_version(params)
         use_bundle_exec?(params) ? `bundle exec pod --version` : `pod --version`
       end
 
