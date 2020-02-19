@@ -12,18 +12,36 @@ describe Fastlane do
         expect(result).to eq("4.3.2")
       end
 
-      it "gets the correct version number for 'TargetVariableParentheses'", requires_xcodeproj: true do
-        result = Fastlane::FastFile.new.parse("lane :test do
-          get_version_number(xcodeproj: '#{path}', target: 'TargetVariableParentheses')
-        end").runner.execute(:test)
-        expect(result).to eq("4.3.2")
+      context "Target Settings" do
+        it "gets the correct version number for 'TargetVariableParentheses'", requires_xcodeproj: true do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj: '#{path}', target: 'TargetVariableParentheses')
+          end").runner.execute(:test)
+          expect(result).to eq("4.3.2")
+        end
+
+        it "gets the correct version number for 'TargetVariableCurlyBraces'", requires_xcodeproj: true do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj: '#{path}', target: 'TargetVariableCurlyBraces')
+          end").runner.execute(:test)
+          expect(result).to eq("4.3.2")
+        end
       end
 
-      it "gets the correct version number for 'TargetVariableCurlyBraces'", requires_xcodeproj: true do
-        result = Fastlane::FastFile.new.parse("lane :test do
-          get_version_number(xcodeproj: '#{path}', target: 'TargetVariableCurlyBraces')
-        end").runner.execute(:test)
-        expect(result).to eq("4.3.2")
+      context "Project Settings" do
+        it "gets the correct version number for 'TargetVariableParenthesesBuildSettings'", requires_xcodeproj: true do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj: '#{path}', target: 'TargetVariableParenthesesBuildSettings')
+          end").runner.execute(:test)
+          expect(result).to eq("7.6.5")
+        end
+
+        it "gets the correct version number for 'TargetVariableCurlyBracesBuildSettings'", requires_xcodeproj: true do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj: '#{path}', target: 'TargetVariableCurlyBracesBuildSettings')
+          end").runner.execute(:test)
+          expect(result).to eq("7.6.5")
+        end
       end
 
       it "gets the correct version number for 'TargetATests'", requires_xcodeproj: true do
@@ -98,6 +116,39 @@ describe Fastlane do
           get_version_number(xcodeproj: '#{path}', target: 'TargetSRC')
         end").runner.execute(:test)
         expect(result).to eq("1.5.9")
+      end
+
+      it "gets the correct version when info-plist is relative path", requires_xcodeproj: true do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          get_version_number(xcodeproj: '#{path}', target: 'TargetRelativePath')
+        end").runner.execute(:test)
+        expect(result).to eq("3.37.0")
+      end
+
+      it "gets the correct version when info-plist is absolute path", requires_xcodeproj: true do
+        begin
+          # given
+          # copy TargetAbsolutePath-Info.plist to /tmp/fastlane_get_version_number_action_spec/
+          info_plist = File.absolute_path("./fastlane/spec/fixtures/actions/get_version_number/TargetAbsolutePath-Info.plist")
+          temp_folder_for_test = "/tmp/fastlane_get_version_number_action_spec/"
+          FileUtils.mkdir_p(temp_folder_for_test)
+          FileUtils.cp_r(info_plist, temp_folder_for_test)
+          temp_info_plist = File.path(temp_folder_for_test + "TargetAbsolutePath-Info.plist")
+          expect(File.file?(temp_info_plist)).not_to(be false)
+
+          # when
+          result = Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj: '#{path}', target: 'TargetAbsolutePath')
+          end").runner.execute(:test)
+
+          # then
+          expect(result).to eq("3.37.4")
+        ensure
+          # after
+          # remove /tmp/fastlane_get_version_number_action_spec/
+          FileUtils.rm_r(temp_folder_for_test)
+          expect(File.file?(temp_info_plist)).to be false
+        end
       end
 
       it "raises if one target and specified wrong target name", requires_xcodeproj: true do

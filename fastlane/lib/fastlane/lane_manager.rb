@@ -113,7 +113,7 @@ module Fastlane
         rows: FastlaneCore::PrintTable.transform_output(rows)
       )
 
-      UI.message("Welcome to fastlane! Here's what your app is setup to do:")
+      UI.message("Welcome to fastlane! Here's what your app is set up to do:")
 
       puts(table)
 

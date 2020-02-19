@@ -33,7 +33,7 @@ module Fastlane
             req.url("/api/upload/")
             req.body = options
           end
-        rescue Faraday::Error::TimeoutError
+        rescue Faraday::TimeoutError
           UI.crash!("Uploading build to TestFairy timed out ⏳")
         end
       end
@@ -92,6 +92,8 @@ module Fastlane
             [key, value]
           when :options
             [key, options_to_client.call(value).join(',')]
+          when :custom
+            [key, value]
           else
             UI.user_error!("Unknown parameter: #{key}")
           end
@@ -223,6 +225,11 @@ module Fastlane
                                        env_name: "FL_TESTFAIRY_OPTIONS",
                                        description: "Array of options (shake,video_only_wifi,anonymous)",
                                        default_value: []),
+          FastlaneCore::ConfigItem.new(key: :custom,
+                                       optional: true,
+                                       env_name: "FL_TESTFAIRY_CUSTOM",
+                                       description: "Array of custom options. Contact support@testfairy.com for more information",
+                                       default_value: ''),
           FastlaneCore::ConfigItem.new(key: :timeout,
                                        env_name: "FL_TESTFAIRY_TIMEOUT",
                                        description: "Request timeout in seconds",
@@ -252,7 +259,7 @@ module Fastlane
       end
 
       def self.authors
-        ["taka0125", "tcurdt"]
+        ["taka0125", "tcurdt", "vijaysharm"]
       end
 
       def self.is_supported?(platform)

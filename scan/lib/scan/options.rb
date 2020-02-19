@@ -81,6 +81,11 @@ module Scan
                                      description: "Enabling this option will automatically erase the simulator before running the application",
                                      default_value: false,
                                      type: Boolean),
+        FastlaneCore::ConfigItem.new(key: :disable_slide_to_type,
+                                     env_name: 'SCAN_DISABLE_SLIDE_TO_TYPE',
+                                     description: "Enabling this option will disable the simulator from showing the 'Slide to type' prompt",
+                                     default_value: true,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :prelaunch_simulator,
                                      env_name: 'SCAN_PRELAUNCH_SIMULATOR',
                                      description: "Enabling this option will launch the first simulator prior to calling any xcodebuild command",
@@ -249,6 +254,11 @@ module Scan
                                      default_value: false),
 
         # concurrency
+        FastlaneCore::ConfigItem.new(key: :concurrent_workers,
+                                     type: Integer,
+                                     env_name: "SCAN_CONCURRENT_WORKERS",
+                                     description: "Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :max_concurrent_simulators,
                                      type: Integer,
                                      env_name: "SCAN_MAX_CONCURRENT_SIMULATORS",
@@ -310,6 +320,18 @@ module Scan
                                      verify_block: proc do |value|
                                        UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
+
+        # build settings
+        FastlaneCore::ConfigItem.new(key: :app_name,
+                                    env_name: "SCAN_APP_NAME",
+                                    optional: true,
+                                    description: "App name to use in slack message and logfile name",
+                                    is_string: true),
+        FastlaneCore::ConfigItem.new(key: :deployment_target_version,
+                                    env_name: "SCAN_DEPLOYMENT_TARGET_VERSION",
+                                    optional: true,
+                                    description: "Target version of the app being build or tested. Used to filter out simulator version",
+                                    is_string: true),
 
         # slack
         FastlaneCore::ConfigItem.new(key: :slack_url,
@@ -381,7 +403,12 @@ module Scan
                                     description: "Allows for override of the default `xcodebuild` command",
                                     type: String,
                                     optional: true,
-                                    default_value: "env NSUnbufferedIO=YES xcodebuild")
+                                    default_value: "env NSUnbufferedIO=YES xcodebuild"),
+        FastlaneCore::ConfigItem.new(key: :cloned_source_packages_path,
+                                    env_name: "SCAN_CLONED_SOURCE_PACKAGES_PATH",
+                                    description: "Sets a custom path for Swift Package Manager dependencies",
+                                    type: String,
+                                    optional: true)
 
       ]
     end

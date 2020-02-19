@@ -50,6 +50,16 @@ class ConnectAPIStubbing
           to_return(status: 200, body: read_fixture_file('beta_build_metrics.json'), headers: { 'Content-Type' => 'application/json' })
       end
 
+      def stub_beta_feedbacks
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks").
+          to_return(status: 200, body: read_fixture_file('beta_feedbacks.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_beta_feedbacks_delete
+        stub_request(:delete, "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks/987654321").
+          to_return(status: 200, body: "", headers: {})
+      end
+
       def stub_beta_groups
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/betaGroups").
           to_return(status: 200, body: read_fixture_file('beta_groups.json'), headers: { 'Content-Type' => 'application/json' })

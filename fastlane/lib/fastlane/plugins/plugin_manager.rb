@@ -278,7 +278,7 @@ module Fastlane
     #   fastlane-plugin-[plugin_name]
     # This will make sure to load the action
     # and all its helpers
-    def load_plugins
+    def load_plugins(print_table: true)
       UI.verbose("Checking if there are any plugins that should be loaded...")
 
       loaded_plugins = false
@@ -311,7 +311,7 @@ module Fastlane
         UI.error("Please follow the troubleshooting guide: #{TROUBLESHOOTING_URL}")
       end
 
-      skip_print_plugin_info = self.plugin_references.empty? || CLIToolsDistributor.running_version_command? || FastlaneCore::Env.truthy?("FASTLANE_ENV_PRINTER")
+      skip_print_plugin_info = self.plugin_references.empty? || CLIToolsDistributor.running_version_command? || !print_table
 
       # We want to avoid printing output other than the version number if we are running `fastlane -v`
       print_plugin_information(self.plugin_references) unless skip_print_plugin_info
@@ -319,9 +319,12 @@ module Fastlane
 
     # Prints a table all the plugins that were loaded
     def print_plugin_information(references)
+      no_action_found = false
+
       rows = references.collect do |current|
         if current[1][:actions].empty?
           # Something is wrong with this plugin, no available actions
+          no_action_found = true
           [current[0].red, current[1][:version_number], "No actions found".red]
         else
           [current[0], current[1][:version_number], current[1][:actions].join("\n")]
@@ -335,6 +338,13 @@ module Fastlane
         headings: ["Plugin", "Version", "Action"]
       }))
       puts("")
+
+      if no_action_found
+        puts("[!] No actions were found while loading one or more plugins".red)
+        puts("    Please use `bundle exec fastlane` with plugins".red)
+        puts("    More info - https://docs.fastlane.tools/plugins/using-plugins/#run-with-plugins".red)
+        puts("")
+      end
     end
 
     #####################################################
@@ -363,7 +373,7 @@ module Fastlane
       # (a plugin may contain any number of actions)
       version_number = Fastlane::ActionCollector.determine_version(gem_name)
       references = Fastlane.const_get(module_name).all_classes.collect do |path|
-        next unless File.dirname(path).end_with?("/actions") # we only want to match actions
+        next unless File.dirname(path).include?("/actions") # we only want to match actions
 
         File.basename(path).gsub("_action", "").gsub(".rb", "").to_sym # the _action is optional
       end

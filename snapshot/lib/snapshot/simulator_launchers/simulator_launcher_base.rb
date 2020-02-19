@@ -5,6 +5,7 @@ require_relative '../test_command_generator'
 require_relative '../collector'
 require_relative '../fixes/hardware_keyboard_fix'
 require_relative '../fixes/simulator_zoom_fix'
+require_relative '../fixes/simulator_shared_pasteboard'
 
 module Snapshot
   class SimulatorLauncherBase
@@ -53,16 +54,23 @@ module Snapshot
 
       Fixes::SimulatorZoomFix.patch
       Fixes::HardwareKeyboardFix.patch
+      Fixes::SharedPasteboardFix.patch
 
       device_types.each do |type|
-        if launcher_config.erase_simulator || launcher_config.localize_simulator
+        if launcher_config.erase_simulator || launcher_config.localize_simulator || !launcher_config.dark_mode.nil?
           erase_simulator(type)
           if launcher_config.localize_simulator
             localize_simulator(type, language, locale)
           end
+          unless launcher_config.dark_mode.nil?
+            interface_style(type, launcher_config.dark_mode)
+          end
         elsif launcher_config.reinstall_app
           # no need to reinstall if device has been erased
           uninstall_app(type)
+        end
+        if launcher_config.disable_slide_to_type
+          disable_slide_to_type(type)
         end
       end
     end
@@ -121,6 +129,26 @@ module Snapshot
         UI.message("Localizing #{device_type} (AppleLocale=#{locale} AppleLanguages=[#{language}])")
         plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/.GlobalPreferences.plist"
         File.write(plist_path, Plist::Emit.dump(plist))
+      end
+    end
+
+    def interface_style(device_type, dark_mode)
+      device_udid = TestCommandGenerator.device_udid(device_type)
+      if device_udid
+        plist = {
+          UserInterfaceStyleMode: (dark_mode ? 2 : 1)
+        }
+        UI.message("Setting interface style #{device_type} (UserInterfaceStyleMode=#{dark_mode})")
+        plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/com.apple.uikitservices.userInterfaceStyleMode.plist"
+        File.write(plist_path, Plist::Emit.dump(plist))
+      end
+    end
+
+    def disable_slide_to_type(device_type)
+      device_udid = TestCommandGenerator.device_udid(device_type)
+      if device_udid
+        UI.message("Disabling slide to type on #{device_type}")
+        FastlaneCore::Simulator.disable_slide_to_type(udid: device_udid)
       end
     end
 

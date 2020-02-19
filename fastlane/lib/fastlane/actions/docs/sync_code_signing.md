@@ -99,7 +99,7 @@ If your machine is currently using SSH to authenticate with GitHub, you'll want 
 Using parameter:
 
 ```
-math(git_basic_authorization: '<YOUR KEY>')
+match(git_basic_authorization: '<YOUR KEY>')
 ```
 
 Using environment variable:
@@ -110,6 +110,25 @@ match
 ```
 
 You can find more information about GitHub basic authentication and personal token generation here: [https://developer.github.com/v3/auth/#basic-authentication](https://developer.github.com/v3/auth/#basic-authentication)
+
+##### Git Storage on Azure Devops
+
+If you're running a pipeline on Azure Devops and using git storage in a another repository on the same project, you might want to use `bearer` token authentication.
+
+Using parameter:
+
+```
+match(git_bearer_authorization: '<YOUR TOKEN>')
+```
+
+Using environment variable:
+
+```
+ENV['MATCH_GIT_BEARER_AUTHORIZATION'] = '<YOUR TOKEN>'
+match
+```
+
+You can find more information about this use case here: [https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#authorize-access-to-your-repositories](https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#authorize-access-to-your-repositories)
 
 #### Google Cloud Storage
 
@@ -236,9 +255,11 @@ There are two cases for reading and writing certificates stored in a Google Clou
 When running `fastlane match init` the first time, the setup process will give you the option to create your `gc_keys.json` file. This file contains the authentication credentials needed to access your Google Cloud storage bucket. Make sure to keep that file secret and never add it to version control. We recommend adding `gc_keys.json` to your `.gitignore`
 
 ##### Managing developer access via keys
+
 If you want to manage developer access to your certificates via authentication keys, every developer should create their own `gc_keys.json` and add the file to all their work machines. This will give the admin full control over who has read/write access to the given Storage bucket. At the same time it allows your team to revoke a single key if a file gets compromised.
 
-##### Managing developer acess via Google accounts
+##### Managing developer access via Google accounts
+
 If your developers already have Google accounts and access to your Google Cloud project, you can also manage access to the storage bucket via [Cloud Identity and Access Management (IAM)](https://cloud.google.com/storage/docs/access-control/iam). Just [set up](https://cloud.google.com/storage/docs/access-control/lists) individual developer accounts or an entire Google Group containing your team as readers and writers on your storage bucket.
 
 You can then specify the Google Cloud project id containing your storage bucket in your `Matchfile`:

@@ -67,6 +67,7 @@ describe Scan do
     allow(rt_response).to receive(:read).and_return("no\n")
     allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, rt_response, nil, nil)
 
+    allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
     allow(FastlaneCore::CommandExecutor).to receive(:execute).with(command: "sw_vers -productVersion", print_all: false, print_command: false).and_return('10.12.1')
 
     allow(Scan).to receive(:project).and_return(@project)
@@ -227,6 +228,20 @@ describe Scan do
       end
     end
 
+    describe "Test Concurrent Workers" do
+      before do
+        options = { project: "./scan/examples/standard/app.xcodeproj", concurrent_workers: 4 }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      end
+
+      it "uses the correct number of concurrent workers", requires_xcodebuild: true do
+        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+        result = @test_command_generator.generate
+        expect(result).to include("-parallel-testing-worker-count 4")
+      end
+    end
+
     describe "Test Max Concurrent Simulators" do
       before do
         options = { project: "./scan/examples/standard/app.xcodeproj", max_concurrent_simulators: 3 }
@@ -237,7 +252,7 @@ describe Scan do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
         result = @test_command_generator.generate
-        expect(result).to include("-maximum-concurrent-test-simulator-destinations 3")
+        expect(result).to include("-maximum-concurrent-test-simulator-destinations 3") if FastlaneCore::Helper.xcode_at_least?(10)
       end
     end
 
@@ -251,7 +266,7 @@ describe Scan do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
         result = @test_command_generator.generate
-        expect(result).to include("-disable-concurrent-testing")
+        expect(result).to include("-disable-concurrent-testing") if FastlaneCore::Helper.xcode_at_least?(10)
       end
     end
 
@@ -268,11 +283,11 @@ describe Scan do
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: "xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
+            with(command: "xcrun simctl spawn --standalone 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
+            with(command: "xcrun simctl spawn --standalone 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
 
           mock_test_result_parser = Object.new
           allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)

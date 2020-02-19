@@ -10,6 +10,17 @@ describe Fastlane do
         describe = %W(git describe --tags #{tag_name}).shelljoin
         expect(result).to eq(describe)
       end
+
+      it "Returns nothing for jibberish tag pattern match" do
+        tag_pattern = "jibberish"
+        result = Fastlane::FastFile.new.parse("lane :test do
+          last_git_tag(pattern: \"#{tag_pattern}\")
+        end").runner.execute(:test)
+
+        tag_name = %W(git rev-list --tags=#{tag_pattern} --max-count=1).shelljoin
+        describe = %W(git describe --tags #{tag_name}).shelljoin
+        expect(result).to eq(describe)
+      end
     end
   end
 end

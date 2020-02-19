@@ -25,9 +25,17 @@ module Scan
     def test_app
       force_quit_simulator_processes if Scan.config[:force_quit_simulator]
 
-      if Scan.config[:reset_simulator]
-        Scan.devices.each do |device|
-          FastlaneCore::Simulator.reset(udid: device.udid)
+      if Scan.devices
+        if Scan.config[:reset_simulator]
+          Scan.devices.each do |device|
+            FastlaneCore::Simulator.reset(udid: device.udid)
+          end
+        end
+
+        if Scan.config[:disable_slide_to_type]
+          Scan.devices.each do |device|
+            FastlaneCore::Simulator.disable_slide_to_type(udid: device.udid)
+          end
         end
       end
 
@@ -67,7 +75,7 @@ module Scan
                                               error: proc do |error_output|
                                                 begin
                                                   exit_status = $?.exitstatus
-                                                  ErrorHandler.handle_build_error(error_output)
+                                                  ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
                                                 rescue => ex
                                                   SlackPoster.new.run({
                                                     build_errors: 1

@@ -2,6 +2,7 @@ module Fastlane
   module Actions
     module SharedValues
       CREATE_PULL_REQUEST_HTML_URL = :CREATE_PULL_REQUEST_HTML_URL
+      CREATE_PULL_REQUEST_NUMBER = :CREATE_PULL_REQUEST_NUMBER
     end
 
     class CreatePullRequestAction < Action
@@ -39,7 +40,14 @@ module Fastlane
           # Add assignees to pull request
           add_assignees(params, number) if params[:assignees]
 
+          # Add reviewers to pull request
+          add_reviewers(params, number) if params[:reviewers] || params[:team_reviewers]
+
+          # Add a milestone to pull request
+          add_milestone(params, number) if params[:milestone]
+
           Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_HTML_URL] = html_url
+          Actions.lane_context[SharedValues::CREATE_PULL_REQUEST_NUMBER] = number
           return html_url
         end
       end
@@ -82,6 +90,51 @@ module Fastlane
         )
       end
 
+      def self.add_reviewers(params, number)
+        payload = {}
+        if params[:reviewers]
+          payload["reviewers"] = params[:reviewers]
+        end
+
+        if params[:team_reviewers]
+          payload["team_reviewers"] = params[:team_reviewers]
+        end
+        GithubApiAction.run(
+          server_url: params[:api_url],
+          api_token: params[:api_token],
+          http_method: 'POST',
+          path: "repos/#{params[:repo]}/pulls/#{number}/requested_reviewers",
+          body: payload,
+          error_handlers: {
+            '*' => proc do |result|
+              UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")
+              return nil
+            end
+          }
+        )
+      end
+
+      def self.add_milestone(params, number)
+        payload = {}
+        if params[:milestone]
+          payload["milestone"] = params[:milestone]
+        end
+
+        GithubApiAction.run(
+          server_url: params[:api_url],
+          api_token: params[:api_token],
+          http_method: 'PATCH',
+          path: "repos/#{params[:repo]}/issues/#{number}",
+          body: payload,
+          error_handlers: {
+              '*' => proc do |result|
+                UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")
+                return nil
+              end
+          }
+        )
+      end
+
       #####################################################
       # @!group Documentation
       #####################################################
@@ -92,7 +145,8 @@ module Fastlane
 
       def self.output
         [
-          ['CREATE_PULL_REQUEST_HTML_URL', 'The HTML URL to the created pull request']
+          ['CREATE_PULL_REQUEST_HTML_URL', 'The HTML URL to the created pull request'],
+          ['CREATE_PULL_REQUEST_NUMBER', 'The identifier number of the created pull request']
         ]
       end
 
@@ -127,6 +181,11 @@ module Fastlane
                                        description: "The labels for the pull request",
                                        type: Array,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :milestone,
+                                       env_name: "GITHUB_PULL_REQUEST_MILESTONE",
+                                       description: "The milestone ID (Integer) for the pull request",
+                                       type: Numeric,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :head,
                                        env_name: "GITHUB_PULL_REQUEST_HEAD",
                                        description: "The name of the branch where your changes are implemented (defaults to the current branch name)",
@@ -152,12 +211,22 @@ module Fastlane
                                        env_name: "GITHUB_PULL_REQUEST_ASSIGNEES",
                                        description: "The assignees for the pull request",
                                        type: Array,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :reviewers,
+                                       env_name: "GITHUB_PULL_REQUEST_REVIEWERS",
+                                       description: "The reviewers (slug) for the pull request",
+                                       type: Array,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :team_reviewers,
+                                       env_name: "GITHUB_PULL_REQUEST_TEAM_REVIEWERS",
+                                       description: "The team reviewers (slug) for the pull request",
+                                       type: Array,
                                        optional: true)
         ]
       end
 
       def self.author
-        ["seei", "tommeier", "marumemomo"]
+        ["seei", "tommeier", "marumemomo", "elneruda"]
       end
 
       def self.is_supported?(platform)
