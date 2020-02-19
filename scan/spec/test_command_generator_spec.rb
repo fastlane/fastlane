@@ -308,7 +308,7 @@ describe Scan do
 
     describe "Result Bundle Example" do
       it "uses the correct build command with the example project when using Xcode 10 or earlier", requires_xcodebuild: true do
-        allow(FastlaneCore::Helper.xcode_version).to receive(:xcode_version).and_return('10')
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('10')
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
         options = { project: "./scan/examples/standard/app.xcodeproj", result_bundle: true, scheme: 'app' }
@@ -329,7 +329,7 @@ describe Scan do
       end
 
       it "uses the correct build command with the example project when using Xcode 11 or later", requires_xcodebuild: true do
-        allow(FastlaneCore::Helper.xcode_version).to receive(:xcode_version).and_return('11')
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11')
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
         options = { project: "./scan/examples/standard/app.xcodeproj", result_bundle: true, scheme: 'app' }
