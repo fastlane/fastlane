@@ -342,7 +342,11 @@ module Screengrab
         # specific name, as expected by supply
         #
         # (Moved to: fastlane/metadata/android/en-US/images/phoneScreenshots)
-        dest_dir = File.join(File.dirname(dest_dir), locale, 'images', device_type_dir_name)
+        if dest_dir.include?("#{locale}/images")
+          dest_dir = File.join(File.dirname(dest_dir), device_type_dir_name)
+        else
+          dest_dir = File.join(File.dirname(dest_dir), locale, 'images', device_type_dir_name)
+        end
 
         FileUtils.mkdir_p(dest_dir)
         FileUtils.cp_r(src_screenshots, dest_dir)
