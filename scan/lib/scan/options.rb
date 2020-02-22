@@ -124,7 +124,7 @@ module Scan
                                      end),
 
         # other test options
-        FastlaneCore::ConfigItem.new(key: :testPlan,
+        FastlaneCore::ConfigItem.new(key: :testplan,
                                      env_name: "SCAN_TESTPLAN",
                                      description: "The testplan associated with the scheme that should be used for testing",
                                      is_string: true,

@@ -616,7 +616,7 @@ describe Scan do
 
     describe "Specifying a test plan" do
       before do
-        options = { project: "./scan/examples/standard/app.xcodeproj", testPlan: "simple" }
+        options = { project: "./scan/examples/standard/app.xcodeproj", testplan: "simple" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       end
 
