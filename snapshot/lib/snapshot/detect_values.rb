@@ -66,6 +66,13 @@ module Snapshot
       elsif Snapshot.project.mac?
         config[:devices] = ["Mac"]
       end
+
+      coerce_to_array_of_strings(:only_testing)
+      coerce_to_array_of_strings(:skip_testing)
+    end
+
+    def self.coerce_to_array_of_strings(config_key)
+      Snapshot.config[config_key] = FastlaneCore::Helper::coerce_to_array_of_strings(Snapshot.config[config_key])
     end
   end
 end

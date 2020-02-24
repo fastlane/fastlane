@@ -48,24 +48,16 @@ module Scan
       return config
     end
 
+    def self.coerce_to_array_of_strings(config_key)
+      Scan.config[config_key] = FastlaneCore::Helper::coerce_to_array_of_strings(Scan.config[config_key])
+    end
+
     def self.prevalidate
       output_types = Scan.config[:output_types]
       has_multiple_report_types = output_types && output_types.split(',').size > 1
       if has_multiple_report_types && Scan.config[:custom_report_file_name]
         UI.user_error!("Using a :custom_report_file_name with multiple :output_types (#{output_types}) will lead to unexpected results. Use :output_files instead.")
       end
-    end
-
-    def self.coerce_to_array_of_strings(config_key)
-      config_value = Scan.config[config_key]
-
-      return if config_value.nil?
-
-      # splitting on comma allows us to support comma-separated lists of values
-      # from the command line, even though the ConfigItem is not defined as an
-      # Array type
-      config_value = config_value.split(',') unless config_value.kind_of?(Array)
-      Scan.config[config_key] = config_value.map(&:to_s)
     end
 
     def self.default_derived_data

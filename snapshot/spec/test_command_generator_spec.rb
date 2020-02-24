@@ -264,6 +264,36 @@ describe Snapshot do
           expect(command.join('')).not_to(include("build test"))
         end
       end
+
+      context 'only-testing support' do
+        it "only tests the test bundle/suite/cases specified in only_testing when the input is a string", requires_xcode: true do
+          configure(options.merge(only_testing: 'TestBundle/TestSuite/ScreenshotsA'))
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-only-testing:TestBundle/TestSuite/ScreenshotsA")
+        end
+
+        it "only tests the test bundle/suite/cases specified in only_testing when the input is an array", requires_xcode: true do
+          configure(options.merge(only_testing: %w(TestBundle/TestSuite/ScreenshotsA ScreenshotsB)))
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-only-testing:TestBundle/TestSuite/ScreenshotsA")
+          expect(command.join('')).to include("-only-testing:ScreenshotsB")
+        end
+      end
+
+      context 'skip-testing support' do
+        it "does not the test bundle/suite/cases specified in skip_testing when the input is a string", requires_xcode: true do
+          configure(options.merge(skip_testing: 'TestBundle/TestSuite/ScreenshotsA'))
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-skip-testing:TestBundle/TestSuite/ScreenshotsA")
+        end
+
+        it "does not the test bundle/suite/cases specified in skip_testing when the input is an array", requires_xcode: true do
+          configure(options.merge(skip_testing: %w(TestBundle/TestSuite/ScreenshotsA ScreenshotsB)))
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-skip-testing:TestBundle/TestSuite/ScreenshotsA")
+          expect(command.join('')).to include("-skip-testing:ScreenshotsB")
+        end
+      end
     end
 
     describe "Valid macOS Configuration" do
