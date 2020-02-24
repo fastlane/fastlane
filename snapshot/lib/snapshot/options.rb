@@ -9,7 +9,7 @@ module Snapshot
       type_ok = [Array, String].any? { |type| value.kind_of?(type) }
       UI.user_error!("'#{item_name}' should be of type #{acceptable_types.join(' or ')} but found: #{value.class.name}") unless type_ok
     end
-    
+
     def self.available_options
       output_directory = (File.directory?("fastlane") ? "fastlane/screenshots" : "screenshots")
 
@@ -253,7 +253,7 @@ module Snapshot
                                     is_string: false,
                                     verify_block: proc do |value|
                                       verify_type('skip_testing', [Array, String], value)
-                                    end),
+                                    end)
       ]
     end
   end

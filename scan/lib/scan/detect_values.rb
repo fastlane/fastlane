@@ -49,7 +49,7 @@ module Scan
     end
 
     def self.coerce_to_array_of_strings(config_key)
-      Scan.config[config_key] = FastlaneCore::Helper::coerce_to_array_of_strings(Scan.config[config_key])
+      Scan.config[config_key] = FastlaneCore::Helper.coerce_to_array_of_strings(Scan.config[config_key])
     end
 
     def self.prevalidate
