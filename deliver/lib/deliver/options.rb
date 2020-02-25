@@ -133,6 +133,11 @@ module Deliver
                                      description: "Don't update app version for submission",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_auto_detecting_app_version,
+                                     optional: true,
+                                     default_value: false,
+                                     description: "Don't detecting app version from ipa or pkg",
+                                     is_string: false),
 
         # how to operate
         FastlaneCore::ConfigItem.new(key: :force,
