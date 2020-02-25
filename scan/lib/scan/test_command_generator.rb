@@ -151,7 +151,8 @@ module Scan
 
     def result_bundle_path
       unless Scan.cache[:result_bundle_path]
-        path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + ".test_result"
+        ext = FastlaneCore::Helper.xcode_version.to_i >= 11 ? '.xcresult' : '.test_result'
+        path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + ext
         if File.directory?(path)
           FileUtils.remove_dir(path)
         end

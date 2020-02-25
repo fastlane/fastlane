@@ -307,7 +307,8 @@ describe Scan do
     end
 
     describe "Result Bundle Example" do
-      it "uses the correct build command with the example project", requires_xcodebuild: true do
+      it "uses the correct build command with the example project when using Xcode 10 or earlier", requires_xcodebuild: true do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('10')
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
         options = { project: "./scan/examples/standard/app.xcodeproj", result_bundle: true, scheme: 'app' }
@@ -322,6 +323,27 @@ describe Scan do
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                        "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
                                        "-resultBundlePath './fastlane/test_output/app.test_result'",
+                                       :build,
+                                       :test
+                                     ])
+      end
+
+      it "uses the correct build command with the example project when using Xcode 11 or later", requires_xcodebuild: true do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11')
+        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+        options = { project: "./scan/examples/standard/app.xcodeproj", result_bundle: true, scheme: 'app' }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        result = @test_command_generator.generate
+        expect(result).to start_with([
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme app",
+                                       "-project ./scan/examples/standard/app.xcodeproj",
+                                       "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                       "-derivedDataPath '#{Scan.config[:derived_data_path]}'",
+                                       "-resultBundlePath './fastlane/test_output/app.xcresult'",
                                        :build,
                                        :test
                                      ])
