@@ -42,8 +42,7 @@ module Deliver
         end
       else
         UI.message("Selecting the latest build...")
-        target_app_version = options[:use_latest_build] ? nil : app_version
-        build = wait_for_build(app, target_app_version)
+        build = wait_for_build(app, app_version)
       end
       UI.message("Selecting build #{app_version} (#{build.build_version})...")
 

@@ -85,12 +85,6 @@ module Deliver
                                      verify_block: proc do |value|
                                        UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include?(value)
                                      end),
-        FastlaneCore::ConfigItem.new(key: :use_latest_build,
-                                     optional: true,
-                                     default_value: false,
-                                     env_name: "DELIVER_USE_LATEST_BUILD",
-                                     description: "Force usage of latest build version",
-                                     is_string: false),
 
         # live version
         FastlaneCore::ConfigItem.new(key: :edit_live,
