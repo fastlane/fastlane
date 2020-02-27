@@ -76,7 +76,9 @@ protocol DeliverfileProtocol: class {
   var appRatingConfigPath: String? { get }
 
   /// Extra information for the submission (e.g. compliance specifications, IDFA settings)
-  var submissionInformation: String? { get }
+  /// Look at the Spaceship's app_submission.rb file for options.
+  /// https://github.com/artsy/eigen/blob/faa02e2746194d8d7c11899474de9c517435eca4/fastlane/Fastfile#L131-L149
+  var submissionInformation: [String : Any?]? { get }
 
   /// The ID of your App Store Connect team if you're in multiple teams
   var teamId: String? { get }
@@ -207,7 +209,7 @@ extension DeliverfileProtocol {
   var resetRatings: Bool { return false }
   var priceTier: String? { return nil }
   var appRatingConfigPath: String? { return nil }
-  var submissionInformation: String? { return nil }
+  var submissionInformation: [String : Any?]? { return nil }
   var teamId: String? { return nil }
   var teamName: String? { return nil }
   var devPortalTeamId: String? { return nil }
