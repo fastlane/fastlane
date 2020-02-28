@@ -16,7 +16,8 @@ module Match
             return nil
           },
           "s3" => lambda { |params|
-            return nil
+            params[:keychain_name] = params[:s3_bucket]
+            return Encryption::OpenSSL.configure(params)
           }
         }
       end
