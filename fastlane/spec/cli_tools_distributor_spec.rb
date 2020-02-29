@@ -58,4 +58,44 @@ describe Fastlane::CLIToolsDistributor do
       end
     end
   end
+
+  describe "dotenv loading" do
+    it "passes --env option into DotenvHelper" do
+      FastlaneSpec::Env.with_ARGV(["lanes", "--env", "one"]) do
+        require 'fastlane/helper/dotenv_helper'
+        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with('one')
+        expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileUseToolNameAsLane").at_least(:once)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
+
+    it "strips --env option" do
+      FastlaneSpec::Env.with_ARGV(["lanes", "--env", "one,two"]) do
+        require 'fastlane/helper/dotenv_helper'
+        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with('one,two')
+        expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileUseToolNameAsLane").at_least(:once)
+        Fastlane::CLIToolsDistributor.take_off
+        expect(ARGV).not_to(include('--env'))
+        expect(ARGV).not_to(include('one,two'))
+      end
+    end
+
+    it "ignores --env missing a value" do
+      FastlaneSpec::Env.with_ARGV(["lanes", "--env"]) do
+        require 'fastlane/helper/dotenv_helper'
+        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with(nil)
+        expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileUseToolNameAsLane").at_least(:once)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
+
+    it "passes nil when --env is not specified" do
+      FastlaneSpec::Env.with_ARGV(["lanes"]) do
+        require 'fastlane/helper/dotenv_helper'
+        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with(nil)
+        expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileUseToolNameAsLane").at_least(:once)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
+  end
 end
