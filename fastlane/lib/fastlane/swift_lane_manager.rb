@@ -18,9 +18,8 @@ module Fastlane
       # and not return to the original working directory
       # https://github.com/CocoaPods/Xcodeproj/issues/426
       # Setting this environment variable causes xcodeproj to work around the problem
+      # TODO: Does this need moving into CLIToolsDistributor to be called **before** loading Dotenv?
       ENV["FORK_XCODE_WRITING"] = "true"
-
-      Fastlane::Helper::DotenvHelper.load_dot_env(env)
 
       started = Time.now
       e = nil
