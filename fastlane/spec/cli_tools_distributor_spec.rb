@@ -77,6 +77,7 @@ describe Fastlane::CLIToolsDistributor do
         Fastlane::CLIToolsDistributor.take_off
         expect(ARGV).not_to(include('--env'))
         expect(ARGV).not_to(include('one,two'))
+        # TODO: Is there a better way to check that ARGV has been updated?
       end
     end
 

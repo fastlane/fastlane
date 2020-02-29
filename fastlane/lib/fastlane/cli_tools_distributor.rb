@@ -62,8 +62,8 @@ module Fastlane
         # Loading any .env files before any lanes are called since
         # variables like FASTLANE_HIDE_CHANGELOG and FASTLANE_DISABLE_COLORS
         # need to be set early on in execution
-        require 'fastlane/helper/dotenv_helper'
-        Fastlane::Helper::DotenvHelper.load_dot_env(nil)
+        # TODO: Should load_dot_env be moved to the top of take_off in order to support FASTLANE_DISABLE_ANIMATION preference?
+        load_dot_env
 
         # Needs to go after load_dot_env for variable FASTLANE_SKIP_UPDATE_CHECK
         FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
@@ -120,6 +120,28 @@ module Fastlane
         end
       ensure
         FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+      end
+
+      # Since loading dotenv should respect additional environments passed using
+      # --env, we must extrat the arguments out of ARGV and process them before
+      # calling into commander. This is required since the ENV must be configured
+      # before running any other commands in order to correclty respect variables
+      # like FASTLANE_HIDE_CHANGELOG and FASTLANE_DISABLE_COLORS
+      def load_dot_env
+        env_cl_param = lambda do
+          index = ARGV.index("--env")
+          return nil if index.nil?
+          ARGV.delete_at(index)
+
+          return nil if ARGV[index].nil?
+          value = ARGV[index]
+          ARGV.delete_at(index)
+
+          value
+        end
+
+        require 'fastlane/helper/dotenv_helper'
+        Fastlane::Helper::DotenvHelper.load_dot_env(env_cl_param.call)
       end
 
       # Since fastlane also supports the rocket and biceps emoji as executable
