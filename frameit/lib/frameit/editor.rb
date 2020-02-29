@@ -60,8 +60,8 @@ module Frameit
     end
 
     def rotation_for_device_orientation
-      return 90 if self.screenshot.landscape_right?
-      return -90 if self.screenshot.landscape_left?
+      return -90 if self.screenshot.landscape_right?
+      return 90 if self.screenshot.landscape_left?
       return 0
     end
 
