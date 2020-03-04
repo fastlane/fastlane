@@ -22,6 +22,8 @@ module Spaceship
       })
 
       module CertificateType
+        DEVELOPMENT = "DEVELOPMENT"
+        DISTRIBUTION = "DISTRIBUTION"
         IOS_DEVELOPMENT = "IOS_DEVELOPMENT"
         IOS_DISTRIBUTION = "IOS_DISTRIBUTION"
         MAC_APP_DISTRIBUTION = "MAC_APP_DISTRIBUTION"
