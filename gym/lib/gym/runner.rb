@@ -326,7 +326,6 @@ module Gym
       end
     end
 
-
     # Move Asset Packs folder to the output directory
     # @return (String) The path to the resulting Asset Packs (aka OnDemandResources) folder
     def move_asset_packs
