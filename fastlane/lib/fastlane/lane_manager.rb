@@ -42,13 +42,6 @@ module Fastlane
 
       platform, lane = choose_lane(ff, platform) unless lane
 
-      # xcodeproj has a bug in certain versions that causes it to change directories
-      # and not return to the original working directory
-      # https://github.com/CocoaPods/Xcodeproj/issues/426
-      # Setting this environment variable causes xcodeproj to work around the problem
-      # TODO: Does this need moving into CLIToolsDistributor to be called **before** loading Dotenv?
-      ENV["FORK_XCODE_WRITING"] = "true" unless platform == 'android'
-
       started = Time.now
       e = nil
       begin
