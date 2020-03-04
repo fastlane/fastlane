@@ -143,10 +143,17 @@ module Screengrab
 
     def determine_internal_screenshots_paths(app_package_name, locales)
       locale_paths = locales.map do |locale|
-        "/data/user/0/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots"
-      end
+        [
+          "/data/user/0/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots",
 
-      return ["/data/data/#{app_package_name}/app_screengrab"] + locale_paths
+          # https://github.com/fastlane/fastlane/issues/15653#issuecomment-578541663
+          "/data/data/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots"
+        ]
+      end.flatten
+
+      return ["/data/data/#{app_package_name}/app_screengrab"] +
+             ["/data/data/#{app_package_name}/screengrab"] +
+             locale_paths
     end
 
     def clear_device_previous_screenshots(device_serial, device_screenshots_paths)
@@ -289,6 +296,7 @@ module Screengrab
       Dir.mktmpdir do |tempdir|
         device_screenshots_paths.each do |device_path|
           if_device_path_exists(device_serial, device_path) do |path|
+            next unless path.include?(locale)
             run_adb_command("-s #{device_serial} pull #{path} #{tempdir}",
                             print_all: false,
                             print_command: true)
