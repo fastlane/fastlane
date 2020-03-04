@@ -18,8 +18,9 @@ module Frameit
     attr_accessor :image # the current image used for editing
     attr_accessor :space_to_device
 
-    def initialize(screenshot, debug_mode = false)
+    def initialize(screenshot, config, debug_mode = false)
       @screenshot = screenshot
+      @config = config
       self.debug_mode = debug_mode
     end
 
@@ -121,7 +122,7 @@ module Frameit
     def offset
       return @offset_information if @offset_information
 
-      @offset_information = fetch_config['offset'] || Offsets.image_offset(screenshot).dup
+      @offset_information = @config['offset'] || Offsets.image_offset(screenshot).dup
 
       if @offset_information && (@offset_information['offset'] || @offset_information['offset'])
         return @offset_information
@@ -148,7 +149,7 @@ module Frameit
 
     # Do we add a background and title as well?
     def is_complex_framing_mode?
-      return (fetch_config['background'] and (fetch_config['title'] or fetch_config['keyword']))
+      return (@config['background'] and (@config['title'] or @config['keyword']))
     end
 
     # more complex mode: background, frame and title
@@ -157,8 +158,8 @@ module Frameit
 
       self.space_to_device = vertical_frame_padding
 
-      if fetch_config['title']
-        background = put_title_into_background(background, fetch_config['stack_title'])
+      if @config['title']
+        background = put_title_into_background(background, @config['stack_title'])
       end
 
       if self.frame # we have no frame on le mac
@@ -169,7 +170,7 @@ module Frameit
         frame_width = background.width - horizontal_frame_padding * 2
         frame_height = background.height - effective_text_height - vertical_frame_padding
 
-        if fetch_config['show_complete_frame']
+        if @config['show_complete_frame']
           # calculate the final size of the screenshot to resize in one go
           # it may be limited either by the width or height of the frame
           image_aspect_ratio = @image.width.to_f / @image.height.to_f
@@ -191,7 +192,7 @@ module Frameit
 
     # Horizontal adding around the frames
     def horizontal_frame_padding
-      padding = fetch_config['padding']
+      padding = @config['padding']
       if padding.kind_of?(String) && padding.split('x').length == 2
         padding = padding.split('x')[0]
         padding = padding.to_i unless padding.end_with?('%')
@@ -201,7 +202,7 @@ module Frameit
 
     # Vertical adding around the frames
     def vertical_frame_padding
-      padding = fetch_config['padding']
+      padding = @config['padding']
       if padding.kind_of?(String) && padding.split('x').length == 2
         padding = padding.split('x')[1]
         padding = padding.to_i unless padding.end_with?('%')
@@ -212,7 +213,7 @@ module Frameit
     # Minimum height for the title
     def title_min_height
       @title_min_height ||= begin
-        height = fetch_config['title_min_height'] || 0
+        height = @config['title_min_height'] || 0
         if height.kind_of?(String) && height.end_with?('%')
           height = ([image.width, image.height].min * height.to_f * 0.01).ceil
         end
@@ -244,12 +245,12 @@ module Frameit
     end
 
     def title_below_image
-      @title_below_image ||= fetch_config['title_below_image']
+      @title_below_image ||= @config['title_below_image']
     end
 
     # Returns a correctly sized background image
     def generate_background
-      background = MiniMagick::Image.open(fetch_config['background'])
+      background = MiniMagick::Image.open(@config['background'])
 
       if background.height != screenshot.size[1]
         background.resize("#{screenshot.size[0]}x#{screenshot.size[1]}^") # `^` says it should fill area
@@ -338,7 +339,7 @@ module Frameit
       sum_width = title.width
       sum_width += keyword.width + keyword_padding if keyword
 
-      title_below_image = fetch_config['title_below_image']
+      title_below_image = @config['title_below_image']
 
       # Resize the 2 labels if they exceed the available space either horizontally or vertically:
       image_scale_factor = 1.0 # default
@@ -385,7 +386,7 @@ module Frameit
     end
 
     def actual_font_size
-      font_scale_factor = fetch_config['font_scale_factor'] || 0.1
+      font_scale_factor = @config['font_scale_factor'] || 0.1
       UI.user_error!("Parameter 'font_scale_factor' can not be 0. Please provide a value larger than 0.0 (default = 0.1).") if font_scale_factor == 0.0
       [@image.width * font_scale_factor].max.round
     end
@@ -420,7 +421,7 @@ module Frameit
         text.gsub!('\n', "\n")
         text.gsub!(/(?<!\\)(')/) { |s| "\\#{s}" } # escape unescaped apostrophes with a backslash
 
-        interline_spacing = fetch_config['interline_spacing']
+        interline_spacing = @config['interline_spacing']
 
         # Add the actual title
         text_image.combine_options do |i|
@@ -429,7 +430,7 @@ module Frameit
           i.pointsize(actual_font_size)
           i.draw("text 0,0 '#{text}'")
           i.interline_spacing(interline_spacing) if interline_spacing
-          i.fill(fetch_config[key.to_s]['color'])
+          i.fill(@config[key.to_s]['color'])
         end
 
         results[key] = text_image
@@ -491,18 +492,6 @@ module Frameit
       results
     end
 
-    # Loads the config (colors, background, texts, etc.)
-    # Don't use this method to access the actual text and use `fetch_texts` instead
-    def fetch_config
-      return @config if @config
-
-      config_path = File.join(File.expand_path("..", screenshot.path), "Framefile.json")
-      config_path = File.join(File.expand_path("../..", screenshot.path), "Framefile.json") unless File.exist?(config_path)
-      file = ConfigParser.new.load(config_path)
-      return {} unless file # no config file at all
-      @config = file.fetch_value(screenshot.path)
-    end
-
     # Fetches the title + keyword for this particular screenshot
     def fetch_text(type)
       UI.user_error!("Valid parameters :keyword, :title") unless [:keyword, :title].include?(type)
@@ -518,20 +507,19 @@ module Frameit
       UI.verbose("Falling back to text in Framefile.json as there was nothing specified in the #{type}.strings file")
 
       # No string files, fallback to Framefile config
-      text = fetch_config[type.to_s]['text'] if fetch_config[type.to_s] && fetch_config[type.to_s]['text'] && fetch_config[type.to_s]['text'].length > 0 # Ignore empty string
+      text = @config[type.to_s]['text'] if @config[type.to_s] && @config[type.to_s]['text'] && @config[type.to_s]['text'].length > 0 # Ignore empty string
       return text
     end
 
     def fetch_frame_color
-      color = fetch_config['frame']
-      if color == "BLACK"
-        return Frameit::Color::BLACK
-      elsif color == "WHITE"
-        return Frameit::Color::SILVER
-      elsif color == "GOLD"
-        return Frameit::Color::GOLD
-      elsif color == "ROSE_GOLD"
-        return Frameit::Color::ROSE_GOLD
+      color = @config['frame']
+      unless color.nil?
+        Frameit::Color.constants.each do |c|
+          constant = Frameit::Color.const_get(c)
+          if color == constant.upcase.gsub(' ', '_')
+            return constant
+          end
+        end
       end
 
       return nil
@@ -539,10 +527,10 @@ module Frameit
 
     # The font we want to use
     def font(key)
-      single_font = fetch_config[key.to_s]['font']
+      single_font = @config[key.to_s]['font']
       return single_font if single_font
 
-      fonts = fetch_config[key.to_s]['fonts']
+      fonts = @config[key.to_s]['fonts']
       if fonts
         fonts.each do |font|
           if font['supported']
