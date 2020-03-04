@@ -4,7 +4,7 @@
 
 ###### Easily put your screenshots into the right device frames
 
-_frameit_ allows you to put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Use _frameit_ to prepare perfect screenshots for the App Store, your website, QA or emails.
+_frameit_ allows you to put a gorgeous device frame around your iOS, macOS and Android screenshots just by running one simple command. Use _frameit_ to prepare perfect screenshots for the App Store, your website, QA or emails.
 
 -------
 
@@ -23,9 +23,10 @@ _frameit_ allows you to put a gorgeous device frame around your iOS and macOS sc
 
 ## Frame screenshot
 
-Put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Support for:
+Put a gorgeous device frame around your iOS, macOS and Android screenshots just by running one simple command. Support for:
 
 - iPhone, iPad and Mac
+- Set of Android devices
 - Portrait and Landscape modes
 - Several device frame colors
 
@@ -69,10 +70,16 @@ More information about this process and how to update the frames can be found [h
 
 Why should you have to use Photoshop, just to add a frame around your screenshots?
 
-Just navigate to your folder of screenshots and use the following command:
+Just navigate to your folder of screenshots and use the following command (iOS and Mac OS are default platforms for backward compatibility):
 
 ```no-highlight
 fastlane frameit
+```
+
+To frame Android screenshots:
+
+```no-highlight
+fastlane frameit android
 ```
 
 To use the silver version of the frames:
@@ -129,8 +136,10 @@ The general parameters are defined in the `default` key and can be:
 | `padding` | The content of the framed screenshot will be resized to match the specified `padding` around all edges. The vertical padding is also applied between the text and the top or bottom (depending on `title_below_image`) of the device frame. <p> There are 3 different options of specyfying the padding: <p> 1. Default: An integer value that defines both horizontal and vertical padding in pixels. <br> 2. A string that defines (different) padding values in pixels for horizontal and vertical padding. The syntax is `"<horizontal>x<vertical>"`, e.g. `"30x60"`. <br> 3. A string that defines (different) padding values in percentage for horizontal and vertical padding. The syntax is `"<horizontal>%x<vertical>%"`, e.g. `"5%x10%"`. <br> **Note:** The percentage is calculated from the smallest image dimension (height or width). <p> A combination of option 2 and 3 is possible, e.g. `"5%x40"`. | `50` |
 | `interline_spacing` | Specifies whether _frameit_ should add or subtract this many pixels between the individual lines of text. This only applies to a multi-line `title` and/or `keyword` to expand or squash together the individual lines of text. | `0` |
 | `font_scale_factor` | Specifies whether _frameit_ should increase or decrease the font size of the text. | `0.1` |
-| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
+| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK`, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
 | `title_min_height` | Specifies a height always reserved for the title. Value can be a percentage of the height or an absolute value. The device will be placed below (or above) this area. Convenient to ensure the device top (or bottom) will be consistently placed at the same height on the different screenshots. | NA |
+| `use_platform` | Overrides the platform used for the screenshot. Valid values are `IOS`, `ANDROID` and `ANY`. | `IOS` |
+| `force_device_type` | Forces a specific device. Valid values are: Huawei P8, Motorola Moto E, Motorola Moto G, Nexus 4, Nexus 5X, Nexus 6P, Nexus 9, Samsung Galaxy Grand Prime, Samsung Galaxy Note 5, Samsung Galaxy S Duos, Samsung Galaxy S3, Samsung Galaxy S5, Samsung Galaxy S7, Samsung Galaxy S8, Samsung Galaxy S9, iPhone 5s, iPhone 5c, iPhone SE, iPhone 6s, iPhone 6s Plus, iPhone 7, iPhone 7 Plus, iPhone 8, iPhone 8 Plus, iPhone X, iPhone XS, iPhone XR, iPhone XS Max, iPad Air 2, iPad Mini 4, iPad Pro, MacBook, Google Pixel 3, Google Pixel 3 XL, HTC One A9, HTC One M8 | NA |
 
 ### Specific parameters
 
@@ -142,7 +151,9 @@ These are defined in the `data` key. This is an array with the following keys fo
 | `filter` | This is mandatory to link the individual configuration to the screenshot, based on part of the file name. <p>Example:<br>If a screenshot is named `iPhone 8-Brainstorming.png` you can use value `Brainstorming` for `filter`.  If there are more than one `filter` matching an entry, they will all be applied in order (which means that the last one has the highest precedence). All other keys from that array element will only be applied on this specific screenshot. |
 | `keyword` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
 | `title` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
-| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
+| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK`, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
+| `use_platform` | Overrides the platform used for the screenshot. Valid values are `IOS`, `ANDROID` and `ANY`. | `IOS` |
+| `force_device_type` | Forces a specific device. Valid values are the same as for the general parameter. | NA |
 
 ### <a name="keyword-and-title-parameters"></a>Framefile `keyword` and `title` parameters
 
@@ -172,7 +183,8 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
     "show_complete_frame": false,
     "stack_title" : false,
     "title_below_image": true,
-    "frame": "WHITE"
+    "frame": "WHITE",
+    "use_platform": "IOS"
   },
 
   "data": [
@@ -200,6 +212,10 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
       "keyword": {
         "color": "#31bb48"
       }
+    },
+    {
+      "filter": "Android",
+      "use_platform": "ANDROID"
     }
   ]
 }

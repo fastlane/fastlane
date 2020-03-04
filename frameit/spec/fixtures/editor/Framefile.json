@@ -4,7 +4,8 @@
     "padding": 50,
     "title": {
       "color": "#000000"
-    }
+    },
+    "use_platform": "IOS"
   },
   "data": [
     {

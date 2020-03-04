@@ -1,3 +1,5 @@
+require 'frameit/config_parser'
+
 describe Frameit do
   describe Frameit::Editor do
     describe "frame!" do
@@ -21,26 +23,34 @@ describe Frameit do
 
       it "properly frame screenshots with captions that include apostrophes" do
         expect_any_instance_of(MiniMagick::Tool::Mogrify).to receive(:draw).with("text 0,0 'Don\\'t forget the apostrophes'")
-        screenshot = Frameit::Screenshot.new('./frameit/spec/fixtures/editor/apostrophes.png', Frameit::Color::BLACK)
-        Frameit::Editor.new(screenshot).frame!
+        screenshot_path = './frameit/spec/fixtures/editor/apostrophes.png'
+        config = Frameit::ConfigParser.new.load('./frameit/spec/fixtures/editor/Framefile.json').fetch_value(screenshot_path)
+        screenshot = Frameit::Screenshot.new(screenshot_path, Frameit::Color::BLACK, config, nil)
+        Frameit::Editor.new(screenshot, config).frame!
       end
 
       it "does not double escape apostrophes" do
         expect_any_instance_of(MiniMagick::Tool::Mogrify).to receive(:draw).with("text 0,0 'Don\\'t forget the apostrophes'")
-        screenshot = Frameit::Screenshot.new('./frameit/spec/fixtures/editor/escaped-apostrophes.png', Frameit::Color::BLACK)
-        Frameit::Editor.new(screenshot).frame!
+        screenshot_path = './frameit/spec/fixtures/editor/escaped-apostrophes.png'
+        config = Frameit::ConfigParser.new.load('./frameit/spec/fixtures/editor/Framefile.json').fetch_value(screenshot_path)
+        screenshot = Frameit::Screenshot.new(screenshot_path, Frameit::Color::BLACK, config, nil)
+        Frameit::Editor.new(screenshot, config).frame!
       end
     end
 
     describe "should_skip?" do
       it "returns true with no matching filter in Framefile.json" do
-        screenshot = Frameit::Screenshot.new('./frameit/spec/fixtures/editor/ignore.png', Frameit::Color::BLACK)
-        skip = Frameit::Editor.new(screenshot).should_skip?
+        screenshot_path = './frameit/spec/fixtures/editor/ignore.png'
+        config = Frameit::ConfigParser.new.load('./frameit/spec/fixtures/editor/Framefile.json').fetch_value(screenshot_path)
+        screenshot = Frameit::Screenshot.new(screenshot_path, Frameit::Color::BLACK, config, nil)
+        skip = Frameit::Editor.new(screenshot, config).should_skip?
         expect(skip).to be(true)
       end
       it "returns false with matching filter in Framefile.json" do
-        screenshot = Frameit::Screenshot.new('./frameit/spec/fixtures/editor/apostrophes.png', Frameit::Color::BLACK)
-        skip = Frameit::Editor.new(screenshot).should_skip?
+        screenshot_path = './frameit/spec/fixtures/editor/apostrophes.png'
+        config = Frameit::ConfigParser.new.load('./frameit/spec/fixtures/editor/Framefile.json').fetch_value(screenshot_path)
+        screenshot = Frameit::Screenshot.new(screenshot_path, Frameit::Color::BLACK, config, nil)
+        skip = Frameit::Editor.new(screenshot, config).should_skip?
         expect(skip).to be(false)
       end
     end
