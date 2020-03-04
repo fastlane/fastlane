@@ -2757,7 +2757,7 @@ func downloadDsyms(username: String,
 func downloadFromPlayStore(packageName: String,
                            versionName: String? = nil,
                            track: String = "production",
-                           metadataPath: String? = nil,
+                           metadataPath: String = "./metadata",
                            key: String? = nil,
                            issuer: String? = nil,
                            jsonKey: String? = nil,
@@ -2986,10 +2986,15 @@ func flock(message: String,
    - forceDeviceType: Forces a given device type, useful for Mac screenshots, as their sizes vary
    - useLegacyIphone5s: Use iPhone 5s instead of iPhone SE frames
    - useLegacyIphone6s: Use iPhone 6s frames instead of iPhone 7 frames
+   - useLegacyIphone7: Use iPhone 7 frames instead of iPhone 8 frames
    - useLegacyIphonex: Use iPhone X instead of iPhone XS frames
+   - useLegacyIphonexr: Use iPhone XR instead of iPhone 11 frames
+   - useLegacyIphonexs: Use iPhone XS instead of iPhone 11 Pro frames
+   - useLegacyIphonexsmax: Use iPhone XS Max instead of iPhone 11 Pro Max frames
    - forceOrientationBlock: [Advanced] A block to customize your screenshots' device orientation
    - debugMode: Output debug information in framed screenshots
    - resume: Resume frameit instead of reprocessing all screenshots
+   - usePlatform: Choose a platform, the valid options are IOS, ANDROID and ANY (IOS is default to ensure backward compatibility)
    - path: The path to the directory containing the screenshots
 
  Uses [frameit](https://docs.fastlane.tools/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.
@@ -3002,10 +3007,15 @@ func frameScreenshots(white: Bool? = nil,
                       forceDeviceType: String? = nil,
                       useLegacyIphone5s: Bool = false,
                       useLegacyIphone6s: Bool = false,
+                      useLegacyIphone7: Bool = false,
                       useLegacyIphonex: Bool = false,
+                      useLegacyIphonexr: Bool = false,
+                      useLegacyIphonexs: Bool = false,
+                      useLegacyIphonexsmax: Bool = false,
                       forceOrientationBlock: String? = nil,
                       debugMode: Bool = false,
                       resume: Bool = false,
+                      usePlatform: String = "IOS",
                       path: String = "./") {
   let command = RubyCommand(commandID: "", methodName: "frame_screenshots", className: nil, args: [RubyCommand.Argument(name: "white", value: white),
                                                                                                    RubyCommand.Argument(name: "silver", value: silver),
@@ -3014,10 +3024,15 @@ func frameScreenshots(white: Bool? = nil,
                                                                                                    RubyCommand.Argument(name: "force_device_type", value: forceDeviceType),
                                                                                                    RubyCommand.Argument(name: "use_legacy_iphone5s", value: useLegacyIphone5s),
                                                                                                    RubyCommand.Argument(name: "use_legacy_iphone6s", value: useLegacyIphone6s),
+                                                                                                   RubyCommand.Argument(name: "use_legacy_iphone7", value: useLegacyIphone7),
                                                                                                    RubyCommand.Argument(name: "use_legacy_iphonex", value: useLegacyIphonex),
+                                                                                                   RubyCommand.Argument(name: "use_legacy_iphonexr", value: useLegacyIphonexr),
+                                                                                                   RubyCommand.Argument(name: "use_legacy_iphonexs", value: useLegacyIphonexs),
+                                                                                                   RubyCommand.Argument(name: "use_legacy_iphonexsmax", value: useLegacyIphonexsmax),
                                                                                                    RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock),
                                                                                                    RubyCommand.Argument(name: "debug_mode", value: debugMode),
                                                                                                    RubyCommand.Argument(name: "resume", value: resume),
+                                                                                                   RubyCommand.Argument(name: "use_platform", value: usePlatform),
                                                                                                    RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
@@ -3033,10 +3048,15 @@ func frameScreenshots(white: Bool? = nil,
    - forceDeviceType: Forces a given device type, useful for Mac screenshots, as their sizes vary
    - useLegacyIphone5s: Use iPhone 5s instead of iPhone SE frames
    - useLegacyIphone6s: Use iPhone 6s frames instead of iPhone 7 frames
+   - useLegacyIphone7: Use iPhone 7 frames instead of iPhone 8 frames
    - useLegacyIphonex: Use iPhone X instead of iPhone XS frames
+   - useLegacyIphonexr: Use iPhone XR instead of iPhone 11 frames
+   - useLegacyIphonexs: Use iPhone XS instead of iPhone 11 Pro frames
+   - useLegacyIphonexsmax: Use iPhone XS Max instead of iPhone 11 Pro Max frames
    - forceOrientationBlock: [Advanced] A block to customize your screenshots' device orientation
    - debugMode: Output debug information in framed screenshots
    - resume: Resume frameit instead of reprocessing all screenshots
+   - usePlatform: Choose a platform, the valid options are IOS, ANDROID and ANY (IOS is default to ensure backward compatibility)
    - path: The path to the directory containing the screenshots
 
  Uses [frameit](https://docs.fastlane.tools/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.
@@ -3049,10 +3069,15 @@ func frameit(white: Bool? = nil,
              forceDeviceType: String? = nil,
              useLegacyIphone5s: Bool = false,
              useLegacyIphone6s: Bool = false,
+             useLegacyIphone7: Bool = false,
              useLegacyIphonex: Bool = false,
+             useLegacyIphonexr: Bool = false,
+             useLegacyIphonexs: Bool = false,
+             useLegacyIphonexsmax: Bool = false,
              forceOrientationBlock: String? = nil,
              debugMode: Bool = false,
              resume: Bool = false,
+             usePlatform: String = "IOS",
              path: String = "./") {
   let command = RubyCommand(commandID: "", methodName: "frameit", className: nil, args: [RubyCommand.Argument(name: "white", value: white),
                                                                                          RubyCommand.Argument(name: "silver", value: silver),
@@ -3061,10 +3086,15 @@ func frameit(white: Bool? = nil,
                                                                                          RubyCommand.Argument(name: "force_device_type", value: forceDeviceType),
                                                                                          RubyCommand.Argument(name: "use_legacy_iphone5s", value: useLegacyIphone5s),
                                                                                          RubyCommand.Argument(name: "use_legacy_iphone6s", value: useLegacyIphone6s),
+                                                                                         RubyCommand.Argument(name: "use_legacy_iphone7", value: useLegacyIphone7),
                                                                                          RubyCommand.Argument(name: "use_legacy_iphonex", value: useLegacyIphonex),
+                                                                                         RubyCommand.Argument(name: "use_legacy_iphonexr", value: useLegacyIphonexr),
+                                                                                         RubyCommand.Argument(name: "use_legacy_iphonexs", value: useLegacyIphonexs),
+                                                                                         RubyCommand.Argument(name: "use_legacy_iphonexsmax", value: useLegacyIphonexsmax),
                                                                                          RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock),
                                                                                          RubyCommand.Argument(name: "debug_mode", value: debugMode),
                                                                                          RubyCommand.Argument(name: "resume", value: resume),
+                                                                                         RubyCommand.Argument(name: "use_platform", value: usePlatform),
                                                                                          RubyCommand.Argument(name: "path", value: path)])
   _ = runner.executeCommand(command)
 }
@@ -4444,6 +4474,10 @@ func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
    - googleCloudProjectId: ID of the Google Cloud project to use for authentication
+   - s3Region: Name of the S3 region
+   - s3AccessKey: S3 access key
+   - s3SecretAccessKey: S3 secret secret access key
+   - s3Bucket: Name of the S3 bucket
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
    - force: Renew the provisioning profiles every time you run match
@@ -4478,6 +4512,10 @@ func match(type: Any = matchfile.type,
            googleCloudBucketName: Any? = matchfile.googleCloudBucketName,
            googleCloudKeysFile: Any? = matchfile.googleCloudKeysFile,
            googleCloudProjectId: Any? = matchfile.googleCloudProjectId,
+           s3Region: Any? = matchfile.s3Region,
+           s3AccessKey: Any? = matchfile.s3AccessKey,
+           s3SecretAccessKey: Any? = matchfile.s3SecretAccessKey,
+           s3Bucket: Any? = matchfile.s3Bucket,
            keychainName: Any = matchfile.keychainName,
            keychainPassword: Any? = matchfile.keychainPassword,
            force: Bool = matchfile.force,
@@ -4509,6 +4547,10 @@ func match(type: Any = matchfile.type,
                                                                                        RubyCommand.Argument(name: "google_cloud_bucket_name", value: googleCloudBucketName),
                                                                                        RubyCommand.Argument(name: "google_cloud_keys_file", value: googleCloudKeysFile),
                                                                                        RubyCommand.Argument(name: "google_cloud_project_id", value: googleCloudProjectId),
+                                                                                       RubyCommand.Argument(name: "s3_region", value: s3Region),
+                                                                                       RubyCommand.Argument(name: "s3_access_key", value: s3AccessKey),
+                                                                                       RubyCommand.Argument(name: "s3_secret_access_key", value: s3SecretAccessKey),
+                                                                                       RubyCommand.Argument(name: "s3_bucket", value: s3Bucket),
                                                                                        RubyCommand.Argument(name: "keychain_name", value: keychainName),
                                                                                        RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
                                                                                        RubyCommand.Argument(name: "force", value: force),
@@ -7000,7 +7042,7 @@ func supply(packageName: String,
             releaseStatus: String = "completed",
             track: String = "production",
             rollout: String? = nil,
-            metadataPath: String? = nil,
+            metadataPath: String = "./metadata",
             key: String? = nil,
             issuer: String? = nil,
             jsonKey: String? = nil,
@@ -7137,6 +7179,10 @@ func swiftlint(mode: Any = "lint",
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
    - googleCloudProjectId: ID of the Google Cloud project to use for authentication
+   - s3Region: Name of the S3 region
+   - s3AccessKey: S3 access key
+   - s3SecretAccessKey: S3 secret secret access key
+   - s3Bucket: Name of the S3 bucket
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
    - force: Renew the provisioning profiles every time you run match
@@ -7171,6 +7217,10 @@ func syncCodeSigning(type: String = "development",
                      googleCloudBucketName: String? = nil,
                      googleCloudKeysFile: String? = nil,
                      googleCloudProjectId: String? = nil,
+                     s3Region: String? = nil,
+                     s3AccessKey: String? = nil,
+                     s3SecretAccessKey: String? = nil,
+                     s3Bucket: String? = nil,
                      keychainName: String = "login.keychain",
                      keychainPassword: String? = nil,
                      force: Bool = false,
@@ -7202,6 +7252,10 @@ func syncCodeSigning(type: String = "development",
                                                                                                    RubyCommand.Argument(name: "google_cloud_bucket_name", value: googleCloudBucketName),
                                                                                                    RubyCommand.Argument(name: "google_cloud_keys_file", value: googleCloudKeysFile),
                                                                                                    RubyCommand.Argument(name: "google_cloud_project_id", value: googleCloudProjectId),
+                                                                                                   RubyCommand.Argument(name: "s3_region", value: s3Region),
+                                                                                                   RubyCommand.Argument(name: "s3_access_key", value: s3AccessKey),
+                                                                                                   RubyCommand.Argument(name: "s3_secret_access_key", value: s3SecretAccessKey),
+                                                                                                   RubyCommand.Argument(name: "s3_bucket", value: s3Bucket),
                                                                                                    RubyCommand.Argument(name: "keychain_name", value: keychainName),
                                                                                                    RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
                                                                                                    RubyCommand.Argument(name: "force", value: force),
@@ -8037,7 +8091,7 @@ func uploadToPlayStore(packageName: String,
                        releaseStatus: String = "completed",
                        track: String = "production",
                        rollout: String? = nil,
-                       metadataPath: String? = nil,
+                       metadataPath: String = "./metadata",
                        key: String? = nil,
                        issuer: String? = nil,
                        jsonKey: String? = nil,
@@ -8536,7 +8590,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-11.3.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-11.2.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -8681,4 +8735,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.70]
+// FastlaneRunnerAPIVersion [0.9.71]
