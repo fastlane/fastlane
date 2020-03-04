@@ -45,7 +45,7 @@ module Match
     end
 
     # This method is called from both here, and from `openssl.rb`
-    def self.ask_password(message: "Passphrase for Git Repo: ", confirm: nil)
+    def self.ask_password(message: "Passphrase for Match storage: ", confirm: nil)
       ensure_ui_interactive
       loop do
         password = UI.password(message)

@@ -46,6 +46,10 @@ module Match
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
         google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
         google_cloud_project_id: params[:google_cloud_project_id].to_s,
+        s3_region: params[:s3_region].to_s,
+        s3_access_key: params[:s3_access_key].to_s,
+        s3_secret_access_key: params[:s3_secret_access_key].to_s,
+        s3_bucket: params[:s3_bucket].to_s,
         readonly: params[:readonly],
         username: params[:readonly] ? nil : params[:username], # only pass username if not readonly
         team_id: params[:team_id],
