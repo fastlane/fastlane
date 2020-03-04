@@ -63,6 +63,18 @@ protocol MatchfileProtocol: class {
   /// ID of the Google Cloud project to use for authentication
   var googleCloudProjectId: String? { get }
 
+  /// Name of the S3 region
+  var s3Region: String? { get }
+
+  /// S3 access key
+  var s3AccessKey: String? { get }
+
+  /// S3 secret secret access key
+  var s3SecretAccessKey: String? { get }
+
+  /// Name of the S3 bucket
+  var s3Bucket: String? { get }
+
   /// Keychain the items should be imported to
   var keychainName: String { get }
 
@@ -116,6 +128,10 @@ extension MatchfileProtocol {
   var googleCloudBucketName: String? { return nil }
   var googleCloudKeysFile: String? { return nil }
   var googleCloudProjectId: String? { return nil }
+  var s3Region: String? { return nil }
+  var s3AccessKey: String? { return nil }
+  var s3SecretAccessKey: String? { return nil }
+  var s3Bucket: String? { return nil }
   var keychainName: String { return "login.keychain" }
   var keychainPassword: String? { return nil }
   var force: Bool { return false }
@@ -130,4 +146,4 @@ extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.13]
+// FastlaneRunnerAPIVersion [0.9.14]
