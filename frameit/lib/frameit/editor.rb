@@ -343,7 +343,7 @@ module Frameit
       # Resize the 2 labels if they exceed the available space either horizontally or vertically:
       image_scale_factor = 1.0 # default
       ratio_horizontal = sum_width / (image.width.to_f - horizontal_frame_padding * 2) # The fraction of the text images compared to the left and right padding
-      ratio_vertical = title.height.to_f / actual_font_size # The fraction of the actual height of the images compared to the available space
+      ratio_vertical = title.height.to_f / effective_text_height # The fraction of the actual height of the images compared to the available space
       if ratio_horizontal > 1.0 || ratio_vertical > 1.0
         # If either is too large, resize with the maximum ratio:
         image_scale_factor = (1.0 / [ratio_horizontal, ratio_vertical].max)
