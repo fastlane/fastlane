@@ -54,9 +54,9 @@ module Match
 
       case cert_type
       when :development
-        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT
+        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT + "," + Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT
       when :distribution, :enterprise
-        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION
+        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION + "," + Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION
       else
         UI.user_error!("Cert type '#{cert_type}' is not supported")
       end
