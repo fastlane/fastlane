@@ -83,7 +83,7 @@ module Match
       # will be set
       def download
         # Check if we already have a functional working_directory
-        return if @working_directory
+        return if @working_directory && Dir.exist?(@working_directory)
 
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
