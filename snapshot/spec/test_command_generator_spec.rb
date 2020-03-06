@@ -343,5 +343,28 @@ describe Snapshot do
         )
       end
     end
+
+    describe "Allows to run and skip tests" do
+      def generateTestCommandWithExtraOptions(extraOptions)
+        options = { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests" }
+        options = options.merge(extraOptions)
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+        return Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+      end
+
+      it "should only run tests defined in tests_to_run", requires_xcode: true do
+        extraOptions = { tests_to_run: %w(TestBundle/TestSuite/ScreenshotsA ScreenshotsB) }
+        command = generateTestCommandWithExtraOptions(extraOptions)
+        expect(command.join('')).to include("-only-testing:TestBundle/TestSuite/ScreenshotsA")
+        expect(command.join('')).to include("-only-testing:ScreenshotsB")
+      end
+
+      it "should skip tests defined in tests_to_skip", requires_xcode: true do
+        extraOptions = { tests_to_skip: %w(TestBundle/TestSuite/ScreenshotsA ScreenshotsB) }
+        command = generateTestCommandWithExtraOptions(extraOptions)
+        expect(command.join('')).to include("-skip-testing:TestBundle/TestSuite/ScreenshotsA")
+        expect(command.join('')).to include("-skip-testing:ScreenshotsB")
+      end
+    end
   end
 end

@@ -232,7 +232,17 @@ module Snapshot
                                      env_name: "SNAPSHOT_CLONED_SOURCE_PACKAGES_PATH",
                                      description: "Sets a custom path for Swift Package Manager dependencies",
                                      type: String,
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :tests_to_run,
+                                    env_name: "SNAPSHOT_TESTS_TO_RUN",
+                                    description: "A lists of tests to run",
+                                    optional: true,
+                                    type: Array),
+        FastlaneCore::ConfigItem.new(key: :tests_to_skip,
+                                    env_name: "SNAPSHOT_TESTS_TO_SKIP",
+                                    description: "A lists of tests to skip",
+                                    optional: true,
+                                    type: Array)
       ]
     end
   end

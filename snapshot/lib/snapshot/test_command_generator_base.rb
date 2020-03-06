@@ -27,6 +27,10 @@ module Snapshot
         options << "-derivedDataPath '#{derived_data_path}'"
         options << "-resultBundlePath '#{result_bundle_path}'" if result_bundle_path
         options << config[:xcargs] if config[:xcargs]
+
+        options += config[:tests_to_run].map { |test_id| "-only-testing:#{test_id.shellescape}" } if config[:tests_to_run]
+        options += config[:tests_to_skip].map { |test_id| "-skip-testing:#{test_id.shellescape}" } if config[:tests_to_skip]
+
         return options
       end
 
