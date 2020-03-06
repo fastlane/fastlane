@@ -376,16 +376,6 @@ module FastlaneCore
       end
     end
 
-    # splitting on comma allows us to support comma-separated lists of values
-    # from the command line, even though the ConfigItem is not defined as an
-    # Array type
-    def self.coerce_to_array_of_strings(value)
-      return if value.nil?
-
-      value = value.split(',') unless value.kind_of?(Array)
-      return value.map(&:to_s)
-    end
-
     # deprecated
     #
 

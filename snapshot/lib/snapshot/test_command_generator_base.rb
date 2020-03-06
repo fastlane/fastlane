@@ -27,12 +27,6 @@ module Snapshot
         options << "-derivedDataPath '#{derived_data_path}'"
         options << "-resultBundlePath '#{result_bundle_path}'" if result_bundle_path
         options << config[:xcargs] if config[:xcargs]
-
-        # detect_values will ensure that these values are present as Arrays if
-        # they are present at all
-        options += config[:only_testing].map { |test_id| "-only-testing:#{test_id.shellescape}" } if config[:only_testing]
-        options += config[:skip_testing].map { |test_id| "-skip-testing:#{test_id.shellescape}" } if config[:skip_testing]
-
         return options
       end
 

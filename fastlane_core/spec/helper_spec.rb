@@ -159,21 +159,5 @@ describe FastlaneCore do
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: true, print: false)
       end
     end
-
-    describe "value coercion" do
-      it "coerces value to be an array", requires_xcodebuild: true do
-        stringValue = "StringValue"
-        expect(FastlaneCore::Helper.coerce_to_array_of_strings(stringValue)).to eq([stringValue])
-      end
-
-      it "leaves value as an array", requires_xcodebuild: true do
-        arrayValue = ["StringValue1", "StringValue2"]
-        expect(FastlaneCore::Helper.coerce_to_array_of_strings(arrayValue)).to eq(arrayValue)
-      end
-
-      it "handles nil", requires_xcodebuild: true do
-        expect(FastlaneCore::Helper.coerce_to_array_of_strings(nil)).to be(nil)
-      end
-    end
   end
 end

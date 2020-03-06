@@ -47,15 +47,6 @@ describe Scan do
         expect(Scan.config[:only_testing]).to eq(["Bundle/SuiteA"])
       end
 
-      it "leave only_testing as an array", requires_xcodebuild: true do
-        options = {
-          project: "./scan/examples/standard/app.xcodeproj",
-          only_testing: ["Bundle/SuiteA", "Bundle/SuiteB"]
-        }
-        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-        expect(Scan.config[:only_testing]).to eq(["Bundle/SuiteA", "Bundle/SuiteB"])
-      end
-
       it "coerces skip_testing to be an array", requires_xcodebuild: true do
         options = {
           project: "./scan/examples/standard/app.xcodeproj",
