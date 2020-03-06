@@ -40,6 +40,7 @@ module Gym
         move_app_thinning_size_report
         move_apps_folder
         move_asset_packs
+        move_appstore_info
       elsif is_mac
         path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
@@ -336,6 +337,18 @@ module Gym
         UI.success("Successfully exported Asset Pack folder:")
         UI.message(asset_packs_path)
         asset_packs_path
+      end
+    end
+
+    # Move the AppStoreInfo.plist folder to the output directory
+    def move_appstore_info
+      if File.exist?(PackageCommandGenerator.appstore_info_path)
+        FileUtils.mv(PackageCommandGenerator.appstore_info_path, File.expand_path(Gym.config[:output_directory]), force: true)
+        appstore_info_path = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(PackageCommandGenerator.appstore_info_path))
+
+        UI.success("Successfully exported the AppStoreInfo.plist file:")
+        UI.message(appstore_info_path)
+        appstore_info_path
       end
     end
 
