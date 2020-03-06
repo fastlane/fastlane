@@ -18,7 +18,7 @@ module Match
       UI.user_error!("Private key does not exist at path: #{p12_path}") unless File.exist?(p12_path)
 
       # Base64 encode contents to find match from API to find a cert ID
-      cert_contents_base_64 = Base64.strict_encode64(File.open(cert_path).read)
+      cert_contents_base_64 = Base64.strict_encode64(File.binread(cert_path))
 
       # Storage
       storage = Storage.for_mode(params[:storage_mode], {
