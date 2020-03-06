@@ -82,7 +82,7 @@ describe Screengrab do
     end
 
     describe "with a complete ANDROID_HOME and a complete PATH and no build tools version specified" do
-        allow(FastlaneCore::Helper).to receive(:windows?).and_return(true)
+      it "finds adb.exe in platform-tools and aapt in the highest version build tools dir" do
         FastlaneSpec::Env.with_env_values('PATH' => 'screengrab/spec/fixtures/complete_home_complete_path_windows/path') do
           android_env = Screengrab::AndroidEnvironment.new('screengrab/spec/fixtures/complete_home_complete_path_windows/android_home', nil)
 
