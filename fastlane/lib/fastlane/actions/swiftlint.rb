@@ -19,6 +19,7 @@ module Fastlane
         command << " --reporter #{params[:reporter]}" if params[:reporter]
         command << supported_option_switch(params, :quiet, "0.9.0", true)
         command << supported_option_switch(params, :format, "0.11.0", true) if params[:mode] == :autocorrect
+        command << " --no-cache" if params[:no_cache] and (params[:mode] == :autocorrect or params[:mode] == :lint)
         command << " --compiler-log-path #{params[:compiler_log_path].shellescape}" if params[:compiler_log_path]
 
         if params[:files]
@@ -135,6 +136,12 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :format,
                                        description: "Format code when mode is :autocorrect",
+                                       default_value: false,
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :no_cache,
+                                       description: "Ignore the cache when mode is :autocorrect or :lint",
                                        default_value: false,
                                        is_string: false,
                                        type: Boolean,
