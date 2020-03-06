@@ -369,7 +369,7 @@ module FastlaneCore
     # checks if a given path is an executable file
     def self.executable?(cmd_path)
       # no executable files on Windows, so existing is enough there
-      cmd_path && !File.directory?(cmd_path) && (File.executable?(cmd_path) || (self.windows? && File.exist?(cmd_path)))
+      cmd_path && !File.directory?(cmd_path) && (File.executable?(cmd_path) || (self.windows? && File.exist?(cmd_path))  || (self.windows? && File.exist?(cmd_path + '.exe')))
     end
 
     # checks if given file is a valid json file
