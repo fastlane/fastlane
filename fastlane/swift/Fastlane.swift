@@ -173,7 +173,7 @@ func appaloosa(binary: String,
    - note: Notes you wish to add to the uploaded app
 
  If you provide a `public_key`, this will overwrite an existing application. If you want to have this build as a new app version, you shouldn't provide this value.
-
+ 
  To integrate appetize into your GitHub workflow check out the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md).
 */
 func appetize(apiHost: String = "api.appetize.io",
@@ -484,7 +484,7 @@ func appledoc(input: Any,
    - app: The (spaceship) app ID of the app you want to use/modify
 
  Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
-
+ 
  If you don't want a PDF report for App Store builds, use the `:force` option.
  This is useful when running _fastlane_ on your Continuous Integration server:
  `_upload_to_app_store_(force: true)`
@@ -1903,7 +1903,7 @@ func checkAppStoreMetadata(appIdentifier: String,
  - parameter excludePattern: Exclude all files from clearing that match the given Regex pattern: e.g. '.*.mobileprovision'
 
  This action deletes the files that get created in your repo as a result of running the _gym_ and _sigh_ commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.
-
+ 
  Useful if you quickly want to send out a test build by dropping down to the command line and typing something like `fastlane beta`, without leaving your repo in a messy state afterwards.
 */
 func cleanBuildArtifacts(excludePattern: String? = nil) {
@@ -2492,7 +2492,7 @@ func deleteKeychain(name: String? = nil,
    - app: The (spaceship) app ID of the app you want to use/modify
 
  Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
-
+ 
  If you don't want a PDF report for App Store builds, use the `:force` option.
  This is useful when running _fastlane_ on your Continuous Integration server:
  `_upload_to_app_store_(force: true)`
@@ -3293,7 +3293,7 @@ func getManagedPlayStorePublishingRights(jsonKey: String? = nil,
    - provisioningName: The name of the profile that is used on the Apple Developer Portal
    - ignoreProfilesWithDifferentName: Use in combination with :provisioning_name - when true only profiles matching this exact name will be downloaded
    - outputPath: Directory in which the profile should be stored
-   - certId: The ID of the code signing certificate to use (e.g. 78ADL6LVAA)
+   - certId: The ID of the code signing certificate to use (e.g. 78ADL6LVAA) 
    - certOwnerName: The certificate name to use for new profiles, or to renew with. (e.g. "Felix Krause")
    - filename: Filename to use for the generated provisioning profile (must include .mobileprovision)
    - skipFetchProfiles: Skips the verification of existing profiles which is useful if you have thousands of profiles
@@ -3938,7 +3938,7 @@ func hipchat(message: String = "",
 
  HockeyApp will be no longer supported and will be transitioned into App Center on November 16, 2019.
  Please migrate over to [App Center](https://github.com/Microsoft/fastlane-plugin-appcenter/)
-
+ 
  Symbols will also be uploaded automatically if a `app.dSYM.zip` file is found next to `app.ipa`. In case it is located in a different place you can specify the path explicitly in the `:dsym` parameter.
  More information about the available options can be found in the [HockeyApp Docs](http://support.hockeyapp.net/kb/api/api-versions#upload-version).
 */
@@ -4993,9 +4993,9 @@ func pilot(username: String,
  [31mNo description provided[0m
 
  - parameters:
-   - outputPath:
-   - templatePath:
-   - cachePath:
+   - outputPath: 
+   - templatePath: 
+   - cachePath: 
 */
 func pluginScores(outputPath: String,
                   templatePath: String,
@@ -5771,8 +5771,8 @@ func runTests(workspace: String? = nil,
  Generates a plist file and uploads all to AWS S3
 
  - parameters:
-   - ipa: .ipa file for the build
-   - dsym: zipped .dsym package for the build
+   - ipa: .ipa file for the build 
+   - dsym: zipped .dsym package for the build 
    - uploadMetadata: Upload relevant metadata for this build
    - plistTemplatePath: plist template path
    - plistFileName: uploaded plist filename
@@ -5780,13 +5780,13 @@ func runTests(workspace: String? = nil,
    - htmlFileName: uploaded html filename
    - versionTemplatePath: version erb template path
    - versionFileName: uploaded version filename
-   - accessKey: AWS Access Key ID
-   - secretAccessKey: AWS Secret Access Key
+   - accessKey: AWS Access Key ID 
+   - secretAccessKey: AWS Secret Access Key 
    - bucket: AWS bucket name
-   - region: AWS region (for bucket creation)
-   - path: S3 'path'. Values from Info.plist will be substituted for keys wrapped in {}
-   - source: Optional source directory e.g. ./build
-   - acl: Uploaded object permissions e.g public_read (default), private, public_read_write, authenticated_read
+   - region: AWS region (for bucket creation) 
+   - path: S3 'path'. Values from Info.plist will be substituted for keys wrapped in {}  
+   - source: Optional source directory e.g. ./build 
+   - acl: Uploaded object permissions e.g public_read (default), private, public_read_write, authenticated_read 
 
  Upload a new build to Amazon S3 to distribute the build to beta testers.
  Works for both Ad Hoc and Enterprise signed applications. This step will generate the necessary HTML, plist, and version files for you.
@@ -6408,7 +6408,7 @@ func setupTravis(force: Bool = false) {
    - provisioningName: The name of the profile that is used on the Apple Developer Portal
    - ignoreProfilesWithDifferentName: Use in combination with :provisioning_name - when true only profiles matching this exact name will be downloaded
    - outputPath: Directory in which the profile should be stored
-   - certId: The ID of the code signing certificate to use (e.g. 78ADL6LVAA)
+   - certId: The ID of the code signing certificate to use (e.g. 78ADL6LVAA) 
    - certOwnerName: The certificate name to use for new profiles, or to renew with. (e.g. "Felix Krause")
    - filename: Filename to use for the generated provisioning profile (must include .mobileprovision)
    - skipFetchProfiles: Skips the verification of existing profiles which is useful if you have thousands of profiles
@@ -6534,7 +6534,7 @@ func slackTrain() {
 }
 
 /**
-
+ 
 */
 func slackTrainCrash() {
   let command = RubyCommand(commandID: "", methodName: "slack_train_crash", className: nil, args: [])
@@ -7513,9 +7513,9 @@ func updateAppIdentifier(xcodeproj: String,
    - nightly: **DEPRECATED!** Nightly builds are no longer being made available - Opt-in to install and use nightly fastlane builds
 
  This action will update fastlane to the most recent version - major version updates will not be performed automatically, as they might include breaking changes. If an update was performed, fastlane will be restarted before the run continues.
-
+ 
  If you are using rbenv or rvm, everything should be good to go. However, if you are using the system's default ruby, some additional setup is needed for this action to work correctly. In short, fastlane needs to be able to access your gem library without running in `sudo` mode.
-
+ 
  The simplest possible fix for this is putting the following lines into your `~/.bashrc` or `~/.zshrc` file:|
  |
  ```bash|
@@ -7524,7 +7524,7 @@ func updateAppIdentifier(xcodeproj: String,
  ```|
  >|
  After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to create the new gem directory. After this, you're good to go!
-
+ 
  Recommended usage of the `update_fastlane` action is at the top inside of the `before_all` block, before running any other action.
 */
 func updateFastlane(noUpdate: Bool = false,
@@ -7863,7 +7863,7 @@ func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/api/0",
    - app: The (spaceship) app ID of the app you want to use/modify
 
  Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
-
+ 
  If you don't want a PDF report for App Store builds, use the `:force` option.
  This is useful when running _fastlane_ on your Continuous Integration server:
  `_upload_to_app_store_(force: true)`
@@ -8672,7 +8672,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
   verbose(message: "parsing an Int from data: \(fromString), from function: \(function)")
   return NSString(string: fromString.trimmingCharacters(in: .punctuationCharacters)).integerValue
 }
-
+      
 let deliverfile: Deliverfile = Deliverfile()
 let gymfile: Gymfile = Gymfile()
 let matchfile: Matchfile = Matchfile()
