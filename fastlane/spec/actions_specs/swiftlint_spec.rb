@@ -352,7 +352,7 @@ describe Fastlane do
           expect(result).to eq("swiftlint autocorrect")
         end
       end
-      
+
       context "when specify no-cache option" do
         it "adds no-cache option if mode is :autocorrect" do
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -364,7 +364,7 @@ describe Fastlane do
 
           expect(result).to eq("swiftlint autocorrect --no-cache")
         end
-        
+
         it "adds no-cache option if mode is :lint" do
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
@@ -387,7 +387,7 @@ describe Fastlane do
           expect(result).to eq("swiftlint analyze")
         end
       end
-      
+
       context "when specify false for no-cache option" do
         it "doesn't add no-cache option if mode is :autocorrect" do
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -399,7 +399,7 @@ describe Fastlane do
 
           expect(result).to eq("swiftlint autocorrect")
         end
-        
+
         it "doesn't add no-cache option if mode is :lint" do
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
