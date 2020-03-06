@@ -162,13 +162,13 @@ describe FastlaneCore do
 
     describe "value coercion" do
       it "coerces value to be an array", requires_xcodebuild: true do
-        string_value = "StringValue"
-        expect(FastlaneCore::Helper.coerce_to_array_of_strings(stringValue)).to eq([string_value])
+        stringValue = "StringValue"
+        expect(FastlaneCore::Helper.coerce_to_array_of_strings(stringValue)).to eq([stringValue])
       end
 
       it "leaves value as an array", requires_xcodebuild: true do
-        array_value = ["StringValue1", "StringValue2"]
-        expect(FastlaneCore::Helper.coerce_to_array_of_strings(arrayValue)).to eq(array_value)
+        arrayValue = ["StringValue1", "StringValue2"]
+        expect(FastlaneCore::Helper.coerce_to_array_of_strings(arrayValue)).to eq(arrayValue)
       end
 
       it "handles nil", requires_xcodebuild: true do
