@@ -428,6 +428,7 @@ module Spaceship
         setup_watch_app_icon
         setup_review_attachment_file if supports_review_attachment_file?
         setup_transit_app_file if supports_app_transit?
+        setup_scaling
         setup_screenshots
         setup_trailers
       end
@@ -501,7 +502,7 @@ module Spaceship
       end
 
       # Uploads or removes a screenshot
-      # @param icon_path (String): The path to the screenshot. Use nil to remove it
+      # @param screenshot_path (String): The path to the screenshot. Use nil to remove it
       # @param sort_order (Fixnum): The sort_order, from 1 to 5
       # @param language (String): The language for this screenshot
       # @param device (string): The device for this screenshot
@@ -535,10 +536,9 @@ module Spaceship
           # We only set this, if we actually successfully uploaded a new screenshot
           # for this device / language combination
           # if this value is not set, iTC will fallback to another device type for screenshots
-          language_details = raw_data_details.find { |d| d["language"] == language }["displayFamilies"]["value"]
-          device_language_details = language_details.find { |display_family| display_family['name'] == device }
           scaled_key = is_messages ? "messagesScaled" : "scaled"
-          device_language_details[scaled_key]["value"] = false
+          scaled_details = container_data_for_language_and_device(scaled_key, language, device)
+          scaled_details["value"] = false
 
           if existing_sort_orders.include?(sort_order) # replace
             device_lang_screenshots[existing_sort_orders.index(sort_order)] = new_screenshot
@@ -617,6 +617,10 @@ module Spaceship
               "isPortrait" => Utilities.portrait?(video_preview_path)
             }
           }
+
+          # We disable "scaling" for this device type / language combination now that there is at least a trailer
+          scaled_details = container_data_for_language_and_device("scaled", language, device)
+          scaled_details["value"] = false
 
           if existing_sort_orders.include?(sort_order) # replace
             device_lang_trailers[existing_sort_orders.index(sort_order)] = new_trailer
@@ -766,24 +770,27 @@ module Spaceship
         raise "App Store Connect error: #{ex}"
       end
 
-      def setup_screenshots
-        # Enable Scaling for all screen sizes that don't have at least one screenshot
-        # We automatically disable scaling once we upload at least one screenshot
-        language_details = raw_data_details.each do |current_language|
+      def setup_scaling
+        # Enable Scaling for all screen sizes that don't have at least one screenshot or trailer
+        # We automatically disable scaling once we upload at least one screenshot or trailer
+        raw_data_details.each do |current_language|
           language_details = (current_language["displayFamilies"] || {})["value"]
           (language_details || []).each do |device_language_details|
             next if device_language_details["screenshots"].nil?
             next if device_language_details["screenshots"]["value"].count > 0
+            next if !device_language_details["trailers"].nil? && device_language_details["trailers"]["value"].count > 0
 
             # The current row includes screenshots for all device types
             # so we need to enable scaling for both iOS and watchOS apps
             device_language_details["scaled"]["value"] = true if device_language_details["scaled"]
             device_language_details["messagesScaled"]["value"] = true if device_language_details["messagesScaled"]
             # we unset `scaled` or `messagesScaled` as soon as we upload a
-            # screenshot for this device/language combination
+            # screenshot or trailer for this device/language combination
           end
         end
+      end
 
+      def setup_screenshots
         @screenshots = {}
         raw_data_details.each do |row|
           # Now that's one language right here
