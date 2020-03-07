@@ -44,6 +44,12 @@ module Fastlane
         else
           require "fastlane"
         end
+
+        # Loading any .env files before any lanes are called since
+        # variables like FASTLANE_HIDE_CHANGELOG, SKIP_SLOW_FASTLANE_WARNING
+        # and FASTLANE_DISABLE_COLORS need to be set early on in execution
+        load_dot_env
+
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
         unless running_version_command? || running_init_command?
           print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
@@ -58,12 +64,6 @@ module Fastlane
             UI.error(warn)
           end
         end
-
-        # Loading any .env files before any lanes are called since
-        # variables like FASTLANE_HIDE_CHANGELOG and FASTLANE_DISABLE_COLORS
-        # need to be set early on in execution
-        # TODO: Should load_dot_env be moved to the top of take_off in order to support FASTLANE_DISABLE_ANIMATION preference?
-        load_dot_env
 
         # Needs to go after load_dot_env for variable FASTLANE_SKIP_UPDATE_CHECK
         FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
