@@ -41,15 +41,15 @@ module Fastlane
           raise if params[:raise_if_swiftlint_error]
         end
       end
-      
+
       # Get current SwiftLint version
       def self.swiftlint_version(executable: nil)
         binary = executable || 'swiftlint'
         Gem::Version.new(`#{binary} version`.chomp)
       end
-      
+
       def self.supported_no_cache_option(params)
-        if (params[:mode] == :autocorrect || params[:mode] == :lint)
+        if params[:mode] == :autocorrect || params[:mode] == :lint
           return " --no-cache"
         else
           return ""
@@ -218,3 +218,4 @@ module Fastlane
     end
   end
 end
+d
