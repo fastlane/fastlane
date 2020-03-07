@@ -13,14 +13,7 @@ module Fastlane
 
         command = (params[:executable] || "swiftlint").dup
         command << " #{params[:mode]}"
-        command << " --path #{params[:path].shellescape}" if params[:path]
-        command << supported_option_switch(params, :strict, "0.9.2", true)
-        command << " --config #{params[:config_file].shellescape}" if params[:config_file]
-        command << " --reporter #{params[:reporter]}" if params[:reporter]
-        command << supported_option_switch(params, :quiet, "0.9.0", true)
-        command << supported_option_switch(params, :format, "0.11.0", true) if params[:mode] == :autocorrect
-        command << supported_no_cache_option(params) if params[:no_cache]
-        command << " --compiler-log-path #{params[:compiler_log_path].shellescape}" if params[:compiler_log_path]
+        command << optional_flags(params)
 
         if params[:files]
           if version < Gem::Version.new('0.5.1')
@@ -40,6 +33,19 @@ module Fastlane
           handle_swiftlint_error(params[:ignore_exit_status], $?.exitstatus)
           raise if params[:raise_if_swiftlint_error]
         end
+      end
+
+      def self.optional_flags(params)
+        command = ""
+        command << " --path #{params[:path].shellescape}" if params[:path]
+        command << supported_option_switch(params, :strict, "0.9.2", true)
+        command << " --config #{params[:config_file].shellescape}" if params[:config_file]
+        command << " --reporter #{params[:reporter]}" if params[:reporter]
+        command << supported_option_switch(params, :quiet, "0.9.0", true)
+        command << supported_option_switch(params, :format, "0.11.0", true) if params[:mode] == :autocorrect
+        command << supported_no_cache_option(params) if params[:no_cache]
+        command << " --compiler-log-path #{params[:compiler_log_path].shellescape}" if params[:compiler_log_path]
+        return command
       end
 
       # Get current SwiftLint version
