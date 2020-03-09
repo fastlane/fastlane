@@ -13,6 +13,8 @@ module Spaceship
       attr_accessor :profile_type
       attr_accessor :expiration_date
 
+      attr_accessor :bundle_id
+
       attr_mapping({
         "name" => "name",
         "platform" => "platform",
@@ -21,7 +23,9 @@ module Spaceship
         "createdDate" => "created_date",
         "profileState" => "profile_state",
         "profileType" => "profile_type",
-        "expirationDate" => "expiration_date"
+        "expirationDate" => "expiration_date",
+
+        "bundleId" => "bundle_id"
       })
 
       module ProfileState

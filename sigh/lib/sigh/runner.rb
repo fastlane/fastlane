@@ -73,9 +73,15 @@ module Sigh
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
       UI.message("Fetching profiles...")
-      results = profile_type.find_by_bundle_id(bundle_id: Sigh.config[:app_identifier],
-                                                     mac: Sigh.config[:platform].to_s == 'macos',
-                                            sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil)
+
+#      results = profile_type.find_by_bundle_id(bundle_id: Sigh.config[:app_identifier],
+#                                                     mac: Sigh.config[:platform].to_s == 'macos',
+#                                            sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil)
+
+      results = Spaceship::ConnectAPI::Profile.all(filter: {}, includes: "bundleId").select do |profile|
+        profile.bundle_id.identifier == Sigh.config[:app_identifier]
+      end
+
       results = results.find_all do |current_profile|
         if current_profile.valid? || Sigh.config[:force]
           true
@@ -272,7 +278,7 @@ module Sigh
         filters << "Owner Name: '#{Sigh.config[:cert_owner_name]}' " if Sigh.config[:cert_owner_name]
         filters << "Certificate ID: '#{Sigh.config[:cert_id]}' " if Sigh.config[:cert_id]
         UI.important("No certificates for filter: #{filters}") if filters.length > 0
-        message = "Could not find a matching code signing identity for type '#{profile_type.to_s.split(':').last}'. "
+        message = "Could not find a matching code signing identity for type '#{profile_type_pretty_type}'. "
         message += "It is recommended to use match to manage code signing for you, more information on https://codesigning.guide. "
         message += "If you don't want to do so, you can also use cert to generate a new one: https://fastlane.tools/cert"
         UI.user_error!(message)
