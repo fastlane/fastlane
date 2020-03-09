@@ -131,7 +131,7 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :platform,
                                      short_option: '-p',
                                      env_name: "SIGH_PLATFORM",
-                                     description: "Set the provisioning profile's platform (i.e. ios, tvos)",
+                                     description: "Set the provisioning profile's platform (i.e. ios, tvos, macos)",
                                      is_string: false,
                                      default_value: "ios",
                                      verify_block: proc do |value|

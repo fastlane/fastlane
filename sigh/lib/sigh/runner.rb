@@ -42,7 +42,7 @@ module Sigh
 
       UI.user_error!("Something went wrong fetching the latest profile") unless profile
 
-      if profile_type == Spaceship.provisioning_profile.in_house
+      if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE
         ENV["SIGH_PROFILE_ENTERPRISE"] = "1"
       else
         ENV.delete("SIGH_PROFILE_ENTERPRISE")
@@ -55,11 +55,17 @@ module Sigh
     def profile_type
       return @profile_type if @profile_type
 
-      @profile_type = Spaceship.provisioning_profile.app_store
-      @profile_type = Spaceship.provisioning_profile.in_house if Spaceship.client.in_house?
-      @profile_type = Spaceship.provisioning_profile.ad_hoc if Sigh.config[:adhoc]
-      @profile_type = Spaceship.provisioning_profile.direct if Sigh.config[:developer_id]
-      @profile_type = Spaceship.provisioning_profile.development if Sigh.config[:development]
+      if ["ios", "tvos"].include?(Sigh.config[:platform])
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE if Spaceship.client.in_house?
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC if Sigh.config[:adhoc]
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT if Sigh.config[:development]
+      else
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT if Sigh.config[:development]
+      end
+
+      @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT if Sigh.config[:developer_id]
 
       @profile_type
     end
@@ -118,11 +124,42 @@ module Sigh
       end
     end
 
+    def profile_type_pretty_type
+      case profile_type
+      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT
+        "Development"
+      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE
+        "AppStore"
+      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC
+        "AdHoc"
+      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE
+        "InHouse"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT
+        "Development"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE
+        "AppStore"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT
+        "Direct"
+      when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT
+        "Development"
+      when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_STORE
+        "AppStore"
+      when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC
+        "AdHoc"
+      when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
+        "InHouse"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
+        "Development"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
+        "AppStore"
+      end
+    end
+
     # Create a new profile and return it
     def create_profile!
       cert = certificate_to_use
       bundle_id = Sigh.config[:app_identifier]
-      name = Sigh.config[:provisioning_name] || [bundle_id, profile_type.pretty_type].join(' ')
+      name = Sigh.config[:provisioning_name] || [bundle_id, profile_type_pretty_type].join(' ')
 
       unless Sigh.config[:skip_fetch_profiles]
         if Spaceship.provisioning_profile.all(mac: Sigh.config[:platform].to_s == 'macos').find { |p| p.name == name }
@@ -248,7 +285,7 @@ module Sigh
     # Downloads and stores the provisioning profile
     def download_profile(profile)
       UI.important("Downloading provisioning profile...")
-      profile_name ||= "#{profile_type.pretty_type}_#{Sigh.config[:app_identifier]}"
+      profile_name ||= "#{profile_type_pretty_type}_#{Sigh.config[:app_identifier]}"
 
       if Sigh.config[:platform].to_s == 'tvos'
         profile_name += "_tvos"

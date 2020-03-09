@@ -38,6 +38,12 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
+      def self.find(identifier)
+        return all(filter: { identifier: identifier }).find do |app|
+          app.identifier == identifier
+        end
+      end
+
       def self.get(bundle_id_id: nil, includes: nil)
         return Spaceship::ConnectAPI.get_bundle_id(bundle_id_id: bundle_id_id, includes: includes).first
       end

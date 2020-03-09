@@ -33,14 +33,22 @@ module Spaceship
         #
 
         def get(url_or_path, params = nil)
-          # The App Store Connect API is only available in a web session through a
-          # a proxy server where GET requests are actually sent as a POST
-          return get_as_post(url_or_path, params) if web_session?
+          # The Provisioning App Store Connect API needs to be proxied through a 
+          # POST request if using web session
+          return proxy_get(url_or_path, params) if web_session?
 
           super(url_or_path, params)
         end
 
-        def get_as_post(url_or_path, params = nil)
+        def post(url_or_path, body)
+          # The Provisioning App Store Connect API needs teamId added to the body of
+          # each post if using web session
+          return proxy_post(url_or_path, body) if web_session?
+
+          super(url_or_path, body)
+        end
+
+        def proxy_get(url_or_path, params = nil)
           encoded_params = Faraday::NestedParamsEncoder.encode(params)
           body = { "urlEncodedQueryParams" => encoded_params, "teamId" => team_id }
 
@@ -49,6 +57,18 @@ module Spaceship
             req.body = body.to_json
             req.headers['Content-Type'] = 'application/vnd.api+json'
             req.headers['X-HTTP-Method-Override'] = 'GET'
+            req.headers['X-Requested-With'] = 'XMLHttpRequest'
+          end
+          handle_response(response)
+        end
+
+        def proxy_post(url_or_path, body)
+          body[:data][:attributes][:teamId] = team_id
+
+          response = request(:post) do |req|
+            req.url(url_or_path)
+            req.body = body.to_json
+            req.headers['Content-Type'] = 'application/vnd.api+json'
             req.headers['X-Requested-With'] = 'XMLHttpRequest'
           end
           handle_response(response)
