@@ -134,8 +134,9 @@ module Spaceship
 
         phone_number = env_2fa_sms_default_phone_number
         phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
+        # don't request sms if no trusted devices and env default is the only trusted number,
+        # code was automatically sent
         should_request_code = !sms_automatically_sent(response)
-
         code_type = 'phone'
         body = request_two_factor_code_from_phone(phone_id, phone_number, code_length, should_request_code)
       elsif sms_automatically_sent(response) # sms fallback, code was automatically sent
