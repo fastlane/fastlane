@@ -131,18 +131,32 @@ module Spaceship
         puts("Environment variable `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` is set, automatically requesting 2FA token via SMS to that number")
         puts("SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER = #{env_2fa_sms_default_phone_number}")
         puts("")
+
         phone_number = env_2fa_sms_default_phone_number
         phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
+        should_request_code = !sms_automatically_sent(response) 
+
         code_type = 'phone'
-        body = request_two_factor_code_from_phone(phone_id, phone_number, code_length)
+        body = request_two_factor_code_from_phone(phone_id, phone_number, code_length, should_request_code)
+      elsif sms_automatically_sent(response) # sms fallback, code was automatically sent
+        fallback_number = response.body["trustedPhoneNumbers"].first
+        phone_number = fallback_number["numberWithDialCode"]
+        phone_id = fallback_number["id"]
+
+        code_type = 'phone'
+        body = request_two_factor_code_from_phone(phone_id, phone_number, code_length, false)
+      elsif sms_fallback(response) # sms fallback but code wasn't sent bec > 1 phone number
+        code_type = 'phone'
+        body = request_two_factor_code_from_phone_choose(response.body["trustedPhoneNumbers"], code_length)
       else
         puts("(Input `sms` to escape this prompt and select a trusted phone number to send the code as a text message)")
         puts("")
         puts("(You can also set the environment variable `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` to automate this)")
         puts("(Read more at: https://github.com/fastlane/fastlane/blob/master/spaceship/docs/Authentication.md#auto-select-sms-via-spaceship-2fa-sms-default-phone-number)")
         puts("")
-        code_type = 'trusteddevice'
+        
         code = ask_for_2fa_code("Please enter the #{code_length} digit code:")
+        code_type = 'trusteddevice'
         body = { "securityCode" => { "code" => code.to_s } }.to_json
 
         # User exited by entering `sms` and wants to choose phone number for SMS
