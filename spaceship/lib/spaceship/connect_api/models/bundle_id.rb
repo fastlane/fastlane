@@ -20,11 +20,6 @@ module Spaceship
         "bundleIdCapabilities" => 'bundle_id_capabilities'
       })
 
-      module Platform
-        IOS = "IOS"
-        MAC_OS = "MAC_OS"
-      end
-
       def self.type
         return "bundleIds"
       end
@@ -38,8 +33,8 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def self.find(identifier)
-        return all(filter: { identifier: identifier }).find do |app|
+      def self.find(identifier, platform: nil)
+        return all(filter: { identifier: identifier, platform: platform }).find do |app|
           app.identifier == identifier
         end
       end

@@ -85,11 +85,7 @@ module Sigh
     def fetch_profiles
       UI.message("Fetching profiles...")
 
-#      results = profile_type.find_by_bundle_id(bundle_id: Sigh.config[:app_identifier],
-#                                                     mac: Sigh.config[:platform].to_s == 'macos',
-#                                            sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil)
-
-      results = Spaceship::ConnectAPI::Profile.all(filter: {}, includes: "bundleId,certificates").select do |profile|
+      results = Spaceship::ConnectAPI::Profile.all(filter: {profileType: profile_type}, includes: "bundleId,certificates").select do |profile|
         profile.bundle_id.identifier == Sigh.config[:app_identifier]
       end
 
@@ -169,9 +165,9 @@ module Sigh
       when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
         "InHouse"
       when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
-        "Development"
+        "Development Catalyst"
       when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
-        "AppStore"
+        "AppStore Catalyst"
       end
     end
 
@@ -203,12 +199,6 @@ module Sigh
         certificate_ids: [certificate_to_use.id]
       )
 
-#      profile = profile_type.create!(name: name,
-#                                bundle_id: bundle_id,
-#                              certificate: cert,
-#                                      mac: Sigh.config[:platform].to_s == 'macos',
-#                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil,
-#                            template_name: Sigh.config[:template_name])
       profile
     end
 
@@ -343,7 +333,13 @@ module Sigh
 
     # Makes sure the current App ID exists. If not, it will show an appropriate error message
     def ensure_app_exists!
-      return if Spaceship::App.find(Sigh.config[:app_identifier], mac: Sigh.config[:platform].to_s == 'macos')
+      if Sigh.config[:platform].to_s == 'macos'
+        platform = Spaceship::ConnectAPI::Platform::MACOS
+      else
+        platform = Spaceship::ConnectAPI::Platform::IOS
+      end
+
+      return if Spaceship::ConnectAPI::BundleId.find(Sigh.config[:app_identifier], platform: platform)
       print_produce_command(Sigh.config)
       UI.user_error!("Could not find App with App Identifier '#{Sigh.config[:app_identifier]}'")
     end
