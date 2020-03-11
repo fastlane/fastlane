@@ -46,6 +46,17 @@ module Spaceship
       end
 
       #
+      # Beta Feedback
+
+      def get_beta_feedback(filter: {}, includes: "tester,build,screenshots", limit: nil, sort: nil)
+        filter ||= {}
+        filter["build.app"] = id
+
+        resps = Spaceship::ConnectAPI.get_beta_feedback(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.flat_map(&:to_models)
+      end
+
+      #
       # Beta Testers
       #
 

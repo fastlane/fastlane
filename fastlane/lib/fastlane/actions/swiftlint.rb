@@ -13,13 +13,7 @@ module Fastlane
 
         command = (params[:executable] || "swiftlint").dup
         command << " #{params[:mode]}"
-        command << " --path #{params[:path].shellescape}" if params[:path]
-        command << supported_option_switch(params, :strict, "0.9.2", true)
-        command << " --config #{params[:config_file].shellescape}" if params[:config_file]
-        command << " --reporter #{params[:reporter]}" if params[:reporter]
-        command << supported_option_switch(params, :quiet, "0.9.0", true)
-        command << supported_option_switch(params, :format, "0.11.0", true) if params[:mode] == :autocorrect
-        command << " --compiler-log-path #{params[:compiler_log_path].shellescape}" if params[:compiler_log_path]
+        command << optional_flags(params)
 
         if params[:files]
           if version < Gem::Version.new('0.5.1')
@@ -37,13 +31,35 @@ module Fastlane
           Actions.sh(command)
         rescue
           handle_swiftlint_error(params[:ignore_exit_status], $?.exitstatus)
+          raise if params[:raise_if_swiftlint_error]
         end
+      end
+
+      def self.optional_flags(params)
+        command = ""
+        command << " --path #{params[:path].shellescape}" if params[:path]
+        command << supported_option_switch(params, :strict, "0.9.2", true)
+        command << " --config #{params[:config_file].shellescape}" if params[:config_file]
+        command << " --reporter #{params[:reporter]}" if params[:reporter]
+        command << supported_option_switch(params, :quiet, "0.9.0", true)
+        command << supported_option_switch(params, :format, "0.11.0", true) if params[:mode] == :autocorrect
+        command << supported_no_cache_option(params) if params[:no_cache]
+        command << " --compiler-log-path #{params[:compiler_log_path].shellescape}" if params[:compiler_log_path]
+        return command
       end
 
       # Get current SwiftLint version
       def self.swiftlint_version(executable: nil)
         binary = executable || 'swiftlint'
         Gem::Version.new(`#{binary} version`.chomp)
+      end
+
+      def self.supported_no_cache_option(params)
+        if params[:mode] == :autocorrect || params[:mode] == :lint
+          return " --no-cache"
+        else
+          return ""
+        end
       end
 
       # Return "--option" switch if option is on and current SwiftLint version is greater or equal than min version.
@@ -106,10 +122,22 @@ module Fastlane
                                        is_string: false,
                                        type: Boolean,
                                        optional: true),
-          FastlaneCore::ConfigItem.new(key: :reporter,
-                                       description: 'Choose output reporter',
-                                       is_string: true,
+          FastlaneCore::ConfigItem.new(key: :raise_if_swiftlint_error,
+                                       description: "Raises an error if swiftlint fails, so you can fail CI/CD jobs if necessary \
+                                                    (true/false)",
+                                       default_value: false,
+                                       is_string: false,
+                                       type: Boolean,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :reporter,
+                                       description: "Choose output reporter. Available: xcode, json, csv, checkstyle, junit, html, \
+                                                     emoji, sonarqube, markdown, github-actions-logging",
+                                       is_string: true,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         available = ['xcode', 'json', 'csv', 'checkstyle', 'junit', 'html', 'emoji', 'sonarqube', 'markdown', 'github-actions-logging']
+                                         UI.user_error!("Available values are '#{available.join("', '")}'") unless available.include?(value)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :quiet,
                                        description: "Don't print status logs like 'Linting <file>' & 'Done linting'",
                                        default_value: false,
@@ -122,6 +150,12 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :format,
                                        description: "Format code when mode is :autocorrect",
+                                       default_value: false,
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :no_cache,
+                                       description: "Ignore the cache when mode is :autocorrect or :lint",
                                        default_value: false,
                                        is_string: false,
                                        type: Boolean,
@@ -161,7 +195,9 @@ module Fastlane
               "AppDelegate.swift",
               "path/to/project/Model.swift"
             ],
+            raise_if_swiftlint_error: true,      # Allow fastlane to raise an error if swiftlint fails
             ignore_exit_status: true              # Allow fastlane to continue even if SwiftLint returns a non-zero exit status
+
           )'
         ]
       end

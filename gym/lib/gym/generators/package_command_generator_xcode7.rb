@@ -58,25 +58,51 @@ module Gym
       end
 
       def ipa_path
-        unless Gym.cache[:ipa_path]
-          path = Dir[File.join(temporary_output_path, "*.ipa")].last
-          # We need to process generic IPA
-          if path
-            # Try to find IPA file in the output directory, used when app thinning was not set
-            Gym.cache[:ipa_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
-            FileUtils.mv(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:ipa_path]).downcase).zero?
-          elsif Dir.exist?(apps_path)
-            # Try to find "generic" IPA file inside "Apps" folder, used when app thinning was set
-            files = Dir[File.join(apps_path, "*.ipa")]
-            # Generic IPA file doesn't have suffix so its name is the shortest
-            path = files.min_by(&:length)
-            Gym.cache[:ipa_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
-            FileUtils.cp(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:ipa_path]).downcase).zero?
-          else
-            ErrorHandler.handle_empty_archive unless path
-          end
+        path = Gym.cache[:ipa_path]
+        return path if path
+
+        path = Dir[File.join(temporary_output_path, "*.ipa")].last
+        # We need to process generic IPA
+        if path
+          # Try to find IPA file in the output directory, used when app thinning was not set
+          Gym.cache[:ipa_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
+          FileUtils.mv(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:ipa_path]).downcase).zero?
+        elsif Dir.exist?(apps_path)
+          # Try to find "generic" IPA file inside "Apps" folder, used when app thinning was set
+          files = Dir[File.join(apps_path, "*.ipa")]
+          # Generic IPA file doesn't have suffix so its name is the shortest
+          path = files.min_by(&:length)
+          Gym.cache[:ipa_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
+          FileUtils.cp(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:ipa_path]).downcase).zero?
+        else
+          ErrorHandler.handle_empty_archive unless path
         end
+
         Gym.cache[:ipa_path]
+      end
+
+      def pkg_path
+        path = Gym.cache[:pkg_path]
+        return path if path
+
+        path = Dir[File.join(temporary_output_path, "*.pkg")].last
+        # We need to process generic PKG
+        if path
+          # Try to find PKG file in the output directory, used when app thinning was not set
+          Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
+          FileUtils.mv(path, Gym.cache[:pkg_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:pkg_path]).downcase).zero?
+        elsif Dir.exist?(apps_path)
+          # Try to find "generic" PKG file inside "Apps" folder, used when app thinning was set
+          files = Dir[File.join(apps_path, "*.pkg")]
+          # Generic PKG file doesn't have suffix so its name is the shortest
+          path = files.min_by(&:length)
+          Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
+          FileUtils.cp(path, Gym.cache[:pkg_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:pkg_path]).downcase).zero?
+        else
+          ErrorHandler.handle_empty_archive unless path
+        end
+
+        Gym.cache[:pkg_path]
       end
 
       # The path the the dsym file for this app. Might be nil
@@ -158,6 +184,10 @@ module Gym
         # if we don't specify signingStyle as manual
         if Helper.xcode_at_least?("9.0") && hash[:provisioningProfiles]
           hash[:signingStyle] = 'manual'
+        end
+
+        if Gym.config[:installer_cert_name] && (Gym.project.mac? || Gym.building_mac_catalyst_for_mac?)
+          hash[:installerSigningCertificate] = Gym.config[:installer_cert_name]
         end
 
         hash[:teamID] = Gym.config[:export_team_id] if Gym.config[:export_team_id]

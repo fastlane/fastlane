@@ -317,6 +317,21 @@ module Spaceship
         params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
         Client.instance.get("preReleaseVersions", params)
       end
+
+      #
+      # betaFeedbacks (private API as of end 2019)
+      #
+
+      def get_beta_feedback(filter: {}, includes: nil, limit: nil, sort: nil)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("betaFeedbacks", params)
+      end
+
+      def delete_beta_feedback(feedback_id: nil)
+        raise "Feedback id is nil" if feedback_id.nil?
+
+        Client.instance.delete("betaFeedbacks/#{feedback_id}")
+      end
     end
   end
 end

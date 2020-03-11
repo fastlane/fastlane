@@ -39,7 +39,7 @@ module Fastlane
       end
 
       def self.details
-        "This action allows you to modify any `plist` file."
+        "This action allows you to modify any value inside any `plist` file."
       end
 
       def self.available_options
@@ -57,11 +57,46 @@ module Fastlane
       end
 
       def self.author
-        'rishabhtayal'
+        ["rishabhtayal", "matthiaszarzecki"]
       end
 
       def self.example_code
         [
+          'update_plist( # Updates the CLIENT_ID and GOOGLE_APP_ID string entries in the plist-file
+            plist_path: "path/to/your_plist_file.plist",
+            block: proc do |plist|
+              plist[:CLIENT_ID] = "new_client_id"
+              plist[:GOOGLE_APP_ID] = "new_google_app_id"
+            end
+          )',
+          'update_plist( # Sets a boolean entry
+            plist_path: "path/to/your_plist_file.plist",
+            block: proc do |plist|
+              plist[:boolean_entry] = true
+            end
+          )',
+          'update_plist( # Sets a number entry
+            plist_path: "path/to/your_plist_file.plist",
+            block: proc do |plist|
+              plist[:number_entry] = 13
+            end
+          )',
+          'update_plist( # Sets an array-entry with multiple sub-types
+            plist_path: "path/to/your_plist_file.plist",
+            block: proc do |plist|
+              plist[:array_entry] = ["entry_01", true, 1243]
+            end
+          )',
+          'update_plist( # The block can contain logic too
+            plist_path: "path/to/your_plist_file.plist",
+            block: proc do |plist|
+              if options[:environment] == "production"
+                plist[:CLIENT_ID] = "new_client_id_production"
+              else
+                plist[:CLIENT_ID] = "new_client_id_development"
+              end
+            end
+          )',
           'update_plist( # Advanced processing: find URL scheme for particular key and replace value
             plist_path: "path/to/Info.plist",
             block: proc do |plist|

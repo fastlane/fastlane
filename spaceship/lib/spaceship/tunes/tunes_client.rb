@@ -400,7 +400,7 @@ module Spaceship
         rating_url << "sort=REVIEW_SORT_ORDER_MOST_RECENT"
         rating_url << "&index=#{index}"
         rating_url << "&storefront=#{storefront}" unless storefront.empty?
-        rating_url << "&version_id=#{version_id}" unless version_id.empty?
+        rating_url << "&versionId=#{version_id}" unless version_id.empty?
 
         r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
@@ -627,7 +627,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def transform_to_raw_pricing_intervals(app_id = nil, purchase_id = nil, pricing_intervals = nil, subscription_price_target = nil)
+    def transform_to_raw_pricing_intervals(app_id = nil, purchase_id = nil, pricing_intervals = 5, subscription_price_target = nil)
       intervals_array = []
       if pricing_intervals
         intervals_array = pricing_intervals.map do |interval|
@@ -784,11 +784,8 @@ module Spaceship
     end
 
     def available_languages
-      r = request(:get, "ra/apps/storePreview/regionCountryLanguage")
-      response = parse_response(r, 'data')
-      response.flat_map { |region| region["storeFronts"] }
-              .flat_map { |storefront| storefront["supportedLocaleCodes"] }
-              .uniq
+      r = request(:get, "ra/ref")
+      parse_response(r, 'data')['detailLocales']
     end
 
     #####################################################

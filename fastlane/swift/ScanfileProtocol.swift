@@ -24,6 +24,9 @@ protocol ScanfileProtocol: class {
   /// Enabling this option will automatically erase the simulator before running the application
   var resetSimulator: Bool { get }
 
+  /// Enabling this option will disable the simulator from showing the 'Slide to type' prompt
+  var disableSlideToType: Bool { get }
+
   /// Enabling this option will launch the first simulator prior to calling any xcodebuild command
   var prelaunchSimulator: Bool? { get }
 
@@ -99,6 +102,9 @@ protocol ScanfileProtocol: class {
   /// Generate the json compilation database with clang naming convention (compile_commands.json)
   var useClangReportName: Bool { get }
 
+  /// Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
+  var concurrentWorkers: Int? { get }
+
   /// Constrain the number of simulator devices on which to test concurrently. Equivalent to -maximum-concurrent-test-simulator-destinations
   var maxConcurrentSimulators: Int? { get }
 
@@ -125,6 +131,12 @@ protocol ScanfileProtocol: class {
 
   /// Use an extra XCCONFIG file to build your app
   var xcconfig: String? { get }
+
+  /// App name to use in slack message and logfile name
+  var appName: String? { get }
+
+  /// Target version of the app being build or tested. Used to filter out simulator version
+  var deploymentTargetVersion: String? { get }
 
   /// Create an Incoming WebHook for your Slack group to post results there
   var slackUrl: String? { get }
@@ -159,6 +171,9 @@ protocol ScanfileProtocol: class {
   /// Allows for override of the default `xcodebuild` command
   var xcodebuildCommand: String { get }
 
+  /// Sets a custom path for Swift Package Manager dependencies
+  var clonedSourcePackagesPath: String? { get }
+
   /// Should this step stop the build if the tests fail? Set this to false if you're using trainer
   var failBuild: Bool { get }
 }
@@ -172,6 +187,7 @@ extension ScanfileProtocol {
   var skipDetectDevices: Bool { return false }
   var forceQuitSimulator: Bool { return false }
   var resetSimulator: Bool { return false }
+  var disableSlideToType: Bool { return true }
   var prelaunchSimulator: Bool? { return nil }
   var reinstallApp: Bool { return false }
   var appIdentifier: String? { return nil }
@@ -197,6 +213,7 @@ extension ScanfileProtocol {
   var shouldZipBuildProducts: Bool { return false }
   var resultBundle: Bool { return false }
   var useClangReportName: Bool { return false }
+  var concurrentWorkers: Int? { return nil }
   var maxConcurrentSimulators: Int? { return nil }
   var disableConcurrentTesting: Bool { return false }
   var skipBuild: Bool { return false }
@@ -206,6 +223,8 @@ extension ScanfileProtocol {
   var configuration: String? { return nil }
   var xcargs: String? { return nil }
   var xcconfig: String? { return nil }
+  var appName: String? { return nil }
+  var deploymentTargetVersion: String? { return nil }
   var slackUrl: String? { return nil }
   var slackChannel: String? { return nil }
   var slackMessage: String? { return nil }
@@ -217,9 +236,10 @@ extension ScanfileProtocol {
   var destination: String? { return nil }
   var customReportFileName: String? { return nil }
   var xcodebuildCommand: String { return "env NSUnbufferedIO=YES xcodebuild" }
+  var clonedSourcePackagesPath: String? { return nil }
   var failBuild: Bool { return true }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.22]
+// FastlaneRunnerAPIVersion [0.9.26]

@@ -10,6 +10,13 @@ describe "Build Manager" do
       changelog = Pilot::BuildManager.truncate_changelog(changelog)
       expect(changelog).to eq("1234")
     end
+    it "Truncates based on bytes not characters" do
+      changelog = "ü" * 4000
+      expect(changelog.unpack("C*").length).to eq(8000)
+      changelog = Pilot::BuildManager.truncate_changelog(changelog)
+      # Truncation appends "...", so the result is 1998 two-byte characters plus "..." for 3999 bytes.
+      expect(changelog.unpack("C*").length).to eq(3999)
+    end
   end
 
   describe ".sanitize_changelog" do
@@ -98,8 +105,15 @@ describe "Build Manager" do
         })
       ]
     end
+    let(:build_beta_detail_still_processing) do
+      Spaceship::ConnectAPI::BuildBetaDetail.new("321", {
+        internal_build_state: Spaceship::ConnectAPI::BuildBetaDetail::InternalState::PROCESSING,
+        external_build_state: Spaceship::ConnectAPI::BuildBetaDetail::ExternalState::PROCESSING
+      })
+    end
     let(:build_beta_detail) do
       Spaceship::ConnectAPI::BuildBetaDetail.new("321", {
+        internal_build_state: Spaceship::ConnectAPI::BuildBetaDetail::InternalState::READY_FOR_BETA_TESTING,
         external_build_state: Spaceship::ConnectAPI::BuildBetaDetail::ExternalState::READY_FOR_BETA_SUBMISSION
       })
     end
@@ -151,6 +165,18 @@ describe "Build Manager" do
     end
 
     describe "distribute success" do
+      let(:distribute_options_skip_waiting_non_localized_changelog) do
+        {
+          apple_id: 'mock_apple_id',
+          app_identifier: 'mock_app_id',
+          distribute_external: false,
+          skip_submission: false,
+          skip_waiting_for_build_processing: true,
+          notify_external_testers: true,
+          uses_non_exempt_encryption: false,
+          changelog: "log of changing"
+        }
+      end
       let(:distribute_options_non_localized) do
         {
           apple_id: 'mock_apple_id',
@@ -177,11 +203,59 @@ describe "Build Manager" do
         # Allow build to return app, buidl_beta_detail, and pre_release_version
         # These are models that are expected to usually be included in the build passed into distribute
         allow(ready_to_submit_mock_build).to receive(:app).and_return(app)
-        allow(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail)
         allow(ready_to_submit_mock_build).to receive(:pre_release_version).and_return(pre_release_version)
       end
 
-      it "updates non-localized  demo_account_required, notify_external_testers, beta_app_feedback_email, and beta_app_description" do
+      it "updates non-localized changelog and doesn't distribute" do
+        allow(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail_still_processing)
+
+        options = distribute_options_skip_waiting_non_localized_changelog
+
+        # Expect a beta app review detail to be patched
+        expect(Spaceship::ConnectAPI).to receive(:patch_beta_app_review_detail).with({
+          app_id: ready_to_submit_mock_build.app_id,
+          attributes: { demoAccountRequired: options[:demo_account_required] }
+        })
+
+        # Expect beta build localizations to be fetched
+        expect(Spaceship::ConnectAPI).to receive(:get_beta_build_localizations).with({
+          filter: { build: ready_to_submit_mock_build.id },
+          includes: nil,
+          limit: nil,
+          sort: nil
+        }).and_return(Spaceship::ConnectAPI::Response.new)
+        expect(ready_to_submit_mock_build).to receive(:get_beta_build_localizations).and_wrap_original do |m, *args|
+          m.call(*args)
+          build_localizations
+        end
+
+        # Expect beta build localizations to be patched with a UI.success after
+        mock_api_client_beta_build_localizations.each do |localization|
+          expect(Spaceship::ConnectAPI).to receive(:patch_beta_build_localizations).with({
+            localization_id: localization['id'],
+            attributes: {
+              whatsNew: options[:changelog]
+            }
+          })
+        end
+        expect(FastlaneCore::UI).to receive(:success).with("Successfully set the changelog for build")
+
+        # Expect build beta details to be patched
+        expect(Spaceship::ConnectAPI).to receive(:patch_build_beta_details).with({
+          build_beta_details_id: build_beta_detail.id,
+          attributes: { autoNotifyEnabled: options[:notify_external_testers] }
+        })
+
+        # Don't expect success messages
+        expect(FastlaneCore::UI).to_not(receive(:message).with(/Distributing new build to testers/))
+        expect(FastlaneCore::UI).to_not(receive(:success).with(/Successfully distributed build to/))
+
+        fake_build_manager.distribute(options, build: ready_to_submit_mock_build)
+      end
+
+      it "updates non-localized demo_account_required, notify_external_testers, beta_app_feedback_email, and beta_app_description and distributes" do
+        allow(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail)
+
         options = distribute_options_non_localized
 
         # Expect App.find to be called from within Pilot::Manager
@@ -278,7 +352,7 @@ describe "Build Manager" do
           m.call(*args)
         end
 
-        # Except success messages
+        # Expect success messages
         expect(FastlaneCore::UI).to receive(:message).with(/Distributing new build to testers/)
         expect(FastlaneCore::UI).to receive(:success).with(/Successfully distributed build to/)
 
