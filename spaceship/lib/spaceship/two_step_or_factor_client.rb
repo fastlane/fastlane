@@ -191,6 +191,14 @@ module Spaceship
       return true
     end
 
+    def sms_fallback(response)
+      response.body["noTrustedDevices"]
+    end
+
+    def sms_automatically_sent(response)
+      (response.body["trustedPhoneNumbers"] || []).count == 1 && sms_fallback(response)
+    end
+
     # extracted into its own method for testing
     def ask_for_2fa_code(text)
       ask(text)
