@@ -134,7 +134,7 @@ module Spaceship
 
         phone_number = env_2fa_sms_default_phone_number
         phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
-        should_request_code = !sms_automatically_sent(response) 
+        should_request_code = !sms_automatically_sent(response)
 
         code_type = 'phone'
         body = request_two_factor_code_from_phone(phone_id, phone_number, code_length, should_request_code)
@@ -154,7 +154,7 @@ module Spaceship
         puts("(You can also set the environment variable `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` to automate this)")
         puts("(Read more at: https://github.com/fastlane/fastlane/blob/master/spaceship/docs/Authentication.md#auto-select-sms-via-spaceship-2fa-sms-default-phone-number)")
         puts("")
-        
+
         code = ask_for_2fa_code("Please enter the #{code_length} digit code:")
         code_type = 'trusteddevice'
         body = { "securityCode" => { "code" => code.to_s } }.to_json
@@ -276,7 +276,7 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
       end
       chosen = choose_phone_number(available)
       phone_id = phone_id_from_masked_number(phone_numbers, chosen)
-      
+
       request_two_factor_code_from_phone(phone_id, chosen, code_length)
     end
 
@@ -294,7 +294,7 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
         # we use `Spaceship::TunesClient.new.handle_itc_response`
         # since this might be from the Dev Portal, but for 2 step
         Spaceship::TunesClient.new.handle_itc_response(r.body)
-      
+
         puts("Successfully requested text message to #{phone_number}")
       end
 

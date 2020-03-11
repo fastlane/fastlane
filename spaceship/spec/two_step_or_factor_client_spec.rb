@@ -71,7 +71,7 @@ describe Spaceship::Client do
 
     context 'when SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER is not set' do
       context 'with trusted devices' do
-        let(:response) do 
+        let(:response) do
           response = OpenStruct.new
           response.body = trusted_devices_response
           return response
@@ -79,36 +79,36 @@ describe Spaceship::Client do
 
         it 'works with input sms' do
           expect(subject).to receive(:ask_for_2fa_code).twice.and_return('sms', '123')
-  
+
           bool = subject.handle_two_factor(response)
           expect(bool).to eq(true)
-  
+
           # sms should be sent despite having trusted devices
           expect(WebMock).to have_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone').with(body: { phoneNumber: { id: 1 }, mode: "sms" })
           expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: 1 }, mode: "sms" })
           expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode')
         end
-        
+
         it 'does not request sms code, and submits code correctly' do
-          bool = subject.handle_two_factor(response)  
+          bool = subject.handle_two_factor(response)
           expect(bool).to eq(true)
-  
+
           expect(WebMock).to have_not_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone')
           expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode')
-          expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode').with(body: { securityCode: { code: "123" }})
+          expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode').with(body: { securityCode: { code: "123" } })
         end
       end
 
       context 'with no trusted devices' do
-         # sms fallback, will be sent automatically
+        # sms fallback, will be sent automatically
         context "with exactly one phone number" do
           it "does not request sms code, and sends the correct request" do
             response = OpenStruct.new
             response.body = no_trusted_devices_response
-  
+
             bool = subject.handle_two_factor(response)
             expect(bool).to eq(true)
-            
+
             expect(WebMock).to have_not_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone')
             expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode')
             expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: 1 }, mode: "sms" })
@@ -119,7 +119,7 @@ describe Spaceship::Client do
         context 'with at least two phone numbers' do
           let(:phone_id) { 2 }
           let(:phone_number) { "+49 ••••• •••••81" }
-          let(:response) do 
+          let(:response) do
             response = OpenStruct.new
             response.body = no_trusted_devices_two_numbers_response
             return response
@@ -139,7 +139,7 @@ describe Spaceship::Client do
           it 'requests sms code, and submits code correctly' do
             bool = subject.handle_two_factor(response)
             expect(bool).to eq(true)
-    
+
             expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode')
             expect(WebMock).to have_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone').with(body: { phoneNumber: { id: phone_id }, mode: "sms" }).once
             expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: phone_id }, mode: "sms" })
@@ -151,12 +151,12 @@ describe Spaceship::Client do
     context 'when SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER is set' do
       let(:phone_number) { '+49 123 4567885' }
       let(:phone_id) { 1 }
-      let(:response) do 
+      let(:response) do
         response = OpenStruct.new
         response.body = trusted_devices_response
         return response
       end
-        
+
       before do
         ENV['SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER'] = phone_number
       end
@@ -189,7 +189,7 @@ describe Spaceship::Client do
         it 'requests sms code, and submits code correctly' do
           bool = subject.handle_two_factor(response)
           expect(bool).to eq(true)
-  
+
           expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode')
           expect(WebMock).to have_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone').with(body: { phoneNumber: { id: phone_id }, mode: "sms" }).once
           expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: phone_id }, mode: "sms" })
@@ -202,10 +202,10 @@ describe Spaceship::Client do
           it "does not request sms code, and sends the correct request" do
             response = OpenStruct.new
             response.body = no_trusted_devices_response
-  
+
             bool = subject.handle_two_factor(response)
             expect(bool).to eq(true)
-            
+
             expect(WebMock).to have_not_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone')
             expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode')
             expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: 1 }, mode: "sms" })
@@ -216,12 +216,12 @@ describe Spaceship::Client do
           # sets env var to the second phone number in this context
           let(:phone_number) { '+49 123 4567881' }
           let(:phone_id) { 2 }
-          let(:response) do 
+          let(:response) do
             response = OpenStruct.new
             response.body = no_trusted_devices_two_numbers_response
             return response
           end
-          
+
           # making sure we use env var for phone number selection
           it 'does not prompt user to choose number' do
             # rubocop:disable Style/MethodCallWithArgsParentheses
