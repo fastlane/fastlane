@@ -262,20 +262,22 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
     end
 
     # this is used in two places: after choosing a phone number and when a phone number is set via ENV var
-    def request_two_factor_code_from_phone(phone_id, phone_number, code_length)
-      # Request code
-      r = request(:put) do |req|
-        req.url("https://idmsa.apple.com/appleauth/auth/verify/phone")
-        req.headers['Content-Type'] = 'application/json'
-        req.body = { "phoneNumber" => { "id" => phone_id }, "mode" => "sms" }.to_json
-        update_request_headers(req)
+    def request_two_factor_code_from_phone(phone_id, phone_number, code_length, should_request_code = true)
+      if should_request_code
+        # Request code
+        r = request(:put) do |req|
+          req.url("https://idmsa.apple.com/appleauth/auth/verify/phone")
+          req.headers['Content-Type'] = 'application/json'
+          req.body = { "phoneNumber" => { "id" => phone_id }, "mode" => "sms" }.to_json
+          update_request_headers(req)
+        end
+
+        # we use `Spaceship::TunesClient.new.handle_itc_response`
+        # since this might be from the Dev Portal, but for 2 step
+        Spaceship::TunesClient.new.handle_itc_response(r.body)
+      
+        puts("Successfully requested text message to #{phone_number}")
       end
-
-      # we use `Spaceship::TunesClient.new.handle_itc_response`
-      # since this might be from the Dev Portal, but for 2 step
-      Spaceship::TunesClient.new.handle_itc_response(r.body)
-
-      puts("Successfully requested text message to #{phone_number}")
 
       code = ask_for_2fa_code("Please enter the #{code_length} digit code you received at #{phone_number}:")
 
