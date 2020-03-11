@@ -1,5 +1,7 @@
 require 'spaceship'
 
+require 'base64'
+
 require 'fastlane_core/print_table'
 require 'fastlane_core/cert_checker'
 require_relative 'module'
@@ -55,14 +57,23 @@ module Sigh
     def profile_type
       return @profile_type if @profile_type
 
-      if ["ios", "tvos"].include?(Sigh.config[:platform])
+      case Sigh.config[:platform]
+      when "ios"
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE if Spaceship.client.in_house?
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC if Sigh.config[:adhoc]
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT if Sigh.config[:development]
-      else
+      when "tvos"
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_STORE
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE if Spaceship.client.in_house?
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC if Sigh.config[:adhoc]
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT if Sigh.config[:development]
+      when "macos"
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT if Sigh.config[:development]
+      when "catalyst"
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT if Sigh.config[:development]
       end
 
       @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT if Sigh.config[:developer_id]
@@ -78,7 +89,7 @@ module Sigh
 #                                                     mac: Sigh.config[:platform].to_s == 'macos',
 #                                            sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil)
 
-      results = Spaceship::ConnectAPI::Profile.all(filter: {}, includes: "bundleId").select do |profile|
+      results = Spaceship::ConnectAPI::Profile.all(filter: {}, includes: "bundleId,certificates").select do |profile|
         profile.bundle_id.identifier == Sigh.config[:app_identifier]
       end
 
@@ -105,7 +116,7 @@ module Sigh
         # "member" and not an a "admin"
         raw_certs = current_profile.certificates.map do |cert|
           begin
-            raw_cert = cert.download_raw
+            raw_cert = Base64.decode64(cert.certificate_content)
           rescue => error
             UI.important("Cannot download cert #{cert.id} - #{error.message}")
             raw_cert = nil
@@ -126,7 +137,10 @@ module Sigh
             UI.message("Certificate for Provisioning Profile '#{current_profile.name}' not available locally: #{current_cert[:cert].id}, skipping this one...")
           end
         end
-        installed && current_profile.certificate_valid?
+
+        # Don't need to check if certificate is valid because it comes with the
+        # profile in the response
+        installed
       end
     end
 
@@ -164,8 +178,8 @@ module Sigh
     # Create a new profile and return it
     def create_profile!
       cert = certificate_to_use
-      bundle_id = Sigh.config[:app_identifier]
-      name = Sigh.config[:provisioning_name] || [bundle_id, profile_type_pretty_type].join(' ')
+      app_identifier = Sigh.config[:app_identifier]
+      name = Sigh.config[:provisioning_name] || [app_identifier, profile_type_pretty_type].join(' ')
 
       unless Sigh.config[:skip_fetch_profiles]
         if Spaceship.provisioning_profile.all(mac: Sigh.config[:platform].to_s == 'macos').find { |p| p.name == name }
@@ -175,13 +189,26 @@ module Sigh
         end
       end
 
+      bundle_id = Spaceship::ConnectAPI::BundleId.find(app_identifier)
+      unless bundle_id
+        UI.user_error!("Could not find App with App Identifier '#{Sigh.config[:app_identifier]}'")
+      end
+
       UI.important("Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}' for '#{Sigh.config[:platform]}' platform")
-      profile = profile_type.create!(name: name,
-                                bundle_id: bundle_id,
-                              certificate: cert,
-                                      mac: Sigh.config[:platform].to_s == 'macos',
-                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil,
-                            template_name: Sigh.config[:template_name])
+
+      profile = Spaceship::ConnectAPI::Profile.create(
+        name: name,
+        profile_type: profile_type,
+        bundle_id_id: bundle_id.id,
+        certificate_ids: [certificate_to_use.id]
+      )
+
+#      profile = profile_type.create!(name: name,
+#                                bundle_id: bundle_id,
+#                              certificate: cert,
+#                                      mac: Sigh.config[:platform].to_s == 'macos',
+#                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil,
+#                            template_name: Sigh.config[:template_name])
       profile
     end
 
@@ -216,7 +243,7 @@ module Sigh
                          Spaceship.certificate.apple_distribution.all
         end
 
-      when 'macos'
+      when 'macos', 'catalyst'
         if profile_type == Spaceship.provisioning_profile.Development
           certificates = Spaceship.certificate.mac_development.all +
                          Spaceship.certificate.apple_development.all
@@ -306,7 +333,8 @@ module Sigh
       tmp_path = Dir.mktmpdir("profile_download")
       output_path = File.join(tmp_path, profile_name)
       File.open(output_path, "wb") do |f|
-        f.write(profile.download)
+        content = Base64.decode64(profile.profile_content)
+        f.write(content)
       end
 
       UI.success("Successfully downloaded provisioning profile...")

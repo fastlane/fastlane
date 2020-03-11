@@ -1,5 +1,7 @@
 require 'spaceship'
 
+require 'base64'
+
 require_relative 'manager'
 require_relative 'module'
 
@@ -12,35 +14,39 @@ module Sigh
       Spaceship.select_team
       UI.message("Successfully logged in")
 
+      if download_xcode_profiles
+        UI.deprecated("The App Store Connect API does not support querying for Xcode managed profiles: --download_code_profiles is deprecated")
+      end
+
       case Sigh.config[:platform].to_s
       when 'ios'
-        download_profiles(Spaceship.provisioning_profile.all(xcode: download_xcode_profiles))
-        xcode_profiles_downloaded?(xcode: download_xcode_profiles, supported: true)
+        profile_types = [
+          Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE,
+          Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE,
+          Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC,
+          Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT
+        ]
       when 'macos'
-        download_profiles(Spaceship.provisioning_profile.all(mac: true, xcode: download_xcode_profiles))
-        xcode_profiles_downloaded?(xcode: download_xcode_profiles, supported: true)
+        profile_types = [
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT
+        ]
+      when 'catalyst'
+        profile_types = [
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
+        ]
       when 'tvos'
-        download_profiles(Spaceship.provisioning_profile.all_tvos)
-        xcode_profiles_downloaded?(xcode: download_xcode_profiles, supported: false)
+        profile_types = [
+          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_STORE,
+          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE,
+          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC,
+          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT
+        ]
       end
-    end
 
-    # @param xcode [Bool] Whether or not the user passed the download_xcode_profiles flag
-    # @param supported [Bool] Whether or not this platform supports downloading xcode profiles at all
-    def xcode_profiles_downloaded?(xcode: false, supported: false)
-      if supported
-        if xcode
-          UI.message("This run also included all Xcode managed provisioning profiles, as you used the `--download_xcode_profiles` flag")
-        elsif !xcode
-          UI.message("All Xcode managed provisioning profiles were ignored on this, to include them use the `--download_xcode_profiles` flag")
-        end
-
-      elsif !supported
-        if xcode
-          UI.important("Downloading Xcode managed profiles is not supported for platform #{Sigh.config[:platform]}")
-          return
-        end
-      end
+      profiles = Spaceship::ConnectAPI::Profile.all(filter: {profileType: profile_types.join(",")}, includes: "bundleId")
+      download_profiles(profiles)
     end
 
     # @param profiles [Array] Array of all the provisioning profiles we want to download
@@ -57,18 +63,49 @@ module Sigh
       end
     end
 
+    def pretty_type(profile_type)
+      case profile_type
+      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT
+        "Development"
+      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE
+        "AppStore"
+      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC
+        "AdHoc"
+      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE
+        "InHouse"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT
+        "Development"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE
+        "AppStore"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT
+        "Direct"
+      when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT
+        "Development"
+      when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_STORE
+        "AppStore"
+      when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC
+        "AdHoc"
+      when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
+        "InHouse"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
+        "Development"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
+        "AppStore"
+      end
+    end
+
     # @param profile [ProvisioningProfile] A profile we plan to download and store
     def download_profile(profile)
       FileUtils.mkdir_p(Sigh.config[:output_path])
 
-      type_name = profile.class.pretty_type
-      profile_name = "#{type_name}_#{profile.uuid}_#{profile.app.bundle_id}"
+      type_name = pretty_type(profile.profile_type)
+      profile_name = "#{type_name}_#{profile.uuid}_#{profile.bundle_id.identifier}"
 
       if Sigh.config[:platform].to_s == 'tvos'
         profile_name += "_tvos"
       end
 
-      if Sigh.config[:platform].to_s == 'macos'
+      if ['macos', 'catalyst'].include?(Sigh.config[:platform].to_s)
         profile_name += '.provisionprofile'
       else
         profile_name += '.mobileprovision'
@@ -76,7 +113,8 @@ module Sigh
 
       output_path = File.join(Sigh.config[:output_path], profile_name)
       File.open(output_path, "wb") do |f|
-        f.write(profile.download)
+        content = Base64.decode64(profile.profile_content)
+        f.write(content)
       end
 
       Manager.install_profile(output_path) unless Sigh.config[:skip_install]

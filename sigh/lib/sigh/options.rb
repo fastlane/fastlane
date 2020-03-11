@@ -131,12 +131,12 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :platform,
                                      short_option: '-p',
                                      env_name: "SIGH_PLATFORM",
-                                     description: "Set the provisioning profile's platform (i.e. ios, tvos, macos)",
+                                     description: "Set the provisioning profile's platform (i.e. ios, tvos, macos, catalyst)",
                                      is_string: false,
                                      default_value: "ios",
                                      verify_block: proc do |value|
                                        value = value.to_s
-                                       pt = %w(macos tvos ios)
+                                       pt = %w(macos tvos ios catalyst)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :readonly,

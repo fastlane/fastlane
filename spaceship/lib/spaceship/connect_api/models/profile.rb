@@ -14,6 +14,7 @@ module Spaceship
       attr_accessor :expiration_date
 
       attr_accessor :bundle_id
+      attr_accessor :certificates
 
       attr_mapping({
         "name" => "name",
@@ -25,7 +26,8 @@ module Spaceship
         "profileType" => "profile_type",
         "expirationDate" => "expiration_date",
 
-        "bundleId" => "bundle_id"
+        "bundleId" => "bundle_id",
+        "certificates" => "certificates"
       })
 
       module ProfileState
@@ -57,6 +59,10 @@ module Spaceship
         return "profiles"
       end
 
+      def valid?
+        return profile_state == ProfileState::ACTIVE
+      end
+
       #
       # API
       #
@@ -67,7 +73,7 @@ module Spaceship
       end
 
       def self.create(name: nil, profile_type: nil, bundle_id_id: nil, certificate_ids: nil, device_ids: nil)
-        return Spaceship::ConnectAPI.post_profiles(
+        resp = Spaceship::ConnectAPI.post_profiles(
           bundle_id_id: bundle_id_id,
           certificates: certificate_ids,
           devices: device_ids,
@@ -76,6 +82,7 @@ module Spaceship
             profileType: profile_type
           }
         )
+        return resp.to_models.first
       end
     end
   end
