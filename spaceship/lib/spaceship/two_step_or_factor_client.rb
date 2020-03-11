@@ -218,6 +218,11 @@ module Spaceship
       ask(text)
     end
 
+    # extracted into its own method for testing
+    def choose_phone_number(opts)
+      choose(*opts)
+    end
+
     def phone_id_from_number(phone_numbers, phone_number)
       characters_to_remove_from_phone_numbers = ' \-()"'
 
@@ -269,9 +274,9 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
       available = phone_numbers.collect do |current|
         current['numberWithDialCode']
       end
-      chosen = choose(*available)
+      chosen = choose_phone_number(available)
       phone_id = phone_id_from_masked_number(phone_numbers, chosen)
-
+      
       request_two_factor_code_from_phone(phone_id, chosen, code_length)
     end
 
