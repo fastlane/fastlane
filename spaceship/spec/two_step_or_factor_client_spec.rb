@@ -76,6 +76,18 @@ describe Spaceship::Client do
           response.body = trusted_devices_response
           return response
         end
+
+        it 'works with input sms' do
+          expect(subject).to receive(:ask_for_2fa_code).twice.and_return('sms', '123')
+  
+          bool = subject.handle_two_factor(response)
+          expect(bool).to eq(true)
+  
+          # sms should be sent despite having trusted devices
+          expect(WebMock).to have_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone').with(body: { phoneNumber: { id: 1 }, mode: "sms" })
+          expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: 1 }, mode: "sms" })
+          expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode')
+        end
         
         it 'does not request sms code, and submits code correctly' do
           bool = subject.handle_two_factor(response)  
