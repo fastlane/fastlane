@@ -206,10 +206,16 @@ module Spaceship
       return true
     end
 
+    # For reference in case auth behavior changes:
+    # The "noTrustedDevices" field is only present
+    # in the response for `GET /appleauth/auth`
+
+    # Account is not signed into any devices that can display a verification code
     def sms_fallback(response)
       response.body["noTrustedDevices"]
     end
 
+    # see `sms_fallback` + account has only one trusted number for receiving an sms
     def sms_automatically_sent(response)
       (response.body["trustedPhoneNumbers"] || []).count == 1 && sms_fallback(response)
     end
