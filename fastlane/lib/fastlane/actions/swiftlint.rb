@@ -13,13 +13,7 @@ module Fastlane
 
         command = (params[:executable] || "swiftlint").dup
         command << " #{params[:mode]}"
-        command << " --path #{params[:path].shellescape}" if params[:path]
-        command << supported_option_switch(params, :strict, "0.9.2", true)
-        command << " --config #{params[:config_file].shellescape}" if params[:config_file]
-        command << " --reporter #{params[:reporter]}" if params[:reporter]
-        command << supported_option_switch(params, :quiet, "0.9.0", true)
-        command << supported_option_switch(params, :format, "0.11.0", true) if params[:mode] == :autocorrect
-        command << " --compiler-log-path #{params[:compiler_log_path].shellescape}" if params[:compiler_log_path]
+        command << optional_flags(params)
 
         if params[:files]
           if version < Gem::Version.new('0.5.1')
@@ -41,10 +35,31 @@ module Fastlane
         end
       end
 
+      def self.optional_flags(params)
+        command = ""
+        command << " --path #{params[:path].shellescape}" if params[:path]
+        command << supported_option_switch(params, :strict, "0.9.2", true)
+        command << " --config #{params[:config_file].shellescape}" if params[:config_file]
+        command << " --reporter #{params[:reporter]}" if params[:reporter]
+        command << supported_option_switch(params, :quiet, "0.9.0", true)
+        command << supported_option_switch(params, :format, "0.11.0", true) if params[:mode] == :autocorrect
+        command << supported_no_cache_option(params) if params[:no_cache]
+        command << " --compiler-log-path #{params[:compiler_log_path].shellescape}" if params[:compiler_log_path]
+        return command
+      end
+
       # Get current SwiftLint version
       def self.swiftlint_version(executable: nil)
         binary = executable || 'swiftlint'
         Gem::Version.new(`#{binary} version`.chomp)
+      end
+
+      def self.supported_no_cache_option(params)
+        if params[:mode] == :autocorrect || params[:mode] == :lint
+          return " --no-cache"
+        else
+          return ""
+        end
       end
 
       # Return "--option" switch if option is on and current SwiftLint version is greater or equal than min version.
@@ -135,6 +150,12 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :format,
                                        description: "Format code when mode is :autocorrect",
+                                       default_value: false,
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :no_cache,
+                                       description: "Ignore the cache when mode is :autocorrect or :lint",
                                        default_value: false,
                                        is_string: false,
                                        type: Boolean,
