@@ -181,6 +181,29 @@ module Spaceship
         Client.instance.post("builds/#{build_id}/relationships/betaGroups", body)
       end
 
+      def create_beta_group(app_id: nil, group_name: nil, publicLinkEnabled: false, publicLinkLimit: 10_000, publicLinkLimitEnabled: false)
+        body = {
+          data: {
+            attributes: {
+              name: group_name,
+              publicLinkEnabled: publicLinkEnabled,
+              publicLinkLimit: publicLinkLimit,
+              publicLinkLimitEnabled: publicLinkLimitEnabled
+            },
+            relationships: {
+              app: {
+                data: {
+                  id: app_id,
+                  type: "apps"
+                }
+              }
+            },
+            type: "betaGroups"
+          }
+        }
+        Client.instance.post("betaGroups", body)
+      end
+
       #
       # betaTesters
       #

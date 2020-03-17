@@ -103,6 +103,11 @@ module Spaceship
         resps = Spaceship::ConnectAPI.get_beta_groups(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
+
+      def create_beta_group(group_name: nil, publicLinkEnabled: false, publicLinkLimit: 10_000, publicLinkLimitEnabled: false)
+        resps = Spaceship::ConnectAPI.create_beta_group(app_id: id, group_name: group_name, publicLinkEnabled: publicLinkEnabled, publicLinkLimit: publicLinkLimit, publicLinkLimitEnabled: publicLinkLimitEnabled).all_pages
+        return resps.flat_map(&:to_models)
+      end
     end
   end
 end
