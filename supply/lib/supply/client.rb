@@ -222,10 +222,6 @@ module Supply
     def release_listings(version)
       ensure_active_edit!
 
-      p "asdf"
-      # p version
-      # p tracks
-
       # Verify that tracks have releases
       filtered_tracks = tracks.select { |t| !t.releases.nil? && t.releases.any? { |r| r.name == version } }
 
@@ -249,8 +245,6 @@ module Supply
       end
 
       filtered_release = filtered_track.releases.find { |r| !r.name.nil? && r.name == version }
-
-      p filtered_release
 
       # Since we can release on Alpha/Beta without release notes.
       if filtered_release.release_notes.nil?
