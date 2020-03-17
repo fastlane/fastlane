@@ -1,8 +1,9 @@
 describe Gym do
   describe Gym::DetectValues do
-    day = Time.now.strftime("%F")
-
     describe 'Xcode config handling', :stuff, requires_xcodebuild: true do
+      day = Date.today.strftime("%F")
+      next_day = (Date.today + 1).strftime("%F")
+
       it "fetches the custom build path from the Xcode config" do
         expect(Gym::DetectValues).to receive(:has_xcode_preferences_plist?).and_return(true)
         expect(Gym::DetectValues).to receive(:xcode_preferences_dictionary).and_return({ "IDECustomDistributionArchivesLocation" => "/test/path" })
@@ -11,7 +12,8 @@ describe Gym do
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
         path = Gym.config[:build_path]
-        expect(path).to eq("/test/path/#{day}")
+        # These tests take time, so accept either the day the tests started or the next day.
+        expect(path).to eq("/test/path/#{day}").or eq("test/path/#{next_day}")
       end
 
       it "fetches the default build path from the Xcode config when preference files exists but not archive location defined" do
@@ -22,8 +24,10 @@ describe Gym do
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
         archive_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}")
+        archive_path_tomorrow = File.expand_path("~/Library/Developer/Xcode/Archives/#{next_day}")
         path = Gym.config[:build_path]
-        expect(path).to eq(archive_path)
+        # These tests take time, so accept either the day the tests started or the next day.
+        expect(path).to eq(archive_path).or eq(archive_path_tomorrow)
       end
 
       it "fetches the default build path from the Xcode config when missing Xcode preferences plist" do
@@ -33,8 +37,10 @@ describe Gym do
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
         archive_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}")
+        archive_path_tomorrow = File.expand_path("~/Library/Developer/Xcode/Archives/#{next_day}")
         path = Gym.config[:build_path]
-        expect(path).to eq(archive_path)
+        # These tests take time, so accept either the day the tests started or the next day.
+        expect(path).to eq(archive_path).or eq(archive_path_tomorrow)
       end
     end
 
