@@ -6,10 +6,10 @@ describe Match do
     let(:cert_path) { "./match/spec/fixtures/test.cer" }
     let(:p12_path) { "./match/spec/fixtures/test.p12" }
     let(:profile_path) { "./match/spec/fixtures/test.mobileprovision" }
-    let(:values) { get_values }
+    let(:values) { test_values }
     let(:config) { FastlaneCore::Configuration.create(Match::Options.available_options, values) }
-    
-    def get_values
+
+    def test_values
       {
         app_identifier: "tools.fastlane.app",
         type: "appstore",
@@ -17,9 +17,6 @@ describe Match do
         shallow_clone: true,
         username: "flapple@something.com"
       }
-    end
-
-    def get_config
     end
 
     before do
@@ -38,7 +35,7 @@ describe Match do
 
     it "imports a .cert, .p12 and .mobileprovision into the match repo" do
       repo_dir = Dir.mktmpdir
-      setupFakeStorage(repo_dir)
+      setup_fake_storage(repo_dir)
 
       expect(Spaceship::Portal).to receive(:login)
       expect(Spaceship::Portal).to receive(:select_team)
@@ -56,7 +53,7 @@ describe Match do
 
     it "imports a .cert and .p12 without profile into the match repo (backwards compatibility)" do
       repo_dir = Dir.mktmpdir
-      setupFakeStorage(repo_dir)
+      setup_fake_storage(repo_dir)
 
       expect(UI).to receive(:input).and_return("")
       expect(Spaceship::Portal).to receive(:login)
@@ -72,7 +69,7 @@ describe Match do
       Match::Importer.new.import_cert(config, cert_path: cert_path, p12_path: p12_path)
     end
 
-    def setupFakeStorage(repo_dir)
+    def setup_fake_storage(repo_dir)
       expect(Match::Storage::GitStorage).to receive(:configure).with(
         git_url: values[:git_url],
         shallow_clone: true,

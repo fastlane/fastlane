@@ -2,15 +2,16 @@ require_relative 'spaceship_ensure'
 require_relative 'encryption'
 require_relative 'storage'
 require_relative 'module'
+require 'fastlane_core/provisioning_profile'
 require 'fileutils'
 
 module Match
   class Importer
     def import_cert(params, cert_path: nil, p12_path: nil, profile_path: nil)
       # Get and verify cert, p12 and profiles path
-      cert_path = ensureValidFilePath(cert_path, "Certificate", ".cer")
-      p12_path = ensureValidFilePath(p12_path, "Private key", ".p12")
-      profile_path = ensureValidFilePath(profile_path, "Provisioning profile", ".mobileprovision", optional: true)
+      cert_path = ensure_valid_file_path(cert_path, "Certificate", ".cer")
+      p12_path = ensure_valid_file_path(p12_path, "Private key", ".p12")
+      profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision", optional: true)
 
       # Storage
       storage = Storage.for_mode(params[:storage_mode], {
@@ -79,10 +80,10 @@ module Match
       # Copy files
       IO.copy_stream(cert_path, dest_cert_path)
       IO.copy_stream(p12_path, dest_p12_path)
-      if (profile_path != nil)
+      unless profile_path.nil?
         FileUtils.mkdir_p(output_dir_profiles)
         bundle_id = FastlaneCore::ProvisioningProfile.bundle_id(profile_path)
-        dest_profile_path = File.join(output_dir_profiles, "#{cert_type.to_s.capitalize()}_#{bundle_id}.mobileprovision")
+        dest_profile_path = File.join(output_dir_profiles, "#{cert_type.to_s.capitalize}_#{bundle_id}.mobileprovision")
         files_to_commit.push(dest_profile_path)
         IO.copy_stream(profile_path, dest_profile_path)
       end
@@ -92,13 +93,13 @@ module Match
       storage.save_changes!(files_to_commit: files_to_commit)
     end
 
-    def ensureValidFilePath(file_path, file_description, file_extension, optional: false)
-      optionalFileMessage = optional ? " or leave empty to skip this file" : ""
-      file_path ||= UI.input("#{file_description} (#{file_extension}) path#{optionalFileMessage}:")
+    def ensure_valid_file_path(file_path, file_description, file_extension, optional: false)
+      optional_file_message = optional ? " or leave empty to skip this file" : ""
+      file_path ||= UI.input("#{file_description} (#{file_extension}) path#{optional_file_message}:")
 
       file_path = File.absolute_path(file_path) unless file_path == ""
-      file_path = File.exist?(file_path) ? file_path : nil;
-      UI.user_error!("#{file_description} does not exist at path: #{file_path}") unless (file_path != nil || optional)
+      file_path = File.exist?(file_path) ? file_path : nil
+      UI.user_error!("#{file_description} does not exist at path: #{file_path}") unless !file_path.nil? || optional
       file_path
     end
   end

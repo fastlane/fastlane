@@ -45,14 +45,12 @@ module FastlaneCore
       end
 
       def bundle_id(path, keychain_path = nil)
-        begin
-          profile = parse(path, keychain_path)
-          app_id_prefix = profile["ApplicationIdentifierPrefix"].first
-          bundle_id = profile["Entitlements"]["application-identifier"].gsub("#{app_id_prefix}.", "")
-          bundle_id
-        rescue => e
-          UI.error("Unable to extract the Bundle Id from the provided provisioning profile '#{path}'.")
-        end
+        profile = parse(path, keychain_path)
+        app_id_prefix = profile["ApplicationIdentifierPrefix"].first
+        bundle_id = profile["Entitlements"]["application-identifier"].gsub("#{app_id_prefix}.", "")
+        bundle_id
+      rescue
+        UI.error("Unable to extract the Bundle Id from the provided provisioning profile '#{path}'.")
       end
 
       def mac?(path, keychain_path = nil)
