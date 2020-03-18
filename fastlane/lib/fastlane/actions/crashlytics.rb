@@ -66,7 +66,7 @@ module Fastlane
       end
 
       def self.description
-        "Upload a new build to [Crashlytics Beta](http://try.crashlytics.com/beta/)"
+        "Refer to [Firebase App Distribution](https://appdistro.page.link/fastlane-repo)"
       end
 
       def self.available_options
@@ -169,6 +169,10 @@ module Fastlane
 
       def self.details
         [
+          "Crashlytics Beta has been deprecated and replaced with Firebase App Distribution.",
+          "Beta will continue working until March 31, 2020.",
+          "Check out the [Firebase App Distribution docs](https://github.com/fastlane/fastlane-plugin-firebase_app_distribution) to get started.",
+          "",
           "Additionally, you can specify `notes`, `emails`, `groups` and `notifications`.",
           "Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog by clicking the 'Manage Groups' button.",
           "This action uses the `submit` binary provided by the Crashlytics framework. If the binary is not found in its usual path, you'll need to specify the path manually by using the `crashlytics_path` option."
@@ -196,7 +200,15 @@ module Fastlane
       end
 
       def self.category
-        :beta
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        [
+          "Crashlytics Beta has been deprecated and replaced with Firebase App Distribution.",
+          "Beta will continue working until March 31, 2020.",
+          "Check out the [Firebase App Distribution docs](https://github.com/fastlane/fastlane-plugin-firebase_app_distribution) to get started."
+        ].join("\n")
       end
     end
   end
