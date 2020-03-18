@@ -405,7 +405,7 @@ module Supply
         )
         return result.releases.flat_map(&:version_codes) || []
       rescue Google::Apis::ClientError => e
-        return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
+        return [] if e.status_code == 404 && (e.to_s.include?("trackEmpty") || e.to_s.include?("Track not found"))
         raise
       end
     end
