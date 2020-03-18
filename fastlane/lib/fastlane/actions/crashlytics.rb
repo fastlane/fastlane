@@ -170,7 +170,7 @@ module Fastlane
       def self.details
         [
           "Crashlytics Beta has been deprecated and replaced with Firebase App Distribution.",
-          "Beta will continue working until March 31, 2020.",
+          "Beta will continue working until May 4, 2020.",
           "Check out the [Firebase App Distribution docs](https://github.com/fastlane/fastlane-plugin-firebase_app_distribution) to get started.",
           "",
           "Additionally, you can specify `notes`, `emails`, `groups` and `notifications`.",
@@ -206,7 +206,7 @@ module Fastlane
       def self.deprecated_notes
         [
           "Crashlytics Beta has been deprecated and replaced with Firebase App Distribution.",
-          "Beta will continue working until March 31, 2020.",
+          "Beta will continue working until May 4, 2020.",
           "Check out the [Firebase App Distribution docs](https://github.com/fastlane/fastlane-plugin-firebase_app_distribution) to get started."
         ].join("\n")
       end
