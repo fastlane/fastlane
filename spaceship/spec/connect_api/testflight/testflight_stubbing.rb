@@ -63,6 +63,9 @@ class ConnectAPIStubbing
       def stub_beta_groups
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/betaGroups").
           to_return(status: 200, body: read_fixture_file('beta_groups.json'), headers: { 'Content-Type' => 'application/json' })
+
+        stub_request(:post, "https://appstoreconnect.apple.com/iris/v1/betaGroups").
+          to_return(status: 200, body: read_fixture_file('beta_create_group.json'), headers: { 'Content-Type' => 'application/json' })
       end
 
       def stub_beta_testers

@@ -41,5 +41,12 @@ describe Spaceship::ConnectAPI::App do
       model = Spaceship::ConnectAPI::App.find("com.joshholtz.FastlaneTest")
       expect(model.bundle_id).to eq("com.joshholtz.FastlaneTest")
     end
+
+    it 'creates beta group' do
+      app = Spaceship::ConnectAPI::App.find("com.joshholtz.FastlaneTest")
+
+      model = app.create_beta_group(group_name: "Brand New Group", public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
+      expect(model.id).to eq("123456789")
+    end
   end
 end
