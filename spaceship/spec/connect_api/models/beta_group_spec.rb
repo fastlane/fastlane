@@ -23,24 +23,4 @@ describe Spaceship::ConnectAPI::BetaGroup do
       expect(model.public_link).to eq("https://testflight.apple.com/join/abcd1234")
     end
   end
-
-  describe '#Spaceship::ConnectAPI' do
-    it '#create_beta_group' do
-      app_response = Spaceship::ConnectAPI.get_apps
-      app = app_response.first
-      response = app.create_beta_group(group_name: "Brand New Group")
-
-      expect(response.count).to eq(1)
-      response.each do |model|
-        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::BetaGroup)
-      end
-
-      model = response.first
-      expect(model.id).to eq("123456789")
-      expect(model.name).to eq("Brand New Group")
-      expect(model.public_link_enabled).to eq(false)
-      expect(model.public_link_limit_enabled).to eq(false)
-      expect(model.public_link_limit).to eq(10_000)
-    end
-  end
 end
