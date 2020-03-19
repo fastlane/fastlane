@@ -5,7 +5,8 @@ describe Match do
     let(:mock_cert) { double }
     let(:cert_path) { "./match/spec/fixtures/test.cer" }
     let(:p12_path) { "./match/spec/fixtures/test.p12" }
-    let(:profile_path) { "./match/spec/fixtures/test.mobileprovision" }
+    let(:ios_profile_path) { "./match/spec/fixtures/test.mobileprovision" }
+    let(:osx_profile_path) { "./match/spec/fixtures/test.provisionprofile" }
     let(:values) { test_values }
     let(:config) { FastlaneCore::Configuration.create(Match::Options.available_options, values) }
 
@@ -33,7 +34,7 @@ describe Match do
       ENV.delete('FASTLANE_TEAM_NAME')
     end
 
-    it "imports a .cert, .p12 and .mobileprovision into the match repo" do
+    it "imports a .cert, .p12 and .mobileprovision (iOS provision) into the match repo" do
       repo_dir = Dir.mktmpdir
       setup_fake_storage(repo_dir)
 
@@ -48,7 +49,25 @@ describe Match do
         ]
       )
 
-      Match::Importer.new.import_cert(config, cert_path: cert_path, p12_path: p12_path, profile_path: profile_path)
+      Match::Importer.new.import_cert(config, cert_path: cert_path, p12_path: p12_path, profile_path: ios_profile_path)
+    end
+
+    it "imports a .cert, .p12 and .provisionprofile (osx provision) into the match repo" do
+      repo_dir = Dir.mktmpdir
+      setup_fake_storage(repo_dir)
+
+      expect(Spaceship::Portal).to receive(:login)
+      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
+      expect(fake_storage).to receive(:save_changes!).with(
+        files_to_commit: [
+          File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.cer"),
+          File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.p12"),
+          File.join(repo_dir, "profiles", "distribution", "Distribution_tools.fastlane.app.provisionprofile")
+        ]
+      )
+
+      Match::Importer.new.import_cert(config, cert_path: cert_path, p12_path: p12_path, profile_path: osx_profile_path)
     end
 
     it "imports a .cert and .p12 without profile into the match repo (backwards compatibility)" do

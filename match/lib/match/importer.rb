@@ -11,7 +11,7 @@ module Match
       # Get and verify cert, p12 and profiles path
       cert_path = ensure_valid_file_path(cert_path, "Certificate", ".cer")
       p12_path = ensure_valid_file_path(p12_path, "Private key", ".p12")
-      profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision", optional: true)
+      profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true)
 
       # Storage
       storage = Storage.for_mode(params[:storage_mode], {
@@ -83,7 +83,8 @@ module Match
       unless profile_path.nil?
         FileUtils.mkdir_p(output_dir_profiles)
         bundle_id = FastlaneCore::ProvisioningProfile.bundle_id(profile_path)
-        dest_profile_path = File.join(output_dir_profiles, "#{cert_type.to_s.capitalize}_#{bundle_id}.mobileprovision")
+        profile_extension = FastlaneCore::ProvisioningProfile.profile_extension(profile_path)
+        dest_profile_path = File.join(output_dir_profiles, "#{cert_type.to_s.capitalize}_#{bundle_id}#{profile_extension}")
         files_to_commit.push(dest_profile_path)
         IO.copy_stream(profile_path, dest_profile_path)
       end

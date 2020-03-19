@@ -59,10 +59,14 @@ module FastlaneCore
 
       def profile_filename(path, keychain_path = nil)
         basename = uuid(path, keychain_path)
+        basename + profile_extension(path, keychain_path)
+      end
+
+      def profile_extension(path, keychain_path = nil)
         if mac?(path, keychain_path)
-          basename + ".provisionprofile"
+          ".provisionprofile"
         else
-          basename + ".mobileprovision"
+          ".mobileprovision"
         end
       end
 
