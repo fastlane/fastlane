@@ -465,7 +465,7 @@ You'll be asked for the new password on all your machines on the next run.
 
 ### Import
 
-To import and encrypt a certificate (`.cer`), the private key (`.p12`) and the provisioning profiles (`.mobileprovision or .provisionprofile`) into the _match_ repo run:
+To import and encrypt a certificate (`.cer`), the private key (`.p12`) and the provisioning profiles (`.mobileprovision` or `.provisionprofile`) into the _match_ repo run:
 
 ```no-highlight
 fastlane match import
