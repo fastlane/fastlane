@@ -635,5 +635,19 @@ describe Scan do
                                      ])
       end
     end
+
+    describe "Specifying a test plan" do
+      before do
+        options = { project: "./scan/examples/standard/app.xcodeproj", testplan: "simple" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      end
+
+      it "adds the testplan to the xcodebuild command", requires_xcodebuild: true do
+        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+        result = @test_command_generator.generate
+        expect(result).to include("-testPlan simple") if FastlaneCore::Helper.xcode_at_least?(10)
+      end
+    end
   end
 end
