@@ -223,7 +223,7 @@ module FastlaneCore
         plist_buddy_cmd = "-c \"Add :KeyboardContinuousPathEnabled bool false\""
         plist_path = File.expand_path("~/Library/Developer/CoreSimulator/Devices/#{self.udid}/data/Library/Preferences/com.apple.keyboard.ContinuousPath.plist")
 
-        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path}")
+        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path} >/dev/null 2>&1")
       end
     end
   end
