@@ -49,6 +49,10 @@ module Gym
         generator.apps_path
       end
 
+      def asset_packs_path
+        generator.asset_packs_path
+      end
+
       # The generator we need to use for the currently used Xcode version
       # Since we dropped Xcode 6 support, it's just this class, but maybe we'll have
       # new classes in the future

@@ -136,6 +136,11 @@ module Gym
         Gym.cache[:apps_path] ||= File.join(temporary_output_path, "Apps")
       end
 
+      # The path to the Apps folder
+      def asset_packs_path
+        Gym.cache[:asset_packs_path] ||= File.join(temporary_output_path, "OnDemandResources")
+      end
+
       private
 
       def normalize_export_options(hash)
