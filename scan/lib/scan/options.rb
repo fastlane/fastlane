@@ -124,6 +124,11 @@ module Scan
                                      end),
 
         # other test options
+        FastlaneCore::ConfigItem.new(key: :testplan,
+                                     env_name: "SCAN_TESTPLAN",
+                                     description: "The testplan associated with the scheme that should be used for testing",
+                                     is_string: true,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :xctestrun,
                                      short_option: "-X",
                                      env_name: "SCAN_XCTESTRUN",
