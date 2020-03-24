@@ -31,7 +31,8 @@ module Scan
       config = Scan.config
 
       options = []
-      options += project_path_array unless config[:xctestrun]
+      options += project_path_array unless config[:xc
+        run]
       options << "-sdk '#{config[:sdk]}'" if config[:sdk]
       options << destination # generated in `detect_values`
       options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
@@ -46,7 +47,7 @@ module Scan
       options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
       options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
       if FastlaneCore::Helper.xcode_at_least?(11)
-        options << "-testPlan #{config[:testplan]}" if config[:testplan]
+        options << "-testPlan '#{config[:testplan]}'" if config[:testplan]
       end
       options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
       options << config[:xcargs] if config[:xcargs]
