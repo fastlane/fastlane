@@ -85,7 +85,7 @@ module Sigh
     def fetch_profiles
       UI.message("Fetching profiles...")
 
-      results = Spaceship::ConnectAPI::Profile.all(filter: {profileType: profile_type}, includes: "bundleId,certificates").select do |profile|
+      results = Spaceship::ConnectAPI::Profile.all(filter: { profileType: profile_type }, includes: "bundleId,certificates").select do |profile|
         profile.bundle_id.identifier == Sigh.config[:app_identifier]
       end
 
@@ -173,7 +173,6 @@ module Sigh
 
     # Create a new profile and return it
     def create_profile!
-      cert = certificate_to_use
       app_identifier = Sigh.config[:app_identifier]
       name = Sigh.config[:provisioning_name] || [app_identifier, profile_type_pretty_type].join(' ')
 
@@ -334,7 +333,7 @@ module Sigh
     # Makes sure the current App ID exists. If not, it will show an appropriate error message
     def ensure_app_exists!
       if Sigh.config[:platform].to_s == 'macos'
-        platform = Spaceship::ConnectAPI::Platform::MACOS
+        platform = Spaceship::ConnectAPI::Platform::MAC_OS
       else
         platform = Spaceship::ConnectAPI::Platform::IOS
       end

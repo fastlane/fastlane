@@ -235,12 +235,12 @@ module Match
         FastlaneCore::ConfigItem.new(key: :platform,
                                      short_option: '-o',
                                      env_name: "MATCH_PLATFORM",
-                                     description: "Set the provisioning profile's platform to work with (i.e. ios, tvos, macos)",
+                                     description: "Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)",
                                      default_value: default_platform,
                                      default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        value = value.to_s
-                                       pt = %w(tvos ios macos)
+                                       pt = %w(tvos ios macos catalyst)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :template_name,

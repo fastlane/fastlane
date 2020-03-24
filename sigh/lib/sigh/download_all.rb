@@ -45,7 +45,7 @@ module Sigh
         ]
       end
 
-      profiles = Spaceship::ConnectAPI::Profile.all(filter: {profileType: profile_types.join(",")}, includes: "bundleId")
+      profiles = Spaceship::ConnectAPI::Profile.all(filter: { profileType: profile_types.join(",") }, includes: "bundleId")
       download_profiles(profiles)
     end
 

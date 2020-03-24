@@ -45,6 +45,11 @@ module Fastlane
           env_variable_name = Match::Utils.environment_variable_name_profile_name(app_identifier: app_identifier,
                                                                                             type: Match.profile_type_sym(params[:type]),
                                                                                         platform: params[:platform])
+
+          if params[:platform].to_s == :catalyst.to_s
+            app_identifier = "maccatalyst.#{app_identifier}"
+          end
+
           mapping[app_identifier] = ENV[env_variable_name]
         end
 

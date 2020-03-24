@@ -33,7 +33,7 @@ module Spaceship
         #
 
         def get(url_or_path, params = nil)
-          # The Provisioning App Store Connect API needs to be proxied through a 
+          # The Provisioning App Store Connect API needs to be proxied through a
           # POST request if using web session
           return proxy_get(url_or_path, params) if web_session?
 

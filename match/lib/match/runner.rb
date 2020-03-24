@@ -219,7 +219,11 @@ module Match
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
       base_dir = File.join(prefixed_working_directory, "profiles", prov_type.to_s)
 
-      extension = params[:platform].to_s == :macos.to_s ? ".provisionprofile" : ".mobileprovision"
+      extension = ".mobileprovision"
+      if [:macos.to_s, :catalyst.to_s].include?(params[:platform].to_s)
+        extension = ".provisionprofile"
+      end
+
       profiles = Dir[File.join(base_dir, "#{profile_name}#{extension}")]
       if Helper.mac?
         keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
@@ -320,7 +324,7 @@ module Match
             Spaceship.device.all_ios_profile_devices.count
           when :tvos
             Spaceship.device.all_apple_tvs.count
-          when :mac
+          when :mac, :catalyst
             Spaceship.device.all_macs.count
           else
             Spaceship.device.all.count
