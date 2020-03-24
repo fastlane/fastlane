@@ -65,11 +65,7 @@ module Match
     end
 
     def profile_exists(username: nil, uuid: nil, platform: nil)
-      puts("LOOKING FOR UUID: #{uuid}")
-
-      require 'pp'
       found = Spaceship::ConnectAPI::Profile.all.find do |profile|
-        pp(profile)
         profile.uuid == uuid
       end
 
