@@ -2122,7 +2122,7 @@ func copyArtifacts(keepOriginal: Bool = true,
 }
 
 /**
- Upload a new build to [Crashlytics Beta](http://try.crashlytics.com/beta/)
+ Refer to [Firebase App Distribution](https://appdistro.page.link/fastlane-repo)
 
  - parameters:
    - ipaPath: Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action
@@ -2137,6 +2137,10 @@ func copyArtifacts(keepOriginal: Bool = true,
    - notifications: Crashlytics notification option (true/false)
    - debug: Crashlytics debug option (true/false)
 
+ Crashlytics Beta has been deprecated and replaced with Firebase App Distribution.
+ Beta will continue working until May 4, 2020.
+ Check out the [Firebase App Distribution docs](https://github.com/fastlane/fastlane-plugin-firebase_app_distribution) to get started.
+ 
  Additionally, you can specify `notes`, `emails`, `groups` and `notifications`.
  Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog by clicking the 'Manage Groups' button.
  This action uses the `submit` binary provided by the Crashlytics framework. If the binary is not found in its usual path, you'll need to specify the path manually by using the `crashlytics_path` option.
@@ -5071,6 +5075,7 @@ func pluginScores(outputPath: String,
    - platforms: Lint against specific platforms (defaults to all platforms supported by the podspec). Multiple platforms must be comma-delimited (available since cocoapods >= 1.6)
    - skipImportValidation: Lint skips validating that the pod can be imported (available since cocoapods >= 1.3)
    - skipTests: Lint skips building and running tests during validation (available since cocoapods >= 1.3)
+   - analyze: Validate with the Xcode Static Analysis tool (available since cocoapods >= 1.6.1)
 
  Test the syntax of your Podfile by linting the pod against the files of its directory
 */
@@ -5092,7 +5097,8 @@ func podLibLint(useBundleExec: Bool = true,
                 noSubspecs: Bool = false,
                 platforms: String? = nil,
                 skipImportValidation: Bool = false,
-                skipTests: Bool = false) {
+                skipTests: Bool = false,
+                analyze: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "pod_lib_lint", className: nil, args: [RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec),
                                                                                               RubyCommand.Argument(name: "podspec", value: podspec),
                                                                                               RubyCommand.Argument(name: "verbose", value: verbose),
@@ -5111,7 +5117,8 @@ func podLibLint(useBundleExec: Bool = true,
                                                                                               RubyCommand.Argument(name: "no_subspecs", value: noSubspecs),
                                                                                               RubyCommand.Argument(name: "platforms", value: platforms),
                                                                                               RubyCommand.Argument(name: "skip_import_validation", value: skipImportValidation),
-                                                                                              RubyCommand.Argument(name: "skip_tests", value: skipTests)])
+                                                                                              RubyCommand.Argument(name: "skip_tests", value: skipTests),
+                                                                                              RubyCommand.Argument(name: "analyze", value: analyze)])
   _ = runner.executeCommand(command)
 }
 
@@ -5640,6 +5647,7 @@ func rubyVersion() {
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - testplan: The testplan associated with the scheme that should be used for testing
    - xctestrun: Run tests using the provided `.xctestrun` file
    - toolchain: The toolchain that should be used for building the application (e.g. `com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a`)
    - clean: Should the project be cleaned before building it?
@@ -5702,6 +5710,7 @@ func runTests(workspace: String? = nil,
               appIdentifier: String? = nil,
               onlyTesting: Any? = nil,
               skipTesting: Any? = nil,
+              testplan: String? = nil,
               xctestrun: String? = nil,
               toolchain: Any? = nil,
               clean: Bool = false,
@@ -5761,6 +5770,7 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                            RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                            RubyCommand.Argument(name: "skip_testing", value: skipTesting),
+                                                                                           RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                            RubyCommand.Argument(name: "xctestrun", value: xctestrun),
                                                                                            RubyCommand.Argument(name: "toolchain", value: toolchain),
                                                                                            RubyCommand.Argument(name: "clean", value: clean),
@@ -5901,6 +5911,7 @@ func say(text: Any,
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - testplan: The testplan associated with the scheme that should be used for testing
    - xctestrun: Run tests using the provided `.xctestrun` file
    - toolchain: The toolchain that should be used for building the application (e.g. `com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a`)
    - clean: Should the project be cleaned before building it?
@@ -5963,6 +5974,7 @@ func scan(workspace: Any? = scanfile.workspace,
           appIdentifier: Any? = scanfile.appIdentifier,
           onlyTesting: Any? = scanfile.onlyTesting,
           skipTesting: Any? = scanfile.skipTesting,
+          testplan: Any? = scanfile.testplan,
           xctestrun: Any? = scanfile.xctestrun,
           toolchain: Any? = scanfile.toolchain,
           clean: Bool = scanfile.clean,
@@ -6022,6 +6034,7 @@ func scan(workspace: Any? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                       RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                       RubyCommand.Argument(name: "skip_testing", value: skipTesting),
+                                                                                      RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                       RubyCommand.Argument(name: "xctestrun", value: xctestrun),
                                                                                       RubyCommand.Argument(name: "toolchain", value: toolchain),
                                                                                       RubyCommand.Argument(name: "clean", value: clean),
@@ -7123,6 +7136,7 @@ func supply(packageName: String,
    - quiet: Don't print status logs like 'Linting <file>' & 'Done linting'
    - executable: Path to the `swiftlint` executable on your machine
    - format: Format code when mode is :autocorrect
+   - noCache: Ignore the cache when mode is :autocorrect or :lint
    - compilerLogPath: Compiler log path when mode is :analyze
 */
 func swiftlint(mode: Any = "lint",
@@ -7137,6 +7151,7 @@ func swiftlint(mode: Any = "lint",
                quiet: Bool = false,
                executable: String? = nil,
                format: Bool = false,
+               noCache: Bool = false,
                compilerLogPath: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "swiftlint", className: nil, args: [RubyCommand.Argument(name: "mode", value: mode),
                                                                                            RubyCommand.Argument(name: "path", value: path),
@@ -7150,6 +7165,7 @@ func swiftlint(mode: Any = "lint",
                                                                                            RubyCommand.Argument(name: "quiet", value: quiet),
                                                                                            RubyCommand.Argument(name: "executable", value: executable),
                                                                                            RubyCommand.Argument(name: "format", value: format),
+                                                                                           RubyCommand.Argument(name: "no_cache", value: noCache),
                                                                                            RubyCommand.Argument(name: "compiler_log_path", value: compilerLogPath)])
   _ = runner.executeCommand(command)
 }
@@ -7554,6 +7570,42 @@ func updateAppIdentifier(xcodeproj: String,
   let command = RubyCommand(commandID: "", methodName: "update_app_identifier", className: nil, args: [RubyCommand.Argument(name: "xcodeproj", value: xcodeproj),
                                                                                                        RubyCommand.Argument(name: "plist_path", value: plistPath),
                                                                                                        RubyCommand.Argument(name: "app_identifier", value: appIdentifier)])
+  _ = runner.executeCommand(command)
+}
+
+/**
+ Configures Xcode's Codesigning options
+
+ - parameters:
+   - path: Path to your Xcode project
+   - useAutomaticSigning: Defines if project should use automatic signing
+   - teamId: Team ID, is used when upgrading project
+   - targets: Specify targets you want to toggle the signing mech. (default to all targets)
+   - codeSignIdentity: Code signing identity type (iPhone Developer, iPhone Distribution)
+   - profileName: Provisioning profile name to use for code signing
+   - profileUuid: Provisioning profile UUID to use for code signing
+   - bundleIdentifier: Application Product Bundle Identifier
+
+ - returns: The current status (boolean) of codesigning after modification
+
+ Configures Xcode's Codesigning options of all targets in the project
+*/
+func updateCodeSigningSettings(path: String,
+                               useAutomaticSigning: Bool = false,
+                               teamId: String? = nil,
+                               targets: [String]? = nil,
+                               codeSignIdentity: String? = nil,
+                               profileName: String? = nil,
+                               profileUuid: String? = nil,
+                               bundleIdentifier: String? = nil) {
+  let command = RubyCommand(commandID: "", methodName: "update_code_signing_settings", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
+                                                                                                              RubyCommand.Argument(name: "use_automatic_signing", value: useAutomaticSigning),
+                                                                                                              RubyCommand.Argument(name: "team_id", value: teamId),
+                                                                                                              RubyCommand.Argument(name: "targets", value: targets),
+                                                                                                              RubyCommand.Argument(name: "code_sign_identity", value: codeSignIdentity),
+                                                                                                              RubyCommand.Argument(name: "profile_name", value: profileName),
+                                                                                                              RubyCommand.Argument(name: "profile_uuid", value: profileUuid),
+                                                                                                              RubyCommand.Argument(name: "bundle_identifier", value: bundleIdentifier)])
   _ = runner.executeCommand(command)
 }
 
@@ -8735,4 +8787,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.71]
+// FastlaneRunnerAPIVersion [0.9.72]

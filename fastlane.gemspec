@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Joshua Liebowitz",
+  spec.authors       = ["Danielle Tomlinson",
+                        "Max Ott",
+                        "Daniel Jankowski",
+                        "Helmut Januschka",
+                        "Josh Holtz",
+                        "Kohki Miki",
+                        "Iulian Onofrei",
+                        "Felix Krause",
+                        "Matthew Ellis",
                         "Stefan Natchev",
+                        "Olivier Halligon",
+                        "Luka Mirosevic",
+                        "Jan Piotrowski",
+                        "Joshua Liebowitz",
+                        "Maksym Grebenets",
+                        "Fumiya Nakamura",
+                        "Jimmy Dee",
+                        "Jorge Revuelta H",
+                        "Jérôme Lacoste",
                         "Andrew McBurney",
                         "Aaron Brager",
-                        "Fumiya Nakamura",
-                        "Daniel Jankowski",
-                        "Kohki Miki",
-                        "Jorge Revuelta H",
-                        "Matthew Ellis",
-                        "Luka Mirosevic",
-                        "Iulian Onofrei",
-                        "Danielle Tomlinson",
-                        "Josh Holtz",
-                        "Manu Wallner",
-                        "Jimmy Dee",
-                        "Helmut Januschka",
-                        "Felix Krause",
-                        "Jérôme Lacoste",
-                        "Olivier Halligon",
-                        "Max Ott",
-                        "Jan Piotrowski",
-                        "Maksym Grebenets"]
+                        "Manu Wallner"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
