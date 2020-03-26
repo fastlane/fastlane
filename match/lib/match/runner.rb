@@ -212,7 +212,7 @@ module Match
       prov_type = Match.profile_type_sym(params[:type])
 
       names = [Match::Generator.profile_type_name(prov_type), app_identifier]
-      if params[:platform].to_s == :tvos.to_s
+      if params[:platform].to_s == :tvos.to_s || params[:platform].to_s == :catalyst.to_s
         names.push(params[:platform])
       end
 
@@ -228,6 +228,9 @@ module Match
       if Helper.mac?
         keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
       end
+
+      require 'pp'
+      pp(profiles)
 
       # Install the provisioning profiles
       profile = profiles.last

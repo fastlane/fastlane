@@ -165,9 +165,9 @@ module Sigh
       when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
         "InHouse"
       when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
-        "Development Catalyst"
+        "Development"
       when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
-        "AppStore Catalyst"
+        "AppStore"
       end
     end
 
@@ -311,9 +311,11 @@ module Sigh
 
       if Sigh.config[:platform].to_s == 'tvos'
         profile_name += "_tvos"
+      elsif Sigh.config[:platform].to_s == 'catalyst'
+        profile_name += "_catalyst"
       end
 
-      if Sigh.config[:platform].to_s == 'macos'
+      if ['macos', 'catalyst'].include?(Sigh.config[:platform].to_s)
         profile_name += '.provisionprofile'
       else
         profile_name += '.mobileprovision'

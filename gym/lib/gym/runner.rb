@@ -24,12 +24,8 @@ module Gym
 
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
-      # Determine platform to archive
-      is_mac = Gym.project.mac? || Gym.building_mac_catalyst_for_mac?
-      is_ios = !is_mac && (Gym.project.ios? || Gym.project.tvos? || Gym.project.watchos?)
-
       # Archive
-      if is_ios
+      if Gym.building_for_ios?
         fix_generic_archive unless Gym.project.watchos? # See https://github.com/fastlane/fastlane/pull/4325
         return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
 
@@ -45,7 +41,7 @@ module Gym
           move_asset_packs
           move_appstore_info
         end
-      elsif is_mac
+      elsif Gym.building_for_mac?
         path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
         if Gym.project.mac_app? || Gym.building_mac_catalyst_for_mac?
@@ -280,11 +276,14 @@ module Gym
       app_path = File.join(BuildCommandGenerator.archive_path, "Products/Applications/#{exe_name}.app")
 
       UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless File.exist?(app_path)
+
+      joined_app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
+      FileUtils.rm_rf(joined_app_path)
       FileUtils.cp_r(app_path, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
-      app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
+
       UI.success("Successfully exported the .app file:")
-      UI.message(app_path)
-      app_path
+      UI.message(joined_app_path)
+      joined_app_path
     end
 
     # Move the manifest.plist if exists into the output directory

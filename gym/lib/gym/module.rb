@@ -25,6 +25,22 @@ module Gym
       require 'gym/xcodebuild_fixes/generic_archive_fix'
     end
 
+    def building_for_ios?
+      if !Gym.project.mac?
+        return Gym.project.ios? || Gym.project.tvos? || Gym.project.watchos?
+      else
+        return building_mac_catalyst_for_ios?
+      end
+    end
+
+    def building_for_mac?
+      if Gym.project.supports_mac_catalyst?
+        return building_mac_catalyst_for_mac?
+      else
+        return Gym.project.mac?
+      end
+    end
+
     def building_mac_catalyst_for_ios?
       Gym.project.supports_mac_catalyst? && Gym.config[:catalyst_platform] == "ios"
     end
