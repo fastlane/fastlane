@@ -84,6 +84,10 @@ module Spaceship
         )
         return resp.to_models.first
       end
+
+      def delete!
+        return Spaceship::ConnectAPI.delete_profile(profile_id: id)
+      end
     end
   end
 end

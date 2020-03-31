@@ -78,6 +78,12 @@ module Spaceship
 
         Client.instance.post("profiles", body)
       end
+
+      def delete_profile(profile_id: nil)
+        raise "Profile id is nil" if profile_id.nil?
+
+        Client.instance.delete("profiles/#{profile_id}")
+      end
     end
   end
 end
