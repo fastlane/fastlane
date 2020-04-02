@@ -214,16 +214,16 @@ module Sigh
     def certificates_for_profile_and_platform
       case Sigh.config[:platform].to_s
       when 'ios', 'tvos'
-        if profile_type == Spaceship.provisioning_profile.Development
+        if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT 
           certificates = Spaceship.certificate.development.all +
                          Spaceship.certificate.apple_development.all
-        elsif profile_type == Spaceship.provisioning_profile.InHouse
+        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE 
           # Enterprise accounts don't have access to Apple Distribution certificates
           certificates = Spaceship.certificate.in_house.all
         # handles case where the desired certificate type is adhoc but the account is an enterprise account
         # the apple dev portal api has a weird quirk in it where if you query for distribution certificates
         # for enterprise accounts, you get nothing back even if they exist.
-        elsif profile_type == Spaceship.provisioning_profile.AdHoc && Spaceship.client && Spaceship.client.in_house?
+        elsif (profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC) && Spaceship.client && Spaceship.client.in_house?
           # Enterprise accounts don't have access to Apple Distribution certificates
           certificates = Spaceship.certificate.in_house.all
         else
@@ -233,13 +233,13 @@ module Sigh
         end
 
       when 'macos', 'catalyst'
-        if profile_type == Spaceship.provisioning_profile.Development
+        if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT 
           certificates = Spaceship.certificate.mac_development.all +
                          Spaceship.certificate.apple_development.all
-        elsif profile_type == Spaceship.provisioning_profile.AppStore
+        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
           certificates = Spaceship.certificate.mac_app_distribution.all +
                          Spaceship.certificate.apple_distribution.all
-        elsif profile_type == Spaceship.provisioning_profile.Direct
+        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT
           certificates = Spaceship.certificate.developer_id_application.all
         else
           certificates = Spaceship.certificate.mac_app_distribution.all +
