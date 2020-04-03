@@ -244,7 +244,7 @@ module Supply
         UI.message("Found '#{version}' in '#{filtered_track.track}' track.")
       end
 
-      filtered_release = filtered_track.releases.find { |r| !r.name.nil? && r.name == version }
+      filtered_release = filtered_track.releases.first { |r| !r.name.nil? && r.name == version }
 
       # Since we can release on Alpha/Beta without release notes.
       if filtered_release.release_notes.nil?
