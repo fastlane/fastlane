@@ -164,6 +164,11 @@
 		A066E60323253F0F0053B487 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03AB82E82056A51B00BAAFD1 /* Main.storyboard */; };
 		A066E60423253F0F0053B487 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 03AB83262056AADB00BAAFD1 /* Info.plist */; };
 		A066E60B23253FAB0053B487 /* TargetVariableCurlyBraces-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A066E60A23253FAB0053B487 /* TargetVariableCurlyBraces-Info.plist */; };
+		D893D49E24322C1A007187BE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AB82E62056A51B00BAAFD1 /* ViewController.swift */; };
+		D893D49F24322C1A007187BE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AB82E42056A51B00BAAFD1 /* AppDelegate.swift */; };
+		D893D4A224322C1A007187BE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03AB82ED2056A51B00BAAFD1 /* LaunchScreen.storyboard */; };
+		D893D4A324322C1A007187BE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 03AB82EB2056A51B00BAAFD1 /* Assets.xcassets */; };
+		D893D4A424322C1A007187BE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03AB82E82056A51B00BAAFD1 /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -231,6 +236,8 @@
 		60E0C95A2390F87700524513 /* TargetAbsolutePath-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "TargetAbsolutePath-Info.plist"; sourceTree = "<group>"; };
 		A066E60823253F0F0053B487 /* TargetVariableCurlyBraces.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TargetVariableCurlyBraces.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A066E60A23253FAB0053B487 /* TargetVariableCurlyBraces-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "TargetVariableCurlyBraces-Info.plist"; sourceTree = "<group>"; };
+		D893D4A824322C1A007187BE /* TargetConfigVersion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TargetConfigVersion.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D893D4A924322C39007187BE /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -353,6 +360,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D893D4A024322C1A007187BE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -370,6 +384,7 @@
 				03AB83242056AAD200BAAFD1 /* TargetB-Info.plist */,
 				4AA286FF2300242600067244 /* TargetVariableParentheses-Info.plist */,
 				A066E60A23253FAB0053B487 /* TargetVariableCurlyBraces-Info.plist */,
+				D893D4A924322C39007187BE /* Version.xcconfig */,
 				03AB82E32056A51B00BAAFD1 /* get_version_number */,
 				03AB82F82056A51B00BAAFD1 /* get_version_numberTests */,
 				03AB82E22056A51B00BAAFD1 /* Products */,
@@ -400,6 +415,7 @@
 				03F663D923538BB200D4B92F /* TargetVariableCurlyBracesBuildSettings.app */,
 				60E0C927238E9B1000524513 /* TargetRelativePath.app */,
 				60E0C94A2390F87500524513 /* TargetAbsolutePath.app */,
+				D893D4A824322C1A007187BE /* TargetConfigVersion.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -424,18 +440,6 @@
 				03AB82F92056A51B00BAAFD1 /* get_version_numberTests.swift */,
 			);
 			path = get_version_numberTests;
-			sourceTree = "<group>";
-		};
-		60E0C94B2390F87500524513 /* TargetAbsolutePath */ = {
-			isa = PBXGroup;
-			children = (
-				60E0C94C2390F87500524513 /* AppDelegate.swift */,
-				60E0C9502390F87500524513 /* ViewController.swift */,
-				60E0C9522390F87500524513 /* Main.storyboard */,
-				60E0C9552390F87700524513 /* Assets.xcassets */,
-				60E0C9572390F87700524513 /* LaunchScreen.storyboard */,
-			);
-			path = TargetAbsolutePath;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -733,6 +737,23 @@
 			productReference = A066E60823253F0F0053B487 /* TargetVariableCurlyBraces.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D893D49C24322C1A007187BE /* TargetConfigVersion */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D893D4A524322C1A007187BE /* Build configuration list for PBXNativeTarget "TargetConfigVersion" */;
+			buildPhases = (
+				D893D49D24322C1A007187BE /* Sources */,
+				D893D4A024322C1A007187BE /* Frameworks */,
+				D893D4A124322C1A007187BE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TargetConfigVersion;
+			productName = TargetAbsolutePath;
+			productReference = D893D4A824322C1A007187BE /* TargetConfigVersion.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -801,6 +822,9 @@
 					A066E5F223253F0F0053B487 = {
 						ProvisioningStyle = Automatic;
 					};
+					D893D49C24322C1A007187BE = {
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 03AB82DC2056A51B00BAAFD1 /* Build configuration list for PBXProject "get_version_number" */;
@@ -834,6 +858,7 @@
 				03F663C323538BB200D4B92F /* TargetVariableCurlyBracesBuildSettings */,
 				60E0C926238E9B1000524513 /* TargetRelativePath */,
 				60E0C9492390F87500524513 /* TargetAbsolutePath */,
+				D893D49C24322C1A007187BE /* TargetConfigVersion */,
 			);
 		};
 /* End PBXProject section */
@@ -1071,6 +1096,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D893D4A124322C1A007187BE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D893D4A224322C1A007187BE /* LaunchScreen.storyboard in Resources */,
+				D893D4A324322C1A007187BE /* Assets.xcassets in Resources */,
+				D893D4A424322C1A007187BE /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1221,6 +1256,15 @@
 			files = (
 				A066E5F423253F0F0053B487 /* ViewController.swift in Sources */,
 				A066E5F523253F0F0053B487 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D893D49D24322C1A007187BE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D893D49E24322C1A007187BE /* ViewController.swift in Sources */,
+				D893D49F24322C1A007187BE /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1945,6 +1989,38 @@
 			};
 			name = Release;
 		};
+		D893D4A624322C1A007187BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D893D4A924322C39007187BE /* Version.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "$(SRCROOT)/TargetVariableParentheses-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "tools.fastlane.get-version-number";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		D893D4A724322C1A007187BE /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D893D4A924322C39007187BE /* Version.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "$(SRCROOT)/TargetVariableParentheses-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "tools.fastlane.get-version-number";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2115,6 +2191,15 @@
 			buildConfigurations = (
 				A066E60623253F0F0053B487 /* Debug */,
 				A066E60723253F0F0053B487 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D893D4A524322C1A007187BE /* Build configuration list for PBXNativeTarget "TargetConfigVersion" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D893D4A624322C1A007187BE /* Debug */,
+				D893D4A724322C1A007187BE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

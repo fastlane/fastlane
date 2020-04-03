@@ -44,6 +44,15 @@ describe Fastlane do
         end
       end
 
+      context "xcconfig defined version" do
+        it "gets the correct version numer for 'TargetConfigVersion'", requires_xcodeproj: true do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj: '#{path}', target: 'TargetConfigVersion')
+          end").runner.execute(:test)
+          expect(result).to eq("4.2.1")
+        end
+      end
+
       it "gets the correct version number for 'TargetATests'", requires_xcodeproj: true do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetATests')
