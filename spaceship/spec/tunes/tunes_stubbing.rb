@@ -42,13 +42,22 @@ class TunesStubbing
         to_return(status: 200, body: "", headers: {})
 
       # 2FA: Request security code to trusted phone
-      stub_request(:put, "https://idmsa.apple.com/appleauth/auth/verify/phone").
-        with(body: "{\"phoneNumber\":{\"id\":1},\"mode\":\"sms\"}").
-        to_return(status: 200, body: "", headers: {})
+      [1, 2].each do |id|
+        stub_request(:put, "https://idmsa.apple.com/appleauth/auth/verify/phone").
+          with(body: "{\"phoneNumber\":{\"id\":#{id}},\"mode\":\"sms\"}").
+          to_return(status: 200, body: "", headers: {})
+      end
 
       # 2FA: Submit security code from trusted phone for verification
-      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode").
-        with(body: "{\"securityCode\":{\"code\":\"123\"},\"phoneNumber\":{\"id\":1},\"mode\":\"sms\"}").
+      [1, 2].each do |id|
+        stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode").
+          with(body: "{\"securityCode\":{\"code\":\"123\"},\"phoneNumber\":{\"id\":#{id}},\"mode\":\"sms\"}").
+          to_return(status: 200, body: "", headers: {})
+      end
+
+      # 2FA: Submit security code from trusted device for verification
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode").
+        with(body: "{\"securityCode\":{\"code\":\"123\"}}").
         to_return(status: 200, body: "", headers: {})
 
       # 2FA: Trust computer
