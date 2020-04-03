@@ -5,6 +5,8 @@ describe Gym do
       day = now.strftime("%F")
 
       before do
+        # These tests can take some time to run
+        # Mocking Time.now to ensure test pass when running between two days
         expect(Time).to receive(:now).and_return(now).once
       end
 
@@ -16,7 +18,6 @@ describe Gym do
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
         path = Gym.config[:build_path]
-        # These tests take time, so accept either the day the tests started or the next day.
         expect(path).to eq("/test/path/#{day}")
       end
 
@@ -29,7 +30,6 @@ describe Gym do
 
         archive_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}")
         path = Gym.config[:build_path]
-        # These tests take time, so accept either the day the tests started or the next day.
         expect(path).to eq(archive_path)
       end
 
@@ -41,7 +41,6 @@ describe Gym do
 
         archive_path = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}")
         path = Gym.config[:build_path]
-        # These tests take time, so accept either the day the tests started or the next day.
         expect(path).to eq(archive_path)
       end
     end
