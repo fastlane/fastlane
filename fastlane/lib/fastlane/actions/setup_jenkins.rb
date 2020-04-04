@@ -40,6 +40,9 @@ module Fastlane
             add_to_search_list: params[:add_keychain_to_search_list],
             set_default: params[:set_default_keychain]
           )
+          ENV['MATCH_KEYCHAIN_NAME'] = keychain_path
+          ENV['MATCH_KEYCHAIN_PASSWORD'] = params[:keychain_password]
+          ENV["MATCH_READONLY"] = true.to_s
         end
 
         # Code signing identity
