@@ -170,7 +170,7 @@ module Match
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :s3_secret_access_key,
                                      env_name: "MATCH_S3_SECRET_ACCESS_KEY",
-                                     description: "S3 secret secret access key",
+                                     description: "S3 secret access key",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :s3_bucket,
                                      env_name: "MATCH_S3_BUCKET",
