@@ -2761,7 +2761,7 @@ func downloadDsyms(username: String,
 func downloadFromPlayStore(packageName: String,
                            versionName: String? = nil,
                            track: String = "production",
-                           metadataPath: String = "./metadata",
+                           metadataPath: String? = nil,
                            key: String? = nil,
                            issuer: String? = nil,
                            jsonKey: String? = nil,
@@ -4480,7 +4480,7 @@ func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - googleCloudProjectId: ID of the Google Cloud project to use for authentication
    - s3Region: Name of the S3 region
    - s3AccessKey: S3 access key
-   - s3SecretAccessKey: S3 secret secret access key
+   - s3SecretAccessKey: S3 secret access key
    - s3Bucket: Name of the S3 bucket
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
@@ -6338,7 +6338,7 @@ func setPodKey(useBundleExec: Bool = true,
  This action helps with CI integration. Add this to the top of your Fastfile if you use CI.
 */
 func setupCi(force: Bool = false,
-             provider: Bool = false) {
+             provider: String? = nil) {
   let command = RubyCommand(commandID: "", methodName: "setup_ci", className: nil, args: [RubyCommand.Argument(name: "force", value: force),
                                                                                           RubyCommand.Argument(name: "provider", value: provider)])
   _ = runner.executeCommand(command)
@@ -6674,7 +6674,7 @@ func slather(buildDirectory: String? = nil,
              show: Bool = false,
              sourceDirectory: String? = nil,
              outputDirectory: String? = nil,
-             ignore: Any? = nil,
+             ignore: [String]? = nil,
              verbose: Bool? = nil,
              useBundleExec: Bool = false,
              binaryBasename: Bool = false,
@@ -7055,7 +7055,7 @@ func supply(packageName: String,
             releaseStatus: String = "completed",
             track: String = "production",
             rollout: String? = nil,
-            metadataPath: String = "./metadata",
+            metadataPath: String? = nil,
             key: String? = nil,
             issuer: String? = nil,
             jsonKey: String? = nil,
@@ -7197,7 +7197,7 @@ func swiftlint(mode: Any = "lint",
    - googleCloudProjectId: ID of the Google Cloud project to use for authentication
    - s3Region: Name of the S3 region
    - s3AccessKey: S3 access key
-   - s3SecretAccessKey: S3 secret secret access key
+   - s3SecretAccessKey: S3 secret access key
    - s3Bucket: Name of the S3 bucket
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
@@ -8143,7 +8143,7 @@ func uploadToPlayStore(packageName: String,
                        releaseStatus: String = "completed",
                        track: String = "production",
                        rollout: String? = nil,
-                       metadataPath: String = "./metadata",
+                       metadataPath: String? = nil,
                        key: String? = nil,
                        issuer: String? = nil,
                        jsonKey: String? = nil,
@@ -8642,7 +8642,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-11.2.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-11.4.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -8787,4 +8787,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.72]
+// FastlaneRunnerAPIVersion [0.9.73]
