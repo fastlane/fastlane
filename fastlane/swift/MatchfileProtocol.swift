@@ -69,7 +69,7 @@ protocol MatchfileProtocol: class {
   /// S3 access key
   var s3AccessKey: String? { get }
 
-  /// S3 secret secret access key
+  /// S3 secret access key
   var s3SecretAccessKey: String? { get }
 
   /// Name of the S3 bucket
@@ -146,4 +146,4 @@ extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.14]
+// FastlaneRunnerAPIVersion [0.9.15]
