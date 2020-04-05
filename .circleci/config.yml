@@ -56,9 +56,9 @@ aliases:
 version: 2
 
 jobs:
-  'Execute tests on macOS (Xcode 9.0.1, Ruby 2.3)': &tests_macos  # define alias
+  'Execute tests on macOS (Xcode 9.4.1, Ruby 2.3)': &tests_macos  # define alias
     macos:
-      xcode: '9.0.1'
+      xcode: '9.4.1'
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'en_US.UTF-8'
@@ -240,7 +240,7 @@ workflows:
   version: 2
   build:
     jobs:
-      - 'Execute tests on macOS (Xcode 9.0.1, Ruby 2.3)'
+      - 'Execute tests on macOS (Xcode 9.4.1, Ruby 2.3)'
       - 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)'
       - 'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)'
       - 'Execute tests on macOS (Xcode 11.3.0, Ruby 2.6)'
