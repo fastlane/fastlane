@@ -244,7 +244,7 @@ module Supply
         UI.message("Found '#{version}' in '#{filtered_track.track}' track.")
       end
 
-      filtered_release = filtered_track.releases.first { |r| r.name == version }
+      filtered_release = filtered_track.releases.first { |r| !r.name.nil? && r.name == version }
 
       # Since we can release on Alpha/Beta without release notes.
       if filtered_release.release_notes.nil?
@@ -258,13 +258,13 @@ module Supply
     end
 
     def latest_version(track)
-      latest_version = tracks.select { |t| t.track == Supply::Tracks::DEFAULT }.map(&:releases).flatten.max_by(&:name)
+      latest_version = tracks.select { |t| t.track == Supply::Tracks::DEFAULT }.map(&:releases).flatten.reject { |r| r.name.nil? }.max_by(&:name)
 
       # Check if user specified '--track' option if version information from 'production' track is nil
       if latest_version.nil? && track == Supply::Tracks::DEFAULT
         UI.user_error!(%(Unable to find latest version information from "#{Supply::Tracks::DEFAULT}" track. Please specify track information by using the '--track' option.))
       else
-        latest_version = tracks.select { |t| t.track == track }.map(&:releases).flatten.max_by(&:name)
+        latest_version = tracks.select { |t| t.track == track }.map(&:releases).flatten.reject { |r| r.name.nil? }.max_by(&:name)
       end
 
       return latest_version
