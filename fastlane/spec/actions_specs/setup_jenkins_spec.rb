@@ -135,6 +135,20 @@ describe Fastlane do
           expect(ENV["MATCH_READONLY"]).to eq("true")
         end
 
+        it "does not setup match if previously set" do
+          ENV["MATCH_KEYCHAIN_NAME"] = keychain_name = "keychain_name"
+          ENV["MATCH_KEYCHAIN_PASSWORD"] = keychain_password = "keychain_password"
+          ENV["MATCH_READONLY"] = "false"
+
+          Fastlane::FastFile.new.parse("lane :test do
+            setup_jenkins
+          end").runner.execute(:test)
+
+          expect(ENV["MATCH_KEYCHAIN_NAME"]).to eq(keychain_name)
+          expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to eq(keychain_password)
+          expect(ENV["MATCH_READONLY"]).to eq("false")
+        end
+
         it "set code signing identity" do
           ENV["CODE_SIGNING_IDENTITY"] = "Code signing"
 
