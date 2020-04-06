@@ -118,9 +118,17 @@ module Pilot
 
       # Get latest uploaded build if no build specified
       if build.nil?
-        UI.important("No build specified - fetching latest build")
+        app_version = config[:app_version]
+        build_number = config[:build_number]
+        if build_number.nil?
+          if app_version.nil?
+            UI.important("No build specified - fetching latest build")
+          else
+            UI.important("No build specified - fetching latest build for version #{app_version}")
+          end
+        end
         platform = Spaceship::ConnectAPI::Platform.map(fetch_app_platform)
-        build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, sort: "-uploadedDate", platform: platform, limit: 1).first
+        build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, version: app_version, build_number: build_number, sort: "-uploadedDate", platform: platform, limit: 1).first
       end
 
       # Verify the build has all the includes that we need
