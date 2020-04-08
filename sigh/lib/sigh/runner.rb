@@ -126,6 +126,7 @@ module Sigh
 
       unless Sigh.config[:skip_fetch_profiles]
         if Spaceship.provisioning_profile.all.find { |p| p.name == name }
+          raise "The name '#{name}' is already taken, and fail_on_name_taken is true" if Sigh.config[:fail_on_name_taken]
           UI.error("The name '#{name}' is already taken, using another one.")
           name += " #{Time.now.to_i}"
         end
