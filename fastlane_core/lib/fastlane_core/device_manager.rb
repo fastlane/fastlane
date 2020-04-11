@@ -91,22 +91,23 @@ module FastlaneCore
 
         discover_devices(result[0], device_types, device_uuids) if result[0]
 
-        if device_uuids.count > 0 # instruments takes a little while to return so skip it if we have no devices
+        #if device_uuids.count > 0 # instruments takes a little while to return so skip it if we have no devices
           instruments_devices_output = ''
           Open3.popen3("instruments -s devices") do |stdin, stdout, stderr, wait_thr|
             instruments_devices_output = stdout.read
           end
 
           instruments_devices_output.split(/\n/).each do |instruments_device|
-            device_uuids.each do |device_uuid|
+            #device_uuids.each do |device_uuid|
               match = instruments_device.match(/(.+) \(([0-9.]+)\) \[(\h{40}|\h{8}-\h{16})\]?/)
-              if match && match[3].delete("-") == device_uuid
+              #if match && match[3].delete("-") == device_uuid
+              if match
                 devices << Device.new(name: match[1], udid: match[3], os_type: requested_os_type, os_version: match[2], state: "Booted", is_simulator: false)
                 UI.verbose("USB Device Found - \"" + match[1] + "\" (" + match[2] + ") UUID:" + match[3])
               end
-            end
+            #end
           end
-        end
+        #end
 
         return devices
       end
