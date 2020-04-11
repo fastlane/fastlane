@@ -535,7 +535,7 @@ module Frameit
         fonts.each do |font|
           if font['supported']
             font['supported'].each do |language|
-              if screenshot.path.include?(language)
+              if File.dirname(screenshot.path).split('/').last.include?(language)
                 return font["font"]
               end
             end
