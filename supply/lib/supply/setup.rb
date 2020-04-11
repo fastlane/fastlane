@@ -98,9 +98,11 @@ module Supply
         FileUtils.mkdir_p(containing)
       end
 
-      path = File.join(containing, "#{release_listing.version}.txt")
-      UI.message("Writing to #{path}...")
-      File.write(path, release_listing.release_notes)
+      release_listing.versioncodes.each do |versioncode|
+        path = File.join(containing, "#{versioncode}.txt")
+        UI.message("Writing to #{path}...")
+        File.write(path, release_listing.release_notes)
+      end
     end
 
     private
