@@ -112,10 +112,10 @@ jobs:
       xcode: '11.0.0'
     environment:
       _RUBY_VERSION: '2.5'
-  'Execute tests on macOS (Xcode 11.3.0, Ruby 2.6)':
+  'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)':
     <<: *tests_macos
     macos:
-      xcode: '11.3.0'
+      xcode: '11.4.0'
     environment:
       _RUBY_VERSION: '2.6'
 
@@ -243,7 +243,7 @@ workflows:
       - 'Execute tests on macOS (Xcode 9.4.1, Ruby 2.3)'
       - 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)'
       - 'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)'
-      - 'Execute tests on macOS (Xcode 11.3.0, Ruby 2.6)'
+      - 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)'
       - 'Execute tests on Ubuntu'
 
       - "Validate Fastlane.swift Generation"
