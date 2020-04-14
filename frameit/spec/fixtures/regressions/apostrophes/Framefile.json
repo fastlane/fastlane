@@ -1,6 +1,6 @@
 {
   "default": {
-    "background": "../background.png",
+    "background": "../../background.png",
     "padding": 50,
     "title": {
       "color": "#000000"
@@ -9,9 +9,15 @@
   },
   "data": [
     {
-      "filter": "no_ignore",
+      "filter": "apostrophes",
       "title": {
         "text": "Don't forget the apostrophes"
+      }
+    },
+    {
+      "filter": "escaped-apostrophes",
+      "title": {
+        "text": "Don\'t forget the apostrophes"
       }
     }
   ]

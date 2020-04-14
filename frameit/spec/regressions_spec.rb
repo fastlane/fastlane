@@ -23,5 +23,21 @@ describe Frameit do
           ).match?).to be_truthy
       end
     end
+
+    describe 'apostrophes' do
+      it 'generates the proper image' do
+        Frameit::Runner.new.run(path('apostrophes'), nil, Platform::IOS)
+
+        expect(matcher.compare(
+          path('apostrophes/fr-FR/iPhone 7 Plus-apostrophes_expectation_framed.png'),
+          path('apostrophes/fr-FR/iPhone 7 Plus-apostrophes_framed.png')
+          ).match?).to be_truthy
+
+        expect(matcher.compare(
+          path('apostrophes/fr-FR/iPhone 7 Plus-apostrophes_expectation_framed.png'), # Same fixture as above
+          path('apostrophes/fr-FR/iPhone 7 Plus-escaped-apostrophes_framed.png')
+          ).match?).to be_truthy
+      end
+    end
   end
 end
