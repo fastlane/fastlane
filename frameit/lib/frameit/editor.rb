@@ -21,6 +21,7 @@ module Frameit
     def initialize(screenshot, config, debug_mode = false)
       @screenshot = screenshot
       @config = config
+      @files_to_cleanup = []
       self.debug_mode = debug_mode
     end
 
@@ -46,6 +47,8 @@ module Frameit
       end
 
       store_result # write to file system
+
+      cleanup
     end
 
     def load_frame
@@ -78,6 +81,12 @@ module Frameit
       image.write(output_path)
       Helper.hide_loading_indicator
       UI.success("Added frame: '#{File.expand_path(output_path)}'")
+    end
+
+    def cleanup
+      @files_to_cleanup.each do |f|
+        File.delete(f) if File.exist?(f)
+      end
     end
 
     # puts the screenshot into the frame
@@ -404,15 +413,6 @@ module Frameit
       top_vertical_trim_offset = Float::INFINITY # Init at a large value, as the code will search for a minimal value.
       bottom_vertical_trim_offset = 0
       words.each do |key|
-        # Create empty background
-        empty_path = File.join(Frameit::ROOT, "lib/assets/empty.png")
-        text_image = MiniMagick::Image.open(empty_path)
-        image_height = max_height # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
-        text_image.combine_options do |i|
-          # Oversize as the text might be larger than the actual image. We're trimming afterwards anyway
-          i.resize("#{max_width * 5.0}x#{image_height}!") # `!` says it should ignore the ratio
-        end
-
         current_font = font(key)
         text = fetch_text(key)
         UI.verbose("Using #{current_font} as font the #{key} of #{screenshot.path}") if current_font
@@ -424,15 +424,21 @@ module Frameit
         interline_spacing = @config['interline_spacing']
 
         # Add the actual title
-        text_image.combine_options do |i|
+        text_image_file = Tempfile.new(['text_image', '.png'])
+        @files_to_cleanup << text_image_file.path
+
+        MiniMagick::Tool::Convert.new do |i|
           i.font(current_font) if current_font
           i.gravity("Center")
           i.pointsize(actual_font_size)
-          i.draw("text 0,0 '#{text}'")
+          i.background('transparent')
           i.interline_spacing(interline_spacing) if interline_spacing
           i.fill(@config[key.to_s]['color'])
+          i << "label: #{text}"
+          i << text_image_file.path
         end
 
+        text_image = MiniMagick::Image.new(text_image_file.path)
         results[key] = text_image
 
         # Natively trimming the image with .trim will result in the loss of the common baseline between the text in all images when side-by-side (e.g. stack_title is false).
