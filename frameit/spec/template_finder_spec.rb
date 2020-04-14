@@ -28,7 +28,7 @@ describe Frameit do
         screenshot = make_screenshot({ mac?: true })
         expected_result = nil
 
-        expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
+        expect(Frameit::TemplateFinder.get_template(screenshot, true)).to eq(expected_result)
       end
 
       it 'finds a vertical iphone se' do
@@ -40,7 +40,7 @@ describe Frameit do
         })
         expected_result = 'Apple iPhone-SE SpaceGray'
 
-        expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
+        expect(Frameit::TemplateFinder.get_template(screenshot, true)).to eq(expected_result)
       end
 
       it 'finds a horizontal iphone se' do
@@ -52,7 +52,7 @@ describe Frameit do
         })
         expected_result = 'Apple iPhone-SE Silver'
 
-        expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
+        expect(Frameit::TemplateFinder.get_template(screenshot, true)).to eq(expected_result)
       end
 
       it 'finds an iphone 5s' do
@@ -64,7 +64,7 @@ describe Frameit do
         })
         expected_result = 'Apple iPhone_5s SpaceGray'
 
-        expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
+        expect(Frameit::TemplateFinder.get_template(screenshot, true)).to eq(expected_result)
       end
 
       it 'finds an iPhone 6s' do
@@ -74,7 +74,7 @@ describe Frameit do
         })
         expected_result = 'Apple iPhone-6s silver'
 
-        expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
+        expect(Frameit::TemplateFinder.get_template(screenshot, true)).to eq(expected_result)
       end
 
       it 'finds an iPhone 6s Plus' do
@@ -85,7 +85,7 @@ describe Frameit do
         })
         expected_result = 'Apple iPhone-6s-Plus silver'
 
-        expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
+        expect(Frameit::TemplateFinder.get_template(screenshot, true)).to eq(expected_result)
       end
 
       it 'finds an ipad mini' do
@@ -95,7 +95,7 @@ describe Frameit do
         })
         expected_result = 'Apple iPad-mini silver'
 
-        expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
+        expect(Frameit::TemplateFinder.get_template(screenshot, true)).to eq(expected_result)
       end
 
       it 'finds an ipad pro' do
@@ -107,7 +107,7 @@ describe Frameit do
         })
         expected_result = 'Apple iPad-Pro SpaceGray'
 
-        expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
+        expect(Frameit::TemplateFinder.get_template(screenshot, true)).to eq(expected_result)
       end
     end
   end

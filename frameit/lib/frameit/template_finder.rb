@@ -7,7 +7,7 @@ module Frameit
   # Responsible for finding the correct device
   class TemplateFinder
     # This will detect the screen size and choose the correct template
-    def self.get_template(screenshot)
+    def self.get_template(screenshot, test = false)
       return nil if screenshot.mac?
 
       filename = create_file_name(screenshot.device_name, screenshot.color.nil? ? screenshot.default_color : screenshot.color)
@@ -15,7 +15,7 @@ module Frameit
 
       UI.verbose("Looking for #{filename} and found #{templates.count} template(s)")
 
-      return filename if Helper.test?
+      return filename if test
       if templates.count == 0 && !screenshot.color.nil? && screenshot.color != screenshot.default_color
         filename = create_file_name(screenshot.device_name, screenshot.default_color)
         UI.important("Unfortunately device type '#{screenshot.device_name}' is not available in #{screenshot.color}, falling back to " + (screenshot.default_color.nil? ? "default" : screenshot.default_color) + "...")
