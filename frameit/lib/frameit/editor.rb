@@ -7,6 +7,7 @@ require_relative 'offsets'
 require_relative 'config_parser'
 require_relative 'strings_parser'
 require_relative 'device_types'
+require_relative 'text_image'
 
 module Frameit
   # Currently the class is 2 lines too long. Reevaluate refactoring when it's length changes significantly
@@ -406,68 +407,42 @@ module Frameit
     end
 
     # This will build up to 2 individual images with the title and optional keyword, which will then be added to the real image
+    #
+    # A simple implementation would do the following: take the title and the keyword, create a transparent image with the
+    # text for each of them. We would just have to overlay them in the final screenshot.
+    #
+    # But there is added complexity because frameit offers the ability to lay out the keyword _next_ to the title, and we want to ensure
+    # that the baseline of the title and the keyword are aligned.
+    #
+    # If we just vertically center them, their baseline might not be aligned, especially if the keyword and the title have a different font.
+    #
+    # We need to first measure the height of each text we have drawn, and then in a second step, for each text we redraw it
+    # _vertically centered around its baseline_ (gravity = center for ImageMagick) in a box which has the width
+    # of that text but the _tallest height_ of both text. Since both texts will be vertically centered around their baseline in a canvas of the
+    # same height, their baselines will be aligned when laid out next to each other.
+    #
     def build_text_images(max_width, max_height, stack_title)
-      words = [:keyword, :title].keep_if { |a| fetch_text(a) } # optional keyword/title
-      results = {}
-      trim_boxes = {}
-      top_vertical_trim_offset = Float::INFINITY # Init at a large value, as the code will search for a minimal value.
-      bottom_vertical_trim_offset = 0
-      words.each do |key|
-        current_font = font(key)
-        text = fetch_text(key)
-        UI.verbose("Using #{current_font} as font the #{key} of #{screenshot.path}") if current_font
-        UI.verbose("Adding text '#{text}'")
+      text_images = [:keyword, :title]
+                    .keep_if { |a| fetch_text(a) } # optional keyword/title
+                    .map { |a| TextImage.new(a, font(a), actual_font_size, @config[a.to_s]['color'], @config['interline_spacing'], fetch_text(a)) }
 
-        text.gsub!('\n', "\n")
-        text.gsub!(/(?<!\\)(')/) { |s| "\\#{s}" } # escape unescaped apostrophes with a backslash
-
-        interline_spacing = @config['interline_spacing']
-
-        # Add the actual title
-        text_image_file = Tempfile.new(['text_image', '.png'])
-        @files_to_cleanup << text_image_file.path
-
-        MiniMagick::Tool::Convert.new do |i|
-          i.font(current_font) if current_font
-          i.gravity("Center")
-          i.pointsize(actual_font_size)
-          i.background('transparent')
-          i.interline_spacing(interline_spacing) if interline_spacing
-          i.fill(@config[key.to_s]['color'])
-          i << "label: #{text}"
-          i << text_image_file.path
+      text_images.map(&:size).map { |s| s[:height] }.max.tap do |tallest_text_height|
+        text_images.each do |text_image|
+          text_image.tallest_text_height = tallest_text_height
         end
-
-        text_image = MiniMagick::Image.new(text_image_file.path)
-        results[key] = text_image
-
-        # Natively trimming the image with .trim will result in the loss of the common baseline between the text in all images when side-by-side (e.g. stack_title is false).
-        # Hence retrieve the calculated trim bounding box without actually trimming:
-        calculated_trim_box = text_image.identify do |b|
-          b.format("%@") # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
-        end
-
-        # Create a Trimbox object from the MiniMagick .identify string with syntax "<width>x<height>+<offset_x>+<offset_y>":
-        trim_box = Frameit::Trimbox.new(calculated_trim_box)
-
-        # Get the minimum top offset of the trim box:
-        if trim_box.offset_y < top_vertical_trim_offset
-          top_vertical_trim_offset = trim_box.offset_y
-        end
-
-        # Get the maximum bottom offset of the trim box, this is the top offset + height:
-        if (trim_box.offset_y + trim_box.height) > bottom_vertical_trim_offset
-          bottom_vertical_trim_offset = trim_box.offset_y + trim_box.height
-        end
-
-        # Store for the crop action:
-        trim_boxes[key] = trim_box
       end
 
+      # Get the minimum top offset of the trim box:
+      top_vertical_trim_offset = text_images.map(&:trim_box).map(&:offset_y).min
+      # Get the maximum bottom offset of the trim box, this is the top offset + height:
+      bottom_vertical_trim_offset = text_images.map(&:trim_box).map { |tb| tb.offset_y + tb.height }.max
+
+      @files_to_cleanup.concat(text_images.map(&:files_to_cleanup).flatten)
+
       # Crop text images:
-      words.each do |key|
+      return text_images.map do |text_image|
         # Get matching trim box:
-        trim_box = trim_boxes[key]
+        trim_box = text_image.trim_box
 
         # For side-by-side text images (e.g. stack_title is false) adjust the trim box based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain the text baseline:
         unless stack_title
@@ -479,7 +454,7 @@ module Frameit
             # Change the vertical top offset to match that of the others:
             trim_box.offset_y = top_vertical_trim_offset
 
-            UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box}\n")
+            UI.verbose("Trim box for key \"#{text_image.key}\" is adjusted to align top: #{trim_box}\n")
           end
 
           # Check if the height needs to be adjusted to reach the bottom offset:
@@ -487,15 +462,16 @@ module Frameit
             # Set the height of the trim box to the difference between vertical bottom and top offset:
             trim_box.height = bottom_vertical_trim_offset - trim_box.offset_y
 
-            UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box}\n")
+            UI.verbose("Trim box for key \"#{text_image.key}\" is adjusted to align bottom: #{trim_box}\n")
           end
         end
 
         # Crop image with (adjusted) trim box parameters in MiniMagick string format:
-        results[key].crop(trim_box.string_format)
-      end
+        image = MiniMagick::Image.new(text_image.image_path)
+        cropped_image = image.crop(trim_box.string_format)
 
-      results
+        [text_image.key, cropped_image]
+      end.to_h
     end
 
     # Fetches the title + keyword for this particular screenshot
