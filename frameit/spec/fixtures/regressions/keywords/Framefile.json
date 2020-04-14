@@ -1,0 +1,30 @@
+{
+  "device_frame_version": "latest",
+  "default": {
+    "title": {
+      "color": "#ffffff",
+      "font" : "../../Roboto-Medium.ttf"
+    },
+    "keyword" : {
+      "color": "#0000ff",
+      "font" : "../../EBGaramond-Regular.ttf"
+    },
+    "background": "../../background.png",
+    "padding": "3%",
+    "show_complete_frame": false,
+    "stack_title" : false,
+    "title_below_image": false,
+    "font_scale_factor": 0.04
+  },
+   "data": [
+    {
+      "filter": "screenshot",
+      "title" : {
+        "text" : "A title"
+      },
+      "keyword" : {
+        "text" : "A keyword"
+      }
+    }
+  ]
+}

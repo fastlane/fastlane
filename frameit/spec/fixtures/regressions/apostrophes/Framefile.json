@@ -3,7 +3,8 @@
     "background": "../../background.png",
     "padding": 50,
     "title": {
-      "color": "#000000"
+      "color": "#000000",
+      "font" : "../../Roboto-Medium.ttf"
     },
     "use_platform": "IOS"
   },

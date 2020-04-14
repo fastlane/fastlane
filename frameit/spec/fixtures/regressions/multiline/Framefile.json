@@ -1,0 +1,21 @@
+{
+  "device_frame_version": "latest",
+  "default": {
+    "title": {
+      "color": "#ffffff",
+      "font" : "../../Roboto-Medium.ttf"
+    },
+    "background": "../../background.png",
+    "padding": "3%",
+    "show_complete_frame": false,
+    "stack_title" : true,
+    "title_below_image": false,
+    "font_scale_factor": 0.04,
+    "title_min_height" : "20%"
+  },
+   "data": [
+    {
+      "filter": "screenshot"
+    }
+  ]
+}
