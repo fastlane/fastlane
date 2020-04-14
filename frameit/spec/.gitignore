@@ -1,2 +1,3 @@
-fixtures/editor/*_framed.png
+*_framed.png
+!*expectation_framed.png
 

@@ -9,8 +9,8 @@ describe Frameit do
 
       it "raise error when file isn't a .strings file" do
         expect do
-          Frameit::StringsParser.parse("./frameit/spec/fixtures/background.jpg")
-        end.to raise_exception("Must be .strings file, only got './frameit/spec/fixtures/background.jpg'")
+          Frameit::StringsParser.parse("./frameit/spec/fixtures/background.png")
+        end.to raise_exception("Must be .strings file, only got './frameit/spec/fixtures/background.png'")
       end
 
       describe "successfully parsing" do
