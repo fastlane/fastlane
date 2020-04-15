@@ -75,6 +75,7 @@ module Pilot
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :beta_app_review_info,
                                      type: Hash,
+                                     is_string: false,
                                      env_name: "PILOT_BETA_APP_REVIEW_INFO",
                                      description: "Beta app review information for contact info and demo account",
                                      optional: true,
@@ -86,6 +87,7 @@ module Pilot
         # app detail
         FastlaneCore::ConfigItem.new(key: :localized_app_info,
                                      type: Hash,
+                                     is_string: false,
                                      env_name: "PILOT_LOCALIZED_APP_INFO",
                                      description: "Localized beta app test info for description, feedback email, marketing url, and privacy policy",
                                      optional: true,
@@ -109,6 +111,7 @@ module Pilot
         # build review info
         FastlaneCore::ConfigItem.new(key: :localized_build_info,
                                      type: Hash,
+                                     is_string: false,
                                      env_name: "PILOT_LOCALIZED_BUILD_INFO",
                                      description: "Localized beta app test info for what's new",
                                      optional: true,
