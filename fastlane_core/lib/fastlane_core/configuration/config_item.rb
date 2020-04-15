@@ -2,6 +2,7 @@ require_relative '../ui/ui'
 require_relative '../ui/errors/fastlane_error'
 require_relative '../helper'
 require_relative '../module'
+require 'json'
 
 module FastlaneCore
   class ConfigItem
@@ -240,6 +241,12 @@ module FastlaneCore
       elsif allow_shell_conversion
         return value.shelljoin if value.kind_of?(Array)
         return value.map { |k, v| "#{k.to_s.shellescape}=#{v.shellescape}" }.join(' ') if value.kind_of?(Hash)
+      elsif data_type == Hash && value.kind_of?(String)
+        begin
+          parsed = JSON.parse(value)
+          return parsed if parsed.kind_of?(Hash)
+        rescue JSON::ParserError
+        end
       elsif data_type != String
         # Special treatment if the user specified true, false or YES, NO
         # There is no boolean type, so we just do it here
