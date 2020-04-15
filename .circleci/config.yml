@@ -78,6 +78,7 @@ jobs:
             echo ${_RUBY_VERSION} > .ruby-version
             brew untap caskroom/versions || true
             brew install shellcheck
+            brew install imagemagick
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
       - run:
           name: debug | build environment

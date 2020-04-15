@@ -16,6 +16,16 @@ describe Frameit do
       allow(Frameit::FrameDownloader).to receive(:templates_path).and_return(path('devices'))
     end
 
+    describe 'testing imatcher', :focus do
+      # It's a sanity test: what value do we get for two dissimilar images
+      it 'returns a high score for two different images' do
+        expect(matcher.compare(
+          path('short-title/fr-FR/iPhone 7 Plus-screenshot_expectation_framed.png'),
+          path('long-title/fr-FR/iPhone 7 Plus-screenshot_expectation_framed.png')
+        ).score).to be > 0
+      end
+    end
+
     describe 'a short text' do
       it 'generates the proper image' do
         Frameit::Runner.new.run(path('short-title'), nil, Platform::IOS)
@@ -23,7 +33,7 @@ describe Frameit do
         expect(matcher.compare(
           path('short-title/fr-FR/iPhone 7 Plus-screenshot_expectation_framed.png'),
           path('short-title/fr-FR/iPhone 7 Plus-screenshot_framed.png')
-        ).match?).to be_truthy
+        ).score).to eq 0
       end
     end
 
@@ -34,7 +44,7 @@ describe Frameit do
         expect(matcher.compare(
           path('long-title/fr-FR/iPhone 7 Plus-screenshot_expectation_framed.png'),
           path('long-title/fr-FR/iPhone 7 Plus-screenshot_framed.png')
-        ).match?).to be_truthy
+        ).score).to eq 0
       end
     end
 
@@ -45,7 +55,7 @@ describe Frameit do
         expect(matcher.compare(
           path('multiline/fr-FR/iPhone 7 Plus-screenshot_expectation_framed.png'),
           path('multiline/fr-FR/iPhone 7 Plus-screenshot_framed.png')
-        ).match?).to be_truthy
+        ).score).to eq 0
       end
     end
 
@@ -56,12 +66,12 @@ describe Frameit do
         expect(matcher.compare(
           path('apostrophes/fr-FR/iPhone 7 Plus-apostrophes_expectation_framed.png'),
           path('apostrophes/fr-FR/iPhone 7 Plus-apostrophes_framed.png')
-        ).match?).to be_truthy
+        ).score).to eq 0
 
         expect(matcher.compare(
           path('apostrophes/fr-FR/iPhone 7 Plus-apostrophes_expectation_framed.png'), # Same fixture as above
           path('apostrophes/fr-FR/iPhone 7 Plus-escaped-apostrophes_framed.png')
-        ).match?).to be_truthy
+        ).score).to eq 0
       end
     end
 
@@ -72,7 +82,8 @@ describe Frameit do
         expect(matcher.compare(
           path('keywords/fr-FR/iPhone 7 Plus-screenshot_expectation_framed.png'),
           path('keywords/fr-FR/iPhone 7 Plus-screenshot_framed.png')
-        ).match?).to be_truthy
+        ).score).to eq 0
+
       end
     end
 
@@ -83,7 +94,7 @@ describe Frameit do
         expect(matcher.compare(
           path('stacked-keywords/fr-FR/iPhone 7 Plus-screenshot_expectation_framed.png'),
           path('stacked-keywords/fr-FR/iPhone 7 Plus-screenshot_framed.png')
-        ).match?).to be_truthy
+        ).score).to eq 0
       end
     end
   end
