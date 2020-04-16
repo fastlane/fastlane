@@ -122,6 +122,10 @@ module Frameit
       return File.mtime(path) > File.mtime(output_path)
     end
 
+    def language
+      @language ||= Pathname.new(path).parent.basename.to_s
+    end
+
     def to_s
       self.path
     end
