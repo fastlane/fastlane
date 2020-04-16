@@ -33,7 +33,7 @@ describe Frameit do
         expect(matcher.compare(
           path('short-title/fr-FR/iPhone 7 Plus-screenshot_expectation_framed.png'),
           path('short-title/fr-FR/iPhone 7 Plus-screenshot_framed.png')
-        ).score).to eq 0
+        ).score).to eq(0)
       end
     end
 
@@ -44,7 +44,7 @@ describe Frameit do
         expect(matcher.compare(
           path('long-title/fr-FR/iPhone 7 Plus-screenshot_expectation_framed.png'),
           path('long-title/fr-FR/iPhone 7 Plus-screenshot_framed.png')
-        ).score).to eq 0
+        ).score).to eq(0)
       end
     end
 
@@ -55,7 +55,7 @@ describe Frameit do
         expect(matcher.compare(
           path('multiline/fr-FR/iPhone 7 Plus-screenshot_expectation_framed.png'),
           path('multiline/fr-FR/iPhone 7 Plus-screenshot_framed.png')
-        ).score).to eq 0
+        ).score).to eq(0)
       end
     end
 
@@ -66,12 +66,12 @@ describe Frameit do
         expect(matcher.compare(
           path('apostrophes/fr-FR/iPhone 7 Plus-apostrophes_expectation_framed.png'),
           path('apostrophes/fr-FR/iPhone 7 Plus-apostrophes_framed.png')
-        ).score).to eq 0
+        ).score).to eq(0)
 
         expect(matcher.compare(
           path('apostrophes/fr-FR/iPhone 7 Plus-apostrophes_expectation_framed.png'), # Same fixture as above
           path('apostrophes/fr-FR/iPhone 7 Plus-escaped-apostrophes_framed.png')
-        ).score).to eq 0
+        ).score).to eq(0)
       end
     end
 
@@ -82,8 +82,7 @@ describe Frameit do
         expect(matcher.compare(
           path('keywords/fr-FR/iPhone 7 Plus-screenshot_expectation_framed.png'),
           path('keywords/fr-FR/iPhone 7 Plus-screenshot_framed.png')
-        ).score).to eq 0
-
+        ).score).to eq(0)
       end
     end
 
@@ -94,7 +93,7 @@ describe Frameit do
         expect(matcher.compare(
           path('stacked-keywords/fr-FR/iPhone 7 Plus-screenshot_expectation_framed.png'),
           path('stacked-keywords/fr-FR/iPhone 7 Plus-screenshot_framed.png')
-        ).score).to eq 0
+        ).score).to eq(0)
       end
     end
   end
