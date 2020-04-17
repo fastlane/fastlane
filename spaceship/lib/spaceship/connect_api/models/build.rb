@@ -158,6 +158,18 @@ module Spaceship
       def post_beta_app_review_submission
         return Spaceship::ConnectAPI.post_beta_app_review_submissions(build_id: id)
       end
+
+      def expire!
+        Spaceship::ConnectAPI::TestFlight::Client.instance.patch("builds/#{id}", {
+          :data => {
+            :attributes => {
+              :expired => true
+            },
+            :id => id,
+            :type => Build.type
+          }
+        })
+      end
     end
   end
 end
