@@ -1,7 +1,7 @@
 describe Match do
   describe Match::Storage::S3Storage do
     subject { described_class.new(s3_region: nil, s3_access_key: nil, s3_secret_access_key: nil, s3_bucket: 'foobar') }
-    let(:working_directory) { '/var/folders/px/abcdefghijklmnop/T/d20181026-96528-1av4gge'}
+    let(:working_directory) { '/var/folders/px/abcdefghijklmnop/T/d20181026-96528-1av4gge' }
 
     before do
       allow(subject).to receive(:working_directory).and_return(working_directory)
