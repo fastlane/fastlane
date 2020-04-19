@@ -215,8 +215,11 @@ module Pilot
     end
 
     def update_beta_app_meta(options, build)
-      # Setting account required wth AppStore Connect API
-      update_review_detail(build, { demo_account_required: options[:demo_account_required] })
+      # If demo_account_required is a parameter, it should added into beta_app_review_info
+      unless options[:demo_account_required].nil?
+        options[:beta_app_review_info] = {} if options[:beta_app_review_info].nil?
+        options[:beta_app_review_info][:demo_account_required] = options[:demo_account_required]
+      end
 
       if should_update_beta_app_review_info(options)
         update_review_detail(build, options[:beta_app_review_info])

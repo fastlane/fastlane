@@ -211,12 +211,6 @@ describe "Build Manager" do
 
         options = distribute_options_skip_waiting_non_localized_changelog
 
-        # Expect a beta app review detail to be patched
-        expect(Spaceship::ConnectAPI).to receive(:patch_beta_app_review_detail).with({
-          app_id: ready_to_submit_mock_build.app_id,
-          attributes: { demoAccountRequired: options[:demo_account_required] }
-        })
-
         # Expect beta build localizations to be fetched
         expect(Spaceship::ConnectAPI).to receive(:get_beta_build_localizations).with({
           filter: { build: ready_to_submit_mock_build.id },
