@@ -228,6 +228,7 @@ module FastlaneCore
       true
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
     # Returns an updated value type (if necessary)
     def auto_convert_value(value)
       return nil if value.nil?
@@ -256,6 +257,7 @@ module FastlaneCore
           return false
         end
       end
+      # rubocop:enable Metrics/PerceivedComplexity
 
       return value # fallback to not doing anything
     end
