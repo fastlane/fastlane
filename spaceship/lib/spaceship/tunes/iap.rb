@@ -134,13 +134,13 @@ module Spaceship
 
       # generate app-specific shared secret (or regenerate if exists)
       def generate_shared_secret
-        client.handle_shared_secret(method: :post, app_id: self.application.apple_id)
+        client.generate_shared_secret(app_id: self.application.apple_id)
       end
 
       # retrieve app-specific shared secret
       # @param create (Boolean) Create new shared secret if does not exist
       def get_shared_secret(create: false)
-        secret = client.handle_shared_secret(method: :get, app_id: self.application.apple_id)
+        secret = client.get_shared_secret(app_id: self.application.apple_id)
         if create && secret.nil?
           secret = generate_shared_secret
         end
