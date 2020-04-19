@@ -19,24 +19,30 @@ module Fastlane
         UI.user_error!("Could not find path to project config '#{project_file_path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_file_path)
 
         # download certificate
-        unless File.exist?(params[:certificate])
-          UI.message("Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'")
-          require 'open-uri'
-          File.open(params[:certificate], "w:ASCII-8BIT") do |file|
-            file.write(open(ROOT_CERTIFICATE_URL, "rb").read)
+        profile_specifier = params[:profile_specifier] 
+        unless profile_specifier
+          unless File.exist?(params[:certificate])
+            UI.message("Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'")
+            require 'open-uri'
+            File.open(params[:certificate], "w:ASCII-8BIT") do |file|
+              file.write(open(ROOT_CERTIFICATE_URL, "rb").read)
+            end
           end
-        end
 
-        # parsing mobileprovision file
-        UI.message("Parsing mobile provisioning profile from '#{params[:profile]}'")
-        profile = File.read(params[:profile])
-        p7 = OpenSSL::PKCS7.new(profile)
-        store = OpenSSL::X509::Store.new
-        UI.user_error!("Could not find valid certificate at '#{params[:certificate]}'") unless File.size(params[:certificate]) > 0
-        cert = OpenSSL::X509::Certificate.new(File.read(params[:certificate]))
-        store.add_cert(cert)
-        p7.verify([cert], store)
-        data = Plist.parse_xml(p7.data)
+          # parsing mobileprovision file
+          UI.message("Parsing mobile provisioning profile from '#{params[:profile]}'")
+          profile = File.read(params[:profile])
+          p7 = OpenSSL::PKCS7.new(profile)
+          store = OpenSSL::X509::Store.new
+          UI.user_error!("Could not find valid certificate at '#{params[:certificate]}'") unless File.size(params[:certificate]) > 0
+          cert = OpenSSL::X509::Certificate.new(File.read(params[:certificate]))
+          store.add_cert(cert)
+          p7.verify([cert], store)
+          data = Plist.parse_xml(p7.data)
+
+          profile_uuid = data["UUID"]
+          profile_specifier = data["Name"]
+        end
 
         target_filter = params[:target_filter] || params[:build_configuration_filter]
         configuration = params[:build_configuration]
@@ -71,8 +77,8 @@ module Fastlane
               end
             end
 
-            build_configuration.build_settings["PROVISIONING_PROFILE"] = data["UUID"]
-            build_configuration.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = data["Name"]
+            build_configuration.build_settings["PROVISIONING_PROFILE"] = profile_uuid
+            build_configuration.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = profile_specifier
           end
         end
 
@@ -114,6 +120,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Path to provisioning profile is invalid") unless File.exist?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :profile_specifier,
+                                       env_name: "FL_PROJECT_PROVISIONING_PROFILE_SPECIFIER",
+                                       description: "Name of provisioning profile",
+                                       default_value: Actions.lane_context[SharedValues::SIGH_NAME],
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :target_filter,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_TARGET_FILTER",
                                        description: "A filter for the target name. Use a standard regex",
