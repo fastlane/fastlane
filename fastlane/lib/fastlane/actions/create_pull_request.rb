@@ -15,6 +15,7 @@ module Fastlane
           'base' => params[:base]
         }
         payload['body'] = params[:body] if params[:body]
+        payload['draft'] = params[:draft] if params[:draft]
 
         GithubApiAction.run(
           server_url: params[:api_url],
@@ -176,6 +177,11 @@ module Fastlane
                                        description: "The contents of the pull request",
                                        is_string: true,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :draft,
+                                       env_name: "GITHUB_PULL_REQUEST_DRAFT",
+                                       description: "Indicates whether the pull request is a draft",
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :labels,
                                        env_name: "GITHUB_PULL_REQUEST_LABELS",
                                        description: "The labels for the pull request",
@@ -226,7 +232,7 @@ module Fastlane
       end
 
       def self.author
-        ["seei", "tommeier", "marumemomo", "elneruda"]
+        ["seei", "tommeier", "marumemomo", "elneruda", "kagemiku"]
       end
 
       def self.is_supported?(platform)
