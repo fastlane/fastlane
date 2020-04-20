@@ -96,7 +96,7 @@ module Snapshot
         language_key = locale || language
 
         unless Snapshot.cache[:result_bundle_path][language_key]
-          ext = FastlaneCore::Helper.xcode_version.to_i >= 11 ? '.xcresult' : '.test_result'
+          ext = FastlaneCore::Helper.xcode_at_least?(11) ? '.xcresult' : '.test_result'
           path = File.join(Snapshot.config[:output_directory], "test_output", language_key, Snapshot.config[:scheme]) + ext
           if File.directory?(path)
             FileUtils.remove_dir(path)
