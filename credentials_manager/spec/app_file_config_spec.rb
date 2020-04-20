@@ -9,6 +9,7 @@ describe CredentialsManager do
         expect(CredentialsManager::AppfileConfig.new('credentials_manager/spec/fixtures/Appfile1').data[:app_identifier]).to eq('net.sunapps.1.beta')
         expect(CredentialsManager::AppfileConfig.new('credentials_manager/spec/fixtures/Appfile1').data[:apple_id]).to eq('felix@sunapps.net')
         expect(CredentialsManager::AppfileConfig.new('credentials_manager/spec/fixtures/Appfile1').data[:team_id]).to eq('3ECBP458CC')
+        expect(CredentialsManager::AppfileConfig.new('credentials_manager/spec/fixtures/Appfile1').data[:itc_provider]).to eq('JoshHoltz')
 
         ENV["FASTLANE_LANE_NAME"] = :enterprise.to_s
 
