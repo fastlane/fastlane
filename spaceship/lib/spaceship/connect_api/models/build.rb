@@ -160,15 +160,7 @@ module Spaceship
       end
 
       def expire!
-        Spaceship::ConnectAPI::TestFlight::Client.instance.patch("builds/#{id}", {
-          data: {
-            attributes: {
-              expired: true
-            },
-            id: id,
-            type: Build.type
-          }
-        })
+        return Spaceship::ConnectAPI.patch_builds(build_id: id, attributes: { expired: true })
       end
     end
   end
