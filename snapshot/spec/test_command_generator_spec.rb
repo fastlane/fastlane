@@ -264,6 +264,15 @@ describe Snapshot do
           expect(command.join('')).not_to(include("build test"))
         end
       end
+
+      context 'test-plan' do
+        it 'adds the testplan to the xcodebuild command', requires_xcode: true do
+          configure(options.merge(testplan: 'simple'))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-testPlan 'simple'") if FastlaneCore::Helper.xcode_at_least?(11)
+        end
+      end
     end
 
     describe "Valid macOS Configuration" do
