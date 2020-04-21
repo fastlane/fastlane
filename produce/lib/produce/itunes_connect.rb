@@ -58,14 +58,16 @@ module Produce
         end
 
         UI.success("Successfully created new app '#{Produce.config[:app_name]}' on App Store Connect with ID #{application.apple_id}")
-
-        return Spaceship::Tunes::Application.find(@full_bundle_identifier, mac: platforms.first == "osx").apple_id
       end
 
-      return Spaceship::Tunes::Application.find(@full_bundle_identifier, mac: Produce.config[:platform] == "osx").apple_id
+      return Spaceship::Tunes::Application.find(@full_bundle_identifier, mac: platform == "osx").apple_id
     end
 
     private
+
+    def platform
+      (Produce.config[:platforms] || []).first || Produce.config[:platform]
+    end
 
     def fetch_application
       Spaceship::Tunes::Application.find(@full_bundle_identifier)
