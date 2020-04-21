@@ -163,6 +163,14 @@ module Pilot
         end
       end
 
+      if options[:expire_previous_builds]
+        builds_to_expire = build.app.get_builds.reject do |asc_build|
+          asc_build.id == build.id
+        end
+
+        builds_to_expire.each(&:expire!)
+      end
+
       if !build.ready_for_internal_testing? && options[:skip_waiting_for_build_processing]
         # Meta can be uploaded for a build still in processing
         # Returning before distribute if skip_waiting_for_build_processing
