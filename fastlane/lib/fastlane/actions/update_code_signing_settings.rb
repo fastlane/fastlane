@@ -29,35 +29,34 @@ module Fastlane
 
           target.build_configurations.each do |config|
             if params[:build_configurations]
-              unless params[:build_configurations].include?(target.name)
+              unless params[:build_configurations].include?(config.name)
                 UI.important("Skipping #{config.name} not selected (#{params[:build_configurations].join(',')})")
                 next
               end
             end
 
             style_value = params[:use_automatic_signing] ? 'Automatic' : 'Manual'
-
-            config.build_settings["CODE_SIGN_STYLE"] = style_value
+            set_build_setting(config, "CODE_SIGN_STYLE", style_value)
 
             if params[:team_id]
-              config.build_settings["DEVELOPMENT_TEAM"] = params[:team_id]
+              set_build_setting(config, "DEVELOPMENT_TEAM", params[:team_id])
               UI.important("Set Team id to: #{params[:team_id]} for target: #{target.name} for build configuration: #{config.name}")
             end
             if params[:code_sign_identity]
-              config.build_settings["CODE_SIGN_IDENTITY"] = params[:code_sign_identity]
+              set_build_setting(config, "CODE_SIGN_IDENTITY", params[:code_sign_identity])
               UI.important("Set Code Sign identity to: #{params[:code_sign_identity]} for target: #{target.name} for build configuration: #{config.name}")
             end
             if params[:profile_name]
-              config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = params[:profile_name]
+              set_build_setting(config, "PROVISIONING_PROFILE_SPECIFIER", params[:profile_name])
               UI.important("Set Provisioning Profile name to: #{params[:profile_name]} for target: #{target.name} for build configuration: #{config.name}")
             end
             # Since Xcode 8, this is no longer needed, you simply use PROVISIONING_PROFILE_SPECIFIER
             if params[:profile_uuid]
-              config.build_settings["PROVISIONING_PROFILE"] = params[:profile_uuid]
+              set_build_setting(config, "PROVISIONING_PROFILE", params[:profile_uuid])
               UI.important("Set Provisioning Profile UUID to: #{params[:profile_uuid]} for target: #{target.name} for build configuration: #{config.name}")
             end
             if params[:bundle_identifier]
-              config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"] = params[:bundle_identifier]
+              set_build_setting(config, "PRODUCT_BUNDLE_IDENTIFIER", params[:bundle_identifier])
               UI.important("Set Bundle identifier to: #{params[:bundle_identifier]} for target: #{target.name} for build configuration: #{config.name}")
             end
 
@@ -71,8 +70,8 @@ module Fastlane
         if changed_targets.empty?
           UI.important("None of the specified targets has been modified")
           UI.important("available targets:")
-          target_dictionary.each do |target|
-            UI.important("\t* #{target[:name]}")
+          project.targets.each do |target|
+            UI.important("\t* #{target.name}")
           end
         else
           UI.success("Successfully updated project settings to use Code Sign Style = '#{params[:use_automatic_signing] ? 'Automatic' : 'Manual'}'")
@@ -88,6 +87,13 @@ module Fastlane
         end
 
         params[:use_automatic_signing]
+      end
+
+      def self.set_build_setting(configuration, name, value)
+        codesign_build_settings_keys = configuration.build_settings.keys.select { |key| key.to_s.match(/#{name}.*/) }
+        codesign_build_settings_keys.each do |key|
+          configuration.build_settings[key] = value
+        end
       end
 
       def self.description
