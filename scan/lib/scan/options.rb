@@ -123,12 +123,30 @@ module Scan
                                        verify_type('skip_testing', [Array, String], value)
                                      end),
 
-        # other test options
+        # test plans to run
         FastlaneCore::ConfigItem.new(key: :testplan,
                                      env_name: "SCAN_TESTPLAN",
                                      description: "The testplan associated with the scheme that should be used for testing",
                                      is_string: true,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :only_test_configurations,
+                                     env_name: "SCAN_ONLY_TEST_CONFIGURATIONS",
+                                     description: "Array of strings matching test plan configurations to run",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       verify_type('only_test_configurations', [Array, String], value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :skip_test_configurations,
+                                     env_name: "SCAN_SKIP_TEST_CONFIGURATIONS",
+                                     description: "Array of strings matching test plan configurations to skip",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       verify_type('skip_test_configurations', [Array, String], value)
+                                     end),
+
+        # other test options
         FastlaneCore::ConfigItem.new(key: :xctestrun,
                                      short_option: "-X",
                                      env_name: "SCAN_XCTESTRUN",
