@@ -14,6 +14,8 @@ describe Fastlane do
     project_path = nil
 
     before :each do
+      ENV.delete("FASTLANE_TEAM_ID")
+
       temp_dir = Dir.tmpdir
       FileUtils.copy_entry(unmodified_project_path, temp_dir)
 
