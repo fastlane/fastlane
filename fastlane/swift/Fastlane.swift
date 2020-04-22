@@ -2215,6 +2215,7 @@ func createAppOnManagedPlayStore(jsonKey: String? = nil,
    - appVersion: Initial version number (e.g. '1.0')
    - sku: SKU Number (e.g. '1234')
    - platform: The platform to use (optional)
+   - platforms: The platforms to use (optional)
    - language: Primary Language (e.g. 'English', 'German')
    - companyName: The name of your company. Only required if it's the first app you create
    - skipItc: Skip the creation of the app on App Store Connect
@@ -2238,6 +2239,7 @@ func createAppOnline(username: String,
                      appVersion: String? = nil,
                      sku: String,
                      platform: String = "ios",
+                     platforms: [String]? = nil,
                      language: String = "English",
                      companyName: String? = nil,
                      skipItc: Bool = false,
@@ -2256,6 +2258,7 @@ func createAppOnline(username: String,
                                                                                                    RubyCommand.Argument(name: "app_version", value: appVersion),
                                                                                                    RubyCommand.Argument(name: "sku", value: sku),
                                                                                                    RubyCommand.Argument(name: "platform", value: platform),
+                                                                                                   RubyCommand.Argument(name: "platforms", value: platforms),
                                                                                                    RubyCommand.Argument(name: "language", value: language),
                                                                                                    RubyCommand.Argument(name: "company_name", value: companyName),
                                                                                                    RubyCommand.Argument(name: "skip_itc", value: skipItc),
@@ -2316,6 +2319,7 @@ func createKeychain(name: String? = nil,
    - repo: The name of the repository you want to submit the pull request to
    - title: The title of the pull request
    - body: The contents of the pull request
+   - draft: Indicates whether the pull request is a draft
    - labels: The labels for the pull request
    - milestone: The milestone ID (Integer) for the pull request
    - head: The name of the branch where your changes are implemented (defaults to the current branch name)
@@ -2331,6 +2335,7 @@ func createPullRequest(apiToken: String,
                        repo: String,
                        title: String,
                        body: String? = nil,
+                       draft: Bool? = nil,
                        labels: [String]? = nil,
                        milestone: String? = nil,
                        head: String? = nil,
@@ -2343,6 +2348,7 @@ func createPullRequest(apiToken: String,
                                                                                                      RubyCommand.Argument(name: "repo", value: repo),
                                                                                                      RubyCommand.Argument(name: "title", value: title),
                                                                                                      RubyCommand.Argument(name: "body", value: body),
+                                                                                                     RubyCommand.Argument(name: "draft", value: draft),
                                                                                                      RubyCommand.Argument(name: "labels", value: labels),
                                                                                                      RubyCommand.Argument(name: "milestone", value: milestone),
                                                                                                      RubyCommand.Argument(name: "head", value: head),
@@ -4956,6 +4962,8 @@ func pem(development: Bool = false,
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers?
    - notifyExternalTesters: Should notify external testers?
+   - appVersion: The version number of the application build to distribute. If the version number is not specified, then the most recent build uploaded to TestFlight will be distributed. If specified, the most recent build for the version number will be distributed
+   - buildNumber: The build number of the application build to distribute. If the build number is not specified, the most recent build is distributed
    - firstName: The tester's first name
    - lastName: The tester's last name
    - email: The tester's email
@@ -4990,6 +4998,8 @@ func pilot(username: String,
            usesNonExemptEncryption: Bool = false,
            distributeExternal: Bool = false,
            notifyExternalTesters: Bool = true,
+           appVersion: String? = nil,
+           buildNumber: String? = nil,
            firstName: String? = nil,
            lastName: String? = nil,
            email: String? = nil,
@@ -5020,6 +5030,8 @@ func pilot(username: String,
                                                                                        RubyCommand.Argument(name: "uses_non_exempt_encryption", value: usesNonExemptEncryption),
                                                                                        RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
                                                                                        RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
+                                                                                       RubyCommand.Argument(name: "app_version", value: appVersion),
+                                                                                       RubyCommand.Argument(name: "build_number", value: buildNumber),
                                                                                        RubyCommand.Argument(name: "first_name", value: firstName),
                                                                                        RubyCommand.Argument(name: "last_name", value: lastName),
                                                                                        RubyCommand.Argument(name: "email", value: email),
@@ -5250,6 +5262,7 @@ func println(message: String? = nil) {
    - appVersion: Initial version number (e.g. '1.0')
    - sku: SKU Number (e.g. '1234')
    - platform: The platform to use (optional)
+   - platforms: The platforms to use (optional)
    - language: Primary Language (e.g. 'English', 'German')
    - companyName: The name of your company. Only required if it's the first app you create
    - skipItc: Skip the creation of the app on App Store Connect
@@ -5273,6 +5286,7 @@ func produce(username: String,
              appVersion: String? = nil,
              sku: String,
              platform: String = "ios",
+             platforms: [String]? = nil,
              language: String = "English",
              companyName: String? = nil,
              skipItc: Bool = false,
@@ -5291,6 +5305,7 @@ func produce(username: String,
                                                                                          RubyCommand.Argument(name: "app_version", value: appVersion),
                                                                                          RubyCommand.Argument(name: "sku", value: sku),
                                                                                          RubyCommand.Argument(name: "platform", value: platform),
+                                                                                         RubyCommand.Argument(name: "platforms", value: platforms),
                                                                                          RubyCommand.Argument(name: "language", value: language),
                                                                                          RubyCommand.Argument(name: "company_name", value: companyName),
                                                                                          RubyCommand.Argument(name: "skip_itc", value: skipItc),
@@ -6377,13 +6392,16 @@ func setupCircleCi(force: Bool = false) {
    - resultBundle: Produce the result bundle describing what occurred will be placed
 
  - Adds and unlocks keychains from Jenkins 'Keychains and Provisioning Profiles Plugin'|
+ - Sets unlocked keychain to be used by Match|
  - Sets code signing identity from Jenkins 'Keychains and Provisioning Profiles Plugin'|
  - Sets output directory to './output' (gym, scan and backup_xcarchive)|
  - Sets derived data path to './derivedData' (xcodebuild, gym, scan and clear_derived_data, carthage)|
  - Produce result bundle (gym and scan)|
  >|
  This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory.
- The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), the selected keychain will be automatically unlocked and the selected code signing identity will be used. By default this action will only work when _fastlane_ is executed on a CI system.
+ The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), the selected keychain will be automatically unlocked and the selected code signing identity will be used.
+ [Match](https://docs.fastlane.tools/actions/match/) will be also set up to use the unlocked keychain and set in read-only mode, if its environment variables were not yet defined.
+ By default this action will only work when _fastlane_ is executed on a CI system.
 */
 func setupJenkins(force: Bool = false,
                   unlockKeychain: Bool = true,
@@ -7372,6 +7390,8 @@ func testfairy(apiKey: String,
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers?
    - notifyExternalTesters: Should notify external testers?
+   - appVersion: The version number of the application build to distribute. If the version number is not specified, then the most recent build uploaded to TestFlight will be distributed. If specified, the most recent build for the version number will be distributed
+   - buildNumber: The build number of the application build to distribute. If the build number is not specified, the most recent build is distributed
    - firstName: The tester's first name
    - lastName: The tester's last name
    - email: The tester's email
@@ -7406,6 +7426,8 @@ func testflight(username: String,
                 usesNonExemptEncryption: Bool = false,
                 distributeExternal: Bool = false,
                 notifyExternalTesters: Bool = true,
+                appVersion: String? = nil,
+                buildNumber: String? = nil,
                 firstName: String? = nil,
                 lastName: String? = nil,
                 email: String? = nil,
@@ -7436,6 +7458,8 @@ func testflight(username: String,
                                                                                             RubyCommand.Argument(name: "uses_non_exempt_encryption", value: usesNonExemptEncryption),
                                                                                             RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
                                                                                             RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
+                                                                                            RubyCommand.Argument(name: "app_version", value: appVersion),
+                                                                                            RubyCommand.Argument(name: "build_number", value: buildNumber),
                                                                                             RubyCommand.Argument(name: "first_name", value: firstName),
                                                                                             RubyCommand.Argument(name: "last_name", value: lastName),
                                                                                             RubyCommand.Argument(name: "email", value: email),
@@ -7581,6 +7605,7 @@ func updateAppIdentifier(xcodeproj: String,
    - useAutomaticSigning: Defines if project should use automatic signing
    - teamId: Team ID, is used when upgrading project
    - targets: Specify targets you want to toggle the signing mech. (default to all targets)
+   - buildConfigurations: Specify build_configurations you want to toggle the signing mech. (default to all targets)
    - codeSignIdentity: Code signing identity type (iPhone Developer, iPhone Distribution)
    - profileName: Provisioning profile name to use for code signing
    - profileUuid: Provisioning profile UUID to use for code signing
@@ -7594,6 +7619,7 @@ func updateCodeSigningSettings(path: String,
                                useAutomaticSigning: Bool = false,
                                teamId: String? = nil,
                                targets: [String]? = nil,
+                               buildConfigurations: [String]? = nil,
                                codeSignIdentity: String? = nil,
                                profileName: String? = nil,
                                profileUuid: String? = nil,
@@ -7602,6 +7628,7 @@ func updateCodeSigningSettings(path: String,
                                                                                                               RubyCommand.Argument(name: "use_automatic_signing", value: useAutomaticSigning),
                                                                                                               RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                               RubyCommand.Argument(name: "targets", value: targets),
+                                                                                                              RubyCommand.Argument(name: "build_configurations", value: buildConfigurations),
                                                                                                               RubyCommand.Argument(name: "code_sign_identity", value: codeSignIdentity),
                                                                                                               RubyCommand.Argument(name: "profile_name", value: profileName),
                                                                                                               RubyCommand.Argument(name: "profile_uuid", value: profileUuid),
@@ -8269,6 +8296,8 @@ func uploadToPlayStoreInternalAppSharing(packageName: String,
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers?
    - notifyExternalTesters: Should notify external testers?
+   - appVersion: The version number of the application build to distribute. If the version number is not specified, then the most recent build uploaded to TestFlight will be distributed. If specified, the most recent build for the version number will be distributed
+   - buildNumber: The build number of the application build to distribute. If the build number is not specified, the most recent build is distributed
    - firstName: The tester's first name
    - lastName: The tester's last name
    - email: The tester's email
@@ -8303,6 +8332,8 @@ func uploadToTestflight(username: String,
                         usesNonExemptEncryption: Bool = false,
                         distributeExternal: Bool = false,
                         notifyExternalTesters: Bool = true,
+                        appVersion: String? = nil,
+                        buildNumber: String? = nil,
                         firstName: String? = nil,
                         lastName: String? = nil,
                         email: String? = nil,
@@ -8333,6 +8364,8 @@ func uploadToTestflight(username: String,
                                                                                                       RubyCommand.Argument(name: "uses_non_exempt_encryption", value: usesNonExemptEncryption),
                                                                                                       RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
                                                                                                       RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
+                                                                                                      RubyCommand.Argument(name: "app_version", value: appVersion),
+                                                                                                      RubyCommand.Argument(name: "build_number", value: buildNumber),
                                                                                                       RubyCommand.Argument(name: "first_name", value: firstName),
                                                                                                       RubyCommand.Argument(name: "last_name", value: lastName),
                                                                                                       RubyCommand.Argument(name: "email", value: email),
@@ -8787,4 +8820,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.73]
+// FastlaneRunnerAPIVersion [0.9.74]
