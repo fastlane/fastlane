@@ -194,20 +194,21 @@
 					771D79501D9E69C900D840FA = {
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = G3KGXDXQL9;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 					};
 					77C503031DD3175E00AC8FF0 = {
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = G3KGXDXQL9;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = 771D794C1D9E69C900D840FA /* Build configuration list for PBXProject "automatic_code_signing" */;
+			buildConfigurationList = 771D794C1D9E69C900D840FA /* Build configuration list for PBXProject "update-code-signing-settings" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -394,7 +395,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				INFOPLIST_FILE = demo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -410,7 +411,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				INFOPLIST_FILE = demo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -425,7 +426,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				INFOPLIST_FILE = today/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
@@ -442,7 +443,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G3KGXDXQL9;
 				INFOPLIST_FILE = today/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
@@ -458,7 +459,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		771D794C1D9E69C900D840FA /* Build configuration list for PBXProject "automatic_code_signing" */ = {
+		771D794C1D9E69C900D840FA /* Build configuration list for PBXProject "update-code-signing-settings" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				771D79661D9E69C900D840FA /* Debug */,
@@ -483,6 +484,7 @@
 				77C503141DD3175E00AC8FF0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
