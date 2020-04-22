@@ -155,7 +155,7 @@ module Sigh
                                      optional: true,
                                      default_value: nil),
         FastlaneCore::ConfigItem.new(key: :fail_on_name_taken,
-                                     env_name: "SIGH_PROVISIONING_PROFILE_FAIL_ON_NAME_TAKEN",
+                                     env_name: "SIGH_FAIL_ON_NAME_TAKEN",
                                      description: "Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first",
                                      optional: true,
                                      is_string: false,
