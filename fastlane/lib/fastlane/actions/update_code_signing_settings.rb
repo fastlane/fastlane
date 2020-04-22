@@ -90,10 +90,15 @@ module Fastlane
       end
 
       def self.set_build_setting(configuration, name, value)
-        codesign_build_settings_keys = configuration.build_settings.keys.select { |key| key.to_s.match(/#{name}.*/) }
-        codesign_build_settings_keys.each do |key|
+        # Iterate over any keys that start with this name
+        # This will also set keys that have filtering like [sdk=iphoneos*]
+        keys = configuration.build_settings.keys.select { |key| key.to_s.match(/#{name}.*/) }
+        keys.each do |key|
           configuration.build_settings[key] = value
         end
+
+        # Explicitly set the key with value if keys don't exist
+        configuration.build_settings[name] = value
       end
 
       def self.description
