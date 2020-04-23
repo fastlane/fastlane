@@ -150,7 +150,7 @@ module Screengrab
 
           # https://github.com/fastlane/fastlane/issues/15653#issuecomment-578541663
           "/data/data/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots",
-          
+
           "/data/data/#{app_package_name}/app_screengrab/#{locale}/images/screenshots",
           "/data/data/#{app_package_name}/screengrab/#{locale}/images/screenshots"
         ]
