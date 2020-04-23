@@ -646,7 +646,7 @@ describe Scan do
         log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
         result = @test_command_generator.generate
-        expect(result).to include("-testPlan simple") if FastlaneCore::Helper.xcode_at_least?(10)
+        expect(result).to include("-testPlan simple") if FastlaneCore::Helper.xcode_at_least?(11)
       end
     end
   end

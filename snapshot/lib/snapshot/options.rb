@@ -232,6 +232,11 @@ module Snapshot
                                      env_name: "SNAPSHOT_CLONED_SOURCE_PACKAGES_PATH",
                                      description: "Sets a custom path for Swift Package Manager dependencies",
                                      type: String,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :testplan,
+                                     env_name: "SNAPSHOT_TESTPLAN",
+                                     description: "The testplan associated with the scheme that should be used for testing",
+                                     is_string: true,
                                      optional: true)
       ]
     end
