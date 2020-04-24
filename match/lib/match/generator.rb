@@ -24,7 +24,8 @@ module Match
         team_id: params[:team_id],
         team_name: params[:team_name],
         keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name]),
-        keychain_password: params[:keychain_password]
+        keychain_password: params[:keychain_password],
+        profile_name: params[:profile_name]
       })
 
       Cert.config = arguments
@@ -60,7 +61,11 @@ module Match
         names << params[:platform]
       end
 
-      profile_name = names.join(" ")
+      if !params[:profile_name] || params[:profile_name].to_s.empty?
+        profile_name = names.join(" ")
+      else
+        profile_name = params[:profile_name]
+      end
 
       values = {
         app_identifier: app_identifier,
