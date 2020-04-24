@@ -61,7 +61,7 @@ module Match
         names << params[:platform]
       end
 
-      if !params[:profile_name] || params[:profile_name].to_s.empty?
+      if params[:profile_name].to_s.empty?
         profile_name = names.join(" ")
       else
         profile_name = params[:profile_name]
