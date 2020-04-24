@@ -24,8 +24,7 @@ module Match
         team_id: params[:team_id],
         team_name: params[:team_name],
         keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name]),
-        keychain_password: params[:keychain_password],
-        profile_name: params[:profile_name]
+        keychain_password: params[:keychain_password]
       })
 
       Cert.config = arguments
