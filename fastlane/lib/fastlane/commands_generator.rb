@@ -159,7 +159,7 @@ module Fastlane
           server = Fastlane::SocketServer.new(
             command_executor: command_executor,
             connection_timeout: connection_timeout,
-            stay_alive: stay_alive, 
+            stay_alive: stay_alive,
             port: port
           )
           result = server.start
