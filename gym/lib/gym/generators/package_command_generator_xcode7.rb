@@ -86,7 +86,8 @@ module Gym
         return path if path
 
         path = Dir[File.join(temporary_output_path, "*.pkg")].last
-        # We need to process generic PKG
+        appPath = Dir[File.join(temporary_output_path, "*.app")].last
+        # We need to process generic PKG or APP
         if path
           # Try to find PKG file in the output directory, used when app thinning was not set
           Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
@@ -98,6 +99,10 @@ module Gym
           path = files.min_by(&:length)
           Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
           FileUtils.cp(path, Gym.cache[:pkg_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:pkg_path]).downcase).zero?
+        elsif appPath
+          # Try to find .app file in the output directory. This is used when macOS is set and .app is being generated.
+          Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.app")
+          FileUtils.mv(appPath, Gym.cache[:pkg_path]) unless File.expand_path(appPath).casecmp(File.expand_path(Gym.cache[:pkg_path]).downcase).zero?
         else
           ErrorHandler.handle_empty_archive unless path
         end
