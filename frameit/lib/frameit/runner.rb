@@ -82,8 +82,13 @@ module Frameit
     # Loads the config (colors, background, texts, etc.)
     # Don't use this method to access the actual text and use `fetch_texts` instead
     def create_config(screenshot_path)
+      # Screengrab pulls screenshots to a different folder location
+      # frameit only handles two levels of folders, to not break
+      # compatibility with Supply we look into a different path for Android
+      # Issue https://github.com/fastlane/fastlane/issues/16289
       config_path = File.join(File.expand_path("..", screenshot_path), "Framefile.json")
       config_path = File.join(File.expand_path("../..", screenshot_path), "Framefile.json") unless File.exist?(config_path)
+      config_path = File.join(File.expand_path("../../../..", screenshot_path), "Framefile.json") unless File.exist?(config_path)
       file = ConfigParser.new.load(config_path)
       return {} unless file # no config file at all
       file.fetch_value(screenshot_path)
