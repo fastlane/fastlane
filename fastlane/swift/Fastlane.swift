@@ -8278,7 +8278,7 @@ func uploadToPlayStoreInternalAppSharing(packageName: String,
  Upload new binary to App Store Connect for TestFlight beta testing (via _pilot_)
 
  - parameters:
-   - username: Your Apple ID Username
+   - username: Your Apple ID Username (optional - if nil, will fallback to other authentication methods like spaceauth or env variables)
    - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
    - appPlatform: The platform to use (optional)
    - appleId: Apple ID property in the App Information section in App Store Connect
@@ -8314,7 +8314,7 @@ func uploadToPlayStoreInternalAppSharing(packageName: String,
  More details can be found on https://docs.fastlane.tools/actions/pilot/.
  This integration will only do the TestFlight upload.
 */
-func uploadToTestflight(username: String,
+func uploadToTestflight(username: String? = nil,
                         appIdentifier: String? = nil,
                         appPlatform: String = "ios",
                         appleId: String? = nil,
