@@ -422,7 +422,7 @@ func appledoc(input: Any,
  Alias for the `upload_to_app_store` action
 
  - parameters:
-   - username: Your Apple ID Username
+   - username: Your Apple ID Username (optional - will fall back to prompt if needed)
    - appIdentifier: The bundle identifier of your app
    - appVersion: The version that should be edited or created
    - ipa: Path to your ipa file
@@ -490,7 +490,7 @@ func appledoc(input: Any,
  `_upload_to_app_store_(force: true)`
  If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
 */
-func appstore(username: String,
+func appstore(username: String? = nil,
               appIdentifier: String? = nil,
               appVersion: String? = nil,
               ipa: String? = nil,
@@ -4944,7 +4944,7 @@ func pem(development: Bool = false,
  Alias for the `upload_to_testflight` action
 
  - parameters:
-   - username: Your Apple ID Username
+   - username: Your Apple ID Username (optional - will fall back to prompt if needed)
    - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
    - appPlatform: The platform to use (optional)
    - appleId: Apple ID property in the App Information section in App Store Connect
@@ -4980,7 +4980,7 @@ func pem(development: Bool = false,
  More details can be found on https://docs.fastlane.tools/actions/pilot/.
  This integration will only do the TestFlight upload.
 */
-func pilot(username: String,
+func pilot(username: String? = nil,
            appIdentifier: String? = nil,
            appPlatform: String = "ios",
            appleId: String? = nil,
@@ -7372,7 +7372,7 @@ func testfairy(apiKey: String,
  Alias for the `upload_to_testflight` action
 
  - parameters:
-   - username: Your Apple ID Username
+   - username: Your Apple ID Username (optional - will fall back to prompt if needed)
    - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
    - appPlatform: The platform to use (optional)
    - appleId: Apple ID property in the App Information section in App Store Connect
@@ -7408,7 +7408,7 @@ func testfairy(apiKey: String,
  More details can be found on https://docs.fastlane.tools/actions/pilot/.
  This integration will only do the TestFlight upload.
 */
-func testflight(username: String,
+func testflight(username: String? = nil,
                 appIdentifier: String? = nil,
                 appPlatform: String = "ios",
                 appleId: String? = nil,
@@ -7932,7 +7932,7 @@ func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/api/0",
  Upload metadata and binary to App Store Connect (via _deliver_)
 
  - parameters:
-   - username: Your Apple ID Username
+   - username: Your Apple ID Username (optional - will fall back to prompt if needed)
    - appIdentifier: The bundle identifier of your app
    - appVersion: The version that should be edited or created
    - ipa: Path to your ipa file
@@ -8000,7 +8000,7 @@ func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/api/0",
  `_upload_to_app_store_(force: true)`
  If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
 */
-func uploadToAppStore(username: String,
+func uploadToAppStore(username: String? = nil,
                       appIdentifier: String? = nil,
                       appVersion: String? = nil,
                       ipa: String? = nil,
@@ -8278,7 +8278,7 @@ func uploadToPlayStoreInternalAppSharing(packageName: String,
  Upload new binary to App Store Connect for TestFlight beta testing (via _pilot_)
 
  - parameters:
-   - username: Your Apple ID Username (optional - if nil, will fallback to other authentication methods like spaceauth or env variables)
+   - username: Your Apple ID Username (optional - will fall back to prompt if needed)
    - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
    - appPlatform: The platform to use (optional)
    - appleId: Apple ID property in the App Information section in App Store Connect
