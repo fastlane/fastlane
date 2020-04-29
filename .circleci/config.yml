@@ -118,6 +118,12 @@ jobs:
       xcode: '11.4.0'
     environment:
       _RUBY_VERSION: '2.6'
+  'Execute tests on macOS (Xcode 11.4.0, Ruby 2.7)':
+    <<: *tests_macos
+    macos:
+      xcode: '11.4.0'
+    environment:
+      _RUBY_VERSION: '2.7'
 
   'Execute tests on Ubuntu':
     environment:
@@ -221,7 +227,7 @@ jobs:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
     docker:
-      - image: circleci/ruby:2.3
+      - image: circleci/ruby:2.4
     shell: /bin/bash --login -eo pipefail
     steps:
       - *cache_restore_git
@@ -244,6 +250,7 @@ workflows:
       - 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)'
       - 'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)'
       - 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)'
+      - 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.7)'
       - 'Execute tests on Ubuntu'
 
       - "Validate Fastlane.swift Generation"
