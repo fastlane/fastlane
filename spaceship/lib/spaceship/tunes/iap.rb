@@ -132,6 +132,21 @@ module Spaceship
         return nil
       end
 
+      # generate app-specific shared secret (or regenerate if exists)
+      def generate_shared_secret
+        client.generate_shared_secret(app_id: self.application.apple_id)
+      end
+
+      # retrieve app-specific shared secret
+      # @param create (Boolean) Create new shared secret if does not exist
+      def get_shared_secret(create: false)
+        secret = client.get_shared_secret(app_id: self.application.apple_id)
+        if create && secret.nil?
+          secret = generate_shared_secret
+        end
+        secret
+      end
+
       private
 
       def find_product_with_retries(product_id, max_tries)
