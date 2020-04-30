@@ -159,7 +159,7 @@ module Fastlane
       require 'json'
       url = "https://rubygems.org/api/v1/gems/#{gem_name}.json"
       begin
-        JSON.parse(::OpenURI.open_uri(url).read)
+        JSON.parse(URI.open(url).read)
       rescue
         nil
       end
