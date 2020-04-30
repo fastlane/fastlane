@@ -215,7 +215,7 @@ module Fastlane
       # Bundler.with_clean_env solves this problem by resetting Bundler state before the
       # exec'd call gets merged into this process.
 
-      Bundler.with_clean_env do
+      Bundler.with_original_env do
         yield if block_given?
       end
     end
