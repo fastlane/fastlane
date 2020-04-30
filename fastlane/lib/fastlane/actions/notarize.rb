@@ -7,6 +7,7 @@ module Fastlane
         try_early_stapling = params[:try_early_stapling]
         print_log = params[:print_log]
         verbose = params[:verbose]
+        remove_compressed_package = params[:remove_compressed_package]
 
         # Compress and read bundle identifier only for .app bundle.
         compressed_package_path = nil
@@ -44,7 +45,7 @@ module Fastlane
           log: verbose
         )
 
-        FileUtils.rm_rf(compressed_package_path) if compressed_package_path
+        FileUtils.rm_rf(compressed_package_path) if compressed_package_path && remove_compressed_package
 
         notarization_upload_plist = Plist.parse_xml(notarization_upload_response)
         notarization_request_id = notarization_upload_plist['notarization-upload']['RequestUUID']
@@ -167,6 +168,12 @@ module Fastlane
                                        description: 'Whether to log requests',
                                        optional: true,
                                        default_value: false,
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :remove_compressed_package,
+                                       env_name: 'FL_REMOVE_COMPRESSED_PACKAGE',
+                                       description: 'Whether to remove generated compressed package',
+                                       optional: true,
+                                       default_value: true,
                                        type: Boolean)
         ]
       end
