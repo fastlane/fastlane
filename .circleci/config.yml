@@ -76,6 +76,8 @@ jobs:
           command: |
             mkdir -p ~/test-reports
             echo ${_RUBY_VERSION} > .ruby-version
+            echo 'chruby ruby-${_RUBY_VERSION}' >> ~/.bash_profile
+            chruby ${_RUBY_VERSION}
             brew untap caskroom/versions || true
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
@@ -118,6 +120,12 @@ jobs:
       xcode: '11.4.0'
     environment:
       _RUBY_VERSION: '2.6'
+  'Execute tests on macOS (Xcode 11.4.0, Ruby 2.7)':
+    <<: *tests_macos
+    macos:
+      xcode: '11.4.0'
+    environment:
+      _RUBY_VERSION: '2.7'
 
   'Execute tests on Ubuntu':
     environment:
@@ -244,6 +252,7 @@ workflows:
       - 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)'
       - 'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)'
       - 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)'
+      - 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.7)'
       - 'Execute tests on Ubuntu'
 
       - "Validate Fastlane.swift Generation"
