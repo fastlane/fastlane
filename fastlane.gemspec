@@ -47,7 +47,7 @@ Gem::Specification.new do |spec|
     "docs_url" => "https://docs.fastlane.tools"
   }
 
-  spec.required_ruby_version = '>= 2.4.0'
+  spec.required_ruby_version = '>= 2.4'
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
