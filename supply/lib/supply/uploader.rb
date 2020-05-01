@@ -2,7 +2,7 @@ module Supply
   # rubocop:disable Metrics/ClassLength
   class Uploader
     def perform_upload
-      FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], mask_keys: [:json_key_data], title: "Summary for supply #{Fastlane::VERSION}")
+      FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], mask_keys: [:json_key_data, :json_token_data], title: "Summary for supply #{Fastlane::VERSION}")
 
       client.begin_edit(package_name: Supply.config[:package_name])
 
