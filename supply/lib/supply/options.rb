@@ -2,6 +2,7 @@ require 'fastlane_core/configuration/config_item'
 require 'credentials_manager/appfile_config'
 
 module Supply
+  # rubocop:disable Metrics/ClassLength
   class Options
     # rubocop:disable Metrics/PerceivedComplexity
     def self.available_options
@@ -334,4 +335,5 @@ module Supply
     end
     # rubocop:enable Metrics/PerceivedComplexity
   end
+  # rubocop:enable Metrics/ClassLength
 end
