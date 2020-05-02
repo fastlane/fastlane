@@ -85,7 +85,7 @@ module Scan
     def pipe
       pipe = ["| tee '#{xcodebuild_log_path}'"]
 
-      if Scan.config[:output_style] == 'raw'
+      if Scan.config[:disable_xcpretty] || Scan.config[:output_style] == 'raw'
         return pipe
       end
 
