@@ -180,6 +180,11 @@ module Scan
                                      description: "Should the HTML report be opened when tests are completed?",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
+                                     env_name: "SCAN_DISABLE_XCPRETTY",
+                                     description: "Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table",
+                                     type: Boolean,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :output_directory,
                                      short_option: "-o",
                                      env_name: "SCAN_OUTPUT_DIRECTORY",
@@ -191,7 +196,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :output_style,
                                      short_option: "-b",
                                      env_name: "SCAN_OUTPUT_STYLE",
-                                     description: "Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty)",
+                                     description: "Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty during xcodebuild)",
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Invalid output_style #{value}") unless ['standard', 'basic', 'rspec', 'raw'].include?(value)
