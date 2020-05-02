@@ -141,10 +141,12 @@ module Fastlane
         c.description = 'Starts local socket server and enables only a single local connection'
         c.option('-s', '--stay_alive', 'Keeps socket server up even after error or disconnects, requires CTRL-C to kill.')
         c.option('-c seconds', '--connection_timeout', 'Sets connection established timeout')
+        c.option('-p port', '--port', "Sets the port on localhost for the socket connection")
         c.action do |args, options|
           default_connection_timeout = 5
           stay_alive = options.stay_alive || false
           connection_timeout = options.connection_timeout || default_connection_timeout
+          port = options.port || 2000
 
           if stay_alive && options.connection_timeout.nil?
             UI.important("stay_alive is set, but the connection timeout is not, this will give you #{default_connection_timeout} seconds to (re)connect")
@@ -157,7 +159,8 @@ module Fastlane
           server = Fastlane::SocketServer.new(
             command_executor: command_executor,
             connection_timeout: connection_timeout,
-            stay_alive: stay_alive
+            stay_alive: stay_alive,
+            port: port
           )
           result = server.start
           UI.success("Result: #{result}") if result
