@@ -329,7 +329,7 @@ Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS scre
 
 ## Use a clean status bar
 
-You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
+You can set `override_status_bar` to `true` in snapshot to set the status bar to Tuesday January 9th at 9:41AM with full battery and reception.
 
 ## Gray artifacts around text
 
