@@ -102,6 +102,26 @@ module Snapshot
       end
     end
 
+    def override_status_bar(device_type)
+        device_udid = TestCommandGenerator.device_udid(device_type)
+
+        UI.message("Launch Simulator #{device_type}")
+        Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+
+        UI.message("Overriding Status Bar")
+        Helper.backticks("xcrun simctl status_bar #{device_udid} override --time 9:41 --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100 &> /dev/null")
+    end
+
+    def clear_status_bar(device_type)
+        device_udid = TestCommandGenerator.device_udid(device_type)
+
+        UI.message("Launch Simulator #{device_type}")
+        Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+
+        UI.message("Clearing Status Bar Override")
+        Helper.backticks("xcrun simctl status_bar #{device_udid} clear &> /dev/null")
+    end
+
     def uninstall_app(device_type)
       launcher_config.app_identifier ||= UI.input("App Identifier: ")
       device_udid = TestCommandGenerator.device_udid(device_type)
