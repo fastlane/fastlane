@@ -126,7 +126,7 @@ jobs:
       LANG: 'C.UTF-8'
       FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
     docker:
-      - image: 'fastlanetools/ci:0.1.0'
+      - image: 'fastlanetools/ci:0.2.0'
     steps:
       - *cache_restore_git
       - checkout
