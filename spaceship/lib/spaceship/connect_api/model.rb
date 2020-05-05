@@ -25,7 +25,7 @@ module Spaceship
       # Example:
       # { "minOsVersion" => "min_os_version" }
       #
-      # Creates attr_write and attr_reader for :min_os_version
+      # Creates attr_write and attr_/Users/tbodt/Developer/projects/fastlane/spaceship/spec/connect_api/models/model_spec.rb/Users/tbodt/Developer/projects/fastlane/spaceship/spec/connect_api/models/model_spec.rbreader for :min_os_version
       # Creates alias for :minOsVersion to :min_os_version
       #
       def attr_mapping(attr_map)
@@ -48,6 +48,12 @@ module Spaceship
           alias_method(key_reader, reader)
           alias_method(key_writer, writer)
         end
+      end
+
+      def to_json(*options)
+        instance_variables.map do |var|
+          [var.to_s[1..-1], instance_variable_get(var)]
+        end.to_h.to_json(*options)
       end
     end
 
