@@ -181,6 +181,29 @@ module Spaceship
         Client.instance.post("builds/#{build_id}/relationships/betaGroups", body)
       end
 
+      def create_beta_group(app_id: nil, group_name: nil, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
+        body = {
+          data: {
+            attributes: {
+              name: group_name,
+              publicLinkEnabled: public_link_enabled,
+              publicLinkLimit: public_link_limit,
+              publicLinkLimitEnabled: public_link_limit_enabled
+            },
+            relationships: {
+              app: {
+                data: {
+                  id: app_id,
+                  type: "apps"
+                }
+              }
+            },
+            type: "betaGroups"
+          }
+        }
+        Client.instance.post("betaGroups", body)
+      end
+
       #
       # betaTesters
       #
@@ -325,6 +348,12 @@ module Spaceship
       def get_beta_feedback(filter: {}, includes: nil, limit: nil, sort: nil)
         params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
         Client.instance.get("betaFeedbacks", params)
+      end
+
+      def delete_beta_feedback(feedback_id: nil)
+        raise "Feedback id is nil" if feedback_id.nil?
+
+        Client.instance.delete("betaFeedbacks/#{feedback_id}")
       end
     end
   end

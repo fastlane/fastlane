@@ -27,7 +27,7 @@ module Scan
       UI.user_error!("No project/workspace found")
     end
 
-    def options
+    def options # rubocop:disable Metrics/PerceivedComplexity
       config = Scan.config
 
       options = []
@@ -37,11 +37,17 @@ module Scan
       options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
       options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
       options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
-      options << "-maximum-concurrent-test-simulator-destinations #{config[:max_concurrent_simulators]}" if config[:max_concurrent_simulators]
-      options << "-disable-concurrent-testing" if config[:disable_concurrent_testing]
+      options << "-parallel-testing-worker-count #{config[:concurrent_workers]}" if config[:concurrent_workers]
+      if FastlaneCore::Helper.xcode_at_least?(10)
+        options << "-maximum-concurrent-test-simulator-destinations #{config[:max_concurrent_simulators]}" if config[:max_concurrent_simulators]
+        options << "-disable-concurrent-testing" if config[:disable_concurrent_testing]
+      end
       options << "-enableCodeCoverage #{config[:code_coverage] ? 'YES' : 'NO'}" unless config[:code_coverage].nil?
       options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
       options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
+      if FastlaneCore::Helper.xcode_at_least?(11)
+        options << "-testPlan '#{config[:testplan]}'" if config[:testplan]
+      end
       options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
       options << config[:xcargs] if config[:xcargs]
 
@@ -79,7 +85,7 @@ module Scan
     def pipe
       pipe = ["| tee '#{xcodebuild_log_path}'"]
 
-      if Scan.config[:output_style] == 'raw'
+      if Scan.config[:disable_xcpretty] || Scan.config[:output_style] == 'raw'
         return pipe
       end
 
@@ -148,7 +154,8 @@ module Scan
 
     def result_bundle_path
       unless Scan.cache[:result_bundle_path]
-        path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + ".test_result"
+        ext = FastlaneCore::Helper.xcode_version.to_i >= 11 ? '.xcresult' : '.test_result'
+        path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + ext
         if File.directory?(path)
           FileUtils.remove_dir(path)
         end

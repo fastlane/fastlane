@@ -124,6 +124,11 @@ module Scan
                                      end),
 
         # other test options
+        FastlaneCore::ConfigItem.new(key: :testplan,
+                                     env_name: "SCAN_TESTPLAN",
+                                     description: "The testplan associated with the scheme that should be used for testing",
+                                     is_string: true,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :xctestrun,
                                      short_option: "-X",
                                      env_name: "SCAN_XCTESTRUN",
@@ -175,6 +180,11 @@ module Scan
                                      description: "Should the HTML report be opened when tests are completed?",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
+                                     env_name: "SCAN_DISABLE_XCPRETTY",
+                                     description: "Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table",
+                                     type: Boolean,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :output_directory,
                                      short_option: "-o",
                                      env_name: "SCAN_OUTPUT_DIRECTORY",
@@ -186,7 +196,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :output_style,
                                      short_option: "-b",
                                      env_name: "SCAN_OUTPUT_STYLE",
-                                     description: "Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty)",
+                                     description: "Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty during xcodebuild)",
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Invalid output_style #{value}") unless ['standard', 'basic', 'rspec', 'raw'].include?(value)
@@ -254,6 +264,11 @@ module Scan
                                      default_value: false),
 
         # concurrency
+        FastlaneCore::ConfigItem.new(key: :concurrent_workers,
+                                     type: Integer,
+                                     env_name: "SCAN_CONCURRENT_WORKERS",
+                                     description: "Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :max_concurrent_simulators,
                                      type: Integer,
                                      env_name: "SCAN_MAX_CONCURRENT_SIMULATORS",
@@ -398,7 +413,12 @@ module Scan
                                     description: "Allows for override of the default `xcodebuild` command",
                                     type: String,
                                     optional: true,
-                                    default_value: "env NSUnbufferedIO=YES xcodebuild")
+                                    default_value: "env NSUnbufferedIO=YES xcodebuild"),
+        FastlaneCore::ConfigItem.new(key: :cloned_source_packages_path,
+                                    env_name: "SCAN_CLONED_SOURCE_PACKAGES_PATH",
+                                    description: "Sets a custom path for Swift Package Manager dependencies",
+                                    type: String,
+                                    optional: true)
 
       ]
     end

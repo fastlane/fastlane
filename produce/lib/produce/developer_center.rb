@@ -59,7 +59,7 @@ module Produce
         app = Spaceship.app.create!(bundle_id: app_identifier,
                                          name: app_name,
                                          enable_services: enable_services,
-                                         mac: Produce.config[:platform] == "osx")
+                                         mac: platform == "osx")
 
         if app.name != Produce.config[:app_name]
           UI.important("Your app name includes non-ASCII characters, which are not supported by the Apple Developer Portal.")
@@ -122,8 +122,17 @@ module Produce
 
     private
 
+    def platform
+      # This was added to support creation of multiple platforms
+      # Produce::ItunesConnect can take an array of platforms to create for App Store Connect
+      # but the Developer Center is now platform agnostic so we choose any platform here
+      #
+      # Platform won't be needed at all in the future when this is change over to use Spaceship::ConnectAPI
+      (Produce.config[:platforms] || []).first || Produce.config[:platform]
+    end
+
     def app_exists?
-      Spaceship.app.find(app_identifier, mac: Produce.config[:platform] == "osx") != nil
+      Spaceship.app.find(app_identifier, mac: platform == "osx") != nil
     end
 
     def login

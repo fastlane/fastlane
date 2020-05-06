@@ -28,6 +28,9 @@ module Spaceship
       # The developer took the app from the App Store
       DEVELOPER_REMOVED_FROM_SALE = "Developer Removed From Sale"
 
+      # In-app purchase need developer's action
+      DEVELOPER_ACTION_NEEDED = "Developer Action Needed"
+
       # Get the iap status matching based on a string (given by App Store Connect)
       def self.get_from_string(text)
         mapping = {
@@ -38,7 +41,8 @@ module Spaceship
           'readyForSale' => APPROVED,
           'deleted' => DELETED,
           'rejected' => REJECTED,
-          'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE
+          'developerRemovedFromSale' => DEVELOPER_REMOVED_FROM_SALE,
+          'developerActionNeeded' => DEVELOPER_ACTION_NEEDED
         }
 
         mapping.each do |itc_status, readable_status|

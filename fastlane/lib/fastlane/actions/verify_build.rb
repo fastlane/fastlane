@@ -46,7 +46,7 @@ module Fastlane
 
         parts = cert_info.strip.split(/\r?\n/)
         parts.each do |part|
-          if part =~ /\AAuthority=i(Phone|OS)/
+          if part =~ /\AAuthority=(iPhone|iOS|Apple)\s(Distribution|Development)/
             type = part.split('=')[1].split(':')[0]
             values['provisioning_type'] = type.downcase =~ /distribution/i ? "distribution" : "development"
           end

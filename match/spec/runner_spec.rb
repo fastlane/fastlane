@@ -54,6 +54,10 @@ describe Match do
             google_cloud_bucket_name: "",
             google_cloud_keys_file: "",
             google_cloud_project_id: "",
+            s3_region: "",
+            s3_access_key: "",
+            s3_secret_access_key: "",
+            s3_bucket: "",
             readonly: false,
             username: values[:username],
             team_id: nil,
@@ -64,7 +68,7 @@ describe Match do
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
           allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
           allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
-          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory).and_return(cert_path)
+          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(cert_path)
           expect(Match::Generator).to receive(:generate_provisioning_profile).with(params: config,
                                                                                 prov_type: :appstore,
                                                                            certificate_id: "something",
@@ -83,7 +87,7 @@ describe Match do
           spaceship = "spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
-          expect(spaceship).to receive(:certificate_exists).and_return(true)
+          expect(spaceship).to receive(:certificates_exists).and_return(true)
           expect(spaceship).to receive(:profile_exists).and_return(true)
           expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 
@@ -131,6 +135,10 @@ describe Match do
             google_cloud_bucket_name: "",
             google_cloud_keys_file: "",
             google_cloud_project_id: "",
+            s3_region: "",
+            s3_access_key: "",
+            s3_secret_access_key: "",
+            s3_bucket: "",
             readonly: false,
             username: values[:username],
             team_id: nil,
@@ -157,7 +165,7 @@ describe Match do
           spaceship = "spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
-          expect(spaceship).to receive(:certificate_exists).and_return(true)
+          expect(spaceship).to receive(:certificates_exists).and_return(true)
           expect(spaceship).to receive(:profile_exists).and_return(true)
           expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 
@@ -207,6 +215,10 @@ describe Match do
             google_cloud_bucket_name: "",
             google_cloud_keys_file: "",
             google_cloud_project_id: "",
+            s3_region: "",
+            s3_access_key: "",
+            s3_secret_access_key: "",
+            s3_bucket: "",
             readonly: false,
             username: values[:username],
             team_id: nil,
@@ -269,6 +281,10 @@ describe Match do
             google_cloud_bucket_name: "",
             google_cloud_keys_file: "",
             google_cloud_project_id: "",
+            s3_region: "",
+            s3_access_key: "",
+            s3_secret_access_key: "",
+            s3_bucket: "",
             readonly: false,
             username: values[:username],
             team_id: nil,
@@ -279,7 +295,7 @@ describe Match do
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
           allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
           allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
-          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory).and_return(cert_path)
+          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(cert_path)
           expect(Match::Generator).to_not(receive(:generate_provisioning_profile))
           expect(FastlaneCore::ProvisioningProfile).to_not(receive(:install))
           expect(fake_storage).to receive(:save_changes!).with(
@@ -292,7 +308,7 @@ describe Match do
           spaceship = "spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
-          expect(spaceship).to receive(:certificate_exists).and_return(true)
+          expect(spaceship).to receive(:certificates_exists).and_return(true)
           expect(spaceship).to_not(receive(:profile_exists))
           expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
 

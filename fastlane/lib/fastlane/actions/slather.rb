@@ -241,7 +241,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ignore,
                                        env_name: "FL_SLATHER_IGNORE",
                                        description: "Tell slather to ignore files matching a path or any path from an array of paths",
-                                       is_string: false,
+                                       type: Array,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_SLATHER_VERBOSE",

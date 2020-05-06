@@ -42,6 +42,9 @@ protocol ScanfileProtocol: class {
   /// Array of strings matching Test Bundle/Test Suite/Test Cases to skip
   var skipTesting: String? { get }
 
+  /// The testplan associated with the scheme that should be used for testing
+  var testplan: String? { get }
+
   /// Run tests using the provided `.xctestrun` file
   var xctestrun: String? { get }
 
@@ -101,6 +104,9 @@ protocol ScanfileProtocol: class {
 
   /// Generate the json compilation database with clang naming convention (compile_commands.json)
   var useClangReportName: Bool { get }
+
+  /// Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
+  var concurrentWorkers: Int? { get }
 
   /// Constrain the number of simulator devices on which to test concurrently. Equivalent to -maximum-concurrent-test-simulator-destinations
   var maxConcurrentSimulators: Int? { get }
@@ -168,6 +174,9 @@ protocol ScanfileProtocol: class {
   /// Allows for override of the default `xcodebuild` command
   var xcodebuildCommand: String { get }
 
+  /// Sets a custom path for Swift Package Manager dependencies
+  var clonedSourcePackagesPath: String? { get }
+
   /// Should this step stop the build if the tests fail? Set this to false if you're using trainer
   var failBuild: Bool { get }
 }
@@ -187,6 +196,7 @@ extension ScanfileProtocol {
   var appIdentifier: String? { return nil }
   var onlyTesting: String? { return nil }
   var skipTesting: String? { return nil }
+  var testplan: String? { return nil }
   var xctestrun: String? { return nil }
   var toolchain: String? { return nil }
   var clean: Bool { return false }
@@ -207,6 +217,7 @@ extension ScanfileProtocol {
   var shouldZipBuildProducts: Bool { return false }
   var resultBundle: Bool { return false }
   var useClangReportName: Bool { return false }
+  var concurrentWorkers: Int? { return nil }
   var maxConcurrentSimulators: Int? { return nil }
   var disableConcurrentTesting: Bool { return false }
   var skipBuild: Bool { return false }
@@ -229,9 +240,10 @@ extension ScanfileProtocol {
   var destination: String? { return nil }
   var customReportFileName: String? { return nil }
   var xcodebuildCommand: String { return "env NSUnbufferedIO=YES xcodebuild" }
+  var clonedSourcePackagesPath: String? { return nil }
   var failBuild: Bool { return true }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.24]
+// FastlaneRunnerAPIVersion [0.9.27]
