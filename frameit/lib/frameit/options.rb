@@ -1,4 +1,5 @@
 require 'fastlane_core/configuration/config_item'
+require 'fastlane/actions/actions_helper'
 
 require_relative 'module'
 require_relative 'config_parser'
