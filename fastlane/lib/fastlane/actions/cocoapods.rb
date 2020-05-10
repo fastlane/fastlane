@@ -156,7 +156,7 @@ module Fastlane
         [
           'cocoapods',
           'cocoapods(
-            clean: true,
+            clean_install: true,
             podfile: "./CustomPodfile"
           )'
         ]
