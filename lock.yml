@@ -1,4 +1,4 @@
-# 
+# Locking closed, inactive issues and pull requests
 name: Locking issues and pull requests
 on:
   schedule:
