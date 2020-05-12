@@ -132,12 +132,12 @@ module CredentialsManager
       setter(:json_key_data_raw, *args, &block)
     end
 
-    def json_token_file(*args, &block)
-      setter(:json_token_file, *args, &block)
+    def refresh_token_file(*args, &block)
+      setter(:refresh_token_file, *args, &block)
     end
 
-    def json_token_data_raw(*args, &block)
-      setter(:json_token_data_raw, *args, &block)
+    def refresh_token_data_raw(*args, &block)
+      setter(:refresh_token_data_raw, *args, &block)
     end
 
     def issuer(*args, &block)

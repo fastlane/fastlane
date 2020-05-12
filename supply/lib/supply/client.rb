@@ -45,7 +45,7 @@ module Supply
     # Initializes the service and its auth_client using the specified information
     # @param service_account_json: The raw service account Json data
     def initialize(service_account_json: nil, params: nil)
-      if params[:json_token] || params[:json_token_data]
+      if params[:refresh_token] || params[:refresh_token_data]
         auth_client = Google::Auth::UserRefreshCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
       else
         auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
@@ -125,10 +125,10 @@ module Supply
           client_email: params[:issuer]
         }
         service_account_json = StringIO.new(JSON.dump(cred_json))
-      elsif params[:json_token]
-        service_account_json = File.open(File.expand_path(params[:json_token]))
-      elsif params[:json_token_data]
-        service_account_json = StringIO.new(params[:json_token_data])
+      elsif params[:refresh_token]
+        service_account_json = File.open(File.expand_path(params[:refresh_token]))
+      elsif params[:refresh_token_data]
+        service_account_json = StringIO.new(params[:refresh_token_data])
       else
         UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
       end
