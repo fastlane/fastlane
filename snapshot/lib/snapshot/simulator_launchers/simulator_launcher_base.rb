@@ -1,4 +1,5 @@
 require 'plist'
+require 'time'
 
 require_relative '../module'
 require_relative '../test_command_generator'
@@ -100,6 +101,26 @@ module Snapshot
           end
         end
       end
+    end
+
+    def override_status_bar(device_type)
+      device_udid = TestCommandGenerator.device_udid(device_type)
+
+      UI.message("Launch Simulator #{device_type}")
+      Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+
+      UI.message("Overriding Status Bar")
+
+      # The time needs to be passed as ISO8601 so the simulator formats it correctly
+      time = Time.new(2007, 1, 9, 9, 41, 0)
+      Helper.backticks("xcrun simctl status_bar #{device_udid} override --time #{time.iso8601} --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100 &> /dev/null")
+    end
+
+    def clear_status_bar(device_type)
+      device_udid = TestCommandGenerator.device_udid(device_type)
+
+      UI.message("Clearing Status Bar Override")
+      Helper.backticks("xcrun simctl status_bar #{device_udid} clear &> /dev/null")
     end
 
     def uninstall_app(device_type)
