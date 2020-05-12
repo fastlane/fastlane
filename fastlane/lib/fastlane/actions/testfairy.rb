@@ -2,6 +2,8 @@ module Fastlane
   module Actions
     module SharedValues
       TESTFAIRY_BUILD_URL = :TESTFAIRY_BUILD_URL
+      TESTFAIRY_DOWNLOAD_URL = :TESTFAIRY_DOWNLOAD_URL
+      TESTFAIRY_LANDING_PAGE = :TESTFAIRY_LANDING_PAGE
     end
 
     class TestfairyAction < Action
@@ -107,6 +109,8 @@ module Fastlane
         response = self.upload_build(params[:upload_url], path, client_options, params[:timeout])
         if parse_response(response)
           UI.success("Build URL: #{Actions.lane_context[SharedValues::TESTFAIRY_BUILD_URL]}")
+          UI.success("Download URL: #{Actions.lane_context[SharedValues::TESTFAIRY_DOWNLOAD_URL]}")
+          UI.success("Landing Page URL: #{Actions.lane_context[SharedValues::TESTFAIRY_LANDING_PAGE]}")
           UI.success("Build successfully uploaded to TestFairy.")
         else
           UI.user_error!("Error when trying to upload ipa to TestFairy")
@@ -120,8 +124,12 @@ module Fastlane
       def self.parse_response(response)
         if response.body && response.body.key?('status') && response.body['status'] == 'ok'
           build_url = response.body['build_url']
+          app_url = response.body['app_url']
+          landing_page_url = response.body['landing_page_url']
 
           Actions.lane_context[SharedValues::TESTFAIRY_BUILD_URL] = build_url
+          Actions.lane_context[SharedValues::TESTFAIRY_DOWNLOAD_URL] = app_url
+          Actions.lane_context[SharedValues::TESTFAIRY_LANDING_PAGE] = landing_page_url
 
           return true
         else
@@ -244,7 +252,12 @@ module Fastlane
             api_key: "...",
             ipa: "./ipa_file.ipa",
             comment: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
-          )'
+          )',
+          'testfairy(
+            api_key: "...",
+            apk: "../build/app/outputs/apk/qa/release/app-qa-release.apk",
+            comment: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
+           )'
         ]
       end
 
@@ -254,12 +267,14 @@ module Fastlane
 
       def self.output
         [
-          ['TESTFAIRY_BUILD_URL', 'URL of the newly uploaded build']
+          ['TESTFAIRY_BUILD_URL', 'URL for the sessions of the newly uploaded build'],
+          ['TESTFAIRY_DOWNLOAD_URL', 'URL directly to the newly uploaded build'],
+          ['TESTFAIRY_LANDING_PAGE', 'URL of the build\'s landing page']
         ]
       end
 
       def self.authors
-        ["taka0125", "tcurdt", "vijaysharm"]
+        ["taka0125", "tcurdt", "vijaysharm", "cdm2012"]
       end
 
       def self.is_supported?(platform)
