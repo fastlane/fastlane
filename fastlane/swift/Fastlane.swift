@@ -7060,6 +7060,7 @@ func ssh(username: String,
    - timeout: Timeout for read, open, and send (in seconds)
    - deactivateOnPromote: **DEPRECATED!** Google Play does this automatically now - When promoting to a new track, deactivate the binary in the origin track
    - versionCodesToRetain: An array of version codes to retain when publishing a new APK
+   - inAppUpdatePriority: In-app update priority level (used when uploading new apks/aabs) - valid values are integers from 0 to 5
    - obbMainReferencesVersion: References version of 'main' expansion file
    - obbMainFileSize: Size of 'main' expansion file in bytes
    - obbPatchReferencesVersion: References version of 'patch' expansion file
@@ -7097,6 +7098,7 @@ func supply(packageName: String,
             timeout: Int = 300,
             deactivateOnPromote: Bool = true,
             versionCodesToRetain: [String]? = nil,
+            inAppUpdatePriority: Int? = nil,
             obbMainReferencesVersion: String? = nil,
             obbMainFileSize: String? = nil,
             obbPatchReferencesVersion: String? = nil,
@@ -7131,6 +7133,7 @@ func supply(packageName: String,
                                                                                         RubyCommand.Argument(name: "timeout", value: timeout),
                                                                                         RubyCommand.Argument(name: "deactivate_on_promote", value: deactivateOnPromote),
                                                                                         RubyCommand.Argument(name: "version_codes_to_retain", value: versionCodesToRetain),
+                                                                                        RubyCommand.Argument(name: "in_app_update_priority", value: inAppUpdatePriority),
                                                                                         RubyCommand.Argument(name: "obb_main_references_version", value: obbMainReferencesVersion),
                                                                                         RubyCommand.Argument(name: "obb_main_file_size", value: obbMainFileSize),
                                                                                         RubyCommand.Argument(name: "obb_patch_references_version", value: obbPatchReferencesVersion),
@@ -8157,6 +8160,7 @@ func uploadToAppStore(username: String,
    - timeout: Timeout for read, open, and send (in seconds)
    - deactivateOnPromote: **DEPRECATED!** Google Play does this automatically now - When promoting to a new track, deactivate the binary in the origin track
    - versionCodesToRetain: An array of version codes to retain when publishing a new APK
+   - inAppUpdatePriority: In-app update priority level (used when uploading new apks/aabs) - valid values are integers from 0 to 5
    - obbMainReferencesVersion: References version of 'main' expansion file
    - obbMainFileSize: Size of 'main' expansion file in bytes
    - obbPatchReferencesVersion: References version of 'patch' expansion file
@@ -8194,6 +8198,7 @@ func uploadToPlayStore(packageName: String,
                        timeout: Int = 300,
                        deactivateOnPromote: Bool = true,
                        versionCodesToRetain: [String]? = nil,
+                       inAppUpdatePriority: Int? = nil,
                        obbMainReferencesVersion: String? = nil,
                        obbMainFileSize: String? = nil,
                        obbPatchReferencesVersion: String? = nil,
@@ -8228,6 +8233,7 @@ func uploadToPlayStore(packageName: String,
                                                                                                       RubyCommand.Argument(name: "timeout", value: timeout),
                                                                                                       RubyCommand.Argument(name: "deactivate_on_promote", value: deactivateOnPromote),
                                                                                                       RubyCommand.Argument(name: "version_codes_to_retain", value: versionCodesToRetain),
+                                                                                                      RubyCommand.Argument(name: "in_app_update_priority", value: inAppUpdatePriority),
                                                                                                       RubyCommand.Argument(name: "obb_main_references_version", value: obbMainReferencesVersion),
                                                                                                       RubyCommand.Argument(name: "obb_main_file_size", value: obbMainFileSize),
                                                                                                       RubyCommand.Argument(name: "obb_patch_references_version", value: obbPatchReferencesVersion),
