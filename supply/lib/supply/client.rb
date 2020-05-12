@@ -135,7 +135,6 @@ module Supply
       else
         UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
       end
-
     end
 
     #####################################################
