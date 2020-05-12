@@ -64,6 +64,14 @@ module Frameit
     def self.all_platforms
       Platform.constants.map { |c| Platform.const_get(c) }
     end
+
+    def self.symbol_to_constant(symbol)
+      if symbol == :android
+        ANDROID
+      else
+        IOS
+      end
+    end
   end
 
   module Devices
