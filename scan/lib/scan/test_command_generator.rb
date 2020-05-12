@@ -47,6 +47,11 @@ module Scan
       options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
       if FastlaneCore::Helper.xcode_at_least?(11)
         options << "-testPlan '#{config[:testplan]}'" if config[:testplan]
+
+        # detect_values will ensure that these values are present as Arrays if
+        # they are present at all
+        options += config[:only_test_configurations].map { |name| "-only-test-configuration '#{name}'" } if config[:only_test_configurations]
+        options += config[:skip_test_configurations].map { |name| "-skip-test-configuration '#{name}'" } if config[:skip_test_configurations]
       end
       options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
       options << config[:xcargs] if config[:xcargs]
