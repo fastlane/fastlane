@@ -57,7 +57,7 @@ module Screengrab
       device_serial = select_device
 
       device_screenshots_paths = [
-        determine_external_screenshots_path(device_serial),
+        determine_external_screenshots_path(device_serial, @config[:locales]),
         determine_internal_screenshots_paths(@config[:app_package_name], @config[:locales])
       ].flatten
 
@@ -130,7 +130,7 @@ module Screengrab
       Dir.glob(File.join(output_directory, '**', device_type, '*.png'), File::FNM_CASEFOLD)
     end
 
-    def determine_external_screenshots_path(device_serial)
+    def determine_external_screenshots_path(device_serial, locales)
       # macOS evaluates $foo in `echo $foo` before executing the command,
       # Windows doesn't - hence the double backslash vs. single backslash
       command = Helper.windows? ? "shell echo \$EXTERNAL_STORAGE " : "shell echo \\$EXTERNAL_STORAGE"
@@ -138,22 +138,23 @@ module Screengrab
                                            print_all: true,
                                            print_command: true)
       device_ext_storage = device_ext_storage.strip
-      File.join(device_ext_storage, @config[:app_package_name], 'screengrab')
+      return locales.map do |locale|
+        File.join(device_ext_storage, @config[:app_package_name], 'screengrab', locale, "images", "screenshots")
+      end.flatten
     end
 
     def determine_internal_screenshots_paths(app_package_name, locales)
-      locale_paths = locales.map do |locale|
+      return locales.map do |locale|
         [
           "/data/user/0/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots",
 
           # https://github.com/fastlane/fastlane/issues/15653#issuecomment-578541663
-          "/data/data/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots"
+          "/data/data/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots",
+
+          "/data/data/#{app_package_name}/app_screengrab/#{locale}/images/screenshots",
+          "/data/data/#{app_package_name}/screengrab/#{locale}/images/screenshots"
         ]
       end.flatten
-
-      return ["/data/data/#{app_package_name}/app_screengrab"] +
-             ["/data/data/#{app_package_name}/screengrab"] +
-             locale_paths
     end
 
     def clear_device_previous_screenshots(device_serial, device_screenshots_paths)
