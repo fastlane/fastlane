@@ -5,6 +5,11 @@ require_relative 'module'
 
 module Snapshot
   class Options
+    def self.verify_type(item_name, acceptable_types, value)
+      type_ok = [Array, String].any? { |type| value.kind_of?(type) }
+      UI.user_error!("'#{item_name}' should be of type #{acceptable_types.join(' or ')} but found: #{value.class.name}") unless type_ok
+    end
+
     def self.available_options
       output_directory = (File.directory?("fastlane") ? "fastlane/screenshots" : "screenshots")
 
@@ -242,7 +247,23 @@ module Snapshot
                                      env_name: "SNAPSHOT_TESTPLAN",
                                      description: "The testplan associated with the scheme that should be used for testing",
                                      is_string: true,
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :only_testing,
+                                     env_name: "SNAPSHOT_ONLY_TESTING",
+                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to run",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       verify_type('only_testing', [Array, String], value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :skip_testing,
+                                     env_name: "SNAPSHOT_SKIP_TESTING",
+                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to skip",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       verify_type('skip_testing', [Array, String], value)
+                                     end)
       ]
     end
   end
