@@ -158,7 +158,7 @@ build_app(
 )
 ```
 
-**Note**: If you use [_fastlane_](https://fastlane.tools) with [_match_](https://fastlane.tools/match) you don't need to provide those values manually.
+**Note**: If you use [_fastlane_](https://fastlane.tools) with [_match_](https://fastlane.tools/match) you don't need to provide those values manually, unless you pass a plist file into `export_options`
 
 For the list of available options run `xcodebuild -help`.
 
