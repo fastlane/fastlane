@@ -66,10 +66,13 @@ protocol ScanfileProtocol: class {
   /// Should the HTML report be opened when tests are completed?
   var openReport: Bool { get }
 
+  /// Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
+  var disableXcpretty: Bool? { get }
+
   /// The directory in which all reports will be stored
   var outputDirectory: String { get }
 
-  /// Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty)
+  /// Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty during xcodebuild)
   var outputStyle: String? { get }
 
   /// Comma separated list of the output types (e.g. html, junit, json-compilation-database)
@@ -204,6 +207,7 @@ extension ScanfileProtocol {
   var addressSanitizer: Bool? { return nil }
   var threadSanitizer: Bool? { return nil }
   var openReport: Bool { return false }
+  var disableXcpretty: Bool? { return nil }
   var outputDirectory: String { return "./test_output" }
   var outputStyle: String? { return nil }
   var outputTypes: String { return "html,junit" }
@@ -246,4 +250,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.27]
+// FastlaneRunnerAPIVersion [0.9.28]

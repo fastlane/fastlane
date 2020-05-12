@@ -45,6 +45,9 @@ protocol SnapshotfileProtocol: class {
   /// Enabling this option will automatically erase the simulator before running the application
   var eraseSimulator: Bool { get }
 
+  /// Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
+  var overrideStatusBar: Bool { get }
+
   /// Enabling this option will configure the Simulator's system language
   var localizeSimulator: Bool { get }
 
@@ -107,6 +110,9 @@ protocol SnapshotfileProtocol: class {
 
   /// Sets a custom path for Swift Package Manager dependencies
   var clonedSourcePackagesPath: String? { get }
+
+  /// The testplan associated with the scheme that should be used for testing
+  var testplan: String? { get }
 }
 
 extension SnapshotfileProtocol {
@@ -125,6 +131,7 @@ extension SnapshotfileProtocol {
   var clearPreviousScreenshots: Bool { return false }
   var reinstallApp: Bool { return false }
   var eraseSimulator: Bool { return false }
+  var overrideStatusBar: Bool { return false }
   var localizeSimulator: Bool { return false }
   var darkMode: Bool? { return nil }
   var appIdentifier: String? { return nil }
@@ -146,8 +153,9 @@ extension SnapshotfileProtocol {
   var concurrentSimulators: Bool { return true }
   var disableSlideToType: Bool { return false }
   var clonedSourcePackagesPath: String? { return nil }
+  var testplan: String? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.7]
+// FastlaneRunnerAPIVersion [0.9.8]

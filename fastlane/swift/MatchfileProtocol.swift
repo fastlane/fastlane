@@ -99,6 +99,9 @@ protocol MatchfileProtocol: class {
   /// The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
   var templateName: String? { get }
 
+  /// A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
+  var profileName: String? { get }
+
   /// Path in which to export certificates, key and profile
   var outputPath: String? { get }
 
@@ -140,10 +143,11 @@ extension MatchfileProtocol {
   var skipDocs: Bool { return false }
   var platform: String { return "ios" }
   var templateName: String? { return nil }
+  var profileName: String? { return nil }
   var outputPath: String? { return nil }
   var verbose: Bool { return false }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.15]
+// FastlaneRunnerAPIVersion [0.9.16]
