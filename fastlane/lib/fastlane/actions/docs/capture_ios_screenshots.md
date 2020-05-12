@@ -216,6 +216,8 @@ output_directory('./screenshots')
 
 clear_previous_screenshots(true)
 
+override_status_bar(true)
+
 add_photos(["MyTestApp/Assets/demo.jpg"])
 ```
 
@@ -326,7 +328,7 @@ To get more information about language and locale codes please read [Internation
 
 ## Use a clean status bar
 
-You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
+You can set `override_status_bar` to `true` to set the status bar to Tuesday January 9th at 9:41AM with full battery and reception.
 
 ## Editing the `Snapfile`
 
