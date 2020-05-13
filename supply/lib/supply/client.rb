@@ -14,8 +14,15 @@ module Supply
 
     def self.make_from_config(params: nil)
       params ||= Supply.config
-      service_account_data = self.service_account_authentication(params: params)
-      return self.new(service_account_json: service_account_data, params: params)
+      if params[:json_key] || params[:json_key_data] || params[:key]
+        service_account_data = self.service_account_authentication(params: params)
+        return self.new(service_account_json: service_account_data, params: params)
+      elsif params[:refresh_token] || params[:refresh_token_data]
+        refresh_token_data = self.refresh_token_authentication(params: params)
+        return self.new(refresh_token_json: refresh_token_data, params: params)
+      else
+        UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
+      end
     end
 
     # Supply authentication file
@@ -42,13 +49,26 @@ module Supply
       service_account_json
     end
 
+    # Supply refresh token file
+    def self.refresh_token_authentication(params: nil)
+      if params[:refresh_token]
+        refresh_token_json = File.open(File.expand_path(params[:refresh_token]))
+      elsif params[:refresh_token_data]
+        refresh_token_json = StringIO.new(params[:refresh_token_data])
+      end
+
+      refresh_token_json
+    end
+
     # Initializes the service and its auth_client using the specified information
+    # Provide one of either service_account_json or refresh_token_json
     # @param service_account_json: The raw service account Json data
-    def initialize(service_account_json: nil, params: nil)
-      if params[:json_key] || params[:json_key_data] || params[:key]
+    # @param refresh_token_json: The raw refresh token Json data
+    def initialize(service_account_json: nil, refresh_token_json: nil, params: nil)
+      if service_account_json
         auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
-      else
-        auth_client = Google::Auth::UserRefreshCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+      elsif refresh_token_json
+        auth_client = Google::Auth::UserRefreshCredentials.make_creds(json_key_io: refresh_token_json, scope: self.class::SCOPE)
       end
 
       UI.verbose("Fetching a new access token from Google...")
@@ -126,14 +146,6 @@ module Supply
         }
         service_account_json = StringIO.new(JSON.dump(cred_json))
         service_account_json
-      elsif params[:refresh_token]
-        service_account_json = File.open(File.expand_path(params[:refresh_token]))
-        service_account_json
-      elsif params[:refresh_token_data]
-        service_account_json = StringIO.new(params[:refresh_token_data])
-        service_account_json
-      else
-        UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
       end
     end
 
