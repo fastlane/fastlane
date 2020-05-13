@@ -159,7 +159,7 @@ module Fastlane
       require 'json'
       url = "https://rubygems.org/api/v1/gems/#{gem_name}.json"
       begin
-        JSON.parse(open(url).read)
+        JSON.parse(URI.open(url).read)
       rescue
         nil
       end
@@ -215,7 +215,7 @@ module Fastlane
       # Bundler.with_clean_env solves this problem by resetting Bundler state before the
       # exec'd call gets merged into this process.
 
-      Bundler.with_clean_env do
+      Bundler.with_original_env do
         yield if block_given?
       end
     end
