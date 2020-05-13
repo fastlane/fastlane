@@ -50,6 +50,7 @@ module Gym
 
           package_app
           path = move_pkg
+          move_appstore_info
           return path
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
@@ -324,6 +325,18 @@ module Gym
         UI.success("Successfully exported Apps folder:")
         UI.message(apps_path)
         apps_path
+      end
+    end
+
+    # Move the AppStoreInfo.plist folder to the output directory
+    def move_appstore_info
+      if File.exist?(PackageCommandGenerator.appstore_info_path)
+        FileUtils.mv(PackageCommandGenerator.appstore_info_path, File.expand_path(Gym.config[:output_directory]), force: true)
+        appstore_info_path = File.join(File.expand_path(Gym.config[:output_directory]), File.basename(PackageCommandGenerator.appstore_info_path))
+
+        UI.success("Successfully exported the AppStoreInfo.plist file:")
+        UI.message(appstore_info_path)
+        appstore_info_path
       end
     end
 

@@ -49,6 +49,10 @@ module Gym
         generator.apps_path
       end
 
+      def appstore_info_path
+        generator.appstore_info_path
+      end
+
       def asset_packs_path
         generator.asset_packs_path
       end
