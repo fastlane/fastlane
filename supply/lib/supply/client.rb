@@ -14,15 +14,8 @@ module Supply
 
     def self.make_from_config(params: nil)
       params ||= Supply.config
-      if params[:json_key] || params[:json_key_data] || params[:key]
-        service_account_data = self.service_account_authentication(params: params)
-        return self.new(service_account_json: service_account_data, params: params)
-      elsif params[:refresh_token] || params[:refresh_token_data]
-        refresh_token_data = self.refresh_token_authentication(params: params)
-        return self.new(refresh_token_json: refresh_token_data, params: params)
-      else
-        UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
-      end
+      service_account_data = self.service_account_authentication(params: params)
+      return self.new(service_account_json: service_account_data, params: params)
     end
 
     # Supply authentication file
@@ -133,6 +126,17 @@ module Supply
     # @!group Login
     #####################################################
 
+    def self.make_from_config(params: nil)
+      params ||= Supply.config
+
+      if params[:json_key] || params[:json_key_data] || params[:key]
+        super(params: params)
+      elsif params[:refresh_token] || params[:refresh_token_data]
+        refresh_token_data = self.refresh_token_authentication(params: params)
+        return self.new(refresh_token_json: refresh_token_data, params: params)
+      end
+    end
+
     def self.service_account_authentication(params: nil)
       if params[:json_key] || params[:json_key_data]
         super(params: params)
@@ -146,6 +150,8 @@ module Supply
         }
         service_account_json = StringIO.new(JSON.dump(cred_json))
         service_account_json
+      else
+        UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
       end
     end
 
