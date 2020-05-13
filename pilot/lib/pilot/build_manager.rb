@@ -154,13 +154,11 @@ module Pilot
 
       return if config[:skip_submission]
       if options[:reject_build_waiting_for_review]
-        waiting_for_review_build = build.app.get_builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
-        unless waiting_for_review_build.nil?
-          UI.important("Another build is already in review. Going to remove that build and submit the new one.")
-          UI.important("Deleting beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
-          waiting_for_review_build.beta_app_review_submission.delete!
-          UI.success("Deleted beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
-        end
+        reject_build_waiting_for_review(build)
+      end
+
+      if options[:expire_previous_builds]
+        expire_previous_builds(build)
       end
 
       if !build.ready_for_internal_testing? && options[:skip_waiting_for_build_processing]
@@ -316,6 +314,24 @@ module Pilot
 
     def should_update_localized_build_information?(options)
       !options[:localized_build_info].nil?
+    end
+
+    def reject_build_waiting_for_review(build)
+      waiting_for_review_build = build.app.get_builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
+      unless waiting_for_review_build.nil?
+        UI.important("Another build is already in review. Going to remove that build and submit the new one.")
+        UI.important("Deleting beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+        waiting_for_review_build.beta_app_review_submission.delete!
+        UI.success("Deleted beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+      end
+    end
+
+    def expire_previous_builds(build)
+      builds_to_expire = build.app.get_builds.reject do |asc_build|
+        asc_build.id == build.id
+      end
+
+      builds_to_expire.each(&:expire!)
     end
 
     # If itc_provider was explicitly specified, use it.
