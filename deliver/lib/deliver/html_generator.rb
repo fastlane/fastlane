@@ -35,8 +35,8 @@ module Deliver
     # Returns a path relative to FastlaneFolder.path
     # This is needed as the Preview.html file is located inside FastlaneFolder.path
     def render_relative_path(export_path, path)
-      export_path = Pathname.new(export_path)
-      path = Pathname.new(path).relative_path_from(export_path)
+      export_path = Pathname.new(File.expand_path(export_path))
+      path = Pathname.new(File.expand_path(path)).relative_path_from(export_path)
       return path.to_path
     end
 
