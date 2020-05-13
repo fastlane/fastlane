@@ -10,6 +10,16 @@ module Fastlane
         require 'match'
 
         params.load_configuration_file("Matchfile")
+
+        # fall back to lane platform when missing from configuration
+        if params.config_file_options[:platform].nil?
+          if lane_context[SharedValues::PLATFORM_NAME] == :mac
+            params.set(:platform, "macos")
+          else
+            params.set(:platform, "ios")
+          end
+        end
+
         Match::Runner.new.run(params)
 
         define_profile_type(params)
