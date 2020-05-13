@@ -53,7 +53,7 @@ describe Match::Generator do
         team_id: 'team_id',
         platform: :ios,
         template_name: 'template_name',
-        fail_on_name_taken: true
+        fail_on_name_taken: false
       })
 
       # This is the important part. We need to see the right configuration come through
