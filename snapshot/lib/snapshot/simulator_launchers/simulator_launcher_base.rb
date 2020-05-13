@@ -59,7 +59,9 @@ module Snapshot
 
       device_types.each do |type|
         if launcher_config.erase_simulator || launcher_config.localize_simulator || !launcher_config.dark_mode.nil?
-          erase_simulator(type)
+          if launcher_config.erase_simulator
+            erase_simulator(type)
+          end
           if launcher_config.localize_simulator
             localize_simulator(type, language, locale)
           end
