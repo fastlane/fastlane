@@ -282,6 +282,7 @@ module Supply
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :in_app_update_priority,
+                                     env_name: "SUPPLY_IN_APP_UPDATE_PRIORITY",
                                      optional: true,
                                      type: Integer,
                                      description: "In-app update priority for all the newly added apks in the release. Can take values between [0,5]",
