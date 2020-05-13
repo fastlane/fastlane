@@ -125,7 +125,8 @@ module Sigh
       name = Sigh.config[:provisioning_name] || [bundle_id, profile_type.pretty_type].join(' ')
 
       unless Sigh.config[:skip_fetch_profiles]
-        if Spaceship.provisioning_profile.all.find { |p| p.name == name }
+        if Spaceship.provisioning_profile.all(mac: Sigh.config[:platform].to_s == 'macos').find { |p| p.name == name }
+          UI.user_error!("The name '#{name}' is already taken, and fail_on_name_taken is true") if Sigh.config[:fail_on_name_taken]
           UI.error("The name '#{name}' is already taken, using another one.")
           name += " #{Time.now.to_i}"
         end
