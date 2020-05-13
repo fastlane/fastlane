@@ -170,6 +170,11 @@ module Pilot
                                      env_name: "PILOT_BUILD_NUMBER",
                                      description: "The build number of the application build to distribute. If the build number is not specified, the most recent build is distributed",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :expire_previous_builds,
+                                     is_string: false,
+                                     env_name: "PILOT_EXPIRE_PREVIOUS_BUILDS",
+                                     description: "Should expire previous builds?",
+                                     default_value: false),
 
         # testers
         FastlaneCore::ConfigItem.new(key: :first_name,
