@@ -113,6 +113,12 @@ protocol SnapshotfileProtocol: class {
 
   /// The testplan associated with the scheme that should be used for testing
   var testplan: String? { get }
+
+  /// Array of strings matching Test Bundle/Test Suite/Test Cases to run
+  var onlyTesting: String? { get }
+
+  /// Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+  var skipTesting: String? { get }
 }
 
 extension SnapshotfileProtocol {
@@ -154,8 +160,10 @@ extension SnapshotfileProtocol {
   var disableSlideToType: Bool { return false }
   var clonedSourcePackagesPath: String? { return nil }
   var testplan: String? { return nil }
+  var onlyTesting: String? { return nil }
+  var skipTesting: String? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.8]
+// FastlaneRunnerAPIVersion [0.9.9]
