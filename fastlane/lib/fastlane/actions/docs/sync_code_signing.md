@@ -111,6 +111,25 @@ match
 
 You can find more information about GitHub basic authentication and personal token generation here: [https://developer.github.com/v3/auth/#basic-authentication](https://developer.github.com/v3/auth/#basic-authentication)
 
+##### Git Storage on GitHub - Deploy keys
+
+If your machine does not have a private key set up for your certificates repository, you can give _match_ a path for one:
+
+Using parameter:
+
+```
+match(git_private_key: '<PATH TO YOUR KEY>')
+```
+
+Using environment variable:
+
+```
+ENV['MATCH_GIT_PRIVATE_KEY'] = '<PATH TO YOUR KEY>'
+match
+```
+
+You can find more information about GitHub basic authentication and personal token generation here: [https://developer.github.com/v3/auth/#basic-authentication](https://developer.github.com/v3/auth/#basic-authentication)
+
 ##### Git Storage on Azure Devops
 
 If you're running a pipeline on Azure Devops and using git storage in a another repository on the same project, you might want to use `bearer` token authentication.
