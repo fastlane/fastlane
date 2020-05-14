@@ -233,6 +233,7 @@ describe Gym do
       expect(Gym::PackageCommandGeneratorXcode7.app_thinning_path).to match(%r{#{Dir.tmpdir}/gym_output.+/app-thinning.plist})
       expect(Gym::PackageCommandGeneratorXcode7.app_thinning_size_report_path).to match(%r{#{Dir.tmpdir}/gym_output.+/App Thinning Size Report.txt})
       expect(Gym::PackageCommandGeneratorXcode7.apps_path).to match(%r{#{Dir.tmpdir}/gym_output.+/Apps})
+      expect(Gym::PackageCommandGeneratorXcode7.appstore_info_path).to match(%r{#{Dir.tmpdir}/gym_output.+/AppStoreInfo.plist})
     end
   end
 end
