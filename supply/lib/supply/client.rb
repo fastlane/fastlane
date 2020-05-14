@@ -134,6 +134,8 @@ module Supply
       elsif params[:refresh_token] || params[:refresh_token_data]
         refresh_token_data = self.refresh_token_authentication(params: params)
         return self.new(refresh_token_json: refresh_token_data, params: params)
+      else
+        UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
       end
     end
 
@@ -150,8 +152,6 @@ module Supply
         }
         service_account_json = StringIO.new(JSON.dump(cred_json))
         service_account_json
-      else
-        UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
       end
     end
 
