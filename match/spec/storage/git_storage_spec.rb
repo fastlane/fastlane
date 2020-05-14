@@ -140,7 +140,7 @@ describe Match do
         expect(File.read(File.join(storage.working_directory, 'match_version.txt'))).to eq(Fastlane::VERSION)
       end
     end
-    
+
     describe "authentication" do
       it "wraps the git command in ssh-agent shell when using a private key" do
         path = Dir.mktmpdir # to have access to the actual path
