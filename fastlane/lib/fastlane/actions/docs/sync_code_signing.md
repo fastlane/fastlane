@@ -4,7 +4,7 @@
 
 ###### Easily sync your certificates and profiles across your team
 
-A new approach to iOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
+A new approach to iOS and macOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
 
 _match_ is the implementation of the [codesigning.guide concept](https://codesigning.guide). _match_ creates all required certificates & provisioning profiles and stores them in a separate git repository, Google Cloud, or Amazon S3. Every team member with access to the selected storage can use those credentials for code signing. _match_ also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
 
@@ -49,7 +49,7 @@ For more information about the concept, visit [codesigning.guide](https://codesi
 
 |          |  match  |
 |----------|---------|
-🔄  | Automatically sync your iOS keys and profiles across all your team members using git
+🔄  | Automatically sync your iOS and macOS keys and profiles across all your team members using git
 📦  | Handle all the heavy lifting of creating and storing your certificates and profiles
 💻  | Setup codesigning on a new machine in under a minute
 🎯 | Designed to work with apps with multiple targets and bundle identifiers
