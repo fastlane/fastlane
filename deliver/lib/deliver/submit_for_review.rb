@@ -36,7 +36,11 @@ module Deliver
 
       if options[:build_number] && options[:build_number] != "latest"
         UI.message("Selecting existing build-number: #{options[:build_number]}")
-        build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] }
+        if app_version
+          build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] && a.train_version == app_version }
+        else
+          build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] }
+        end
         unless build
           UI.user_error!("Build number: #{options[:build_number]} does not exist")
         end
