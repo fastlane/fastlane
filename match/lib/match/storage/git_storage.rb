@@ -89,6 +89,10 @@ module Match
           command += " -b #{self.branch.shellescape} --single-branch"
         end
 
+        unless self.git_private_key.nil?
+          command = "ssh-agent bash -c 'ssh-add #{File.expand_path(self.git_private_key).shellescape}; #{command}'"
+        end
+
         UI.message("Cloning remote git repo...")
         if self.branch && !self.clone_branch_directly
           UI.message("If cloning the repo takes too long, you can use the `clone_branch_directly` option in match.")
