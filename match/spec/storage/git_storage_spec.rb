@@ -147,7 +147,7 @@ describe Match do
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = false
-        private_key = "/tmp/fastlane.match.id_dsa"
+        private_key = "#{path}/fastlane.match.id_dsa"
         command = "ssh-agent bash -c 'ssh-add #{private_key.shellescape}; git clone #{git_url.shellescape} #{path.shellescape}'"
         to_params = {
           command: command,
