@@ -35,6 +35,7 @@ module Match
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
+      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       command :run do |c|
         c.syntax = 'fastlane match'

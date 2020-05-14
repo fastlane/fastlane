@@ -25,6 +25,7 @@ module PEM
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
+      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       command :renew do |c|
         c.syntax = 'fastlane pem renew'
