@@ -1,4 +1,5 @@
 require 'fastlane_core/configuration/config_item'
+require 'fastlane/helper/lane_helper'
 require 'credentials_manager/appfile_config'
 require_relative 'module'
 
@@ -8,6 +9,15 @@ module Match
     def self.append_option(option)
       self.available_options # to ensure we created the initial `@available_options` array
       @available_options << option
+    end
+
+    def self.default_platform
+      case Fastlane::Helper::LaneHelper.current_platform.to_s
+      when "mac"
+        "macos"
+      else
+        "ios"
+      end
     end
 
     def self.available_options
@@ -215,7 +225,8 @@ module Match
                                      short_option: '-o',
                                      env_name: "MATCH_PLATFORM",
                                      description: "Set the provisioning profile's platform to work with (i.e. ios, tvos, macos)",
-                                     default_value: "ios",
+                                     default_value: default_platform,
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        value = value.to_s
                                        pt = %w(tvos ios macos)
