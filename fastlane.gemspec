@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Josh Holtz",
-                        "Joshua Liebowitz",
-                        "Felix Krause",
-                        "Iulian Onofrei",
-                        "Stefan Natchev",
-                        "Fumiya Nakamura",
-                        "Jorge Revuelta H",
-                        "Helmut Januschka",
-                        "Manu Wallner",
+  spec.authors       = ["Matthew Ellis",
                         "Olivier Halligon",
-                        "Danielle Tomlinson",
-                        "Jérôme Lacoste",
-                        "Matthew Ellis",
-                        "Max Ott",
-                        "Aaron Brager",
-                        "Luka Mirosevic",
-                        "Andrew McBurney",
-                        "Maksym Grebenets",
-                        "Daniel Jankowski",
-                        "Jan Piotrowski",
                         "Kohki Miki",
-                        "Jimmy Dee"]
+                        "Danielle Tomlinson",
+                        "Maksym Grebenets",
+                        "Helmut Januschka",
+                        "Daniel Jankowski",
+                        "Max Ott",
+                        "Stefan Natchev",
+                        "Jimmy Dee",
+                        "Luka Mirosevic",
+                        "Jan Piotrowski",
+                        "Andrew McBurney",
+                        "Aaron Brager",
+                        "Josh Holtz",
+                        "Jérôme Lacoste",
+                        "Fumiya Nakamura",
+                        "Manu Wallner",
+                        "Joshua Liebowitz",
+                        "Iulian Onofrei",
+                        "Jorge Revuelta H",
+                        "Felix Krause"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION

@@ -45,6 +45,12 @@ protocol ScanfileProtocol: class {
   /// The testplan associated with the scheme that should be used for testing
   var testplan: String? { get }
 
+  /// Array of strings matching test plan configurations to run
+  var onlyTestConfigurations: String? { get }
+
+  /// Array of strings matching test plan configurations to skip
+  var skipTestConfigurations: String? { get }
+
   /// Run tests using the provided `.xctestrun` file
   var xctestrun: String? { get }
 
@@ -200,6 +206,8 @@ extension ScanfileProtocol {
   var onlyTesting: String? { return nil }
   var skipTesting: String? { return nil }
   var testplan: String? { return nil }
+  var onlyTestConfigurations: String? { return nil }
+  var skipTestConfigurations: String? { return nil }
   var xctestrun: String? { return nil }
   var toolchain: String? { return nil }
   var clean: Bool { return false }
@@ -250,4 +258,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.28]
+// FastlaneRunnerAPIVersion [0.9.29]

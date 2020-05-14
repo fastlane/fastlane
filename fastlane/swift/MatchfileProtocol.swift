@@ -102,6 +102,9 @@ protocol MatchfileProtocol: class {
   /// A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
   var profileName: String? { get }
 
+  /// Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
+  var failOnNameTaken: Bool { get }
+
   /// Path in which to export certificates, key and profile
   var outputPath: String? { get }
 
@@ -144,10 +147,11 @@ extension MatchfileProtocol {
   var platform: String { return "ios" }
   var templateName: String? { return nil }
   var profileName: String? { return nil }
+  var failOnNameTaken: Bool { return false }
   var outputPath: String? { return nil }
   var verbose: Bool { return false }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.16]
+// FastlaneRunnerAPIVersion [0.9.17]
