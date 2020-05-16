@@ -154,7 +154,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :git_private_key,
                                      env_name: "MATCH_GIT_PRIVATE_KEY",
                                      sensitive: true,
-                                     description: "Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file",
+                                     description: "Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof",
                                      conflicting_options: [:git_basic_authorization, :git_bearer_authorization],
                                      optional: true,
                                      default_value: nil),
