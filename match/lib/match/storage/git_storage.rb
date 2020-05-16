@@ -90,7 +90,13 @@ module Match
         end
 
         unless self.git_private_key.nil?
-          command = "ssh-agent bash -c 'ssh-add #{File.expand_path(self.git_private_key).shellescape}; #{command}'"
+          if File.file?(self.git_private_key)
+            ssh_add = File.expand_path(self.git_private_key).shellescape.to_s
+          else
+            UI.message("Private key file does not exist, will continue by using it as a raw key.")
+            ssh_add = "- <<< \"#{self.git_private_key}\""
+          end
+          command = "ssh-agent bash -c 'ssh-add #{ssh_add}; #{command}'"
         end
 
         UI.message("Cloning remote git repo...")
