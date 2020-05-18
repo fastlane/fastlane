@@ -18,4 +18,4 @@ class Gymfile: GymfileProtocol {
 
 
 
-// Generated with fastlane 2.148.0
+// Generated with fastlane 2.148.1
