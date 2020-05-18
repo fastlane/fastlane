@@ -375,7 +375,7 @@ module Fastlane
       references = Fastlane.const_get(module_name).all_classes.collect do |path|
         next unless File.dirname(path).include?("/actions") # we only want to match actions
 
-        File.basename(path).gsub("_action", "").gsub(".rb", "").to_sym # the _action is optional
+        File.basename(path).gsub(".rb", "").gsub(/_action$/, '').to_sym # the _action is optional
       end
       references.compact!
 

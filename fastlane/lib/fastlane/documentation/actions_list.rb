@@ -176,7 +176,7 @@ module Fastlane
         # them as broken actions in the table, regardless of platform specification
         next if platform && action.respond_to?(:is_supported?) && !action.is_supported?(platform.to_sym)
 
-        name = symbol.to_s.gsub('Action', '').fastlane_underscore
+        name = symbol.to_s.gsub(/Action$/, '').fastlane_underscore
         yield(action, name)
       end
     end
