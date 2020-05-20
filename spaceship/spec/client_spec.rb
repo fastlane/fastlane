@@ -95,7 +95,7 @@ describe Spaceship::Client do
     end
 
     it "raises Spaceship::AccessForbiddenError" do
-      stub_client_request(Spaceship::AccessForbiddenError, 6, 406, "<html>Access Denied - In Read</html>")
+      stub_client_request(Spaceship::AccessForbiddenError, 6, 403, "<html>Access Denied - In Read</html>")
 
       expect do
         subject.req_home
