@@ -26,6 +26,7 @@ module Fastlane
         platform = params[:platform]
         output_directory = params[:output_directory]
         wait_for_dsym_processing = params[:wait_for_dsym_processing]
+        wait_timeout = params[:wait_timeout]
         min_version = Gem::Version.new(params[:min_version]) if params[:min_version]
 
         # Set version if it is latest
@@ -45,6 +46,20 @@ module Fastlane
             version = latest_candidate_build.train_version
             build_number = latest_candidate_build.build_version
           end
+        elsif version == 'live'
+          UI.message("Looking for live version...")
+          live_version = app.live_version(platform: platform)
+
+          UI.user_error!("Could not find live version for your app, please try setting 'latest' or a specific version") if live_version.nil?
+
+          # No need to search for candidates, because released App Store version should only have one build
+          version = live_version.version
+          build_number = live_version.build_version
+        end
+
+        # Remove leading zeros from version string (eg. 1.02 -> 1.2)
+        if version
+          version = version.split(".").map(&:to_i).join(".")
         end
 
         # Make sure output_directory has a slash on the end
@@ -101,8 +116,9 @@ module Fastlane
               end
 
               unless download_url
-                if !wait_for_dsym_processing || (Time.now - start) > (60 * 5)
-                  UI.error("Could not find any dSYM for #{build.build_version} (#{train.version_string})")
+                if !wait_for_dsym_processing || (Time.now - start) > wait_timeout
+                  # In some cases, AppStoreConnect does not process the dSYMs, thus no error should be thrown.
+                  UI.message("Could not find any dSYM for #{build.build_version} (#{train.version_string})")
                 else
                   UI.message("Waiting for dSYM file to appear...")
                   sleep(30)
@@ -113,8 +129,12 @@ module Fastlane
               break
             end
 
-            self.download(download_url, app.bundle_id, train.version_string, build.build_version, output_directory)
-            break if build_number
+            if download_url
+              self.download(download_url, app.bundle_id, train.version_string, build.build_version, output_directory)
+              break if build_number
+            else
+              UI.message("No dSYM URL for #{build.build_version} (#{train.version_string})")
+            end
           end
         end
 
@@ -226,7 +246,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
                                        env_name: "DOWNLOAD_DSYMS_VERSION",
-                                       description: "The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs",
+                                       description: "The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs or 'live' to download only the live version dSYMs",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :build_number,
                                        short_option: "-b",
@@ -249,7 +269,14 @@ module Fastlane
                                        description: "Wait for dSYMs to process",
                                        optional: true,
                                        default_value: false,
-                                       type: Boolean)
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :wait_timeout,
+                                       short_option: "-t",
+                                       env_name: "DOWNLOAD_DSYMS_WAIT_TIMEOUT",
+                                       description: "Number of seconds to wait for dSYMs to process",
+                                       optional: true,
+                                       default_value: 300,
+                                       type: Integer)
         ]
       end
 
@@ -275,6 +302,7 @@ module Fastlane
         [
           'download_dsyms',
           'download_dsyms(version: "1.0.0", build_number: "345")',
+          'download_dsyms(version: "live")',
           'download_dsyms(min_version: "1.2.3")'
         ]
       end

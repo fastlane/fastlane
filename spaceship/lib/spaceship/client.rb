@@ -563,10 +563,15 @@ module Spaceship
     #####################################################
 
     def load_session_from_file
-      if File.exist?(persistent_cookie_path)
-        puts("Loading session from '#{persistent_cookie_path}'") if Spaceship::Globals.verbose?
-        @cookie.load(persistent_cookie_path)
-        return true
+      begin
+        if File.exist?(persistent_cookie_path)
+          puts("Loading session from '#{persistent_cookie_path}'") if Spaceship::Globals.verbose?
+          @cookie.load(persistent_cookie_path)
+          return true
+        end
+      rescue => ex
+        puts(ex.to_s)
+        puts("Continuing with normal login.")
       end
       return false
     end
@@ -619,8 +624,8 @@ module Spaceship
     def with_retry(tries = 5, &_block)
       return yield
     rescue \
-        Faraday::Error::ConnectionFailed,
-        Faraday::Error::TimeoutError, # New Faraday version: Faraday::TimeoutError => ex
+        Faraday::ConnectionFailed,
+        Faraday::TimeoutError,
         BadGatewayError,
         AppleTimeoutError,
         GatewayTimeoutError => ex

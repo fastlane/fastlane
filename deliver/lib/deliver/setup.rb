@@ -67,7 +67,7 @@ module Deliver
           else
             content = app_details.send(key)[language].to_s
           end
-          content << "\n"
+          content += "\n"
           resulting_path = File.join(path, language, "#{key}.txt")
           FileUtils.mkdir_p(File.expand_path('..', resulting_path))
           File.write(resulting_path, content)
@@ -82,7 +82,7 @@ module Deliver
         else
           content = app_details.send(key).to_s
         end
-        content << "\n"
+        content += "\n"
         resulting_path = File.join(path, "#{key}.txt")
         File.write(resulting_path, content)
         UI.message("Writing to '#{resulting_path}'")
@@ -91,7 +91,7 @@ module Deliver
       # Trade Representative Contact Information
       UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, option_name|
         content = v.send(key).to_s
-        content << "\n"
+        content += "\n"
         base_dir = File.join(path, UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR)
         FileUtils.mkdir_p(base_dir)
         resulting_path = File.join(base_dir, "#{option_name}.txt")
@@ -102,7 +102,7 @@ module Deliver
       # Review information
       UploadMetadata::REVIEW_INFORMATION_VALUES.each do |key, option_name|
         content = v.send(key).to_s
-        content << "\n"
+        content += "\n"
         base_dir = File.join(path, UploadMetadata::REVIEW_INFORMATION_DIR)
         FileUtils.mkdir_p(base_dir)
         resulting_path = File.join(base_dir, "#{option_name}.txt")

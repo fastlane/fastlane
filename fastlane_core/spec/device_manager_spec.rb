@@ -137,6 +137,38 @@ describe FastlaneCore do
           is_simulator: true
         )
       end
+
+      it 'Xcode 11' do
+        response = "response"
+        simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode11')
+        expect(response).to receive(:read).and_return(simctl_output)
+        expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+        thing = {}
+        expect(thing).to receive(:read).and_return("line\n")
+        allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
+
+        devices = FastlaneCore::Simulator.all
+        expect(devices.count).to eq(29)
+
+        expect(devices[-3]).to have_attributes(
+          name: "iPad Pro (12.9-inch) (4th generation)", os_type: "iOS", os_version: "13.4",
+          udid: "D311F577-F7B7-4487-9322-BF9A418F4EF3",
+          state: "Shutdown",
+          is_simulator: true
+        )
+        expect(devices[-2]).to have_attributes(
+          name: "iPad Air (3rd generation)", os_type: "iOS", os_version: "13.4",
+          udid: "B6EDB5A2-820D-4DBE-A4E2-06DFF06DCB20",
+          state: "Shutdown",
+          is_simulator: true
+        )
+        expect(devices[-1]).to have_attributes(
+          name: "iPad Air (3rd generation) Dark", os_type: "iOS", os_version: "13.4",
+          udid: "2B0E9B5D-3680-42B1-BC44-26B380921500",
+          state: "Shutdown",
+          is_simulator: true
+        )
+      end
     end
 
     it "properly parses the simctl output and generates Device objects for tvOS simulator" do
@@ -445,6 +477,41 @@ describe FastlaneCore do
         state: "Shutdown",
         is_simulator: true
       )
+    end
+
+    describe FastlaneCore::DeviceManager::Device do
+      it "slide to type gets disabled if iOS 13.0 or greater" do
+        device = FastlaneCore::DeviceManager::Device.new(os_type: "iOS", os_version: "13.0", is_simulator: true)
+
+        expect(UI).to receive(:message).with("Disabling 'Slide to Type' #{device}")
+        expect(FastlaneCore::Helper).to receive(:backticks).times.once
+
+        device.disable_slide_to_type
+      end
+
+      it "bypass slide to type disabling if less than iOS 13.0" do
+        device = FastlaneCore::DeviceManager::Device.new(os_type: "iOS", os_version: "12.4", is_simulator: true)
+
+        expect(FastlaneCore::Helper).to_not(receive(:backticks))
+
+        device.disable_slide_to_type
+      end
+
+      it "bypass slide to type disabling if not a simulator" do
+        device = FastlaneCore::DeviceManager::Device.new(os_type: "iOS", os_version: "13.0", is_simulator: false)
+
+        expect(FastlaneCore::Helper).to_not(receive(:backticks))
+
+        device.disable_slide_to_type
+      end
+
+      it "bypass slide to type disabling if not iOS" do
+        device = FastlaneCore::DeviceManager::Device.new(os_type: "somethingelse", os_version: "13.0", is_simulator: true)
+
+        expect(FastlaneCore::Helper).to_not(receive(:backticks))
+
+        device.disable_slide_to_type
+      end
     end
   end
 end

@@ -4,9 +4,9 @@
 
 ###### Easily sync your certificates and profiles across your team
 
-A new approach to iOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
+A new approach to iOS and macOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
 
-_match_ is the implementation of the [https://codesigning.guide concept](https://codesigning.guide). _match_ creates all required certificates & provisioning profiles and stores them in a separate git repository. Every team member with access to the repo can use those credentials for code signing. _match_ also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
+_match_ is the implementation of the [codesigning.guide concept](https://codesigning.guide). _match_ creates all required certificates & provisioning profiles and stores them in a separate git repository, Google Cloud, or Amazon S3. Every team member with access to the selected storage can use those credentials for code signing. _match_ also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
 
 [More information on how to get started with codesigning](https://docs.fastlane.tools/codesigning/getting-started/)
 
@@ -49,7 +49,7 @@ For more information about the concept, visit [codesigning.guide](https://codesi
 
 |          |  match  |
 |----------|---------|
-🔄  | Automatically sync your iOS keys and profiles across all your team members using git
+🔄  | Automatically sync your iOS and macOS keys and profiles across all your team members using git
 📦  | Handle all the heavy lifting of creating and storing your certificates and profiles
 💻  | Setup codesigning on a new machine in under a minute
 🎯 | Designed to work with apps with multiple targets and bundle identifiers
@@ -73,13 +73,13 @@ fastlane match init
 
 <img src="/img/actions/match_init.gif" width="550" />
 
-You'll be asked if you want to store your code signing identities inside a **Git repo**, or on **Google Cloud**.
+You'll be asked if you want to store your code signing identities inside a **Git repo**, **Google Cloud** or **Amazon S3**.
 
 #### Git Storage
 
 Use Git Storage to store all code signing identities in a private git repo, owned and operated by you. The files will be encrypted using OpenSSL.
 
-First, enter the URL to your private (!) Git repo (You can create one for free on e.g. [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)). The URL you enter can be either a `https://` or a `git` URL. (If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise you may see an authentication error when you attempt to use match.) `fastlane match init` won't read or modify your certificates or profiles yet, and also won't validate your git URL.
+First, enter the URL to your private (!) Git repo (You can create one for free on e.g. [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)). The URL you enter can be either a `https://` or a `git` URL. `fastlane match init` won't read or modify your certificates or profiles yet, and also won't validate your git URL.
 
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder).
 
@@ -92,6 +92,44 @@ app_identifier("tools.fastlane.app")
 username("user@fastlane.tools")
 ```
 
+##### Git Storage on GitHub
+
+If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise, you may see an authentication error when you attempt to use match. Alternatively, you can set a basic authorization for _match_:
+
+Using parameter:
+
+```
+match(git_basic_authorization: '<YOUR KEY>')
+```
+
+Using environment variable:
+
+```
+ENV['MATCH_GIT_BASIC_AUTHORIZATION'] = '<YOUR KEY>'
+match
+```
+
+You can find more information about GitHub basic authentication and personal token generation here: [https://developer.github.com/v3/auth/#basic-authentication](https://developer.github.com/v3/auth/#basic-authentication)
+
+##### Git Storage on Azure Devops
+
+If you're running a pipeline on Azure Devops and using git storage in a another repository on the same project, you might want to use `bearer` token authentication.
+
+Using parameter:
+
+```
+match(git_bearer_authorization: '<YOUR TOKEN>')
+```
+
+Using environment variable:
+
+```
+ENV['MATCH_GIT_BEARER_AUTHORIZATION'] = '<YOUR TOKEN>'
+match
+```
+
+You can find more information about this use case here: [https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#authorize-access-to-your-repositories](https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#authorize-access-to-your-repositories)
+
 #### Google Cloud Storage
 
 Use [Google Cloud Storage](https://cloud.google.com/storage/) for a fully hosted solution for your code signing identities. Certificates are stored on Google Cloud, encrypted using Google managed keys. Everything will be stored on your Google account, inside a storage bucket you provide. You can also directly access the files using the web console.
@@ -102,6 +140,18 @@ Example content (for more advanced setups check out the [fastlane section](#fast
 
 ```ruby-skip-tests
 google_cloud_bucket_name("major-key-certificates")
+```
+
+#### Amazon S3
+
+Use [Amazon S3](https://aws.amazon.com/s3/) for a fully hosted solution for your code signing identities. Certificates are stored on S3, inside a storage bucket you provide. You can also directly access the files using the web console.
+
+This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder).
+
+Example content (for more advanced setups check out the [fastlane section](#fastlane)):
+
+```ruby-skip-tests
+s3_bucket("ios-certificates")
 ```
 
 ### Multiple teams
@@ -117,9 +167,9 @@ match(git_branch: "team1", username: "user@team1.com")
 match(git_branch: "team2", username: "user@team2.com")
 ```
 
-#### Google Cloud Storage
+#### Google Cloud or Amazon S3 Storage
 
-If you use Google Cloud Storage, you don't need to do anything manually. Just use Google Cloud Storage, and the top level folder will be the team ID.
+If you use Google Cloud or Amazon S3 Storage, you don't need to do anything manually. Just use Google Cloud or Amazon S3 Storage, and the top level folder will be the team ID.
 
 ### Run
 
@@ -156,7 +206,7 @@ fastlane action match
 
 #### Handle multiple targets
 
-_match_ can use the same one Git repository or Google Cloud Storage for all bundle identifiers.
+_match_ can use the same one Git repository, Google Cloud, or Amazon S3 Storage for all bundle identifiers.
 
 If you have several targets with different bundle identifiers, supply them as a comma-separated list:
 
@@ -214,12 +264,14 @@ There are two cases for reading and writing certificates stored in a Google Clou
 1. Continuous integration jobs. These will authenticate to your Google Cloud project via a service account, and use a `gc_keys.json` file as credentials.
 1. Developers on a local workstation. In this case, you should choose whether everyone on your team will create their own `gc_keys.json` file, or whether you want to manage access to the bucket directly using your developers' Google accounts.
 
-When running `fastlane match init` the first time, the setup process will give you the option to create your `gc_keys.json` file. This file contains the auth credentials needed to access your Google Cloud storage bucket. Make sure to keep that file secret and never add it to version control. We recommend adding `gc_keys.json` to your `.gitignore`
+When running `fastlane match init` the first time, the setup process will give you the option to create your `gc_keys.json` file. This file contains the authentication credentials needed to access your Google Cloud storage bucket. Make sure to keep that file secret and never add it to version control. We recommend adding `gc_keys.json` to your `.gitignore`
 
 ##### Managing developer access via keys
+
 If you want to manage developer access to your certificates via authentication keys, every developer should create their own `gc_keys.json` and add the file to all their work machines. This will give the admin full control over who has read/write access to the given Storage bucket. At the same time it allows your team to revoke a single key if a file gets compromised.
 
-##### Managing developer acess via Google accounts
+##### Managing developer access via Google accounts
+
 If your developers already have Google accounts and access to your Google Cloud project, you can also manage access to the storage bucket via [Cloud Identity and Access Management (IAM)](https://cloud.google.com/storage/docs/access-control/iam). Just [set up](https://cloud.google.com/storage/docs/access-control/lists) individual developer accounts or an entire Google Group containing your team as readers and writers on your storage bucket.
 
 You can then specify the Google Cloud project id containing your storage bucket in your `Matchfile`:
@@ -379,6 +431,10 @@ Once you've decided which approach to take, all that's left to do is to set your
 
 Accessing Google Cloud Storage from your CI system requires you to provide the `gc_keys.json` file as part of your build. How you implement this is your decision. You can inject that file during build time.
 
+#### Amazon S3 Storage access
+
+Accessing Amazon S3 Storage from your CI system requires you to provide the `s3_region`, `s3_access_key`, `s3_secret_access_key` and `s3_bucket` options (or environment variables), with keys that has read access to the bucket.
+
 ### Nuke
 
 If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command to revoke your certificates and provisioning profiles. Don't worry, apps that are already available in the App Store / TestFlight will still work. Builds distributed via Ad Hoc or Enterprise will be disabled after nuking your account, so you'll have to re-upload a new build. After clearing your account you'll start from a clean state, and you can run _match_ to generate your certificates and profiles again.
@@ -409,13 +465,13 @@ You'll be asked for the new password on all your machines on the next run.
 
 ### Import
 
-To import and encrypt a certificate (`.cer`) and the private key (`.p12`) into the _match_ repo run:
+To import and encrypt a certificate (`.cer`), the private key (`.p12`) and the provisioning profiles (`.mobileprovision` or `.provisionprofile`) into the _match_ repo run:
 
 ```no-highlight
 fastlane match import
 ```
 
-You'll be prompted for the certificate (`.cer`) and the private key (`.p12`) paths. _match_ will first validate the certificate (`.cer`) against the Developer Portal before importing the certificate (`.cer`) and the private key (`.p12`).
+You'll be prompted for the certificate (`.cer`), the private key (`.p12`) and the provisioning profiles (`.mobileprovision` or `.provisionprofile`) paths. _match_ will first validate the certificate (`.cer`) against the Developer Portal before importing the certificate, the private key and the provisioning profiles into the specified _match_ repository.
 
 ### Manual Decrypt
 
