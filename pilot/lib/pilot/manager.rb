@@ -27,9 +27,9 @@ module Pilot
 
     # The app object we're currently using
     def app
-      @apple_id ||= fetch_apple_id
+      @app_id ||= fetch_app_id
 
-      @app ||= Spaceship::Tunes::Application.find(@apple_id)
+      @app ||= Spaceship::ConnectAPI::App.get(app_id: @app_id)
       unless @app
         UI.user_error!("Could not find app with #{(config[:apple_id] || config[:app_identifier])}")
       end
@@ -42,20 +42,20 @@ module Pilot
     # Config Related
     ################
 
-    def fetch_apple_id
-      @apple_id ||= config[:apple_id]
-      return @apple_id if @apple_id
+    def fetch_app_id
+      @app_id ||= config[:apple_id]
+      return @app_id if @app_id
       config[:app_identifier] = fetch_app_identifier
 
       if config[:app_identifier]
-        @app ||= Spaceship::Tunes::Application.find(config[:app_identifier])
+        @app ||= Spaceship::ConnectAPI::App.find(config[:app_identifier])
         UI.user_error!("Couldn't find app '#{config[:app_identifier]}' on the account of '#{config[:username]}' on App Store Connect") unless @app
-        apple_id ||= @app.apple_id
+        @app_id ||= @app.id
       end
 
-      apple_id ||= UI.input("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
+      @app_id ||= UI.input("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
 
-      return apple_id
+      return @app_id
     end
 
     def fetch_app_identifier

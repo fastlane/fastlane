@@ -1,14 +1,18 @@
+require 'ostruct'
+
 module Fastlane
   module Actions
     module SharedValues
       LATEST_BUILD_NUMBER = :LATEST_BUILD_NUMBER
+      LATEST_VERSION = :LATEST_VERSION
     end
 
     class AppStoreBuildNumberAction < Action
       def self.run(params)
         require 'spaceship'
 
-        build_nr = get_build_number(params)
+        result = get_build_number(params)
+        build_nr = result.build_nr
 
         # Convert build_nr to int (for legacy use) if no "." in string
         if build_nr.kind_of?(String) && !build_nr.include?(".")
@@ -16,6 +20,9 @@ module Fastlane
         end
 
         Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = build_nr
+        Actions.lane_context[SharedValues::LATEST_VERSION] = result.build_v
+
+        return build_nr
       end
 
       def self.get_build_number(params)
@@ -24,7 +31,7 @@ module Fastlane
         Spaceship::Tunes.select_team(team_id: params[:team_id], team_name: params[:team_name])
         UI.message("Login successful")
 
-        app = Spaceship::Tunes::Application.find(params[:app_identifier])
+        app = Spaceship::Tunes::Application.find(params[:app_identifier], mac: params[:platform] == "osx")
         UI.user_error!("Could not find an app on App Store Connect with app_identifier: #{params[:app_identifier]}") unless app
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
@@ -32,46 +39,49 @@ module Fastlane
           build_nr = app.live_version.current_build_number
 
           UI.message("Latest upload for live-version #{app.live_version.version} is build: #{build_nr}")
+
+          return OpenStruct.new({ build_nr: build_nr, build_v: app.live_version.version })
         else
           version_number = params[:version]
+          platform = params[:platform]
 
-          # Filter on app (and version is specified)
+          # Create filter for get_builds with optional version number
           filter = { app: app.apple_id }
-          filter["version"] = version_number if version_number
-
-          # Get version number from latest pre-release if no version number given
-          client = Spaceship::ConnectAPI::Base.client
-          version = client.get_pre_release_versions(filter: filter, sort: "-version", limit: 1).first
-          if version
-            # Need pre_release_version_id for filtering build numbers
-            pre_release_version_id = version["id"]
-            version_number = version["attributes"]["version"]
-
-            UI.message("Fetching the latest build number for version #{version_number}")
-
-            # Get latest build for version number
-            build = client.get_builds(filter: { app: app.apple_id, "preReleaseVersion" => pre_release_version_id }, sort: "-version", limit: 1).first
-            if build
-              build_nr = build["attributes"]["version"]
-              build_nr
-            else
-              UI.important("Could not find a build number for version #{version_number} on App Store Connect")
-            end
+          if version_number
+            filter["preReleaseVersion.version"] = version_number
+            version_number_message = "version #{version_number}"
+          else
+            version_number_message = "any version"
           end
 
-          # Show error and set initial build number
-          if build_nr
-            UI.message("Latest upload for version #{version_number} is build: #{build_nr}")
-          elsif params[:initial_build_number].nil?
+          if platform
+            filter["preReleaseVersion.platform"] = Spaceship::ConnectAPI::Platform.map(platform)
+            platform_message = "#{platform} platform"
+          else
+            platform_message = "any platform"
+          end
+
+          UI.message("Fetching the latest build number for #{version_number_message}")
+
+          # Get latest build for optional version number and return build number if found
+          build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).first
+          if build
+            build_nr = build.version
+            UI.message("Latest upload for version #{build.app_version} on #{platform_message} is build: #{build_nr}")
+            return OpenStruct.new({ build_nr: build_nr, build_v: build.app_version })
+          end
+
+          # Let user know that build couldn't be found
+          UI.important("Could not find a build for #{version_number_message} on #{platform_message} on App Store Connect")
+
+          if params[:initial_build_number].nil?
             UI.user_error!("Could not find a build on App Store Connect - and 'initial_build_number' option is not set")
           else
             build_nr = params[:initial_build_number]
-            UI.message("Using initial build number of #{build_nr} for version #{version_number}")
+            UI.message("Using initial build number of #{build_nr}")
+            return OpenStruct.new({ build_nr: build_nr, build_v: version_number })
           end
-
         end
-
-        build_nr
       end
 
       def self.order_versions(versions)
@@ -156,7 +166,8 @@ module Fastlane
 
       def self.output
         [
-          ['LATEST_BUILD_NUMBER', 'The latest build number of either live or testflight version']
+          ['LATEST_BUILD_NUMBER', 'The latest build number of either live or testflight version'],
+          ['LATEST_VERSION', 'The version of the latest build number']
         ]
       end
 

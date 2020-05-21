@@ -54,9 +54,9 @@
     "name": "Fumiya Nakamura",
     "twitter": "nafu003"
   },
-  "DanToml": {
+  "endocrimes": {
     "name": "Danielle Tomlinson",
-    "twitter": "DanToml"
+    "twitter": "endocrimes"
   },
   "lmirosevic": {
     "name": "Luka Mirosevic",
@@ -77,5 +77,13 @@
   "armcburney": {
     "name": "Andrew McBurney",
     "twitter": "armcburney"
+  },
+  "mollyIV": {
+    "name": "Daniel Jankowski",
+    "twitter": "mollyIV"
+  },
+  "max-ott": {
+    "name": "Max Ott",
+    "twitter": "ott_max"
   }
 }

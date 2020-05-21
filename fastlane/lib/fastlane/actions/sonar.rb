@@ -20,7 +20,12 @@ module Fastlane
         sonar_scanner_args << "-Dsonar.sourceEncoding=\"#{params[:source_encoding]}\"" if params[:source_encoding]
         sonar_scanner_args << "-Dsonar.login=\"#{params[:sonar_login]}\"" if params[:sonar_login]
         sonar_scanner_args << "-Dsonar.host.url=\"#{params[:sonar_url]}\"" if params[:sonar_url]
+        sonar_scanner_args << "-Dsonar.organization=\"#{params[:sonar_organization]}\"" if params[:sonar_organization]
         sonar_scanner_args << "-Dsonar.branch.name=\"#{params[:branch_name]}\"" if params[:branch_name]
+        sonar_scanner_args << "-Dsonar.pullrequest.branch=\"#{params[:pull_request_branch]}\"" if params[:pull_request_branch]
+        sonar_scanner_args << "-Dsonar.pullrequest.base=\"#{params[:pull_request_base]}\"" if params[:pull_request_base]
+        sonar_scanner_args << "-Dsonar.pullrequest.key=\"#{params[:pull_request_key]}\"" if params[:pull_request_key]
+
         sonar_scanner_args << params[:sonar_runner_args] if params[:sonar_runner_args]
 
         command = [
@@ -99,9 +104,29 @@ module Fastlane
                                        description: "Pass the url of the Sonar server",
                                        optional: true,
                                        is_string: true),
+          FastlaneCore::ConfigItem.new(key: :sonar_organization,
+                                       env_name: "FL_SONAR_ORGANIZATION",
+                                       description: "Key of the organization on SonarCloud",
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :branch_name,
                                        env_name: "FL_SONAR_RUNNER_BRANCH_NAME",
                                        description: "Pass the branch name which is getting scanned",
+                                       optional: true,
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :pull_request_branch,
+                                       env_name: "FL_SONAR_RUNNER_PULL_REQUEST_BRANCH",
+                                       description: "The name of the branch that contains the changes to be merged",
+                                       optional: true,
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :pull_request_base,
+                                       env_name: "FL_SONAR_RUNNER_PULL_REQUEST_BASE",
+                                       description: "The long-lived branch into which the PR will be merged",
+                                       optional: true,
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :pull_request_key,
+                                       env_name: "FL_SONAR_RUNNER_PULL_REQUEST_KEY",
+                                       description: "Unique identifier of your PR. Must correspond to the key of the PR in GitHub or TFS",
                                        optional: true,
                                        is_string: true)
         ]
@@ -126,6 +151,15 @@ module Fastlane
             project_version: "1.0",
             project_name: "iOS - AwesomeApp",
             sources_path: File.expand_path("../AwesomeApp")
+          )',
+          'sonar(
+            project_key: "name.gretzki.awesomeApp",
+            project_version: "1.0",
+            project_name: "iOS - AwesomeApp",
+            sources_path: File.expand_path("../AwesomeApp"),
+            sonar_organization: "myOrg",
+            sonar_login: "123456abcdef",
+            sonar_url: "https://sonarcloud.io"
           )'
         ]
       end

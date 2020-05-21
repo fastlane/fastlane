@@ -6,6 +6,7 @@ module Produce
     # See this pull request for example: https://github.com/fastlane/fastlane/pull/14110
     def self.all_languages
       [
+        "Arabic",
         "Catalan",
         "Croatian",
         "Czech",
@@ -21,6 +22,7 @@ module Produce
         "French_CA",
         "German",
         "Greek",
+        "Hebrew",
         "Hindi",
         "Hungarian",
         "Indonesian",

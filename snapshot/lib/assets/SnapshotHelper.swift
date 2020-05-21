@@ -38,22 +38,13 @@ func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
 }
 
 enum SnapshotError: Error, CustomDebugStringConvertible {
-    case cannotDetectUser
-    case cannotFindHomeDirectory
     case cannotFindSimulatorHomeDirectory
-    case cannotAccessSimulatorHomeDirectory(String)
     case cannotRunOnPhysicalDevice
 
     var debugDescription: String {
         switch self {
-        case .cannotDetectUser:
-            return "Couldn't find Snapshot configuration files - can't detect current user "
-        case .cannotFindHomeDirectory:
-            return "Couldn't find Snapshot configuration files - can't detect `Users` dir"
         case .cannotFindSimulatorHomeDirectory:
             return "Couldn't find simulator home location. Please, check SIMULATOR_HOST_HOME env variable."
-        case .cannotAccessSimulatorHomeDirectory(let simulatorHostHome):
-            return "Can't prepare environment. Simulator home location is inaccessible. Does \(simulatorHostHome) exist?"
         case .cannotRunOnPhysicalDevice:
             return "Can't use Snapshot on a physical device."
         }
@@ -70,27 +61,27 @@ open class Snapshot: NSObject {
     }
 
     open class func setupSnapshot(_ app: XCUIApplication, waitForAnimations: Bool = true) {
-        
+
         Snapshot.app = app
         Snapshot.waitForAnimations = waitForAnimations
 
         do {
-            let cacheDir = try pathPrefix()
+            let cacheDir = try getCacheDirectory()
             Snapshot.cacheDirectory = cacheDir
             setLanguage(app)
             setLocale(app)
             setLaunchArguments(app)
         } catch let error {
-            print(error)
+            NSLog(error.localizedDescription)
         }
     }
 
     class func setLanguage(_ app: XCUIApplication) {
         guard let cacheDirectory = self.cacheDirectory else {
-            print("CacheDirectory is not set - probably running on a physical device?")
+            NSLog("CacheDirectory is not set - probably running on a physical device?")
             return
         }
-        
+
         let path = cacheDirectory.appendingPathComponent("language.txt")
 
         do {
@@ -98,29 +89,29 @@ open class Snapshot: NSObject {
             deviceLanguage = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
             app.launchArguments += ["-AppleLanguages", "(\(deviceLanguage))"]
         } catch {
-            print("Couldn't detect/set language...")
+            NSLog("Couldn't detect/set language...")
         }
     }
 
     class func setLocale(_ app: XCUIApplication) {
         guard let cacheDirectory = self.cacheDirectory else {
-            print("CacheDirectory is not set - probably running on a physical device?")
+            NSLog("CacheDirectory is not set - probably running on a physical device?")
             return
         }
-        
+
         let path = cacheDirectory.appendingPathComponent("locale.txt")
 
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
             locale = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
         } catch {
-            print("Couldn't detect/set locale...")
+            NSLog("Couldn't detect/set locale...")
         }
-        
+
         if locale.isEmpty && !deviceLanguage.isEmpty {
             locale = Locale(identifier: deviceLanguage).identifier
         }
-        
+
         if !locale.isEmpty {
             app.launchArguments += ["-AppleLocale", "\"\(locale)\""]
         }
@@ -128,10 +119,10 @@ open class Snapshot: NSObject {
 
     class func setLaunchArguments(_ app: XCUIApplication) {
         guard let cacheDirectory = self.cacheDirectory else {
-            print("CacheDirectory is not set - probably running on a physical device?")
+            NSLog("CacheDirectory is not set - probably running on a physical device?")
             return
         }
-        
+
         let path = cacheDirectory.appendingPathComponent("snapshot-launch_arguments.txt")
         app.launchArguments += ["-FASTLANE_SNAPSHOT", "YES", "-ui_testing"]
 
@@ -144,7 +135,7 @@ open class Snapshot: NSObject {
             }
             app.launchArguments += results
         } catch {
-            print("Couldn't detect/set launch_arguments...")
+            NSLog("Couldn't detect/set launch_arguments...")
         }
     }
 
@@ -153,7 +144,7 @@ open class Snapshot: NSObject {
             waitForLoadingIndicatorToDisappear(within: timeout)
         }
 
-        print("snapshot: \(name)") // more information about this, check out https://docs.fastlane.tools/actions/snapshot/#how-does-it-work
+        NSLog("snapshot: \(name)") // more information about this, check out https://docs.fastlane.tools/actions/snapshot/#how-does-it-work
 
         if Snapshot.waitForAnimations {
             sleep(1) // Waiting for the animation to be finished (kind of)
@@ -161,27 +152,32 @@ open class Snapshot: NSObject {
 
         #if os(OSX)
             guard let app = self.app else {
-                print("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
+                NSLog("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
                 return
             }
 
             app.typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
         #else
-            
-            guard let app = self.app else {
-                print("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
+
+            guard self.app != nil else {
+                NSLog("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
                 return
             }
-            
-            let window = app.windows.firstMatch
-            let screenshot = window.screenshot()
-            guard let simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
-            let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
+
+            let screenshot = XCUIScreen.main.screenshot()
+            guard var simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
+
             do {
+                // The simulator name contains "Clone X of " inside the screenshot file when running parallelized UI Tests on concurrent devices
+                let regex = try NSRegularExpression(pattern: "Clone [0-9]+ of ")
+                let range = NSRange(location: 0, length: simulator.count)
+                simulator = regex.stringByReplacingMatches(in: simulator, range: range, withTemplate: "")
+
+                let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
                 try screenshot.pngRepresentation.write(to: path)
             } catch let error {
-                print("Problem writing screenshot: \(name) to \(path)")
-                print(error)
+                NSLog("Problem writing screenshot: \(name) to \(screenshotsDir)/\(simulator)-\(name).png")
+                NSLog(error.localizedDescription)
             }
         #endif
     }
@@ -192,7 +188,7 @@ open class Snapshot: NSObject {
         #endif
 
         guard let app = self.app else {
-            print("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
+            NSLog("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
             return
         }
 
@@ -201,34 +197,22 @@ open class Snapshot: NSObject {
         _ = XCTWaiter.wait(for: [networkLoadingIndicatorDisappeared], timeout: timeout)
     }
 
-    class func pathPrefix() throws -> URL? {
-        let homeDir: URL
+    class func getCacheDirectory() throws -> URL {
+        let cachePath = "Library/Caches/tools.fastlane"
         // on OSX config is stored in /Users/<username>/Library
         // and on iOS/tvOS/WatchOS it's in simulator's home dir
         #if os(OSX)
-            guard let user = ProcessInfo().environment["USER"] else {
-                throw SnapshotError.cannotDetectUser
+            let homeDir = URL(fileURLWithPath: NSHomeDirectory())
+            return homeDir.appendingPathComponent(cachePath)
+        #elseif arch(i386) || arch(x86_64)
+            guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
+                throw SnapshotError.cannotFindSimulatorHomeDirectory
             }
-
-            guard let usersDir = FileManager.default.urls(for: .userDirectory, in: .localDomainMask).first else {
-                throw SnapshotError.cannotFindHomeDirectory
-            }
-
-            homeDir = usersDir.appendingPathComponent(user)
+            let homeDir = URL(fileURLWithPath: simulatorHostHome)
+            return homeDir.appendingPathComponent(cachePath)
         #else
-            #if arch(i386) || arch(x86_64)
-                guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
-                    throw SnapshotError.cannotFindSimulatorHomeDirectory
-                }
-                guard let homeDirUrl = URL(string: simulatorHostHome) else {
-                    throw SnapshotError.cannotAccessSimulatorHomeDirectory(simulatorHostHome)
-                }
-                homeDir = URL(fileURLWithPath: homeDirUrl.path)
-            #else
-                throw SnapshotError.cannotRunOnPhysicalDevice
-            #endif
+            throw SnapshotError.cannotRunOnPhysicalDevice
         #endif
-        return homeDir.appendingPathComponent("Library/Caches/tools.fastlane")
     }
 }
 
@@ -295,4 +279,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.15]
+// SnapshotHelperVersion [1.22]

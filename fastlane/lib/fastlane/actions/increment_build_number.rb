@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      BUILD_NUMBER = :BUILD_NUMBER
+      BUILD_NUMBER ||= :BUILD_NUMBER
     end
 
     class IncrementBuildNumberAction < Action

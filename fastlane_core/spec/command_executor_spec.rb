@@ -12,23 +12,21 @@ describe FastlaneCore do
       end
 
       it 'handles reading which throws a EIO exception', requires_pty: true do
-        explodes_on_strip = 'danger! lasers!'
-        fake_std_in = ['a_filename', explodes_on_strip]
-
-        # In reality the exception is raised by the `each` call, but for easier mocking
-        # we manually raise the exception when the line is cleaned up with `strip` afterward
-        expect(explodes_on_strip).to receive(:strip).and_raise(Errno::EIO)
-
-        child_process_id = 1
-        expect(Process).to receive(:wait).with(child_process_id)
-
-        # Hacky approach because $? is not be defined since we skip the actual spawn
-        allow_message_expectations_on_nil
-        expect($?).to receive(:exitstatus).and_return(0)
+        fake_std_in = [
+          "a_filename\n"
+        ]
+        expect(fake_std_in).to receive(:each).and_yield(*fake_std_in).and_raise(Errno::EIO)
 
         # Make a fake child process so we have a valid PID and $? is set correctly
         expect(PTY).to receive(:spawn) do |command, &block|
           expect(command).to eq('ls')
+
+          # PTY uses "$?" to get exitcode, which is filled in by Process.wait(),
+          # so we have to spawn a real process unless we want to mock methods
+          # on nil.
+          child_process_id = Process.spawn('echo foo', out: File::NULL)
+          expect(Process).to receive(:wait).with(child_process_id)
+
           block.yield(fake_std_in, 'not_really_std_out', child_process_id)
         end
 
@@ -37,6 +35,38 @@ describe FastlaneCore do
         # We are implicitly also checking that the error was not rethrown because that would
         # have crashed the test
         expect(result).to eq('a_filename')
+      end
+
+      it 'chomps but does not strip output lines', requires_pty: true do
+        fake_std_in = [
+          "Shopping list:\n",
+          "  - Milk\n",
+          "  - Bread\n",
+          "  - Muffins\n"
+        ]
+
+        expect(PTY).to receive(:spawn) do |command, &block|
+          expect(command).to eq('echo foo')
+
+          # PTY uses "$?" to get exitcode, which is filled in by Process.wait(),
+          # so we have to spawn a real process unless we want to mock methods
+          # on nil.
+          child_process_id = Process.spawn('echo foo', out: File::NULL)
+          expect(Process).to receive(:wait).with(child_process_id)
+
+          block.yield(fake_std_in, 'not_really_std_out', child_process_id)
+        end
+
+        result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
+
+        # We are implicitly also checking that the error was not rethrown because that would
+        # have crashed the test
+        expect(result).to eq(<<-LIST.chomp)
+Shopping list:
+  - Milk
+  - Bread
+  - Muffins
+        LIST
       end
     end
 

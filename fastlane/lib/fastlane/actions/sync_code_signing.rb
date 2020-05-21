@@ -2,6 +2,7 @@ module Fastlane
   module Actions
     module SharedValues
       MATCH_PROVISIONING_PROFILE_MAPPING = :MATCH_PROVISIONING_PROFILE_MAPPING
+      SIGH_PROFILE_TYPE ||= :SIGH_PROFILE_TYPE # originally defined in GetProvisioningProfileAction
     end
 
     class SyncCodeSigningAction < Action
@@ -69,7 +70,8 @@ module Fastlane
 
       def self.output
         [
-          ['MATCH_PROVISIONING_PROFILE_MAPPING', 'The match provisioning profile mapping']
+          ['MATCH_PROVISIONING_PROFILE_MAPPING', 'The match provisioning profile mapping'],
+          ['SIGH_PROFILE_TYPE', 'The profile type, can be appstore, adhoc, development, enterprise']
         ]
       end
 
@@ -81,7 +83,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

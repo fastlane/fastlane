@@ -51,7 +51,7 @@ platform :android do
   end
 
   lane :unsupported_action do
-    frameit
+    team_name('Fastlane Tools')
   end
 
   after_all do

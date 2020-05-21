@@ -38,8 +38,8 @@ module Spaceship
             'ipad' => [1024, 768],
             'ipad105' => [2224, 1668],
             'ipadPro' => [2732, 2048],
-            'iPadPro11' => [2388, 1668],
-            'iPadPro129' => [2732, 2048]
+            'ipadPro11' => [2388, 1668],
+            'ipadPro129' => [2732, 2048]
         }
 
         r = resolutions[device]
@@ -286,7 +286,7 @@ module Spaceship
     # @param sku (String): A unique ID for your app that is not visible on the App Store.
     # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
     #   can't be changed after you submit your first build.
-    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, itunes_connect_users: nil)
+    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, platforms: nil, itunes_connect_users: nil)
       puts("The `version` parameter is deprecated. Use `Spaceship::Tunes::Application.ensure_version!` method instead") if version
 
       # First, we need to fetch the data from Apple, which we then modify with the user's values
@@ -307,7 +307,7 @@ module Spaceship
       data['enabledPlatformsForCreation'] = { value: [platform] }
 
       data['initialPlatform'] = platform
-      data['enabledPlatformsForCreation'] = { value: [platform] }
+      data['enabledPlatformsForCreation'] = { value: platforms || [platform] }
 
       unless itunes_connect_users.nil?
         data['iTunesConnectUsers']['grantedAllUsers'] = false
@@ -352,6 +352,31 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    def post_resolution_center(app_id, platform, thread_id, version_id, version_number, from, message_body)
+      r = request(:post) do |req|
+        req.url("ra/apps/#{app_id}/platforms/#{platform}/resolutionCenter")
+        req.body = {
+          appNotes: {
+            threads: [{
+              id: thread_id,
+              versionId: version_id,
+              version: version_number,
+              messages: [{
+                from: from,
+                date: DateTime.now.strftime('%Q'),
+                body: message_body,
+                tokens: []
+              }]
+            }]
+          }
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
+    end
+
     def get_ratings(app_id, platform, version_id = '', storefront = '')
       # if storefront or version_id is empty api fails
       rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews/summary"
@@ -375,7 +400,7 @@ module Spaceship
         rating_url << "sort=REVIEW_SORT_ORDER_MOST_RECENT"
         rating_url << "&index=#{index}"
         rating_url << "&storefront=#{storefront}" unless storefront.empty?
-        rating_url << "&version_id=#{version_id}" unless version_id.empty?
+        rating_url << "&versionId=#{version_id}" unless version_id.empty?
 
         r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
@@ -602,7 +627,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def transform_to_raw_pricing_intervals(app_id = nil, purchase_id = nil, pricing_intervals = nil, subscription_price_target = nil)
+    def transform_to_raw_pricing_intervals(app_id = nil, purchase_id = nil, pricing_intervals = 5, subscription_price_target = nil)
       intervals_array = []
       if pricing_intervals
         intervals_array = pricing_intervals.map do |interval|
@@ -718,7 +743,7 @@ module Spaceship
       data["preOrder"]["clearedForPreOrder"] = { "value" => cleared_for_preorder, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
       data["preOrder"]["appAvailableDate"] = { "value" => app_available_date, "isEditable" => true, "isRequired" => true, "errorKeys" => nil }
       data["b2bUsers"] = availability.b2b_app_enabled ? availability.b2b_users.map { |user| { "value" => { "add" => user.add, "delete" => user.delete, "dsUsername" => user.ds_username } } } : []
-
+      data["b2bOrganizations"] = availability.b2b_app_enabled ? availability.b2b_organizations.map { |org| { "value" => { "type" => org.type, "depCustomerId" => org.dep_customer_id, "organizationId" => org.dep_organization_id, "name" => org.name } } } : []
       # send the changes back to Apple
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/pricing/intervals")
@@ -759,11 +784,8 @@ module Spaceship
     end
 
     def available_languages
-      r = request(:get, "ra/apps/storePreview/regionCountryLanguage")
-      response = parse_response(r, 'data')
-      response.flat_map { |region| region["storeFronts"] }
-              .flat_map { |storefront| storefront["supportedLocaleCodes"] }
-              .uniq
+      r = request(:get, "ra/ref")
+      parse_response(r, 'data')['detailLocales']
     end
 
     #####################################################
@@ -789,6 +811,35 @@ module Spaceship
       raise "upload_image is required" unless upload_image
 
       du_client.upload_watch_icon(app_version, upload_image, content_provider_id, sso_token_for_image)
+    end
+
+    # Uploads an In-App-Purchase Promotional image
+    # @param upload_image (UploadFile): The icon to upload
+    # @return [JSON] the image data, ready to be added to an In-App-Purchase
+    def upload_purchase_merch_screenshot(app_id, upload_image)
+      data = du_client.upload_purchase_merch_screenshot(app_id, upload_image, content_provider_id, sso_token_for_image)
+      {
+        "images" => [
+          {
+            "id" => nil,
+            "image" => {
+              "value" => {
+                "assetToken" => data["token"],
+                "originalFileName" => upload_image.file_name,
+                "height" => data["height"],
+                "width" => data["width"],
+                "checksum" => data["md5"]
+              },
+              "isEditable" => true,
+              "isREquired" => false,
+              "errorKeys" => nil
+            },
+            "status" => "proposed"
+          }
+        ],
+        "showByDefault" => true,
+        "isActive" => false
+      }
     end
 
     # Uploads an In-App-Purchase Review screenshot
@@ -871,6 +922,21 @@ module Spaceship
       raise "device is required" unless device
 
       du_client.upload_trailer_preview(app_version, upload_trailer_preview, content_provider_id, sso_token_for_image, device)
+    end
+
+    #####################################################
+    # @!review attachment file
+    #####################################################
+    # Uploads a attachment file
+    # @param app_version (AppVersion): The version of your app(must be edit version)
+    # @param upload_attachment_file (file): File to upload
+    # @return [JSON] the response
+    def upload_app_review_attachment(app_version, upload_attachment_file)
+      raise "app_version is required" unless app_version
+      raise "app_version must be live version" if app_version.is_live?
+      raise "upload_attachment_file is required" unless upload_attachment_file
+
+      du_client.upload_app_review_attachment(app_version, upload_attachment_file, content_provider_id, sso_token_for_image)
     end
 
     # Fetches the App Version Reference information from ITC
@@ -1289,7 +1355,7 @@ module Spaceship
     end
 
     # Creates an In-App-Purchases
-    def create_iap!(app_id: nil, type: nil, versions: nil, reference_name: nil, product_id: nil, cleared_for_sale: true, review_notes: nil, review_screenshot: nil, pricing_intervals: nil, family_id: nil, subscription_duration: nil, subscription_free_trial: nil)
+    def create_iap!(app_id: nil, type: nil, versions: nil, reference_name: nil, product_id: nil, cleared_for_sale: true, merch_screenshot: nil, review_notes: nil, review_screenshot: nil, pricing_intervals: nil, family_id: nil, subscription_duration: nil, subscription_free_trial: nil)
       # Load IAP Template based on Type
       type ||= "consumable"
       r = request(:get, "ra/apps/#{app_id}/iaps/#{type}/template")
@@ -1333,6 +1399,13 @@ module Spaceship
       data["versions"][0]["details"]["value"] = versions_array
       data['versions'][0]["reviewNotes"] = { value: review_notes }
 
+      if merch_screenshot
+        # Upload App Store Promotional image (Optional)
+        upload_file = UploadFile.from_path(merch_screenshot)
+        merch_data = upload_purchase_merch_screenshot(app_id, upload_file)
+        data["versions"][0]["merch"] = merch_data
+      end
+
       if review_screenshot
         # Upload Screenshot:
         upload_file = UploadFile.from_path(review_screenshot)
@@ -1347,6 +1420,20 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
+    end
+
+    # Retrieves app-specific shared secret key
+    def get_shared_secret(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/appSharedSecret")
+      data = parse_response(r, 'data')
+      data['sharedSecret']
+    end
+
+    # Generates app-specific shared secret key
+    def generate_shared_secret(app_id: nil)
+      r = request(:post, "ra/apps/#{app_id}/iaps/appSharedSecret")
+      data = parse_response(r, 'data')
+      data['sharedSecret']
     end
 
     #####################################################

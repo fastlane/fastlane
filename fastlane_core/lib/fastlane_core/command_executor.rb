@@ -51,7 +51,7 @@ module FastlaneCore
         begin
           status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
             command_stdout.each do |l|
-              line = l.strip # strip so that \n gets removed
+              line = l.chomp
               output << line
 
               next unless print_all

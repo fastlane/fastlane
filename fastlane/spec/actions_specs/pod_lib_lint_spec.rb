@@ -148,6 +148,14 @@ describe Fastlane do
 
         expect(result).to eq("bundle exec pod lib lint --skip-tests")
       end
+
+      it "generates the correct pod lib lint command with analyze parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_lib_lint(analyze: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod lib lint --analyze")
+      end
     end
   end
 end

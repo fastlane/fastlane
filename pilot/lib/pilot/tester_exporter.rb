@@ -1,5 +1,4 @@
 require 'spaceship/tunes/application'
-require 'spaceship/test_flight/tester'
 require_relative 'tester_util'
 require_relative 'module'
 require_relative 'manager'
@@ -12,13 +11,11 @@ module Pilot
       start(options)
       require 'csv'
 
-      app_filter = (config[:apple_id] || config[:app_identifier])
-      if app_filter
-        app = Spaceship::Tunes::Application.find(app_filter)
-
-        testers = Spaceship::TestFlight::Tester.all(app_id: app.apple_id)
+      app = find_app(apple_id: options[:apple_id], app_identifier: options[:app_identifier])
+      if app
+        testers = app.get_beta_testers(includes: "apps,betaTesterMetrics,betaGroups")
       else
-        testers = Spaceship::TestFlight::Tester.all
+        testers = Spaceship::ConnectAPI::BetaTester.all(includes: "apps,betaTesterMetrics,betaGroups")
       end
 
       file = config[:testers_file_path]
@@ -27,16 +24,35 @@ module Pilot
         csv << ['First', 'Last', 'Email', 'Groups', 'Installed Version', 'Install Date']
 
         testers.each do |tester|
-          group_names = tester.groups.join(";") || ""
-          latest_install_info = tester.latest_install_info
-          install_version = latest_install_info["latestInstalledShortVersion"] || ""
-          pretty_date = tester.pretty_install_date || ""
+          group_names = tester.beta_groups.map(&:name).join(";") || ""
+
+          metric = (tester.beta_tester_metrics || []).first
+          if metric.installed?
+            install_version = "#{metric.installed_cf_bundle_short_version_string} (#{metric.installed_cf_bundle_version})"
+            pretty_date = metric.installed_cf_bundle_version
+          end
 
           csv << [tester.first_name, tester.last_name, tester.email, group_names, install_version, pretty_date]
         end
 
         UI.success("Successfully exported CSV to #{file}")
       end
+    end
+
+    def find_app(apple_id: nil, app_identifier: nil)
+      if app_identifier
+        app = Spaceship::ConnectAPI::App.find(app_identifier)
+        UI.user_error!("Could not find an app by #{app_identifier}") unless app
+        return app
+      end
+
+      if apple_id
+        app = Spaceship::ConnectAPI::App.get(app_id: apple_id)
+        UI.user_error!("Could not find an app by #{apple_id}") unless app
+        return app
+      end
+
+      UI.user_error!("You must include an `app_identifier` to `list_testers`")
     end
   end
 end
