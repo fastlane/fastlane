@@ -11,20 +11,22 @@ module Fastlane
 
         if command_name == "archive" && params[:frameworks].count > 0
           cmd.concat(params[:frameworks])
-        elsif ["update", "build", "bootstrap"].include?(command_name) && params[:dependencies].count > 0
-          cmd.concat(params[:dependencies])
+        # "update", "build" and "bootstrap" are the only commands that support "--derived-data" parameter
+        elsif ["update", "build", "bootstrap"].include?(command_name)
+          cmd.concat(params[:dependencies]) if params[:dependencies].count > 0
+          cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
         end
 
         cmd << "--output #{params[:output]}" if params[:output]
         cmd << "--use-ssh" if params[:use_ssh]
         cmd << "--use-submodules" if params[:use_submodules]
         cmd << "--no-use-binaries" if params[:use_binaries] == false
+        cmd << "--no-checkout" if params[:no_checkout] == true
         cmd << "--no-build" if params[:no_build] == true
         cmd << "--no-skip-current" if params[:no_skip_current] == true
         cmd << "--verbose" if params[:verbose] == true
         cmd << "--platform #{params[:platform]}" if params[:platform]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
-        cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
         cmd << "--toolchain #{params[:toolchain]}" if params[:toolchain]
         cmd << "--project-directory #{params[:project_directory]}" if params[:project_directory]
         cmd << "--cache-builds" if params[:cache_builds]
@@ -90,6 +92,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :use_binaries,
                                        env_name: "FL_CARTHAGE_USE_BINARIES",
                                        description: "Check out dependency repositories even when prebuilt frameworks exist",
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :no_checkout,
+                                       env_name: "FL_CARTHAGE_NO_CHECKOUT",
+                                       description: "When bootstrapping Carthage do not checkout",
                                        is_string: false,
                                        type: Boolean,
                                        optional: true),

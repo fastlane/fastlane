@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      VERSION_NUMBER = :VERSION_NUMBER
+      VERSION_NUMBER ||= :VERSION_NUMBER
     end
 
     class IncrementVersionNumberAction < Action
@@ -33,28 +33,33 @@ module Fastlane
           current_version = ''
         end
 
-        version_regex = /^\d+\.\d+\.\d+$/
         if params[:version_number]
-          UI.verbose("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
+          UI.verbose(version_format_error(current_version)) unless current_version =~ version_regex
 
           # Specific version
           next_version_number = params[:version_number]
         else
-          UI.user_error!("Your current version (#{current_version}) does not respect the format A.B.C") unless current_version =~ version_regex
+          UI.user_error!(version_format_error(current_version)) unless current_version =~ version_regex
           version_array = current_version.split(".").map(&:to_i)
 
           case params[:bump_type]
+          when "bump"
+            version_array[-1] = version_array[-1] + 1
+            next_version_number = version_array.join(".")
           when "patch"
+            UI.user_error!(version_token_error) if version_array.count < 3
             version_array[2] = version_array[2] + 1
             next_version_number = version_array.join(".")
           when "minor"
+            UI.user_error!(version_token_error) if version_array.count < 2
             version_array[1] = version_array[1] + 1
-            version_array[2] = version_array[2] = 0
+            version_array[2] = 0 if version_array[2]
             next_version_number = version_array.join(".")
           when "major"
+            UI.user_error!(version_token_error) if version_array.count == 0
             version_array[0] = version_array[0] + 1
-            version_array[1] = version_array[1] = 0
-            version_array[1] = version_array[2] = 0
+            version_array[1] = 0 if version_array[1]
+            version_array[2] = 0 if version_array[2]
             next_version_number = version_array.join(".")
           when "specific_version"
             next_version_number = specific_version_number
@@ -79,6 +84,18 @@ module Fastlane
         raise ex
       end
 
+      def self.version_regex
+        /^\d+(\.\d+){0,2}$/
+      end
+
+      def self.version_format_error(version)
+        "Your current version (#{version}) does not respect the format A or A.B or A.B.C"
+      end
+
+      def self.version_token_error
+        "Can't increment version"
+      end
+
       def self.description
         "Increment the version number of your project"
       end
@@ -95,9 +112,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :bump_type,
                                        env_name: "FL_VERSION_NUMBER_BUMP_TYPE",
                                        description: "The type of this version bump. Available: patch, minor, major",
-                                       default_value: "patch",
+                                       default_value: "bump",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['patch', 'minor', 'major'].include?(value)
+                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['bump', 'patch', 'minor', 'major'].include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_NUMBER_VERSION_NUMBER",
@@ -134,7 +151,7 @@ module Fastlane
 
       def self.example_code
         [
-          'increment_version_number # Automatically increment patch version number',
+          'increment_version_number # Automatically increment version number',
           'increment_version_number(
             bump_type: "patch" # Automatically increment patch version number
           )',

@@ -1,5 +1,6 @@
 require_relative 'helper'
 require 'xcodeproj'
+require 'fastlane_core/command_executor'
 
 module FastlaneCore
   # Represents an Xcode project
@@ -273,6 +274,10 @@ module FastlaneCore
       (framework? && build_settings(key: "PLATFORM_NAME") == "macosx")
     end
 
+    def supports_mac_catalyst?
+      build_settings(key: "SUPPORTS_MACCATALYST") == "YES"
+    end
+
     def command_line_tool?
       (build_settings(key: "PRODUCT_TYPE") == "com.apple.product-type.tool")
     end
@@ -287,6 +292,10 @@ module FastlaneCore
 
     def ios?
       supported_platforms.include?(:iOS)
+    end
+
+    def watchos?
+      supported_platforms.include?(:watchOS)
     end
 
     def supported_platforms
@@ -313,6 +322,10 @@ module FastlaneCore
       proj << "-configuration #{options[:configuration].shellescape}" if options[:configuration]
       proj << "-xcconfig #{options[:xcconfig].shellescape}" if options[:xcconfig]
 
+      if FastlaneCore::Helper.xcode_at_least?('11.0') && options[:cloned_source_packages_path]
+        proj << "-clonedSourcePackagesDirPath #{options[:cloned_source_packages_path].shellescape}"
+      end
+
       return proj
     end
 
@@ -335,6 +348,12 @@ module FastlaneCore
       command
     end
 
+    def build_xcodebuild_resolvepackagedependencies_command
+      command = "xcodebuild -resolvePackageDependencies #{xcodebuild_parameters.join(' ')}"
+      command += " 2> /dev/null" if xcodebuild_suppress_stderr
+      command
+    end
+
     # Get the build settings for our project
     # e.g. to properly get the DerivedData folder
     # @param [String] The key of which we want the value for (e.g. "PRODUCT_NAME")
@@ -345,6 +364,14 @@ module FastlaneCore
             UI.user_error!("Could not find any schemes for Xcode workspace at path '#{self.path}'. Please make sure that the schemes you want to use are marked as `Shared` from Xcode.")
           end
           options[:scheme] ||= schemes.first
+        end
+
+        # SwiftPM support
+        if FastlaneCore::Helper.xcode_at_least?('11.0')
+          UI.important("Resolving Swift Package Manager dependencies...")
+          FastlaneCore::CommandExecutor.execute(command: build_xcodebuild_resolvepackagedependencies_command,
+                                                print_all: true,
+                                                print_command: !self.xcodebuild_list_silent)
         end
 
         command = build_xcodebuild_showbuildsettings_command

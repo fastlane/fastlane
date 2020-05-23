@@ -20,8 +20,7 @@ describe FastlaneCore do
         "-u #{email.shellescape}",
         "-p #{escaped_password}",
         "-f \"/tmp/my.app.id.itmsp\"",
-        "-t DAV",
-        "-t Signiant",
+        "-t DAV,Signiant",
         "-k 100000",
         ("-WONoPause true" if FastlaneCore::Helper.windows?),
         ("-itc_provider #{provider_short_name}" if provider_short_name)
@@ -72,8 +71,7 @@ describe FastlaneCore do
         "-u #{email.shellescape}",
         "-p #{password.shellescape}",
         "-f /tmp/my.app.id.itmsp",
-        "-t DAV",
-        "-t Signiant",
+        "-t DAV,Signiant",
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
         '2>&1'
@@ -136,8 +134,7 @@ describe FastlaneCore do
         "-u #{email.shellescape}",
         "-p #{password.shellescape}",
         "-f /tmp/my.app.id.itmsp",
-        "-t DAV",
-        "-t Signiant",
+        "-t DAV,Signiant",
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
         '2>&1'
@@ -245,7 +242,7 @@ describe FastlaneCore do
       describe "when use shell script ENV var is set" do
         describe "upload command generation" do
           it 'generates a call to the shell script' do
-            with_env_values('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT' => 'true') do
+            FastlaneSpec::Env.with_env_values('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT' => 'true') do
               transporter = FastlaneCore::ItunesTransporter.new(email, password)
               expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
             end
@@ -254,7 +251,7 @@ describe FastlaneCore do
 
         describe "download command generation" do
           it 'generates a call to the shell script' do
-            with_env_values('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT' => 'true') do
+            FastlaneSpec::Env.with_env_values('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT' => 'true') do
               transporter = FastlaneCore::ItunesTransporter.new(email, password)
               expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
             end
@@ -263,7 +260,7 @@ describe FastlaneCore do
 
         describe "provider ID command generation" do
           it 'generates a call to the shell script' do
-            with_env_values('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT' => 'true') do
+            FastlaneSpec::Env.with_env_values('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT' => 'true') do
               transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<")
               expect(transporter.provider_ids).to eq(shell_provider_id_command)
             end

@@ -50,11 +50,11 @@ module Fastlane
     end
 
     def self.print_loaded_plugins
-      ENV["FASTLANE_ENV_PRINTER"] = "enabled"
       env_output =  "### Loaded fastlane plugins:\n"
       env_output << "\n"
       plugin_manager = Fastlane::PluginManager.new
-      plugin_manager.load_plugins
+      plugin_manager.load_plugins(print_table: false)
+
       if plugin_manager.available_plugins.length <= 0
         env_output << "**No plugins Loaded**\n"
       else
@@ -211,7 +211,7 @@ module Fastlane
         "OS" => os_version,
         "Ruby" => RUBY_VERSION,
         "Bundler?" => Helper.bundler?,
-        "Git" => `git --version`.strip.split("\n").first,
+        "Git" => git_version,
         "Installation Source" => anonymized_path($PROGRAM_NAME),
         "Host" => "#{product} #{version} (#{build})",
         "Ruby Lib Dir" => anonymized_path(RbConfig::CONFIG['libdir']),
@@ -292,6 +292,12 @@ module Fastlane
     def self.copy_to_clipboard(string)
       require 'open3'
       Open3.popen3('pbcopy') { |input, _, _| input << string }
+    end
+
+    def self.git_version
+      return `git --version`.strip.split("\n").first
+    rescue
+      return "not found"
     end
   end
 end

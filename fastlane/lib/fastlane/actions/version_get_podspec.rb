@@ -1,5 +1,9 @@
 module Fastlane
   module Actions
+    module SharedValues
+      PODSPEC_VERSION_NUMBER ||= :PODSPEC_VERSION_NUMBER # originally defined in VersionBumpPodspecAction
+    end
+
     class VersionGetPodspecAction < Action
       def self.run(params)
         podspec_path = params[:path]

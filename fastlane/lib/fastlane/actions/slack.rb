@@ -15,7 +15,9 @@ module Fastlane
         # We want the last 7000 characters, instead of the first 7000, as the error is at the bottom
         start_index = [message.length - 7000, 0].max
         message = message[start_index..-1]
-        message
+        # We want line breaks to be shown on slack output so we replace
+        # input non-interpreted line break with interpreted line break
+        message.gsub('\n', "\n")
       end
 
       def self.run(options)
@@ -23,6 +25,8 @@ module Fastlane
 
         options[:message] = self.trim_message(options[:message].to_s || '')
         options[:message] = Slack::Notifier::Util::LinkFormatter.format(options[:message])
+
+        options[:pretext] = options[:pretext].gsub('\n', "\n") unless options[:pretext].nil?
 
         if options[:channel].to_s.length > 0
           channel = options[:channel]

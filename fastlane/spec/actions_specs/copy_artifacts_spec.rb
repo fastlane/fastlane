@@ -47,7 +47,7 @@ describe Fastlane do
         expect(UI).to receive(:verbose).once.ordered.with("Copying artifacts #{source_path} to #{target_path}")
         expect(UI).to receive(:verbose).once.ordered.with('Keeping original files')
 
-        with_verbose(true) do
+        FastlaneSpec::Env.with_verbose(true) do
           Fastlane::FastFile.new.parse("lane :test do
             copy_artifacts(artifacts: '#{source_path}', target_path: '#{target_path}')
           end").runner.execute(:test)
@@ -65,7 +65,7 @@ describe Fastlane do
         expect(UI).to receive(:verbose).once.ordered.with("Copying artifacts #{source_path} to #{target_path}")
         expect(UI).to receive(:verbose).once.ordered.with('Not keeping original files')
 
-        with_verbose(true) do
+        FastlaneSpec::Env.with_verbose(true) do
           Fastlane::FastFile.new.parse("lane :test do
             copy_artifacts(artifacts: '#{source_path}', target_path: '#{target_path}', keep_original: false)
           end").runner.execute(:test)

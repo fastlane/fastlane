@@ -108,9 +108,18 @@ module Spaceship
         # @return (App) The app you're looking for. This is nil if the app can't be found.
         def find(bundle_id, mac: false)
           raise "`bundle_id` parameter must not be nil" if bundle_id.nil?
-          all(mac: mac).find do |app|
-            return app if app.bundle_id.casecmp(bundle_id) == 0
+          found_app = all(mac: mac).find do |app|
+            app if app.bundle_id.casecmp(bundle_id) == 0
           end
+
+          # Find catalyst enabled mac apps (look for mac first and then iOS)
+          if !found_app && mac
+            found_app = all(mac: false).find do |app|
+              app if app.bundle_id.casecmp(bundle_id) == 0
+            end
+          end
+
+          found_app
         end
       end
 

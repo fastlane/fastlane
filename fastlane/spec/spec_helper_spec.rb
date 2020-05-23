@@ -23,16 +23,6 @@ describe FastlaneSpec::Env do
       end
       expect(ARGV).to eq(current_ARGV)
     end
-
-    it "sets ARGV for good if no block is given" do
-      current_ARGV = ARGV.dup
-      new_ARGV = ['forever']
-      FastlaneSpec::Env.with_ARGV(new_ARGV)
-      expect(ARGV).to eq(new_ARGV)
-      # reset...
-      FastlaneSpec::Env.with_ARGV(current_ARGV)
-      expect(ARGV).to eq(current_ARGV)
-    end
   end
   # rubocop:enable Style/VariableName
 end

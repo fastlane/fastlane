@@ -10,7 +10,7 @@ module Deliver
     NON_LOCALISED_VERSION_VALUES = [:copyright]
 
     # Localised app details values
-    LOCALISED_APP_VALUES = [:name, :subtitle, :privacy_url]
+    LOCALISED_APP_VALUES = [:name, :subtitle, :privacy_url, :apple_tv_privacy_policy]
 
     # Non localized app details values
     NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
@@ -131,6 +131,8 @@ module Deliver
       set_review_information(v, options)
       set_app_rating(v, options)
       v.ratings_reset = options[:reset_ratings] unless options[:reset_ratings].nil?
+
+      set_review_attachment_file(v, options)
 
       Helper.show_loading_indicator("Uploading metadata to App Store Connect")
       v.save!
@@ -365,6 +367,11 @@ module Deliver
         v.send("#{key}=", info[option_name].to_s.chomp) if info[option_name]
       end
       v.review_user_needed = (v.review_demo_user.to_s.chomp + v.review_demo_password.to_s.chomp).length > 0
+    end
+
+    def set_review_attachment_file(v, options)
+      return unless options[:app_review_attachment_file]
+      v.upload_review_attachment!(options[:app_review_attachment_file])
     end
 
     def set_app_rating(v, options)

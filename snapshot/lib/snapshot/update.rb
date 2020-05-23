@@ -11,7 +11,7 @@ module Snapshot
       paths.reject { |p| p.include?("snapshot/lib/assets/") }
     end
 
-    def update
+    def update(force: false)
       paths = self.class.find_helper
       UI.user_error!("Couldn't find any SnapshotHelper files in current directory") if paths.count == 0
 
@@ -22,7 +22,9 @@ module Snapshot
       UI.message("The underlying API will not change. You can always migrate manually by looking at")
       UI.message("https://github.com/fastlane/fastlane/blob/master/snapshot/lib/assets/SnapshotHelper.swift")
 
-      return 1 unless UI.confirm("Overwrite configuration files?")
+      if !force && !UI.confirm("Overwrite configuration files?")
+        return 1
+      end
 
       paths.each do |path|
         UI.message("Updating '#{path}'...")
