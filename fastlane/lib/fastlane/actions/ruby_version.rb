@@ -40,7 +40,7 @@ module Fastlane
       def self.details
         [
           "Add this to your `Fastfile` to require a certain version of _ruby_.",
-          "Put it at the top of your `Fastfile to ensure that _fastlane_ is executed appropriately."
+          "Put it at the top of your `Fastfile` to ensure that _fastlane_ is executed appropriately."
         ].join("\n")
       end
 

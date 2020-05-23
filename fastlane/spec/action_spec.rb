@@ -5,12 +5,47 @@ describe Fastlane do
         expect(Fastlane::Actions::IpaAction.action_name).to eq('ipa')
         expect(Fastlane::Actions::IncrementBuildNumberAction.action_name).to eq('increment_build_number')
       end
+
+      it "only removes the last occurrence of Action" do
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
+        expect(Fastlane::Actions::ActionFromActionAction.action_name).to eq('action_from_action')
+      end
     end
 
     describe "Easy access to the lane context" do
       it "redirects to the correct class and method" do
         Fastlane::Actions.lane_context[:something] = 1
         expect(Fastlane::Action.lane_context).to eq({ something: 1 })
+      end
+    end
+
+    describe "#step_text" do
+      it "allows custom step_text with no parameters in method signature" do
+        expect(Fastlane::UI).to receive(:header).with("Step: Custom Step Text")
+
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
+        result = Fastlane::FastFile.new.parse("lane :test do
+          step_text_custom_no_params
+        end").runner.execute(:test)
+      end
+
+      it "allows nil step_text with no parameters in method signature" do
+        expect(Fastlane::UI).to_not(receive(:header))
+
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
+        result = Fastlane::FastFile.new.parse("lane :test do
+          step_text_none_no_params
+        end").runner.execute(:test)
+      end
+
+      it "allows custom step_text with parameters in method signature" do
+        task = "Some Task Param"
+        expect(Fastlane::UI).to receive(:header).with("Step: Doing #{task}")
+
+        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
+        result = Fastlane::FastFile.new.parse("lane :test do
+          step_text_custom_with_params(task: '#{task}')
+        end").runner.execute(:test)
       end
     end
 
@@ -74,7 +109,7 @@ describe Fastlane do
           pwd: Dir.pwd
         }
         expect(ff.runner.execute(:something, :ios)).to eq(response)
-        expect(Fastlane::Actions.executed_actions.map { |a| a[:name] }).to eq(['from'])
+        expect(Fastlane::Actions.executed_actions.map { |a| a[:name] }).to eq(['action_from_action'])
       end
 
       it "shows only actions called from Fastfile" do
@@ -83,7 +118,7 @@ describe Fastlane do
         Fastlane::Actions.executed_actions.clear
 
         ff.runner.execute(:something, :ios)
-        expect(Fastlane::Actions.executed_actions.map { |a| a[:name] }).to eq(['from', 'example'])
+        expect(Fastlane::Actions.executed_actions.map { |a| a[:name] }).to eq(['action_from_action', 'example_action'])
       end
 
       it "shows an appropriate error message when trying to directly call an action" do

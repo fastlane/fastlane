@@ -117,7 +117,7 @@ module Commander
             abort(e.to_s)
           end
         end
-      rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we dont count as crashes
+      rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we don't count as crashes
         display_user_error!(e, e.to_s)
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
         rescue_fastlane_error(e)

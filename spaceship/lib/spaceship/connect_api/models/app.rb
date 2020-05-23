@@ -32,7 +32,7 @@ module Spaceship
 
       def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
         resps = Spaceship::ConnectAPI.get_apps(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def self.find(bundle_id)
@@ -46,6 +46,17 @@ module Spaceship
       end
 
       #
+      # Beta Feedback
+
+      def get_beta_feedback(filter: {}, includes: "tester,build,screenshots", limit: nil, sort: nil)
+        filter ||= {}
+        filter["build.app"] = id
+
+        resps = Spaceship::ConnectAPI.get_beta_feedback(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.flat_map(&:to_models)
+      end
+
+      #
       # Beta Testers
       #
 
@@ -54,7 +65,7 @@ module Spaceship
         filter[:apps] = id
 
         resps = Spaceship::ConnectAPI.get_beta_testers(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       #
@@ -66,7 +77,7 @@ module Spaceship
         filter[:app] = id
 
         resps = Spaceship::ConnectAPI.get_builds(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def get_build_deliveries(filter: {}, includes: nil, limit: nil, sort: nil)
@@ -74,7 +85,7 @@ module Spaceship
         filter[:app] = id
 
         resps = Spaceship::ConnectAPI.get_build_deliveries(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def get_beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
@@ -82,7 +93,7 @@ module Spaceship
         filter[:app] = id
 
         resps = Spaceship::ConnectAPI.get_beta_app_localizations(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def get_beta_groups(filter: {}, includes: nil, limit: nil, sort: nil)
@@ -90,7 +101,18 @@ module Spaceship
         filter[:app] = id
 
         resps = Spaceship::ConnectAPI.get_beta_groups(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
+      end
+
+      def create_beta_group(group_name: nil, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
+        resps = Spaceship::ConnectAPI.create_beta_group(
+          app_id: id,
+          group_name: group_name,
+          public_link_enabled: public_link_enabled,
+          public_link_limit: public_link_limit,
+          public_link_limit_enabled: public_link_limit_enabled
+        ).all_pages
+        return resps.flat_map(&:to_models).first
       end
     end
   end
