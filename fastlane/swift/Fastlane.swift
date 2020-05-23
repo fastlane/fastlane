@@ -6707,6 +6707,7 @@ func slackTrainStart(distance: Int = 5,
    - simpleOutput: Tell slather that it should output results to the terminal
    - gutterJson: Tell slather that it should output results as Gutter JSON format
    - coberturaXml: Tell slather that it should output results as Cobertura XML format
+   - sonarQubeXml: Tell slather that it should output results as SonarQube Generic XML format
    - llvmCov: Tell slather that it should output results as llvm-cov show format
    - html: Tell slather that it should output results as static HTML pages
    - show: Tell slather that it should open static html pages automatically
@@ -6740,6 +6741,7 @@ func slather(buildDirectory: String? = nil,
              simpleOutput: Bool? = nil,
              gutterJson: Bool? = nil,
              coberturaXml: Bool? = nil,
+             sonarQubeXml: Bool? = nil,
              llvmCov: Any? = nil,
              html: Bool? = nil,
              show: Bool = false,
