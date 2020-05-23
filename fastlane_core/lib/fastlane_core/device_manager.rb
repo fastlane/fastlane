@@ -49,8 +49,8 @@ module FastlaneCore
 
             # "    iPad (5th generation) (852A5796-63C3-4641-9825-65EBDC5C4259) (Shutdown)"
             # This line will turn the above string into
-            # ["iPad", "(5th generation)", "(852A5796-63C3-4641-9825-65EBDC5C4259)", "(Shutdown)"]
-            matches = line.strip.scan(/(.*?) (\(.*?\))/).flatten.reject(&:empty?)
+            # ["iPad (5th generation)", "(852A5796-63C3-4641-9825-65EBDC5C4259)", "(Shutdown)"]
+            matches = line.strip.scan(/^(.*?) (\([^)]*?\)) (\([^)]*?\))$/).flatten.reject(&:empty?)
             state = matches.pop.to_s.delete('(').delete(')')
             udid = matches.pop.to_s.delete('(').delete(')')
             name = matches.join(' ')
@@ -223,7 +223,7 @@ module FastlaneCore
         plist_buddy_cmd = "-c \"Add :KeyboardContinuousPathEnabled bool false\""
         plist_path = File.expand_path("~/Library/Developer/CoreSimulator/Devices/#{self.udid}/data/Library/Preferences/com.apple.keyboard.ContinuousPath.plist")
 
-        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path}")
+        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path} >/dev/null 2>&1")
       end
     end
   end

@@ -42,6 +42,15 @@ protocol ScanfileProtocol: class {
   /// Array of strings matching Test Bundle/Test Suite/Test Cases to skip
   var skipTesting: String? { get }
 
+  /// The testplan associated with the scheme that should be used for testing
+  var testplan: String? { get }
+
+  /// Array of strings matching test plan configurations to run
+  var onlyTestConfigurations: String? { get }
+
+  /// Array of strings matching test plan configurations to skip
+  var skipTestConfigurations: String? { get }
+
   /// Run tests using the provided `.xctestrun` file
   var xctestrun: String? { get }
 
@@ -63,10 +72,13 @@ protocol ScanfileProtocol: class {
   /// Should the HTML report be opened when tests are completed?
   var openReport: Bool { get }
 
+  /// Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
+  var disableXcpretty: Bool? { get }
+
   /// The directory in which all reports will be stored
   var outputDirectory: String { get }
 
-  /// Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty)
+  /// Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty during xcodebuild)
   var outputStyle: String? { get }
 
   /// Comma separated list of the output types (e.g. html, junit, json-compilation-database)
@@ -101,6 +113,9 @@ protocol ScanfileProtocol: class {
 
   /// Generate the json compilation database with clang naming convention (compile_commands.json)
   var useClangReportName: Bool { get }
+
+  /// Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
+  var concurrentWorkers: Int? { get }
 
   /// Constrain the number of simulator devices on which to test concurrently. Equivalent to -maximum-concurrent-test-simulator-destinations
   var maxConcurrentSimulators: Int? { get }
@@ -190,6 +205,9 @@ extension ScanfileProtocol {
   var appIdentifier: String? { return nil }
   var onlyTesting: String? { return nil }
   var skipTesting: String? { return nil }
+  var testplan: String? { return nil }
+  var onlyTestConfigurations: String? { return nil }
+  var skipTestConfigurations: String? { return nil }
   var xctestrun: String? { return nil }
   var toolchain: String? { return nil }
   var clean: Bool { return false }
@@ -197,6 +215,7 @@ extension ScanfileProtocol {
   var addressSanitizer: Bool? { return nil }
   var threadSanitizer: Bool? { return nil }
   var openReport: Bool { return false }
+  var disableXcpretty: Bool? { return nil }
   var outputDirectory: String { return "./test_output" }
   var outputStyle: String? { return nil }
   var outputTypes: String { return "html,junit" }
@@ -210,6 +229,7 @@ extension ScanfileProtocol {
   var shouldZipBuildProducts: Bool { return false }
   var resultBundle: Bool { return false }
   var useClangReportName: Bool { return false }
+  var concurrentWorkers: Int? { return nil }
   var maxConcurrentSimulators: Int? { return nil }
   var disableConcurrentTesting: Bool { return false }
   var skipBuild: Bool { return false }
@@ -238,4 +258,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.25]
+// FastlaneRunnerAPIVersion [0.9.29]

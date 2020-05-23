@@ -69,6 +69,7 @@ describe Fastlane do
           download_from_play_store
           validate_play_store_json_key
           update_fastlane
+          s3
         )
       end
 
