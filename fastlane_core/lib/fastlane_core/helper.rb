@@ -416,5 +416,22 @@ module FastlaneCore
       UI.deprecated("Helper.log is deprecated. Use `UI` class instead")
       UI.current.log
     end
+
+    def self.ask_password(message: "Passphrase: ", confirm: nil)
+      raise "This code should only run in interactive mode" unless UI.interactive?
+
+      loop do
+        password = UI.password(message)
+        if confirm
+          password2 = UI.password("Type passphrase again: ")
+          if password == password2
+            return password
+          end
+        else
+          return password
+        end
+        UI.error("Passphrases differ. Try again")
+      end
+    end
   end
 end

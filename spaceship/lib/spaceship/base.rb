@@ -295,7 +295,7 @@ module Spaceship
     def inspect_value
       self.attributes.map do |k|
         v = self.send(k).inspect
-        v.gsub!("\n", "\n\t") # to align nested elements
+        v = v.gsub("\n", "\n\t") # to align nested elements
 
         "\t#{k}=#{v}"
       end.join(", \n")

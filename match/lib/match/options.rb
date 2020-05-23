@@ -1,4 +1,5 @@
 require 'fastlane_core/configuration/config_item'
+require 'fastlane/helper/lane_helper'
 require 'credentials_manager/appfile_config'
 require_relative 'module'
 
@@ -8,6 +9,15 @@ module Match
     def self.append_option(option)
       self.available_options # to ensure we created the initial `@available_options` array
       @available_options << option
+    end
+
+    def self.default_platform
+      case Fastlane::Helper::LaneHelper.current_platform.to_s
+      when "mac"
+        "macos"
+      else
+        "ios"
+      end
     end
 
     def self.available_options
@@ -170,7 +180,7 @@ module Match
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :s3_secret_access_key,
                                      env_name: "MATCH_S3_SECRET_ACCESS_KEY",
-                                     description: "S3 secret secret access key",
+                                     description: "S3 secret access key",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :s3_bucket,
                                      env_name: "MATCH_S3_BUCKET",
@@ -215,7 +225,8 @@ module Match
                                      short_option: '-o',
                                      env_name: "MATCH_PLATFORM",
                                      description: "Set the provisioning profile's platform to work with (i.e. ios, tvos, macos)",
-                                     default_value: "ios",
+                                     default_value: default_platform,
+                                     default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        value = value.to_s
                                        pt = %w(tvos ios macos)
@@ -226,6 +237,17 @@ module Match
                                      description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
                                      optional: true,
                                      default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :profile_name,
+                                    env_name: "MATCH_PROVISIONING_PROFILE_NAME",
+                                    description: "A custom name for the provisioning profile. This will replace the default provisioning profile name if specified",
+                                    optional: true,
+                                    default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :fail_on_name_taken,
+                                     env_name: "MATCH_FAIL_ON_NAME_TAKEN",
+                                     description: "Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first",
+                                     optional: true,
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :output_path,
                                      env_name: "MATCH_OUTPUT_PATH",
                                      description: "Path in which to export certificates, key and profile",

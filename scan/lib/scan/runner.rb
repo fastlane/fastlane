@@ -148,6 +148,8 @@ module Scan
     end
 
     def test_results
+      return if Scan.config[:disable_xcpretty]
+
       temp_junit_report = Scan.cache[:temp_junit_report]
       return File.read(temp_junit_report) if temp_junit_report && File.file?(temp_junit_report)
 

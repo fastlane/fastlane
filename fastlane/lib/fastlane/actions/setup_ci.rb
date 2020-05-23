@@ -93,7 +93,7 @@ module Fastlane
                                        env_name: "FL_SETUP_CI_PROVIDER",
                                        description: "CI provider. If none is set, the provider is detected automatically",
                                        is_string: true,
-                                       default_value: false,
+                                       optional: true,
                                        verify_block: proc do |value|
                                          value = value.to_s
                                          # Validate both 'travis' and 'circleci' for backwards compatibility, even

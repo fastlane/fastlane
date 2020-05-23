@@ -4,9 +4,9 @@
 
 ###### Easily sync your certificates and profiles across your team
 
-A new approach to iOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
+A new approach to iOS and macOS code signing: Share one code signing identity across your development team to simplify your codesigning setup and prevent code signing issues.
 
-_match_ is the implementation of the [codesigning.guide concept](https://codesigning.guide). _match_ creates all required certificates & provisioning profiles and stores them in a separate git repository. Every team member with access to the repo can use those credentials for code signing. _match_ also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
+_match_ is the implementation of the [codesigning.guide concept](https://codesigning.guide). _match_ creates all required certificates & provisioning profiles and stores them in a separate git repository, Google Cloud, or Amazon S3. Every team member with access to the selected storage can use those credentials for code signing. _match_ also automatically repairs broken and expired credentials. It's the easiest way to share signing credentials across teams
 
 [More information on how to get started with codesigning](https://docs.fastlane.tools/codesigning/getting-started/)
 
@@ -49,7 +49,7 @@ For more information about the concept, visit [codesigning.guide](https://codesi
 
 |          |  match  |
 |----------|---------|
-🔄  | Automatically sync your iOS keys and profiles across all your team members using git
+🔄  | Automatically sync your iOS and macOS keys and profiles across all your team members using git
 📦  | Handle all the heavy lifting of creating and storing your certificates and profiles
 💻  | Setup codesigning on a new machine in under a minute
 🎯 | Designed to work with apps with multiple targets and bundle identifiers
@@ -465,13 +465,13 @@ You'll be asked for the new password on all your machines on the next run.
 
 ### Import
 
-To import and encrypt a certificate (`.cer`) and the private key (`.p12`) into the _match_ repo run:
+To import and encrypt a certificate (`.cer`), the private key (`.p12`) and the provisioning profiles (`.mobileprovision` or `.provisionprofile`) into the _match_ repo run:
 
 ```no-highlight
 fastlane match import
 ```
 
-You'll be prompted for the certificate (`.cer`) and the private key (`.p12`) paths. _match_ will first validate the certificate (`.cer`) against the Developer Portal before importing the certificate (`.cer`) and the private key (`.p12`).
+You'll be prompted for the certificate (`.cer`), the private key (`.p12`) and the provisioning profiles (`.mobileprovision` or `.provisionprofile`) paths. _match_ will first validate the certificate (`.cer`) against the Developer Portal before importing the certificate, the private key and the provisioning profiles into the specified _match_ repository.
 
 ### Manual Decrypt
 

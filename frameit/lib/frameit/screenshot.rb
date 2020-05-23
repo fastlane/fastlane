@@ -27,6 +27,7 @@ module Frameit
       #   - see Parameters in the doc
       #   - contains default values and validates values
       #   - accessed via Frameit.config[:key]
+      #   - default value is either general platform from fastfile or IOS if run directly
       #   - lowest priority
       # - commands_generator.rb
       #   - commands entered directly to CLI (e. g. fastlane frameit android)
@@ -120,6 +121,10 @@ module Frameit
     def outdated?
       return true unless File.exist?(output_path)
       return File.mtime(path) > File.mtime(output_path)
+    end
+
+    def language
+      @language ||= Pathname.new(path).parent.basename.to_s
     end
 
     def to_s

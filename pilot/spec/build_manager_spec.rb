@@ -1,9 +1,14 @@
 describe "Build Manager" do
   describe ".truncate_changelog" do
-    it "Truncates Changelog" do
+    it "Truncates Changelog if it exceeds character size" do
       changelog = File.read("./pilot/spec/fixtures/build_manager/changelog_long")
       changelog = Pilot::BuildManager.truncate_changelog(changelog)
       expect(changelog).to eq(File.read("./pilot/spec/fixtures/build_manager/changelog_long_truncated"))
+    end
+    it "Truncates Changelog if it exceeds byte size" do
+      changelog = File.binread("./pilot/spec/fixtures/build_manager/changelog_bytes_long").force_encoding("UTF-8")
+      changelog = Pilot::BuildManager.truncate_changelog(changelog)
+      expect(changelog).to eq(File.binread("./pilot/spec/fixtures/build_manager/changelog_bytes_long_truncated").force_encoding("UTF-8"))
     end
     it "Keeps changelog if short enough" do
       changelog = "1234"
@@ -210,12 +215,6 @@ describe "Build Manager" do
         allow(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail_still_processing)
 
         options = distribute_options_skip_waiting_non_localized_changelog
-
-        # Expect a beta app review detail to be patched
-        expect(Spaceship::ConnectAPI).to receive(:patch_beta_app_review_detail).with({
-          app_id: ready_to_submit_mock_build.app_id,
-          attributes: { demoAccountRequired: options[:demo_account_required] }
-        })
 
         # Expect beta build localizations to be fetched
         expect(Spaceship::ConnectAPI).to receive(:get_beta_build_localizations).with({

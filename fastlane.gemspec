@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Joshua Liebowitz",
+  spec.authors       = ["Jan Piotrowski",
+                        "Aaron Brager",
                         "Stefan Natchev",
                         "Andrew McBurney",
-                        "Aaron Brager",
-                        "Fumiya Nakamura",
-                        "Daniel Jankowski",
-                        "Kohki Miki",
-                        "Jorge Revuelta H",
-                        "Matthew Ellis",
-                        "Luka Mirosevic",
-                        "Iulian Onofrei",
-                        "Danielle Tomlinson",
-                        "Josh Holtz",
-                        "Manu Wallner",
-                        "Jimmy Dee",
-                        "Helmut Januschka",
-                        "Felix Krause",
-                        "Jérôme Lacoste",
                         "Olivier Halligon",
+                        "Danielle Tomlinson",
+                        "Jimmy Dee",
+                        "Joshua Liebowitz",
+                        "Felix Krause",
+                        "Iulian Onofrei",
                         "Max Ott",
-                        "Jan Piotrowski",
-                        "Maksym Grebenets"]
+                        "Maksym Grebenets",
+                        "Manu Wallner",
+                        "Jorge Revuelta H",
+                        "Fumiya Nakamura",
+                        "Matthew Ellis",
+                        "Daniel Jankowski",
+                        "Helmut Januschka",
+                        "Josh Holtz",
+                        "Jérôme Lacoste",
+                        "Luka Mirosevic",
+                        "Kohki Miki"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -47,7 +47,7 @@ Gem::Specification.new do |spec|
     "docs_url" => "https://docs.fastlane.tools"
   }
 
-  spec.required_ruby_version = '>= 2.0.0'
+  spec.required_ruby_version = '>= 2.4'
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
@@ -78,8 +78,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency('commander-fastlane', '>= 4.4.6', '< 5.0.0') # CLI parser
   spec.add_dependency('excon', '>= 0.71.0', '< 1.0.0') # Great HTTP Client
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
-  spec.add_dependency('faraday', '~> 0.17') # Used for deploygate, hockey and testfairy actions
-  spec.add_dependency('faraday_middleware', '~> 0.13.1') # same as faraday
+  spec.add_dependency('faraday', '>= 0.17', '< 2.0') # Used for deploygate, hockey and testfairy actions
+  spec.add_dependency('faraday_middleware', '>= 0.13.1', '< 2.0') # Same as faraday
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
@@ -94,24 +94,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
   spec.add_dependency('jwt', '~> 2.1.0') # Used for generating authentication tokens for AppStore connect api
 
-  # need to lock 0.11 and under when using less than Ruby 2.4 to prevent install issues when using 'gem install'
-  # 'gem install' does not respect Ruby versions and would try installing 0.12 on Ruby 2.3 or less
-  # https://github.com/fastlane/fastlane/pull/15483
-  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4')
-    spec.add_dependency('signet', '<= 0.11')
-    spec.add_dependency('google-cloud-env', '1.2.1')
-    spec.add_dependency('google-cloud-core', '1.3.2')
-    STDERR.puts("WARNING: Locking to a potentially insecure version of 'signet', 'google-cloud-env', and 'google-cloud-core' because you are using a version of Ruby which is marked as End-Of-Life. Please upgrade your Ruby installation to 2.4 or later")
-  end
-
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
-  spec.add_dependency('google-api-client', '>= 0.29.2', '< 0.37.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-api-client', '>= 0.37.0', '< 0.39.0') # Google API Client to access Play Publishing API
   spec.add_dependency('google-cloud-storage', '>= 1.15.0', '< 2.0.0') # Access Google Cloud Storage for match
 
   spec.add_dependency('emoji_regex', '>= 0.1', '< 2.0') # Used to scan for Emoji in the changelog
 
-  spec.add_dependency('aws-sdk', '~> 2.3') # Used in match for S3 storage
+  spec.add_dependency('aws-sdk-s3', '~> 1.0') # Used for S3 storage in fastlane match
 
   # Development only
   spec.add_development_dependency('rake', '< 12')

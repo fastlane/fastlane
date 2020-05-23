@@ -316,6 +316,7 @@ module Deliver
     def self.resolve_ipadpro_conflict_if_needed(screen_size, filename)
       is_3rd_gen = [
         "iPad Pro (12.9-inch) (3rd generation)", # default simulator name has this
+        "iPad Pro (12.9-inch) (4th generation)", # default simulator name has this
         "ipadPro129" # downloaded screenshots name has this
       ].any? { |key| filename.include?(key) }
       if is_3rd_gen

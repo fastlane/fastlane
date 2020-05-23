@@ -37,14 +37,22 @@ module Scan
       options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
       options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
       options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
-      options << "-parallel-testing-worker-count #{config[:concurrent_workers]}" if config[:concurrent_workers]
       if FastlaneCore::Helper.xcode_at_least?(10)
+        options << "-parallel-testing-worker-count #{config[:concurrent_workers]}" if config[:concurrent_workers]
         options << "-maximum-concurrent-test-simulator-destinations #{config[:max_concurrent_simulators]}" if config[:max_concurrent_simulators]
         options << "-disable-concurrent-testing" if config[:disable_concurrent_testing]
       end
       options << "-enableCodeCoverage #{config[:code_coverage] ? 'YES' : 'NO'}" unless config[:code_coverage].nil?
       options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
       options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
+      if FastlaneCore::Helper.xcode_at_least?(11)
+        options << "-testPlan '#{config[:testplan]}'" if config[:testplan]
+
+        # detect_values will ensure that these values are present as Arrays if
+        # they are present at all
+        options += config[:only_test_configurations].map { |name| "-only-test-configuration '#{name}'" } if config[:only_test_configurations]
+        options += config[:skip_test_configurations].map { |name| "-skip-test-configuration '#{name}'" } if config[:skip_test_configurations]
+      end
       options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
       options << config[:xcargs] if config[:xcargs]
 
@@ -82,7 +90,7 @@ module Scan
     def pipe
       pipe = ["| tee '#{xcodebuild_log_path}'"]
 
-      if Scan.config[:output_style] == 'raw'
+      if Scan.config[:disable_xcpretty] || Scan.config[:output_style] == 'raw'
         return pipe
       end
 
