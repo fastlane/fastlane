@@ -132,7 +132,9 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :skip_waiting_for_build_processing,
                                      short_option: "-z",
                                      env_name: "PILOT_SKIP_WAITING_FOR_BUILD_PROCESSING",
-                                     description: "Don't wait for the build to process. If set to true, the changelog won't be set, `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan)",
+                                     description: "If set to true, the `distribute_external` option won't work and no build will be distributed to testers. " \
+                                      "(You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). " \
+                                      "If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :update_build_info_on_upload,
@@ -160,6 +162,19 @@ module Pilot
                                     env_name: "PILOT_NOTIFY_EXTERNAL_TESTERS",
                                     description: "Should notify external testers?",
                                     default_value: true),
+        FastlaneCore::ConfigItem.new(key: :app_version,
+                                     env_name: "PILOT_APP_VERSION",
+                                     description: "The version number of the application build to distribute. If the version number is not specified, then the most recent build uploaded to TestFlight will be distributed. If specified, the most recent build for the version number will be distributed",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :build_number,
+                                     env_name: "PILOT_BUILD_NUMBER",
+                                     description: "The build number of the application build to distribute. If the build number is not specified, the most recent build is distributed",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :expire_previous_builds,
+                                     is_string: false,
+                                     env_name: "PILOT_EXPIRE_PREVIOUS_BUILDS",
+                                     description: "Should expire previous builds?",
+                                     default_value: false),
 
         # testers
         FastlaneCore::ConfigItem.new(key: :first_name,

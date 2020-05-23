@@ -100,6 +100,19 @@ module Spaceship
     end
     private :platform_slug
 
+    def list_pending_agreements(language: "en")
+      r = request(:post) do |req|
+        req.url("account/listPendingAgreements")
+        req.body = {
+          teamId: team_id,
+          languageIsoCode: language
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      return parse_response(r)
+    end
+
     #####################################################
     # @!group Apps
     #####################################################

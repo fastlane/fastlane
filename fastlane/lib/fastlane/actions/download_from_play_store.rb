@@ -29,7 +29,7 @@ module Fastlane
         options = Supply::Options.available_options.clone
 
         # remove all the unnecessary (for this action) options
-        options_to_keep = [:package_name, :metadata_path, :json_key, :json_key_data, :root_url, :timeout, :key, :issuer]
+        options_to_keep = [:package_name, :version_name, :track, :metadata_path, :json_key, :json_key_data, :root_url, :timeout, :key, :issuer]
         options.delete_if { |option| options_to_keep.include?(option.key) == false }
       end
 

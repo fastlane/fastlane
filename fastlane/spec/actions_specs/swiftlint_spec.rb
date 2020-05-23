@@ -353,6 +353,65 @@ describe Fastlane do
         end
       end
 
+      context "when specify no-cache option" do
+        it "adds no-cache option if mode is :autocorrect" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :autocorrect,
+              no_cache: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint autocorrect --no-cache")
+        end
+
+        it "adds no-cache option if mode is :lint" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :lint,
+              no_cache: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint --no-cache")
+        end
+
+        it "omits format option if mode is :analyze" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :analyze,
+              no_cache: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint analyze")
+        end
+      end
+
+      context "when specify false for no-cache option" do
+        it "doesn't add no-cache option if mode is :autocorrect" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :autocorrect,
+              no_cache: false
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint autocorrect")
+        end
+
+        it "doesn't add no-cache option if mode is :lint" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :lint,
+              no_cache: false
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint")
+        end
+      end
+
       context "when using analyzer mode" do
         it "adds compiler-log-path option" do
           path = "./spec/fixtures"
