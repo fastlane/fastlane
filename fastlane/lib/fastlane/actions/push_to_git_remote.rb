@@ -5,7 +5,7 @@ module Fastlane
       def self.run(params)
         local_branch = params[:local_branch]
         local_branch ||= Actions.git_branch.gsub(%r{#{params[:remote]}\/}, '') if Actions.git_branch
-        local_branch ||= 'master'
+        UI.user_error!('Failed to get the current branch.') unless local_branch
 
         remote_branch = params[:remote_branch] || local_branch
 

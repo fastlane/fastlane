@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Jérôme Lacoste",
-                        "Iulian Onofrei",
-                        "Luka Mirosevic",
-                        "Matthew Ellis",
-                        "Helmut Januschka",
-                        "Manu Wallner",
-                        "Olivier Halligon",
+  spec.authors       = ["Jan Piotrowski",
                         "Aaron Brager",
-                        "Jan Piotrowski",
-                        "Kohki Miki",
-                        "Maksym Grebenets",
-                        "Felix Krause",
-                        "Josh Holtz",
-                        "Max Ott",
-                        "Danielle Tomlinson",
-                        "Daniel Jankowski",
-                        "Jimmy Dee",
-                        "Fumiya Nakamura",
-                        "Andrew McBurney",
                         "Stefan Natchev",
+                        "Andrew McBurney",
+                        "Olivier Halligon",
+                        "Danielle Tomlinson",
+                        "Jimmy Dee",
                         "Joshua Liebowitz",
-                        "Jorge Revuelta H"]
+                        "Felix Krause",
+                        "Iulian Onofrei",
+                        "Max Ott",
+                        "Maksym Grebenets",
+                        "Manu Wallner",
+                        "Jorge Revuelta H",
+                        "Fumiya Nakamura",
+                        "Matthew Ellis",
+                        "Daniel Jankowski",
+                        "Helmut Januschka",
+                        "Josh Holtz",
+                        "Jérôme Lacoste",
+                        "Luka Mirosevic",
+                        "Kohki Miki"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -96,7 +96,7 @@ Gem::Specification.new do |spec|
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
-  spec.add_dependency('google-api-client', '>= 0.29.2', '< 0.37.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-api-client', '>= 0.37.0', '< 0.39.0') # Google API Client to access Play Publishing API
   spec.add_dependency('google-cloud-storage', '>= 1.15.0', '< 2.0.0') # Access Google Cloud Storage for match
 
   spec.add_dependency('emoji_regex', '>= 0.1', '< 2.0') # Used to scan for Emoji in the changelog

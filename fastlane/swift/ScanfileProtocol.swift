@@ -45,6 +45,12 @@ protocol ScanfileProtocol: class {
   /// The testplan associated with the scheme that should be used for testing
   var testplan: String? { get }
 
+  /// Array of strings matching test plan configurations to run
+  var onlyTestConfigurations: String? { get }
+
+  /// Array of strings matching test plan configurations to skip
+  var skipTestConfigurations: String? { get }
+
   /// Run tests using the provided `.xctestrun` file
   var xctestrun: String? { get }
 
@@ -66,10 +72,13 @@ protocol ScanfileProtocol: class {
   /// Should the HTML report be opened when tests are completed?
   var openReport: Bool { get }
 
+  /// Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
+  var disableXcpretty: Bool? { get }
+
   /// The directory in which all reports will be stored
   var outputDirectory: String { get }
 
-  /// Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty)
+  /// Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty during xcodebuild)
   var outputStyle: String? { get }
 
   /// Comma separated list of the output types (e.g. html, junit, json-compilation-database)
@@ -197,6 +206,8 @@ extension ScanfileProtocol {
   var onlyTesting: String? { return nil }
   var skipTesting: String? { return nil }
   var testplan: String? { return nil }
+  var onlyTestConfigurations: String? { return nil }
+  var skipTestConfigurations: String? { return nil }
   var xctestrun: String? { return nil }
   var toolchain: String? { return nil }
   var clean: Bool { return false }
@@ -204,6 +215,7 @@ extension ScanfileProtocol {
   var addressSanitizer: Bool? { return nil }
   var threadSanitizer: Bool? { return nil }
   var openReport: Bool { return false }
+  var disableXcpretty: Bool? { return nil }
   var outputDirectory: String { return "./test_output" }
   var outputStyle: String? { return nil }
   var outputTypes: String { return "html,junit" }
@@ -246,4 +258,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.27]
+// FastlaneRunnerAPIVersion [0.9.29]

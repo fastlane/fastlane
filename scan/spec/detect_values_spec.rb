@@ -64,6 +64,33 @@ describe Scan do
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
         expect(Scan.config[:skip_testing]).to eq(["Bundle/SuiteA", "Bundle/SuiteB"])
       end
+
+      it "coerces only_test_configurations to be an array", requires_xcodebuild: true do
+        options = {
+          project: "./scan/examples/standard/app.xcodeproj",
+          only_test_configurations: "ConfigurationA"
+        }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        expect(Scan.config[:only_test_configurations]).to eq(["ConfigurationA"])
+      end
+
+      it "coerces skip_test_configurations to be an array", requires_xcodebuild: true do
+        options = {
+          project: "./scan/examples/standard/app.xcodeproj",
+          skip_test_configurations: "ConfigurationA,ConfigurationB"
+        }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        expect(Scan.config[:skip_test_configurations]).to eq(["ConfigurationA", "ConfigurationB"])
+      end
+
+      it "leaves skip_test_configurations as an array", requires_xcodebuild: true do
+        options = {
+          project: "./scan/examples/standard/app.xcodeproj",
+          skip_test_configurations: ["ConfigurationA", "ConfigurationB"]
+        }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        expect(Scan.config[:skip_test_configurations]).to eq(["ConfigurationA", "ConfigurationB"])
+      end
     end
   end
 end

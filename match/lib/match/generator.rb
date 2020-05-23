@@ -76,7 +76,8 @@ module Match
         ignore_profiles_with_different_name: true,
         team_id: params[:team_id],
         team_name: params[:team_name],
-        template_name: params[:template_name]
+        template_name: params[:template_name],
+        fail_on_name_taken: params[:fail_on_name_taken]
       }
 
       values[:platform] = params[:platform]
