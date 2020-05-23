@@ -273,6 +273,42 @@ describe Snapshot do
           expect(command.join('')).to include("-testPlan 'simple'") if FastlaneCore::Helper.xcode_at_least?(11)
         end
       end
+
+      context "only-testing" do
+        it "only tests the test bundle/suite/cases specified in only_testing when the input is an array", requires_xcode: true do
+          configure(options.merge(only_testing: %w(TestBundleA/TestSuiteB TestBundleC)))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-only-testing:TestBundleA/TestSuiteB")
+          expect(command.join('')).to include("-only-testing:TestBundleC")
+        end
+
+        it "only tests the test bundle/suite/cases specified in only_testing when the input is a string", requires_xcode: true do
+          configure(options.merge(only_testing: 'TestBundleA/TestSuiteB'))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-only-testing:TestBundleA/TestSuiteB")
+          expect(command.join('')).not_to(include("-only-testing:TestBundleC"))
+        end
+      end
+
+      context "skip-testing" do
+        it "does not test the test bundle/suite/cases specified in skip_testing when the input is an array", requires_xcode: true do
+          configure(options.merge(skip_testing: %w(TestBundleA/TestSuiteB TestBundleC)))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-skip-testing:TestBundleA/TestSuiteB")
+          expect(command.join('')).to include("-skip-testing:TestBundleC")
+        end
+
+        it "does not test the test bundle/suite/cases specified in skip_testing when the input is a string", requires_xcode: true do
+          configure(options.merge(skip_testing: 'TestBundleA/TestSuiteB'))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-skip-testing:TestBundleA/TestSuiteB")
+          expect(command.join('')).not_to(include("-skip-testing:TestBundleC"))
+        end
+      end
     end
 
     describe "Valid macOS Configuration" do
