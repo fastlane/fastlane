@@ -3,6 +3,8 @@ module Fastlane
   module Actions
     class AutomaticCodeSigningAction < Action
       def self.run(params)
+        UI.deprecated("The `automatic_code_signing` action has been deprecated,")
+        UI.deprecated("Please use `update_code_signing_settings` action instead.")
         FastlaneCore::PrintTable.print_values(config: params, title: "Summary for Automatic Codesigning")
         path = params[:path]
         path = File.join(File.expand_path(path), "project.pbxproj")
@@ -201,7 +203,11 @@ module Fastlane
       end
 
       def self.category
-        :code_signing
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "Please use `update_code_signing_settings` action instead."
       end
 
       def self.return_value

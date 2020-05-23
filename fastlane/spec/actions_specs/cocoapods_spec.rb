@@ -51,6 +51,30 @@ describe Fastlane do
         expect(result).to eq("bundle exec pod install --repo-update")
       end
 
+      it "add clean_install to command if clean_install is set to true, and  pod version is 1.7 and over" do
+        allow(Fastlane::Actions::CocoapodsAction).to receive(:pod_version).and_return('1.7')
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            clean_install: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod install --clean-install")
+      end
+
+      it "does not add clean_install to command if clean_install is set to true, and pod version is less than 1.7" do
+        allow(Fastlane::Actions::CocoapodsAction).to receive(:pod_version).and_return('1.6')
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            clean_install: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod install")
+      end
+
       it "adds silent to command if silent is set to true" do
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
@@ -79,6 +103,16 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("bundle exec pod install --no-ansi")
+      end
+
+      it "adds deployment to command if deployment is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            deployment: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod install --deployment")
       end
 
       it "changes directory if podfile is set to the Podfile path" do

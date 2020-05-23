@@ -37,6 +37,7 @@ module FastlaneCore
 
     def self.fetch_info_plist_file(path)
       UI.user_error!("Could not find file at path '#{path}'") unless File.exist?(path)
+      Zip.validate_entry_sizes = true # https://github.com/rubyzip/rubyzip/releases/tag/v2.0.0
       Zip::File.open(path, "rb") do |zipfile|
         file = zipfile.glob('**/Payload/*.app/Info.plist').first
         return nil unless file
