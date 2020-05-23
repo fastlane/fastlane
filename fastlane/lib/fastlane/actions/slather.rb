@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     class SlatherAction < Action
-      # https://github.com/SlatherOrg/slather/blob/v2.4.2/lib/slather/command/coverage_command.rb
+      # https://github.com/SlatherOrg/slather/blob/v2.4.9/lib/slather/command/coverage_command.rb
       ARGS_MAP = {
           travis: '--travis',
           travis_pro: '--travispro',
@@ -14,6 +14,7 @@ module Fastlane
           simple_output: '--simple-output',
           gutter_json: '--gutter-json',
           cobertura_xml: '--cobertura-xml',
+          sonarqube_xml: '--sonarqube-xml',
           llvm_cov: '--llvm-cov',
           html: '--html',
           show: '--show',
@@ -210,6 +211,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :cobertura_xml,
                                        env_name: "FL_SLATHER_COBERTURA_XML_ENABLED",
                                        description: "Tell slather that it should output results as Cobertura XML format",
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :sonarqube_xml,
+                                       env_name: "FL_SLATHER_SONARQUBE_XML_ENABLED",
+                                       description: "Tell slather that it should output results as SonarQube Generic XML format",
                                        is_string: false,
                                        type: Boolean,
                                        optional: true),
