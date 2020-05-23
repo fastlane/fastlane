@@ -75,7 +75,7 @@ jobs:
           name: Set Ruby version
           command: | # see https://circleci.com/docs/2.0/testing-ios/#using-ruby
             echo "ruby-${_RUBY_VERSION}" > ~/.ruby-version
-            command: echo 'chruby ruby-${_RUBY_VERSION}' >> ~/.bash_profile
+            echo 'chruby ruby-${_RUBY_VERSION}' >> ~/.bash_profile
       - run:
           name: Setup Build
           command: |
