@@ -7,6 +7,7 @@ require_relative 'device_types'
 require_relative 'runner'
 require_relative 'options'
 require_relative 'dependency_checker'
+require_relative 'device'
 
 HighLine.track_eof = false
 
@@ -29,6 +30,7 @@ module Frameit
       program :help_formatter, :compact
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
+      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       default_command(:run)
 
@@ -77,6 +79,30 @@ module Frameit
         c.action do |args, options|
           load_config(options)
           Frameit::Runner.new.run('.', Frameit::Color::ROSE_GOLD)
+        end
+      end
+
+      command :android do |c|
+        c.syntax = 'fastlane frameit android'
+        c.description = "Adds Android frames around all screenshots"
+
+        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
+
+        c.action do |args, options|
+          load_config(options)
+          Frameit::Runner.new.run('.', nil, Platform::ANDROID)
+        end
+      end
+
+      command :ios do |c|
+        c.syntax = 'fastlane frameit ios'
+        c.description = "Adds iOS frames around all screenshots"
+
+        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
+
+        c.action do |args, options|
+          load_config(options)
+          Frameit::Runner.new.run('.', nil, Platform::IOS)
         end
       end
 

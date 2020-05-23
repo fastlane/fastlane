@@ -125,7 +125,8 @@ module Sigh
       name = Sigh.config[:provisioning_name] || [bundle_id, profile_type.pretty_type].join(' ')
 
       unless Sigh.config[:skip_fetch_profiles]
-        if Spaceship.provisioning_profile.all.find { |p| p.name == name }
+        if Spaceship.provisioning_profile.all(mac: Sigh.config[:platform].to_s == 'macos').find { |p| p.name == name }
+          UI.user_error!("The name '#{name}' is already taken, and fail_on_name_taken is true") if Sigh.config[:fail_on_name_taken]
           UI.error("The name '#{name}' is already taken, using another one.")
           name += " #{Time.now.to_i}"
         end
@@ -155,27 +156,35 @@ module Sigh
       case Sigh.config[:platform].to_s
       when 'ios', 'tvos'
         if profile_type == Spaceship.provisioning_profile.Development
-          certificates = Spaceship.certificate.development.all
+          certificates = Spaceship.certificate.development.all +
+                         Spaceship.certificate.apple_development.all
         elsif profile_type == Spaceship.provisioning_profile.InHouse
+          # Enterprise accounts don't have access to Apple Distribution certificates
           certificates = Spaceship.certificate.in_house.all
         # handles case where the desired certificate type is adhoc but the account is an enterprise account
         # the apple dev portal api has a weird quirk in it where if you query for distribution certificates
         # for enterprise accounts, you get nothing back even if they exist.
         elsif profile_type == Spaceship.provisioning_profile.AdHoc && Spaceship.client && Spaceship.client.in_house?
+          # Enterprise accounts don't have access to Apple Distribution certificates
           certificates = Spaceship.certificate.in_house.all
         else
-          certificates = Spaceship.certificate.production.all # Ad hoc or App Store
+          # Ad hoc or App Store
+          certificates = Spaceship.certificate.production.all +
+                         Spaceship.certificate.apple_distribution.all
         end
 
       when 'macos'
         if profile_type == Spaceship.provisioning_profile.Development
-          certificates = Spaceship.certificate.mac_development.all
+          certificates = Spaceship.certificate.mac_development.all +
+                         Spaceship.certificate.apple_development.all
         elsif profile_type == Spaceship.provisioning_profile.AppStore
-          certificates = Spaceship.certificate.mac_app_distribution.all
+          certificates = Spaceship.certificate.mac_app_distribution.all +
+                         Spaceship.certificate.apple_distribution.all
         elsif profile_type == Spaceship.provisioning_profile.Direct
           certificates = Spaceship.certificate.developer_id_application.all
         else
-          certificates = Spaceship.certificate.mac_app_distribution.all
+          certificates = Spaceship.certificate.mac_app_distribution.all +
+                         Spaceship.certificate.apple_distribution.all
         end
       end
 

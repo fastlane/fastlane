@@ -10,7 +10,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.novoda:bintray-release:0.8.1'
+        classpath 'com.novoda:bintray-release:0.9.1'
     }
 }
 
@@ -18,10 +18,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion 8
+        minSdkVersion 18
     }
 }
 
@@ -38,10 +38,10 @@ publish {
 }
 
 dependencies {
-    api "com.android.support:support-annotations:28.0.0"
-    api 'com.android.support.test:runner:1.0.2'
-    api 'com.android.support.test:rules:1.0.2'
-    api 'com.android.support.test.espresso:espresso-core:3.0.2'
-    api 'com.android.support.test.uiautomator:uiautomator-v18:2.1.3'
-    api 'com.jraska:falcon:1.0.4'
+    api "androidx.annotation:annotation:1.1.0"
+    api 'androidx.test:runner:1.2.0'
+    api 'androidx.test:rules:1.2.0'
+    api 'androidx.test.espresso:espresso-core:3.2.0'
+    api 'androidx.test.uiautomator:uiautomator:2.2.0'
+    api 'com.jraska:falcon:2.1.1'
 }

@@ -25,7 +25,11 @@ module Fastlane
           end
 
           new_devices = devices_file.drop(1).map do |row|
-            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)") unless (2..3).cover?(row.count)
+            if row.count == 1
+              UI.user_error!("Invalid device line, ensure you are using tabs (NOT spaces). See Apple's sample/spec here: https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip")
+            elsif !(2..3).cover?(row.count)
+              UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)")
+            end
             row
           end
         else
@@ -45,7 +49,7 @@ module Fastlane
         end
         supported_platforms = all_platforms.select { |platform| self.is_supported?(platform.to_sym) }
 
-        existing_devices = supported_platforms.map { |platform| Spaceship::Device.all(mac: platform == "mac") }.flatten
+        existing_devices = supported_platforms.flat_map { |platform| Spaceship::Device.all(mac: platform == "mac") }
 
         device_objs = new_devices.map do |device|
           next if existing_devices.map(&:udid).include?(device[0])
