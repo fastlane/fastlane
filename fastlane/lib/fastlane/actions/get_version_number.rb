@@ -82,7 +82,7 @@ module Fastlane
       def self.get_version_number_from_build_settings!(target, variable, configuration = nil)
         target.build_configurations.each do |config|
           if configuration.nil? || config.name == configuration
-            value = config.build_settings[variable]
+            value = config.resolve_build_setting(variable)
             return value if value
           end
         end

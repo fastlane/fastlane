@@ -159,7 +159,7 @@ module Fastlane
       require 'json'
       url = "https://rubygems.org/api/v1/gems/#{gem_name}.json"
       begin
-        JSON.parse(open(url).read)
+        JSON.parse(URI.open(url).read)
       rescue
         nil
       end
@@ -215,7 +215,7 @@ module Fastlane
       # Bundler.with_clean_env solves this problem by resetting Bundler state before the
       # exec'd call gets merged into this process.
 
-      Bundler.with_clean_env do
+      Bundler.with_original_env do
         yield if block_given?
       end
     end
@@ -375,7 +375,7 @@ module Fastlane
       references = Fastlane.const_get(module_name).all_classes.collect do |path|
         next unless File.dirname(path).include?("/actions") # we only want to match actions
 
-        File.basename(path).gsub("_action", "").gsub(".rb", "").to_sym # the _action is optional
+        File.basename(path).gsub(".rb", "").gsub(/_action$/, '').to_sym # the _action is optional
       end
       references.compact!
 

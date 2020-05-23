@@ -123,6 +123,29 @@ module Scan
                                        verify_type('skip_testing', [Array, String], value)
                                      end),
 
+        # test plans to run
+        FastlaneCore::ConfigItem.new(key: :testplan,
+                                     env_name: "SCAN_TESTPLAN",
+                                     description: "The testplan associated with the scheme that should be used for testing",
+                                     is_string: true,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :only_test_configurations,
+                                     env_name: "SCAN_ONLY_TEST_CONFIGURATIONS",
+                                     description: "Array of strings matching test plan configurations to run",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       verify_type('only_test_configurations', [Array, String], value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :skip_test_configurations,
+                                     env_name: "SCAN_SKIP_TEST_CONFIGURATIONS",
+                                     description: "Array of strings matching test plan configurations to skip",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       verify_type('skip_test_configurations', [Array, String], value)
+                                     end),
+
         # other test options
         FastlaneCore::ConfigItem.new(key: :xctestrun,
                                      short_option: "-X",
@@ -175,6 +198,11 @@ module Scan
                                      description: "Should the HTML report be opened when tests are completed?",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
+                                     env_name: "SCAN_DISABLE_XCPRETTY",
+                                     description: "Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table",
+                                     type: Boolean,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :output_directory,
                                      short_option: "-o",
                                      env_name: "SCAN_OUTPUT_DIRECTORY",
@@ -186,7 +214,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :output_style,
                                      short_option: "-b",
                                      env_name: "SCAN_OUTPUT_STYLE",
-                                     description: "Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty)",
+                                     description: "Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty during xcodebuild)",
                                      optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Invalid output_style #{value}") unless ['standard', 'basic', 'rspec', 'raw'].include?(value)

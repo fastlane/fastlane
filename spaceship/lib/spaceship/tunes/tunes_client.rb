@@ -286,7 +286,7 @@ module Spaceship
     # @param sku (String): A unique ID for your app that is not visible on the App Store.
     # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
     #   can't be changed after you submit your first build.
-    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, itunes_connect_users: nil)
+    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, platforms: nil, itunes_connect_users: nil)
       puts("The `version` parameter is deprecated. Use `Spaceship::Tunes::Application.ensure_version!` method instead") if version
 
       # First, we need to fetch the data from Apple, which we then modify with the user's values
@@ -307,7 +307,7 @@ module Spaceship
       data['enabledPlatformsForCreation'] = { value: [platform] }
 
       data['initialPlatform'] = platform
-      data['enabledPlatformsForCreation'] = { value: [platform] }
+      data['enabledPlatformsForCreation'] = { value: platforms || [platform] }
 
       unless itunes_connect_users.nil?
         data['iTunesConnectUsers']['grantedAllUsers'] = false
@@ -1420,6 +1420,20 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
+    end
+
+    # Retrieves app-specific shared secret key
+    def get_shared_secret(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/appSharedSecret")
+      data = parse_response(r, 'data')
+      data['sharedSecret']
+    end
+
+    # Generates app-specific shared secret key
+    def generate_shared_secret(app_id: nil)
+      r = request(:post, "ra/apps/#{app_id}/iaps/appSharedSecret")
+      data = parse_response(r, 'data')
+      data['sharedSecret']
     end
 
     #####################################################
