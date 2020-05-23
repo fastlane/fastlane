@@ -18,6 +18,7 @@ module Match
       attr_accessor :type
       attr_accessor :platform
       attr_accessor :git_basic_authorization
+      attr_accessor :git_bearer_authorization
 
       def self.configure(params)
         return self.new(
@@ -30,7 +31,8 @@ module Match
           git_full_name: params[:git_full_name],
           git_user_email: params[:git_user_email],
           clone_branch_directly: params[:clone_branch_directly],
-          git_basic_authorization: params[:git_basic_authorization]
+          git_basic_authorization: params[:git_basic_authorization],
+          git_bearer_authorization: params[:git_bearer_authorization]
         )
       end
 
@@ -43,7 +45,8 @@ module Match
                      git_full_name: nil,
                      git_user_email: nil,
                      clone_branch_directly: false,
-                     git_basic_authorization: nil)
+                     git_basic_authorization: nil,
+                     git_bearer_authorization: nil)
         self.git_url = git_url
         self.shallow_clone = shallow_clone
         self.skip_docs = skip_docs
@@ -52,6 +55,7 @@ module Match
         self.git_user_email = git_user_email
         self.clone_branch_directly = clone_branch_directly
         self.git_basic_authorization = git_basic_authorization
+        self.git_bearer_authorization = git_bearer_authorization
 
         self.type = type if type
         self.platform = platform if platform
@@ -69,7 +73,11 @@ module Match
         self.working_directory = Dir.mktmpdir
 
         command = "git clone #{self.git_url.shellescape} #{self.working_directory.shellescape}"
-        command << " -c http.extraheader='AUTHORIZATION: basic #{self.git_basic_authorization}'" unless self.git_basic_authorization.nil?
+        # HTTP headers are supposed to be be case insensitive but
+        # Bitbucket requires `Authorization: Basic` and `Authorization Bearer` to work
+        # https://github.com/fastlane/fastlane/pull/15928
+        command << " -c http.extraheader='Authorization: Basic #{self.git_basic_authorization}'" unless self.git_basic_authorization.nil?
+        command << " -c http.extraheader='Authorization: Bearer #{self.git_bearer_authorization}'" unless self.git_bearer_authorization.nil?
 
         if self.shallow_clone
           command << " --depth 1 --no-single-branch"

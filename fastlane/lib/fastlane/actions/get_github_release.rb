@@ -129,6 +129,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_GITHUB_RELEASE_API_TOKEN",
                                        sensitive: true,
+                                       code_gen_sensitive: true,
+                                       default_value: ENV["GITHUB_API_TOKEN"],
+                                       default_value_dynamic: true,
                                        description: "GitHub Personal Token (required for private repositories)",
                                        optional: true)
         ]
