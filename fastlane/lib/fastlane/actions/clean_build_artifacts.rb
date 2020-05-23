@@ -21,6 +21,9 @@ module Fastlane
           File.delete(file)
         end
 
+        Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATHS] = nil
+        Actions.lane_context[Actions::SharedValues::DSYM_PATHS] = nil
+
         UI.success('Cleaned up build artifacts 🐙')
       end
 

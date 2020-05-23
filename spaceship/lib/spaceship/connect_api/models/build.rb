@@ -79,8 +79,7 @@ module Spaceship
       end
 
       def ready_for_internal_testing?
-        raise "No build_beta_detail included" unless build_beta_detail
-        return build_beta_detail.ready_for_internal_testing?
+        return build_beta_detail.nil? == false && build_beta_detail.ready_for_internal_testing?
       end
 
       def ready_for_beta_submission?
@@ -158,6 +157,10 @@ module Spaceship
 
       def post_beta_app_review_submission
         return Spaceship::ConnectAPI.post_beta_app_review_submissions(build_id: id)
+      end
+
+      def expire!
+        return Spaceship::ConnectAPI.patch_builds(build_id: id, attributes: { expired: true })
       end
     end
   end

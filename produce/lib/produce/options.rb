@@ -50,10 +50,22 @@ module Produce
                                      short_option: "-j",
                                      env_name: "PRODUCE_PLATFORM",
                                      description: "The platform to use (optional)",
+                                     conflicting_options: [:platforms],
                                      optional: true,
                                      default_value: "ios",
                                      verify_block: proc do |value|
                                                      UI.user_error!("The platform can only be ios or osx") unless %('ios', 'osx').include?(value)
+                                                   end),
+        FastlaneCore::ConfigItem.new(key: :platforms,
+                                     short_option: "-J",
+                                     env_name: "PRODUCE_PLATFORMS",
+                                     description: "The platforms to use (optional)",
+                                     conflicting_options: [:platform],
+                                     optional: true,
+                                     type: Array,
+                                     verify_block: proc do |values|
+                                                     types = %w(ios osx)
+                                                     UI.user_error!("The platform can only be #{types}") unless (values - types).empty?
                                                    end),
         FastlaneCore::ConfigItem.new(key: :language,
                                      short_option: "-m",

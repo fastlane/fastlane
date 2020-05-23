@@ -60,7 +60,11 @@ module Match
         names << params[:platform]
       end
 
-      profile_name = names.join(" ")
+      if params[:profile_name].to_s.empty?
+        profile_name = names.join(" ")
+      else
+        profile_name = params[:profile_name]
+      end
 
       values = {
         app_identifier: app_identifier,
@@ -72,7 +76,8 @@ module Match
         ignore_profiles_with_different_name: true,
         team_id: params[:team_id],
         team_name: params[:team_name],
-        template_name: params[:template_name]
+        template_name: params[:template_name],
+        fail_on_name_taken: params[:fail_on_name_taken]
       }
 
       values[:platform] = params[:platform]
