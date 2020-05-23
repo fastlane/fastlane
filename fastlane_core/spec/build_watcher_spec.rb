@@ -37,6 +37,15 @@ describe FastlaneCore::BuildWatcher do
       expect(found_build).to eq(ready_build)
     end
 
+    it 'returns a build that is still processing when return_when_build_appears is true' do
+      expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([])
+      expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([processing_build])
+
+      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_when_build_appears: true, return_spaceship_testflight_build: false)
+
+      expect(found_build).to eq(processing_build)
+    end
+
     it 'returns a ready to submit build with train_version and build_version truncated' do
       expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([])
       expect(Spaceship::ConnectAPI::Build).to receive(:all).and_return([ready_build])

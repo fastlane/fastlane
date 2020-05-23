@@ -1,3 +1,5 @@
+require 'ostruct'
+
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "app_store_build_number" do
@@ -23,7 +25,7 @@ describe Fastlane do
       end
 
       it "returns value as string (with build number as version string)" do
-        allow(Fastlane::Actions::AppStoreBuildNumberAction).to receive(:get_build_number).and_return("1.2.3")
+        allow(Fastlane::Actions::AppStoreBuildNumberAction).to receive(:get_build_number).and_return(OpenStruct.new({ build_nr: "1.2.3", build_v: "foo" }))
 
         result = Fastlane::FastFile.new.parse("lane :test do
           app_store_build_number(username: 'name@example.com', app_identifier: 'x.y.z')
@@ -33,7 +35,7 @@ describe Fastlane do
       end
 
       it "returns value as integer (with build number as version number)" do
-        allow(Fastlane::Actions::AppStoreBuildNumberAction).to receive(:get_build_number).and_return("3")
+        allow(Fastlane::Actions::AppStoreBuildNumberAction).to receive(:get_build_number).and_return(OpenStruct.new({ build_nr: "3", build_v: "foo" }))
 
         result = Fastlane::FastFile.new.parse("lane :test do
           app_store_build_number(username: 'name@example.com', app_identifier: 'x.y.z')

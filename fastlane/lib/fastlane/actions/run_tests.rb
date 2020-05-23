@@ -10,17 +10,10 @@ module Fastlane
     class RunTestsAction < Action
       def self.run(values)
         require 'scan'
-        plist_files_before = []
+        manager = Scan::Manager.new
 
         begin
-          destination = values[:destination] # save destination value which can be later overridden
-          Scan.config = values # we set this here to auto-detect missing values, which we need later on
-          unless values[:derived_data_path].to_s.empty?
-            plist_files_before = test_summary_filenames(values[:derived_data_path])
-          end
-
-          values[:destination] = destination # restore destination value
-          Scan::Manager.new.work(values)
+          manager.work(values)
 
           zip_build_products_path = Scan.cache[:zip_build_products_path]
           Actions.lane_context[SharedValues::SCAN_ZIP_BUILD_PRODUCTS_PATH] = zip_build_products_path if zip_build_products_path
@@ -37,8 +30,10 @@ module Fastlane
           end
         ensure
           unless values[:derived_data_path].to_s.empty?
+            plist_files_before = manager.plist_files_before || []
+
             Actions.lane_context[SharedValues::SCAN_DERIVED_DATA_PATH] = values[:derived_data_path]
-            plist_files_after = test_summary_filenames(values[:derived_data_path])
+            plist_files_after = manager.test_summary_filenames(values[:derived_data_path])
             all_test_summaries = (plist_files_after - plist_files_before)
             Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILES] = all_test_summaries
             Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILE] = all_test_summaries.last
@@ -84,18 +79,6 @@ module Fastlane
       end
 
       private_class_method
-
-      def self.test_summary_filenames(derived_data_path)
-        files = []
-
-        # Xcode < 10
-        files += Dir["#{derived_data_path}/**/Logs/Test/*TestSummaries.plist"]
-
-        # Xcode 10
-        files += Dir["#{derived_data_path}/**/Logs/Test/*.xcresult/TestSummaries.plist"]
-
-        return files
-      end
 
       def self.example_code
         [

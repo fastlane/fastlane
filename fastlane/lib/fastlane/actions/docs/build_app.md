@@ -146,7 +146,7 @@ export_options({
 Optional: If _gym_ can't automatically detect the provisioning profiles to use, you can pass a mapping of bundle identifiers to provisioning profiles:
 
 ```ruby
-build_ios_app(
+build_app(
   scheme: "Release",
   export_options: {
     method: "app-store",
@@ -158,7 +158,7 @@ build_ios_app(
 )
 ```
 
-**Note**: If you use [_fastlane_](https://fastlane.tools) with [_match_](https://fastlane.tools/match) you don't need to provide those values manually.
+**Note**: If you use [_fastlane_](https://fastlane.tools) with [_match_](https://fastlane.tools/match) you don't need to provide those values manually, unless you pass a plist file into `export_options`
 
 For the list of available options run `xcodebuild -help`.
 

@@ -1,0 +1,16 @@
+{
+    "data" : {
+      "type" : "betaGroups",
+      "id" : "123456789",
+      "attributes" : {
+        "name" : "Brand New Group",
+        "createdDate" : "2018-04-15T18:13:40Z",
+        "isInternalGroup" : false,
+        "publicLinkEnabled" : false,
+        "publicLinkId" : "abcd1234",
+        "publicLinkLimitEnabled" : false,
+        "publicLinkLimit" : 10000,
+        "publicLink" : "https://testflight.apple.com/join/abcd1234"
+      }
+    }
+}
