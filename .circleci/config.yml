@@ -53,6 +53,13 @@ aliases:
       paths:
         - "~/.cache/rubocop_cache"
 
+  - &set_ruby
+    run:
+      name: Set Ruby version
+      command: | # see https://circleci.com/docs/2.0/testing-ios/#using-ruby
+        echo "ruby-${_RUBY_VERSION}" > ~/.ruby-version
+        echo 'chruby ruby-${_RUBY_VERSION}' >> ~/.bash_profile
+
 version: 2
 
 jobs:
@@ -71,11 +78,11 @@ jobs:
       - *cache_save_git
       - *cache_restore_bundler
       - *cache_restore_homebrew
+      - *set_ruby
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            echo ${_RUBY_VERSION} > .ruby-version
             brew untap caskroom/versions || true
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
@@ -166,11 +173,11 @@ jobs:
       - *cache_save_git
       - *cache_restore_bundler
       - *cache_restore_homebrew
+      - *set_ruby
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            echo ${_RUBY_VERSION} > .ruby-version
             brew untap caskroom/versions
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
