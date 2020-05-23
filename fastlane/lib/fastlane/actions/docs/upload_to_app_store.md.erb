@@ -706,6 +706,16 @@ DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" fastlane deliver
 ## HTTP Proxy
 iTunes Transporter is a Java application bundled with Xcode. In addition to utilizing the `DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV"`, you need to configure the transporter application to use the proxy independently from the system proxy or any environment proxy settings. You can find the configuration file within Xcode:
 
+**for Xcode11 and later**
+
+```no-highlight
+TOOLS_PATH=$( xcode-select -p )
+REL_PATH='../SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms/java/lib/net.properties'
+echo "$TOOLS_PATH/$REL_PATH"
+```
+
+**for Xcode10 or earlier**
+
 ```no-highlight
 TOOLS_PATH=$( xcode-select -p )
 REL_PATH='../Applications/Application Loader.app/Contents/itms/java/lib/net.properties'

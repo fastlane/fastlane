@@ -36,7 +36,11 @@ module Deliver
 
       if options[:build_number] && options[:build_number] != "latest"
         UI.message("Selecting existing build-number: #{options[:build_number]}")
-        build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] }
+        if app_version
+          build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] && a.train_version == app_version }
+        else
+          build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] }
+        end
         unless build
           UI.user_error!("Build number: #{options[:build_number]} does not exist")
         end
@@ -58,11 +62,17 @@ module Deliver
       start = Time.now
       build = nil
 
+      use_latest_version = app_version.nil?
+
       loop do
         # Sometimes candidate_builds don't appear immediately after submission
         # Wait for candidate_builds to appear on App Store Connect
         # Issue https://github.com/fastlane/fastlane/issues/10411
-        candidate_builds = app.latest_version.candidate_builds
+        if use_latest_version
+          candidate_builds = app.latest_version.candidate_builds
+        else
+          candidate_builds = app.tunes_all_builds_for_train(train: app_version)
+        end
         if (candidate_builds || []).count == 0
           UI.message("Waiting for candidate builds to appear...")
           if (Time.now - start) > (60 * 5)

@@ -1,4 +1,5 @@
 require 'fastlane_core/helper'
+require 'fastlane/boolean'
 require_relative 'detect_values'
 
 module Screengrab
@@ -19,6 +20,7 @@ module Screengrab
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI
+  Boolean = Fastlane::Boolean
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
   DESCRIPTION = "Automated localized screenshots of your Android app on every device".freeze
 end

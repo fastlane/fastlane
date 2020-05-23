@@ -47,6 +47,10 @@ module Fastlane
           command << "--verbose"
         end
 
+        if params[:use_modular_headers]
+          command << "--use-modular-headers"
+        end
+
         result = Actions.sh(command.join(' '))
         UI.success("Successfully pushed Podspec ⬆️ ")
         return result
@@ -118,7 +122,12 @@ module Fastlane
                                        optional: true,
                                        type: Boolean,
                                        default_value: false,
-                                       env_name: "FL_POD_PUSH_VERBOSE")
+                                       env_name: "FL_POD_PUSH_VERBOSE"),
+          FastlaneCore::ConfigItem.new(key: :use_modular_headers,
+                                       description: "Use modular headers option during validation",
+                                       optional: true,
+                                       type: Boolean,
+                                       env_name: "FL_POD_PUSH_USE_MODULAR_HEADERS")
         ]
       end
 

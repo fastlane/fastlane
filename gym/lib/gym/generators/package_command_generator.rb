@@ -25,6 +25,10 @@ module Gym
         generator.ipa_path
       end
 
+      def pkg_path
+        generator.pkg_path
+      end
+
       def dsym_path
         generator.dsym_path
       end
@@ -43,6 +47,14 @@ module Gym
 
       def apps_path
         generator.apps_path
+      end
+
+      def asset_packs_path
+        generator.asset_packs_path
+      end
+
+      def appstore_info_path
+        generator.appstore_info_path
       end
 
       # The generator we need to use for the currently used Xcode version

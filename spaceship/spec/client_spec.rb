@@ -97,8 +97,8 @@ describe Spaceship::Client do
 
   describe 'retry' do
     [
-      Faraday::Error::TimeoutError,
-      Faraday::Error::ConnectionFailed,
+      Faraday::TimeoutError,
+      Faraday::ConnectionFailed,
       Faraday::ParsingError,
       Spaceship::BadGatewayError,
       Spaceship::InternalServerError,

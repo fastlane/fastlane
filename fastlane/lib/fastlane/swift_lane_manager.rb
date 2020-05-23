@@ -14,14 +14,6 @@ module Fastlane
       ENV["FASTLANE_LANE_NAME"] = lane
       Actions.lane_context[Actions::SharedValues::LANE_NAME] = lane
 
-      # xcodeproj has a bug in certain versions that causes it to change directories
-      # and not return to the original working directory
-      # https://github.com/CocoaPods/Xcodeproj/issues/426
-      # Setting this environment variable causes xcodeproj to work around the problem
-      ENV["FORK_XCODE_WRITING"] = "true"
-
-      Fastlane::Helper::DotenvHelper.load_dot_env(env)
-
       started = Time.now
       e = nil
       begin
