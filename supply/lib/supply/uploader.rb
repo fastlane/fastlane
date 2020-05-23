@@ -391,6 +391,10 @@ module Supply
         end
       end
 
+      if Supply.config[:in_app_update_priority]
+        track_release.in_app_update_priority = Supply.config[:in_app_update_priority].to_i
+      end
+
       tracks = client.tracks(Supply.config[:track])
       track = tracks.first
       if track

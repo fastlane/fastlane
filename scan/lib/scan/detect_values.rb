@@ -45,6 +45,9 @@ module Scan
       coerce_to_array_of_strings(:only_testing)
       coerce_to_array_of_strings(:skip_testing)
 
+      coerce_to_array_of_strings(:only_test_configurations)
+      coerce_to_array_of_strings(:skip_test_configurations)
+
       return config
     end
 
