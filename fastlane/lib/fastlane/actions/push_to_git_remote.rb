@@ -5,7 +5,7 @@ module Fastlane
       def self.run(params)
         local_branch = params[:local_branch]
         local_branch ||= Actions.git_branch.gsub(%r{#{params[:remote]}\/}, '') if Actions.git_branch
-        local_branch ||= 'master'
+        UI.user_error!('Failed to get the current branch.') unless local_branch
 
         remote_branch = params[:remote_branch] || local_branch
 
@@ -28,6 +28,9 @@ module Fastlane
 
         # optionally add the no-verify component
         command << '--no-verify' if params[:no_verify]
+
+        # optionally add the set-upstream component
+        command << '--set-upstream' if params[:set_upstream]
 
         # execute our command
         Actions.sh('pwd')
@@ -76,6 +79,11 @@ module Fastlane
                                        env_name: "FL_GIT_PUSH_USE_NO_VERIFY",
                                        description: "Whether or not to use --no-verify",
                                        type: Boolean,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :set_upstream,
+                                       env_name: "FL_GIT_PUSH_USE_SET_UPSTREAM",
+                                       description: "Whether or not to use --set-upstream",
+                                       type: Boolean,
                                        default_value: false)
         ]
       end
@@ -85,7 +93,10 @@ module Fastlane
       end
 
       def self.details
-        "Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo."
+        [
+          "Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.",
+          "If this is a new branch, use the `set_upstream` option to set the remote branch as upstream."
+        ].join("\n")
       end
 
       def self.is_supported?(platform)
@@ -102,7 +113,8 @@ module Fastlane
             force: true,              # optional, default: false
             force_with_lease: true,   # optional, default: false
             tags: false,              # optional, default: true
-            no_verify: true           # optional, default: false
+            no_verify: true,          # optional, default: false
+            set_upstream: true        # optional, default: false
           )'
         ]
       end

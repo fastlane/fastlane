@@ -71,11 +71,17 @@ module FastlaneCore
 
     # @return [boolean] true if building in a known CI environment
     def self.ci?
+      return true if self.is_circle_ci?
+
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CIRCLECI', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD'].each do |current|
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO'].each do |current|
         return true if ENV.key?(current)
       end
       return false
+    end
+
+    def self.is_circle_ci?
+      return ENV.key?('CIRCLECI')
     end
 
     def self.operating_system
@@ -202,9 +208,15 @@ module FastlaneCore
       return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
 
       if self.mac?
+        # First check for manually install iTMSTransporter
+        user_local_itms_path = "/usr/local/itms"
+        return user_local_itms_path if File.exist?(user_local_itms_path)
+
+        # Then check for iTMSTransporter in the Xcode path
         [
           "../Applications/Application Loader.app/Contents/MacOS/itms",
-          "../Applications/Application Loader.app/Contents/itms"
+          "../Applications/Application Loader.app/Contents/itms",
+          "../SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms" # For Xcode 11
         ].each do |path|
           result = File.expand_path(File.join(self.xcode_path, path))
           return result if File.exist?(result)
@@ -403,6 +415,23 @@ module FastlaneCore
     def self.log
       UI.deprecated("Helper.log is deprecated. Use `UI` class instead")
       UI.current.log
+    end
+
+    def self.ask_password(message: "Passphrase: ", confirm: nil)
+      raise "This code should only run in interactive mode" unless UI.interactive?
+
+      loop do
+        password = UI.password(message)
+        if confirm
+          password2 = UI.password("Type passphrase again: ")
+          if password == password2
+            return password
+          end
+        else
+          return password
+        end
+        UI.error("Passphrases differ. Try again")
+      end
     end
   end
 end

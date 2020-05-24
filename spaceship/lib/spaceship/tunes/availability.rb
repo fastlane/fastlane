@@ -1,5 +1,6 @@
 require_relative 'territory'
 require_relative 'b2b_user'
+require_relative 'b2b_organization'
 module Spaceship
   module Tunes
     class Availability < TunesBase
@@ -27,6 +28,9 @@ module Spaceship
       # @return (Array of Spaceship::Tunes::B2bUser objects) A list of users
       attr_accessor :b2b_users
 
+      # @return (Array of Spaceship::Tunes::B2bOrganization objects) A list of b2b orgs
+      attr_accessor :b2b_organizations
+
       attr_mapping(
         'theWorld' => :include_future_territories,
         'preOrder.clearedForPreOrder.value' => :cleared_for_preorder,
@@ -47,12 +51,12 @@ module Spaceship
         # Base::DataHash sets values for paths that don't exist
         obj = self.new(
           'preOrder' => {
-            'clearedForPreOrder' => {
-              'value' => false
-            },
-            'appAvailableDate' => {
-              'value' => nil
-            }
+              'clearedForPreOrder' => {
+                  'value' => false
+              },
+              'appAvailableDate' => {
+                  'value' => nil
+              }
           }
         )
 
@@ -66,8 +70,8 @@ module Spaceship
         obj.include_future_territories = params.fetch(:include_future_territories, true)
         obj.cleared_for_preorder = params.fetch(:cleared_for_preorder, false)
         obj.app_available_date = params.fetch(:app_available_date, nil)
-        obj.b2b_unavailable =  params.fetch(:b2b_unavailable, false)
-        obj.b2b_app_enabled =  params.fetch(:b2b_app_enabled, false)
+        obj.b2b_unavailable = params.fetch(:b2b_unavailable, false)
+        obj.b2b_app_enabled = params.fetch(:b2b_app_enabled, false)
         obj.educational_discount = params.fetch(:educational_discount, true)
         return obj
       end
@@ -78,6 +82,10 @@ module Spaceship
 
       def b2b_users
         @b2b_users || raw_data['b2bUsers'].map { |user| B2bUser.new(user) }
+      end
+
+      def b2b_organizations
+        @b2b_organizations || raw_data['b2bOrganizations'].map { |user| B2bOrganization.new(user) }
       end
 
       def b2b_app_enabled
@@ -124,6 +132,30 @@ module Spaceship
         @b2b_users = b2b_users.reject { |user| users_to_remove.include?(user.ds_username) }
         @b2b_users.concat(users_to_add.map { |user| B2bUser.from_username(user) })
         @b2b_users.concat(users_to_remove.map { |user| B2bUser.from_username(user, is_add_type: false) })
+
+        return self
+      end
+
+      # Updates users for b2b enabled apps
+      def update_dep_organizations(organization_list = [])
+        raise "Cannot add dep organizations if b2b is not enabled" unless b2b_app_enabled
+
+        added_orgs = b2b_organizations
+
+        # Returns if list is unchanged
+        return self if (added_orgs - organization_list) == (organization_list - added_orgs)
+
+        orgs_to_add = organization_list.reject { |organization| added_orgs.include?(organization) }
+        orgs_to_remove = added_orgs.nil? ? organization_list : added_orgs.reject { |organization| organization_list.include?(organization) }
+
+        @b2b_organizations = b2b_organizations.reject { |organization| orgs_to_remove.include?(organization) }
+        @b2b_organizations.concat(orgs_to_add)
+        @b2b_organizations.concat(orgs_to_remove.map do |organization|
+          B2bOrganization.from_id_info(dep_id: organization.dep_customer_id,
+                                       dep_name: organization.name,
+                                       dep_org_id: organization.dep_organization_id,
+                                       type: false)
+        end)
 
         return self
       end

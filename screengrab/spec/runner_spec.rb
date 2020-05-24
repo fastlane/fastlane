@@ -33,11 +33,15 @@ describe Screengrab::Runner do
         config[:launch_arguments] = ["username hjanuschka", "build_type x500"]
         config[:locales] = %w(en-US)
         config[:ending_locale] = 'en-US'
+        config[:use_timestamp_suffix] = true
       end
       it 'sets custom launch_arguments' do
+        # Don't actually try to pull screenshot from device
+        allow(@runner).to receive(:pull_screenshots_from_device)
+
         expect(mock_executor).to receive(:execute)
-          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e username hjanuschka -e build_type x500 \\\n/"))
-        @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, config[:launch_arguments])
+          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp true \\\n-e username hjanuschka -e build_type x500 \\\n/"))
+        @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, config[:launch_arguments])
       end
     end
 
@@ -58,9 +62,12 @@ describe Screengrab::Runner do
           end
 
           it 'prints an error and exits the program' do
+            # Don't actually try to pull screenshot from device
+            allow(@runner).to receive(:pull_screenshots_from_device)
+
             expect(ui).to receive(:test_failure!).with("Tests failed for locale en-US on device #{device_serial}").and_call_original
 
-            expect { @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil) }.to raise_fastlane_test_failure
+            expect { @runner.run_tests_for_locale('devie', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil) }.to raise_fastlane_test_failure
           end
         end
 
@@ -70,10 +77,51 @@ describe Screengrab::Runner do
           end
 
           it 'prints an error and does not exit the program' do
+            # Don't actually try to pull screenshot from device
+            allow(@runner).to receive(:pull_screenshots_from_device)
+
             expect(ui).to receive(:error).with("Tests failed").and_call_original
 
-            @runner.run_tests_for_locale('en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
+            @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
           end
+        end
+      end
+    end
+
+    context 'when using use_timestamp_suffix' do
+      context 'when set to false' do
+        before do
+          @runner = Screengrab::Runner.new(
+            mock_executor,
+            FastlaneCore::Configuration.create(Screengrab::Options.available_options, { use_timestamp_suffix: false }),
+            mock_android_environment
+          )
+        end
+        it 'sets appendTimestamp as false' do
+          # Don't actually try to pull screenshot from device
+          allow(@runner).to receive(:pull_screenshots_from_device)
+
+          expect(mock_executor).to receive(:execute)
+            .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp false \\\n/androidx.test.runner.AndroidJUnitRunner"))
+          @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
+        end
+      end
+
+      context 'use_timestamp_suffix is not specified' do
+        before do
+          @runner = Screengrab::Runner.new(
+            mock_executor,
+            FastlaneCore::Configuration.create(Screengrab::Options.available_options, {}),
+            mock_android_environment
+          )
+        end
+        it 'should set appendTimestamp by default' do
+          # Don't actually try to pull screenshot from device
+          allow(@runner).to receive(:pull_screenshots_from_device)
+
+          expect(mock_executor).to receive(:execute)
+            .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp true \\\n/androidx.test.runner.AndroidJUnitRunner"))
+          @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil)
         end
       end
     end
@@ -102,84 +150,77 @@ describe Screengrab::Runner do
     end
   end
 
-  describe :select_device do
-    let(:adb_list_devices_command) { 'adb devices -l' }
+  describe :uninstall_existing do
+    let(:device_serial) { 'device_serial' }
+    let(:app_package_name) { 'tools.fastlane.dev' }
+    let(:test_package_name) { 'tools.fastlane.dev.test' }
+    let(:adb_list_packages_command) { "adb -s #{device_serial} shell pm list packages" }
+
+    context 'app and test package installed' do
+      before do
+        expect(mock_android_environment).to receive(:adb_path).and_return("adb").exactly(3).times
+
+        adb_response = strip_heredoc(<<-ADB_OUTPUT)
+          package:android
+          package:com.android.contacts
+          package:com.google.android.webview
+          package:tools.fastlane.dev
+          package:tools.fastlane.dev.test
+
+        ADB_OUTPUT
+
+        mock_adb_response_for_command(adb_list_packages_command, adb_response)
+      end
+
+      it 'uninstalls app and test package' do
+        expect(mock_executor).to receive(:execute).with(hash_including(command: "adb -s #{device_serial} uninstall #{app_package_name}"))
+        expect(mock_executor).to receive(:execute).with(hash_including(command: "adb -s #{device_serial} uninstall #{test_package_name}"))
+        @runner.uninstall_apks(device_serial, app_package_name, test_package_name)
+      end
+    end
+
+    context 'app and test package not installed' do
+      before do
+        expect(mock_android_environment).to receive(:adb_path).and_return("adb")
+
+        adb_response = strip_heredoc(<<-ADB_OUTPUT)
+          package:android
+          package:com.android.contacts
+          package:com.google.android.webview
+
+        ADB_OUTPUT
+
+        mock_adb_response_for_command(adb_list_packages_command, adb_response)
+      end
+
+      it 'skips uninstall of app' do
+        expect(mock_executor).not_to(receive(:execute)).with(hash_including(command: "adb -s #{device_serial} uninstall #{app_package_name}"))
+        expect(mock_executor).not_to(receive(:execute)).with(hash_including(command: "adb -s #{device_serial} uninstall #{test_package_name}"))
+        @runner.uninstall_apks(device_serial, app_package_name, test_package_name)
+      end
+    end
+  end
+
+  describe :installed_packages do
+    let(:device_serial) { 'device_serial' }
+    let(:adb_list_packages_command) { "adb -s #{device_serial} shell pm list packages" }
 
     before do
       expect(mock_android_environment).to receive(:adb_path).and_return("adb")
     end
 
-    context 'no devices' do
-      it 'does not find any active devices' do
-        adb_response = strip_heredoc(<<-ADB_OUTPUT)
-        List of devices attached
+    it 'returns installed packages' do
+      adb_response = strip_heredoc(<<-ADB_OUTPUT)
+        package:android
+        package:com.android.contacts
+        package:com.google.android.webview
+        package:tools.fastlane.dev
+        package:tools.fastlane.dev.test
 
-        ADB_OUTPUT
-        mock_adb_response_for_command(adb_list_devices_command, adb_response)
+      ADB_OUTPUT
 
-        expect(ui).to receive(:user_error!).with(/no connected.* devices/).and_call_original
-
-        expect { @runner.select_device }.to raise_fastlane_error
-      end
-    end
-
-    context 'one device with spurious ADB output mixed in' do
-      it 'finds an active device' do
-        adb_response = strip_heredoc(<<-ADB_OUTPUT)
-          List of devices attached
-          adb server version (39) doesn't match this client (36); killing...
-          * daemon started successfully
-          T065002LTT             device usb:437387264X product:ghost_retail model:XT1053 device:ghost
-
-
-        ADB_OUTPUT
-        mock_adb_response_for_command(adb_list_devices_command, adb_response)
-
-        expect(@runner.select_device).to eq('T065002LTT')
-      end
-    end
-
-    context 'one device' do
-      it 'finds an active device' do
-        adb_response = strip_heredoc(<<-ADB_OUTPUT)
-          List of devices attached
-          T065002LTT             device usb:437387264X product:ghost_retail model:XT1053 device:ghost
-
-
-        ADB_OUTPUT
-        mock_adb_response_for_command(adb_list_devices_command, adb_response)
-
-        expect(@runner.select_device).to eq('T065002LTT')
-      end
-    end
-
-    context 'multiple devices' do
-      it 'finds an active device' do
-        adb_response = strip_heredoc(<<-ADB_OUTPUT)
-          List of devices attached
-          emulator-5554          device product:sdk_phone_x86_64 model:Android_SDK_built_for_x86_64 device:generic_x86_64
-          T065002LTT             device usb:437387264X product:ghost_retail model:XT1053 device:ghost
-
-        ADB_OUTPUT
-
-        mock_adb_response_for_command(adb_list_devices_command, adb_response)
-        expect(@runner.select_device).to eq('emulator-5554')
-      end
-    end
-
-    context 'one device booting' do
-      it 'finds an active device' do
-        adb_response = strip_heredoc(<<-ADB_OUTPUT)
-          List of devices attached
-          emulator-5554 offline
-          T065002LTT  device
-
-        ADB_OUTPUT
-
-        mock_adb_response_for_command(adb_list_devices_command, adb_response)
-
-        expect(@runner.select_device).to eq('T065002LTT')
-      end
+      mock_adb_response_for_command(adb_list_packages_command, adb_response)
+      expect(@runner.installed_packages(device_serial)).to eq(['android', 'com.android.contacts', 'com.google.android.webview', 'tools.fastlane.dev', 'tools.fastlane.dev.test'])
     end
   end
 
@@ -196,9 +237,23 @@ describe Screengrab::Runner do
 
           ADB_OUTPUT
 
-      mock_adb_response_for_command("test", adb_response)
+      mock_adb_response_for_command("adb test", adb_response)
 
       expect(@runner.run_adb_command("test").lines.any? { |line| line.start_with?('adb: ') }).to eq(false)
+    end
+  end
+
+  describe :select_device do
+    it 'connects to host if specified' do
+      config[:adb_host] = "device_farm"
+
+      mock_helper = double('mock helper')
+      device = Fastlane::Helper::AdbDevice.new(serial: 'e1dbf228')
+
+      expect(Fastlane::Helper::AdbHelper).to receive(:new).with(adb_host: 'device_farm').and_return(mock_helper)
+      expect(mock_helper).to receive(:load_all_devices).and_return([device])
+
+      expect(@runner.select_device).to eq('e1dbf228')
     end
   end
 end

@@ -5,7 +5,7 @@ describe Fastlane do
       it "doesn't work outside CI" do
         stub_const("ENV", {})
 
-        expect(UI).to receive(:message).with("Currently not running on CI system, skipping travis setup")
+        expect(UI).to receive(:message).with("Not running on CI, skipping CI setup")
 
         Fastlane::FastFile.new.parse("lane :test do
           setup_travis
@@ -38,7 +38,8 @@ describe Fastlane do
             unlock: true,
             timeout: 3600,
             lock_when_sleeps: true,
-            password: ""
+            password: "",
+            add_to_search_list: true
           }
         )
 

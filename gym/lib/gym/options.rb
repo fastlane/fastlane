@@ -85,6 +85,11 @@ module Gym
                                      description: "Should we skip packaging the ipa?",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_package_pkg,
+                                     env_name: "GYM_SKIP_PACKAGE_PKG",
+                                     description: "Should we skip packaging the pkg?",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :include_symbols,
                                      short_option: "-m",
                                      env_name: "GYM_INCLUDE_SYMBOLS",
@@ -101,6 +106,7 @@ module Gym
                                      short_option: "-j",
                                      env_name: "GYM_EXPORT_METHOD",
                                      description: "Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id",
+                                     type: String,
                                      optional: true,
                                      verify_block: proc do |value|
                                        av = %w(app-store ad-hoc package enterprise development developer-id)
@@ -125,13 +131,32 @@ module Gym
                                      type: :shell_string),
         FastlaneCore::ConfigItem.new(key: :skip_build_archive,
                                      env_name: "GYM_SKIP_BUILD_ARCHIVE",
-                                     description: "Export ipa from previously built xarchive. Uses archive_path as source",
+                                     description: "Export ipa from previously built xcarchive. Uses archive_path as source",
                                      type: Boolean,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_archive,
                                      env_name: "GYM_SKIP_ARCHIVE",
                                      description: "After building, don't archive, effectively not including -archivePath param",
                                      type: Boolean,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_codesigning,
+                                     env_name: "GYM_SKIP_CODESIGNING",
+                                     description: "Build without codesigning",
+                                     type: Boolean,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :catalyst_platform,
+                                     env_name: "GYM_CATALYST_PLATFORM",
+                                     description: "Platform to build when using a Catalyst enabled app. Valid values are: ios, macos",
+                                     type: String,
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       av = %w(ios macos)
+                                       UI.user_error!("Unsupported export_method '#{value}', must be: #{av}") unless av.include?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :installer_cert_name,
+                                     env_name: "GYM_INSTALLER_CERT_NAME",
+                                     description: "Full name of 3rd Party Mac Developer Installer or Deveoper ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`",
+                                     type: String,
                                      optional: true),
         # Very optional
         FastlaneCore::ConfigItem.new(key: :build_path,
@@ -155,6 +180,10 @@ module Gym
                                      description: "Should an Xcode result bundle be generated in the output directory",
                                      default_value: false,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :result_bundle_path,
+                                     env_name: "GYM_RESULT_BUNDLE_PATH",
+                                     description: "Path to the result bundle directory to create. Ignored if `result_bundle` if false",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
                                      short_option: "-l",
                                      env_name: "GYM_BUILDLOG_PATH",
@@ -169,7 +198,8 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :toolchain,
                                      env_name: "GYM_TOOLCHAIN",
                                      description: "The toolchain that should be used for building the application (e.g. com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a)",
-                                     optional: true),
+                                     optional: true,
+                                     type: String),
         FastlaneCore::ConfigItem.new(key: :destination,
                                      short_option: "-d",
                                      env_name: "GYM_DESTINATION",
@@ -244,7 +274,12 @@ module Gym
                                      description: "Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used",
                                      optional: true,
                                      type: Boolean,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :cloned_source_packages_path,
+                                     env_name: "GYM_CLONED_SOURCE_PACKAGES_PATH",
+                                     description: "Sets a custom path for Swift Package Manager dependencies",
+                                     type: String,
+                                     optional: true)
       ]
     end
   end

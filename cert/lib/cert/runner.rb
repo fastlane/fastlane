@@ -12,7 +12,7 @@ module Cert
     def launch
       run
 
-      installed = FastlaneCore::CertChecker.installed?(ENV["CER_FILE_PATH"])
+      installed = FastlaneCore::CertChecker.installed?(ENV["CER_FILE_PATH"], in_keychain: ENV["CER_KEYCHAIN_PATH"])
       UI.message("Verifying the certificate is properly installed locally...")
       UI.user_error!("Could not find the newly generated certificate installed", show_github_issues: true) unless installed
       UI.success("Successfully installed certificate #{ENV['CER_CERTIFICATE_ID']}")
@@ -92,22 +92,26 @@ module Cert
         path = store_certificate(certificate, Cert.config[:filename])
         private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
 
-        if FastlaneCore::CertChecker.installed?(path)
+        # As keychain is specific to macOS, this will likely fail on non macOS systems.
+        # See also: https://github.com/fastlane/fastlane/pull/14462
+        keychain = File.expand_path(Cert.config[:keychain_path]) unless Cert.config[:keychain_path].nil?
+        if FastlaneCore::CertChecker.installed?(path, in_keychain: keychain)
           # This certificate is installed on the local machine
           ENV["CER_CERTIFICATE_ID"] = certificate.id
           ENV["CER_FILE_PATH"] = path
+          ENV["CER_KEYCHAIN_PATH"] = keychain
 
           UI.success("Found the certificate #{certificate.id} (#{certificate.name}) which is installed on the local machine. Using this one.")
 
           return path
         elsif File.exist?(private_key_path)
-          keychain = File.expand_path(Cert.config[:keychain_path])
           password = Cert.config[:keychain_password]
           FastlaneCore::KeychainImporter.import_file(private_key_path, keychain, keychain_password: password)
           FastlaneCore::KeychainImporter.import_file(path, keychain, keychain_password: password)
 
           ENV["CER_CERTIFICATE_ID"] = certificate.id
           ENV["CER_FILE_PATH"] = path
+          ENV["CER_KEYCHAIN_PATH"] = keychain
 
           UI.success("Found the cached certificate #{certificate.id} (#{certificate.name}). Using this one.")
 
@@ -130,26 +134,45 @@ module Cert
 
     # The kind of certificate we're interested in
     def certificate_type
-      case Cert.config[:platform].to_s
-      when 'ios', 'tvos'
-        cert_type = Spaceship.certificate.production
-        cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
-        cert_type = Spaceship.certificate.development if Cert.config[:development]
-
-      when 'macos'
-        cert_type = Spaceship.certificate.mac_app_distribution
-        cert_type = Spaceship.certificate.mac_development if Cert.config[:development]
-
+      if Cert.config[:type]
+        case Cert.config[:type].to_sym
+        when :mac_installer_distribution
+          return Spaceship.certificate.mac_installer_distribution
+        when :developer_id_application
+          return Spaceship.certificate.developer_id_application
+        when :developer_id_installer
+          return Spaceship.certificate.developer_id_installer
+        else
+          UI.user_error("Unaccepted value for :type - #{Cert.config[:type]}")
+        end
       end
 
-      cert_type
+      # Check if apple certs (Xcode 11 and later) should be used
+      if Cert.config[:generate_apple_certs]
+        cert_type = Spaceship.certificate.apple_distribution
+        cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house? # Enterprise doesn't use Apple Distribution
+        cert_type = Spaceship.certificate.apple_development if Cert.config[:development]
+      else
+        case Cert.config[:platform].to_s
+        when 'ios', 'tvos'
+          cert_type = Spaceship.certificate.production
+          cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
+          cert_type = Spaceship.certificate.development if Cert.config[:development]
+
+        when 'macos'
+          cert_type = Spaceship.certificate.mac_app_distribution
+          cert_type = Spaceship.certificate.mac_development if Cert.config[:development]
+        end
+      end
+
+      return cert_type
     end
 
     def create_certificate
       # Create a new certificate signing request
       csr, pkey = Spaceship.certificate.create_certificate_signing_request
 
-      # Use the signing request to create a new distribution certificate
+      # Use the signing request to create a new (development|distribution) certificate
       begin
         certificate = certificate_type.create!(csr: csr)
       rescue => ex

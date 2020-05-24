@@ -1,11 +1,7 @@
 module Fastlane
   module Actions
-    module SharedValues
-      SLATHER_CUSTOM_VALUE = :SLATHER_CUSTOM_VALUE
-    end
-
     class SlatherAction < Action
-      # https://github.com/SlatherOrg/slather/blob/v2.4.2/lib/slather/command/coverage_command.rb
+      # https://github.com/SlatherOrg/slather/blob/v2.4.9/lib/slather/command/coverage_command.rb
       ARGS_MAP = {
           travis: '--travis',
           travis_pro: '--travispro',
@@ -18,6 +14,7 @@ module Fastlane
           simple_output: '--simple-output',
           gutter_json: '--gutter-json',
           cobertura_xml: '--cobertura-xml',
+          sonarqube_xml: '--sonarqube-xml',
           llvm_cov: '--llvm-cov',
           html: '--html',
           show: '--show',
@@ -75,6 +72,17 @@ module Fastlane
         else
           UI.user_error!("You have to provide a project with `:proj` or use a .slather.yml")
         end
+
+        # for backwards compatibility when :binary_file type was Boolean
+        if params[:binary_file] == true || params[:binary_file] == false
+          params[:binary_file] = nil
+        end
+
+        # :binary_file validation was skipped for backwards compatibility with Boolean. If a
+        # Boolean was passed in, it has now been removed. Revalidate :binary_file
+        binary_file_options = available_options.find { |a| a.key == :binary_file }
+        binary_file_options.skip_type_validation = false
+        binary_file_options.verify!(params[:binary_file])
       end
 
       def self.build_command(params)
@@ -206,6 +214,12 @@ module Fastlane
                                        is_string: false,
                                        type: Boolean,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :sonarqube_xml,
+                                       env_name: "FL_SLATHER_SONARQUBE_XML_ENABLED",
+                                       description: "Tell slather that it should output results as SonarQube Generic XML format",
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :llvm_cov,
                                        env_name: "FL_SLATHER_LLVM_COV_ENABLED",
                                        description: "Tell slather that it should output results as llvm-cov show format",
@@ -234,7 +248,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ignore,
                                        env_name: "FL_SLATHER_IGNORE",
                                        description: "Tell slather to ignore files matching a path or any path from an array of paths",
-                                       is_string: false,
+                                       type: Array,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_SLATHER_VERBOSE",
@@ -256,8 +270,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :binary_file,
                                        env_name: "FL_SLATHER_BINARY_FILE",
                                        description: "Binary file name to be used for code coverage",
-                                       is_string: false,
-                                       default_value: false),
+                                       type: Array,
+                                       skip_type_validation: true, # skipping validation for backwards compatibility with Boolean type
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :arch,
                                        env_name: "FL_SLATHER_ARCH",
                                        description: "Specify which architecture the binary file is in. Needed for universal binaries",

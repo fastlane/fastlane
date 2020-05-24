@@ -22,6 +22,7 @@ describe Fastlane do
             simple_output: true,
             gutter_json: true,
             cobertura_xml: true,
+            sonarqube_xml: true,
             llvm_cov: true,
             html: true,
             show: true,
@@ -50,6 +51,7 @@ describe Fastlane do
                     --simple-output
                     --gutter-json
                     --cobertura-xml
+                    --sonarqube-xml
                     --llvm-cov
                     --html
                     --show
@@ -90,6 +92,7 @@ describe Fastlane do
             simple_output: true,
             gutter_json: true,
             cobertura_xml: true,
+            sonarqube_xml: true,
             llvm_cov: true,
             html: true,
             show: true,
@@ -113,6 +116,7 @@ describe Fastlane do
                     --simple-output
                     --gutter-json
                     --cobertura-xml
+                    --sonarqube-xml
                     --llvm-cov
                     --html
                     --show
@@ -186,6 +190,50 @@ describe Fastlane do
                     --input-format bah
                     --scheme #{scheme.shellescape}
                     #{proj.shellescape}".gsub(/\s+/, ' ')
+        expect(result).to eq(expected)
+      end
+
+      it "works with binary_file set to true or false" do
+        possible_values = ["true", "false"]
+        expected = "slather coverage foo.xcodeproj".gsub(/\s+/, ' ')
+
+        possible_values.each do |value|
+          result = Fastlane::FastFile.new.parse("lane :test do
+            slather({
+              binary_file: #{value},
+              proj: 'foo.xcodeproj'
+            })
+          end").runner.execute(:test)
+
+          expect(result).to eq(expected)
+        end
+      end
+
+      it "works with binary_file as string" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            binary_file: 'bar',
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("slather coverage --binary-file bar foo.xcodeproj")
+      end
+
+      it "works with binary_file as array" do
+        binary_file = ['other', 'stuff']
+        expected = "slather coverage
+                    --binary-file #{binary_file[0]}
+                    --binary-file #{binary_file[1]}
+                    foo.xcodeproj".gsub(/\s+/, ' ')
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            binary_file: #{binary_file},
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
         expect(result).to eq(expected)
       end
 

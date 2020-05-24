@@ -51,6 +51,23 @@ Key | Description | Default
 
 <hr />
 
+<% if action.output && action.output.kind_of?(Array) && action.output.length > 0 %>
+
+## Lane Variables
+
+Actions can communicate with each other using a shared hash `lane_context`, that can be accessed in other actions, plugins or your lanes: `lane_context[SharedValues:XYZ]`. The `<%= @action.action_name %>` action generates the following Lane Variables:
+
+SharedValue | Description 
+------------|-------------
+<%- (action.output || []).each do |array_item| -%>
+  <%- next unless array_item.kind_of?(Array) -%>
+  <%- next if array_item.length != 2 -%>
+  `SharedValues::<%= array_item[0] %>` | <%= array_item[1] %>
+<%- end %>
+To get more information check the [Lanes documentation](https://docs.fastlane.tools/advanced/lanes/#lane-context).
+<hr />
+<% end %><%# End of action.output... %>
+
 ## Documentation
 
 To show the documentation in your terminal, run

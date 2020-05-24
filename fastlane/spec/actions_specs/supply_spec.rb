@@ -29,7 +29,7 @@ describe Fastlane do
         end
 
         it "uses the lane context APK path if no other APK info is present" do
-          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_APK_OUTPUT_PATH => apk_path) do
+          FastlaneSpec::Env.with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_APK_OUTPUT_PATH => apk_path) do
             Fastlane::FastFile.new.parse("lane :test do
               supply
             end").runner.execute(:test)
@@ -41,7 +41,7 @@ describe Fastlane do
         end
 
         it "ignores the lane context APK path if the APK param is present" do
-          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_APK_OUTPUT_PATH => 'app/wrong.apk') do
+          FastlaneSpec::Env.with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_APK_OUTPUT_PATH => 'app/wrong.apk') do
             Fastlane::FastFile.new.parse("lane :test do
               supply(apk: '#{apk_path}')
             end").runner.execute(:test)
@@ -57,7 +57,7 @@ describe Fastlane do
             allow(File).to receive(:exist?).with(path).and_return(true)
           end
 
-          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS => wrong_apk_paths) do
+          FastlaneSpec::Env.with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS => wrong_apk_paths) do
             Fastlane::FastFile.new.parse("lane :test do
               supply(apk: '#{apk_path}')
             end").runner.execute(:test)
@@ -87,7 +87,7 @@ describe Fastlane do
         end
 
         it "uses the lane context APK paths if no other APK info is present" do
-          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS => apk_paths) do
+          FastlaneSpec::Env.with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS => apk_paths) do
             Fastlane::FastFile.new.parse("lane :test do
               supply
             end").runner.execute(:test)
@@ -99,7 +99,7 @@ describe Fastlane do
         end
 
         it "ignores the lane context APK paths if the APK paths param is present" do
-          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS => ['wrong.apk', 'nope.apk']) do
+          FastlaneSpec::Env.with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS => ['wrong.apk', 'nope.apk']) do
             Fastlane::FastFile.new.parse("lane :test do
               supply(apk_paths: #{apk_paths})
             end").runner.execute(:test)
@@ -113,7 +113,7 @@ describe Fastlane do
         it "ignores the lane context APK path if the APK paths param is present" do
           allow(File).to receive(:exist?).with('wrong.apk').and_return(true)
 
-          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_APK_OUTPUT_PATH => 'wrong.apk') do
+          FastlaneSpec::Env.with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_APK_OUTPUT_PATH => 'wrong.apk') do
             Fastlane::FastFile.new.parse("lane :test do
               supply(apk_paths: #{apk_paths})
             end").runner.execute(:test)
@@ -141,7 +141,7 @@ describe Fastlane do
         end
 
         it "uses the lane context AAB path if no other AAB info is present" do
-          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_AAB_OUTPUT_PATH => aab_path) do
+          FastlaneSpec::Env.with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_AAB_OUTPUT_PATH => aab_path) do
             Fastlane::FastFile.new.parse("lane :test do
               supply
             end").runner.execute(:test)
@@ -153,7 +153,7 @@ describe Fastlane do
         end
 
         it "ignores the lane context AAB path if the AAB param is present" do
-          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_AAB_OUTPUT_PATH => 'app/wrong.aab') do
+          FastlaneSpec::Env.with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_AAB_OUTPUT_PATH => 'app/wrong.aab') do
             Fastlane::FastFile.new.parse("lane :test do
               supply(aab: '#{aab_path}')
             end").runner.execute(:test)
@@ -175,7 +175,7 @@ describe Fastlane do
         end
 
         it "uses the lane context AAB paths if no other AAB info is present" do
-          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS => aab_paths_unique) do
+          FastlaneSpec::Env.with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS => aab_paths_unique) do
             Fastlane::FastFile.new.parse("lane :test do
               supply
             end").runner.execute(:test)
@@ -187,7 +187,7 @@ describe Fastlane do
         end
 
         it "ignores the lane context AAB paths if the AAB path param is present" do
-          with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS => aab_paths_unique) do
+          FastlaneSpec::Env.with_action_context_values(Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS => aab_paths_unique) do
             Fastlane::FastFile.new.parse("lane :test do
               supply(aab: '#{aab_path}')
             end").runner.execute(:test)
@@ -199,7 +199,7 @@ describe Fastlane do
         end
 
         it "use the lane context AAB unique path if the AAB paths has multiple values" do
-          with_action_context_values(
+          FastlaneSpec::Env.with_action_context_values(
             Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS => aab_paths_multiple,
             Fastlane::Actions::SharedValues::GRADLE_AAB_OUTPUT_PATH => aab_path
           ) do
@@ -214,7 +214,7 @@ describe Fastlane do
         end
 
         it "use the lane context AAB paths firt value if both unique and multiple contexts are set" do
-          with_action_context_values(
+          FastlaneSpec::Env.with_action_context_values(
             Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS => aab_paths_unique,
             Fastlane::Actions::SharedValues::GRADLE_AAB_OUTPUT_PATH => aab_path
           ) do

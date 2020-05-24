@@ -1,5 +1,4 @@
 require 'spaceship/tunes/tunes'
-require 'spaceship/tunes/device_type'
 
 require_relative 'app_screenshot'
 require_relative 'module'
@@ -43,7 +42,7 @@ module Deliver
         Helper.show_loading_indicator("Activating #{lng_text} #{enabled_languages.join(', ')}...")
         v.save!
         # This refreshes the app version from iTC after enabling a localization
-        v = app.edit_version
+        v = app.edit_version(platform: options[:platform])
         Helper.hide_loading_indicator
       end
 
@@ -88,7 +87,7 @@ module Deliver
       screenshots = []
       extensions = '{png,jpg,jpeg}'
 
-      available_languages = Spaceship::Tunes.client.available_languages.each_with_object({}) do |lang, lang_hash|
+      available_languages = UploadScreenshots.available_languages.each_with_object({}) do |lang, lang_hash|
         lang_hash[lang.downcase] = lang
       end
 
@@ -104,9 +103,9 @@ module Deliver
         files = Dir.glob(File.join(lng_folder, "*.#{extensions}"), File::FNM_CASEFOLD).sort
         next if files.count == 0
 
-        prefer_framed = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}"), File::FNM_CASEFOLD).count > 0
+        framed_screenshots_found = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}"), File::FNM_CASEFOLD).count > 0
 
-        UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃") if prefer_framed
+        UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃") if framed_screenshots_found
 
         language_dir_name = File.basename(lng_folder)
 
@@ -120,7 +119,7 @@ module Deliver
           is_framed = file_path.downcase.include?("_framed.")
           is_watch = file_path.downcase.include?("watch")
 
-          if prefer_framed && !is_framed && !is_watch
+          if framed_screenshots_found && !is_framed && !is_watch
             UI.important("🏃 Skipping screenshot file: #{file_path}")
             next
           end
@@ -134,7 +133,7 @@ module Deliver
       # to have it in there for frameit support
       unaccepted_device_shown = false
       screenshots.select! do |screenshot|
-        exists = Spaceship::Tunes::DeviceType.exists?(screenshot.device_type)
+        exists = !screenshot.device_type.nil?
         unless exists
           UI.important("Unaccepted device screenshots are detected! 🚫 Screenshot file will be skipped. 🏃") unless unaccepted_device_shown
           unaccepted_device_shown = true
@@ -145,6 +144,15 @@ module Deliver
       end
 
       return screenshots
+    end
+
+    # helper method so Spaceship::Tunes.client.available_languages is easier to test
+    def self.available_languages
+      if Helper.test?
+        FastlaneCore::Languages::ALL_LANGUAGES
+      else
+        Spaceship::Tunes.client.available_languages
+      end
     end
   end
 end

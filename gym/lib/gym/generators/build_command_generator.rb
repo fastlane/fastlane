@@ -51,6 +51,7 @@ module Gym
 
         buildactions = []
         buildactions << :clean if config[:clean]
+        buildactions << :build if config[:skip_archive]
         buildactions << :archive unless config[:skip_archive]
 
         buildactions
@@ -58,7 +59,11 @@ module Gym
 
       def setting
         setting = []
-        setting << "CODE_SIGN_IDENTITY=#{Gym.config[:codesigning_identity].shellescape}" if Gym.config[:codesigning_identity]
+        if Gym.config[:skip_codesigning]
+          setting << "CODE_SIGN_IDENTITY='' CODE_SIGNING_REQUIRED=NO CODE_SIGN_ENTITLEMENTS='' CODE_SIGNING_ALLOWED=NO"
+        elsif Gym.config[:codesigning_identity]
+          setting << "CODE_SIGN_IDENTITY=#{Gym.config[:codesigning_identity].shellescape}"
+        end
         setting
       end
 
@@ -129,7 +134,8 @@ module Gym
 
       def result_bundle_path
         unless Gym.cache[:result_bundle_path]
-          path = File.join(Gym.config[:output_directory], Gym.config[:output_name]) + ".result"
+          path = Gym.config[:result_bundle_path]
+          path ||= File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".result")
           if File.directory?(path)
             FileUtils.remove_dir(path)
           end

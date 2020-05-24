@@ -4,12 +4,17 @@ module Fastlane
   module Actions
     module SharedValues
       LATEST_TESTFLIGHT_BUILD_NUMBER = :LATEST_TESTFLIGHT_BUILD_NUMBER
+      LATEST_TESTFLIGHT_VERSION = :LATEST_TESTFLIGHT_VERSION
     end
 
     class LatestTestflightBuildNumberAction < Action
       def self.run(params)
-        build_number = AppStoreBuildNumberAction.run(params)
-        Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER] = build_number
+        AppStoreBuildNumberAction.run(params)
+        build_nr = Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER]
+        build_v = Actions.lane_context[SharedValues::LATEST_VERSION]
+        Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER] = build_nr
+        Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION] = build_v
+        return build_nr
       end
 
       #####################################################
@@ -64,7 +69,7 @@ module Fastlane
                                        is_string: true,
                                        default_value: "ios",
                                        verify_block: proc do |value|
-                                         UI.user_error!("The platform can only be ios, or appletvos") unless %('ios', 'appletvos').include?(value)
+                                         UI.user_error!("The platform can only be ios, osx, or appletvos") unless %('osx', ios', 'appletvos').include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
                                        env_name: "INITIAL_BUILD_NUMBER",
@@ -79,10 +84,7 @@ module Fastlane
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
-                                       end),
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-e",
                                        env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_NAME",
@@ -90,16 +92,14 @@ module Fastlane
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
-                                       end)
+                                       default_value_dynamic: true)
         ]
       end
 
       def self.output
         [
-          ['LATEST_TESTFLIGHT_BUILD_NUMBER', 'The latest build number of the latest version of the app uploaded to TestFlight']
+          ['LATEST_TESTFLIGHT_BUILD_NUMBER', 'The latest build number of the latest version of the app uploaded to TestFlight'],
+          ['LATEST_TESTFLIGHT_VERSION', 'The version of the latest build number']
         ]
       end
 
@@ -116,7 +116,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

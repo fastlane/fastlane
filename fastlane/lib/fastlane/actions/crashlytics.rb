@@ -66,7 +66,7 @@ module Fastlane
       end
 
       def self.description
-        "Upload a new build to [Crashlytics Beta](http://try.crashlytics.com/beta/)"
+        "Refer to [Firebase App Distribution](https://appdistro.page.link/fastlane-repo)"
       end
 
       def self.available_options
@@ -196,7 +196,15 @@ module Fastlane
       end
 
       def self.category
-        :beta
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        [
+          "Crashlytics Beta has been deprecated and replaced with Firebase App Distribution.",
+          "Beta will continue working until May 4, 2020.",
+          "Check out the [Firebase App Distribution docs](https://github.com/fastlane/fastlane-plugin-firebase_app_distribution) to get started."
+        ].join("\n")
       end
     end
   end

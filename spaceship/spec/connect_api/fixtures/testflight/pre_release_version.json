@@ -1,0 +1,30 @@
+{
+    "data" : {
+      "type" : "preReleaseVersions",
+      "id" : "123456789",
+      "attributes" : {
+        "version" : "3.3.3",
+        "platform" : "IOS"
+      },
+      "relationships" : {
+        "builds" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/123456789/relationships/builds",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/123456789/builds"
+          }
+        },
+        "app" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/123456789/relationships/app",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/123456789/app"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/123456789"
+      }
+    },
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/preReleaseVersions/123456789"
+    }
+  }

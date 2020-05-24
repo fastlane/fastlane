@@ -83,7 +83,7 @@ module Fastlane
 
       case command.method_name
       when "sh"
-        error_callback = proc { |string_value| closure_argument_value = string_value }
+        error_callback = proc { |string_value| closure_argument_value = string_value } if parameter_map[:error_callback]
         command_param = parameter_map[:command]
         log_param = parameter_map[:log]
         action_return = Fastlane::FastFile.sh(command_param, log: log_param, error_callback: error_callback)
