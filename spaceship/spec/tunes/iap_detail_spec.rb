@@ -34,7 +34,7 @@ describe Spaceship::Tunes::IAPDetail do
       context "when iap is not cleared for sale yet" do
         before { allow(detailed).to receive(:cleared_for_sale).and_return(false) }
 
-        it "retuns an empty array" do
+        it "returns an empty array" do
           expect(subject).to eq([])
         end
       end
@@ -177,7 +177,7 @@ describe Spaceship::Tunes::IAPDetail do
             }
           }
       edited.save!
-      expect(edited.versions).to eq({ :"en-US" => { name: "Edit It", description: "Description has at least 10 characters" } })
+      expect(edited.versions).to eq({ :"en-US" => { name: "Edit It", description: "Description has at least 10 characters", id: nil, status: nil } })
     end
   end
 

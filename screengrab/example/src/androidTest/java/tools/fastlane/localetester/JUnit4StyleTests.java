@@ -1,7 +1,8 @@
 package tools.fastlane.localetester;
 
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.rule.ActivityTestRule;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -11,14 +12,17 @@ import org.junit.runners.JUnit4;
 
 import tools.fastlane.screengrab.Screengrab;
 import tools.fastlane.screengrab.UiAutomatorScreenshotStrategy;
+import tools.fastlane.screengrab.cleanstatusbar.BluetoothState;
+import tools.fastlane.screengrab.cleanstatusbar.CleanStatusBar;
+import tools.fastlane.screengrab.cleanstatusbar.MobileDataType;
 import tools.fastlane.screengrab.locale.LocaleTestRule;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 @RunWith(JUnit4.class)
 public class JUnit4StyleTests {
@@ -31,6 +35,16 @@ public class JUnit4StyleTests {
     @BeforeClass
     public static void beforeAll() {
         Screengrab.setDefaultScreenshotStrategy(new UiAutomatorScreenshotStrategy());
+
+        new CleanStatusBar()
+                .setMobileNetworkDataType(MobileDataType.THREEG)
+                .setBluetoothState(BluetoothState.DISCONNECTED)
+                .enable();
+    }
+
+    @AfterClass
+    public static void afterAll() {
+        CleanStatusBar.disable();
     }
 
     @Test

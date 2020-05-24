@@ -222,6 +222,18 @@ describe Fastlane do
           end.to raise_error(/^Please pass a valid xcpretty output type: /)
         end
 
+        it "passes additional arguments to xcpretty if specified" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+              spm(
+                command: '#{command}',
+                xcpretty_output: 'simple',
+                xcpretty_args: '--tap --no-utf'
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("set -o pipefail && swift package #{command} 2>&1 | xcpretty --simple --tap --no-utf")
+        end
+
         it "set pipefail with xcpretty" do
           result = Fastlane::FastFile.new.parse("lane :test do
               spm(

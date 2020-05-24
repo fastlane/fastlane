@@ -58,7 +58,7 @@ def before_each_spaceship
   TunesStubbing.itc_stub_sandbox_testers
   TunesStubbing.itc_stub_create_sandbox_tester
   TunesStubbing.itc_stub_delete_sandbox_tester
-  TunesStubbing.itc_stub_candiate_builds
+  TunesStubbing.itc_stub_candidate_builds
   TunesStubbing.itc_stub_pricing_tiers
   TunesStubbing.itc_stub_release_to_store
   TunesStubbing.itc_stub_release_to_all_users
@@ -79,6 +79,8 @@ def before_each_spaceship
   ConnectAPIStubbing::TestFlight.stub_beta_app_review_submissions
   ConnectAPIStubbing::TestFlight.stub_beta_build_localizations
   ConnectAPIStubbing::TestFlight.stub_beta_build_metrics
+  ConnectAPIStubbing::TestFlight.stub_beta_feedbacks
+  ConnectAPIStubbing::TestFlight.stub_beta_feedbacks_delete
   ConnectAPIStubbing::TestFlight.stub_beta_groups
   ConnectAPIStubbing::TestFlight.stub_beta_testers
   ConnectAPIStubbing::TestFlight.stub_beta_tester_metrics

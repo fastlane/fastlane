@@ -3,6 +3,8 @@ module Fastlane
   module Actions
     class AutomaticCodeSigningAction < Action
       def self.run(params)
+        UI.deprecated("The `automatic_code_signing` action has been deprecated,")
+        UI.deprecated("Please use `update_code_signing_settings` action instead.")
         FastlaneCore::PrintTable.print_values(config: params, title: "Summary for Automatic Codesigning")
         path = params[:path]
         path = File.join(File.expand_path(path), "project.pbxproj")
@@ -50,7 +52,7 @@ module Fastlane
           if params[:code_sign_identity]
             build_configuration_list.set_setting("CODE_SIGN_IDENTITY", params[:code_sign_identity])
 
-            # We also need to update the value if it was overriden for a specific SDK
+            # We also need to update the value if it was overridden for a specific SDK
             build_configuration_list.build_configurations.each do |build_configuration|
               codesign_build_settings_keys = build_configuration.build_settings.keys.select { |key| key.to_s.match(/CODE_SIGN_IDENTITY.*/) }
               codesign_build_settings_keys.each do |setting|
@@ -201,7 +203,11 @@ module Fastlane
       end
 
       def self.category
-        :code_signing
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "Please use `update_code_signing_settings` action instead."
       end
 
       def self.return_value

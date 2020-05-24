@@ -18,4 +18,4 @@ class Snapshotfile: SnapshotfileProtocol {
 
 
 
-// Generated with fastlane 2.127.1
+// Generated with fastlane 2.148.1

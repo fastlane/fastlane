@@ -6,8 +6,13 @@ module Scan
     class << self
       # @param [String] The output of the errored build
       # This method should raise an exception in any case, as the return code indicated a failed build
-      def handle_build_error(output)
-        # The order of the handling below is import
+      def handle_build_error(output, log_path)
+        # The order of the handling below is important
+
+        instruction = 'See the log'
+        location = Scan.config[:suppress_xcode_output] ? "here: '#{log_path}'" : "above"
+        details = "#{instruction} #{location}."
+
         case output
         when /US\-ASCII/
           print("Your shell environment is not correctly configured")
@@ -23,7 +28,7 @@ module Scan
           print("For more information visit this stackoverflow answer:")
           print("https://stackoverflow.com/a/17031697/445598")
         when /Testing failed/
-          UI.build_failure!("Error building the application - see the log above")
+          UI.build_failure!("Error building the application. #{details}")
         when /Executed/, /Failing tests:/
           # this is *really* important:
           # we don't want to raise an exception here
@@ -38,7 +43,7 @@ module Scan
           # followed by a list of tests that failed.
           return
         end
-        UI.build_failure!("Error building/testing the application - see the log above")
+        UI.build_failure!("Error building/testing the application. #{details}")
       end
 
       private
