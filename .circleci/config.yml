@@ -260,8 +260,6 @@ workflows:
 
       - "Validate docs generation"
       - "Validate Fastlane.swift Generation"
-      - "Validate Documentation"
-
-      - "Lint Source Code"
+      - "Lint source code"
 
       - "Execute modules load up tests"
