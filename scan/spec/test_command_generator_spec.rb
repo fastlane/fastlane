@@ -757,5 +757,23 @@ describe Scan do
         end
       end
     end
+
+    context "disable_xcpretty" do
+      it "does not include xcpretty in the pipe command when true", requires_xcode: true do
+        options = { disable_xcpretty: true, project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        result = @test_command_generator.generate
+        expect(result.last).to_not(include("| xcpretty "))
+      end
+
+      it "includes xcpretty in the pipe command when false", requires_xcode: true do
+        options = { disable_xcpretty: false, project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        result = @test_command_generator.generate
+        expect(result.last).to include("| xcpretty ")
+      end
+    end
   end
 end

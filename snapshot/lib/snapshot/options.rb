@@ -269,7 +269,12 @@ module Snapshot
                                      is_string: false,
                                      verify_block: proc do |value|
                                        verify_type('skip_testing', [Array, String], value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
+                                     env_name: "SNAPSHOT_DISABLE_XCPRETTY",
+                                     description: "Disable xcpretty formatting of build",
+                                     type: Boolean,
+                                     optional: true)
       ]
     end
   end
