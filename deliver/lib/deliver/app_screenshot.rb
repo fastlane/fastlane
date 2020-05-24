@@ -97,7 +97,7 @@ module Deliver
       matching = {
         ScreenSize::IOS_35 => "iphone35",
         ScreenSize::IOS_40 => "iphone4",
-        ScreenSize::IOS_47 => "iphone6", # also 7 and 8
+        ScreenSize::IOS_47 => "iphone6", # also 7 & 8
         ScreenSize::IOS_55 => "iphone6Plus", # also 7 Plus & 8 Plus
         ScreenSize::IOS_58 => "iphone58",
         ScreenSize::IOS_65 => "iphone65",
@@ -129,8 +129,8 @@ module Deliver
       matching = {
         ScreenSize::IOS_35 => "iPhone 4",
         ScreenSize::IOS_40 => "iPhone 5",
-        ScreenSize::IOS_47 => "iPhone 6", # and 7
-        ScreenSize::IOS_55 => "iPhone 6 Plus", # and 7 Plus
+        ScreenSize::IOS_47 => "iPhone 6", # also 7 & 8
+        ScreenSize::IOS_55 => "iPhone 6 Plus", # also 7 Plus & 8 Plus
         ScreenSize::IOS_58 => "iPhone XS",
         ScreenSize::IOS_61 => "iPhone XR",
         ScreenSize::IOS_65 => "iPhone XS Max",
