@@ -180,7 +180,8 @@ describe Snapshot do
               "FASTLANE_SNAPSHOT=YES",
               :build,
               :test,
-              "| tee /path/to/logs | xcpretty "
+              "| tee /path/to/logs",
+              "| xcpretty "
             ]
           )
         end
@@ -208,7 +209,8 @@ describe Snapshot do
               "FASTLANE_SNAPSHOT=YES",
               :build,
               :test,
-              "| tee /path/to/logs | xcpretty "
+              "| tee /path/to/logs",
+              "| xcpretty "
             ]
           )
         end
@@ -235,7 +237,8 @@ describe Snapshot do
               "FASTLANE_SNAPSHOT=YES",
               :build,
               :test,
-              "| tee /path/to/logs | xcpretty "
+              "| tee /path/to/logs",
+              "| xcpretty "
             ]
           )
         end
@@ -309,6 +312,22 @@ describe Snapshot do
           expect(command.join('')).not_to(include("-skip-testing:TestBundleC"))
         end
       end
+
+      context "disable_xcpretty" do
+        it "does not include xcpretty in the pipe command when true", requires_xcode: true do
+          configure(options.merge(disable_xcpretty: true))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to_not(include("| xcpretty "))
+        end
+
+        it "includes xcpretty in the pipe command when false", requires_xcode: true do
+          configure(options.merge(disable_xcpretty: false))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("| xcpretty ")
+        end
+      end
     end
 
     describe "Valid macOS Configuration" do
@@ -334,7 +353,8 @@ describe Snapshot do
             "FASTLANE_SNAPSHOT=YES",
             :build,
             :test,
-            "| tee /path/to/logs | xcpretty "
+            "| tee /path/to/logs",
+            "| xcpretty "
           ]
         )
       end
