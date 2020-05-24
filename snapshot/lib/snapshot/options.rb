@@ -152,6 +152,12 @@ module Snapshot
                                      description: "A list of videos that should be added to the simulator before running the application",
                                      type: Array,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :html_template,
+                                     env_name: 'SNAPSHOT_HTML_TEMPLATE',
+                                     short_option: "-e",
+                                     description: "A path to screenshots.html template",
+                                     default_value: File.join(Snapshot::ROOT, "lib", "snapshot/page.html.erb"),
+                                     optional: true),
 
         # Everything around building
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
