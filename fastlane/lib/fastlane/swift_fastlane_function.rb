@@ -112,7 +112,6 @@ module Fastlane
     end
 
     def get_type(param: nil, default_value: nil, optional: nil, param_type_override: nil, is_string: true)
-      
       unless param_type_override.nil?
         type = determine_type_from_override(type_override: param_type_override)
       end
@@ -133,7 +132,7 @@ module Fastlane
         type = "[String]"
       elsif default_value.kind_of?(Hash)
         type = "[String : Any]"
-      # Altough we can have a default value of Integer type, if param_type_override overridden that value, respect it. 
+      # Altough we can have a default value of Integer type, if param_type_override overridden that value, respect it.
       elsif default_value.kind_of?(Integer)
         if type == "Double" || type == "Float"
           begin
