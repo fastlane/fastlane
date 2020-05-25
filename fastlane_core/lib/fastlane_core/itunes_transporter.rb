@@ -120,11 +120,6 @@ module FastlaneCore
             CredentialsManager::AccountManager.new(user: @user).invalid_credentials
             UI.error("Please run this tool again to apply the new password")
           end
-        elsif $1.include?("Redundant Binary Upload. You've already uploaded a build with build")
-          UI.error($1)
-          /build number (?<build_number>'.*') for version number (?<version_number>'.*')./ =~ $1
-          UI.error("You need to upload a binary with a build number greater than #{build_number}. Or upload a binary with a version greater than #{version_number}.")
-        end
 
         output_done = true
       elsif line =~ WARNING_REGEX
