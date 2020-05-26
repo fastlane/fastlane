@@ -870,7 +870,7 @@ module Spaceship
         if resp_hash[:status] == 403
           msg = "Access forbidden"
           logger.warn(msg)
-          raise AccessForbiddenError.new, "Access Forbidden"
+          raise AccessForbiddenError.new, msg
         end
 
         return response
