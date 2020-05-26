@@ -53,23 +53,22 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 ##### Configuring your <a href="#ui-tests">UI Tests</a> for Screenshots
 
 1. Add `LocaleTestRule` to your tests class to handle automatic switching of locales. If you're using Java use:
-
-```java
-@ClassRule
-public static final LocaleTestRule localeTestRule = new LocaleTestRule();
-```
-If you're using Kotlin use:
-```kotlin
-@Rule @JvmField
-val localeTestRule = LocaleTestRule()
-```
-Important is the `@JvmField` annotation. It won't work like that:
-```kotlin
-companion object {
-    @get:ClassRule
-    val localeTestRule = LocaleTestRule()
-}
-```
+   ```java
+   @ClassRule
+   public static final LocaleTestRule localeTestRule = new LocaleTestRule();
+   ```
+   If you're using Kotlin use:
+   ```kotlin
+   @Rule @JvmField
+   val localeTestRule = LocaleTestRule()
+   ```
+   Important is the `@JvmField` annotation. It won't work like that:
+   ```kotlin
+   companion object {
+       @get:ClassRule
+       val localeTestRule = LocaleTestRule()
+   }
+   ```
 
 2. To capture screenshots, add the following to your tests `Screengrab.screenshot("name_of_screenshot_here");` on the appropriate screens
 
