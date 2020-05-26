@@ -60,7 +60,7 @@ protocol GymfileProtocol: class {
   /// Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
   var catalystPlatform: String? { get }
 
-  /// Full name of 3rd Party Mac Developer Installer or Deveoper ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`
+  /// Full name of 3rd Party Mac Developer Installer or Developer ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`
   var installerCertName: String? { get }
 
   /// The directory in which the archive should be stored in
