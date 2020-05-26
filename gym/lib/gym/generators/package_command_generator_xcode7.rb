@@ -141,6 +141,10 @@ module Gym
         Gym.cache[:asset_packs_path] ||= File.join(temporary_output_path, "OnDemandResources")
       end
 
+      def appstore_info_path
+        Gym.cache[:appstore_info_path] ||= File.join(temporary_output_path, "AppStoreInfo.plist")
+      end
+
       private
 
       def normalize_export_options(hash)

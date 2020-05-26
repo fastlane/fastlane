@@ -89,7 +89,7 @@ module Match
         self.working_directory = Dir.mktmpdir
 
         s3_client.find_bucket!(s3_bucket).objects.each do |object|
-          file_path = object.public_url.to_s.split("s3.amazonaws.com/").last
+          file_path = object.key # :team_id/path/to/file
           download_path = File.join(self.working_directory, file_path)
 
           FileUtils.mkdir_p(File.expand_path("..", download_path))
@@ -111,17 +111,17 @@ module Match
         # Those doesn't mean they're new, it might just be they're changed
         # Either way, we'll upload them using the same technique
 
-        files_to_upload.each do |current_file|
+        files_to_upload.each do |file_name|
           # Go from
           #   "/var/folders/px/bz2kts9n69g8crgv4jpjh6b40000gn/T/d20181026-96528-1av4gge/profiles/development/Development_me.mobileprovision"
           # to
           #   "profiles/development/Development_me.mobileprovision"
           #
 
-          target_path = current_file.gsub(self.working_directory + "/", "")
+          target_path = sanitize_file_name(file_name)
           UI.verbose("Uploading '#{target_path}' to S3 Storage...")
 
-          body = File.read(current_file)
+          body = File.read(file_name)
           acl = 'private'
           s3_url = s3_client.upload_file(s3_bucket, target_path, body, acl)
           UI.verbose("Uploaded '#{s3_url}' to S3 Storage.")
@@ -130,7 +130,8 @@ module Match
 
       def delete_files(files_to_delete: [], custom_message: nil)
         files_to_delete.each do |file_name|
-          s3_client.delete_file(s3_bucket, file_name)
+          target_path = sanitize_file_name(file_name)
+          s3_client.delete_file(s3_bucket, target_path)
         end
       end
 
@@ -146,6 +147,10 @@ module Match
       end
 
       private
+
+      def sanitize_file_name(file_name)
+        file_name.gsub(self.working_directory + "/", "")
+      end
 
       def currently_used_team_id
         if self.readonly

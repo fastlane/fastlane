@@ -1,4 +1,6 @@
 require 'fastlane_core/configuration/config_item'
+require 'fastlane/actions/actions_helper'
+require 'fastlane/helper/lane_helper'
 
 require_relative 'module'
 require_relative 'config_parser'
@@ -97,9 +99,10 @@ module Frameit
                                        type: Boolean),
         FastlaneCore::ConfigItem.new(key: :use_platform,
                                        env_name: "FRAMEIT_USE_PLATFORM",
-                                       description: "Choose a platform, the valid options are IOS, ANDROID and ANY (IOS is default to ensure backward compatibility)",
+                                       description: "Choose a platform, the valid options are IOS, ANDROID and ANY (default is either general platform defined in the fastfile or IOS to ensure backward compatibility)",
                                        optional: true,
-                                       default_value: Platform::IOS,
+                                       default_value: Platform.symbol_to_constant(Fastlane::Helper::LaneHelper.current_platform),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Invalid platform type '#{value}'. Available values are " + Platform.all_platforms.join(', ') + ".") unless ConfigParser.supported_platform?(value)
                                        end)

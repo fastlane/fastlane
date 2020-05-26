@@ -23,6 +23,8 @@ module Produce
       else
         UI.success("Creating new app '#{Produce.config[:app_name]}' on App Store Connect")
 
+        platforms = Produce.config[:platforms] || [Produce.config[:platform]]
+
         Produce.config[:bundle_identifier_suffix] = '' unless wildcard_bundle?
         generated_app = Spaceship::Tunes::Application.create!(name: Produce.config[:app_name],
                                                               primary_language: language,
@@ -30,7 +32,7 @@ module Produce
                                                               bundle_id: app_identifier,
                                                               bundle_id_suffix: Produce.config[:bundle_identifier_suffix],
                                                               company_name: Produce.config[:company_name],
-                                                              platform: Produce.config[:platform],
+                                                              platforms: platforms,
                                                               itunes_connect_users: Produce.config[:itc_users])
 
         UI.crash!("Something went wrong when creating the new app on iTC") if generated_app["adamId"].to_s.empty?
@@ -51,15 +53,21 @@ module Produce
         UI.crash!("Something went wrong when creating the new app - it's not listed in the App's list") unless application
 
         UI.message("Ensuring version number")
-        application.ensure_version!(Produce.config[:app_version], platform: Produce.config[:platform]) if Produce.config[:app_version]
+        platforms.each do |platform|
+          application.ensure_version!(Produce.config[:app_version], platform: platform) if Produce.config[:app_version]
+        end
 
         UI.success("Successfully created new app '#{Produce.config[:app_name]}' on App Store Connect with ID #{application.apple_id}")
       end
 
-      return Spaceship::Tunes::Application.find(@full_bundle_identifier, mac: Produce.config[:platform] == "osx").apple_id
+      return Spaceship::Tunes::Application.find(@full_bundle_identifier, mac: platform == "osx").apple_id
     end
 
     private
+
+    def platform
+      (Produce.config[:platforms] || []).first || Produce.config[:platform]
+    end
 
     def fetch_application
       Spaceship::Tunes::Application.find(@full_bundle_identifier)

@@ -78,6 +78,12 @@ To gradually roll out a new build use
 fastlane supply --apk path/app.apk --track beta --rollout 0.5
 ```
 
+To set the in-app update priority level for a release, set a valid update priority (an integer value from 0 to 5) using option `in_app_update_priority`
+
+```no-highlight
+fastlane supply --apk path/app.apk --track beta --in_app_update_priority 3
+```
+
 ### Expansion files (`.obb`)
 
 Expansion files (obbs) found under the same directory as your APK will also be uploaded together with your APK as long as:
@@ -111,6 +117,12 @@ To gradually roll out a new build use
 
 ```no-highlight
 fastlane supply --aab path/app.aab --track beta --rollout 0.5
+```
+
+To set the in-app update priority level for a release, set a valid update priority (an integer value from 0 to 5) using option `in_app_update_priority`
+
+```no-highlight
+fastlane supply --aab path/app.aab --track beta --in_app_update_priority 3
 ```
 
 ## Images and Screenshots
