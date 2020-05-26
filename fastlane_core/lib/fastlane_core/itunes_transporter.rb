@@ -120,6 +120,7 @@ module FastlaneCore
             CredentialsManager::AccountManager.new(user: @user).invalid_credentials
             UI.error("Please run this tool again to apply the new password")
           end
+        end
 
         output_done = true
       elsif line =~ WARNING_REGEX
