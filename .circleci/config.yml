@@ -80,16 +80,16 @@ jobs:
       - *cache_restore_homebrew
       - *set_ruby
       - run:
+          name: debug | ruby version
+          command: |
+            ruby -v
+      - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
             brew untap caskroom/versions || true
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-      - run:
-          name: debug | build environment
-          command: |
-            ruby -v
       - *cache_save_homebrew
       - *cache_save_bundler
       - run:
