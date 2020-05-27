@@ -52,7 +52,8 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 
 ##### Configuring your <a href="#ui-tests">UI Tests</a> for Screenshots
 
-1. Add `LocaleTestRule` to your tests class to handle automatic switching of locales. If you're using Java use:
+1. Add `LocaleTestRule` to your tests class to handle automatic switching of locales. 
+   If you're using Java use:
    ```java
    @ClassRule
    public static final LocaleTestRule localeTestRule = new LocaleTestRule();
@@ -330,4 +331,3 @@ Sit back and enjoy your new screenshots!
 Note: while this could also be done by creating a new build variant (i.e. debug, release and creating a new one called screengrab), [Android only allows one build type to be tested](http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Testing) which defaults to debug. That's why we use product flavors.
 
 </details>
-
