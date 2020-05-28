@@ -52,7 +52,7 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 
 ##### Configuring your <a href="#ui-tests">UI Tests</a> for Screenshots
 
-1. Add `LocaleTestRule` to your tests class to handle automatic switching of locales. 
+1. Add `LocaleTestRule` to your tests class to handle automatic switching of locales.  
    If you're using Java use:
    ```java
    @ClassRule
