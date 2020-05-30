@@ -87,6 +87,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
+            brew update
             brew untap caskroom/versions || true
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
