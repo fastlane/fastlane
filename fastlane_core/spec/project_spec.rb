@@ -517,6 +517,15 @@ describe FastlaneCore do
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
       end
 
+      it 'generates an xcodebuild -derivedDataPath command with derived_data_path' do
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          derived_data_path: "./path/to/derived"
+        })
+        command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -derivedDataPath ./path/to/derived"
+        expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+      end
+
       it 'build_settings() should not add SPM path if Xcode < 11' do
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
