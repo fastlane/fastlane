@@ -96,6 +96,10 @@ module Match
         not_implemented(__method__)
       end
 
+      def list_files(file_name: "", file_ext: "")
+        not_implemented(__method__)
+      end
+
       # Implement this for the `fastlane match init` command
       # This method must return the content of the Matchfile
       # that should be generated
