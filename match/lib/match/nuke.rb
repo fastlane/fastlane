@@ -41,7 +41,8 @@ module Match
         s3_region: params[:s3_region].to_s,
         s3_access_key: params[:s3_access_key].to_s,
         s3_secret_access_key: params[:s3_secret_access_key].to_s,
-        s3_bucket: params[:s3_bucket].to_s
+        s3_bucket: params[:s3_bucket].to_s,
+        team_id: params[:team_id]
       })
       self.storage.download
 
@@ -141,15 +142,15 @@ module Match
       certs = []
       keys = []
       cert_types.each do |ct|
-        certs += Dir[File.join(self.storage.working_directory, "**", ct.to_s, "*.cer")]
-        keys += Dir[File.join(self.storage.working_directory, "**", ct.to_s, "*.p12")]
+        certs += self.storage.list_files(file_name: ct.to_s, file_ext: "cer")
+        keys += self.storage.list_files(file_name: ct.to_s, file_ext: "p12")
       end
 
       # Finds all the iOS and macOS profofiles in the file storage
       profiles = []
       prov_types.each do |prov_type|
-        profiles += Dir[File.join(self.storage.working_directory, "**", prov_type.to_s, "*.mobileprovision")]
-        profiles += Dir[File.join(self.storage.working_directory, "**", prov_type.to_s, "*.provisionprofile")]
+        profiles += self.storage.list_files(file_name: prov_type.to_s, file_ext: "mobileprovision")
+        profiles += self.storage.list_files(file_name: prov_type.to_s, file_ext: "provisionprofile")
       end
 
       self.files = certs + keys + profiles
