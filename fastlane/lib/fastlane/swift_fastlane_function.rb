@@ -95,6 +95,8 @@ module Fastlane
         return "Int"
       elsif type_override == Boolean
         return "Bool"
+      elsif type_override == Float
+        return "Float"
       elsif type_override == :string_callback
         return "((String) -> Void)"
       else
@@ -130,8 +132,19 @@ module Fastlane
         type = "[String]"
       elsif default_value.kind_of?(Hash)
         type = "[String : Any]"
+      # Altough we can have a default value of Integer type, if param_type_override overridden that value, respect it.
       elsif default_value.kind_of?(Integer)
-        type = "Int"
+        if type == "Double" || type == "Float"
+          begin
+            # If we're not able to instantiate
+            _ = BigDecimal(default_value)
+          rescue
+            # We set it as a Int
+            type = "Int"
+          end
+        else
+          type = "Int"
+        end
       end
       return "#{type}#{optional_specifier}"
     end
@@ -149,7 +162,7 @@ module Fastlane
             # we can't handle default values for Hashes, yet
             # see method swift_default_implementations for similar behavior
             default_value = "[:]"
-          elsif type != "Bool" && type != "[String]" && type != "Int" && type != "((String) -> Void)"
+          elsif type != "Bool" && type != "[String]" && type != "Int" && type != "((String) -> Void)" && type != "Float" && type != "Double"
             default_value = "\"#{default_value}\""
           end
         end
