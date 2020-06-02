@@ -119,7 +119,7 @@ module Fastlane
       end
 
       def self.find_gsp_path(params)
-        return if params[:api_token]
+        return if params[:api_token] && params[:gsp_path].nil?
 
         if params[:gsp_path].to_s.length > 0
           params[:gsp_path] = File.expand_path(params[:gsp_path])
