@@ -45,22 +45,8 @@ module Fastlane
       # @param current_path this is a path to either a dSYM or a zipped dSYM
       #   this might also be either nested or not, we're flexible
       def self.handle_dsym(params, current_path, max_worker_threads)
-        if current_path.end_with?(".dSYM")
+        if current_path.end_with?(".dSYM") || current_path.end_with?(".zip")
           upload_dsym(params, current_path)
-        elsif current_path.end_with?(".zip")
-          UI.message("Extracting '#{current_path}'...")
-
-          current_path = File.expand_path(current_path)
-          Dir.mktmpdir do |dir|
-            Dir.chdir(dir) do
-              Actions.sh("unzip -qo #{current_path.shellescape}")
-              work_q = Queue.new
-              Dir["*.dSYM"].each do |sub|
-                work_q.push(sub)
-              end
-              execute_uploads(params, max_worker_threads, work_q)
-            end
-          end
         else
           UI.error("Don't know how to handle '#{current_path}'")
         end
