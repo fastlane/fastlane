@@ -326,7 +326,6 @@ module FastlaneCore
       if FastlaneCore::Helper.xcode_at_least?('11.0') && options[:cloned_source_packages_path]
         proj << "-clonedSourcePackagesDirPath #{options[:cloned_source_packages_path].shellescape}"
       end
-
       return proj
     end
 
