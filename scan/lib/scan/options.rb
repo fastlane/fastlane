@@ -398,7 +398,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :slack_icon_url,
                                      env_name: "SCAN_SLACK_ICON_URL",
                                      description: "Overrides the webhook's image property if slack_use_webhook_configured_username_and_icon is false",
-                                     default_value: "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png",
+                                     default_value: "https://fastlane.tools/assets/img/fastlane_icon.png",
                                      is_string: true,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_slack,
