@@ -894,7 +894,7 @@ func buildAndroidApp(task: String? = nil,
    - skipArchive: After building, don't archive, effectively not including -archivePath param
    - skipCodesigning: Build without codesigning
    - catalystPlatform: Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
-   - installerCertName: Full name of 3rd Party Mac Developer Installer or Deveoper ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`
+   - installerCertName: Full name of 3rd Party Mac Developer Installer or Developer ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`
    - buildPath: The directory in which the archive should be stored in
    - archivePath: The path to the created archive
    - derivedDataPath: The directory where built products and other derived data will go
@@ -1171,7 +1171,7 @@ func buildIosApp(workspace: String? = nil,
    - skipBuildArchive: Export ipa from previously built xcarchive. Uses archive_path as source
    - skipArchive: After building, don't archive, effectively not including -archivePath param
    - skipCodesigning: Build without codesigning
-   - installerCertName: Full name of 3rd Party Mac Developer Installer or Deveoper ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`
+   - installerCertName: Full name of 3rd Party Mac Developer Installer or Developer ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`
    - buildPath: The directory in which the archive should be stored in
    - archivePath: The path to the created archive
    - derivedDataPath: The directory where built products and other derived data will go
@@ -1448,6 +1448,7 @@ func captureAndroidScreenshots(androidHome: String? = nil,
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
    - addPhotos: A list of photos that should be added to the simulator before running the application
    - addVideos: A list of videos that should be added to the simulator before running the application
+   - htmlTemplate: A path to screenshots.html template
    - buildlogPath: The directory where to store the build log
    - clean: Should the project be cleaned before building it?
    - testWithoutBuilding: Test without building, requires a derived data path
@@ -1467,6 +1468,7 @@ func captureAndroidScreenshots(androidHome: String? = nil,
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - disableXcpretty: Disable xcpretty formatting of build
 */
 func captureIosScreenshots(workspace: String? = nil,
                            project: String? = nil,
@@ -1489,6 +1491,7 @@ func captureIosScreenshots(workspace: String? = nil,
                            appIdentifier: String? = nil,
                            addPhotos: [String]? = nil,
                            addVideos: [String]? = nil,
+                           htmlTemplate: String = "/Users/josh/Projects/fastlane/fastlane/snapshot/lib/snapshot/page.html.erb",
                            buildlogPath: String = "~/Library/Logs/snapshot",
                            clean: Bool = false,
                            testWithoutBuilding: Bool? = nil,
@@ -1507,7 +1510,8 @@ func captureIosScreenshots(workspace: String? = nil,
                            clonedSourcePackagesPath: String? = nil,
                            testplan: String? = nil,
                            onlyTesting: Any? = nil,
-                           skipTesting: Any? = nil) {
+                           skipTesting: Any? = nil,
+                           disableXcpretty: Bool? = nil) {
   let command = RubyCommand(commandID: "", methodName: "capture_ios_screenshots", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                                          RubyCommand.Argument(name: "project", value: project),
                                                                                                          RubyCommand.Argument(name: "xcargs", value: xcargs),
@@ -1529,6 +1533,7 @@ func captureIosScreenshots(workspace: String? = nil,
                                                                                                          RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                          RubyCommand.Argument(name: "add_photos", value: addPhotos),
                                                                                                          RubyCommand.Argument(name: "add_videos", value: addVideos),
+                                                                                                         RubyCommand.Argument(name: "html_template", value: htmlTemplate),
                                                                                                          RubyCommand.Argument(name: "buildlog_path", value: buildlogPath),
                                                                                                          RubyCommand.Argument(name: "clean", value: clean),
                                                                                                          RubyCommand.Argument(name: "test_without_building", value: testWithoutBuilding),
@@ -1547,7 +1552,8 @@ func captureIosScreenshots(workspace: String? = nil,
                                                                                                          RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
                                                                                                          RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                                          RubyCommand.Argument(name: "only_testing", value: onlyTesting),
-                                                                                                         RubyCommand.Argument(name: "skip_testing", value: skipTesting)])
+                                                                                                         RubyCommand.Argument(name: "skip_testing", value: skipTesting),
+                                                                                                         RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty)])
   _ = runner.executeCommand(command)
 }
 
@@ -1576,6 +1582,7 @@ func captureIosScreenshots(workspace: String? = nil,
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
    - addPhotos: A list of photos that should be added to the simulator before running the application
    - addVideos: A list of videos that should be added to the simulator before running the application
+   - htmlTemplate: A path to screenshots.html template
    - buildlogPath: The directory where to store the build log
    - clean: Should the project be cleaned before building it?
    - testWithoutBuilding: Test without building, requires a derived data path
@@ -1595,6 +1602,7 @@ func captureIosScreenshots(workspace: String? = nil,
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - disableXcpretty: Disable xcpretty formatting of build
 */
 func captureScreenshots(workspace: String? = nil,
                         project: String? = nil,
@@ -1617,6 +1625,7 @@ func captureScreenshots(workspace: String? = nil,
                         appIdentifier: String? = nil,
                         addPhotos: [String]? = nil,
                         addVideos: [String]? = nil,
+                        htmlTemplate: String = "/Users/josh/Projects/fastlane/fastlane/snapshot/lib/snapshot/page.html.erb",
                         buildlogPath: String = "~/Library/Logs/snapshot",
                         clean: Bool = false,
                         testWithoutBuilding: Bool? = nil,
@@ -1635,7 +1644,8 @@ func captureScreenshots(workspace: String? = nil,
                         clonedSourcePackagesPath: String? = nil,
                         testplan: String? = nil,
                         onlyTesting: Any? = nil,
-                        skipTesting: Any? = nil) {
+                        skipTesting: Any? = nil,
+                        disableXcpretty: Bool? = nil) {
   let command = RubyCommand(commandID: "", methodName: "capture_screenshots", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                                      RubyCommand.Argument(name: "project", value: project),
                                                                                                      RubyCommand.Argument(name: "xcargs", value: xcargs),
@@ -1657,6 +1667,7 @@ func captureScreenshots(workspace: String? = nil,
                                                                                                      RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                      RubyCommand.Argument(name: "add_photos", value: addPhotos),
                                                                                                      RubyCommand.Argument(name: "add_videos", value: addVideos),
+                                                                                                     RubyCommand.Argument(name: "html_template", value: htmlTemplate),
                                                                                                      RubyCommand.Argument(name: "buildlog_path", value: buildlogPath),
                                                                                                      RubyCommand.Argument(name: "clean", value: clean),
                                                                                                      RubyCommand.Argument(name: "test_without_building", value: testWithoutBuilding),
@@ -1675,7 +1686,8 @@ func captureScreenshots(workspace: String? = nil,
                                                                                                      RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
                                                                                                      RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                                      RubyCommand.Argument(name: "only_testing", value: onlyTesting),
-                                                                                                     RubyCommand.Argument(name: "skip_testing", value: skipTesting)])
+                                                                                                     RubyCommand.Argument(name: "skip_testing", value: skipTesting),
+                                                                                                     RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty)])
   _ = runner.executeCommand(command)
 }
 
@@ -3735,7 +3747,7 @@ func gradle(task: String? = nil,
    - skipArchive: After building, don't archive, effectively not including -archivePath param
    - skipCodesigning: Build without codesigning
    - catalystPlatform: Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
-   - installerCertName: Full name of 3rd Party Mac Developer Installer or Deveoper ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`
+   - installerCertName: Full name of 3rd Party Mac Developer Installer or Developer ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`
    - buildPath: The directory in which the archive should be stored in
    - archivePath: The path to the created archive
    - derivedDataPath: The directory where built products and other derived data will go
@@ -5801,7 +5813,7 @@ func runTests(workspace: String? = nil,
               slackMessage: String? = nil,
               slackUseWebhookConfiguredUsernameAndIcon: Bool = false,
               slackUsername: String = "fastlane",
-              slackIconUrl: String = "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png",
+              slackIconUrl: String = "https://fastlane.tools/assets/img/fastlane_icon.png",
               skipSlack: Bool = false,
               slackOnlyOnFailure: Bool = false,
               destination: Any? = nil,
@@ -6626,7 +6638,7 @@ func slack(message: String? = nil,
            useWebhookConfiguredUsernameAndIcon: Bool = false,
            slackUrl: String,
            username: String = "fastlane",
-           iconUrl: String = "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png",
+           iconUrl: String = "https://fastlane.tools/assets/img/fastlane_icon.png",
            payload: [String : Any] = [:],
            defaultPayloads: [String]? = nil,
            attachmentProperties: [String : Any] = [:],
@@ -6707,7 +6719,7 @@ func slackTrainStart(distance: Int = 5,
    - simpleOutput: Tell slather that it should output results to the terminal
    - gutterJson: Tell slather that it should output results as Gutter JSON format
    - coberturaXml: Tell slather that it should output results as Cobertura XML format
-   - sonarQubeXml: Tell slather that it should output results as SonarQube Generic XML format
+   - sonarqubeXml: Tell slather that it should output results as SonarQube Generic XML format
    - llvmCov: Tell slather that it should output results as llvm-cov show format
    - html: Tell slather that it should output results as static HTML pages
    - show: Tell slather that it should open static html pages automatically
@@ -6741,7 +6753,7 @@ func slather(buildDirectory: String? = nil,
              simpleOutput: Bool? = nil,
              gutterJson: Bool? = nil,
              coberturaXml: Bool? = nil,
-             sonarQubeXml: Bool? = nil,
+             sonarqubeXml: Bool? = nil,
              llvmCov: Any? = nil,
              html: Bool? = nil,
              show: Bool = false,
@@ -6771,6 +6783,7 @@ func slather(buildDirectory: String? = nil,
                                                                                          RubyCommand.Argument(name: "simple_output", value: simpleOutput),
                                                                                          RubyCommand.Argument(name: "gutter_json", value: gutterJson),
                                                                                          RubyCommand.Argument(name: "cobertura_xml", value: coberturaXml),
+                                                                                         RubyCommand.Argument(name: "sonarqube_xml", value: sonarqubeXml),
                                                                                          RubyCommand.Argument(name: "llvm_cov", value: llvmCov),
                                                                                          RubyCommand.Argument(name: "html", value: html),
                                                                                          RubyCommand.Argument(name: "show", value: show),
@@ -6812,6 +6825,7 @@ func slather(buildDirectory: String? = nil,
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
    - addPhotos: A list of photos that should be added to the simulator before running the application
    - addVideos: A list of videos that should be added to the simulator before running the application
+   - htmlTemplate: A path to screenshots.html template
    - buildlogPath: The directory where to store the build log
    - clean: Should the project be cleaned before building it?
    - testWithoutBuilding: Test without building, requires a derived data path
@@ -6831,6 +6845,7 @@ func slather(buildDirectory: String? = nil,
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - disableXcpretty: Disable xcpretty formatting of build
 */
 func snapshot(workspace: Any? = snapshotfile.workspace,
               project: Any? = snapshotfile.project,
@@ -6853,6 +6868,7 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
               appIdentifier: Any? = snapshotfile.appIdentifier,
               addPhotos: [String]? = snapshotfile.addPhotos,
               addVideos: [String]? = snapshotfile.addVideos,
+              htmlTemplate: Any = snapshotfile.htmlTemplate,
               buildlogPath: Any = snapshotfile.buildlogPath,
               clean: Bool = snapshotfile.clean,
               testWithoutBuilding: Bool? = snapshotfile.testWithoutBuilding,
@@ -6871,7 +6887,8 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
               clonedSourcePackagesPath: Any? = snapshotfile.clonedSourcePackagesPath,
               testplan: Any? = snapshotfile.testplan,
               onlyTesting: Any? = snapshotfile.onlyTesting,
-              skipTesting: Any? = snapshotfile.skipTesting) {
+              skipTesting: Any? = snapshotfile.skipTesting,
+              disableXcpretty: Bool? = snapshotfile.disableXcpretty) {
   let command = RubyCommand(commandID: "", methodName: "snapshot", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                           RubyCommand.Argument(name: "project", value: project),
                                                                                           RubyCommand.Argument(name: "xcargs", value: xcargs),
@@ -6893,6 +6910,7 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
                                                                                           RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                           RubyCommand.Argument(name: "add_photos", value: addPhotos),
                                                                                           RubyCommand.Argument(name: "add_videos", value: addVideos),
+                                                                                          RubyCommand.Argument(name: "html_template", value: htmlTemplate),
                                                                                           RubyCommand.Argument(name: "buildlog_path", value: buildlogPath),
                                                                                           RubyCommand.Argument(name: "clean", value: clean),
                                                                                           RubyCommand.Argument(name: "test_without_building", value: testWithoutBuilding),
@@ -6911,7 +6929,8 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
                                                                                           RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
                                                                                           RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                           RubyCommand.Argument(name: "only_testing", value: onlyTesting),
-                                                                                          RubyCommand.Argument(name: "skip_testing", value: skipTesting)])
+                                                                                          RubyCommand.Argument(name: "skip_testing", value: skipTesting),
+                                                                                          RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty)])
   _ = runner.executeCommand(command)
 }
 
@@ -8744,7 +8763,7 @@ func xcov(workspace: String? = nil,
           htmlReport: Bool = true,
           markdownReport: Bool = false,
           jsonReport: Bool = false,
-          minimumCoveragePercentage: Int = 0,
+          minimumCoveragePercentage: Float = 0,
           slackUrl: String? = nil,
           slackChannel: String? = nil,
           skipSlack: Bool = false,
@@ -8760,7 +8779,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-11.4.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-11.5.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                       RubyCommand.Argument(name: "project", value: project),
@@ -8905,4 +8924,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.76]
+// FastlaneRunnerAPIVersion [0.9.77]

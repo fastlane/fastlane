@@ -246,7 +246,7 @@ extension ScanfileProtocol {
   var slackMessage: String? { return nil }
   var slackUseWebhookConfiguredUsernameAndIcon: Bool { return false }
   var slackUsername: String { return "fastlane" }
-  var slackIconUrl: String { return "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png" }
+  var slackIconUrl: String { return "https://fastlane.tools/assets/img/fastlane_icon.png" }
   var skipSlack: Bool { return false }
   var slackOnlyOnFailure: Bool { return false }
   var destination: String? { return nil }
@@ -258,4 +258,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.29]
+// FastlaneRunnerAPIVersion [0.9.30]

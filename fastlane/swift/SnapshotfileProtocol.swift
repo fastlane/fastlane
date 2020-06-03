@@ -63,6 +63,9 @@ protocol SnapshotfileProtocol: class {
   /// A list of videos that should be added to the simulator before running the application
   var addVideos: [String]? { get }
 
+  /// A path to screenshots.html template
+  var htmlTemplate: String { get }
+
   /// The directory where to store the build log
   var buildlogPath: String { get }
 
@@ -119,6 +122,9 @@ protocol SnapshotfileProtocol: class {
 
   /// Array of strings matching Test Bundle/Test Suite/Test Cases to skip
   var skipTesting: String? { get }
+
+  /// Disable xcpretty formatting of build
+  var disableXcpretty: Bool? { get }
 }
 
 extension SnapshotfileProtocol {
@@ -143,6 +149,7 @@ extension SnapshotfileProtocol {
   var appIdentifier: String? { return nil }
   var addPhotos: [String]? { return nil }
   var addVideos: [String]? { return nil }
+  var htmlTemplate: String { return "/Users/josh/Projects/fastlane/fastlane/snapshot/lib/snapshot/page.html.erb" }
   var buildlogPath: String { return "~/Library/Logs/snapshot" }
   var clean: Bool { return false }
   var testWithoutBuilding: Bool? { return nil }
@@ -162,8 +169,9 @@ extension SnapshotfileProtocol {
   var testplan: String? { return nil }
   var onlyTesting: String? { return nil }
   var skipTesting: String? { return nil }
+  var disableXcpretty: Bool? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.9]
+// FastlaneRunnerAPIVersion [0.9.10]
