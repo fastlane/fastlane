@@ -35,7 +35,6 @@ module Scan
       options << "-sdk '#{config[:sdk]}'" if config[:sdk]
       options << destination # generated in `detect_values`
       options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
-      options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path] and !options.to_s.include? '-derivedDataPath'
       options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
       if FastlaneCore::Helper.xcode_at_least?(10)
         options << "-parallel-testing-worker-count #{config[:concurrent_workers]}" if config[:concurrent_workers]
