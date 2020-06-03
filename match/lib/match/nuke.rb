@@ -27,6 +27,8 @@ module Match
 
       update_optional_values_depending_on_storage_type(params)
 
+      spaceship_login
+
       self.storage = Storage.for_mode(params[:storage_mode], {
         git_url: params[:git_url],
         shallow_clone: params[:shallow_clone],
@@ -42,7 +44,7 @@ module Match
         s3_access_key: params[:s3_access_key].to_s,
         s3_secret_access_key: params[:s3_secret_access_key].to_s,
         s3_bucket: params[:s3_bucket].to_s,
-        team_id: params[:team_id]
+        team_id: params[:team_id] || Spaceship.client.team_id
       })
       self.storage.download
 
@@ -94,17 +96,7 @@ module Match
       end
     end
 
-    # Collect all the certs/profiles
-    def prepare_list
-      UI.message("Fetching certificates and profiles...")
-      cert_type = Match.cert_type_sym(type)
-      cert_types = [cert_type]
-
-      prov_types = []
-      prov_types = [:development] if cert_type == :development
-      prov_types = [:appstore, :adhoc, :developer_id] if cert_type == :distribution
-      prov_types = [:enterprise] if cert_type == :enterprise
-
+    def spaceship_login
       Spaceship.login(params[:username])
       Spaceship.select_team(team_id: params[:team_id], team_name: params[:team_name])
 
@@ -117,6 +109,18 @@ module Match
 
         UI.user_error!("Enterprise account nuke cancelled") unless UI.confirm("Do you really want to nuke your Enterprise account?")
       end
+    end
+
+    # Collect all the certs/profiles
+    def prepare_list
+      UI.message("Fetching certificates and profiles...")
+      cert_type = Match.cert_type_sym(type)
+      cert_types = [cert_type]
+
+      prov_types = []
+      prov_types = [:development] if cert_type == :development
+      prov_types = [:appstore, :adhoc, :developer_id] if cert_type == :distribution
+      prov_types = [:enterprise] if cert_type == :enterprise
 
       # Get all iOS and macOS profile
       self.profiles = []
