@@ -25,7 +25,7 @@ module Fastlane
 
         message = options[:message]
         if (message_format == "html") && (options[:include_html_header] == true)
-          message = "<table><tr><td><img src='https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png' width='50' height='50'></td><td>#{message[0..9999]}</td></tr></table>"
+          message = "<table><tr><td><img src='https://fastlane.tools/assets/img/fastlane_icon.png' width='50' height='50'></td><td>#{message[0..9999]}</td></tr></table>"
         end
 
         if api_version.to_i == 1
