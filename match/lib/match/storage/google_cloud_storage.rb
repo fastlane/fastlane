@@ -180,6 +180,10 @@ module Match
         false
       end
 
+      def list_files(file_name: "", file_ext: "")
+        Dir[File.join(working_directory, self.team_id, "**", file_name, "*.#{file_ext}")]
+      end
+
       def generate_matchfile_content
         return "google_cloud_bucket_name(\"#{self.bucket_name}\")"
       end

@@ -139,6 +139,10 @@ module Match
         false
       end
 
+      def list_files(file_name: "", file_ext: "")
+        Dir[File.join(working_directory, self.team_id, "**", file_name, "*.#{file_ext}")]
+      end
+
       # Implement this for the `fastlane match init` command
       # This method must return the content of the Matchfile
       # that should be generated

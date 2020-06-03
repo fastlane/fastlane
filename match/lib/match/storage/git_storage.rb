@@ -152,6 +152,10 @@ module Match
         return "git_url(\"#{url}\")"
       end
 
+      def list_files(file_name: "", file_ext: "")
+        Dir[File.join(working_directory, "**", file_name, "*.#{file_ext}")]
+      end
+
       private
 
       # Create and checkout an specific branch in the git repo
