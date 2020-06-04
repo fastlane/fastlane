@@ -164,7 +164,13 @@ module Fastlane
 
       def self.download_file(url)
         uri = URI.parse(url)
-        http = Net::HTTP.new(uri.host, uri.port)
+        if ENV['http_proxy']
+          UI.verbose("Found 'http_proxy' environment variable so connect via proxy")
+          proxy_uri = URI.parse(ENV['http_proxy'])
+          http = Net::HTTP.new(uri.host, uri.port, proxy_uri.host, proxy_uri.port)
+        else
+          http = Net::HTTP.new(uri.host, uri.port)
+        end
         http.use_ssl = (uri.scheme == "https")
         res = http.get(uri.request_uri)
         res.body
