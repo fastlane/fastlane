@@ -156,7 +156,6 @@ module Snapshot
                                      env_name: 'SNAPSHOT_HTML_TEMPLATE',
                                      short_option: "-e",
                                      description: "A path to screenshots.html template",
-                                     default_value: File.join(Snapshot::ROOT, "lib", "snapshot/page.html.erb"),
                                      optional: true),
 
         # Everything around building
