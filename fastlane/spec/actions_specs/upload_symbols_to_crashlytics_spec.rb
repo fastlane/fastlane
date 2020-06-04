@@ -5,20 +5,6 @@ describe Fastlane do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
       end
 
-      it "extracts zip files" do
-        binary_path = './fastlane/spec/fixtures/screenshots/screenshot1.png'
-        dsym_path = './fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip'
-
-        expect(Fastlane::Actions).to receive(:sh).with("unzip -qo #{File.expand_path(dsym_path).shellescape}")
-
-        Fastlane::FastFile.new.parse("lane :test do
-          upload_symbols_to_crashlytics(
-            dsym_path: '#{dsym_path}',
-            api_token: 'something123',
-            binary_path: '#{binary_path}')
-        end").runner.execute(:test)
-      end
-
       it "uploads dSYM files with app_id" do
         binary_path = './spec/fixtures/screenshots/screenshot1.png'
         dsym_path = './spec/fixtures/dSYM/Themoji.dSYM'
