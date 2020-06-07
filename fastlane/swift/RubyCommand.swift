@@ -81,28 +81,34 @@ struct RubyCommand: RubyCommandable {
     let commandID: String
     let methodName: String
     let className: String?
+    var token: NSObject?
     let args: [Argument]
-
-    func performCallback(callbackArg: String) {
+    
+    private func callbackClosure(_ callbackArg: String) -> ((String) -> Void)? {
         // WARNING: This will perform the first callback it receives
         let callbacks = self.args.filter { ($0.type != nil) && $0.type == .stringClosure }
         guard let callback = callbacks.first else {
             verbose(message: "received call to performCallback with \(callbackArg), but no callback available to perform")
-            return
+            return nil
         }
 
         guard let callbackArgValue = callback.value else {
             verbose(message: "received call to performCallback with \(callbackArg), but callback is nil")
-            return
+            return nil
         }
 
         guard let callbackClosure = callbackArgValue as? ((String) -> Void) else {
             verbose(message: "received call to performCallback with \(callbackArg), but callback type is unknown \(callbackArgValue.self)")
-            return
+            return nil
         }
+        return callbackClosure
+    }
 
+    func performCallback(callbackArg: String, socket: SocketClient, completion: () -> Void) {
         print("Performing callback with: \(callbackArg)")
-        callbackClosure(callbackArg)
+        socket.leave()
+        self.callbackClosure(callbackArg)?(callbackArg)
+        completion()
     }
 
     var commandJson: String {
