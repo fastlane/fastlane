@@ -54,6 +54,7 @@ module Spaceship
     GatewayTimeoutError = Spaceship::GatewayTimeoutError
     InternalServerError = Spaceship::InternalServerError
     BadGatewayError = Spaceship::BadGatewayError
+    AccessForbiddenError = Spaceship::AccessForbiddenError
 
     def self.hostname
       raise "You must implement self.hostname"
@@ -563,10 +564,15 @@ module Spaceship
     #####################################################
 
     def load_session_from_file
-      if File.exist?(persistent_cookie_path)
-        puts("Loading session from '#{persistent_cookie_path}'") if Spaceship::Globals.verbose?
-        @cookie.load(persistent_cookie_path)
-        return true
+      begin
+        if File.exist?(persistent_cookie_path)
+          puts("Loading session from '#{persistent_cookie_path}'") if Spaceship::Globals.verbose?
+          @cookie.load(persistent_cookie_path)
+          return true
+        end
+      rescue => ex
+        puts(ex.to_s)
+        puts("Continuing with normal login.")
       end
       return false
     end
@@ -623,7 +629,8 @@ module Spaceship
         Faraday::TimeoutError,
         BadGatewayError,
         AppleTimeoutError,
-        GatewayTimeoutError => ex
+        GatewayTimeoutError,
+        AccessForbiddenError => ex
       tries -= 1
       unless tries.zero?
         msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
@@ -858,6 +865,12 @@ module Spaceship
 
         if response.body.to_s.include?("<h3>Bad Gateway</h3>")
           raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
+        end
+
+        if resp_hash[:status] == 403
+          msg = "Access forbidden"
+          logger.warn(msg)
+          raise AccessForbiddenError.new, msg
         end
 
         return response

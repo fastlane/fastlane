@@ -4,6 +4,7 @@ AndroidPublisher = Google::Apis::AndroidpublisherV3
 
 require 'net/http'
 
+# rubocop:disable Metrics/ClassLength
 module Supply
   class AbstractGoogleServiceClient
     SCOPE = nil
@@ -244,7 +245,7 @@ module Supply
         UI.message("Found '#{version}' in '#{filtered_track.track}' track.")
       end
 
-      filtered_release = filtered_track.releases.first { |r| r.name == version }
+      filtered_release = filtered_track.releases.first { |r| !r.name.nil? && r.name == version }
 
       # Since we can release on Alpha/Beta without release notes.
       if filtered_release.release_notes.nil?
@@ -258,13 +259,13 @@ module Supply
     end
 
     def latest_version(track)
-      latest_version = tracks.select { |t| t.track == Supply::Tracks::DEFAULT }.map(&:releases).flatten.max_by(&:name)
+      latest_version = tracks.select { |t| t.track == Supply::Tracks::DEFAULT }.map(&:releases).flatten.reject { |r| r.name.nil? }.max_by(&:name)
 
       # Check if user specified '--track' option if version information from 'production' track is nil
       if latest_version.nil? && track == Supply::Tracks::DEFAULT
         UI.user_error!(%(Unable to find latest version information from "#{Supply::Tracks::DEFAULT}" track. Please specify track information by using the '--track' option.))
       else
-        latest_version = tracks.select { |t| t.track == track }.map(&:releases).flatten.max_by(&:name)
+        latest_version = tracks.select { |t| t.track == track }.map(&:releases).flatten.reject { |r| r.name.nil? }.max_by(&:name)
       end
 
       return latest_version
@@ -310,6 +311,19 @@ module Supply
       return result_upload.version_code
     end
 
+    def upload_apk_to_internal_app_sharing(package_name, path_to_apk)
+      # NOTE: This Google API is a little different. It doesn't require an active edit.
+      result_upload = call_google_api do
+        client.uploadapk_internalappsharingartifact(
+          package_name,
+          upload_source: path_to_apk,
+          content_type: "application/octet-stream"
+        )
+      end
+
+      return result_upload.download_url
+    end
+
     def upload_mapping(path_to_mapping, apk_version_code)
       ensure_active_edit!
 
@@ -340,11 +354,25 @@ module Supply
       return result_upload.version_code
     end
 
+    def upload_bundle_to_internal_app_sharing(package_name, path_to_aab)
+      # NOTE: This Google API is a little different. It doesn't require an active edit.
+      result_upload = call_google_api do
+        client.uploadbundle_internalappsharingartifact(
+          package_name,
+          upload_source: path_to_aab,
+          content_type: "application/octet-stream"
+        )
+      end
+
+      return result_upload.download_url
+    end
+
     # Get a list of all tracks - returns the list
     def tracks(*tracknames)
       ensure_active_edit!
 
       all_tracks = call_google_api { client.list_edit_tracks(current_package_name, current_edit.id) }.tracks
+      all_tracks = [] unless all_tracks
 
       if tracknames.length > 0
         all_tracks = all_tracks.select { |track| tracknames.include?(track.track) }
@@ -377,6 +405,23 @@ module Supply
           track
         )
         return result.releases.flat_map(&:version_codes) || []
+      rescue Google::Apis::ClientError => e
+        return [] if e.status_code == 404 && (e.to_s.include?("trackEmpty") || e.to_s.include?("Track not found"))
+        raise
+      end
+    end
+
+    # Get list of release names for track
+    def track_releases(track)
+      ensure_active_edit!
+
+      begin
+        result = client.get_edit_track(
+          current_package_name,
+          current_edit.id,
+          track
+        )
+        return result.releases || []
       rescue Google::Apis::ClientError => e
         return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
         raise
@@ -502,3 +547,4 @@ module Supply
     end
   end
 end
+# rubocop:enable Metrics/ClassLength

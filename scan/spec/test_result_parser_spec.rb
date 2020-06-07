@@ -64,5 +64,15 @@ describe Scan do
         failures: 1
       )
     end
+
+    it "returns early if the xcodebuild output is nil" do
+      output = nil
+
+      result = Scan::TestResultParser.new.parse_result(output)
+      expect(result).to eq(
+        tests: 0,
+        failures: 0
+      )
+    end
   end
 end

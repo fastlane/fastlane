@@ -71,7 +71,7 @@ module Match
       private
 
       def iterate(source_path)
-        Dir[File.join(source_path, "**", "*.{cer,p12,mobileprovision}")].each do |path|
+        Dir[File.join(source_path, "**", "*.{cer,p12,mobileprovision,provisionprofile}")].each do |path|
           next if File.directory?(path)
           yield(path)
         end
@@ -99,7 +99,7 @@ module Match
             UI.important("Enter the passphrase that should be used to encrypt/decrypt your certificates")
             UI.important("This passphrase is specific per repository and will be stored in your local keychain")
             UI.important("Make sure to remember the password, as you'll need it when you run match on a different machine")
-            password = ChangePassword.ask_password(confirm: true)
+            password = FastlaneCore::Helper.ask_password(message: "Passphrase for Match storage: ", confirm: true)
             store_password(password)
           end
         end

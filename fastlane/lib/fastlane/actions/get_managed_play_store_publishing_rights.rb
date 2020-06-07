@@ -26,7 +26,7 @@ module Fastlane
         # Login
         credentials = JSON.parse(json_key_data)
         callback_uri = 'https://fastlane.github.io/managed_google_play-callback/callback.html'
-        uri = "https://play.google.com/apps/publish/delegatePrivateApp?service_account=#{credentials['client_email']}&continueUrl=#{URI.escape(callback_uri)}"
+        uri = "https://play.google.com/apps/publish/delegatePrivateApp?service_account=#{credentials['client_email']}&continueUrl=#{URI.encode_www_form_component(callback_uri)}"
 
         UI.message("To obtain publishing rights for custom apps on Managed Play Store, open the following URL and log in:")
         UI.message("")

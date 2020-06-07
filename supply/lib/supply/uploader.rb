@@ -42,6 +42,34 @@ module Supply
       end
     end
 
+    def perform_upload_to_internal_app_sharing
+      download_urls = []
+
+      package_name = Supply.config[:package_name]
+
+      apk_paths = [Supply.config[:apk]] unless (apk_paths = Supply.config[:apk_paths])
+      apk_paths.compact!
+      apk_paths.each do |apk_path|
+        download_url = client.upload_apk_to_internal_app_sharing(package_name, apk_path)
+        download_urls << download_url
+        UI.success("Successfully uploaded APK to Internal App Sharing URL: #{download_url}")
+      end
+
+      aab_paths = [Supply.config[:aab]] unless (aab_paths = Supply.config[:aab_paths])
+      aab_paths.compact!
+      aab_paths.each do |aab_path|
+        download_url = client.upload_bundle_to_internal_app_sharing(package_name, aab_path)
+        download_urls << download_url
+        UI.success("Successfully uploaded AAB to Internal App Sharing URL: #{download_url}")
+      end
+
+      if download_urls.count == 1
+        return download_urls.first
+      else
+        return download_urls
+      end
+    end
+
     def perform_upload_meta(version_codes)
       if (!Supply.config[:skip_upload_metadata] || !Supply.config[:skip_upload_images] || !Supply.config[:skip_upload_changelogs] || !Supply.config[:skip_upload_screenshots]) && metadata_path
         # Use version code from config if version codes is empty and no nil or empty string
@@ -195,7 +223,13 @@ module Supply
         UI.message("Updating changelog for '#{version_code}' and language '#{language}'...")
         changelog_text = File.read(path, encoding: 'UTF-8')
       else
-        UI.message("Could not find changelog for '#{version_code}' and language '#{language}' at path #{path}...")
+        default_changelog_path = File.join(Supply.config[:metadata_path], language, Supply::CHANGELOGS_FOLDER_NAME, "default.txt")
+        if File.exist?(default_changelog_path)
+          UI.message("Updating changelog for '#{version_code}' and language '#{language}' to default changelog...")
+          changelog_text = File.read(default_changelog_path, encoding: 'UTF-8')
+        else
+          UI.message("Could not find changelog for '#{version_code}' and language '#{language}' at path #{path}...")
+        end
       end
 
       AndroidPublisher::LocalizedText.new({
@@ -355,6 +389,10 @@ module Supply
           track_release.status = Supply::ReleaseStatus::IN_PROGRESS
           track_release.user_fraction = rollout
         end
+      end
+
+      if Supply.config[:in_app_update_priority]
+        track_release.in_app_update_priority = Supply.config[:in_app_update_priority].to_i
       end
 
       tracks = client.tracks(Supply.config[:track])

@@ -110,7 +110,7 @@ module Fastlane
 
     # Is printed out in the Steps: output in the terminal
     # Return nil if you don't want any logging in the terminal/JUnit Report
-    def self.step_text
+    def self.step_text(params)
       self.action_name
     end
 
@@ -121,7 +121,7 @@ module Fastlane
 
     # instead of "AddGitAction", this will return "add_git" to print it to the user
     def self.action_name
-      self.name.split('::').last.gsub('Action', '').fastlane_underscore
+      self.name.split('::').last.gsub(/Action$/, '').fastlane_underscore
     end
 
     def self.lane_context

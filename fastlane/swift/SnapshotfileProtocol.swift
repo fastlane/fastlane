@@ -45,6 +45,9 @@ protocol SnapshotfileProtocol: class {
   /// Enabling this option will automatically erase the simulator before running the application
   var eraseSimulator: Bool { get }
 
+  /// Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
+  var overrideStatusBar: Bool { get }
+
   /// Enabling this option will configure the Simulator's system language
   var localizeSimulator: Bool { get }
 
@@ -59,6 +62,9 @@ protocol SnapshotfileProtocol: class {
 
   /// A list of videos that should be added to the simulator before running the application
   var addVideos: [String]? { get }
+
+  /// A path to screenshots.html template
+  var htmlTemplate: String { get }
 
   /// The directory where to store the build log
   var buildlogPath: String { get }
@@ -101,6 +107,24 @@ protocol SnapshotfileProtocol: class {
 
   /// Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
   var concurrentSimulators: Bool { get }
+
+  /// Disable the simulator from showing the 'Slide to type' prompt
+  var disableSlideToType: Bool { get }
+
+  /// Sets a custom path for Swift Package Manager dependencies
+  var clonedSourcePackagesPath: String? { get }
+
+  /// The testplan associated with the scheme that should be used for testing
+  var testplan: String? { get }
+
+  /// Array of strings matching Test Bundle/Test Suite/Test Cases to run
+  var onlyTesting: String? { get }
+
+  /// Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+  var skipTesting: String? { get }
+
+  /// Disable xcpretty formatting of build
+  var disableXcpretty: Bool? { get }
 }
 
 extension SnapshotfileProtocol {
@@ -119,11 +143,13 @@ extension SnapshotfileProtocol {
   var clearPreviousScreenshots: Bool { return false }
   var reinstallApp: Bool { return false }
   var eraseSimulator: Bool { return false }
+  var overrideStatusBar: Bool { return false }
   var localizeSimulator: Bool { return false }
   var darkMode: Bool? { return nil }
   var appIdentifier: String? { return nil }
   var addPhotos: [String]? { return nil }
   var addVideos: [String]? { return nil }
+  var htmlTemplate: String { return "/Users/josh/Projects/fastlane/fastlane/snapshot/lib/snapshot/page.html.erb" }
   var buildlogPath: String { return "~/Library/Logs/snapshot" }
   var clean: Bool { return false }
   var testWithoutBuilding: Bool? { return nil }
@@ -138,8 +164,14 @@ extension SnapshotfileProtocol {
   var testTargetName: String? { return nil }
   var namespaceLogFiles: String? { return nil }
   var concurrentSimulators: Bool { return true }
+  var disableSlideToType: Bool { return false }
+  var clonedSourcePackagesPath: String? { return nil }
+  var testplan: String? { return nil }
+  var onlyTesting: String? { return nil }
+  var skipTesting: String? { return nil }
+  var disableXcpretty: Bool? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.6]
+// FastlaneRunnerAPIVersion [0.9.10]

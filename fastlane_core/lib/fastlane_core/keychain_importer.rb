@@ -1,15 +1,17 @@
 require_relative 'helper'
 require 'open3'
+require 'security'
 
 module FastlaneCore
   class KeychainImporter
-    def self.import_file(path, keychain_path, keychain_password: "", certificate_password: "", output: FastlaneCore::Globals.verbose?)
+    def self.import_file(path, keychain_path, keychain_password: nil, certificate_password: "", output: FastlaneCore::Globals.verbose?)
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
       command = "security import #{path.shellescape} -k '#{keychain_path.shellescape}'"
       command << " -P #{certificate_password.shellescape}"
       command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym` (before Sierra)
       command << " -T /usr/bin/security"
+      command << " -T /usr/bin/productbuild" # to not be asked for permission when using an installer cert for macOS
       command << " 1> /dev/null" unless output
 
       UI.command(command) if output
@@ -18,6 +20,7 @@ module FastlaneCore
 
         # Set partition list only if success since it can be a time consuming process if a lot of keys are installed
         if thrd.value.success?
+          keychain_password ||= resolve_keychain_password(keychain_path)
           set_partition_list(path, keychain_path, keychain_password: keychain_password, output: output)
         else
           # Output verbose if file is already installed since not an error otherwise we will show the whole error
@@ -31,12 +34,13 @@ module FastlaneCore
       end
     end
 
-    def self.set_partition_list(path, keychain_path, keychain_password: "", output: FastlaneCore::Globals.verbose?)
+    def self.set_partition_list(path, keychain_path, keychain_password: nil, output: FastlaneCore::Globals.verbose?)
       # When security supports partition lists, also add the partition IDs
       # See https://openradar.appspot.com/28524119
       if Helper.backticks('security -h | grep set-key-partition-list', print: false).length > 0
         command = "security set-key-partition-list"
         command << " -S apple-tool:,apple:"
+        command << " -s" # This is a needed in Catalina to prevent "security: SecKeychainItemCopyAccess: A missing value was detected."
         command << " -k #{keychain_password.to_s.shellescape}"
         command << " #{keychain_path.shellescape}"
         command << " 1> /dev/null" # always disable stdout. This can be very verbose, and leak potentially sensitive info
@@ -51,6 +55,9 @@ module FastlaneCore
 
             # Inform user when no/wrong password was used as its needed to prevent UI permission popup from Xcode when signing
             if err.include?("SecKeychainItemSetAccessWithPassword")
+              keychain_name = File.basename(keychain_path, ".*")
+              Security::InternetPassword.delete(server: server_name(keychain_name))
+
               UI.important("")
               UI.important("Could not configure imported keychain item (certificate) to prevent UI permission popup when code signing\n" \
                        "Check if you supplied the correct `keychain_password` for keychain: `#{keychain_path}`\n" \
@@ -70,5 +77,44 @@ module FastlaneCore
 
       end
     end
+
+    # https://github.com/fastlane/fastlane/issues/14196
+    # Keychain password is needed to set the partition list to
+    # prevent Xcode from prompting dialog for keychain password when signing
+    # 1. Uses keychain password from login keychain if found
+    # 2. Prompts user for keychain password and stores it in login keychain for user later
+    def self.resolve_keychain_password(keychain_path)
+      keychain_name = File.basename(keychain_path, ".*")
+      server = server_name(keychain_name)
+
+      # Attempt to find password in keychain for keychain
+      item = Security::InternetPassword.find(server: server)
+      if item
+        keychain_password = item.password
+        UI.important("Using keychain password from keychain item #{server} in #{keychain_path}")
+      end
+
+      if keychain_password.nil?
+        if UI.interactive?
+          UI.important("Enter the password for #{keychain_path}")
+          UI.important("This passphrase will be stored in your local keychain with the name #{server} and used in future runs")
+          UI.important("This prompt can be avoided by specifying the 'keychain_password' option or 'MATCH_KEYCHAIN_PASSWORD' environment variable")
+          keychain_password = FastlaneCore::Helper.ask_password(message: "Password for #{keychain_name} keychain: ", confirm: true)
+          Security::InternetPassword.add(server, "", keychain_password)
+        else
+          UI.important("Keychain password for #{keychain_path} was not specified and not found in your keychain. Specify the 'keychain_password' option to prevent the UI permission popup when code signing")
+          keychain_password = ""
+        end
+      end
+
+      return keychain_password
+    end
+
+    # server name used for accessing the macOS keychain
+    def self.server_name(keychain_name)
+      ["fastlane", "keychain", keychain_name].join("_")
+    end
+
+    private_class_method :server_name
   end
 end

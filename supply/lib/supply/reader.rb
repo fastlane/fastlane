@@ -16,6 +16,22 @@ module Supply
       version_codes
     end
 
+    def track_release_names
+      track = Supply.config[:track]
+
+      client.begin_edit(package_name: Supply.config[:package_name])
+      release_names = client.track_releases(track).map(&:name)
+      client.abort_current_edit
+
+      if release_names.empty?
+        UI.important("No release names found in track '#{track}'")
+      else
+        UI.success("Found '#{release_names.join(', ')}' release names in track '#{track}'")
+      end
+
+      release_names
+    end
+
     private
 
     def client

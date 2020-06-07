@@ -1,6 +1,7 @@
 app_identifier "net.sunapps.1"
 apple_id "felix@sunapps.net"
 team_id "Q2CBPJ58CC"
+itc_provider "JoshHoltz"
 
 for_lane "beta" do
   app_identifier "net.sunapps.1.beta"

@@ -78,6 +78,12 @@ To gradually roll out a new build use
 fastlane supply --apk path/app.apk --track beta --rollout 0.5
 ```
 
+To set the in-app update priority level for a release, set a valid update priority (an integer value from 0 to 5) using option `in_app_update_priority`
+
+```no-highlight
+fastlane supply --apk path/app.apk --track beta --in_app_update_priority 3
+```
+
 ### Expansion files (`.obb`)
 
 Expansion files (obbs) found under the same directory as your APK will also be uploaded together with your APK as long as:
@@ -113,6 +119,12 @@ To gradually roll out a new build use
 fastlane supply --aab path/app.aab --track beta --rollout 0.5
 ```
 
+To set the in-app update priority level for a release, set a valid update priority (an integer value from 0 to 5) using option `in_app_update_priority`
+
+```no-highlight
+fastlane supply --aab path/app.aab --track beta --in_app_update_priority 3
+```
+
 ## Images and Screenshots
 
 After running `fastlane supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short_description.txt`.
@@ -136,7 +148,7 @@ Note that these will replace the current images and screenshots on the play stor
 
 ## Changelogs (What's new)
 
-You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the [version code](https://developer.android.com/studio/publish/versioning#appversioning) of the APK that it represents. `fastlane supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
+You can add changelog files under the `changelogs/` directory for each locale. The filename should exactly match the [version code](https://developer.android.com/studio/publish/versioning#appversioning) of the APK that it represents. You can also provide default notes that will be used if no files match the version code by adding a `default.txt` file. `fastlane supply init` will populate changelog files from existing data on Google Play if no `metadata/` directory exists when it is run.
 
 ```no-highlight
 └── fastlane
@@ -144,10 +156,12 @@ You can add changelog files under the `changelogs/` directory for each locale. T
         └── android
             ├── en-US
             │   └── changelogs
+            │       ├── default.txt
             │       ├── 100000.txt
             │       └── 100100.txt
             └── fr-FR
                 └── changelogs
+                    ├── default.txt
                     └── 100100.txt
 ```
 
@@ -157,9 +171,10 @@ A common Play publishing scenario might involve uploading an APK version to a te
 
 This can be done using the `--track_promote_to` parameter. The `--track_promote_to` parameter works with the `--track` parameter to command the Play API to promote existing Play track APK version(s) (those active on the track identified by the `--track` param value) to a new track (`--track_promote_to` value).
 
-## Retrieve Track Version Codes
+## Retrieve Track Release Names & Version Codes
 
-Before performing a new APK upload you may want to check existing track version codes, or you may simply want to provide an informational lane that displays the currently promoted version codes for the production track. You can use the `google_play_track_version_codes` action to retrieve existing version codes for a package and track. For more information, see `fastlane action google_play_track_version_codes` help output.
+Before performing a new APK upload you may want to check existing track version codes or release names, or you may simply want to provide an informational lane that displays the currently promoted version codes or release name for the production track. You can use the `google_play_track_version_codes` action to retrieve existing version codes for a package and track. You can use the `google_play_track_release_names` action to retrieve existing release names for a package and track.
+For more information, see the `fastlane action google_play_track_version_codes` and `fastlane action google_play_track_release_names` help output.
 
 ## Migration from AndroidPublisherV2 to AndroidPublisherV3 in _fastlane_ 2.135.0
 
@@ -168,7 +183,7 @@ Before performing a new APK upload you may want to check existing track version 
   - Used when uploading with `:apk_path`, `:apk_paths`, `:aab_path`, and `:aab_paths`
   - Can be any string such (example: "October Release" or "Awesome New Feature")
   - Defaults to the version name in app/build.gradle or AndroidManifest.xml
-- `:release_status` 
+- `:release_status`
   - Used when uploading with `:apk_path`, `:apk_paths`, `:aab_path`, and `:aab_paths`
   - Can set as  "draft" to complete the release at some other time
   - Defaults to "completed"

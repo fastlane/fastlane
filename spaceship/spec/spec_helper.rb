@@ -79,6 +79,8 @@ def before_each_spaceship
   ConnectAPIStubbing::TestFlight.stub_beta_app_review_submissions
   ConnectAPIStubbing::TestFlight.stub_beta_build_localizations
   ConnectAPIStubbing::TestFlight.stub_beta_build_metrics
+  ConnectAPIStubbing::TestFlight.stub_beta_feedbacks
+  ConnectAPIStubbing::TestFlight.stub_beta_feedbacks_delete
   ConnectAPIStubbing::TestFlight.stub_beta_groups
   ConnectAPIStubbing::TestFlight.stub_beta_testers
   ConnectAPIStubbing::TestFlight.stub_beta_tester_metrics
