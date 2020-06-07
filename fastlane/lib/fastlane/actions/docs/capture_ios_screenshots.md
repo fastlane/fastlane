@@ -364,7 +364,7 @@ snapshot(launch_arguments: ["SKIP_ANIMATIONS"])
 ```
 
 By default, _snapshot_ will wait for a short time for the animations to finish.
-If you're skipping the animations, this is wait time is unnecessary and can be skipped:
+If you're skipping the animations, this wait time is unnecessary and can be skipped:
 
 ```swift
 setupSnapshot(app, waitForAnimations: false)
