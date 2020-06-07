@@ -33,26 +33,67 @@ class Runner {
     fileprivate var returnValue: String? // lol, so safe
     fileprivate var currentlyExecutingCommand: RubyCommandable? = nil
     fileprivate var shouldLeaveDispatchGroupDuringDisconnect = false
+    fileprivate var executeNext: Bool = false
     
     func executeCommand(_ command: RubyCommandable) -> String {
         self.dispatchGroup.enter()
-        currentlyExecutingCommand = command
-        socketClient.send(rubyCommand: command)
+        self.currentlyExecutingCommand = command
+        self.socketClient.send(rubyCommand: command)
         
         let secondsToWait = DispatchTimeInterval.seconds(SocketClient.defaultCommandTimeoutSeconds)
-        let connectTimeout = DispatchTime.now() + secondsToWait
-        let timeoutResult = self.dispatchGroup.wait(timeout: connectTimeout)
+        let timeoutResult = waitWithPolling(self.executeNext, toEventually: { $0 == true }, timeout: SocketClient.defaultCommandTimeoutSeconds)
+        executeNext = false
         let failureMessage = "command didn't execute in: \(SocketClient.defaultCommandTimeoutSeconds) seconds"
-        let success = testDispatchTimeoutResult(timeoutResult, failureMessage: failureMessage, timeToWait: secondsToWait)
+        let success = self.testDispatchTimeoutResult(timeoutResult, failureMessage: failureMessage, timeToWait: secondsToWait)
         guard success else {
             log(message: "command timeout")
             fatalError()
         }
         
-        if let returnValue = self.returnValue {
-            return returnValue
+        if let _returnValue = self.returnValue {
+            return _returnValue
         } else {
             return ""
+        }
+    }
+    
+    private func waitWithPolling<T>(_ expression: @autoclosure @escaping () throws -> T, toEventually predicate: @escaping (T) -> Bool, timeout: Int, pollingInterval: DispatchTimeInterval = .milliseconds(4)) -> DispatchTimeoutResult {
+        func memoizedClosure<T>(_ closure: @escaping () throws -> T) -> (Bool) throws -> T {
+            var cache: T?
+            return { withoutCaching in
+                if withoutCaching || cache == nil {
+                    cache = try closure()
+                }
+                guard let cache = cache else {
+                    preconditionFailure()
+                }
+                
+                return cache
+            }
+        }
+        
+        let runLoop = RunLoop.current
+        let timeoutDate = Date(timeInterval: TimeInterval(timeout), since: Date())
+        var fulfilled: Bool = false
+        let _expression = memoizedClosure(expression)
+        repeat {
+            do {
+                let exp = try _expression(true)
+                fulfilled = predicate(exp)
+            } catch {
+                fatalError("Error raised \(error.localizedDescription)")
+            }
+            if !fulfilled {
+                runLoop.run(until: Date(timeIntervalSinceNow: pollingInterval.timeInterval))
+            } else {
+                break
+            }
+        } while Date().compare(timeoutDate) == .orderedAscending
+
+        if fulfilled {
+            return .success
+        } else {
+            return .timedOut
         }
     }
 }
@@ -110,24 +151,28 @@ extension Runner {
 }
 
 extension Runner : SocketClientDelegateProtocol {
-    func commandExecuted(serverResponse: SocketClientResponse) {
+    func commandExecuted(serverResponse: SocketClientResponse, completion: ((SocketClient) -> Void)? = nil) {
         switch serverResponse {
         case .success(let returnedObject, let closureArgumentValue):
             verbose(message: "command executed")
             self.returnValue = returnedObject
             if let command = self.currentlyExecutingCommand as? RubyCommand {
                 if let closureArgumentValue = closureArgumentValue {
-                    command.performCallback(callbackArg: closureArgumentValue)
+                    command.performCallback(callbackArg: closureArgumentValue, socket: socketClient) { [unowned self] in
+                        self.executeNext = true
+                    }
                 }
             }
-            self.dispatchGroup.leave()
+            dispatchGroup.leave()
         case .clientInitiatedCancelAcknowledged:
             verbose(message: "server acknowledged a cancel request")
             self.dispatchGroup.leave()
+            self.executeNext = true
             
         case .alreadyClosedSockets, .connectionFailure, .malformedRequest, .malformedResponse, .serverError:
             log(message: "error encountered while executing command:\n\(serverResponse)")
             self.dispatchGroup.leave()
+            self.executeNext = true
             
         case .commandTimeout(let timeout):
             log(message: "Runner timed out after \(timeout) second(s)")
@@ -192,6 +237,25 @@ func log(message: String) {
 
 func verbose(message: String) {
     logger.verbose(message: message)
+}
+
+private extension DispatchTimeInterval {
+    var timeInterval: TimeInterval {
+        var result: TimeInterval = 0
+        switch self {
+        case .seconds(let value):
+            result = TimeInterval(value)
+        case .milliseconds(let value):
+            result = TimeInterval(value)*0.001
+        case .microseconds(let value):
+            result = TimeInterval(value)*0.000001
+        case .nanoseconds(let value):
+            result = TimeInterval(value)*0.000000001
+        case .never:
+            fatalError()
+        }
+        return result
+    }
 }
 
 // Please don't remove the lines below
