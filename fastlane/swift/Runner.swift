@@ -190,6 +190,7 @@ extension Runner : SocketClientDelegateProtocol {
         DispatchQueue.main.async {
             self.thread?.cancel()
             self.thread = nil
+            self.socketClient.closeSession()
             self.socketClient = nil
             verbose(message: "connection closed!")
             if self.shouldLeaveDispatchGroupDuringDisconnect {
