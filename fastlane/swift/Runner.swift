@@ -83,11 +83,11 @@ class Runner {
             } catch {
                 fatalError("Error raised \(error.localizedDescription)")
             }
-            guard fulfilled else {
-                runLoop.run(until: Date(timeIntervalSinceNow: pollingInterval.timeInterval))
+            guard !fulfilled else {
+                break
             }
-
-            break
+            
+            runLoop.run(until: Date(timeIntervalSinceNow: pollingInterval.timeInterval))
 
         } while Date().compare(timeoutDate) == .orderedAscending
 
