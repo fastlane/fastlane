@@ -75,19 +75,20 @@ class Runner {
         let runLoop = RunLoop.current
         let timeoutDate = Date(timeInterval: TimeInterval(timeout), since: Date())
         var fulfilled: Bool = false
-        let _expression = memoizedClosure(expression)
+        let expression = memoizedClosure(expression)
         repeat {
             do {
-                let exp = try _expression(true)
+                let exp = try expression(true)
                 fulfilled = predicate(exp)
             } catch {
                 fatalError("Error raised \(error.localizedDescription)")
             }
-            if !fulfilled {
+            guard fulfilled else {
                 runLoop.run(until: Date(timeIntervalSinceNow: pollingInterval.timeInterval))
-            } else {
-                break
             }
+
+            break
+
         } while Date().compare(timeoutDate) == .orderedAscending
 
         if fulfilled {
