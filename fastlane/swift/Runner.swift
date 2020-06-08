@@ -33,7 +33,7 @@ class Runner {
     fileprivate var returnValue: String? // lol, so safe
     fileprivate var currentlyExecutingCommand: RubyCommandable? = nil
     fileprivate var shouldLeaveDispatchGroupDuringDisconnect = false
-    fileprivate var executeNext: Bool = false
+    fileprivate var executeNext = false
     
     func executeCommand(_ command: RubyCommandable) -> String {
         self.dispatchGroup.enter()
@@ -50,8 +50,8 @@ class Runner {
             fatalError()
         }
         
-        if let _returnValue = self.returnValue {
-            return _returnValue
+        if let returnValue = self.returnValue {
+            return returnValue
         } else {
             return ""
         }
