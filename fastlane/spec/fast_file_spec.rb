@@ -181,7 +181,7 @@ describe Fastlane do
         end
       end
 
-      it "raises an error if the name is on a black list" do
+      it "raises an error if the name is on a deny list" do
         expect(UI).to receive(:user_error!).with("Lane name 'run' is invalid")
         @ff.lane(:run) do
         end
