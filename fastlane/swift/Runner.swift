@@ -74,7 +74,7 @@ class Runner {
         
         let runLoop = RunLoop.current
         let timeoutDate = Date(timeInterval: TimeInterval(timeout), since: Date())
-        var fulfilled: Bool = false
+        var fulfilled = false
         let expression = memoizedClosure(expression)
         repeat {
             do {
