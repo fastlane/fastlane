@@ -4,7 +4,7 @@ version: "{build}"
 
 # branches to build
 branches:
-  # whitelist
+  # allowlist
   only:
     - master
 
