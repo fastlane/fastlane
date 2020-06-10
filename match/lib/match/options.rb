@@ -243,6 +243,11 @@ module Match
                                        pt = %w(tvos ios macos catalyst)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end),
+        FastlaneCore::ConfigItem.new(key: :derive_catalyst_app_identifier,
+                                     env_name: "MATCH_DERIVE_CATALYST_APP_IDENTIFIER",
+                                     description: "Enable this if you have the Mac Catalyst capability enabled. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :template_name,
                                      env_name: "MATCH_PROVISIONING_PROFILE_TEMPLATE_NAME",
                                      description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
