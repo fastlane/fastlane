@@ -81,10 +81,26 @@ struct RubyCommand: RubyCommandable {
     let commandID: String
     let methodName: String
     let className: String?
-    var token: NSObject?
     let args: [Argument]
     
-    private func callbackClosure(_ callbackArg: String) -> ((String) -> Void)? {
+    var closure: ((String) -> Void)? {
+        let callbacks = self.args.filter { ($0.type != nil) && $0.type == .stringClosure }
+        guard let callback = callbacks.first else {
+            return nil
+        }
+
+        guard let callbackArgValue = callback.value else {
+            return nil
+        }
+
+        guard let callbackClosure = callbackArgValue as? ((String) -> Void) else {
+            return nil
+        }
+        return callbackClosure
+    }
+    
+    
+    func callbackClosure(_ callbackArg: String) -> ((String) -> Void)? {
         // WARNING: This will perform the first callback it receives
         let callbacks = self.args.filter { ($0.type != nil) && $0.type == .stringClosure }
         guard let callback = callbacks.first else {
@@ -104,7 +120,7 @@ struct RubyCommand: RubyCommandable {
         return callbackClosure
     }
 
-    func performCallback(callbackArg: String, socket: SocketClient, completion: () -> Void) {
+    func performCallback(callbackArg: String, socket: SocketClient, completion: @escaping () -> Void) {
         print("Performing callback with: \(callbackArg)")
         socket.leave()
         self.callbackClosure(callbackArg)?(callbackArg)

@@ -33,7 +33,7 @@ class Runner {
     fileprivate var returnValue: String? // lol, so safe
     fileprivate var currentlyExecutingCommand: RubyCommandable? = nil
     fileprivate var shouldLeaveDispatchGroupDuringDisconnect = false
-    fileprivate var executeNext = false
+    fileprivate var executeNext: [String: Bool] = [:]
     
     func executeCommand(_ command: RubyCommandable) -> String {
         self.dispatchGroup.enter()
@@ -41,8 +41,8 @@ class Runner {
         self.socketClient.send(rubyCommand: command)
         
         let secondsToWait = DispatchTimeInterval.seconds(SocketClient.defaultCommandTimeoutSeconds)
-        let timeoutResult = waitWithPolling(self.executeNext, toEventually: { $0 == true }, timeout: SocketClient.defaultCommandTimeoutSeconds)
-        executeNext = false
+        let timeoutResult = waitWithPolling(self.executeNext[command.commandJson], toEventually: { $0 == true }, timeout: SocketClient.defaultCommandTimeoutSeconds)
+        executeNext[command.commandJson] = false
         let failureMessage = "command didn't execute in: \(SocketClient.defaultCommandTimeoutSeconds) seconds"
         let success = self.testDispatchTimeoutResult(timeoutResult, failureMessage: failureMessage, timeToWait: secondsToWait)
         guard success else {
@@ -50,8 +50,8 @@ class Runner {
             fatalError()
         }
         
-        if let returnValue = self.returnValue {
-            return returnValue
+        if let _returnValue = self.returnValue {
+            return _returnValue
         } else {
             return ""
         }
@@ -74,21 +74,20 @@ class Runner {
         
         let runLoop = RunLoop.current
         let timeoutDate = Date(timeInterval: TimeInterval(timeout), since: Date())
-        var fulfilled = false
-        let expression = memoizedClosure(expression)
+        var fulfilled: Bool = false
+        let _expression = memoizedClosure(expression)
         repeat {
             do {
-                let exp = try expression(true)
+                let exp = try _expression(true)
                 fulfilled = predicate(exp)
             } catch {
                 fatalError("Error raised \(error.localizedDescription)")
             }
-            guard !fulfilled else {
+            if !fulfilled {
+                runLoop.run(until: Date(timeIntervalSinceNow: pollingInterval.timeInterval))
+            } else {
                 break
             }
-            
-            runLoop.run(until: Date(timeIntervalSinceNow: pollingInterval.timeInterval))
-
         } while Date().compare(timeoutDate) == .orderedAscending
 
         if fulfilled {
@@ -125,6 +124,7 @@ extension Runner {
     func disconnectFromFastlaneProcess() {
         self.shouldLeaveDispatchGroupDuringDisconnect = true
         self.dispatchGroup.enter()
+        print("Enter \(#function) \(#line)")
         socketClient.sendComplete()
         
         let connectTimeout = DispatchTime.now() + 2
@@ -137,6 +137,7 @@ extension Runner {
         }
         
         socketClient.connectAndOpenStreams()
+        print("Leave \(#function) \(#line)")
         self.dispatchGroup.leave()
     }
     
@@ -152,29 +153,39 @@ extension Runner {
 }
 
 extension Runner : SocketClientDelegateProtocol {
-    func commandExecuted(serverResponse: SocketClientResponse, completion: ((SocketClient) -> Void)? = nil) {
+    func commandExecuted(serverResponse: SocketClientResponse, completion: (SocketClient) -> Void) {
         switch serverResponse {
         case .success(let returnedObject, let closureArgumentValue):
             verbose(message: "command executed")
             self.returnValue = returnedObject
             if let command = self.currentlyExecutingCommand as? RubyCommand {
-                if let closureArgumentValue = closureArgumentValue {
-                    command.performCallback(callbackArg: closureArgumentValue, socket: socketClient) { [unowned self] in
-                        self.executeNext = true
+                if let closureArgumentValue = closureArgumentValue, !closureArgumentValue.isEmpty {
+                    command.performCallback(callbackArg: closureArgumentValue, socket: socketClient) {
+                        print("Leave \(#function) \(#line)")
+                        self.executeNext[command.commandJson] = true
                     }
+                } else {
+                    self.executeNext[command.commandJson] = true
                 }
             }
             dispatchGroup.leave()
+            completion(socketClient)
         case .clientInitiatedCancelAcknowledged:
             verbose(message: "server acknowledged a cancel request")
+            print("Leave \(#function) \(#line)")
             self.dispatchGroup.leave()
-            self.executeNext = true
-            
+            if let command = self.currentlyExecutingCommand as? RubyCommand {
+                self.executeNext[command.commandJson] = true
+            }
+            completion(socketClient)
         case .alreadyClosedSockets, .connectionFailure, .malformedRequest, .malformedResponse, .serverError:
             log(message: "error encountered while executing command:\n\(serverResponse)")
+            print("Leave \(#function) \(#line)")
             self.dispatchGroup.leave()
-            self.executeNext = true
-            
+            if let command = self.currentlyExecutingCommand as? RubyCommand {
+                self.executeNext[command.commandJson] = true
+            }
+            completion(socketClient)
         case .commandTimeout(let timeout):
             log(message: "Runner timed out after \(timeout) second(s)")
         }
@@ -190,10 +201,10 @@ extension Runner : SocketClientDelegateProtocol {
         DispatchQueue.main.async {
             self.thread?.cancel()
             self.thread = nil
-            self.socketClient.closeSession()
             self.socketClient = nil
             verbose(message: "connection closed!")
             if self.shouldLeaveDispatchGroupDuringDisconnect {
+                print("Leave \(#function) \(#line)")
                 self.dispatchGroup.leave()
             }
             exit(0)

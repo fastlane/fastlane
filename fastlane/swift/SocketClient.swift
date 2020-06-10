@@ -89,11 +89,13 @@ class SocketClient: NSObject {
         }
         
         self.dispatchGroup.enter()
+        print("Enter \(#function) \(#line)")
         self.readQueue.sync {
             self.inputStream.open()
         }
         
         self.dispatchGroup.enter()
+        print("Enter \(#function) \(#line)")
         self.writeQueue.sync {
             self.outputStream.open()
         }
@@ -107,7 +109,7 @@ class SocketClient: NSObject {
         let success = testDispatchTimeoutResult(timeoutResult, failureMessage: failureMessage, timeToWait: secondsToWait)
         
         guard success else {
-            self.socketDelegate?.commandExecuted(serverResponse: .connectionFailure, completion: nil)
+            self.socketDelegate?.commandExecuted(serverResponse: .connectionFailure) { _ in }
             return
         }
         
@@ -132,7 +134,7 @@ class SocketClient: NSObject {
             log(message: "Timeout: \(failureMessage)")
             
             if case .seconds(let seconds) = timeToWait {
-                socketDelegate?.commandExecuted(serverResponse: .commandTimeout(seconds: seconds), completion: nil)
+                socketDelegate?.commandExecuted(serverResponse: .commandTimeout(seconds: seconds)) { _ in }
             }
             return false
         }
@@ -154,6 +156,9 @@ class SocketClient: NSObject {
     private func privateSend(string: String) {
         writeQueue.sync {
             writeSemaphore.wait()
+            print("ESTE")
+            print("Enter \(#function) \(#line)")
+            print(string)
             self.sendThroughQueue(string: string)
             writeSemaphore.signal()
             let timeoutSeconds = self.cleaningUpAfterDone ? 1 : self.commandTimeoutSeconds
@@ -194,6 +199,10 @@ class SocketClient: NSObject {
         self.socketDelegate?.connectionsClosed()
     }
     
+    public func enter() {
+        dispatchGroup.enter()
+    }
+    
     public func leave() {
         readSemaphore.signal()
         writeSemaphore.signal()
@@ -206,6 +215,7 @@ extension SocketClient: StreamDelegate {
             // Still getting response from server eventhough we are done.
             // No big deal, we're closing the streams anyway.
             // That being said, we need to balance out the dispatchGroups
+            print("Leave \(#function) \(#line)")
             self.dispatchGroup.leave()
             return
         }
@@ -213,6 +223,7 @@ extension SocketClient: StreamDelegate {
         if aStream === self.inputStream {
             switch eventCode {
             case Stream.Event.openCompleted:
+                print("Leave \(#function) \(#line)")
                 self.dispatchGroup.leave()
                 
             case Stream.Event.errorOccurred:
@@ -237,6 +248,7 @@ extension SocketClient: StreamDelegate {
         } else if aStream === self.outputStream {
             switch eventCode {
             case Stream.Event.openCompleted:
+                print("Leave \(#function) \(#line)")
                 self.dispatchGroup.leave()
                 
             case Stream.Event.errorOccurred:
@@ -266,7 +278,7 @@ extension SocketClient: StreamDelegate {
             while self.inputStream!.hasBytesAvailable {
                 let bytesRead: Int = inputStream!.read(&buffer, maxLength: buffer.count)
                 if bytesRead >= 0 {
-                    output += String(bytes: buffer[0..<bytesRead], encoding: .utf8)!
+                    output += NSString(bytes: UnsafePointer(buffer), length: bytesRead, encoding: String.Encoding.utf8.rawValue)! as String
                 } else {
                     verbose(message: "Stream read() error")
                 }
@@ -286,6 +298,7 @@ extension SocketClient: StreamDelegate {
         guard string.count > 0 else {
             self.socketDelegate?.commandExecuted(serverResponse: .malformedResponse) {
                 self.handleFailure(message: ["empty response from ruby process"])
+                print("Leave \(#function) \(#line)")
                 $0.writeSemaphore.signal()
             }
             return
@@ -298,6 +311,7 @@ extension SocketClient: StreamDelegate {
         case .clientInitiatedCancel:
             self.socketDelegate?.commandExecuted(serverResponse: .clientInitiatedCancelAcknowledged) {
                 self.closeSession(sendAbort: false)
+                print("Leave \(#function) \(#line)")
                 $0.writeSemaphore.signal()
             }
             
@@ -305,6 +319,7 @@ extension SocketClient: StreamDelegate {
         case .failure(let failureInformation):
             self.socketDelegate?.commandExecuted(serverResponse: .serverError) {
                 self.handleFailure(message: failureInformation)
+                print("Leave \(#function) \(#line)")
                 $0.writeSemaphore.signal()
             }
             
@@ -312,12 +327,14 @@ extension SocketClient: StreamDelegate {
         case .parseFailure(let failureInformation):
             self.socketDelegate?.commandExecuted(serverResponse: .malformedResponse) {
                 self.handleFailure(message: failureInformation)
+                print("Leave \(#function) \(#line)")
                 $0.writeSemaphore.signal()
             }
             
 
         case .readyForNext(let returnedObject, let closureArgumentValue):
             self.socketDelegate?.commandExecuted(serverResponse: .success(returnedObject: returnedObject, closureArgumentValue: closureArgumentValue)) {
+                print("Leave \(#function) \(#line)")
                 $0.writeSemaphore.signal()
             }
         }

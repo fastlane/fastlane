@@ -19,7 +19,6 @@ public protocol LaneFileProtocol: class {
     static func runLane(named: String, parameters: [String : String]) -> Bool
 
     func recordLaneDescriptions()
-    func beforeAll(currentLane: String, parameters: [String : String])
     func beforeAll()
     func afterAll(currentLane: String)
     func onError(currentLane: String, errorInfo: String)
@@ -27,7 +26,6 @@ public protocol LaneFileProtocol: class {
 
 public extension LaneFileProtocol {
     var fastlaneVersion: String { return "" } // default "" because that means any is fine
-    func beforeAll(currentLane: String, parameters: [String : String]) { } // no op by default
     func beforeAll() { } // no op by default
     func afterAll(currentLane: String) { } // no op by default
     func onError(currentLane: String, errorInfo: String) {} // no op by default
@@ -39,8 +37,7 @@ public class LaneFile: NSObject, LaneFileProtocol {
     private(set) static var fastfileInstance: Fastfile?
 
     // Called before any lane is executed.
-    private func setupAllTheThings(lane: String, parameters: [String : String]) {
-        LaneFile.fastfileInstance!.beforeAll(currentLane: lane, parameters: parameters)
+    private func setupAllTheThings() {
         LaneFile.fastfileInstance!.beforeAll()
     }
 
@@ -126,7 +123,7 @@ public class LaneFile: NSObject, LaneFileProtocol {
         }
 
         // call all methods that need to be called before we start calling lanes
-        fastfileInstance.setupAllTheThings(lane: named, parameters: parameters)
+        fastfileInstance.setupAllTheThings()
 
         // We need to catch all possible errors here and display a nice message
         _ = fastfileInstance.perform(NSSelectorFromString(laneMethod), with: parameters)

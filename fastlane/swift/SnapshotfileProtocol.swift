@@ -64,7 +64,7 @@ protocol SnapshotfileProtocol: class {
   var addVideos: [String]? { get }
 
   /// A path to screenshots.html template
-  var htmlTemplate: String { get }
+  var htmlTemplate: String? { get }
 
   /// The directory where to store the build log
   var buildlogPath: String { get }
@@ -149,7 +149,7 @@ extension SnapshotfileProtocol {
   var appIdentifier: String? { return nil }
   var addPhotos: [String]? { return nil }
   var addVideos: [String]? { return nil }
-  var htmlTemplate: String { return "/Users/josh/Projects/fastlane/fastlane/snapshot/lib/snapshot/page.html.erb" }
+  var htmlTemplate: String? { return nil }
   var buildlogPath: String { return "~/Library/Logs/snapshot" }
   var clean: Bool { return false }
   var testWithoutBuilding: Bool? { return nil }
@@ -174,4 +174,4 @@ extension SnapshotfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.10]
+// FastlaneRunnerAPIVersion [0.9.7]
