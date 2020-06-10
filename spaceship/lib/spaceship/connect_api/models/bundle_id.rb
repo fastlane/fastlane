@@ -1,4 +1,5 @@
 require_relative '../model'
+require_relative './bundle_id_capability'
 module Spaceship
   class ConnectAPI
     class BundleId
@@ -25,6 +26,16 @@ module Spaceship
       end
 
       #
+      # Helpers
+      #
+
+      def supports_catalyst?
+        return bundle_id_capabilities.any? do |capability|
+          capability.is_type?(Spaceship::ConnectAPI::BundleIdCapability::Type::MARZIPAN)
+        end
+      end
+
+      #
       # API
       #
 
@@ -33,8 +44,8 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def self.find(identifier, platform: nil)
-        return all(filter: { identifier: identifier, platform: platform }).find do |app|
+      def self.find(identifier, platform: nil, includes: nil)
+        return all(filter: { identifier: identifier, platform: platform }, includes: includes).find do |app|
           app.identifier == identifier
         end
       end

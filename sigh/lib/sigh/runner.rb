@@ -214,10 +214,10 @@ module Sigh
     def certificates_for_profile_and_platform
       case Sigh.config[:platform].to_s
       when 'ios', 'tvos'
-        if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT 
+        if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT
           certificates = Spaceship.certificate.development.all +
                          Spaceship.certificate.apple_development.all
-        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE 
+        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
           # Enterprise accounts don't have access to Apple Distribution certificates
           certificates = Spaceship.certificate.in_house.all
         # handles case where the desired certificate type is adhoc but the account is an enterprise account
@@ -233,7 +233,7 @@ module Sigh
         end
 
       when 'macos', 'catalyst'
-        if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT 
+        if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
           certificates = Spaceship.certificate.mac_development.all +
                          Spaceship.certificate.apple_development.all
         elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
