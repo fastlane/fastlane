@@ -18,6 +18,16 @@ describe Fastlane do
 
         expect(result).to eq("git fetch --tags")
       end
+
+      it "uses git pull --rebase if rebase" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            git_pull(
+              rebase: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("git pull --rebase && git fetch --tags")
+      end
     end
   end
 end
