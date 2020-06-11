@@ -82,6 +82,7 @@ struct RubyCommand: RubyCommandable {
     let methodName: String
     let className: String?
     let args: [Argument]
+    let id: String = UUID().uuidString
     
     var closure: ((String) -> Void)? {
         let callbacks = self.args.filter { ($0.type != nil) && $0.type == .stringClosure }

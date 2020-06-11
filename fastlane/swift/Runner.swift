@@ -41,8 +41,8 @@ class Runner {
         self.socketClient.send(rubyCommand: command)
         
         let secondsToWait = DispatchTimeInterval.seconds(SocketClient.defaultCommandTimeoutSeconds)
-        let timeoutResult = waitWithPolling(self.executeNext[command.commandJson], toEventually: { $0 == true }, timeout: SocketClient.defaultCommandTimeoutSeconds)
-        executeNext[command.commandJson] = false
+        let timeoutResult = waitWithPolling(self.executeNext[command.id], toEventually: { $0 == true }, timeout: SocketClient.defaultCommandTimeoutSeconds)
+        executeNext.removeValue(forKey: command.id)
         let failureMessage = "command didn't execute in: \(SocketClient.defaultCommandTimeoutSeconds) seconds"
         let success = self.testDispatchTimeoutResult(timeoutResult, failureMessage: failureMessage, timeToWait: secondsToWait)
         guard success else {
@@ -162,10 +162,10 @@ extension Runner : SocketClientDelegateProtocol {
                 if let closureArgumentValue = closureArgumentValue, !closureArgumentValue.isEmpty {
                     command.performCallback(callbackArg: closureArgumentValue, socket: socketClient) {
                         print("Leave \(#function) \(#line)")
-                        self.executeNext[command.commandJson] = true
+                        self.executeNext[command.id] = true
                     }
                 } else {
-                    self.executeNext[command.commandJson] = true
+                    self.executeNext[command.id] = true
                 }
             }
             dispatchGroup.leave()
@@ -175,7 +175,7 @@ extension Runner : SocketClientDelegateProtocol {
             print("Leave \(#function) \(#line)")
             self.dispatchGroup.leave()
             if let command = self.currentlyExecutingCommand as? RubyCommand {
-                self.executeNext[command.commandJson] = true
+                self.executeNext[command.id] = true
             }
             completion(socketClient)
         case .alreadyClosedSockets, .connectionFailure, .malformedRequest, .malformedResponse, .serverError:
@@ -183,7 +183,7 @@ extension Runner : SocketClientDelegateProtocol {
             print("Leave \(#function) \(#line)")
             self.dispatchGroup.leave()
             if let command = self.currentlyExecutingCommand as? RubyCommand {
-                self.executeNext[command.commandJson] = true
+                self.executeNext[command.id] = true
             }
             completion(socketClient)
         case .commandTimeout(let timeout):
