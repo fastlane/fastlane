@@ -2039,7 +2039,7 @@ func cocoapods(repoUpdate: Bool = false,
                ansi: Bool = true,
                useBundleExec: Bool = true,
                podfile: String? = nil,
-               errorCallback: @escaping (String) -> Void = {_ in },
+               errorCallback: ((String) -> Void)? = nil,
                tryRepoUpdateOnError: Bool = false,
                deployment: Bool = false,
                clean: Bool = true,
@@ -3054,7 +3054,7 @@ func frameScreenshots(white: Bool? = nil,
                       useLegacyIphonexr: Bool = false,
                       useLegacyIphonexs: Bool = false,
                       useLegacyIphonexsmax: Bool = false,
-                      forceOrientationBlock: @escaping (String) -> Void = {_ in },
+                      forceOrientationBlock: ((String) -> Void)? = nil,
                       debugMode: Bool = false,
                       resume: Bool = false,
                       usePlatform: String = "IOS",
@@ -3116,7 +3116,7 @@ func frameit(white: Bool? = nil,
              useLegacyIphonexr: Bool = false,
              useLegacyIphonexs: Bool = false,
              useLegacyIphonexsmax: Bool = false,
-             forceOrientationBlock: @escaping (String) -> Void = {_ in },
+             forceOrientationBlock: ((String) -> Void)? = nil,
              debugMode: Bool = false,
              resume: Bool = false,
              usePlatform: String = "IOS",
@@ -6556,7 +6556,7 @@ func setupTravis(force: Bool = false) {
 */
 @discardableResult func sh(command: String,
                            log: Bool = true,
-                           errorCallback: @escaping (String) -> Void = {_ in }) -> String {
+                           errorCallback: ((String) -> Void)? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "sh", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
                                                                                     RubyCommand.Argument(name: "log", value: log),
                                                                                     RubyCommand.Argument(name: "error_callback", value: errorCallback, type: .stringClosure)])
@@ -8960,4 +8960,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.67]
+// FastlaneRunnerAPIVersion [0.9.70]
