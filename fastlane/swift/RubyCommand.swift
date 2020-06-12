@@ -122,7 +122,7 @@ struct RubyCommand: RubyCommandable {
     }
 
     func performCallback(callbackArg: String, socket: SocketClient, completion: @escaping () -> Void) {
-        print("Performing callback with: \(callbackArg)")
+        verbose(message: "Performing callback with: \(callbackArg)")
         socket.leave()
         self.callbackClosure(callbackArg)?(callbackArg)
         completion()

@@ -124,7 +124,6 @@ extension Runner {
     func disconnectFromFastlaneProcess() {
         self.shouldLeaveDispatchGroupDuringDisconnect = true
         self.dispatchGroup.enter()
-        print("Enter \(#function) \(#line)")
         socketClient.sendComplete()
         
         let connectTimeout = DispatchTime.now() + 2
@@ -137,7 +136,6 @@ extension Runner {
         }
         
         socketClient.connectAndOpenStreams()
-        print("Leave \(#function) \(#line)")
         self.dispatchGroup.leave()
     }
     
@@ -161,7 +159,6 @@ extension Runner : SocketClientDelegateProtocol {
             if let command = self.currentlyExecutingCommand as? RubyCommand {
                 if let closureArgumentValue = closureArgumentValue, !closureArgumentValue.isEmpty {
                     command.performCallback(callbackArg: closureArgumentValue, socket: socketClient) {
-                        print("Leave \(#function) \(#line)")
                         self.executeNext[command.id] = true
                     }
                 } else {
@@ -172,7 +169,6 @@ extension Runner : SocketClientDelegateProtocol {
             completion(socketClient)
         case .clientInitiatedCancelAcknowledged:
             verbose(message: "server acknowledged a cancel request")
-            print("Leave \(#function) \(#line)")
             self.dispatchGroup.leave()
             if let command = self.currentlyExecutingCommand as? RubyCommand {
                 self.executeNext[command.id] = true
@@ -180,7 +176,6 @@ extension Runner : SocketClientDelegateProtocol {
             completion(socketClient)
         case .alreadyClosedSockets, .connectionFailure, .malformedRequest, .malformedResponse, .serverError:
             log(message: "error encountered while executing command:\n\(serverResponse)")
-            print("Leave \(#function) \(#line)")
             self.dispatchGroup.leave()
             if let command = self.currentlyExecutingCommand as? RubyCommand {
                 self.executeNext[command.id] = true
@@ -201,10 +196,10 @@ extension Runner : SocketClientDelegateProtocol {
         DispatchQueue.main.async {
             self.thread?.cancel()
             self.thread = nil
+            self.socketClient.closeSession()
             self.socketClient = nil
             verbose(message: "connection closed!")
             if self.shouldLeaveDispatchGroupDuringDisconnect {
-                print("Leave \(#function) \(#line)")
                 self.dispatchGroup.leave()
             }
             exit(0)
