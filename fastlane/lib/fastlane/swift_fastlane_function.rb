@@ -99,7 +99,7 @@ module Fastlane
         return "Float"
       elsif type_override == :string_callback
         # David Hart:
-        # It doesn't make sense to add escaping annotations to optional closures because they aren’t function types:
+        # It doesn't make sense to add escaping annotations to optional closures because they aren't function types:
         # they are basically an enum (Optional) containing a function, the same way you would store a closure in any type:
         # it's implicitly escaping because it's owned by another type.
         return "((String) -> Void)?"
