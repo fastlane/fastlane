@@ -28,7 +28,7 @@ struct SocketResponse {
             }
             
             if status == "ready_for_next" {
-                print("ready for next")
+                verbose(message: "ready for next")
                 let returnedObject = statusDictionary["return_object"] as? String
                 let closureArgumentValue = statusDictionary["closure_argument_value"] as? String
                 self = .readyForNext(returnedObject: returnedObject, closureArgumentValue: closureArgumentValue)
