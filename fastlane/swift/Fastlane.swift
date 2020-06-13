@@ -1491,7 +1491,7 @@ func captureIosScreenshots(workspace: String? = nil,
                            appIdentifier: String? = nil,
                            addPhotos: [String]? = nil,
                            addVideos: [String]? = nil,
-                           htmlTemplate: String = "/Users/josh/Projects/fastlane/fastlane/snapshot/lib/snapshot/page.html.erb",
+                           htmlTemplate: String? = nil,
                            buildlogPath: String = "~/Library/Logs/snapshot",
                            clean: Bool = false,
                            testWithoutBuilding: Bool? = nil,
@@ -1625,7 +1625,7 @@ func captureScreenshots(workspace: String? = nil,
                         appIdentifier: String? = nil,
                         addPhotos: [String]? = nil,
                         addVideos: [String]? = nil,
-                        htmlTemplate: String = "/Users/josh/Projects/fastlane/fastlane/snapshot/lib/snapshot/page.html.erb",
+                        htmlTemplate: String? = nil,
                         buildlogPath: String = "~/Library/Logs/snapshot",
                         clean: Bool = false,
                         testWithoutBuilding: Bool? = nil,
@@ -2039,7 +2039,7 @@ func cocoapods(repoUpdate: Bool = false,
                ansi: Bool = true,
                useBundleExec: Bool = true,
                podfile: String? = nil,
-               errorCallback: Any? = nil,
+               errorCallback: ((String) -> Void)? = nil,
                tryRepoUpdateOnError: Bool = false,
                deployment: Bool = false,
                clean: Bool = true,
@@ -2051,7 +2051,7 @@ func cocoapods(repoUpdate: Bool = false,
                                                                                            RubyCommand.Argument(name: "ansi", value: ansi),
                                                                                            RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec),
                                                                                            RubyCommand.Argument(name: "podfile", value: podfile),
-                                                                                           RubyCommand.Argument(name: "error_callback", value: errorCallback),
+                                                                                           RubyCommand.Argument(name: "error_callback", value: errorCallback, type: .stringClosure),
                                                                                            RubyCommand.Argument(name: "try_repo_update_on_error", value: tryRepoUpdateOnError),
                                                                                            RubyCommand.Argument(name: "deployment", value: deployment),
                                                                                            RubyCommand.Argument(name: "clean", value: clean),
@@ -3054,7 +3054,7 @@ func frameScreenshots(white: Bool? = nil,
                       useLegacyIphonexr: Bool = false,
                       useLegacyIphonexs: Bool = false,
                       useLegacyIphonexsmax: Bool = false,
-                      forceOrientationBlock: String? = nil,
+                      forceOrientationBlock: ((String) -> Void)? = nil,
                       debugMode: Bool = false,
                       resume: Bool = false,
                       usePlatform: String = "IOS",
@@ -3071,7 +3071,7 @@ func frameScreenshots(white: Bool? = nil,
                                                                                                    RubyCommand.Argument(name: "use_legacy_iphonexr", value: useLegacyIphonexr),
                                                                                                    RubyCommand.Argument(name: "use_legacy_iphonexs", value: useLegacyIphonexs),
                                                                                                    RubyCommand.Argument(name: "use_legacy_iphonexsmax", value: useLegacyIphonexsmax),
-                                                                                                   RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock),
+                                                                                                   RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock, type: .stringClosure),
                                                                                                    RubyCommand.Argument(name: "debug_mode", value: debugMode),
                                                                                                    RubyCommand.Argument(name: "resume", value: resume),
                                                                                                    RubyCommand.Argument(name: "use_platform", value: usePlatform),
@@ -3116,7 +3116,7 @@ func frameit(white: Bool? = nil,
              useLegacyIphonexr: Bool = false,
              useLegacyIphonexs: Bool = false,
              useLegacyIphonexsmax: Bool = false,
-             forceOrientationBlock: String? = nil,
+             forceOrientationBlock: ((String) -> Void)? = nil,
              debugMode: Bool = false,
              resume: Bool = false,
              usePlatform: String = "IOS",
@@ -3133,7 +3133,7 @@ func frameit(white: Bool? = nil,
                                                                                          RubyCommand.Argument(name: "use_legacy_iphonexr", value: useLegacyIphonexr),
                                                                                          RubyCommand.Argument(name: "use_legacy_iphonexs", value: useLegacyIphonexs),
                                                                                          RubyCommand.Argument(name: "use_legacy_iphonexsmax", value: useLegacyIphonexsmax),
-                                                                                         RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock),
+                                                                                         RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock, type: .stringClosure),
                                                                                          RubyCommand.Argument(name: "debug_mode", value: debugMode),
                                                                                          RubyCommand.Argument(name: "resume", value: resume),
                                                                                          RubyCommand.Argument(name: "use_platform", value: usePlatform),
@@ -3636,6 +3636,42 @@ func githubApi(serverUrl: String = "https://api.github.com",
                                                                                             RubyCommand.Argument(name: "error_handlers", value: errorHandlers),
                                                                                             RubyCommand.Argument(name: "headers", value: headers),
                                                                                             RubyCommand.Argument(name: "secure", value: secure)])
+  _ = runner.executeCommand(command)
+}
+
+/**
+ Retrieves release names for a Google Play track
+
+ - parameters:
+   - packageName: The package name of the application to use
+   - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal
+   - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
+   - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
+   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
+   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
+   - timeout: Timeout for read, open, and send (in seconds)
+
+ - returns: Array of strings representing the release names for the given Google Play track
+
+ More information: [https://docs.fastlane.tools/actions/supply/](https://docs.fastlane.tools/actions/supply/)
+*/
+func googlePlayTrackReleaseNames(packageName: String,
+                                 track: String = "production",
+                                 key: String? = nil,
+                                 issuer: String? = nil,
+                                 jsonKey: String? = nil,
+                                 jsonKeyData: String? = nil,
+                                 rootUrl: String? = nil,
+                                 timeout: Int = 300) {
+  let command = RubyCommand(commandID: "", methodName: "google_play_track_release_names", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
+                                                                                                                 RubyCommand.Argument(name: "track", value: track),
+                                                                                                                 RubyCommand.Argument(name: "key", value: key),
+                                                                                                                 RubyCommand.Argument(name: "issuer", value: issuer),
+                                                                                                                 RubyCommand.Argument(name: "json_key", value: jsonKey),
+                                                                                                                 RubyCommand.Argument(name: "json_key_data", value: jsonKeyData),
+                                                                                                                 RubyCommand.Argument(name: "root_url", value: rootUrl),
+                                                                                                                 RubyCommand.Argument(name: "timeout", value: timeout)])
   _ = runner.executeCommand(command)
 }
 
@@ -6520,10 +6556,10 @@ func setupTravis(force: Bool = false) {
 */
 @discardableResult func sh(command: String,
                            log: Bool = true,
-                           errorCallback: Any? = nil) -> String {
+                           errorCallback: ((String) -> Void)? = nil) -> String {
   let command = RubyCommand(commandID: "", methodName: "sh", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
                                                                                     RubyCommand.Argument(name: "log", value: log),
-                                                                                    RubyCommand.Argument(name: "error_callback", value: errorCallback)])
+                                                                                    RubyCommand.Argument(name: "error_callback", value: errorCallback, type: .stringClosure)])
   return runner.executeCommand(command)
 }
 
@@ -6868,7 +6904,7 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
               appIdentifier: Any? = snapshotfile.appIdentifier,
               addPhotos: [String]? = snapshotfile.addPhotos,
               addVideos: [String]? = snapshotfile.addVideos,
-              htmlTemplate: Any = snapshotfile.htmlTemplate,
+              htmlTemplate: Any? = snapshotfile.htmlTemplate,
               buildlogPath: Any = snapshotfile.buildlogPath,
               clean: Bool = snapshotfile.clean,
               testWithoutBuilding: Bool? = snapshotfile.testWithoutBuilding,
@@ -8924,4 +8960,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.77]
+// FastlaneRunnerAPIVersion [0.9.71]
