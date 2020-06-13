@@ -82,27 +82,50 @@ struct RubyCommand: RubyCommandable {
     let methodName: String
     let className: String?
     let args: [Argument]
+    let id: String = UUID().uuidString
+    
+    var closure: ((String) -> Void)? {
+        let callbacks = self.args.filter { ($0.type != nil) && $0.type == .stringClosure }
+        guard let callback = callbacks.first else {
+            return nil
+        }
 
-    func performCallback(callbackArg: String) {
+        guard let callbackArgValue = callback.value else {
+            return nil
+        }
+
+        guard let callbackClosure = callbackArgValue as? ((String) -> Void) else {
+            return nil
+        }
+        return callbackClosure
+    }
+    
+    
+    func callbackClosure(_ callbackArg: String) -> ((String) -> Void)? {
         // WARNING: This will perform the first callback it receives
         let callbacks = self.args.filter { ($0.type != nil) && $0.type == .stringClosure }
         guard let callback = callbacks.first else {
             verbose(message: "received call to performCallback with \(callbackArg), but no callback available to perform")
-            return
+            return nil
         }
 
         guard let callbackArgValue = callback.value else {
             verbose(message: "received call to performCallback with \(callbackArg), but callback is nil")
-            return
+            return nil
         }
 
         guard let callbackClosure = callbackArgValue as? ((String) -> Void) else {
             verbose(message: "received call to performCallback with \(callbackArg), but callback type is unknown \(callbackArgValue.self)")
-            return
+            return nil
         }
+        return callbackClosure
+    }
 
-        print("Performing callback with: \(callbackArg)")
-        callbackClosure(callbackArg)
+    func performCallback(callbackArg: String, socket: SocketClient, completion: @escaping () -> Void) {
+        verbose(message: "Performing callback with: \(callbackArg)")
+        socket.leave()
+        self.callbackClosure(callbackArg)?(callbackArg)
+        completion()
     }
 
     var commandJson: String {

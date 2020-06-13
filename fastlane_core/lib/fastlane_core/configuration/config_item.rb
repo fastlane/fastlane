@@ -264,9 +264,7 @@ module FastlaneCore
 
     # Determines the defined data type of this ConfigItem
     def data_type
-      if @data_type.kind_of?(Symbol)
-        nil
-      elsif @data_type
+      if @data_type
         @data_type
       else
         (@is_string ? String : nil)

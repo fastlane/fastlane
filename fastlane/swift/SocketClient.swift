@@ -13,6 +13,7 @@
 //
 
 import Foundation
+import Dispatch
 
 public enum SocketClientResponse: Error {
     case alreadyClosedSockets
@@ -41,8 +42,12 @@ class SocketClient: NSObject {
     fileprivate var outputStream: OutputStream!
     fileprivate var cleaningUpAfterDone = false
     fileprivate let dispatchGroup: DispatchGroup = DispatchGroup()
+    fileprivate let readSemaphore = DispatchSemaphore(value: 1)
+    fileprivate let writeSemaphore = DispatchSemaphore(value: 1)
     fileprivate let commandTimeoutSeconds: Int
     
+    private let writeQueue: DispatchQueue
+    private let readQueue: DispatchQueue
     private let streamQueue: DispatchQueue
     private let host: String
     private let port: UInt32
@@ -58,7 +63,9 @@ class SocketClient: NSObject {
         self.host = host
         self.port = port
         self.commandTimeoutSeconds = commandTimeoutSeconds
-        self.streamQueue = DispatchQueue(label: "streamQueue")
+        self.readQueue = DispatchQueue(label: "readQueue", qos: .background, attributes: .concurrent)
+        self.writeQueue = DispatchQueue(label: "writeQueue", qos: .background, attributes: .concurrent)
+        self.streamQueue = DispatchQueue.global(qos: .background)
         self.socketStatus = .closed
         self.socketDelegate = socketDelegate
         super.init()
@@ -68,7 +75,7 @@ class SocketClient: NSObject {
         var readStream: Unmanaged<CFReadStream>?
         var writeStream: Unmanaged<CFWriteStream>?
         
-        self.streamQueue.async {
+        self.streamQueue.sync {
             CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault, self.host as CFString, self.port, &readStream, &writeStream)
             
             self.inputStream = readStream!.takeRetainedValue()
@@ -82,12 +89,12 @@ class SocketClient: NSObject {
         }
         
         self.dispatchGroup.enter()
-        self.streamQueue.async {
+        self.readQueue.sync {
             self.inputStream.open()
         }
         
         self.dispatchGroup.enter()
-        self.streamQueue.async {
+        self.writeQueue.sync {
             self.outputStream.open()
         }
         
@@ -100,7 +107,7 @@ class SocketClient: NSObject {
         let success = testDispatchTimeoutResult(timeoutResult, failureMessage: failureMessage, timeToWait: secondsToWait)
         
         guard success else {
-            self.socketDelegate?.commandExecuted(serverResponse: .connectionFailure)
+            self.socketDelegate?.commandExecuted(serverResponse: .connectionFailure) { _ in }
             return
         }
         
@@ -125,7 +132,7 @@ class SocketClient: NSObject {
             log(message: "Timeout: \(failureMessage)")
             
             if case .seconds(let seconds) = timeToWait {
-                socketDelegate?.commandExecuted(serverResponse: .commandTimeout(seconds: seconds))
+                socketDelegate?.commandExecuted(serverResponse: .commandTimeout(seconds: seconds)) { _ in }
             }
             return false
         }
@@ -140,29 +147,30 @@ class SocketClient: NSObject {
     }
 
     private func sendThroughQueue(string: String) {
-        streamQueue.async {
-            let data = string.data(using: .utf8)!
-            _ = data.withUnsafeBytes { self.outputStream.write($0, maxLength: data.count) }
-        }
+        let data = string.data(using: .utf8)!
+        _ = data.withUnsafeBytes { self.outputStream.write($0, maxLength: data.count) }
     }
 
     private func privateSend(string: String) {
-        self.dispatchGroup.enter()
-        sendThroughQueue(string: string)
-
-        let timeoutSeconds = self.cleaningUpAfterDone ? 1 : self.commandTimeoutSeconds
-        let timeToWait = DispatchTimeInterval.seconds(timeoutSeconds)
-        let commandTimeout = DispatchTime.now() + timeToWait
-        let timeoutResult =  self.dispatchGroup.wait(timeout: commandTimeout)
-
-        _ = testDispatchTimeoutResult(timeoutResult, failureMessage: "Ruby process didn't return after: \(SocketClient.connectTimeoutSeconds) seconds", timeToWait: timeToWait)
+        writeQueue.sync {
+            writeSemaphore.wait()
+            self.sendThroughQueue(string: string)
+            writeSemaphore.signal()
+            let timeoutSeconds = self.cleaningUpAfterDone ? 1 : self.commandTimeoutSeconds
+            let timeToWait = DispatchTimeInterval.seconds(timeoutSeconds)
+            let commandTimeout = DispatchTime.now() + timeToWait
+            let timeoutResult = writeSemaphore.wait(timeout: commandTimeout)
+            
+            _ = self.testDispatchTimeoutResult(timeoutResult, failureMessage: "Ruby process didn't return after: \(SocketClient.connectTimeoutSeconds) seconds", timeToWait: timeToWait)
+            
+        }
     }
 
     private func send(string: String) {
         guard !self.cleaningUpAfterDone else {
             // This will happen after we abort if there are commands waiting to be executed
             // Need to check state of SocketClient in command runner to make sure we can accept `send`
-            socketDelegate?.commandExecuted(serverResponse: .alreadyClosedSockets)
+            socketDelegate?.commandExecuted(serverResponse: .alreadyClosedSockets) { _ in }
             return
         }
 
@@ -184,6 +192,15 @@ class SocketClient: NSObject {
 
         stopOutputSession()
         self.socketDelegate?.connectionsClosed()
+    }
+    
+    public func enter() {
+        dispatchGroup.enter()
+    }
+    
+    public func leave() {
+        readSemaphore.signal()
+        writeSemaphore.signal()
     }
 }
 
@@ -246,18 +263,24 @@ extension SocketClient: StreamDelegate {
     }
     
     func read() {
-        var buffer = [UInt8](repeating: 0, count: maxReadLength)
-        var output = ""
-        while self.inputStream!.hasBytesAvailable {
-            let bytesRead: Int = inputStream!.read(&buffer, maxLength: buffer.count)
-            if bytesRead >= 0 {
-                output += NSString(bytes: UnsafePointer(buffer), length: bytesRead, encoding: String.Encoding.utf8.rawValue)! as String
-            } else {
-                verbose(message: "Stream read() error")
+        readQueue.sync {
+            self.readSemaphore.wait()
+            var buffer = [UInt8](repeating: 0, count: maxReadLength)
+            var output = ""
+            while self.inputStream!.hasBytesAvailable {
+                let bytesRead: Int = inputStream!.read(&buffer, maxLength: buffer.count)
+                if bytesRead >= 0 {
+                    guard let read = String(bytes: buffer[..<bytesRead], encoding: .utf8) else {
+                        fatalError("Unable to decode bytes from buffer \(buffer[..<bytesRead])")
+                    }
+                    output.append(contentsOf: read)
+                } else {
+                    verbose(message: "Stream read() error")
+                }
             }
+            self.processResponse(string: output, socket: self)
+            readSemaphore.signal()
         }
-
-        processResponse(string: output)
     }
     
     func handleFailure(message: [String]) {
@@ -266,11 +289,12 @@ extension SocketClient: StreamDelegate {
         self.send(rubyCommand: shutdownCommand)
     }
     
-    func processResponse(string: String) {
+    func processResponse(string: String, socket: SocketClient) {
         guard string.count > 0 else {
-            self.socketDelegate?.commandExecuted(serverResponse: .malformedResponse)
-            self.handleFailure(message: ["empty response from ruby process"])
-
+            self.socketDelegate?.commandExecuted(serverResponse: .malformedResponse) {
+                self.handleFailure(message: ["empty response from ruby process"])
+                $0.writeSemaphore.signal()
+            }
             return
         }
         
@@ -279,24 +303,31 @@ extension SocketClient: StreamDelegate {
         verbose(message: "response is: \(responseString)")
         switch socketResponse.responseType {
         case .clientInitiatedCancel:
-            self.socketDelegate?.commandExecuted(serverResponse: .clientInitiatedCancelAcknowledged)
-            self.closeSession(sendAbort: false)
+            self.socketDelegate?.commandExecuted(serverResponse: .clientInitiatedCancelAcknowledged) {
+                self.closeSession(sendAbort: false)
+                $0.writeSemaphore.signal()
+            }
+            
 
         case .failure(let failureInformation):
-            self.socketDelegate?.commandExecuted(serverResponse: .serverError)
-            self.handleFailure(message: failureInformation)
+            self.socketDelegate?.commandExecuted(serverResponse: .serverError) {
+                self.handleFailure(message: failureInformation)
+                $0.writeSemaphore.signal()
+            }
+            
 
         case .parseFailure(let failureInformation):
-            self.socketDelegate?.commandExecuted(serverResponse: .malformedResponse)
-            self.handleFailure(message: failureInformation)
+            self.socketDelegate?.commandExecuted(serverResponse: .malformedResponse) {
+                self.handleFailure(message: failureInformation)
+                $0.writeSemaphore.signal()
+            }
+            
 
         case .readyForNext(let returnedObject, let closureArgumentValue):
-            self.socketDelegate?.commandExecuted(serverResponse: .success(returnedObject: returnedObject, closureArgumentValue: closureArgumentValue))
-            // cool, ready for next command
-            break
+            self.socketDelegate?.commandExecuted(serverResponse: .success(returnedObject: returnedObject, closureArgumentValue: closureArgumentValue)) {
+                $0.writeSemaphore.signal()
+            }
         }
-
-        self.dispatchGroup.leave() // should now pull the next piece of work
     }
 }
 

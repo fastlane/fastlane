@@ -49,6 +49,7 @@ struct ControlCommand: RubyCommandable {
     }
 
     let message: String?
+    let id: String = UUID().uuidString
     let shutdownCommandType: ShutdownCommandType
     var commandJson: String {
         var jsonDictionary: [String: Any] = [ControlCommand.commandKey : self.shutdownCommandType.token]
