@@ -89,6 +89,20 @@ module Spaceship
         app_crashes_interval(start_t, end_t)
       end
 
+      # Usage / Uninstalls
+      def app_uninstalls
+        start_t, end_t = time_last_7_days
+
+        app_uninstalls_interval(start_t, end_t)
+      end
+
+      # About App Analytics Data / Opt-in Rate
+      def app_optin_rates
+        start_t, end_t = time_last_7_days
+
+        app_optin_rates_interval(start_t, end_t)
+      end
+
       def app_measure_interval(start_t, end_t, measure, view_by = nil)
         client.time_series_analytics([apple_id], [measure], start_t, end_t, "DAY", view_by)
       end
@@ -135,6 +149,14 @@ module Spaceship
 
       def app_crashes_interval(start_t, end_t, view_by = nil)
         client.time_series_analytics([apple_id], ['crashes'], start_t, end_t, "DAY", view_by)
+      end
+
+      def app_uninstalls_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['uninstalls'], start_t, end_t, "DAY", view_by)
+      end
+
+      def app_optin_rates_interval(start_t, end_t, view_by = nil)
+        client.time_series_analytics([apple_id], ['optin'], start_t, end_t, "DAY", view_by)
       end
 
       def time_last_7_days

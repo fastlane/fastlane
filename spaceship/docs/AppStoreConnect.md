@@ -358,7 +358,7 @@ impressions = analytics.app_impressions  # => Array of dates representing raw da
 sales = analytics.app_sales              # => Array of dates representing raw data for each day
 
 # Get paying users
-users = analytics.paying_users           # => Array of dates representing raw data for each day
+users = analytics.app_paying_users       # => Array of dates representing raw data for each day
 
 # Get in app purchases
 iap = analytics.app_in_app_purchases     # => Array of dates representing raw data for each day
@@ -374,6 +374,12 @@ devices = analytics.app_active_devices   # => Array of dates representing raw da
 
 # Get crashes
 crashes = analytics.app_crashes          # => Array of dates representing raw data for each day
+
+# Get app uninstalls
+crashes = analytics.app_uninstalls       # => Array of dates representing raw data for each day
+
+# Get Rolling 30 day opt-in rate history for app
+crashes = analytics.app_optin_rates      # => Array of dates representing raw data for each day
 ```
 
 ## License
