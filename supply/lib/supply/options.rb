@@ -309,7 +309,14 @@ module Supply
                                      env_name: "SUPPLY_OBB_PATCH_FILE SIZE",
                                      description: "Size of 'patch' expansion file in bytes",
                                      optional: true,
-                                     type: Numeric)
+                                     type: Numeric),
+        FastlaneCore::ConfigItem.new(key: :ack_bundle_installation_warning,
+                                     env_name: "ACK_BUNDLE_INSTALLATION_WARNING",
+                                     description: "Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 100mb",
+                                     optional: true,
+                                     type: Boolean,
+                                     default_value: false)
+
       ]
     end
     # rubocop:enable Metrics/PerceivedComplexity
