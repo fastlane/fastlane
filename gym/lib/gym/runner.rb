@@ -34,13 +34,17 @@ module Gym
 
         package_app
         compress_and_move_dsym
-        path = move_ipa
-        move_manifest
-        move_app_thinning
-        move_app_thinning_size_report
-        move_apps_folder
-        move_asset_packs
-        move_appstore_info
+
+        result = CFPropertyList.native_types(CFPropertyList::List.new(file: Gym.cache[:config_path]).value)
+        unless result["destination"] == "upload"
+          path = move_ipa
+          move_manifest
+          move_app_thinning
+          move_app_thinning_size_report
+          move_apps_folder
+          move_asset_packs
+          move_appstore_info
+        end
       elsif is_mac
         path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
