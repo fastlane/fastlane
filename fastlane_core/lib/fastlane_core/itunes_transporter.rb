@@ -239,25 +239,59 @@ module FastlaneCore
   # escaping problems in its accompanying shell script.
   class JavaTransporterExecutor < TransporterExecutor
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "")
-      [
-        Helper.transporter_java_executable_path.shellescape,
-        "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
-        '-XX:NewSize=2m',
-        '-Xms32m',
-        '-Xmx1024m',
-        '-Xms1024m',
-        '-Djava.awt.headless=true',
-        '-Dsun.net.http.retryPost=false',
-        java_code_option,
-        '-m upload',
-        "-u #{username.shellescape}",
-        "-p #{password.shellescape}",
-        "-f #{source.shellescape}",
-        additional_upload_parameters, # that's here, because the user might overwrite the -t option
-        '-k 100000',
-        ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
-        '2>&1' # cause stderr to be written to stdout
-      ].compact.join(' ') # compact gets rid of the possibly nil ENV value
+      if Helper.mac
+        [
+          Helper.transporter_java_executable_path.shellescape,
+          '-DWORootDirectory=',
+          '-DWOLocalRootDirectory=',
+          '-DWOUserDirectory=/',
+          '-DWOEnvClassPath=',
+          '-DWOApplicationClass=',
+          '-DWOPlatform=MacOS',
+          '-Dtransporter.client=Xcode',
+          '-Dtransporter.client.version=11.5.0\(11E608c\)',
+          '-p',
+          '/usr/local/itms/modules',
+          '--add-modules=java.activation,java.net.http,java.sql,java.xml,java.xml.bind',
+          '--add-exports=java.base/sun.security.provider.certpath=ALL-UNNAMED',
+          '--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED',
+          '-XX:NewSize=2m',
+          '-Xms32m',
+          '-Xmx1024m',
+          '-Xms1024m',
+          '-Djava.awt.headless=true',
+          '-Dsun.net.http.retryPost=false',
+          java_code_option,
+          '-m upload',
+          "-u #{username.shellescape}",
+          "-p #{password.shellescape}",
+          "-f #{source.shellescape}",
+          additional_upload_parameters, # that's here, because the user might overwrite the -t option
+          '-k 100000',
+          ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
+          '2>&1' # cause stderr to be written to stdout
+        ].compact.join(' ')
+      else
+        [
+          Helper.transporter_java_executable_path.shellescape,
+          "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
+          '-XX:NewSize=2m',
+          '-Xms32m',
+          '-Xmx1024m',
+          '-Xms1024m',
+          '-Djava.awt.headless=true',
+          '-Dsun.net.http.retryPost=false',
+          java_code_option,
+          '-m upload',
+          "-u #{username.shellescape}",
+          "-p #{password.shellescape}",
+          "-f #{source.shellescape}",
+          additional_upload_parameters, # that's here, because the user might overwrite the -t option
+          '-k 100000',
+          ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
+          '2>&1' # cause stderr to be written to stdout
+        ].compact.join(' ') # compact gets rid of the possibly nil ENV value
+      end
     end
 
     def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "")
@@ -415,6 +449,9 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir, @provider_short_name))
 
       begin
+        if helper.mac
+          Dir.chdir('/usr/local/itms')
+        end
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
