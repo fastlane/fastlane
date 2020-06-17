@@ -113,7 +113,7 @@ module Match
           UI.user_error!("Error cloning repo, make sure you have access to it '#{self.git_url}'")
         end
 
-        checkout_branch unless self.branch == "master"
+        checkout_branch
       end
 
       def human_readable_description
