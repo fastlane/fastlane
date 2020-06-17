@@ -49,7 +49,7 @@ describe Match do
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         git_branch = "master"
         shallow_clone = false
-        
+
         expected_commands = [
           "git clone #{git_url.shellescape} #{path.shellescape}",
           "git --no-pager branch --list origin/#{git_branch} --no-color -r",
