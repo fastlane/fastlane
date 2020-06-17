@@ -7196,7 +7196,7 @@ func ssh(username: String,
    - obbMainFileSize: Size of 'main' expansion file in bytes
    - obbPatchReferencesVersion: References version of 'patch' expansion file
    - obbPatchFileSize: Size of 'patch' expansion file in bytes
-   - ackBundleInstallationWarning: Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 100mb
+   - ackBundleInstallationWarning: Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 150MB
 
  More information: https://docs.fastlane.tools/actions/supply/
 */
@@ -8311,7 +8311,7 @@ func uploadToAppStore(username: String,
    - obbMainFileSize: Size of 'main' expansion file in bytes
    - obbPatchReferencesVersion: References version of 'patch' expansion file
    - obbPatchFileSize: Size of 'patch' expansion file in bytes
-   - ackBundleInstallationWarning: Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 100mb
+   - ackBundleInstallationWarning: Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 150MB
 
  More information: https://docs.fastlane.tools/actions/supply/
 */

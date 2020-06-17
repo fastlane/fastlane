@@ -312,7 +312,7 @@ module Supply
                                      type: Numeric),
         FastlaneCore::ConfigItem.new(key: :ack_bundle_installation_warning,
                                      env_name: "ACK_BUNDLE_INSTALLATION_WARNING",
-                                     description: "Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 100mb",
+                                     description: "Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 150MB",
                                      optional: true,
                                      type: Boolean,
                                      default_value: false)
