@@ -13,13 +13,17 @@ module Spaceship
       attr_accessor :removed
       attr_accessor :is_aag
 
+      attr_accessor :app_store_versions
+
       self.attr_mapping({
         "name" => "name",
         "bundleId" => "bundle_id",
         "sku" => "sku",
         "primaryLocale" => "primary_locale",
         "removed" => "removed",
-        "isAAG" => "is_aag"
+        "isAAG" => "is_aag",
+
+        "appStoreVersions" => "app_store_versions"
       })
 
       def self.type
@@ -30,7 +34,7 @@ module Spaceship
       # Apps
       #
 
-      def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
+      def self.all(filter: {}, includes: "appStoreVersions", limit: nil, sort: nil)
         resps = Spaceship::ConnectAPI.get_apps(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
@@ -41,12 +45,38 @@ module Spaceship
         end
       end
 
-      def self.get(app_id: nil, includes: nil)
+      def self.get(app_id: nil, includes: "appStoreVersions")
         return Spaceship::ConnectAPI.get_app(app_id: app_id, includes: includes).first
       end
 
       #
+      # App Store Versions
+      #
+
+      def get_ready_for_sale_app_store_version(platform: nil, includes: nil)
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE
+        }
+        return get_app_store_versions(filter: filter, includes: includes).first
+      end
+
+      def get_prepare_for_submission_app_store_version(platform: nil, includes: nil)
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PREPARE_FOR_SUBMISSION
+        }
+        return get_app_store_versions(filter: filter, includes: includes).first
+      end
+
+      def get_app_store_versions(filter: {}, includes: nil, limit: nil, sort: nil)
+        resps = Spaceship::ConnectAPI.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.flat_map(&:to_models)
+      end
+
+      #
       # Beta Feedback
+      #
 
       def get_beta_feedback(filter: {}, includes: "tester,build,screenshots", limit: nil, sort: nil)
         filter ||= {}

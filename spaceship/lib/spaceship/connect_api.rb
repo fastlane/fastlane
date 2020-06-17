@@ -5,6 +5,7 @@ require 'spaceship/connect_api/token'
 require 'spaceship/connect_api/provisioning/provisioning'
 require 'spaceship/connect_api/testflight/testflight'
 require 'spaceship/connect_api/users/users'
+require 'spaceship/connect_api/tunes/tunes'
 
 require 'spaceship/connect_api/models/bundle_id_capability'
 require 'spaceship/connect_api/models/bundle_id'
@@ -30,11 +31,21 @@ require 'spaceship/connect_api/models/build_delivery'
 require 'spaceship/connect_api/models/build_beta_detail'
 require 'spaceship/connect_api/models/pre_release_version'
 
+require 'spaceship/connect_api/models/app_review_attachment'
+require 'spaceship/connect_api/models/app_store_review_detail'
+require 'spaceship/connect_api/models/app_screenshot_set'
+require 'spaceship/connect_api/models/app_screenshot'
+require 'spaceship/connect_api/models/app_store_version_localization'
+require 'spaceship/connect_api/models/app_store_version_phased_release'
+require 'spaceship/connect_api/models/app_store_version'
+require 'spaceship/connect_api/models/reset_ratings_request'
+
 module Spaceship
   class ConnectAPI
     extend Spaceship::ConnectAPI::Provisioning
     extend Spaceship::ConnectAPI::TestFlight
     extend Spaceship::ConnectAPI::Users
+    extend Spaceship::ConnectAPI::Tunes
 
     @token = nil
 

@@ -11,42 +11,86 @@ module Deliver
       return if options[:skip_screenshots]
       return if options[:edit_live]
 
-      app = options[:app]
+      require 'pp'
 
-      v = app.edit_version(platform: options[:platform])
-      UI.user_error!("Could not find a version to edit for app '#{app.name}'") unless v
+      legacy_app = options[:app]
+      app_id = legacy_app.apple_id
+      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      version = app.get_prepare_for_submission_app_store_version(platform: platform)
+      UI.user_error!("Could not find a version to edit for app '#{app.name}' for '#{platform}'") unless version
 
       UI.message("Starting with the upload of screenshots...")
       screenshots_per_language = screenshots.group_by(&:language)
+      
+      
+      # pp screenshots_per_language
 
+      localizations = version.get_app_store_version_localizations
+
+      # TODO: Delete existing screenshots for each language
       if options[:overwrite_screenshots]
         UI.message("Removing all previously uploaded screenshots...")
-        # First, clear all previously uploaded screenshots
-        screenshots_per_language.keys.each do |language|
-          # We have to nil check for languages not activated
-          next if v.screenshots[language].nil?
-          v.screenshots[language].each_with_index do |t, index|
-            v.upload_screenshot!(nil, t.sort_order, t.language, t.device_type, t.is_imessage)
+
+        # Get localizations on version
+        localizations.each do |localization|
+          # Only delete screenshots if trying to upload
+          next unless screenshots_per_language.keys.include?(localization.locale)
+          
+          # Iterate over all screenshots for each set and delete
+          screenshot_sets = localization.get_app_screenshot_sets
+          screenshot_sets.each do |screenshot_set|
+            screenshot_set.app_screenshots.each do |screenshot|
+              UI.verbose("Deleting screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
+              screenshot.delete!
+            end
           end
         end
       end
 
-      # Now, fill in the new ones
-      indized = {} # per language and device type
+      # Finding languages to enable
+      languages = screenshots_per_language.keys
+      locales_to_enable = languages - localizations.map(&:locale)
 
-      enabled_languages = screenshots_per_language.keys
-      if enabled_languages.count > 0
-        v.create_languages(enabled_languages)
+      if locales_to_enable.count > 0
         lng_text = "language"
-        lng_text += "s" if enabled_languages.count != 1
-        Helper.show_loading_indicator("Activating #{lng_text} #{enabled_languages.join(', ')}...")
-        v.save!
-        # This refreshes the app version from iTC after enabling a localization
-        v = app.edit_version(platform: options[:platform])
+        lng_text += "s" if locales_to_enable.count != 1
+        Helper.show_loading_indicator("Activating #{lng_text} #{locales_to_enable.join(', ')}...")
+
+        locales_to_enable.each do |locale|
+          version.create_app_store_version_localization(attributes: {
+            locale: locale
+          })
+        end
+
         Helper.hide_loading_indicator
+
+        # Refresh version localizations
+        localizations = version.get_app_store_version_localizations
       end
 
+      # Upload screenshots
+      indized = {} # per language and device type
+
       screenshots_per_language.each do |language, screenshots_for_language|
+        # Find localization to upload screenshots to
+        localization = localizations.find do |localization|
+          localization.locale == language
+        end
+
+        unless localization
+          UI.error("Couldn't find localization on version for #{language}")
+          next
+        end
+
+        # Create map to find screenshot set to add screenshot to
+        app_screenshot_sets_map = {}
+        app_screenshot_sets = localization.get_app_screenshot_sets
+        app_screenshot_sets.each do |app_screenshot_set|
+          app_screenshot_sets_map[app_screenshot_set.screenshot_display_type] = app_screenshot_set
+        end
+
         UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
         screenshots_for_language.each do |screenshot|
           indized[screenshot.language] ||= {}
@@ -60,22 +104,39 @@ module Deliver
             next
           end
 
+          display_type = map_to_display_type(screenshot.screen_size)
+          set = app_screenshot_sets_map[display_type]
+          
+          unless set
+            set = localization.create_app_screenshot_set(attributes: {
+              screenshotDisplayType: display_type
+            })
+            app_screenshot_sets_map[display_type] = set
+          end
+          
+          # TODO: Do we need to do something specific for messages?
+          # Also.. what is the messages type even for?
           UI.message("Uploading '#{screenshot.path}'...")
-          v.upload_screenshot!(screenshot.path,
-                               index,
-                               screenshot.language,
-                               screenshot.device_type,
-                               screenshot.is_messages?)
+          set.upload_screenshot(path: screenshot.path)
         end
-        # ideally we should only save once, but itunes server can't cope it seems
-        # so we save per language. See issue #349
-        Helper.show_loading_indicator("Saving changes")
-        v.save!
-        # Refresh app version to start clean again. See issue #9859
-        v = app.edit_version
-        Helper.hide_loading_indicator
+
       end
       UI.success("Successfully uploaded screenshots to App Store Connect")
+    end
+
+    def map_to_display_type(screen_size)
+      case screen_size
+      when ScreenSize::IOS_58, ScreenSize::IOS_58_MESSAGES
+        return Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_58
+      when ScreenSize::IOS_55, ScreenSize::IOS_55_MESSAGES
+        return Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55
+      when ScreenSize::IOS_IPAD_PRO_12_9, ScreenSize::IOS_IPAD_PRO_12_9_MESSAGES
+        return Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPAD_PRO_3GEN_129
+      when ScreenSize::IOS_65, ScreenSize::IOS_65_MESSAGES
+        return Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_65
+      when ScreenSize::IOS_IPAD_PRO, ScreenSize::IOS_IPAD_PRO_MESSAGES
+        return Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPAD_PRO_129
+      end
     end
 
     def collect_screenshots(options)
