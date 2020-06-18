@@ -7,10 +7,42 @@ module Deliver
       app_id = legacy_app.apple_id
       app = Spaceship::ConnectAPI::App.get(app_id: app_id)
 
-      select_build(options, app)
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      version = app.get_edit_app_store_version(platform: platform)
+
+      unless version
+        UI.user_error!("Cannot submit for review - could not find an editable version for '#{platform}'")
+        return
+      end
+
+      select_build(options, app, version, platform)
+
+      # TODO: Do IDFA things (on idfa model)
+
+      # TODO: content rights (patch on app)
+      # "contentRightsDeclaration": "USES_THIRD_PARTY_CONTENT"
+      # "contentRightsDeclaration": "DOES_NOT_USE_THIRD_PARTY_CONTENT"
+
+      submission_information = options[:submission_information] || {}
+      if submission_information.include?(:content_rights_contains_third_party_content)
+        value = if submission_information[:content_rights_contains_third_party_content]
+          Spaceship::ConnectAPI::App::ContentRightsDeclaration::USES_THIRD_PARTY_CONTENT
+        else
+          Spaceship::ConnectAPI::App::ContentRightsDeclaration::DOES_NOT_USE_THIRD_PARTY_CONTENT
+        end
+
+        UI.success("Updating contents rights declaration on App Store Connect")
+        app.update(attributes: {
+          contentRightsDeclaration: value
+        })
+      end
+
+      # TODO: export compliance still uses legacy iTC API
 
       # TODO: submit build
-      UI.error("Submit build is currently disabled. Will enable shortly :)")
+      version.create_app_store_version_submission
+
+      UI.success("Successfully submitted the app for review!")
     end
 
     def submit_old!(options)
@@ -40,10 +72,7 @@ module Deliver
       UI.success("Successfully submitted the app for review!")
     end
 
-    private def select_build(options, app)
-      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
-      version = app.get_prepare_for_submission_app_store_version(platform: platform)
-
+    private def select_build(options, app, version, platform)
       if options[:build_number] && options[:build_number] != "latest"
         UI.message("Selecting existing build-number: #{options[:build_number]}")
 

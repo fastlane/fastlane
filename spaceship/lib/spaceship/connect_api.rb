@@ -33,6 +33,7 @@ require 'spaceship/connect_api/models/pre_release_version'
 
 require 'spaceship/connect_api/models/app_review_attachment'
 require 'spaceship/connect_api/models/app_store_review_detail'
+require 'spaceship/connect_api/models/app_store_version_submission'
 require 'spaceship/connect_api/models/app_screenshot_set'
 require 'spaceship/connect_api/models/app_screenshot'
 require 'spaceship/connect_api/models/app_store_version_localization'

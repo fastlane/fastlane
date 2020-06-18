@@ -85,14 +85,14 @@ module Deliver
 
         if v.nil?
           UI.message("Couldn't find live version, editing the current version on App Store Connect instead")
-          version = app.get_prepare_for_submission_app_store_version(platform: platform)
+          version = app.get_edit_app_store_version(platform: platform)
           # we don't want to update the localised_options and non_localised_options
           # as we also check for `options[:edit_live]` at other areas in the code
           # by not touching those 2 variables, deliver is more consistent with what the option says
           # in the documentation
         end
       else
-        version = app.get_prepare_for_submission_app_store_version(platform: platform)
+        version = app.get_edit_app_store_version(platform: platform)
         localised_options = (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES)
         non_localised_options = (NON_LOCALISED_VERSION_VALUES.keys + NON_LOCALISED_APP_VALUES)
       end
@@ -276,7 +276,7 @@ module Deliver
     # Finding languages to enable
     def verify_available_languages!(options, app)
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
-      version = app.get_prepare_for_submission_app_store_version(platform: platform)
+      version = app.get_edit_store_version(platform: platform)
 
       # TODO: Handle better?
       unless version
@@ -307,43 +307,6 @@ module Deliver
       end
 
       return localizations
-    end
-
-    # Makes sure all languages we need are actually created
-    def verify_available_languages_old!(options)
-      return if options[:skip_metadata]
-
-      # Collect all languages we need
-      # We only care about languages from user provided values
-      # as the other languages are on iTC already anyway
-      v = options[:app].edit_version(platform: options[:platform])
-      UI.user_error!("Could not find a version to edit for app '#{options[:app].name}', the app metadata is read-only currently") unless v
-
-      enabled_languages = options[:languages] || []
-      LOCALISED_VERSION_VALUES.each do |key|
-        current = options[key]
-        next unless current && current.kind_of?(Hash)
-        current.each do |language, value|
-          language = language.to_s
-          enabled_languages << language unless enabled_languages.include?(language)
-        end
-      end
-
-      # Reject "default" language from getting enabled
-      # because "default" is not an iTC language
-      enabled_languages = enabled_languages.reject do |lang|
-        lang == "default"
-      end.uniq
-
-      if enabled_languages.count > 0
-        v.create_languages(enabled_languages)
-        lng_text = "language"
-        lng_text += "s" if enabled_languages.count != 1
-        Helper.show_loading_indicator("Activating #{lng_text} #{enabled_languages.join(', ')}...")
-        v.save!
-        Helper.hide_loading_indicator
-      end
-      true
     end
 
     # Loads the metadata files and stores them into the options object

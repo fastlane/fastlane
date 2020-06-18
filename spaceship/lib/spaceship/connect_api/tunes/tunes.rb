@@ -5,6 +5,22 @@ module Spaceship
     module Tunes
 
       #
+      # app
+      #
+
+      def patch_app(app_id: nil, attributes: {})
+        body = {
+          data: {
+            type: "apps",
+            id: app_id,
+            attributes: attributes
+          }
+        }
+
+        Client.instance.patch("apps/#{app_id}", body)
+      end
+
+      #
       # appReviewAttachments
       #
 
@@ -115,6 +131,32 @@ module Spaceship
       def delete_app_screenshot(app_screenshot_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.delete("appScreenshots/#{app_screenshot_id}", params)
+      end
+
+      #
+      # appInfos
+      #
+
+      def get_app_infos(app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("appStoreVersions/#{app_store_version_id}/appInfos", params)
+      end
+
+      def patch_app_info(app_info_id: nil, attributes: {})
+        body = {
+          data: {
+            type: "appInfos",
+            id: app_info_id,
+            attributes: attributes
+          }
+        }
+
+        Client.instance.patch("appInfos/#{app_info_id}", body)
+      end
+
+      def delete_app_info(app_info_id: nil)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+        Client.instance.delete("appInfos/#{app_info_id}", params)
       end
 
       #
@@ -314,6 +356,39 @@ module Spaceship
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.delete("resetRatingsRequests/#{reset_ratings_request_id}", params)
       end
+
+      #
+      # appStoreVersionSubmissions
+      #
+
+      def get_app_store_version_submission(app_store_version_id: nil)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+        Client.instance.get("appStoreVersions/#{app_store_version_id}/appStoreVersionSubmission", params)
+      end
+
+      def post_app_store_version_submission(app_store_version_id: nil)
+        body = {
+          data: {
+            type: "appStoreVersionSubmissions",
+            relationships: {
+              appStoreVersion: {
+                data: {
+                  type: "appStoreVersions",
+                  id: app_store_version_id
+                }
+              }
+            }
+          }
+        }
+
+        Client.instance.post("appStoreVersionSubmissions", body)
+      end
+
+      def delete_app_store_version_submission(app_store_version_submission_id: nil)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+        Client.instance.delete("appStoreVersionSubmissions/#{app_store_version_submission_id}", params)
+      end
+
     end
   end
 end

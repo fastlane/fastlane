@@ -13,7 +13,14 @@ module Spaceship
       attr_accessor :removed
       attr_accessor :is_aag
 
+      attr_accessor :content_rights_declaration
+
       attr_accessor :app_store_versions
+
+      module ContentRightsDeclaration
+        USES_THIRD_PARTY_CONTENT = "USES_THIRD_PARTY_CONTENT"
+        DOES_NOT_USE_THIRD_PARTY_CONTENT = "DOES_NOT_USE_THIRD_PARTY_CONTENT"
+      end
 
       self.attr_mapping({
         "name" => "name",
@@ -22,6 +29,8 @@ module Spaceship
         "primaryLocale" => "primary_locale",
         "removed" => "removed",
         "isAAG" => "is_aag",
+
+        "contentRightsDeclaration" => "content_rights_declaration",
 
         "appStoreVersions" => "app_store_versions"
       })
@@ -49,6 +58,25 @@ module Spaceship
         return Spaceship::ConnectAPI.get_app(app_id: app_id, includes: includes).first
       end
 
+      def update(attributes: nil)
+        return Spaceship::ConnectAPI.patch_app(app_id: id, attributes: attributes)
+      end
+
+      #
+      # App Info
+      #
+
+      def get_app_infos(app_store_state: nil)
+        resp = Spaceship::ConnectAPI.get_app_info(app_store_version_id: id)
+        models = resp.to_models
+
+        models = models.select do |model|
+          model.app_store_state = app_store_state
+        end if app_store_state
+
+        return models
+      end
+
       #
       # App Store Versions
       #
@@ -58,7 +86,7 @@ module Spaceship
       # from an existing version
       # @return (Bool) Was something changed?
       def ensure_version!(version_string, platform: nil)
-        app_store_version = get_prepare_for_submission_app_store_version(platform: platform)
+        app_store_version = get_edit_app_store_version(platform: platform)
         if app_store_version
           if version_string != app_store_version.version_string
             app_store_version.update(attributes: {
@@ -75,16 +103,19 @@ module Spaceship
       def get_ready_for_sale_app_store_version(platform: nil, includes: nil)
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
+          appStoreState: [Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE],
           platform: platform
         }
         return get_app_store_versions(filter: filter, includes: includes).first
       end
 
-      def get_prepare_for_submission_app_store_version(platform: nil, includes: nil)
+      def get_edit_app_store_version(platform: nil, includes: nil)
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PREPARE_FOR_SUBMISSION,
+          appStoreState: [
+              Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
+              Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REJECTED,
+            ].join(","),
           platform: platform
         }
         return get_app_store_versions(filter: filter, includes: includes).first

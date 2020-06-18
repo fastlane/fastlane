@@ -19,6 +19,8 @@ module Spaceship
 
       module AppStoreState
         READY_FOR_SALE = "READY_FOR_SALE"
+        WAITING_FOR_REVIEW = "WAITING_FOR_REVIEW"
+        DEVELOPER_REJECTED = "DEVELOPER_REJECTED"
         PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
       end
       
@@ -104,6 +106,20 @@ module Spaceship
 
       def create_app_store_version_phased_release(attributes: nil)
         resp = Spaceship::ConnectAPI.post_app_store_version_phased_release(app_store_version_id: id, attributes: attributes)
+        return resp.to_models.first
+      end
+
+      #
+      # App Store Version Submissions
+      #
+
+      def get_app_store_version_submission
+        resp = Spaceship::ConnectAPI.get_app_store_version_submission(app_store_version_id: id)
+        return resp.to_models.first
+      end
+
+      def create_app_store_version_submission
+        resp = Spaceship::ConnectAPI.post_app_store_version_submission(app_store_version_id: id)
         return resp.to_models.first
       end
 

@@ -18,7 +18,7 @@ module Deliver
       app = Spaceship::ConnectAPI::App.get(app_id: app_id)
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
-      version = app.get_prepare_for_submission_app_store_version(platform: platform)
+      version = app.get_edit_app_store_version(platform: platform)
       UI.user_error!("Could not find a version to edit for app '#{app.name}' for '#{platform}'") unless version
 
       UI.message("Starting with the upload of screenshots...")
