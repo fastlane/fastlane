@@ -44,15 +44,16 @@ module Deliver
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       version = app.get_prepare_for_submission_app_store_version(platform: platform)
 
-      app_version = options[:app_version]
-
       if options[:build_number] && options[:build_number] != "latest"
         UI.message("Selecting existing build-number: #{options[:build_number]}")
-        # if app_version
-        #   build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] && a.train_version == app_version }
-        # else
-        #   build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] }
-        # end
+
+        build = Spaceship::ConnectAPI::Build.all(
+          app_id: app.id,
+          version: options[:app_version],
+          build_number: options[:build_number],
+          platform: platform
+        ).first
+        
         unless build
           UI.user_error!("Build number: #{options[:build_number]} does not exist")
         end

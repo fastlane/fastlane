@@ -475,23 +475,15 @@ Key | Editable While Live | Directory | Filename
 
 Key | Editable While Live | Directory | Filename
 ----|--------|--------|--------
-<%- (Deliver::UploadMetadata::LOCALISED_APP_VALUES + Deliver::UploadMetadata::LOCALISED_VERSION_VALUES).each do |value| -%>
+<%- (Deliver::UploadMetadata::LOCALISED_APP_VALUES.keys + Deliver::UploadMetadata::LOCALISED_VERSION_VALUES.keys).each do |value| -%>
   `<%= value %>` | <%= Deliver::UploadMetadata::LOCALISED_LIVE_VALUES.include?(value) ? 'Yes' : 'No' %> | `<metadata_path>/<lang>/` | `<%= value %>.txt`
-<%- end %>
-
-### Trade Representative Contact Information Metadata
-
-Key | Editable While Live | Directory | Filename
-----|--------|--------|--------
-<%- Deliver::UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, value| -%>
-  `<%= value %>` | Yes | `<metadata_path>/<%= Deliver::UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR %>` | `<%= value %>.txt`
 <%- end %>
 
 ### Review Information Metadata
 
 Key | Editable While Live | Directory | Filename
 ----|--------|--------|--------
-<%- Deliver::UploadMetadata::REVIEW_INFORMATION_VALUES.each do |key, value| -%>
+<%- Deliver::UploadMetadata::REVIEW_INFORMATION_VALUES_LEGACY.each do |key, value| -%>
   `<%= value %>` | Yes | `<metadata_path>/<%= Deliver::UploadMetadata::REVIEW_INFORMATION_DIR %>` | `<%= value %>.txt`
 <%- end %>
 

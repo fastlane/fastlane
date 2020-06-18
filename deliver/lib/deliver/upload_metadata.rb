@@ -26,23 +26,6 @@ module Deliver
                                 :primary_first_sub_category, :primary_second_sub_category,
                                 :secondary_first_sub_category, :secondary_second_sub_category]
 
-    # Trade Representative Contact Information values
-    TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES = {
-        trade_representative_trade_name: :trade_name,
-        trade_representative_first_name: :first_name,
-        trade_representative_last_name: :last_name,
-        trade_representative_address_line_1: :address_line1,
-        trade_representative_address_line_2: :address_line2,
-        trade_representative_address_line_3: :address_line3,
-        trade_representative_city_name: :city_name,
-        trade_representative_state: :state,
-        trade_representative_country: :country,
-        trade_representative_postal_code: :postal_code,
-        trade_representative_phone_number: :phone_number,
-        trade_representative_email: :email_address,
-        trade_representative_is_displayed_on_app_store: :is_displayed_on_app_store
-    }
-
     # Review information values
     REVIEW_INFORMATION_VALUES_LEGACY = {
       review_first_name: :first_name,
@@ -213,7 +196,6 @@ module Deliver
       set_review_attachment_file(version, options)
 
       # set_app_rating(version, options)
-      # set_trade_representative_contact_information(version, options)
     end
 
     # rubocop:enable Metrics/PerceivedComplexity
@@ -391,17 +373,6 @@ module Deliver
         options[key] ||= File.read(path)
       end
 
-      # Load trade representative contact information
-      options[:trade_representative_contact_information] ||= {}
-      TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.values.each do |option_name|
-        path = File.join(options[:metadata_path], TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR, "#{option_name}.txt")
-        next unless File.exist?(path)
-        next if options[:trade_representative_contact_information][option_name].to_s.length > 0
-
-        UI.message("Loading '#{path}'...")
-        options[:trade_representative_contact_information][option_name] ||= File.read(path)
-      end
-
       # Load review information
       options[:app_review_information] ||= {}
       REVIEW_INFORMATION_VALUES.keys.each do |option_name|
@@ -428,20 +399,6 @@ module Deliver
       end
 
       options
-    end
-
-    def set_trade_representative_contact_information(version, options)
-      return unless options[:trade_representative_contact_information]
-
-       # TODO: PUT THIS IN
-       UI.error("We have temporarily disabled 'trade_representative_contact_information'. It will be back shortly 😊")
-
-      # info = options[:trade_representative_contact_information]
-      # UI.user_error!("`trade_representative_contact_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
-
-      # TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, option_name|
-      #   v.send("#{key}=", info[option_name].to_s.chomp) if info[option_name]
-      # end
     end
 
     def set_review_information(version, options)
