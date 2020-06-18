@@ -94,7 +94,7 @@ module Deliver
       UI.success("Successfully selected build")
     end
 
-    def wait_for_build_processing_to_be_complete(app: nil, platform: nil, options: options)
+    def wait_for_build_processing_to_be_complete(app: nil, platform: nil, options: nil)
       app_version = options[:app_version]
       app_version ||= FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa]) if options[:ipa]
       app_version ||= FastlaneCore::PkgFileAnalyser.fetch_app_version(options[:pkg]) if options[:pkg]
