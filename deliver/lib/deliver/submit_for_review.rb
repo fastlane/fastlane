@@ -8,6 +8,9 @@ module Deliver
       app = Spaceship::ConnectAPI::App.get(app_id: app_id)
 
       select_build(options, app)
+
+      # TODO: submit build
+      UI.error("Submit build is currently disabled. Will enable shortly :)")
     end
 
     def submit_old!(options)
