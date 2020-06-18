@@ -3,6 +3,14 @@ require_relative 'module'
 module Deliver
   class SubmitForReview
     def submit!(options)
+      legacy_app = options[:app]
+      app_id = legacy_app.apple_id
+      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+
+      select_build(options, app)
+    end
+
+    def submit_old!(options)
       app = options[:app]
       select_build(options)
 
@@ -29,7 +37,34 @@ module Deliver
       UI.success("Successfully submitted the app for review!")
     end
 
-    private def select_build(options)
+    private def select_build(options, app)
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      version = app.get_prepare_for_submission_app_store_version(platform: platform)
+
+      app_version = options[:app_version]
+
+      if options[:build_number] && options[:build_number] != "latest"
+        UI.message("Selecting existing build-number: #{options[:build_number]}")
+        # if app_version
+        #   build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] && a.train_version == app_version }
+        # else
+        #   build = v.candidate_builds.detect { |a| a.build_version == options[:build_number] }
+        # end
+        unless build
+          UI.user_error!("Build number: #{options[:build_number]} does not exist")
+        end
+      else
+        UI.message("Selecting the latest build...")
+        build = wait_for_build_processing_to_be_complete(app: app, platform: platform, options: options)
+      end
+      UI.message("Selecting build #{build.app_version} (#{build.version})...")
+
+      version.select_build(build_id: build.id)
+
+      UI.success("Successfully selected build")
+    end
+
+    private def select_build_old(options)
       app = options[:app]
       app_version = options[:app_version]
       v = app.edit_version(platform: options[:platform])
@@ -48,12 +83,36 @@ module Deliver
         UI.message("Selecting the latest build...")
         build = wait_for_build(app, app_version)
       end
-      UI.message("Selecting build #{app_version} (#{build.build_version})...")
+      UI.message("Selecting build #{build.app_version} (#{build.version})...")
 
-      v.select_build(build)
-      v.save!
+      
 
       UI.success("Successfully selected build")
+    end
+
+    def wait_for_build_processing_to_be_complete(app: nil, platform: nil, options: options)
+      app_version = options[:app_version]
+      app_version ||= FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa]) if options[:ipa]
+      app_version ||= FastlaneCore::PkgFileAnalyser.fetch_app_version(options[:pkg]) if options[:pkg]
+
+      app_build ||= FastlaneCore::IpaFileAnalyser.fetch_app_build(options[:ipa]) if options[:ipa]
+      app_build ||= FastlaneCore::PkgFileAnalyser.fetch_app_build(options[:pkg]) if options[:pkg]
+
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(
+        app_id: app.id,
+        platform: platform,
+        app_version: app_version,
+        build_version: app_build,
+        poll_interval: 15,
+        return_when_build_appears: false,
+        return_spaceship_testflight_build: false
+      )
+
+      unless latest_build.app_version == app_version && latest_build.version == app_build
+        UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.app_version} - #{latest_build.version}.")
+      end
+
+      return latest_build
     end
 
     def wait_for_build(app, app_version)

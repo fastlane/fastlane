@@ -456,8 +456,12 @@ module Deliver
       end
 
       UI.message("Uploading app review information to App Store Connect")
-      app_store_review_detail = version.get_app_store_review_detail
-      app_store_review_detail.update(attributes: attributes)
+      app_store_review_detail = version.get_app_store_review_detail rescue nil # errors if doesn't exist
+      if app_store_review_detail
+        app_store_review_detail.update(attributes: attributes)
+      else
+        version.create_app_store_review_detail(attributes: attributes)
+      end
     end
 
     def set_review_attachment_file(version, options)

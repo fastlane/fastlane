@@ -126,6 +126,25 @@ module Spaceship
         Client.instance.get("appStoreVersions/#{app_store_version_id}/appStoreReviewDetail", params)
       end
 
+      def post_app_store_review_detail(app_store_version_id: nil, attributes: {})
+        body = {
+          data: {
+            type: "appStoreReviewDetails",
+            attributes: attributes,
+            relationships: {
+              appStoreVersion: {
+                data: {
+                  type: "appStoreVersions",
+                  id: app_store_version_id
+                }
+              }
+            }
+          }
+        }
+
+        Client.instance.post("appStoreReviewDetails", body)
+      end
+
       def patch_app_store_review_detail(app_store_review_detail_id: nil, attributes: {})
         body = {
           data: {
@@ -221,7 +240,7 @@ module Spaceship
       #
 
       def get_app_store_versions(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        params = Client.instance.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
         Client.instance.get("apps/#{app_id}/appStoreVersions", params)
       end
 
@@ -236,6 +255,28 @@ module Spaceship
             type: "appStoreVersions",
             id: app_store_version_id,
             attributes: attributes
+          }
+        }
+
+        Client.instance.patch("appStoreVersions/#{app_store_version_id}", body)
+      end
+
+      def patch_app_store_version_with_build(app_store_version_id: nil, build_id: nil)
+        data = nil
+        data = {
+          "type": "builds",
+          "id": build_id
+        } if build_id
+
+        body = {
+          data: {
+            type: "appStoreVersions",
+            id: app_store_version_id,
+            relationships: {
+              build: {
+                data: data
+              }
+            }
           }
         }
 

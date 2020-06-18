@@ -89,7 +89,12 @@ module Deliver
       app_version = options[:app_version]
       UI.message("Making sure the latest version on App Store Connect matches '#{app_version}' from the ipa file...")
 
-      changed = options[:app].ensure_version!(app_version, platform: options[:platform])
+      legacy_app = options[:app]
+      app_id = legacy_app.apple_id
+      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      changed = app.ensure_version!(app_version, platform: platform)
 
       if changed
         UI.success("Successfully set the version to '#{app_version}'")

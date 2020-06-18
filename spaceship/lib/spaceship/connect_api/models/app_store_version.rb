@@ -83,6 +83,11 @@ module Spaceship
       # App Store Review Detail
       #
 
+      def create_app_store_review_detail(attributes: nil)
+        resp = Spaceship::ConnectAPI.post_app_store_review_detail(app_store_version_id: id, attributes: attributes)
+        return resp.to_models.first
+      end
+
       def get_app_store_review_detail
         resp = Spaceship::ConnectAPI.get_app_store_review_detail(app_store_version_id: id)
         return resp.to_models.first
@@ -99,6 +104,15 @@ module Spaceship
 
       def create_app_store_version_phased_release(attributes: nil)
         resp = Spaceship::ConnectAPI.post_app_store_version_phased_release(app_store_version_id: id, attributes: attributes)
+        return resp.to_models.first
+      end
+
+      #
+      # Build
+      #
+
+      def select_build(build_id: nil)
+        resp = Spaceship::ConnectAPI.patch_app_store_version_with_build(app_store_version_id: id, build_id: build_id)
         return resp.to_models.first
       end
 

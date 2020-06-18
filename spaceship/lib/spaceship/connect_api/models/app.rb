@@ -53,10 +53,30 @@ module Spaceship
       # App Store Versions
       #
 
+      # Will make sure the current edit_version matches the given version number
+      # This will either create a new version or change the version number
+      # from an existing version
+      # @return (Bool) Was something changed?
+      def ensure_version!(version_string, platform: nil)
+        app_store_version = get_prepare_for_submission_app_store_version(platform: platform)
+        if app_store_version
+          if version_string != app_store_version.version_string
+            app_store_version.update(attributes: {
+              versionString: version_string
+            })
+            return true
+          end
+          return false
+        else
+          return true
+        end
+      end
+
       def get_ready_for_sale_app_store_version(platform: nil, includes: nil)
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE
+          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
+          platform: platform
         }
         return get_app_store_versions(filter: filter, includes: includes).first
       end
@@ -64,7 +84,8 @@ module Spaceship
       def get_prepare_for_submission_app_store_version(platform: nil, includes: nil)
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PREPARE_FOR_SUBMISSION
+          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PREPARE_FOR_SUBMISSION,
+          platform: platform
         }
         return get_app_store_versions(filter: filter, includes: includes).first
       end
