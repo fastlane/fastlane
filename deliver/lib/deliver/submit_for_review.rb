@@ -19,10 +19,9 @@ module Deliver
 
       # TODO: Do IDFA things (on idfa model)
 
-      # TODO: content rights (patch on app)
-      # "contentRightsDeclaration": "USES_THIRD_PARTY_CONTENT"
-      # "contentRightsDeclaration": "DOES_NOT_USE_THIRD_PARTY_CONTENT"
 
+      # Submission information
+      # TODO: Still missing :content_rights_has_rights if that is still a thing
       submission_information = options[:submission_information] || {}
       if submission_information.include?(:content_rights_contains_third_party_content)
         value = if submission_information[:content_rights_contains_third_party_content]
