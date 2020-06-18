@@ -116,6 +116,8 @@ module Deliver
               screenshotDisplayType: display_type
             })
             app_screenshot_sets_map[display_type] = set
+
+            indized[localization.locale][set.screenshot_display_type] = 0
           end
 
           index = indized[localization.locale][set.screenshot_display_type]
