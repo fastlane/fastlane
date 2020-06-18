@@ -296,6 +296,12 @@ module Deliver
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       version = app.get_prepare_for_submission_app_store_version(platform: platform)
 
+      # TODO: Handle better?
+      unless version
+        UI.user_error!("Cannot update languages - could not find an editable version for '#{platform}'")
+        return
+      end
+
       localizations = version.get_app_store_version_localizations
 
       languages = options[:languages] || []

@@ -84,28 +84,32 @@ module Deliver
           next
         end
 
+        indized[localization.locale] ||= {}
+
         # Create map to find screenshot set to add screenshot to
         app_screenshot_sets_map = {}
         app_screenshot_sets = localization.get_app_screenshot_sets
         app_screenshot_sets.each do |app_screenshot_set|
           app_screenshot_sets_map[app_screenshot_set.screenshot_display_type] = app_screenshot_set
+
+          # Set initial screnshot count
+          indized[localization.locale][app_screenshot_set.screenshot_display_type] ||= app_screenshot_set.app_screenshots.size
         end
+
+        require 'pp'
+        puts "INDIZED"
+        pp indized
 
         UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
         screenshots_for_language.each do |screenshot|
-          indized[screenshot.language] ||= {}
-          indized[screenshot.language][screenshot.formatted_name] ||= 0
-          indized[screenshot.language][screenshot.formatted_name] += 1 # we actually start with 1... wtf iTC
 
-          index = indized[screenshot.language][screenshot.formatted_name]
+          display_type = screenshot.device_type
+          set = app_screenshot_sets_map[display_type]
 
-          if index > 10
-            UI.error("Too many screenshots found for device '#{screenshot.formatted_name}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
+          if display_type.nil?
+            UI.error("Error... Screenshot size #{screenshot.screen_size} not valid for App Store Connect")
             next
           end
-
-          display_type = map_to_display_type(screenshot.screen_size)
-          set = app_screenshot_sets_map[display_type]
           
           unless set
             set = localization.create_app_screenshot_set(attributes: {
@@ -113,6 +117,15 @@ module Deliver
             })
             app_screenshot_sets_map[display_type] = set
           end
+
+          index = indized[localization.locale][set.screenshot_display_type]
+
+          if index >= 10
+            UI.error("Too many screenshots found for device '#{screenshot.formatted_name}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
+            next
+          end
+
+          indized[localization.locale][set.screenshot_display_type] += 1
           
           # TODO: Do we need to do something specific for messages?
           # Also.. what is the messages type even for?
@@ -122,21 +135,6 @@ module Deliver
 
       end
       UI.success("Successfully uploaded screenshots to App Store Connect")
-    end
-
-    def map_to_display_type(screen_size)
-      case screen_size
-      when ScreenSize::IOS_58, ScreenSize::IOS_58_MESSAGES
-        return Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_58
-      when ScreenSize::IOS_55, ScreenSize::IOS_55_MESSAGES
-        return Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55
-      when ScreenSize::IOS_IPAD_PRO_12_9, ScreenSize::IOS_IPAD_PRO_12_9_MESSAGES
-        return Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPAD_PRO_3GEN_129
-      when ScreenSize::IOS_65, ScreenSize::IOS_65_MESSAGES
-        return Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_65
-      when ScreenSize::IOS_IPAD_PRO, ScreenSize::IOS_IPAD_PRO_MESSAGES
-        return Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPAD_PRO_129
-      end
     end
 
     def collect_screenshots(options)

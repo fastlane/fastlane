@@ -7,7 +7,6 @@ require 'fastlane_core/itunes_transporter'
 require 'spaceship'
 require_relative 'html_generator'
 require_relative 'submit_for_review'
-require_relative 'upload_assets'
 require_relative 'upload_price_tier'
 require_relative 'upload_metadata'
 require_relative 'upload_screenshots'
@@ -125,7 +124,6 @@ module Deliver
       upload_metadata.upload(options)
       upload_screenshots.upload(options, screenshots)
       UploadPriceTier.new.upload(options)
-      UploadAssets.new.upload(options) # e.g. app icon
     end
 
     # If options[:app_icon]/options[:apple_watch_app_icon]
