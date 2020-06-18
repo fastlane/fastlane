@@ -276,7 +276,7 @@ module Deliver
     # Finding languages to enable
     def verify_available_languages!(options, app)
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
-      version = app.get_edit_store_version(platform: platform)
+      version = app.get_edit_app_store_version(platform: platform)
 
       # TODO: Handle better?
       unless version
