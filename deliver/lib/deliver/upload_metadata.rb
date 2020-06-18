@@ -90,12 +90,16 @@ module Deliver
           # as we also check for `options[:edit_live]` at other areas in the code
           # by not touching those 2 variables, deliver is more consistent with what the option says
           # in the documentation
+        else
+          UI.message("Found live version")
         end
       else
         version = app.get_edit_app_store_version(platform: platform)
         localised_options = (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES)
         non_localised_options = (NON_LOCALISED_VERSION_VALUES.keys + NON_LOCALISED_APP_VALUES)
       end
+
+      UI.important("Will begin uploading metadata for '#{version.version_string}' on App Store Connect")
 
       localized_version_attributes_by_locale = {}
 

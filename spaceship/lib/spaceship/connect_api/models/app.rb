@@ -87,15 +87,20 @@ module Spaceship
       # @return (Bool) Was something changed?
       def ensure_version!(version_string, platform: nil)
         app_store_version = get_edit_app_store_version(platform: platform)
+
         if app_store_version
           if version_string != app_store_version.version_string
-            app_store_version.update(attributes: {
-              versionString: version_string
-            })
+            attributes = { versionString: version_string }
+            app_store_version.update(attributes: attributes)
             return true
           end
           return false
         else
+          attributes = { versionString: version_string, platform: platform }
+          Spaceship::ConnectAPI.post_app_store_version(app_id: id, attributes: attributes)
+
+          UI.import("Successfully created new version for '#{version_string}' on App Store Connect")
+
           return true
         end
       end
@@ -113,7 +118,7 @@ module Spaceship
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           appStoreState: [
-              Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
+              Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PREPARE_FOR_SUBMISSION,
               Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REJECTED,
             ].join(","),
           platform: platform

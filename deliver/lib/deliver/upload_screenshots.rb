@@ -21,6 +21,8 @@ module Deliver
       version = app.get_edit_app_store_version(platform: platform)
       UI.user_error!("Could not find a version to edit for app '#{app.name}' for '#{platform}'") unless version
 
+      UI.important("Will begin uploading snapshots for '#{version.version_string}' on App Store Connect")
+
       UI.message("Starting with the upload of screenshots...")
       screenshots_per_language = screenshots.group_by(&:language)
       

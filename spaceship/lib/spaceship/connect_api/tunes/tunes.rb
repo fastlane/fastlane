@@ -291,6 +291,25 @@ module Spaceship
         Client.instance.get("appStoreVersions/#{app_store_version_id}", params)
       end
 
+      def post_app_store_version(app_id: nil, attributes: {})
+        body = {
+          data: {
+            type: "appStoreVersions",
+            attributes: attributes,
+            relationships: {
+              app: {
+                data: {
+                  type: "apps",
+                  id: app_id
+                }
+              }
+            }
+          }
+        }
+
+        Client.instance.post("appStoreVersions", body)
+      end
+
       def patch_app_store_version(app_store_version_id: nil, attributes: {})
         body = {
           data: {

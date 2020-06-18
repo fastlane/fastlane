@@ -86,7 +86,7 @@ module Deliver
     # If not, the new version will automatically be created
     def verify_version
       app_version = options[:app_version]
-      UI.message("Making sure the latest version on App Store Connect matches '#{app_version}' from the ipa file...")
+      UI.message("Making sure the latest version on App Store Connect matches '#{app_version}'...")
 
       legacy_app = options[:app]
       app_id = legacy_app.apple_id
