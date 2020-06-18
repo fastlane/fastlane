@@ -99,8 +99,6 @@ module Spaceship
           attributes = { versionString: version_string, platform: platform }
           Spaceship::ConnectAPI.post_app_store_version(app_id: id, attributes: attributes)
 
-          UI.import("Successfully created new version for '#{version_string}' on App Store Connect")
-
           return true
         end
       end
