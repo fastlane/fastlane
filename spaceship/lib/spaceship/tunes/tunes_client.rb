@@ -1422,6 +1422,20 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
+    # Retrieves app-specific shared secret key
+    def get_shared_secret(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/appSharedSecret")
+      data = parse_response(r, 'data')
+      data['sharedSecret']
+    end
+
+    # Generates app-specific shared secret key
+    def generate_shared_secret(app_id: nil)
+      r = request(:post, "ra/apps/#{app_id}/iaps/appSharedSecret")
+      data = parse_response(r, 'data')
+      data['sharedSecret']
+    end
+
     #####################################################
     # @!group Sandbox Testers
     #####################################################

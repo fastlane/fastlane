@@ -359,6 +359,16 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file("iap_price_goal_calc.json"),
                  headers: { "Content-Type" => "application/json" })
 
+      # get shared secret
+      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/appSharedSecret").
+        to_return(status: 200, body: itc_read_fixture_file("iap_shared_secret_1.json"),
+                 headers: { "Content-Type" => "application/json" })
+
+      # generate new shared secret
+      stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/appSharedSecret").
+        to_return(status: 200, body: itc_read_fixture_file("iap_shared_secret_2.json"),
+                 headers: { "Content-Type" => "application/json" })
+
       # delete iap
       stub_request(:delete, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1194457865").
         to_return(status: 200, body: "", headers: {})

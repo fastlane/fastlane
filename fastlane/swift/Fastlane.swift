@@ -1442,6 +1442,7 @@ func captureAndroidScreenshots(androidHome: String? = nil,
    - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running snapshot
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
+   - overrideStatusBar: Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
@@ -1463,6 +1464,9 @@ func captureAndroidScreenshots(androidHome: String? = nil,
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - testplan: The testplan associated with the scheme that should be used for testing
+   - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
+   - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
 */
 func captureIosScreenshots(workspace: String? = nil,
                            project: String? = nil,
@@ -1479,6 +1483,7 @@ func captureIosScreenshots(workspace: String? = nil,
                            clearPreviousScreenshots: Bool = false,
                            reinstallApp: Bool = false,
                            eraseSimulator: Bool = false,
+                           overrideStatusBar: Bool = false,
                            localizeSimulator: Bool = false,
                            darkMode: Bool? = nil,
                            appIdentifier: String? = nil,
@@ -1499,7 +1504,10 @@ func captureIosScreenshots(workspace: String? = nil,
                            namespaceLogFiles: Any? = nil,
                            concurrentSimulators: Bool = true,
                            disableSlideToType: Bool = false,
-                           clonedSourcePackagesPath: String? = nil) {
+                           clonedSourcePackagesPath: String? = nil,
+                           testplan: String? = nil,
+                           onlyTesting: Any? = nil,
+                           skipTesting: Any? = nil) {
   let command = RubyCommand(commandID: "", methodName: "capture_ios_screenshots", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                                          RubyCommand.Argument(name: "project", value: project),
                                                                                                          RubyCommand.Argument(name: "xcargs", value: xcargs),
@@ -1515,6 +1523,7 @@ func captureIosScreenshots(workspace: String? = nil,
                                                                                                          RubyCommand.Argument(name: "clear_previous_screenshots", value: clearPreviousScreenshots),
                                                                                                          RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                                          RubyCommand.Argument(name: "erase_simulator", value: eraseSimulator),
+                                                                                                         RubyCommand.Argument(name: "override_status_bar", value: overrideStatusBar),
                                                                                                          RubyCommand.Argument(name: "localize_simulator", value: localizeSimulator),
                                                                                                          RubyCommand.Argument(name: "dark_mode", value: darkMode),
                                                                                                          RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
@@ -1535,7 +1544,10 @@ func captureIosScreenshots(workspace: String? = nil,
                                                                                                          RubyCommand.Argument(name: "namespace_log_files", value: namespaceLogFiles),
                                                                                                          RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators),
                                                                                                          RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
-                                                                                                         RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath)])
+                                                                                                         RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                                         RubyCommand.Argument(name: "testplan", value: testplan),
+                                                                                                         RubyCommand.Argument(name: "only_testing", value: onlyTesting),
+                                                                                                         RubyCommand.Argument(name: "skip_testing", value: skipTesting)])
   _ = runner.executeCommand(command)
 }
 
@@ -1558,6 +1570,7 @@ func captureIosScreenshots(workspace: String? = nil,
    - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running snapshot
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
+   - overrideStatusBar: Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
@@ -1579,6 +1592,9 @@ func captureIosScreenshots(workspace: String? = nil,
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - testplan: The testplan associated with the scheme that should be used for testing
+   - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
+   - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
 */
 func captureScreenshots(workspace: String? = nil,
                         project: String? = nil,
@@ -1595,6 +1611,7 @@ func captureScreenshots(workspace: String? = nil,
                         clearPreviousScreenshots: Bool = false,
                         reinstallApp: Bool = false,
                         eraseSimulator: Bool = false,
+                        overrideStatusBar: Bool = false,
                         localizeSimulator: Bool = false,
                         darkMode: Bool? = nil,
                         appIdentifier: String? = nil,
@@ -1615,7 +1632,10 @@ func captureScreenshots(workspace: String? = nil,
                         namespaceLogFiles: Any? = nil,
                         concurrentSimulators: Bool = true,
                         disableSlideToType: Bool = false,
-                        clonedSourcePackagesPath: String? = nil) {
+                        clonedSourcePackagesPath: String? = nil,
+                        testplan: String? = nil,
+                        onlyTesting: Any? = nil,
+                        skipTesting: Any? = nil) {
   let command = RubyCommand(commandID: "", methodName: "capture_screenshots", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                                      RubyCommand.Argument(name: "project", value: project),
                                                                                                      RubyCommand.Argument(name: "xcargs", value: xcargs),
@@ -1631,6 +1651,7 @@ func captureScreenshots(workspace: String? = nil,
                                                                                                      RubyCommand.Argument(name: "clear_previous_screenshots", value: clearPreviousScreenshots),
                                                                                                      RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                                      RubyCommand.Argument(name: "erase_simulator", value: eraseSimulator),
+                                                                                                     RubyCommand.Argument(name: "override_status_bar", value: overrideStatusBar),
                                                                                                      RubyCommand.Argument(name: "localize_simulator", value: localizeSimulator),
                                                                                                      RubyCommand.Argument(name: "dark_mode", value: darkMode),
                                                                                                      RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
@@ -1651,7 +1672,10 @@ func captureScreenshots(workspace: String? = nil,
                                                                                                      RubyCommand.Argument(name: "namespace_log_files", value: namespaceLogFiles),
                                                                                                      RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators),
                                                                                                      RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
-                                                                                                     RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath)])
+                                                                                                     RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                                     RubyCommand.Argument(name: "testplan", value: testplan),
+                                                                                                     RubyCommand.Argument(name: "only_testing", value: onlyTesting),
+                                                                                                     RubyCommand.Argument(name: "skip_testing", value: skipTesting)])
   _ = runner.executeCommand(command)
 }
 
@@ -2137,10 +2161,6 @@ func copyArtifacts(keepOriginal: Bool = true,
    - notifications: Crashlytics notification option (true/false)
    - debug: Crashlytics debug option (true/false)
 
- Crashlytics Beta has been deprecated and replaced with Firebase App Distribution.
- Beta will continue working until May 4, 2020.
- Check out the [Firebase App Distribution docs](https://github.com/fastlane/fastlane-plugin-firebase_app_distribution) to get started.
- 
  Additionally, you can specify `notes`, `emails`, `groups` and `notifications`.
  Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog by clicking the 'Manage Groups' button.
  This action uses the `submit` binary provided by the Crashlytics framework. If the binary is not found in its usual path, you'll need to specify the path manually by using the `crashlytics_path` option.
@@ -3004,7 +3024,7 @@ func flock(message: String,
    - forceOrientationBlock: [Advanced] A block to customize your screenshots' device orientation
    - debugMode: Output debug information in framed screenshots
    - resume: Resume frameit instead of reprocessing all screenshots
-   - usePlatform: Choose a platform, the valid options are IOS, ANDROID and ANY (IOS is default to ensure backward compatibility)
+   - usePlatform: Choose a platform, the valid options are IOS, ANDROID and ANY (default is either general platform defined in the fastfile or IOS to ensure backward compatibility)
    - path: The path to the directory containing the screenshots
 
  Uses [frameit](https://docs.fastlane.tools/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.
@@ -3066,7 +3086,7 @@ func frameScreenshots(white: Bool? = nil,
    - forceOrientationBlock: [Advanced] A block to customize your screenshots' device orientation
    - debugMode: Output debug information in framed screenshots
    - resume: Resume frameit instead of reprocessing all screenshots
-   - usePlatform: Choose a platform, the valid options are IOS, ANDROID and ANY (IOS is default to ensure backward compatibility)
+   - usePlatform: Choose a platform, the valid options are IOS, ANDROID and ANY (default is either general platform defined in the fastfile or IOS to ensure backward compatibility)
    - path: The path to the directory containing the screenshots
 
  Uses [frameit](https://docs.fastlane.tools/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.
@@ -3341,6 +3361,7 @@ func getManagedPlayStorePublishingRights(jsonKey: String? = nil,
    - platform: Set the provisioning profile's platform (i.e. ios, tvos)
    - readonly: Only fetch existing profile, don't generate new ones
    - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
 
  - returns: The UUID of the profile sigh just fetched/generated
 
@@ -3365,7 +3386,8 @@ func getProvisioningProfile(adhoc: Bool = false,
                             skipCertificateVerification: Bool = false,
                             platform: Any = "ios",
                             readonly: Bool = false,
-                            templateName: String? = nil) {
+                            templateName: String? = nil,
+                            failOnNameTaken: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "get_provisioning_profile", className: nil, args: [RubyCommand.Argument(name: "adhoc", value: adhoc),
                                                                                                           RubyCommand.Argument(name: "developer_id", value: developerId),
                                                                                                           RubyCommand.Argument(name: "development", value: development),
@@ -3385,7 +3407,8 @@ func getProvisioningProfile(adhoc: Bool = false,
                                                                                                           RubyCommand.Argument(name: "skip_certificate_verification", value: skipCertificateVerification),
                                                                                                           RubyCommand.Argument(name: "platform", value: platform),
                                                                                                           RubyCommand.Argument(name: "readonly", value: readonly),
-                                                                                                          RubyCommand.Argument(name: "template_name", value: templateName)])
+                                                                                                          RubyCommand.Argument(name: "template_name", value: templateName),
+                                                                                                          RubyCommand.Argument(name: "fail_on_name_taken", value: failOnNameTaken)])
   _ = runner.executeCommand(command)
 }
 
@@ -4496,6 +4519,8 @@ func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos)
    - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
+   - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
    - outputPath: Path in which to export certificates, key and profile
    - verbose: Print out extra information and all commands
 
@@ -4534,6 +4559,8 @@ func match(type: Any = matchfile.type,
            skipDocs: Bool = matchfile.skipDocs,
            platform: Any = matchfile.platform,
            templateName: Any? = matchfile.templateName,
+           profileName: Any? = matchfile.profileName,
+           failOnNameTaken: Bool = matchfile.failOnNameTaken,
            outputPath: Any? = matchfile.outputPath,
            verbose: Bool = matchfile.verbose) {
   let command = RubyCommand(commandID: "", methodName: "match", className: nil, args: [RubyCommand.Argument(name: "type", value: type),
@@ -4569,6 +4596,8 @@ func match(type: Any = matchfile.type,
                                                                                        RubyCommand.Argument(name: "skip_docs", value: skipDocs),
                                                                                        RubyCommand.Argument(name: "platform", value: platform),
                                                                                        RubyCommand.Argument(name: "template_name", value: templateName),
+                                                                                       RubyCommand.Argument(name: "profile_name", value: profileName),
+                                                                                       RubyCommand.Argument(name: "fail_on_name_taken", value: failOnNameTaken),
                                                                                        RubyCommand.Argument(name: "output_path", value: outputPath),
                                                                                        RubyCommand.Argument(name: "verbose", value: verbose)])
   _ = runner.executeCommand(command)
@@ -4964,6 +4993,7 @@ func pem(development: Bool = false,
    - notifyExternalTesters: Should notify external testers?
    - appVersion: The version number of the application build to distribute. If the version number is not specified, then the most recent build uploaded to TestFlight will be distributed. If specified, the most recent build for the version number will be distributed
    - buildNumber: The build number of the application build to distribute. If the build number is not specified, the most recent build is distributed
+   - expirePreviousBuilds: Should expire previous builds?
    - firstName: The tester's first name
    - lastName: The tester's last name
    - email: The tester's email
@@ -5000,6 +5030,7 @@ func pilot(username: String,
            notifyExternalTesters: Bool = true,
            appVersion: String? = nil,
            buildNumber: String? = nil,
+           expirePreviousBuilds: Bool = false,
            firstName: String? = nil,
            lastName: String? = nil,
            email: String? = nil,
@@ -5032,6 +5063,7 @@ func pilot(username: String,
                                                                                        RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
                                                                                        RubyCommand.Argument(name: "app_version", value: appVersion),
                                                                                        RubyCommand.Argument(name: "build_number", value: buildNumber),
+                                                                                       RubyCommand.Argument(name: "expire_previous_builds", value: expirePreviousBuilds),
                                                                                        RubyCommand.Argument(name: "first_name", value: firstName),
                                                                                        RubyCommand.Argument(name: "last_name", value: lastName),
                                                                                        RubyCommand.Argument(name: "email", value: email),
@@ -5663,6 +5695,8 @@ func rubyVersion() {
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
    - testplan: The testplan associated with the scheme that should be used for testing
+   - onlyTestConfigurations: Array of strings matching test plan configurations to run
+   - skipTestConfigurations: Array of strings matching test plan configurations to skip
    - xctestrun: Run tests using the provided `.xctestrun` file
    - toolchain: The toolchain that should be used for building the application (e.g. `com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a`)
    - clean: Should the project be cleaned before building it?
@@ -5670,8 +5704,9 @@ func rubyVersion() {
    - addressSanitizer: Should the address sanitizer be turned on?
    - threadSanitizer: Should the thread sanitizer be turned on?
    - openReport: Should the HTML report be opened when tests are completed?
+   - disableXcpretty: Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
    - outputDirectory: The directory in which all reports will be stored
-   - outputStyle: Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty)
+   - outputStyle: Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty during xcodebuild)
    - outputTypes: Comma separated list of the output types (e.g. html, junit, json-compilation-database)
    - outputFiles: Comma separated list of the output files, corresponding to the types provided by :output_types (order should match). If specifying an output type of json-compilation-database with :use_clang_report_name enabled, that option will take precedence
    - buildlogPath: The directory where to store the raw log
@@ -5726,6 +5761,8 @@ func runTests(workspace: String? = nil,
               onlyTesting: Any? = nil,
               skipTesting: Any? = nil,
               testplan: String? = nil,
+              onlyTestConfigurations: Any? = nil,
+              skipTestConfigurations: Any? = nil,
               xctestrun: String? = nil,
               toolchain: Any? = nil,
               clean: Bool = false,
@@ -5733,6 +5770,7 @@ func runTests(workspace: String? = nil,
               addressSanitizer: Bool? = nil,
               threadSanitizer: Bool? = nil,
               openReport: Bool = false,
+              disableXcpretty: Bool? = nil,
               outputDirectory: String = "./test_output",
               outputStyle: String? = nil,
               outputTypes: String = "html,junit",
@@ -5786,6 +5824,8 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                            RubyCommand.Argument(name: "skip_testing", value: skipTesting),
                                                                                            RubyCommand.Argument(name: "testplan", value: testplan),
+                                                                                           RubyCommand.Argument(name: "only_test_configurations", value: onlyTestConfigurations),
+                                                                                           RubyCommand.Argument(name: "skip_test_configurations", value: skipTestConfigurations),
                                                                                            RubyCommand.Argument(name: "xctestrun", value: xctestrun),
                                                                                            RubyCommand.Argument(name: "toolchain", value: toolchain),
                                                                                            RubyCommand.Argument(name: "clean", value: clean),
@@ -5793,6 +5833,7 @@ func runTests(workspace: String? = nil,
                                                                                            RubyCommand.Argument(name: "address_sanitizer", value: addressSanitizer),
                                                                                            RubyCommand.Argument(name: "thread_sanitizer", value: threadSanitizer),
                                                                                            RubyCommand.Argument(name: "open_report", value: openReport),
+                                                                                           RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty),
                                                                                            RubyCommand.Argument(name: "output_directory", value: outputDirectory),
                                                                                            RubyCommand.Argument(name: "output_style", value: outputStyle),
                                                                                            RubyCommand.Argument(name: "output_types", value: outputTypes),
@@ -5927,6 +5968,8 @@ func say(text: Any,
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
    - testplan: The testplan associated with the scheme that should be used for testing
+   - onlyTestConfigurations: Array of strings matching test plan configurations to run
+   - skipTestConfigurations: Array of strings matching test plan configurations to skip
    - xctestrun: Run tests using the provided `.xctestrun` file
    - toolchain: The toolchain that should be used for building the application (e.g. `com.apple.dt.toolchain.Swift_2_3, org.swift.30p620160816a`)
    - clean: Should the project be cleaned before building it?
@@ -5934,8 +5977,9 @@ func say(text: Any,
    - addressSanitizer: Should the address sanitizer be turned on?
    - threadSanitizer: Should the thread sanitizer be turned on?
    - openReport: Should the HTML report be opened when tests are completed?
+   - disableXcpretty: Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
    - outputDirectory: The directory in which all reports will be stored
-   - outputStyle: Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty)
+   - outputStyle: Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty during xcodebuild)
    - outputTypes: Comma separated list of the output types (e.g. html, junit, json-compilation-database)
    - outputFiles: Comma separated list of the output files, corresponding to the types provided by :output_types (order should match). If specifying an output type of json-compilation-database with :use_clang_report_name enabled, that option will take precedence
    - buildlogPath: The directory where to store the raw log
@@ -5990,6 +6034,8 @@ func scan(workspace: Any? = scanfile.workspace,
           onlyTesting: Any? = scanfile.onlyTesting,
           skipTesting: Any? = scanfile.skipTesting,
           testplan: Any? = scanfile.testplan,
+          onlyTestConfigurations: Any? = scanfile.onlyTestConfigurations,
+          skipTestConfigurations: Any? = scanfile.skipTestConfigurations,
           xctestrun: Any? = scanfile.xctestrun,
           toolchain: Any? = scanfile.toolchain,
           clean: Bool = scanfile.clean,
@@ -5997,6 +6043,7 @@ func scan(workspace: Any? = scanfile.workspace,
           addressSanitizer: Bool? = scanfile.addressSanitizer,
           threadSanitizer: Bool? = scanfile.threadSanitizer,
           openReport: Bool = scanfile.openReport,
+          disableXcpretty: Bool? = scanfile.disableXcpretty,
           outputDirectory: Any = scanfile.outputDirectory,
           outputStyle: Any? = scanfile.outputStyle,
           outputTypes: Any = scanfile.outputTypes,
@@ -6050,6 +6097,8 @@ func scan(workspace: Any? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                       RubyCommand.Argument(name: "skip_testing", value: skipTesting),
                                                                                       RubyCommand.Argument(name: "testplan", value: testplan),
+                                                                                      RubyCommand.Argument(name: "only_test_configurations", value: onlyTestConfigurations),
+                                                                                      RubyCommand.Argument(name: "skip_test_configurations", value: skipTestConfigurations),
                                                                                       RubyCommand.Argument(name: "xctestrun", value: xctestrun),
                                                                                       RubyCommand.Argument(name: "toolchain", value: toolchain),
                                                                                       RubyCommand.Argument(name: "clean", value: clean),
@@ -6057,6 +6106,7 @@ func scan(workspace: Any? = scanfile.workspace,
                                                                                       RubyCommand.Argument(name: "address_sanitizer", value: addressSanitizer),
                                                                                       RubyCommand.Argument(name: "thread_sanitizer", value: threadSanitizer),
                                                                                       RubyCommand.Argument(name: "open_report", value: openReport),
+                                                                                      RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty),
                                                                                       RubyCommand.Argument(name: "output_directory", value: outputDirectory),
                                                                                       RubyCommand.Argument(name: "output_style", value: outputStyle),
                                                                                       RubyCommand.Argument(name: "output_types", value: outputTypes),
@@ -6489,6 +6539,7 @@ func setupTravis(force: Bool = false) {
    - platform: Set the provisioning profile's platform (i.e. ios, tvos)
    - readonly: Only fetch existing profile, don't generate new ones
    - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
 
  - returns: The UUID of the profile sigh just fetched/generated
 
@@ -6513,7 +6564,8 @@ func sigh(adhoc: Bool = false,
           skipCertificateVerification: Bool = false,
           platform: Any = "ios",
           readonly: Bool = false,
-          templateName: String? = nil) {
+          templateName: String? = nil,
+          failOnNameTaken: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "sigh", className: nil, args: [RubyCommand.Argument(name: "adhoc", value: adhoc),
                                                                                       RubyCommand.Argument(name: "developer_id", value: developerId),
                                                                                       RubyCommand.Argument(name: "development", value: development),
@@ -6533,7 +6585,8 @@ func sigh(adhoc: Bool = false,
                                                                                       RubyCommand.Argument(name: "skip_certificate_verification", value: skipCertificateVerification),
                                                                                       RubyCommand.Argument(name: "platform", value: platform),
                                                                                       RubyCommand.Argument(name: "readonly", value: readonly),
-                                                                                      RubyCommand.Argument(name: "template_name", value: templateName)])
+                                                                                      RubyCommand.Argument(name: "template_name", value: templateName),
+                                                                                      RubyCommand.Argument(name: "fail_on_name_taken", value: failOnNameTaken)])
   _ = runner.executeCommand(command)
 }
 
@@ -6751,6 +6804,7 @@ func slather(buildDirectory: String? = nil,
    - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running snapshot
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
+   - overrideStatusBar: Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
@@ -6772,6 +6826,9 @@ func slather(buildDirectory: String? = nil,
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - testplan: The testplan associated with the scheme that should be used for testing
+   - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
+   - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
 */
 func snapshot(workspace: Any? = snapshotfile.workspace,
               project: Any? = snapshotfile.project,
@@ -6788,6 +6845,7 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
               clearPreviousScreenshots: Bool = snapshotfile.clearPreviousScreenshots,
               reinstallApp: Bool = snapshotfile.reinstallApp,
               eraseSimulator: Bool = snapshotfile.eraseSimulator,
+              overrideStatusBar: Bool = snapshotfile.overrideStatusBar,
               localizeSimulator: Bool = snapshotfile.localizeSimulator,
               darkMode: Bool? = snapshotfile.darkMode,
               appIdentifier: Any? = snapshotfile.appIdentifier,
@@ -6808,7 +6866,10 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
               namespaceLogFiles: Any? = snapshotfile.namespaceLogFiles,
               concurrentSimulators: Bool = snapshotfile.concurrentSimulators,
               disableSlideToType: Bool = snapshotfile.disableSlideToType,
-              clonedSourcePackagesPath: Any? = snapshotfile.clonedSourcePackagesPath) {
+              clonedSourcePackagesPath: Any? = snapshotfile.clonedSourcePackagesPath,
+              testplan: Any? = snapshotfile.testplan,
+              onlyTesting: Any? = snapshotfile.onlyTesting,
+              skipTesting: Any? = snapshotfile.skipTesting) {
   let command = RubyCommand(commandID: "", methodName: "snapshot", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                           RubyCommand.Argument(name: "project", value: project),
                                                                                           RubyCommand.Argument(name: "xcargs", value: xcargs),
@@ -6824,6 +6885,7 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
                                                                                           RubyCommand.Argument(name: "clear_previous_screenshots", value: clearPreviousScreenshots),
                                                                                           RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                           RubyCommand.Argument(name: "erase_simulator", value: eraseSimulator),
+                                                                                          RubyCommand.Argument(name: "override_status_bar", value: overrideStatusBar),
                                                                                           RubyCommand.Argument(name: "localize_simulator", value: localizeSimulator),
                                                                                           RubyCommand.Argument(name: "dark_mode", value: darkMode),
                                                                                           RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
@@ -6844,7 +6906,10 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
                                                                                           RubyCommand.Argument(name: "namespace_log_files", value: namespaceLogFiles),
                                                                                           RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators),
                                                                                           RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
-                                                                                          RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath)])
+                                                                                          RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                          RubyCommand.Argument(name: "testplan", value: testplan),
+                                                                                          RubyCommand.Argument(name: "only_testing", value: onlyTesting),
+                                                                                          RubyCommand.Argument(name: "skip_testing", value: skipTesting)])
   _ = runner.executeCommand(command)
 }
 
@@ -7060,6 +7125,7 @@ func ssh(username: String,
    - timeout: Timeout for read, open, and send (in seconds)
    - deactivateOnPromote: **DEPRECATED!** Google Play does this automatically now - When promoting to a new track, deactivate the binary in the origin track
    - versionCodesToRetain: An array of version codes to retain when publishing a new APK
+   - inAppUpdatePriority: In-app update priority for all the newly added apks in the release. Can take values between [0,5]
    - obbMainReferencesVersion: References version of 'main' expansion file
    - obbMainFileSize: Size of 'main' expansion file in bytes
    - obbPatchReferencesVersion: References version of 'patch' expansion file
@@ -7097,6 +7163,7 @@ func supply(packageName: String,
             timeout: Int = 300,
             deactivateOnPromote: Bool = true,
             versionCodesToRetain: [String]? = nil,
+            inAppUpdatePriority: Int? = nil,
             obbMainReferencesVersion: String? = nil,
             obbMainFileSize: String? = nil,
             obbPatchReferencesVersion: String? = nil,
@@ -7131,6 +7198,7 @@ func supply(packageName: String,
                                                                                         RubyCommand.Argument(name: "timeout", value: timeout),
                                                                                         RubyCommand.Argument(name: "deactivate_on_promote", value: deactivateOnPromote),
                                                                                         RubyCommand.Argument(name: "version_codes_to_retain", value: versionCodesToRetain),
+                                                                                        RubyCommand.Argument(name: "in_app_update_priority", value: inAppUpdatePriority),
                                                                                         RubyCommand.Argument(name: "obb_main_references_version", value: obbMainReferencesVersion),
                                                                                         RubyCommand.Argument(name: "obb_main_file_size", value: obbMainFileSize),
                                                                                         RubyCommand.Argument(name: "obb_patch_references_version", value: obbPatchReferencesVersion),
@@ -7225,6 +7293,8 @@ func swiftlint(mode: Any = "lint",
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos)
    - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
+   - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
    - outputPath: Path in which to export certificates, key and profile
    - verbose: Print out extra information and all commands
 
@@ -7263,6 +7333,8 @@ func syncCodeSigning(type: String = "development",
                      skipDocs: Bool = false,
                      platform: String = "ios",
                      templateName: String? = nil,
+                     profileName: String? = nil,
+                     failOnNameTaken: Bool = false,
                      outputPath: String? = nil,
                      verbose: Bool = false) {
   let command = RubyCommand(commandID: "", methodName: "sync_code_signing", className: nil, args: [RubyCommand.Argument(name: "type", value: type),
@@ -7298,6 +7370,8 @@ func syncCodeSigning(type: String = "development",
                                                                                                    RubyCommand.Argument(name: "skip_docs", value: skipDocs),
                                                                                                    RubyCommand.Argument(name: "platform", value: platform),
                                                                                                    RubyCommand.Argument(name: "template_name", value: templateName),
+                                                                                                   RubyCommand.Argument(name: "profile_name", value: profileName),
+                                                                                                   RubyCommand.Argument(name: "fail_on_name_taken", value: failOnNameTaken),
                                                                                                    RubyCommand.Argument(name: "output_path", value: outputPath),
                                                                                                    RubyCommand.Argument(name: "verbose", value: verbose)])
   _ = runner.executeCommand(command)
@@ -7392,6 +7466,7 @@ func testfairy(apiKey: String,
    - notifyExternalTesters: Should notify external testers?
    - appVersion: The version number of the application build to distribute. If the version number is not specified, then the most recent build uploaded to TestFlight will be distributed. If specified, the most recent build for the version number will be distributed
    - buildNumber: The build number of the application build to distribute. If the build number is not specified, the most recent build is distributed
+   - expirePreviousBuilds: Should expire previous builds?
    - firstName: The tester's first name
    - lastName: The tester's last name
    - email: The tester's email
@@ -7428,6 +7503,7 @@ func testflight(username: String,
                 notifyExternalTesters: Bool = true,
                 appVersion: String? = nil,
                 buildNumber: String? = nil,
+                expirePreviousBuilds: Bool = false,
                 firstName: String? = nil,
                 lastName: String? = nil,
                 email: String? = nil,
@@ -7460,6 +7536,7 @@ func testflight(username: String,
                                                                                             RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
                                                                                             RubyCommand.Argument(name: "app_version", value: appVersion),
                                                                                             RubyCommand.Argument(name: "build_number", value: buildNumber),
+                                                                                            RubyCommand.Argument(name: "expire_previous_builds", value: expirePreviousBuilds),
                                                                                             RubyCommand.Argument(name: "first_name", value: firstName),
                                                                                             RubyCommand.Argument(name: "last_name", value: lastName),
                                                                                             RubyCommand.Argument(name: "email", value: email),
@@ -8157,6 +8234,7 @@ func uploadToAppStore(username: String,
    - timeout: Timeout for read, open, and send (in seconds)
    - deactivateOnPromote: **DEPRECATED!** Google Play does this automatically now - When promoting to a new track, deactivate the binary in the origin track
    - versionCodesToRetain: An array of version codes to retain when publishing a new APK
+   - inAppUpdatePriority: In-app update priority for all the newly added apks in the release. Can take values between [0,5]
    - obbMainReferencesVersion: References version of 'main' expansion file
    - obbMainFileSize: Size of 'main' expansion file in bytes
    - obbPatchReferencesVersion: References version of 'patch' expansion file
@@ -8194,6 +8272,7 @@ func uploadToPlayStore(packageName: String,
                        timeout: Int = 300,
                        deactivateOnPromote: Bool = true,
                        versionCodesToRetain: [String]? = nil,
+                       inAppUpdatePriority: Int? = nil,
                        obbMainReferencesVersion: String? = nil,
                        obbMainFileSize: String? = nil,
                        obbPatchReferencesVersion: String? = nil,
@@ -8228,6 +8307,7 @@ func uploadToPlayStore(packageName: String,
                                                                                                       RubyCommand.Argument(name: "timeout", value: timeout),
                                                                                                       RubyCommand.Argument(name: "deactivate_on_promote", value: deactivateOnPromote),
                                                                                                       RubyCommand.Argument(name: "version_codes_to_retain", value: versionCodesToRetain),
+                                                                                                      RubyCommand.Argument(name: "in_app_update_priority", value: inAppUpdatePriority),
                                                                                                       RubyCommand.Argument(name: "obb_main_references_version", value: obbMainReferencesVersion),
                                                                                                       RubyCommand.Argument(name: "obb_main_file_size", value: obbMainFileSize),
                                                                                                       RubyCommand.Argument(name: "obb_patch_references_version", value: obbPatchReferencesVersion),
@@ -8298,6 +8378,7 @@ func uploadToPlayStoreInternalAppSharing(packageName: String,
    - notifyExternalTesters: Should notify external testers?
    - appVersion: The version number of the application build to distribute. If the version number is not specified, then the most recent build uploaded to TestFlight will be distributed. If specified, the most recent build for the version number will be distributed
    - buildNumber: The build number of the application build to distribute. If the build number is not specified, the most recent build is distributed
+   - expirePreviousBuilds: Should expire previous builds?
    - firstName: The tester's first name
    - lastName: The tester's last name
    - email: The tester's email
@@ -8334,6 +8415,7 @@ func uploadToTestflight(username: String,
                         notifyExternalTesters: Bool = true,
                         appVersion: String? = nil,
                         buildNumber: String? = nil,
+                        expirePreviousBuilds: Bool = false,
                         firstName: String? = nil,
                         lastName: String? = nil,
                         email: String? = nil,
@@ -8366,6 +8448,7 @@ func uploadToTestflight(username: String,
                                                                                                       RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
                                                                                                       RubyCommand.Argument(name: "app_version", value: appVersion),
                                                                                                       RubyCommand.Argument(name: "build_number", value: buildNumber),
+                                                                                                      RubyCommand.Argument(name: "expire_previous_builds", value: expirePreviousBuilds),
                                                                                                       RubyCommand.Argument(name: "first_name", value: firstName),
                                                                                                       RubyCommand.Argument(name: "last_name", value: lastName),
                                                                                                       RubyCommand.Argument(name: "email", value: email),
@@ -8820,4 +8903,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.74]
+// FastlaneRunnerAPIVersion [0.9.76]
