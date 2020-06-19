@@ -66,15 +66,16 @@ module Spaceship
       # App Info
       #
 
-      def get_app_infos(app_store_state: nil)
-        resp = Spaceship::ConnectAPI.get_app_info(app_store_version_id: id)
-        models = resp.to_models
+      def get_edit_app_info
+        states = [
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::PREPARE_FOR_SUBMISSION,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::DEVELOPER_REJECTED
+        ]
 
-        models = models.select do |model|
-          model.app_store_state = app_store_state
-        end if app_store_state
-
-        return models
+        resp = Spaceship::ConnectAPI.get_app_infos(app_id: id)
+        return resp.to_models.select do |model|
+          states.include?(model.app_store_state)
+        end.first
       end
 
       #

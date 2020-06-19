@@ -137,18 +137,57 @@ module Spaceship
       # appInfos
       #
 
-      def get_app_infos(app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_app_infos(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        Client.instance.get("appStoreVersions/#{app_store_version_id}/appInfos", params)
+        Client.instance.get("apps/#{app_id}/appInfos", params)
       end
 
       def patch_app_info(app_info_id: nil, attributes: {})
+        attributes ||= {}
+
+        data = {
+          type: "appInfos",
+          id: app_info_id,
+        }
+        data[:attributes] = attributes unless attributes.empty?
+
         body = {
-          data: {
-            type: "appInfos",
-            id: app_info_id,
-            attributes: attributes
+          data: data
+        }
+
+        Client.instance.patch("appInfos/#{app_info_id}", body)
+      end
+
+      def patch_app_info_categories(app_info_id: nil, primary_category_id: nil, secondary_category_id: nil, primary_subcategory_one_id: nil, primary_subcategory_two_id: nil, secondary_subcategory_one_id: nil, secondary_subcategory_two_id: nil)
+        relationships = {
+          primaryCategory: {
+            data: primary_category_id ? { "type": "appCategories", "id": primary_category_id } : nil
+          },
+          secondaryCategory: {
+            data: secondary_category_id ? { "type": "appCategories", "id": secondary_category_id } : nil
+          },
+          primarySubcategoryOne: {
+            data: primary_subcategory_one_id ? { "type": "appCategories", "id": primary_subcategory_one_id } : nil
+          },
+          primarySubcategoryTwo: {
+            data: primary_subcategory_two_id ? { "type": "appCategories", "id": primary_subcategory_two_id } : nil
+          },
+          secondarySubcategoryOne: {
+            data: secondary_subcategory_one_id ? { "type": "appCategories", "id": secondary_subcategory_one_id } : nil
+          },
+          secondarySubcategoryTwo: {
+            data: secondary_subcategory_two_id ? { "type": "appCategories", "id": secondary_subcategory_two_id } : nil
           }
+        }
+
+        data = {
+          type: "appInfos",
+          id: app_info_id,
+        }
+        data[:relationships] = relationships unless relationships.empty?
+
+        body = {
+          data: data
         }
 
         Client.instance.patch("appInfos/#{app_info_id}", body)
@@ -432,9 +471,6 @@ module Spaceship
             }
           }
         }
-
-        require 'pp'
-        pp body
 
         Client.instance.post("idfaDeclarations", body)
       end

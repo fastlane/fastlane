@@ -38,6 +38,18 @@ module Spaceship
       def update(filter: {}, includes: nil, limit: nil, sort: nil)
         Spaceship::ConnectAPI::patch_app_info(app_info_id: id)
       end
+      
+      def update_categories(primary_category_id: nil, secondary_category_id: nil, primary_subcategory_one_id: nil, primary_subcategory_two_id: nil, secondary_subcategory_one_id: nil, secondary_subcategory_two_id: nil)
+        Spaceship::ConnectAPI::patch_app_info_categories(
+          app_info_id: id, 
+          primary_category_id: primary_category_id, 
+          secondary_category_id: secondary_category_id, 
+          primary_subcategory_one_id: primary_subcategory_one_id, 
+          primary_subcategory_two_id: primary_subcategory_two_id, 
+          secondary_subcategory_one_id: secondary_subcategory_one_id, 
+          secondary_subcategory_two_id: secondary_subcategory_two_id
+        )
+      end
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
         Spaceship::ConnectAPI::delete_app_info(app_info_id: id)

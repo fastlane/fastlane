@@ -96,7 +96,8 @@ module Deliver
       else
         version = app.get_edit_app_store_version(platform: platform)
         localised_options = (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES)
-        non_localised_options = (NON_LOCALISED_VERSION_VALUES.keys + NON_LOCALISED_APP_VALUES)
+        non_localised_options = NON_LOCALISED_VERSION_VALUES.keys
+        category_options = NON_LOCALISED_APP_VALUES
       end
 
       UI.important("Will begin uploading metadata for '#{version.version_string}' on App Store Connect")
@@ -165,6 +166,32 @@ module Deliver
       # Update app store version
       UI.message("Uploading metadata to App Store Connect for version")
       version.update(attributes: non_localized_version_attributes)
+
+      # Update categories
+      app_info = app.get_edit_app_info
+      if app_info
+        app_info.update_categories(
+          primary_category_id: Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
+            options[:primary_category].to_s.strip
+          ), 
+          secondary_category_id: Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
+            options[:secondary_category].to_s.strip
+          ), 
+          primary_subcategory_one_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            options[:primary_first_sub_category].to_s.strip
+          ), 
+          primary_subcategory_two_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            options[:primary_second_sub_category].to_s.strip
+          ), 
+          secondary_subcategory_one_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            options[:secondary_first_sub_category].to_s.strip
+          ), 
+          secondary_subcategory_two_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            options[:secondary_second_sub_category].to_s.strip
+          )
+        )
+      end
+
 
       # Update phased release
       unless options[:phased_release].nil?
