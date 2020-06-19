@@ -41,8 +41,8 @@ module Fastlane
     class << self
       # Makes sure the lane name is valid
       def verify_lane_name(name)
-        if self.black_list.include?(name.to_s)
-          UI.error("Lane name '#{name}' is invalid! Invalid names are #{self.black_list.join(', ')}.")
+        if self.deny_list.include?(name.to_s)
+          UI.error("Lane name '#{name}' is invalid! Invalid names are #{self.deny_list.join(', ')}.")
           UI.user_error!("Lane name '#{name}' is invalid")
         end
 
@@ -59,7 +59,7 @@ module Fastlane
         self.ensure_name_not_conflicts(name.to_s)
       end
 
-      def black_list
+      def deny_list
         %w(
           run
           init

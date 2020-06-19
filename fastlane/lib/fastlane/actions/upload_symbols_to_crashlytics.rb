@@ -45,42 +45,11 @@ module Fastlane
       # @param current_path this is a path to either a dSYM or a zipped dSYM
       #   this might also be either nested or not, we're flexible
       def self.handle_dsym(params, current_path, max_worker_threads)
-        if current_path.end_with?(".dSYM")
+        if current_path.end_with?(".dSYM", ".zip")
           upload_dsym(params, current_path)
-        elsif current_path.end_with?(".zip")
-          UI.message("Extracting '#{current_path}'...")
-
-          current_path = File.expand_path(current_path)
-          Dir.mktmpdir do |dir|
-            Dir.chdir(dir) do
-              Actions.sh("unzip -qo #{current_path.shellescape}")
-              work_q = Queue.new
-              Dir["*.dSYM"].each do |sub|
-                work_q.push(sub)
-              end
-              execute_uploads(params, max_worker_threads, work_q)
-            end
-          end
         else
           UI.error("Don't know how to handle '#{current_path}'")
         end
-      end
-
-      def self.execute_uploads(params, max_worker_threads, work_q)
-        number_of_threads = [max_worker_threads, work_q.size].min
-        workers = (0...number_of_threads).map do
-          Thread.new do
-            begin
-              while work_q.size > 0
-                current_path = work_q.pop(true)
-                upload_dsym(params, current_path)
-              end
-            rescue => ex
-              UI.error(ex.to_s)
-            end
-          end
-        end
-        workers.map(&:join)
       end
 
       def self.upload_dsym(params, path)
@@ -119,7 +88,7 @@ module Fastlane
       end
 
       def self.find_gsp_path(params)
-        return if params[:api_token]
+        return if params[:api_token] && params[:gsp_path].nil?
 
         if params[:gsp_path].to_s.length > 0
           params[:gsp_path] = File.expand_path(params[:gsp_path])

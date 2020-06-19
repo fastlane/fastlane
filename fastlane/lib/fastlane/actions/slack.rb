@@ -105,7 +105,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :icon_url,
                                        env_name: "FL_SLACK_ICON_URL",
                                        description: "Overrides the webhook's image property if use_webhook_configured_username_and_icon is false",
-                                       default_value: "https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png",
+                                       default_value: "https://fastlane.tools/assets/img/fastlane_icon.png",
                                        is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :payload,
@@ -159,7 +159,7 @@ module Fastlane
               "Build Date" => Time.new.to_s,
               "Built by" => "Jenkins",
             },
-            default_payloads: [:git_branch, :git_author], # Optional, lets you specify a whitelist of default payloads to include. Pass an empty array to suppress all the default payloads.
+            default_payloads: [:git_branch, :git_author], # Optional, lets you specify an allowlist of default payloads to include. Pass an empty array to suppress all the default payloads.
                                                           # Don\'t add this key, or pass nil, if you want all the default payloads. The available default payloads are: `lane`, `test_result`, `git_branch`, `git_author`, `last_git_commit`, `last_git_commit_hash`.
             attachment_properties: { # Optional, lets you specify any other properties available for attachments in the slack API (see https://api.slack.com/docs/attachments).
                                      # This hash is deep merged with the existing properties set using the other properties above. This allows your own fields properties to be appended to the existing fields that were created using the `payload` property for instance.

@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Matthew Ellis",
-                        "Olivier Halligon",
-                        "Kohki Miki",
+  spec.authors       = ["Manu Wallner",
                         "Danielle Tomlinson",
-                        "Maksym Grebenets",
-                        "Helmut Januschka",
-                        "Daniel Jankowski",
-                        "Max Ott",
+                        "Matthew Ellis",
                         "Stefan Natchev",
                         "Jimmy Dee",
-                        "Luka Mirosevic",
-                        "Jan Piotrowski",
+                        "Kohki Miki",
+                        "Jorge Revuelta H",
+                        "Daniel Jankowski",
+                        "Jérôme Lacoste",
                         "Andrew McBurney",
+                        "Max Ott",
+                        "Iulian Onofrei",
+                        "Helmut Januschka",
+                        "Jan Piotrowski",
+                        "Luka Mirosevic",
+                        "Felix Krause",
+                        "Fumiya Nakamura",
+                        "Olivier Halligon",
+                        "Maksym Grebenets",
                         "Aaron Brager",
                         "Josh Holtz",
-                        "Jérôme Lacoste",
-                        "Fumiya Nakamura",
-                        "Manu Wallner",
-                        "Joshua Liebowitz",
-                        "Iulian Onofrei",
-                        "Jorge Revuelta H",
-                        "Felix Krause"]
+                        "Joshua Liebowitz"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -66,8 +66,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency('addressable', '>= 2.3', '< 3.0.0') # Support for URI templates
   spec.add_dependency('multipart-post', '~> 2.0.0') # Needed for uploading builds to appetize
   spec.add_dependency('word_wrap', '~> 1.0.0') # to add line breaks for tables with long strings
-
-  spec.add_dependency('public_suffix', '~> 2.0.0') # https://github.com/fastlane/fastlane/issues/10162
 
   # TTY dependencies
   spec.add_dependency('tty-screen', '>= 0.6.3', '< 1.0.0') # detect the terminal width
@@ -104,7 +102,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('aws-sdk-s3', '~> 1.0') # Used for S3 storage in fastlane match
 
   # Development only
-  spec.add_development_dependency('rake', '< 12')
+  spec.add_development_dependency('rake')
   spec.add_development_dependency('rspec', '~> 3.5.0')
   spec.add_development_dependency('rspec_junit_formatter', '~> 0.2.3')
   spec.add_development_dependency('pry')

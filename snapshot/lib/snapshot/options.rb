@@ -152,6 +152,11 @@ module Snapshot
                                      description: "A list of videos that should be added to the simulator before running the application",
                                      type: Array,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :html_template,
+                                     env_name: 'SNAPSHOT_HTML_TEMPLATE',
+                                     short_option: "-e",
+                                     description: "A path to screenshots.html template",
+                                     optional: true),
 
         # Everything around building
         FastlaneCore::ConfigItem.new(key: :buildlog_path,
@@ -263,7 +268,12 @@ module Snapshot
                                      is_string: false,
                                      verify_block: proc do |value|
                                        verify_type('skip_testing', [Array, String], value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
+                                     env_name: "SNAPSHOT_DISABLE_XCPRETTY",
+                                     description: "Disable xcpretty formatting of build",
+                                     type: Boolean,
+                                     optional: true)
       ]
     end
   end
