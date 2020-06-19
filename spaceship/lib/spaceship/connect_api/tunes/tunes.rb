@@ -199,6 +199,46 @@ module Spaceship
       end
 
       #
+      # appInfoLocalizations
+      #
+
+      def get_app_info_localizations(app_info_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("appInfos/#{app_info_id}/appInfoLocalizations", params)
+      end
+
+      def post_app_info_localization(app_info_id: nil, attributes: {})
+        body = {
+          data: {
+            type: "appInfoLocalizations",
+            attributes: attributes,
+            relationships: {
+              appStoreVersion: {
+                data: {
+                  type: "appStoreVersions",
+                  id: app_info_id
+                }
+              }
+            }
+          }
+        }
+
+        Client.instance.post("appInfoLocalizations", body)
+      end
+
+      def patch_app_info_localization(app_info_localization_id: nil, attributes: {})
+        body = {
+          data: {
+            type: "appInfoLocalizations",
+            id: app_info_localization_id,
+            attributes: attributes
+          }
+        }
+
+        Client.instance.patch("appInfoLocalizations/#{app_info_localization_id}", body)
+      end
+
+      #
       # appStoreReviewDetails
       #
 

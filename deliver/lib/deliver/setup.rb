@@ -60,7 +60,7 @@ module Deliver
       app_details = v.application.details
 
       # All the localised metadata
-      (UploadMetadata::LOCALISED_VERSION_VALUES.keys + UploadMetadata::LOCALISED_APP_VALUES).each do |key|
+      (UploadMetadata::LOCALISED_VERSION_VALUES.keys + UploadMetadata::LOCALISED_APP_VALUES.keys).each do |key|
         v.description.languages.each do |language|
           if UploadMetadata::LOCALISED_VERSION_VALUES.keys.include?(key)
             content = v.send(key)[language].to_s
@@ -100,20 +100,6 @@ module Deliver
       end
 
       UI.success("Successfully created new configuration files.")
-
-      # get App icon + watch icon
-      if v.large_app_icon.asset_token
-        app_icon_extension = File.extname(v.large_app_icon.url)
-        app_icon_path = File.join(path, "app_icon#{app_icon_extension}")
-        File.write(app_icon_path, open(v.large_app_icon.url).read)
-        UI.success("Successfully downloaded large app icon")
-      end
-      if v.watch_app_icon.asset_token
-        watch_app_icon_extension = File.extname(v.watch_app_icon.url)
-        watch_icon_path = File.join(path, "watch_icon#{watch_app_icon_extension}")
-        File.write(watch_icon_path, open(v.watch_app_icon.url).read)
-        UI.success("Successfully downloaded watch icon")
-      end
     end
 
     def download_screenshots(path, options)

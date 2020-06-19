@@ -98,10 +98,6 @@ module Deliver
           indized[localization.locale][app_screenshot_set.screenshot_display_type] ||= app_screenshot_set.app_screenshots.size
         end
 
-        require 'pp'
-        puts "INDIZED"
-        pp indized
-
         UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
         screenshots_for_language.each do |screenshot|
 

@@ -19,7 +19,12 @@ module Deliver
     }
 
     # Localised app details values
-    LOCALISED_APP_VALUES = [:name, :subtitle, :privacy_url, :apple_tv_privacy_policy]
+    LOCALISED_APP_VALUES = {
+      name: "name", 
+      subtitle: "subtitle", 
+      privacy_url: "privacyPolicyUrl", 
+      apple_tv_privacy_policy: "privacyPolicyText"
+    }
 
     # Non localized app details values
     NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
@@ -75,7 +80,8 @@ module Deliver
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
 
-      app_store_version_localizations = verify_available_languages!(options, app) unless options[:edit_live]
+      app_store_version_localizations = verify_available_version_languages!(options, app) unless options[:edit_live]
+      app_info_localizations = verify_available_info_languages!(options, app) unless options[:edit_live]
 
       if options[:edit_live]
         # not all values are editable when using live_version
@@ -95,7 +101,7 @@ module Deliver
         end
       else
         version = app.get_edit_app_store_version(platform: platform)
-        localised_options = (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES)
+        localised_options = (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys)
         non_localised_options = NON_LOCALISED_VERSION_VALUES.keys
         category_options = NON_LOCALISED_APP_VALUES
       end
@@ -103,6 +109,7 @@ module Deliver
       UI.important("Will begin uploading metadata for '#{version.version_string}' on App Store Connect")
 
       localized_version_attributes_by_locale = {}
+      localized_info_attributes_by_locale = {}
 
       individual = options[:individual_metadata_items] || []
       localised_options.each do |key|
@@ -125,9 +132,11 @@ module Deliver
             localized_version_attributes_by_locale[language][attribute_name] = strip_value
           end
 
-          if LOCALISED_APP_VALUES.include?(key)
-            # puts "LOCALISED_APP_VALUES: NEED TO SEND #{key} #{language}"
-            # puts "\t#{value}"
+          if LOCALISED_APP_VALUES.include?(key) && !strip_value.empty?
+            attribute_name = LOCALISED_APP_VALUES[key]
+
+            localized_info_attributes_by_locale[language] ||= {}
+            localized_info_attributes_by_locale[language][attribute_name] = strip_value
           end
 
         end
@@ -160,6 +169,15 @@ module Deliver
         if attributes
           UI.message("Uploading metadata to App Store Connect for localized version '#{app_store_version_localization.locale}'")
           app_store_version_localization.update(attributes: attributes)
+        end
+      end
+
+      # Update app info localizations
+      app_info_localizations.each do |app_info_localization|
+        attributes = localized_info_attributes_by_locale[app_info_localization.locale]
+        if attributes
+          UI.message("Uploading metadata to App Store Connect for localized info '#{app_info_localization.locale}'")
+          app_info_localization.update(attributes: attributes)
         end
       end
 
@@ -240,7 +258,7 @@ module Deliver
       enabled_languages = detect_languages(options)
 
       # Get all languages used in existing settings
-      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES).each do |key|
+      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
         current.each do |language, value|
@@ -259,7 +277,7 @@ module Deliver
       return unless enabled_languages.include?("default")
       UI.message("Detected languages: " + enabled_languages.to_s)
 
-      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES).each do |key|
+      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
 
@@ -281,7 +299,7 @@ module Deliver
       enabled_languages = options[:languages] || []
 
       # Get all languages used in existing settings
-      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES).each do |key|
+      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
         current.each do |language, value|
@@ -305,7 +323,42 @@ module Deliver
     end
 
     # Finding languages to enable
-    def verify_available_languages!(options, app)
+    def verify_available_info_languages!(options, app)
+      app_info = app.get_edit_app_info
+
+      # TODO: Handle better?
+      unless app_info
+        UI.user_error!("Cannot update languages - could not find an editable info")
+        return
+      end
+
+      localizations = app_info.get_app_info_localizations
+
+      languages = options[:languages] || []
+      locales_to_enable = languages - localizations.map(&:locale)
+
+      if locales_to_enable.count > 0
+        lng_text = "language"
+        lng_text += "s" if locales_to_enable.count != 1
+        Helper.show_loading_indicator("Activating info #{lng_text} #{locales_to_enable.join(', ')}...")
+
+        locales_to_enable.each do |locale|
+          app_info.create_app_info_localization(attributes: {
+            locale: locale
+          })
+        end
+
+        Helper.hide_loading_indicator
+
+        # Refresh version localizations
+        localizations = app_info.get_app_info_localizations
+      end
+
+      return localizations
+    end
+
+    # Finding languages to enable
+    def verify_available_version_languages!(options, app)
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       version = app.get_edit_app_store_version(platform: platform)
 
@@ -323,7 +376,7 @@ module Deliver
       if locales_to_enable.count > 0
         lng_text = "language"
         lng_text += "s" if locales_to_enable.count != 1
-        Helper.show_loading_indicator("Activating #{lng_text} #{locales_to_enable.join(', ')}...")
+        Helper.show_loading_indicator("Activating version #{lng_text} #{locales_to_enable.join(', ')}...")
 
         locales_to_enable.each do |locale|
           version.create_app_store_version_localization(attributes: {
@@ -348,7 +401,7 @@ module Deliver
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
         language = File.basename(lang_folder)
-        (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES).each do |key|
+        (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
           path = File.join(lang_folder, "#{key}.txt")
           next unless File.exist?(path)
 
@@ -383,7 +436,7 @@ module Deliver
 
     # Normalizes languages keys from symbols to strings
     def normalize_language_keys(options)
-      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES).each do |key|
+      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
 
@@ -422,18 +475,23 @@ module Deliver
     end
 
     def set_review_attachment_file(version, options)
-      return unless options[:app_review_attachment_file]
-
       app_store_review_detail = version.get_app_store_review_detail
       app_review_attachments = app_store_review_detail.get_app_review_attachments
 
-      app_review_attachments.each do |app_review_attachment|
-        UI.message("Removing previous review attachment file from App Store Connect")
-        app_review_attachment.delete!
-      end
+      if options[:app_review_attachment_file]
+        app_review_attachments.each do |app_review_attachment|
+          UI.message("Removing previous review attachment file from App Store Connect")
+          app_review_attachment.delete!
+        end
 
-      UI.message("Uploading review attachment file to App Store Connect")
-      app_store_review_detail.upload_attachment(path: options[:app_review_attachment_file])
+        UI.message("Uploading review attachment file to App Store Connect")
+        app_store_review_detail.upload_attachment(path: options[:app_review_attachment_file])
+      else
+        app_review_attachments.each do |app_review_attachment|
+          app_review_attachment.delete!
+        end
+        UI.message("Removing review attachment file to App Store Connect") unless app_review_attachments.empty?
+      end
     end
 
     def set_app_rating(version, options)

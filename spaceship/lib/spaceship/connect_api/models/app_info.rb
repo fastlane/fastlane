@@ -54,6 +54,19 @@ module Spaceship
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
         Spaceship::ConnectAPI::delete_app_info(app_info_id: id)
       end
+
+      #
+      # App Info Localizations
+      #
+
+      def create_app_info_localization(attributes: nil)
+        resp = Spaceship::ConnectAPI.post_app_info_localization(app_info_id: id, attributes: attributes)
+        return resp.to_models.first
+      end
+
+      def get_app_info_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
+        return Spaceship::ConnectAPI.get_app_info_localizations(app_info_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
+      end
     end
   end
 end
