@@ -239,7 +239,7 @@ module FastlaneCore
   # escaping problems in its accompanying shell script.
   class JavaTransporterExecutor < TransporterExecutor
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "")
-      if Helper.mac
+      if Helper.mac?
         [
           Helper.transporter_java_executable_path.shellescape,
           '-DWORootDirectory=',
@@ -449,7 +449,7 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir, @provider_short_name))
 
       begin
-        if helper.mac
+        if Helper.mac?
           Dir.chdir('/usr/local/itms')
         end
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
