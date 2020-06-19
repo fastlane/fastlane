@@ -216,7 +216,7 @@ module Fastlane
       exception_array << e.backtrace
 
       ec = e.class
-      
+
       em = e.message
 
       while e.respond_to?("cause") && (e = e.cause)
