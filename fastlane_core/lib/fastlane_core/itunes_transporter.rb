@@ -449,9 +449,6 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_upload_command(@user, 'YourPassword', actual_dir, @provider_short_name))
 
       begin
-        if Helper.mac?
-          Dir.chdir('/usr/local/itms')
-        end
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
