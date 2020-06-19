@@ -23,7 +23,7 @@ module Deliver
 
       # TODO: export compliance still uses legacy iTC API
 
-      #version.create_app_store_version_submission
+      version.create_app_store_version_submission
 
       UI.success("Successfully submitted the app for review!")
     end
