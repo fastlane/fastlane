@@ -23,7 +23,7 @@ module Deliver
 
       # TODO: export compliance still uses legacy iTC API
 
-      version.create_app_store_version_submission
+      #version.create_app_store_version_submission
 
       UI.success("Successfully submitted the app for review!")
     end
@@ -54,7 +54,65 @@ module Deliver
     end
 
     def update_idfa(options, app, version)
-      
+      submission_information = options[:submission_information] || {}
+      return unless submission_information.include?(:add_id_info_uses_idfa)
+
+      uses_idfa = submission_information[:add_id_info_uses_idfa]
+      idfa_declaration = version.get_idfa_declaration rescue nil
+
+      build = version.get_build
+
+      UI.verbose("Updating app store version for IDFA status of '#{uses_idfa}'")
+      version = version.update(attributes: {
+        usesIdfa: uses_idfa
+      })
+      UI.verbose("Updated app store version for IDFA status of '#{version.uses_idfa}'")
+
+      UI.verbose("Updating build for IDFA status of '#{uses_idfa}'")
+      build = build.update(attributes: {
+        usesNonExemptEncryption: uses_idfa
+      })
+      UI.verbose("Updated build for IDFA status of '#{build.uses_non_exempt_encryption}'")
+
+      if uses_idfa == false
+        if idfa_declaration
+          UI.verbose("Deleting IDFA delcaration")
+          idfa_declaration.delete!
+          UI.verbose("Deleted IDFA delcaration")
+        else
+        end
+      else
+
+        attributes = {}
+        if submission_information.include?(:add_id_info_limits_tracking)
+          attributes[:honorsLimitedAdTracking] = submission_information[:add_id_info_limits_tracking]
+        end
+
+        if submission_information.include?(:add_id_info_serves_ads)
+          attributes[:servesAds] = submission_information[:add_id_info_serves_ads]
+        end
+
+        if submission_information.include?(:add_id_info_tracks_install)
+          attributes[:attributesAppInstallationToPreviousAd] = submission_information[:add_id_info_tracks_install]
+        end
+
+        if submission_information.include?(:add_id_info_tracks_action)
+          attributes[:attributesActionWithPreviousAd] = submission_information[:add_id_info_tracks_action]
+        end
+
+        if idfa_declaration
+          UI.verbose("Updating IDFA delcaration")
+          idfa_declaration.update(attributes: attributes)
+          UI.verbose("Updated IDFA delcaration")
+        else
+          UI.verbose("Creating IDFA delcaration")
+          version.create_idfa_declaration(attributes: attributes)
+          UI.verbose("Created IDFA delcaration")
+        end
+      end
+
+      UI.success("Successfully updated IDFA delcarations")
+
     end
 
     def update_submission_information(options, app)

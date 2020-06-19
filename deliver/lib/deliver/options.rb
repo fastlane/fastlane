@@ -205,6 +205,7 @@ module Deliver
                                      short_option: "-b",
                                      description: "Extra information for the submission (e.g. compliance specifications, IDFA settings)",
                                      is_string: false,
+                                     type: Hash,
                                      optional: true),
 
         # affiliation

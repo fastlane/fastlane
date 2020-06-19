@@ -31,6 +31,7 @@ require 'spaceship/connect_api/models/build_delivery'
 require 'spaceship/connect_api/models/build_beta_detail'
 require 'spaceship/connect_api/models/pre_release_version'
 
+require 'spaceship/connect_api/models/app_category'
 require 'spaceship/connect_api/models/app_review_attachment'
 require 'spaceship/connect_api/models/app_store_review_detail'
 require 'spaceship/connect_api/models/app_store_version_submission'
@@ -39,6 +40,7 @@ require 'spaceship/connect_api/models/app_screenshot'
 require 'spaceship/connect_api/models/app_store_version_localization'
 require 'spaceship/connect_api/models/app_store_version_phased_release'
 require 'spaceship/connect_api/models/app_store_version'
+require 'spaceship/connect_api/models/idfa_declaration'
 require 'spaceship/connect_api/models/reset_ratings_request'
 
 module Spaceship

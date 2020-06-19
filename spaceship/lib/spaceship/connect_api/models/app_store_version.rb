@@ -62,7 +62,7 @@ module Spaceship
       end
 
       def update(attributes: nil)
-        Spaceship::ConnectAPI::patch_app_store_version(app_store_version_id: id, attributes: attributes)
+        return Spaceship::ConnectAPI::patch_app_store_version(app_store_version_id: id, attributes: attributes).first
       end
 
       #
@@ -127,8 +127,27 @@ module Spaceship
       # Build
       #
 
+      def get_build(build_id: nil)
+        resp = Spaceship::ConnectAPI.get_build(app_store_version_id: id, build_id: build_id)
+        return resp.to_models.first
+      end
+
       def select_build(build_id: nil)
         resp = Spaceship::ConnectAPI.patch_app_store_version_with_build(app_store_version_id: id, build_id: build_id)
+        return resp.to_models.first
+      end
+
+      #
+      # IDFA Declarations
+      #
+
+      def get_idfa_declaration
+        resp = Spaceship::ConnectAPI.get_idfa_declaration(app_store_version_id: id)
+        return resp.to_models.first
+      end
+
+      def create_idfa_declaration(attributes: nil)
+        resp = Spaceship::ConnectAPI.post_idfa_declaration(app_store_version_id: id, attributes: attributes)
         return resp.to_models.first
       end
 

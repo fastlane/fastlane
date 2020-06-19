@@ -408,6 +408,54 @@ module Spaceship
         Client.instance.delete("appStoreVersionSubmissions/#{app_store_version_submission_id}", params)
       end
 
+      #
+      # idfaDeclarations
+      #
+
+      def get_idfa_declaration(app_store_version_id: nil)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+        Client.instance.get("appStoreVersions/#{app_store_version_id}/idfaDeclaration", params)
+      end
+
+      def post_idfa_declaration(app_store_version_id: nil, attributes: nil)
+        body = {
+          data: {
+            type: "idfaDeclarations",
+            attributes: attributes,
+            relationships: {
+              appStoreVersion: {
+                data: {
+                  type: "appStoreVersions",
+                  id: app_store_version_id
+                }
+              }
+            }
+          }
+        }
+
+        require 'pp'
+        pp body
+
+        Client.instance.post("idfaDeclarations", body)
+      end
+
+      def patch_idfa_declaration(idfa_declaration_id: nil, attributes: nil)
+        body = {
+          data: {
+            type: "idfaDeclarations",
+            id: idfa_declaration_id,
+            attributes: attributes
+          }
+        }
+
+        Client.instance.patch("idfaDeclarations/#{idfa_declaration_id}", body)
+      end
+
+      def delete_idfa_declaration(idfa_declaration_id: nil)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+        Client.instance.delete("idfaDeclarations/#{idfa_declaration_id}", params)
+      end
+
     end
   end
 end

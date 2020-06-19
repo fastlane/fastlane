@@ -129,6 +129,10 @@ module Spaceship
         return Spaceship::ConnectAPI.get_build(build_id: build_id, includes: includes).first
       end
 
+      def update(attributes: nil)
+        return Spaceship::ConnectAPI.patch_builds(build_id: id, attributes: attributes).first
+      end
+
       def add_beta_groups(beta_groups: nil)
         beta_groups ||= []
         beta_group_ids = beta_groups.map(&:id)
