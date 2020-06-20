@@ -19,13 +19,11 @@ module Deliver
         return
       end
 
-      select_build(options, app, version, platform)
+      build = select_build(options, app, version, platform)
 
-      # TODO: Do IDFA things (on idfa model)
+      update_export_compliance(options, app, build)
       update_idfa(options, app, version)
       update_submission_information(options, app)
-
-      # TODO: export compliance still uses legacy iTC API
 
       version.create_app_store_version_submission
 
@@ -55,6 +53,21 @@ module Deliver
       version.select_build(build_id: build.id)
 
       UI.success("Successfully selected build")
+
+      return build
+    end
+
+    def update_export_compliance(options, app, build)
+      submission_information = options[:submission_information] || {}
+      uses_encryption = submission_information[:export_compliance_uses_encryption]
+
+      UI.verbose("Updating build for export compliance status of '#{uses_encryption}'")
+      if build.uses_non_exempt_encryption.nil?
+        build = build.update(attributes: {
+          usesNonExemptEncryption: uses_encryption
+        })
+      end
+      UI.verbose("Updated build for export compliance status of '#{build.uses_non_exempt_encryption}'")
     end
 
     def update_idfa(options, app, version)
@@ -68,19 +81,11 @@ module Deliver
                            nil
                          end
 
-      build = version.get_build
-
       UI.verbose("Updating app store version for IDFA status of '#{uses_idfa}'")
       version = version.update(attributes: {
         usesIdfa: uses_idfa
       })
       UI.verbose("Updated app store version for IDFA status of '#{version.uses_idfa}'")
-
-      UI.verbose("Updating build for IDFA status of '#{uses_idfa}'")
-      build = build.update(attributes: {
-        usesNonExemptEncryption: uses_idfa
-      })
-      UI.verbose("Updated build for IDFA status of '#{build.uses_non_exempt_encryption}'")
 
       if uses_idfa == false
         if idfa_declaration

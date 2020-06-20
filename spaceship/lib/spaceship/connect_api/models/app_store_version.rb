@@ -25,6 +25,7 @@ module Spaceship
         DEVELOPER_REJECTED = "DEVELOPER_REJECTED"
         REJECTED = "REJECTED"
         PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
+        METADATA_REJECTED = "METADATA_REJECTED"
       end
 
       module ReleaseType

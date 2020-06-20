@@ -26,14 +26,10 @@ module Deliver
       UI.message("Starting with the upload of screenshots...")
       screenshots_per_language = screenshots.group_by(&:language)
 
-      # pp screenshots_per_language
-
       localizations = version.get_app_store_version_localizations
 
       # TODO: Delete existing screenshots for each language
       if options[:overwrite_screenshots]
-        UI.message("Removing all previously uploaded screenshots...")
-
         # Get localizations on version
         localizations.each do |localization|
           # Only delete screenshots if trying to upload
@@ -42,6 +38,7 @@ module Deliver
           # Iterate over all screenshots for each set and delete
           screenshot_sets = localization.get_app_screenshot_sets
           screenshot_sets.each do |screenshot_set|
+            UI.message("Removing all previously uploaded screenshots for '#{localization.locale}' '#{screenshot_set.screenshot_display_type}'...")
             screenshot_set.app_screenshots.each do |screenshot|
               UI.verbose("Deleting screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
               screenshot.delete!
