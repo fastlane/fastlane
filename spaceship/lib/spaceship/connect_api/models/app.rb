@@ -54,6 +54,10 @@ module Spaceship
         end
       end
 
+      def self.create(name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil)
+        Spaceship::ConnectAPI.post_app(name: name, version_string: version_string, sku: sku, primary_locale: primary_locale, bundle_id: bundle_id, platforms: platforms)
+      end
+
       def self.get(app_id: nil, includes: "appStoreVersions")
         return Spaceship::ConnectAPI.get_app(app_id: app_id, includes: includes).first
       end

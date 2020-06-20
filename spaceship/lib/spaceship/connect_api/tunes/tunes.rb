@@ -28,6 +28,95 @@ module Spaceship
       # app
       #
 
+      def post_app(name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil)
+        included = []
+        included << {
+          type: "appInfos",
+          id: "${new-appInfo-id}",
+          relationships: {
+            appInfoLocalizations: {
+              data: [
+                {
+                  type: "appInfoLocalizations",
+                  id: "${new-appInfoLocalization-id}"
+                }
+              ]
+            }
+          }
+        }
+        included << {
+          type: "appInfoLocalizations",
+          id: "${new-appInfoLocalization-id}",
+          attributes: {
+            locale: primary_locale,
+            name: name
+          }
+        }
+
+        platforms.each do |platform|
+          included << {
+            type: "appStoreVersions",
+            id: "${store-version-#{platform}}",
+            attributes: {
+              platform: platform,
+              versionString: version_string
+            },
+            relationships: {
+              appStoreVersionLocalizations: {
+                data: [
+                  {
+                    type: "appStoreVersionLocalizations",
+                    id: "${new-#{platform}VersionLocalization-id}"
+                  }
+                ]
+              }
+            }
+          }
+
+          included << {
+            type: "appStoreVersionLocalizations",
+            id: "${new-#{platform}VersionLocalization-id}",
+            attributes: {
+              locale: primary_locale
+            }
+          }
+        end
+
+        app_store_verions_data = platforms.map do |platform|
+          {
+            type: "appStoreVersions",
+            id: "${store-version-#{platform}}"
+          }
+        end
+
+        body = {
+          data: {
+            type: "apps",
+            attributes: {
+              sku: sku,
+              primaryLocale: primary_locale,
+              bundleId: bundle_id
+            },
+            relationships: {
+              appStoreVersions: {
+                data: app_store_verions_data
+              },
+              appInfos: {
+                data: [
+                  {
+                    type: "appInfos",
+                    id: "${new-appInfo-id}"
+                  }
+                ]
+              }
+            }
+          },
+          included: included
+        }
+
+        Client.instance.post("apps", body)
+      end
+
       def patch_app(app_id: nil, attributes: {})
         body = {
           data: {

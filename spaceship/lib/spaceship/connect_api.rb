@@ -82,9 +82,9 @@ module Spaceship
 
         # Map from fastlane input and Spaceship::TestFlight platform values
         case platform.to_sym
-        when :appletvos
+        when :appletvos, :tvos
           return Spaceship::ConnectAPI::Platform::TV_OS
-        when :osx
+        when :osx, :macos
           return Spaceship::ConnectAPI::Platform::MAC_OS
         when :ios
           return Spaceship::ConnectAPI::Platform::IOS
