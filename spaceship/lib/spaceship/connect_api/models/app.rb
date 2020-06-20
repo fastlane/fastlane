@@ -81,6 +81,22 @@ module Spaceship
       end
 
       #
+      # App Pricing
+      #
+
+      def fetch_app_prices(filter: {}, includes: "priceTier", limit: nil, sort: nil)
+        filter ||= {}
+        filter[:app] = id
+        resp = Spaceship::ConnectAPI.get_app_prices(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
+        return resp.to_models
+      end
+
+      def update_app_price_tier(app_price_tier_id: nil)
+        resp = Spaceship::ConnectAPI.patch_app_app_prices(app_id: id, app_price_tier_id: app_price_tier_id)
+        return resp.first
+      end
+
+      #
       # App Store Versions
       #
 

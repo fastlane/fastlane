@@ -35,7 +35,7 @@ module Spaceship
       #
 
       def fetch_app_review_attachments
-        resp = Spaceship::ConnectAPI.fetch_app_review_attachments(app_store_review_detail_id: id)
+        resp = Spaceship::ConnectAPI.get_app_review_attachments(app_store_review_detail_id: id)
         return resp.to_models
       end
 

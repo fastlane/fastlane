@@ -7,7 +7,7 @@ module Spaceship
       # ageRatingDeclarations
       #
 
-      def fetch_age_rating_declaration(app_store_version_id: nil)
+      def get_age_rating_declaration(app_store_version_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.get("appStoreVersions/#{app_store_version_id}/ageRatingDeclaration", params)
       end
@@ -40,11 +40,67 @@ module Spaceship
         Client.instance.patch("apps/#{app_id}", body)
       end
 
+      def patch_app_app_prices(app_id: nil, app_price_tier_id: nil)
+        body = {
+          data: {
+            type: "apps",
+            id: app_id,
+            attributes: {
+              availableInNewTerritories: true
+            },
+            relationships: {
+              prices: {
+                data: [
+                  {
+                    type: "appPrices",
+                    id: "${price1}"
+                  }
+                ]
+              }
+            }
+          },
+          included: [
+            {
+              type: "appPrices",
+              id: "${price1}",
+              attributes: {
+                startDate: nil
+              },
+              relationships: {
+                app: {
+                  data: {
+                    type: "apps",
+                    id: app_id
+                  }
+                },
+                priceTier: {
+                  data: {
+                    type: "appPriceTiers",
+                    id: app_price_tier_id.to_s
+                  }
+                }
+              }
+            }
+          ]
+        }
+
+        Client.instance.patch("apps/#{app_id}", body)
+      end
+
+      #
+      # appPrices
+      #
+
+      def get_app_prices(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("appPrices", params)
+      end
+
       #
       # appReviewAttachments
       #
 
-      def fetch_app_review_attachments(app_store_review_detail_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_app_review_attachments(app_store_review_detail_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
         Client.instance.get("appStoreReviewDetails/#{app_store_review_detail_id}/appReviewAttachments", params)
       end
@@ -262,7 +318,7 @@ module Spaceship
       # appStoreReviewDetails
       #
 
-      def fetch_app_store_review_detail(app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_app_store_review_detail(app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
         Client.instance.get("appStoreVersions/#{app_store_version_id}/appStoreReviewDetail", params)
       end
@@ -347,7 +403,7 @@ module Spaceship
       # appStoreVersionPhasedReleases
       #
 
-      def fetch_app_store_version_phased_release(app_store_version_id: nil)
+      def get_app_store_version_phased_release(app_store_version_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.get("appStoreVersions/#{app_store_version_id}/appStoreVersionPhasedRelease", params)
       end
@@ -449,7 +505,7 @@ module Spaceship
       # appStoreVersionPhasedReleases
       #
 
-      def fetch_reset_ratings_request(app_store_version_id: nil)
+      def get_reset_ratings_request(app_store_version_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.get("appStoreVersions/#{app_store_version_id}/resetRatingsRequest", params)
       end
@@ -481,7 +537,7 @@ module Spaceship
       # appStoreVersionSubmissions
       #
 
-      def fetch_app_store_version_submission(app_store_version_id: nil)
+      def get_app_store_version_submission(app_store_version_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.get("appStoreVersions/#{app_store_version_id}/appStoreVersionSubmission", params)
       end
@@ -513,7 +569,7 @@ module Spaceship
       # idfaDeclarations
       #
 
-      def fetch_idfa_declaration(app_store_version_id: nil)
+      def get_idfa_declaration(app_store_version_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.get("appStoreVersions/#{app_store_version_id}/idfaDeclaration", params)
       end

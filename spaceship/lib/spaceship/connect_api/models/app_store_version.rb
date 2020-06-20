@@ -74,7 +74,7 @@ module Spaceship
       #
 
       def fetch_age_rating_declaration
-        resp = Spaceship::ConnectAPI.fetch_age_rating_declaration(app_store_version_id: id)
+        resp = Spaceship::ConnectAPI.get_age_rating_declaration(app_store_version_id: id)
         return resp.to_models.first
       end
 
@@ -104,7 +104,7 @@ module Spaceship
       end
 
       def fetch_app_store_review_detail
-        resp = Spaceship::ConnectAPI.fetch_app_store_review_detail(app_store_version_id: id)
+        resp = Spaceship::ConnectAPI.get_app_store_review_detail(app_store_version_id: id)
         return resp.to_models.first
       end
 
@@ -113,7 +113,7 @@ module Spaceship
       #
 
       def fetch_app_store_version_phased_release
-        resp = Spaceship::ConnectAPI.fetch_app_store_version_phased_release(app_store_version_id: id)
+        resp = Spaceship::ConnectAPI.get_app_store_version_phased_release(app_store_version_id: id)
         return resp.to_models.first
       end
 
@@ -127,7 +127,7 @@ module Spaceship
       #
 
       def fetch_app_store_version_submission
-        resp = Spaceship::ConnectAPI.fetch_app_store_version_submission(app_store_version_id: id)
+        resp = Spaceship::ConnectAPI.get_app_store_version_submission(app_store_version_id: id)
         return resp.to_models.first
       end
 
@@ -155,7 +155,7 @@ module Spaceship
       #
 
       def fetch_idfa_declaration
-        resp = Spaceship::ConnectAPI.fetch_idfa_declaration(app_store_version_id: id)
+        resp = Spaceship::ConnectAPI.get_idfa_declaration(app_store_version_id: id)
         return resp.to_models.first
       end
 
@@ -169,7 +169,7 @@ module Spaceship
       #
 
       def fetch_reset_ratings_request
-        resp = Spaceship::ConnectAPI.fetch_reset_ratings_request(app_store_version_id: id)
+        resp = Spaceship::ConnectAPI.get_reset_ratings_request(app_store_version_id: id)
         return resp.to_models.first
       end
 
