@@ -28,7 +28,6 @@ module Deliver
 
       localizations = version.get_app_store_version_localizations
 
-      # TODO: Delete existing screenshots for each language
       if options[:overwrite_screenshots]
         # Get localizations on version
         localizations.each do |localization|
@@ -122,7 +121,6 @@ module Deliver
 
           indized[localization.locale][set.screenshot_display_type] += 1
 
-          # TODO: Do we need to do something specific for messages?
           # Also.. what is the messages type even for?
           UI.message("Uploading '#{screenshot.path}'...")
           set.upload_screenshot(path: screenshot.path)

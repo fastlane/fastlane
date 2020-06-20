@@ -338,7 +338,6 @@ module Deliver
     def verify_available_info_languages!(options, app)
       app_info = app.fetch_edit_app_info
 
-      # TODO: Handle better?
       unless app_info
         UI.user_error!("Cannot update languages - could not find an editable info")
         return
@@ -374,7 +373,6 @@ module Deliver
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       version = app.get_edit_app_store_version(platform: platform)
 
-      # TODO: Handle better?
       unless version
         UI.user_error!("Cannot update languages - could not find an editable version for '#{platform}'")
         return
@@ -511,7 +509,6 @@ module Deliver
     def set_app_rating(version, options)
       return unless options[:app_rating_config_path]
 
-      # TODO: PUT THIS IN
       UI.error("We have temporarily disabled 'app_rating_config_path'. It will be back shortly 😊")
 
       # require 'json'

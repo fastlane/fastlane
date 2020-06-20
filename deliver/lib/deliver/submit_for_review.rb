@@ -99,7 +99,6 @@ module Deliver
     end
 
     def update_submission_information(options, app)
-      # TODO: Still missing :content_rights_has_rights if that is still a thing
       submission_information = options[:submission_information] || {}
       if submission_information.include?(:content_rights_contains_third_party_content)
         value = if submission_information[:content_rights_contains_third_party_content]
