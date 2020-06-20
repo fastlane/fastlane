@@ -73,7 +73,6 @@ module Deliver
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
       return if options[:skip_metadata]
-      require 'pp'
 
       legacy_app = options[:app]
       app_id = legacy_app.apple_id
@@ -255,8 +254,7 @@ module Deliver
 
       set_review_information(version, options)
       set_review_attachment_file(version, options)
-
-      # set_app_rating(version, options)
+      set_app_rating(version, options)
     end
 
     # rubocop:enable Metrics/PerceivedComplexity
@@ -509,17 +507,25 @@ module Deliver
     def set_app_rating(version, options)
       return unless options[:app_rating_config_path]
 
-      UI.error("We have temporarily disabled 'app_rating_config_path'. It will be back shortly 😊")
+      require 'json'
+      begin
+        json = JSON.parse(File.read(options[:app_rating_config_path]))
+      rescue => ex
+        UI.error(ex.to_s)
+        UI.user_error!("Error parsing JSON file at path '#{options[:app_rating_config_path]}'")
+      end
+      UI.message("Setting the app's age rating...")
 
-      # require 'json'
-      # begin
-      #   json = JSON.parse(File.read(options[:app_rating_config_path]))
-      # rescue => ex
-      #   UI.error(ex.to_s)
-      #   UI.user_error!("Error parsing JSON file at path '#{options[:app_rating_config_path]}'")
-      # end
-      # UI.message("Setting the app's age rating...")
-      # v.update_rating(json)
+      # Maping from legacy ITC values to App Store Connect Values
+      attributes = {}
+      json.each do |k, v|
+        new_key = Spaceship::ConnectAPI::AgeRatingDeclaration.map_key_from_itc(k)
+        new_value = Spaceship::ConnectAPI::AgeRatingDeclaration.map_value_from_itc(new_key, v)
+        attributes[new_key] = new_value
+      end
+
+      age_rating_delcaration = version.fetch_age_rating_declaration
+      age_rating_delcaration.update(attributes: attributes)
     end
   end
   # rubocop:enable Metrics/ClassLength

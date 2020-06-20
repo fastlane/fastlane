@@ -70,6 +70,15 @@ module Spaceship
       end
 
       #
+      # Age Rating Delcaration
+      #
+
+      def fetch_age_rating_declaration
+        resp = Spaceship::ConnectAPI.fetch_age_rating_declaration(app_store_version_id: id)
+        return resp.to_models.first
+      end
+
+      #
       # App Store Version Localizations
       #
 

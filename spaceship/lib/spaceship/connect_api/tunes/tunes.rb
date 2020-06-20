@@ -4,6 +4,27 @@ module Spaceship
   class ConnectAPI
     module Tunes
       #
+      # ageRatingDeclarations
+      #
+
+      def fetch_age_rating_declaration(app_store_version_id: nil)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+        Client.instance.get("appStoreVersions/#{app_store_version_id}/ageRatingDeclaration", params)
+      end
+
+      def patch_age_rating_declaration(age_rating_declaration_id: nil, attributes: nil)
+        body = {
+          data: {
+            type: "ageRatingDeclarations",
+            id: age_rating_declaration_id,
+            attributes: attributes
+          }
+        }
+
+        Client.instance.patch("ageRatingDeclarations/#{age_rating_declaration_id}", body)
+      end
+
+      #
       # app
       #
 
