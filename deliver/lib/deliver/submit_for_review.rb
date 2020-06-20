@@ -93,6 +93,33 @@ module Deliver
           idfa_declaration.delete!
           UI.verbose("Deleted IDFA delcaration")
         end
+      else
+        attributes = {}
+        if submission_information.include?(:add_id_info_limits_tracking)
+          attributes[:honorsLimitedAdTracking] = submission_information[:add_id_info_limits_tracking]
+        end
+
+        if submission_information.include?(:add_id_info_serves_ads)
+          attributes[:servesAds] = submission_information[:add_id_info_serves_ads]
+        end
+
+        if submission_information.include?(:add_id_info_tracks_install)
+          attributes[:attributesAppInstallationToPreviousAd] = submission_information[:add_id_info_tracks_install]
+        end
+
+        if submission_information.include?(:add_id_info_tracks_action)
+          attributes[:attributesActionWithPreviousAd] = submission_information[:add_id_info_tracks_action]
+        end
+
+        if idfa_declaration
+          UI.verbose("Updating IDFA delcaration")
+          idfa_declaration.update(attributes: attributes)
+          UI.verbose("Updated IDFA delcaration")
+        else
+          UI.verbose("Creating IDFA delcaration")
+          version.create_idfa_declaration(attributes: attributes)
+          UI.verbose("Created IDFA delcaration")
+        end
       end
 
       UI.success("Successfully updated IDFA delcarations")
