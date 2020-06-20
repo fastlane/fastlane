@@ -11,8 +11,6 @@ module Deliver
       return if options[:skip_screenshots]
       return if options[:edit_live]
 
-      require 'pp'
-
       legacy_app = options[:app]
       app_id = legacy_app.apple_id
       app = Spaceship::ConnectAPI::App.get(app_id: app_id)
