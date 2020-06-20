@@ -59,7 +59,7 @@ module Spaceship
         "Apps.Stickers.KidsAndFamily" => "STICKERS_KIDS_AND_FAMILY",
         "Apps.Stickers.People" => "STICKERS_PEOPLE",
         "Apps.Stickers.Music" => "STICKERS_MUSIC",
-      
+
         "Sports" => "GAMES_SPORTS",
         "Word" => "GAMES_WORD",
         "Music" => "GAMES_MUSIC",

@@ -1,4 +1,6 @@
 require_relative '../model'
+require_relative './app_screenshot_set'
+
 module Spaceship
   class ConnectAPI
     class AppStoreVersionLocalization
@@ -42,11 +44,11 @@ module Spaceship
       end
 
       def update(attributes: nil)
-        Spaceship::ConnectAPI::patch_app_store_version_localization(app_store_version_localization_id: id, attributes: attributes)
+        Spaceship::ConnectAPI.patch_app_store_version_localization(app_store_version_localization_id: id, attributes: attributes)
       end
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI::delete_app_store_version_localization(app_store_version_localization_id: id)
+        Spaceship::ConnectAPI.delete_app_store_version_localization(app_store_version_localization_id: id)
       end
 
       #

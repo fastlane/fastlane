@@ -19,7 +19,7 @@ module Spaceship
       #
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI::delete_reset_ratings_request(reset_ratings_request_id: id)
+        Spaceship::ConnectAPI.delete_reset_ratings_request(reset_ratings_request_id: id)
       end
     end
   end

@@ -1,6 +1,7 @@
 require 'fastimage'
 
 require_relative 'module'
+require 'spaceship/connect_api/models/app_screenshot_set'
 
 module Deliver
   # AppScreenshot represents one screenshots for one specific locale and
@@ -119,7 +120,7 @@ module Deliver
         ScreenSize::MAC => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_DESKTOP,
         ScreenSize::IOS_APPLE_WATCH => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_3,
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_4,
-        #ScreenSize::APPLE_TV => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::
+        # ScreenSize::APPLE_TV => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::
       }
       return matching[self.screen_size]
     end

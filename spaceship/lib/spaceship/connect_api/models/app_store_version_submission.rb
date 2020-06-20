@@ -19,7 +19,7 @@ module Spaceship
       #
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI::delete_app_store_version_submission(app_store_version_submission_id: id)
+        Spaceship::ConnectAPI.delete_app_store_version_submission(app_store_version_submission_id: id)
       end
     end
   end

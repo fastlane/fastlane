@@ -29,11 +29,11 @@ module Spaceship
       #
 
       def update(attributes: nil)
-        Spaceship::ConnectAPI::patch_idfa_declaration(idfa_declaration_id: id, attributes: attributes)
+        Spaceship::ConnectAPI.patch_idfa_declaration(idfa_declaration_id: id, attributes: attributes)
       end
 
       def delete!
-        Spaceship::ConnectAPI::delete_idfa_declaration(idfa_declaration_id: id)
+        Spaceship::ConnectAPI.delete_idfa_declaration(idfa_declaration_id: id)
       end
     end
   end

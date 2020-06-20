@@ -2,6 +2,7 @@ require_relative 'module'
 
 module Deliver
   # upload description, rating, etc.
+  # rubocop:disable Metrics/ClassLength
   class UploadMetadata
     # All the localised values attached to the version
     LOCALISED_VERSION_VALUES = {
@@ -20,9 +21,9 @@ module Deliver
 
     # Localised app details values
     LOCALISED_APP_VALUES = {
-      name: "name", 
-      subtitle: "subtitle", 
-      privacy_url: "privacyPolicyUrl", 
+      name: "name",
+      subtitle: "subtitle",
+      privacy_url: "privacyPolicyUrl",
       apple_tv_privacy_policy: "privacyPolicyText"
     }
 
@@ -103,7 +104,6 @@ module Deliver
         version = app.get_edit_app_store_version(platform: platform)
         localised_options = (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys)
         non_localised_options = NON_LOCALISED_VERSION_VALUES.keys
-        category_options = NON_LOCALISED_APP_VALUES
       end
 
       # Needed for to filter out release notes from being sent up
@@ -114,7 +114,6 @@ module Deliver
       localized_version_attributes_by_locale = {}
       localized_info_attributes_by_locale = {}
 
-      individual = options[:individual_metadata_items] || []
       localised_options.each do |key|
         current = options[key]
         next unless current
@@ -132,7 +131,7 @@ module Deliver
         current.each do |language, value|
           next unless value.to_s.length > 0
           strip_value = value.to_s.strip
-          
+
           if LOCALISED_VERSION_VALUES.include?(key) && !strip_value.empty?
             attribute_name = LOCALISED_VERSION_VALUES[key]
 
@@ -140,13 +139,11 @@ module Deliver
             localized_version_attributes_by_locale[language][attribute_name] = strip_value
           end
 
-          if LOCALISED_APP_VALUES.include?(key) && !strip_value.empty?
-            attribute_name = LOCALISED_APP_VALUES[key]
+          next unless LOCALISED_APP_VALUES.include?(key) && !strip_value.empty?
+          attribute_name = LOCALISED_APP_VALUES[key]
 
-            localized_info_attributes_by_locale[language] ||= {}
-            localized_info_attributes_by_locale[language][attribute_name] = strip_value
-          end
-
+          localized_info_attributes_by_locale[language] ||= {}
+          localized_info_attributes_by_locale[language][attribute_name] = strip_value
         end
       end
 
@@ -162,13 +159,13 @@ module Deliver
       end
 
       release_type = if options[:auto_release_date]
-        non_localized_version_attributes['earliestReleaseDate'] = options[:auto_release_date]
-        Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::SCHEDULED
-      elsif options[:automatic_release]
-        Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::AFTER_APPROVAL
-      else
-        Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::MANUAL
-      end
+                       non_localized_version_attributes['earliestReleaseDate'] = options[:auto_release_date]
+                       Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::SCHEDULED
+                     elsif options[:automatic_release]
+                       Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::AFTER_APPROVAL
+                     else
+                       Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::MANUAL
+                     end
       non_localized_version_attributes['releaseType'] = release_type
 
       # Update app store version localizations
@@ -194,34 +191,37 @@ module Deliver
       version.update(attributes: non_localized_version_attributes)
 
       # Update categories
-      app_info = app.get_edit_app_info
+      app_info = app.fetch_edit_app_info
       if app_info
         app_info.update_categories(
           primary_category_id: Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
             options[:primary_category].to_s.strip
-          ), 
+          ),
           secondary_category_id: Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
             options[:secondary_category].to_s.strip
-          ), 
+          ),
           primary_subcategory_one_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
             options[:primary_first_sub_category].to_s.strip
-          ), 
+          ),
           primary_subcategory_two_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
             options[:primary_second_sub_category].to_s.strip
-          ), 
+          ),
           secondary_subcategory_one_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
             options[:secondary_first_sub_category].to_s.strip
-          ), 
+          ),
           secondary_subcategory_two_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
             options[:secondary_second_sub_category].to_s.strip
           )
         )
       end
 
-
       # Update phased release
       unless options[:phased_release].nil?
-        phased_release = version.get_app_store_version_phased_release rescue nil # returns no data error so need to rescue
+        phased_release = begin
+                           version.fetch_app_store_version_phased_release
+                         rescue
+                           nil
+                         end # returns no data error so need to rescue
         if !!options[:phased_release]
           unless phased_release
             UI.message("Creating phased release on App Store Connect")
@@ -237,7 +237,11 @@ module Deliver
 
       # Update rating reset
       unless options[:reset_ratings].nil?
-        reset_rating_request = version.get_reset_ratings_request rescue nil # returns no data error so need to rescue
+        reset_rating_request = begin
+                                 version.fetch_reset_ratings_request
+                               rescue
+                                 nil
+                               end # returns no data error so need to rescue
         if !!options[:reset_ratings]
           unless reset_rating_request
             UI.message("Creating reset ratings request on App Store Connect")
@@ -332,7 +336,7 @@ module Deliver
 
     # Finding languages to enable
     def verify_available_info_languages!(options, app)
-      app_info = app.get_edit_app_info
+      app_info = app.fetch_edit_app_info
 
       # TODO: Handle better?
       unless app_info
@@ -474,7 +478,11 @@ module Deliver
       end
 
       UI.message("Uploading app review information to App Store Connect")
-      app_store_review_detail = version.get_app_store_review_detail rescue nil # errors if doesn't exist
+      app_store_review_detail = begin
+                                  version.fetch_app_store_review_detail
+                                rescue
+                                  nil
+                                end # errors if doesn't exist
       if app_store_review_detail
         app_store_review_detail.update(attributes: attributes)
       else
@@ -483,8 +491,8 @@ module Deliver
     end
 
     def set_review_attachment_file(version, options)
-      app_store_review_detail = version.get_app_store_review_detail
-      app_review_attachments = app_store_review_detail.get_app_review_attachments
+      app_store_review_detail = version.fetch_app_store_review_detail
+      app_review_attachments = app_store_review_detail.fetch_app_review_attachments
 
       if options[:app_review_attachment_file]
         app_review_attachments.each do |app_review_attachment|
@@ -495,9 +503,7 @@ module Deliver
         UI.message("Uploading review attachment file to App Store Connect")
         app_store_review_detail.upload_attachment(path: options[:app_review_attachment_file])
       else
-        app_review_attachments.each do |app_review_attachment|
-          app_review_attachment.delete!
-        end
+        app_review_attachments.each(&:delete!)
         UI.message("Removing review attachment file to App Store Connect") unless app_review_attachments.empty?
       end
     end
@@ -519,4 +525,5 @@ module Deliver
       # v.update_rating(json)
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

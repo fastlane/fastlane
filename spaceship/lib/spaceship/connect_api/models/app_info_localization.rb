@@ -27,11 +27,11 @@ module Spaceship
       #
 
       def update(attributes: nil)
-        Spaceship::ConnectAPI::patch_app_info_localization(app_info_localization_id: id, attributes: attributes)
+        Spaceship::ConnectAPI.patch_app_info_localization(app_info_localization_id: id, attributes: attributes)
       end
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI::delete_app_info_localization(app_info_localization_id: id)
+        Spaceship::ConnectAPI.delete_app_info_localization(app_info_localization_id: id)
       end
     end
   end

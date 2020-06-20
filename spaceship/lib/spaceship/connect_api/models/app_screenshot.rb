@@ -63,6 +63,8 @@ module Spaceship
       #
 
       def self.create(app_screenshot_set_id: nil, path: nil)
+        require 'faraday'
+
         filename = File.basename(path)
         filesize = File.size(path)
         payload = File.binread(path)
@@ -93,22 +95,22 @@ module Spaceship
           headers[hash["name"]] = hash["value"]
         end
 
-        upload_resp = Faraday.put(
+        Faraday.put(
           upload_operation["url"],
           payload,
           headers
         )
-        
+
         patch_attributes = {
-          "uploaded": true,
-          "sourceFileChecksum": "checksum-holder"
+          uploaded: true,
+          sourceFileChecksum: "checksum-holder"
         }
 
-        patch_resp = Spaceship::ConnectAPI.patch_app_screenshot(app_screenshot_id: post_resp.id, attributes: patch_attributes).to_models.first
+        Spaceship::ConnectAPI.patch_app_screenshot(app_screenshot_id: post_resp.id, attributes: patch_attributes).to_models.first
       end
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI::delete_app_screenshot(app_screenshot_id: id)
+        Spaceship::ConnectAPI.delete_app_screenshot(app_screenshot_id: id)
       end
     end
   end

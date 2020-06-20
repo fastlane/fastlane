@@ -66,7 +66,7 @@ module Spaceship
       # App Info
       #
 
-      def get_edit_app_info
+      def fetch_edit_app_info
         states = [
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PREPARE_FOR_SUBMISSION,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::DEVELOPER_REJECTED,
@@ -118,10 +118,10 @@ module Spaceship
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           appStoreState: [
-              Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PREPARE_FOR_SUBMISSION,
-              Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REJECTED,
-              Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::REJECTED
-            ].join(","),
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PREPARE_FOR_SUBMISSION,
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REJECTED,
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::REJECTED
+          ].join(","),
           platform: platform
         }
         return get_app_store_versions(filter: filter, includes: includes).first

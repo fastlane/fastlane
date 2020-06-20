@@ -1,5 +1,9 @@
 require_relative 'module'
 
+require 'fastlane_core/build_watcher'
+require 'fastlane_core/ipa_file_analyser'
+require 'fastlane_core/pkg_file_analyser'
+
 module Deliver
   class SubmitForReview
     def submit!(options)
@@ -38,7 +42,7 @@ module Deliver
           build_number: options[:build_number],
           platform: platform
         ).first
-        
+
         unless build
           UI.user_error!("Build number: #{options[:build_number]} does not exist")
         end
@@ -58,7 +62,11 @@ module Deliver
       return unless submission_information.include?(:add_id_info_uses_idfa)
 
       uses_idfa = submission_information[:add_id_info_uses_idfa]
-      idfa_declaration = version.get_idfa_declaration rescue nil
+      idfa_declaration = begin
+                           version.fetch_idfa_declaration
+                         rescue
+                           nil
+                         end
 
       build = version.get_build
 
@@ -79,40 +87,10 @@ module Deliver
           UI.verbose("Deleting IDFA delcaration")
           idfa_declaration.delete!
           UI.verbose("Deleted IDFA delcaration")
-        else
-        end
-      else
-
-        attributes = {}
-        if submission_information.include?(:add_id_info_limits_tracking)
-          attributes[:honorsLimitedAdTracking] = submission_information[:add_id_info_limits_tracking]
-        end
-
-        if submission_information.include?(:add_id_info_serves_ads)
-          attributes[:servesAds] = submission_information[:add_id_info_serves_ads]
-        end
-
-        if submission_information.include?(:add_id_info_tracks_install)
-          attributes[:attributesAppInstallationToPreviousAd] = submission_information[:add_id_info_tracks_install]
-        end
-
-        if submission_information.include?(:add_id_info_tracks_action)
-          attributes[:attributesActionWithPreviousAd] = submission_information[:add_id_info_tracks_action]
-        end
-
-        if idfa_declaration
-          UI.verbose("Updating IDFA delcaration")
-          idfa_declaration.update(attributes: attributes)
-          UI.verbose("Updated IDFA delcaration")
-        else
-          UI.verbose("Creating IDFA delcaration")
-          version.create_idfa_declaration(attributes: attributes)
-          UI.verbose("Created IDFA delcaration")
         end
       end
 
       UI.success("Successfully updated IDFA delcarations")
-
     end
 
     def update_submission_information(options, app)
@@ -120,10 +98,10 @@ module Deliver
       submission_information = options[:submission_information] || {}
       if submission_information.include?(:content_rights_contains_third_party_content)
         value = if submission_information[:content_rights_contains_third_party_content]
-          Spaceship::ConnectAPI::App::ContentRightsDeclaration::USES_THIRD_PARTY_CONTENT
-        else
-          Spaceship::ConnectAPI::App::ContentRightsDeclaration::DOES_NOT_USE_THIRD_PARTY_CONTENT
-        end
+                  Spaceship::ConnectAPI::App::ContentRightsDeclaration::USES_THIRD_PARTY_CONTENT
+                else
+                  Spaceship::ConnectAPI::App::ContentRightsDeclaration::DOES_NOT_USE_THIRD_PARTY_CONTENT
+                end
 
         UI.success("Updating contents rights declaration on App Store Connect")
         app.update(attributes: {

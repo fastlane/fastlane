@@ -1,4 +1,6 @@
 require_relative '../model'
+require_relative './app_screenshot'
+
 module Spaceship
   class ConnectAPI
     class AppScreenshotSet
@@ -87,7 +89,7 @@ module Spaceship
       #
 
       def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
-        resp = Spaceship::ConnectAPI::get_app_screenshot_sets(filter: filter, includes: includes, limit: limit, sort: sort)
+        resp = Spaceship::ConnectAPI.get_app_screenshot_sets(filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       end
 

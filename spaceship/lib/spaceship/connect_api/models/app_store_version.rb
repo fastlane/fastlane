@@ -1,4 +1,6 @@
 require_relative '../model'
+require_relative './app_store_version_localization'
+
 module Spaceship
   class ConnectAPI
     class AppStoreVersion
@@ -24,7 +26,7 @@ module Spaceship
         REJECTED = "REJECTED"
         PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
       end
-      
+
       module ReleaseType
         AFTER_APPROVAL = "AFTER_APPROVAL"
         MANUAL = "MANUAL"
@@ -57,13 +59,13 @@ module Spaceship
       # app,routingAppCoverage,resetRatingsRequest,appStoreVersionSubmission,appStoreVersionPhasedRelease,ageRatingDeclaration,appStoreReviewDetail,idfaDeclaration,gameCenterConfiguration
       def self.get(app_store_version_id: nil, includes: nil, limit: nil, sort: nil)
         return Spaceship::ConnectAPI.get_app_store_version(
-            app_store_version_id: app_store_version_id, 
-            includes: includes
+          app_store_version_id: app_store_version_id,
+          includes: includes
         ).first
       end
 
       def update(attributes: nil)
-        return Spaceship::ConnectAPI::patch_app_store_version(app_store_version_id: id, attributes: attributes).first
+        return Spaceship::ConnectAPI.patch_app_store_version(app_store_version_id: id, attributes: attributes).first
       end
 
       #
@@ -91,8 +93,8 @@ module Spaceship
         return resp.to_models.first
       end
 
-      def get_app_store_review_detail
-        resp = Spaceship::ConnectAPI.get_app_store_review_detail(app_store_version_id: id)
+      def fetch_app_store_review_detail
+        resp = Spaceship::ConnectAPI.fetch_app_store_review_detail(app_store_version_id: id)
         return resp.to_models.first
       end
 
@@ -100,8 +102,8 @@ module Spaceship
       # App Store Version Phased Releases
       #
 
-      def get_app_store_version_phased_release
-        resp = Spaceship::ConnectAPI.get_app_store_version_phased_release(app_store_version_id: id)
+      def fetch_app_store_version_phased_release
+        resp = Spaceship::ConnectAPI.fetch_app_store_version_phased_release(app_store_version_id: id)
         return resp.to_models.first
       end
 
@@ -114,8 +116,8 @@ module Spaceship
       # App Store Version Submissions
       #
 
-      def get_app_store_version_submission
-        resp = Spaceship::ConnectAPI.get_app_store_version_submission(app_store_version_id: id)
+      def fetch_app_store_version_submission
+        resp = Spaceship::ConnectAPI.fetch_app_store_version_submission(app_store_version_id: id)
         return resp.to_models.first
       end
 
@@ -142,8 +144,8 @@ module Spaceship
       # IDFA Declarations
       #
 
-      def get_idfa_declaration
-        resp = Spaceship::ConnectAPI.get_idfa_declaration(app_store_version_id: id)
+      def fetch_idfa_declaration
+        resp = Spaceship::ConnectAPI.fetch_idfa_declaration(app_store_version_id: id)
         return resp.to_models.first
       end
 
@@ -156,8 +158,8 @@ module Spaceship
       # Reset Ratings Requests
       #
 
-      def get_reset_ratings_request
-        resp = Spaceship::ConnectAPI.get_reset_ratings_request(app_store_version_id: id)
+      def fetch_reset_ratings_request
+        resp = Spaceship::ConnectAPI.fetch_reset_ratings_request(app_store_version_id: id)
         return resp.to_models.first
       end
 

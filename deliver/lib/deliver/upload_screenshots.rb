@@ -25,8 +25,7 @@ module Deliver
 
       UI.message("Starting with the upload of screenshots...")
       screenshots_per_language = screenshots.group_by(&:language)
-      
-      
+
       # pp screenshots_per_language
 
       localizations = version.get_app_store_version_localizations
@@ -39,7 +38,7 @@ module Deliver
         localizations.each do |localization|
           # Only delete screenshots if trying to upload
           next unless screenshots_per_language.keys.include?(localization.locale)
-          
+
           # Iterate over all screenshots for each set and delete
           screenshot_sets = localization.get_app_screenshot_sets
           screenshot_sets.each do |screenshot_set|
@@ -77,8 +76,8 @@ module Deliver
 
       screenshots_per_language.each do |language, screenshots_for_language|
         # Find localization to upload screenshots to
-        localization = localizations.find do |localization|
-          localization.locale == language
+        localization = localizations.find do |l|
+          l.locale == language
         end
 
         unless localization
@@ -100,7 +99,6 @@ module Deliver
 
         UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
         screenshots_for_language.each do |screenshot|
-
           display_type = screenshot.device_type
           set = app_screenshot_sets_map[display_type]
 
@@ -108,7 +106,7 @@ module Deliver
             UI.error("Error... Screenshot size #{screenshot.screen_size} not valid for App Store Connect")
             next
           end
-          
+
           unless set
             set = localization.create_app_screenshot_set(attributes: {
               screenshotDisplayType: display_type
@@ -126,13 +124,12 @@ module Deliver
           end
 
           indized[localization.locale][set.screenshot_display_type] += 1
-          
+
           # TODO: Do we need to do something specific for messages?
           # Also.. what is the messages type even for?
           UI.message("Uploading '#{screenshot.path}'...")
           set.upload_screenshot(path: screenshot.path)
         end
-
       end
       UI.success("Successfully uploaded screenshots to App Store Connect")
     end

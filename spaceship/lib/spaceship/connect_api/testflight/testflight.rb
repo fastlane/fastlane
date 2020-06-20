@@ -306,7 +306,7 @@ module Spaceship
           }
         }
 
-        puts "patching builds with #{body}"
+        puts("patching builds with #{body}")
 
         Client.instance.patch("builds/#{build_id}", body)
       end

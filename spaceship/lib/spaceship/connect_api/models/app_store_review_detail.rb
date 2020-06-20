@@ -1,4 +1,6 @@
 require_relative '../model'
+require_relative './app_review_attachment'
+
 module Spaceship
   class ConnectAPI
     class AppStoreReviewDetail
@@ -32,19 +34,18 @@ module Spaceship
       # API
       #
 
-      def get_app_review_attachments
-        resp = Spaceship::ConnectAPI::get_app_review_attachments(app_store_review_detail_id: id)
+      def fetch_app_review_attachments
+        resp = Spaceship::ConnectAPI.fetch_app_review_attachments(app_store_review_detail_id: id)
         return resp.to_models
       end
 
       def update(attributes: nil)
-        return Spaceship::ConnectAPI::patch_app_store_review_detail(app_store_review_detail_id: id, attributes: attributes)
+        return Spaceship::ConnectAPI.patch_app_store_review_detail(app_store_review_detail_id: id, attributes: attributes)
       end
 
       def upload_attachment(path: nil)
         return Spaceship::ConnectAPI::AppReviewAttachment.create(app_store_review_detail_id: id, path: path)
       end
-
     end
   end
 end

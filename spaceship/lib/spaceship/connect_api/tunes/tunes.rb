@@ -3,7 +3,6 @@ require 'spaceship/connect_api/tunes/client'
 module Spaceship
   class ConnectAPI
     module Tunes
-
       #
       # app
       #
@@ -24,7 +23,7 @@ module Spaceship
       # appReviewAttachments
       #
 
-      def get_app_review_attachments(app_store_review_detail_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def fetch_app_review_attachments(app_store_review_detail_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
         Client.instance.get("appStoreReviewDetails/#{app_store_review_detail_id}/appReviewAttachments", params)
       end
@@ -147,7 +146,7 @@ module Spaceship
 
         data = {
           type: "appInfos",
-          id: app_info_id,
+          id: app_info_id
         }
         data[:attributes] = attributes unless attributes.empty?
 
@@ -161,28 +160,28 @@ module Spaceship
       def patch_app_info_categories(app_info_id: nil, primary_category_id: nil, secondary_category_id: nil, primary_subcategory_one_id: nil, primary_subcategory_two_id: nil, secondary_subcategory_one_id: nil, secondary_subcategory_two_id: nil)
         relationships = {
           primaryCategory: {
-            data: primary_category_id ? { "type": "appCategories", "id": primary_category_id } : nil
+            data: primary_category_id ? { type: "appCategories", id: primary_category_id } : nil
           },
           secondaryCategory: {
-            data: secondary_category_id ? { "type": "appCategories", "id": secondary_category_id } : nil
+            data: secondary_category_id ? { type: "appCategories", id: secondary_category_id } : nil
           },
           primarySubcategoryOne: {
-            data: primary_subcategory_one_id ? { "type": "appCategories", "id": primary_subcategory_one_id } : nil
+            data: primary_subcategory_one_id ? { type: "appCategories", id: primary_subcategory_one_id } : nil
           },
           primarySubcategoryTwo: {
-            data: primary_subcategory_two_id ? { "type": "appCategories", "id": primary_subcategory_two_id } : nil
+            data: primary_subcategory_two_id ? { type: "appCategories", id: primary_subcategory_two_id } : nil
           },
           secondarySubcategoryOne: {
-            data: secondary_subcategory_one_id ? { "type": "appCategories", "id": secondary_subcategory_one_id } : nil
+            data: secondary_subcategory_one_id ? { type: "appCategories", id: secondary_subcategory_one_id } : nil
           },
           secondarySubcategoryTwo: {
-            data: secondary_subcategory_two_id ? { "type": "appCategories", "id": secondary_subcategory_two_id } : nil
+            data: secondary_subcategory_two_id ? { type: "appCategories", id: secondary_subcategory_two_id } : nil
           }
         }
 
         data = {
           type: "appInfos",
-          id: app_info_id,
+          id: app_info_id
         }
         data[:relationships] = relationships unless relationships.empty?
 
@@ -242,7 +241,7 @@ module Spaceship
       # appStoreReviewDetails
       #
 
-      def get_app_store_review_detail(app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def fetch_app_store_review_detail(app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
         Client.instance.get("appStoreVersions/#{app_store_version_id}/appStoreReviewDetail", params)
       end
@@ -327,7 +326,7 @@ module Spaceship
       # appStoreVersionPhasedReleases
       #
 
-      def get_app_store_version_phased_release(app_store_version_id: nil)
+      def fetch_app_store_version_phased_release(app_store_version_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.get("appStoreVersions/#{app_store_version_id}/appStoreVersionPhasedRelease", params)
       end
@@ -403,10 +402,12 @@ module Spaceship
 
       def patch_app_store_version_with_build(app_store_version_id: nil, build_id: nil)
         data = nil
-        data = {
-          "type": "builds",
-          "id": build_id
-        } if build_id
+        if build_id
+          data = {
+            type: "builds",
+            id: build_id
+          }
+        end
 
         body = {
           data: {
@@ -427,7 +428,7 @@ module Spaceship
       # appStoreVersionPhasedReleases
       #
 
-      def get_reset_ratings_request(app_store_version_id: nil)
+      def fetch_reset_ratings_request(app_store_version_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.get("appStoreVersions/#{app_store_version_id}/resetRatingsRequest", params)
       end
@@ -459,7 +460,7 @@ module Spaceship
       # appStoreVersionSubmissions
       #
 
-      def get_app_store_version_submission(app_store_version_id: nil)
+      def fetch_app_store_version_submission(app_store_version_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.get("appStoreVersions/#{app_store_version_id}/appStoreVersionSubmission", params)
       end
@@ -491,7 +492,7 @@ module Spaceship
       # idfaDeclarations
       #
 
-      def get_idfa_declaration(app_store_version_id: nil)
+      def fetch_idfa_declaration(app_store_version_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.get("appStoreVersions/#{app_store_version_id}/idfaDeclaration", params)
       end
@@ -531,7 +532,6 @@ module Spaceship
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.delete("idfaDeclarations/#{idfa_declaration_id}", params)
       end
-
     end
   end
 end
