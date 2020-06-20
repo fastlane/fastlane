@@ -85,7 +85,7 @@ module Deliver
 
       if options[:edit_live]
         # not all values are editable when using live_version
-        version = app.get_ready_for_sale_app_store_version(platform: platform)
+        version = app.get_live_app_store_version(platform: platform)
         localised_options = LOCALISED_LIVE_VALUES
         non_localised_options = NON_LOCALISED_LIVE_VALUES
 
@@ -106,6 +106,9 @@ module Deliver
         category_options = NON_LOCALISED_APP_VALUES
       end
 
+      # Needed for to filter out release notes from being sent up
+      is_first_version = app.get_live_app_store_version(platform: platform).nil?
+
       UI.important("Will begin uploading metadata for '#{version.version_string}' on App Store Connect")
 
       localized_version_attributes_by_locale = {}
@@ -118,6 +121,11 @@ module Deliver
 
         unless current.kind_of?(Hash)
           UI.error("Error with provided '#{key}'. Must be a hash, the key being the language.")
+          next
+        end
+
+        if key == :release_notes && is_first_version
+          UI.error("Skipping 'release_notes'... this is the first version of the app")
           next
         end
 
