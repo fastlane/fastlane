@@ -1,6 +1,6 @@
 ---
 name: ‼️ Release Candidate (Deliver) Issue (2.150.0.rc1)
-about: If a recent release broke a feature 😬 (Please make sure you know the last known working release version)
+about: This is a temporary but highly imporant issue for the 2.150.0 release candidate
 
 ---
 
