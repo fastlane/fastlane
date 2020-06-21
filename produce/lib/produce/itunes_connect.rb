@@ -1,7 +1,7 @@
 require 'spaceship'
 require 'spaceship/tunes/tunes'
+require 'fastlane_core/languages'
 require_relative 'module'
-require_relative 'available_default_languages'
 
 module Produce
   class ItunesConnect
@@ -18,24 +18,27 @@ module Produce
     def create_new_app
       application = fetch_application
       if application
-        UI.success("App '#{Produce.config[:app_identifier]}' already exists (#{application.apple_id}), nothing to do on App Store Connect")
+        UI.success("App '#{Produce.config[:app_identifier]}' already exists (#{application.id}), nothing to do on App Store Connect")
         # Nothing to do here
       else
         UI.success("Creating new app '#{Produce.config[:app_name]}' on App Store Connect")
 
         platforms = Produce.config[:platforms] || [Produce.config[:platform]]
 
-        Produce.config[:bundle_identifier_suffix] = '' unless wildcard_bundle?
-        generated_app = Spaceship::Tunes::Application.create!(name: Produce.config[:app_name],
-                                                              primary_language: language,
-                                                              sku: Produce.config[:sku].to_s, # might be an int
-                                                              bundle_id: app_identifier,
-                                                              bundle_id_suffix: Produce.config[:bundle_identifier_suffix],
-                                                              company_name: Produce.config[:company_name],
-                                                              platforms: platforms,
-                                                              itunes_connect_users: Produce.config[:itc_users])
+        platforms = platforms.map do |platform|
+          Spaceship::ConnectAPI::Platform.map(platform)
+        end
 
-        UI.crash!("Something went wrong when creating the new app on iTC") if generated_app["adamId"].to_s.empty?
+        # Produce.config[:company_name]
+        # Produce.config[:itc_users]
+        application = Spaceship::ConnectAPI::App.create(
+          name: Produce.config[:app_name],
+          version_string: Produce.config[:app_version] || "1.0",
+          sku: Produce.config[:sku].to_s,
+          primary_locale: language,
+          bundle_id: app_identifier,
+          platforms: platforms
+        )
 
         application = fetch_application
         counter = 0
@@ -57,10 +60,10 @@ module Produce
           application.ensure_version!(Produce.config[:app_version], platform: platform) if Produce.config[:app_version]
         end
 
-        UI.success("Successfully created new app '#{Produce.config[:app_name]}' on App Store Connect with ID #{application.apple_id}")
+        UI.success("Successfully created new app '#{Produce.config[:app_name]}' on App Store Connect with ID #{application.id}")
       end
 
-      return Spaceship::Tunes::Application.find(@full_bundle_identifier, mac: platform == "osx").apple_id
+      return application.id
     end
 
     private
@@ -70,7 +73,7 @@ module Produce
     end
 
     def fetch_application
-      Spaceship::Tunes::Application.find(@full_bundle_identifier)
+      Spaceship::ConnectAPI::App.find(@full_bundle_identifier)
     end
 
     def wildcard_bundle?
@@ -87,11 +90,8 @@ module Produce
     def language
       @language = Produce.config[:language]
 
-      converted = Spaceship::Tunes::LanguageConverter.from_itc_readable_to_itc(@language)
-      @language = converted if converted # overwrite it with the actual value
-
-      unless AvailableDefaultLanguages.all_languages.include?(@language)
-        UI.user_error!("Please enter one of available languages: #{AvailableDefaultLanguages.all_languages}")
+      unless FastlaneCore::Languages::ALL_LANGUAGES.include?(@language)
+        UI.user_error!("Please enter one of available languages: #{FastlaneCore::Languages::ALL_LANGUAGES}")
       end
 
       return @language

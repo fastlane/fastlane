@@ -7,7 +7,6 @@ require 'fastlane_core/itunes_transporter'
 require 'spaceship'
 require_relative 'html_generator'
 require_relative 'submit_for_review'
-require_relative 'upload_assets'
 require_relative 'upload_price_tier'
 require_relative 'upload_metadata'
 require_relative 'upload_screenshots'
@@ -87,9 +86,14 @@ module Deliver
     # If not, the new version will automatically be created
     def verify_version
       app_version = options[:app_version]
-      UI.message("Making sure the latest version on App Store Connect matches '#{app_version}' from the ipa file...")
+      UI.message("Making sure the latest version on App Store Connect matches '#{app_version}'...")
 
-      changed = options[:app].ensure_version!(app_version, platform: options[:platform])
+      legacy_app = options[:app]
+      app_id = legacy_app.apple_id
+      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      changed = app.ensure_version!(app_version, platform: platform)
 
       if changed
         UI.success("Successfully set the version to '#{app_version}'")
@@ -120,7 +124,6 @@ module Deliver
       upload_metadata.upload(options)
       upload_screenshots.upload(options, screenshots)
       UploadPriceTier.new.upload(options)
-      UploadAssets.new.upload(options) # e.g. app icon
     end
 
     # If options[:app_icon]/options[:apple_watch_app_icon]

@@ -141,21 +141,57 @@ module Spaceship
       def handle_errors(response)
         # Example error format
         # {
-        #   "errors" : [ {
-        #     "id" : "ce8c391e-f858-411b-a14b-5aa26e0915f2",
-        #     "status" : "400",
-        #     "code" : "PARAMETER_ERROR.INVALID",
-        #     "title" : "A parameter has an invalid value",
-        #     "detail" : "'uploadedDate3' is not a valid field name",
-        #     "source" : {
-        #       "parameter" : "sort"
+        # "errors":[
+        #     {
+        #       "id":"cbfd8674-4802-4857-bfe8-444e1ea36e32",
+        #       "status":"409",
+        #       "code":"STATE_ERROR",
+        #       "title":"The request cannot be fulfilled because of the state of another resource.",
+        #       "detail":"Submit for review errors found.",
+        #       "meta":{
+        #           "associatedErrors":{
+        #             "/v1/appScreenshots/":[
+        #                 {
+        #                   "id":"23d1734f-b81f-411a-98e4-6d3e763d54ed",
+        #                   "status":"409",
+        #                   "code":"STATE_ERROR.SCREENSHOT_REQUIRED.APP_WATCH_SERIES_4",
+        #                   "title":"App screenshot missing (APP_WATCH_SERIES_4)."
+        #                 },
+        #                 {
+        #                   "id":"db993030-0a93-48e9-9fd7-7e5676633431",
+        #                   "status":"409",
+        #                   "code":"STATE_ERROR.SCREENSHOT_REQUIRED.APP_WATCH_SERIES_4",
+        #                   "title":"App screenshot missing (APP_WATCH_SERIES_4)."
+        #                 }
+        #             ],
+        #             "/v1/builds/d710b6fa-5235-4fe4-b791-2b80d6818db0":[
+        #                 {
+        #                   "id":"e421fe6f-0e3b-464b-89dc-ba437e7bb77d",
+        #                   "status":"409",
+        #                   "code":"ENTITY_ERROR.ATTRIBUTE.REQUIRED",
+        #                   "title":"The provided entity is missing a required attribute",
+        #                   "detail":"You must provide a value for the attribute 'usesNonExemptEncryption' with this request",
+        #                   "source":{
+        #                       "pointer":"/data/attributes/usesNonExemptEncryption"
+        #                   }
+        #                 }
+        #             ]
+        #           }
+        #       }
         #     }
-        #   } ]
+        # ]
         # }
 
         return response.body['errors'].map do |error|
-          "#{error['title']} - #{error['detail']}"
-        end.join(" ")
+          messages = [[error['title'], error['detail']].compact.join(" - ")]
+
+          meta = error["meta"] || {}
+          associated_errors = meta["associatedErrors"] || {}
+
+          messages + associated_errors.values.flatten.map do |associated_error|
+            [[associated_error["title"], associated_error["detail"]].compact.join(" - ")]
+          end
+        end.flatten.join("\n")
       end
 
       private

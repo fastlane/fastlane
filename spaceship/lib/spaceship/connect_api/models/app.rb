@@ -13,13 +13,26 @@ module Spaceship
       attr_accessor :removed
       attr_accessor :is_aag
 
+      attr_accessor :content_rights_declaration
+
+      attr_accessor :app_store_versions
+
+      module ContentRightsDeclaration
+        USES_THIRD_PARTY_CONTENT = "USES_THIRD_PARTY_CONTENT"
+        DOES_NOT_USE_THIRD_PARTY_CONTENT = "DOES_NOT_USE_THIRD_PARTY_CONTENT"
+      end
+
       self.attr_mapping({
         "name" => "name",
         "bundleId" => "bundle_id",
         "sku" => "sku",
         "primaryLocale" => "primary_locale",
         "removed" => "removed",
-        "isAAG" => "is_aag"
+        "isAAG" => "is_aag",
+
+        "contentRightsDeclaration" => "content_rights_declaration",
+
+        "appStoreVersions" => "app_store_versions"
       })
 
       def self.type
@@ -30,7 +43,7 @@ module Spaceship
       # Apps
       #
 
-      def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
+      def self.all(filter: {}, includes: "appStoreVersions", limit: nil, sort: nil)
         resps = Spaceship::ConnectAPI.get_apps(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
@@ -41,12 +54,109 @@ module Spaceship
         end
       end
 
-      def self.get(app_id: nil, includes: nil)
+      def self.create(name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil)
+        Spaceship::ConnectAPI.post_app(name: name, version_string: version_string, sku: sku, primary_locale: primary_locale, bundle_id: bundle_id, platforms: platforms)
+      end
+
+      def self.get(app_id: nil, includes: "appStoreVersions")
         return Spaceship::ConnectAPI.get_app(app_id: app_id, includes: includes).first
+      end
+
+      def update(attributes: nil)
+        return Spaceship::ConnectAPI.patch_app(app_id: id, attributes: attributes)
+      end
+
+      #
+      # App Info
+      #
+
+      def fetch_edit_app_info
+        states = [
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::PREPARE_FOR_SUBMISSION,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::DEVELOPER_REJECTED,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::REJECTED,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::METADATA_REJECTED
+        ]
+
+        resp = Spaceship::ConnectAPI.get_app_infos(app_id: id)
+        return resp.to_models.select do |model|
+          states.include?(model.app_store_state)
+        end.first
+      end
+
+      #
+      # App Pricing
+      #
+
+      def fetch_app_prices(filter: {}, includes: "priceTier", limit: nil, sort: nil)
+        filter ||= {}
+        filter[:app] = id
+        resp = Spaceship::ConnectAPI.get_app_prices(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
+        return resp.to_models
+      end
+
+      def update_app_price_tier(app_price_tier_id: nil)
+        resp = Spaceship::ConnectAPI.patch_app_app_prices(app_id: id, app_price_tier_id: app_price_tier_id)
+        return resp.first
+      end
+
+      #
+      # App Store Versions
+      #
+
+      # Will make sure the current edit_version matches the given version number
+      # This will either create a new version or change the version number
+      # from an existing version
+      # @return (Bool) Was something changed?
+      def ensure_version!(version_string, platform: nil)
+        app_store_version = get_edit_app_store_version(platform: platform)
+
+        if app_store_version
+          if version_string != app_store_version.version_string
+            attributes = { versionString: version_string }
+            app_store_version.update(attributes: attributes)
+            return true
+          end
+          return false
+        else
+          attributes = { versionString: version_string, platform: platform }
+          Spaceship::ConnectAPI.post_app_store_version(app_id: id, attributes: attributes)
+
+          return true
+        end
+      end
+
+      def get_live_app_store_version(platform: nil, includes: nil)
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          appStoreState: [Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE].join(","),
+          platform: platform
+        }
+        return get_app_store_versions(filter: filter, includes: includes).first
+      end
+
+      def get_edit_app_store_version(platform: nil, includes: nil)
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          appStoreState: [
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PREPARE_FOR_SUBMISSION,
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REJECTED,
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::REJECTED,
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::METADATA_REJECTED
+          ].join(","),
+          platform: platform
+        }
+        return get_app_store_versions(filter: filter, includes: includes).first
+      end
+
+      def get_app_store_versions(filter: {}, includes: nil, limit: nil, sort: nil)
+        resps = Spaceship::ConnectAPI.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.flat_map(&:to_models)
       end
 
       #
       # Beta Feedback
+      #
 
       def get_beta_feedback(filter: {}, includes: "tester,build,screenshots", limit: nil, sort: nil)
         filter ||= {}
