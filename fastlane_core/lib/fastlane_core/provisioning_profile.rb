@@ -113,7 +113,7 @@ module FastlaneCore
           else
             # `security` only works on Mac, fallback to `openssl`
             # via https://stackoverflow.com/a/14379814/252627
-            decoded = `openssl smime -inform der -verify -noverify -in #{path} 2> #{err}`
+            decoded = `openssl smime -inform der -verify -noverify -in #{path.shellescape} 2> #{err}`
           end
           UI.error("Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(err)}") if $?.exitstatus != 0
           decoded
