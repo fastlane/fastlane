@@ -65,7 +65,6 @@ module Deliver
       elsif options[:pkg]
         options[:app_version] ||= FastlaneCore::PkgFileAnalyser.fetch_app_version(options[:pkg])
       end
-
     rescue => ex
       UI.error("#{ex.message}\n#{ex.backtrace.join('\n')}")
       UI.user_error!("Could not infer your app's version")
