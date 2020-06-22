@@ -63,6 +63,17 @@ module Deliver
 
       UI.verbose("Updating build for export compliance status of '#{uses_encryption}'")
       if build.uses_non_exempt_encryption.nil?
+        if uses_encryption.to_s.empty?
+          message = [
+            "Export compliance is required to submit",
+            "Add information to the :submission_information option...",
+            "  Docs: http://docs.fastlane.tools/actions/deliver/#compliance-and-idfa-settings",
+            "  Example: submission_information: { export_compliance_uses_encryption: false }",
+            "This can also be set in your Info.plist with key 'ITSAppUsesNonExemptEncryption'"
+          ].join("\n")
+          UI.user_error!(message)
+        end
+
         build = build.update(attributes: {
           usesNonExemptEncryption: uses_encryption
         })
