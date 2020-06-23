@@ -91,10 +91,14 @@ module Spaceship
 
       def self.map_value_from_itc(key, value)
         if ["gamblingAndContests", "unrestrictedWebAccess"].include?(key)
-          return LEGACY_BOOLEAN_VALUE_ITC_MAP[value]
+          new_value = LEGACY_BOOLEAN_VALUE_ITC_MAP[value]
+          return value if new_value.nil?
+          return new_value
         else
           return LEGACY_RATING_VALUE_ITC_MAP[value]
         end
+
+        return value
       end
 
       #

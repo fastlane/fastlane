@@ -261,6 +261,7 @@ module Deliver
         has_mapped_values = false
         mapped_values.each do |k, v|
           next if k.nil? || v.nil?
+          next if k == v
           has_mapped_values = true
           UI.deprecated("Category '#{k}' from iTunesConnect as been deprecated. Please replace with '#{v}'")
         end
@@ -588,10 +589,11 @@ module Deliver
       has_mapped_values = false
       mapped_values.each do |k, v|
         next if k.nil? || v.nil?
+        next if k == v
         has_mapped_values = true
         UI.deprecated("Age rating '#{k}' from iTunesConnect as been deprecated. Please replace with '#{v}'")
       end
-      UI.deprecated("You can find more info at http://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
+      UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
 
       age_rating_delcaration = version.fetch_age_rating_declaration
       age_rating_delcaration.update(attributes: attributes)
