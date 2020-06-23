@@ -28,7 +28,7 @@ module Spaceship
       # app
       #
 
-      def post_app(name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil)
+      def post_app(name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil, territory_ids: nil, available_in_new_territories: true)
         included = []
         included << {
           type: "appInfos",
@@ -89,27 +89,38 @@ module Spaceship
           }
         end
 
+        # "availableTerritories": {
+        #   "data": [
+        #     {
+        #       "type": "territories",
+        #       "id": "ALB"
+        #     },
+        #     {
+
+        relationships = {
+          appStoreVersions: {
+            data: app_store_verions_data
+          },
+          appInfos: {
+            data: [
+              {
+                type: "appInfos",
+                id: "${new-appInfo-id}"
+              }
+            ]
+          }
+        }
+
         body = {
           data: {
             type: "apps",
             attributes: {
               sku: sku,
               primaryLocale: primary_locale,
-              bundleId: bundle_id
+              bundleId: bundle_id,
+              availableInNewTerritories: !!available_in_new_territories
             },
-            relationships: {
-              appStoreVersions: {
-                data: app_store_verions_data
-              },
-              appInfos: {
-                data: [
-                  {
-                    type: "appInfos",
-                    id: "${new-appInfo-id}"
-                  }
-                ]
-              }
-            }
+            relationships: relationships
           },
           included: included
         }
@@ -117,61 +128,67 @@ module Spaceship
         Client.instance.post("apps", body)
       end
 
-      def patch_app(app_id: nil, attributes: {})
-        body = {
-          data: {
-            type: "apps",
-            id: app_id,
-            attributes: attributes
+      def patch_app(app_id: nil, attributes: {}, app_price_tier_id: nil, territory_ids: nil)
+        relationships = {}
+        included = []
+
+        # Price tier
+        unless app_price_tier_id.nil?
+          relationships[:prices] = {
+            data: [
+              {
+                type: "appPrices",
+                id: "${price1}"
+              }
+            ]
           }
-        }
 
-        Client.instance.patch("apps/#{app_id}", body)
-      end
-
-      def patch_app_app_prices(app_id: nil, app_price_tier_id: nil)
-        body = {
-          data: {
-            type: "apps",
-            id: app_id,
+          included << {
+            type: "appPrices",
+            id: "${price1}",
             attributes: {
-              availableInNewTerritories: true
+              startDate: nil
             },
             relationships: {
-              prices: {
-                data: [
-                  {
-                    type: "appPrices",
-                    id: "${price1}"
-                  }
-                ]
-              }
-            }
-          },
-          included: [
-            {
-              type: "appPrices",
-              id: "${price1}",
-              attributes: {
-                startDate: nil
+              app: {
+                data: {
+                  type: "apps",
+                  id: app_id
+                }
               },
-              relationships: {
-                app: {
-                  data: {
-                    type: "apps",
-                    id: app_id
-                  }
-                },
-                priceTier: {
-                  data: {
-                    type: "appPriceTiers",
-                    id: app_price_tier_id.to_s
-                  }
+              priceTier: {
+                data: {
+                  type: "appPriceTiers",
+                  id: app_price_tier_id.to_s
                 }
               }
             }
-          ]
+          }
+        end
+
+        # Territories
+        territories_data = (territory_ids || []).map do |id|
+          { type: "territories", id: id }
+        end
+        unless territories_data.empty?
+          relationships[:availableTerritories] = {
+            data: territories_data
+          }
+        end
+
+        # Data
+        data = {
+          type: "apps",
+          id: app_id
         }
+        data[:attributes] = attributes unless attributes.empty?
+        data[:relationships] = relationships unless relationships.empty?
+
+        # Body
+        body = {
+          data: data
+        }
+        body[:included] = included unless included.empty?
 
         Client.instance.patch("apps/#{app_id}", body)
       end
@@ -740,6 +757,15 @@ module Spaceship
       def delete_idfa_declaration(idfa_declaration_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.delete("idfaDeclarations/#{idfa_declaration_id}", params)
+      end
+
+      #
+      # territories
+      #
+
+      def get_territories(filter: {}, includes: nil, limit: nil, sort: nil)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+        Client.instance.get("territories", params)
       end
     end
   end
