@@ -261,10 +261,11 @@ module Deliver
         has_mapped_values = false
         mapped_values.each do |k, v|
           next if k.nil? || v.nil?
+          next if k == v
           has_mapped_values = true
-          UI.deprecated("'#{k}' from iTunesConnect as been deprecated. Please replace with '#{v}'")
+          UI.deprecated("Category '#{k}' from iTunesConnect as been deprecated. Please replace with '#{v}'")
         end
-        UI.deprecated("You can find more info at http://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
+        UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
 
         app_info.update_categories(category_id_map: category_id_map)
       end
@@ -572,12 +573,27 @@ module Deliver
       UI.message("Setting the app's age rating...")
 
       # Maping from legacy ITC values to App Store Connect Values
+      mapped_values = {}
       attributes = {}
       json.each do |k, v|
         new_key = Spaceship::ConnectAPI::AgeRatingDeclaration.map_key_from_itc(k)
         new_value = Spaceship::ConnectAPI::AgeRatingDeclaration.map_value_from_itc(new_key, v)
+
+        mapped_values[k] = new_key
+        mapped_values[v] = new_value
+
         attributes[new_key] = new_value
       end
+
+      # Print deprecation warnings if category was mapped
+      has_mapped_values = false
+      mapped_values.each do |k, v|
+        next if k.nil? || v.nil?
+        next if k == v
+        has_mapped_values = true
+        UI.deprecated("Age rating '#{k}' from iTunesConnect as been deprecated. Please replace with '#{v}'")
+      end
+      UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
 
       age_rating_delcaration = version.fetch_age_rating_declaration
       age_rating_delcaration.update(attributes: attributes)
