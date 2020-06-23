@@ -61,55 +61,79 @@ module Deliver
       submission_information = options[:submission_information] || {}
       uses_encryption = submission_information[:export_compliance_uses_encryption]
 
-      UI.verbose("Updating build for export compliance status of '#{uses_encryption}'")
       if build.uses_non_exempt_encryption.nil?
+        UI.verbose("Updating build for export compliance status of '#{uses_encryption}'")
+
+        if uses_encryption.to_s.empty?
+          message = [
+            "Export compliance is required to submit",
+            "Add information to the :submission_information option...",
+            "  Docs: http://docs.fastlane.tools/actions/deliver/#compliance-and-idfa-settings",
+            "  Example: submission_information: { export_compliance_uses_encryption: false }",
+            "This can also be set in your Info.plist with key 'ITSAppUsesNonExemptEncryption'"
+          ].join("\n")
+          UI.user_error!(message)
+        end
+
         build = build.update(attributes: {
           usesNonExemptEncryption: uses_encryption
         })
+
+        UI.verbose("Successfully updated build for export compliance status of '#{build.uses_non_exempt_encryption}' on App Store Connect")
       end
-      UI.verbose("Updated build for export compliance status of '#{build.uses_non_exempt_encryption}'")
     end
 
     def update_idfa(options, app, version)
       submission_information = options[:submission_information] || {}
-      return unless submission_information.include?(:add_id_info_uses_idfa)
-
       uses_idfa = submission_information[:add_id_info_uses_idfa]
+
       idfa_declaration = begin
                            version.fetch_idfa_declaration
                          rescue
                            nil
                          end
 
+      # Set IDFA on version
       UI.verbose("Updating app store version for IDFA status of '#{uses_idfa}'")
-      version = version.update(attributes: {
-        usesIdfa: uses_idfa
-      })
+      unless uses_idfa.nil?
+        version = version.update(attributes: {
+          usesIdfa: uses_idfa
+        })
+      end
       UI.verbose("Updated app store version for IDFA status of '#{version.uses_idfa}'")
 
+      # Error if uses_idfa not set
+      if version.uses_idfa.nil?
+        message = [
+          "Use of Advertising Identifier (IDFA) is required to submit",
+          "Add information to the :submission_information option...",
+          "  Docs: http://docs.fastlane.tools/actions/deliver/#compliance-and-idfa-settings",
+          "  Example: submission_information: { add_id_info_uses_idfa: false }",
+          "  Example: submission_information: {",
+          "    add_id_info_uses_idfa: true,",
+          "    add_id_info_limits_tracking: false,",
+          "    add_id_info_serves_ads: false,",
+          "    add_id_info_uses_idfa: false,",
+          "    add_id_info_tracks_install: false",
+          "  }"
+        ].join("\n")
+        UI.user_error!(message)
+      end
+
+      # Create, update, or delete IDFA declaration
       if uses_idfa == false
         if idfa_declaration
           UI.verbose("Deleting IDFA delcaration")
           idfa_declaration.delete!
           UI.verbose("Deleted IDFA delcaration")
         end
-      else
-        attributes = {}
-        if submission_information.include?(:add_id_info_limits_tracking)
-          attributes[:honorsLimitedAdTracking] = submission_information[:add_id_info_limits_tracking]
-        end
-
-        if submission_information.include?(:add_id_info_serves_ads)
-          attributes[:servesAds] = submission_information[:add_id_info_serves_ads]
-        end
-
-        if submission_information.include?(:add_id_info_tracks_install)
-          attributes[:attributesAppInstallationToPreviousAd] = submission_information[:add_id_info_tracks_install]
-        end
-
-        if submission_information.include?(:add_id_info_tracks_action)
-          attributes[:attributesActionWithPreviousAd] = submission_information[:add_id_info_tracks_action]
-        end
+      elsif uses_idfa == true
+        attributes = {
+          honorsLimitedAdTracking: !!submission_information[:add_id_info_limits_tracking],
+          servesAds: !!submission_information[:add_id_info_serves_ads],
+          attributesAppInstallationToPreviousAd: !!submission_information[:add_id_info_tracks_install],
+          attributesActionWithPreviousAd: !!submission_information[:add_id_info_tracks_action]
+        }
 
         if idfa_declaration
           UI.verbose("Updating IDFA delcaration")
@@ -122,22 +146,26 @@ module Deliver
         end
       end
 
-      UI.success("Successfully updated IDFA delcarations")
+      UI.success("Successfully updated IDFA delcarations on App Store Connect")
     end
 
     def update_submission_information(options, app)
       submission_information = options[:submission_information] || {}
-      if submission_information.include?(:content_rights_contains_third_party_content)
-        value = if submission_information[:content_rights_contains_third_party_content]
+
+      content_rights = submission_information[:content_rights_contains_third_party_content]
+
+      unless content_rights.nil?
+        value = if content_rights
                   Spaceship::ConnectAPI::App::ContentRightsDeclaration::USES_THIRD_PARTY_CONTENT
                 else
                   Spaceship::ConnectAPI::App::ContentRightsDeclaration::DOES_NOT_USE_THIRD_PARTY_CONTENT
                 end
 
-        UI.success("Updating contents rights declaration on App Store Connect")
+        UI.verbose("Updating contents rights declaration on App Store Connect")
         app.update(attributes: {
           contentRightsDeclaration: value
         })
+        UI.success("Successfully updated contents rights declaration on App Store Connect")
       end
     end
 
