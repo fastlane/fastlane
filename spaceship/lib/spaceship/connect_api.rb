@@ -47,6 +47,7 @@ require 'spaceship/connect_api/models/app_store_version_phased_release'
 require 'spaceship/connect_api/models/app_store_version'
 require 'spaceship/connect_api/models/idfa_declaration'
 require 'spaceship/connect_api/models/reset_ratings_request'
+require 'spaceship/connect_api/models/territory'
 
 module Spaceship
   class ConnectAPI
@@ -84,7 +85,7 @@ module Spaceship
         case platform.to_sym
         when :appletvos, :tvos
           return Spaceship::ConnectAPI::Platform::TV_OS
-        when :osx, :macos
+        when :osx, :macos, :mac
           return Spaceship::ConnectAPI::Platform::MAC_OS
         when :ios
           return Spaceship::ConnectAPI::Platform::IOS

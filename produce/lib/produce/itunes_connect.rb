@@ -85,13 +85,24 @@ module Produce
     end
 
     # Makes sure to get the value for the language
-    # Instead of using the user's value `UK English` spaceship should send
-    # `English_UK` to the server
+    # Instead of using the user's value `UK English` spaceship should send `en-UK`
     def language
       @language = Produce.config[:language]
 
       unless FastlaneCore::Languages::ALL_LANGUAGES.include?(@language)
-        UI.user_error!("Please enter one of available languages: #{FastlaneCore::Languages::ALL_LANGUAGES}")
+        mapped_language = Spaceship::Tunes::LanguageConverter.from_standard_to_itc_locale(@language)
+        if mapped_language.to_s.empty?
+          message = [
+            "Sending language name is deprecated. Could not map '#{@language}' to a locale.",
+            "Please enter one of available languages: #{FastlaneCore::Languages::ALL_LANGUAGES}"
+          ].join("\n")
+          UI.user_error!(message)
+        end
+
+        UI.deprecated("Sending language name is deprecated. '#{@language}' has been mapped to '#{mapped_language}'.")
+        UI.deprecated("Please enter one of available languages: #{FastlaneCore::Languages::ALL_LANGUAGES}")
+
+        @language = mapped_language
       end
 
       return @language

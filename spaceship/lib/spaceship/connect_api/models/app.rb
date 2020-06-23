@@ -55,15 +55,24 @@ module Spaceship
       end
 
       def self.create(name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil)
-        Spaceship::ConnectAPI.post_app(name: name, version_string: version_string, sku: sku, primary_locale: primary_locale, bundle_id: bundle_id, platforms: platforms)
+        Spaceship::ConnectAPI.post_app(
+          name: name,
+          version_string: version_string,
+          sku: sku, primary_locale:
+          primary_locale,
+          bundle_id: bundle_id,
+          platforms: platforms,
+          territory_ids: territory_ids,
+          available_in_new_territories: available_in_new_territories
+        )
       end
 
       def self.get(app_id: nil, includes: "appStoreVersions")
         return Spaceship::ConnectAPI.get_app(app_id: app_id, includes: includes).first
       end
 
-      def update(attributes: nil)
-        return Spaceship::ConnectAPI.patch_app(app_id: id, attributes: attributes)
+      def update(attributes: nil, app_price_tier_id: nil, territory_ids: nil)
+        return Spaceship::ConnectAPI.patch_app(app_id: id, attributes: attributes, app_price_tier_id: app_price_tier_id, territory_ids: territory_ids)
       end
 
       #
@@ -93,11 +102,6 @@ module Spaceship
         filter[:app] = id
         resp = Spaceship::ConnectAPI.get_app_prices(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
-      end
-
-      def update_app_price_tier(app_price_tier_id: nil)
-        resp = Spaceship::ConnectAPI.patch_app_app_prices(app_id: id, app_price_tier_id: app_price_tier_id)
-        return resp.first
       end
 
       #
