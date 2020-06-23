@@ -89,14 +89,6 @@ module Spaceship
           }
         end
 
-        # "availableTerritories": {
-        #   "data": [
-        #     {
-        #       "type": "territories",
-        #       "id": "ALB"
-        #     },
-        #     {
-
         relationships = {
           appStoreVersions: {
             data: app_store_verions_data
