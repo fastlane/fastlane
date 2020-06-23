@@ -192,26 +192,52 @@ module Deliver
       # Update categories
       app_info = app.fetch_edit_app_info
       if app_info
-        app_info.update_categories(
-          primary_category_id: Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
-            options[:primary_category].to_s.strip
-          ),
-          secondary_category_id: Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
-            options[:secondary_category].to_s.strip
-          ),
-          primary_subcategory_one_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
-            options[:primary_first_sub_category].to_s.strip
-          ),
-          primary_subcategory_two_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
-            options[:primary_second_sub_category].to_s.strip
-          ),
-          secondary_subcategory_one_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
-            options[:secondary_first_sub_category].to_s.strip
-          ),
-          secondary_subcategory_two_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
-            options[:secondary_second_sub_category].to_s.strip
+        category_id_map = {}
+
+        primary_category = options[:primary_category].to_s.strip
+        secondary_category = options[:secondary_category].to_s.strip
+        primary_first_sub_category = options[:primary_first_sub_category].to_s.strip
+        primary_second_sub_category = options[:primary_second_sub_category].to_s.strip
+        secondary_first_sub_category = options[:secondary_first_sub_category].to_s.strip
+        secondary_second_sub_category = options[:secondary_second_sub_category].to_s.strip
+
+        # Only update primary and secondar category if explicitly set
+        unless primary_category.empty?
+          category_id_map[:primary_category_id] = Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
+            primary_category
           )
-        )
+        end
+        unless secondary_category.empty?
+          category_id_map[:secondary_category_id] = Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
+            secondary_category
+          )
+        end
+
+        # Only set if primary category is going to be set
+        unless primary_category.empty?
+          category_id_map[:primary_subcategory_one_id] = Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            primary_first_sub_category
+          )
+        end
+        unless primary_category.empty?
+          category_id_map[:primary_subcategory_two_id] = Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            primary_second_sub_category
+          )
+        end
+
+        # Only set if secondary category is going to be set
+        unless secondary_category.empty?
+          category_id_map[:secondary_subcategory_one_id] = Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            secondary_first_sub_category
+          )
+        end
+        unless secondary_category.empty?
+          category_id_map[:secondary_subcategory_two_id] = Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            secondary_second_sub_category
+          )
+        end
+
+        app_info.update_categories(category_id_map: category_id_map)
       end
 
       # Update phased release
