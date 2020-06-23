@@ -264,7 +264,7 @@ module Deliver
           has_mapped_values = true
           UI.deprecated("Category '#{k}' from iTunesConnect as been deprecated. Please replace with '#{v}'")
         end
-        UI.deprecated("You can find more info at http://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
+        UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
 
         app_info.update_categories(category_id_map: category_id_map)
       end
