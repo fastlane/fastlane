@@ -192,26 +192,81 @@ module Deliver
       # Update categories
       app_info = app.fetch_edit_app_info
       if app_info
-        app_info.update_categories(
-          primary_category_id: Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
-            options[:primary_category].to_s.strip
-          ),
-          secondary_category_id: Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
-            options[:secondary_category].to_s.strip
-          ),
-          primary_subcategory_one_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
-            options[:primary_first_sub_category].to_s.strip
-          ),
-          primary_subcategory_two_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
-            options[:primary_second_sub_category].to_s.strip
-          ),
-          secondary_subcategory_one_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
-            options[:secondary_first_sub_category].to_s.strip
-          ),
-          secondary_subcategory_two_id: Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
-            options[:secondary_second_sub_category].to_s.strip
+        category_id_map = {}
+
+        primary_category = options[:primary_category].to_s.strip
+        secondary_category = options[:secondary_category].to_s.strip
+        primary_first_sub_category = options[:primary_first_sub_category].to_s.strip
+        primary_second_sub_category = options[:primary_second_sub_category].to_s.strip
+        secondary_first_sub_category = options[:secondary_first_sub_category].to_s.strip
+        secondary_second_sub_category = options[:secondary_second_sub_category].to_s.strip
+
+        mapped_values = {}
+
+        # Only update primary and secondar category if explicitly set
+        unless primary_category.empty?
+          mapped = Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
+            primary_category
           )
-        )
+
+          mapped_values[primary_category] = mapped
+          category_id_map[:primary_category_id] = mapped
+        end
+        unless secondary_category.empty?
+          mapped = Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
+            secondary_category
+          )
+
+          mapped_values[secondary_category] = mapped
+          category_id_map[:secondary_category_id] = mapped
+        end
+
+        # Only set if primary category is going to be set
+        unless primary_category.empty?
+          mapped = Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            primary_first_sub_category
+          )
+
+          mapped_values[primary_first_sub_category] = mapped
+          category_id_map[:primary_subcategory_one_id] = mapped
+        end
+        unless primary_category.empty?
+          mapped = Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            primary_second_sub_category
+          )
+
+          mapped_values[primary_second_sub_category] = mapped
+          category_id_map[:primary_subcategory_two_id] = mapped
+        end
+
+        # Only set if secondary category is going to be set
+        unless secondary_category.empty?
+          mapped = Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            secondary_first_sub_category
+          )
+
+          mapped_values[secondary_first_sub_category] = mapped
+          category_id_map[:secondary_subcategory_one_id] = mapped
+        end
+        unless secondary_category.empty?
+          mapped = Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            secondary_second_sub_category
+          )
+
+          mapped_values[secondary_second_sub_category] = mapped
+          category_id_map[:secondary_subcategory_two_id] = mapped
+        end
+
+        # Print deprecation warnings if category was mapped
+        has_mapped_values = false
+        mapped_values.each do |k, v|
+          next if k.nil? || v.nil?
+          has_mapped_values = true
+          UI.deprecated("'#{k}' from iTunesConnect as been deprecated. Please replace with '#{v}'")
+        end
+        UI.deprecated("You can find more info at http://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
+
+        app_info.update_categories(category_id_map: category_id_map)
       end
 
       # Update phased release
