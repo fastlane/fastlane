@@ -324,10 +324,12 @@ module Spaceship
       end
 
       #
+      # Adding the key will create/update (if value) or delete if nil
+      # Not including a key will leave as is
       # category_id_map: {
-      #   primary_category_id: nil,
-      #   primary_subcategory_one_id: nil,
-      #   primary_subcategory_two_id: nil,
+      #   primary_category_id: "GAMES",
+      #   primary_subcategory_one_id: "PUZZLE",
+      #   primary_subcategory_two_id: "STRATEGY",
       #   secondary_category_id: nil,
       #   secondary_subcategory_one_id: nil,
       #   secondary_subcategory_two_id: nil
@@ -344,36 +346,42 @@ module Spaceship
 
         relationships = {}
 
+        # Only update if key is included (otherwise category will be removed)
         if category_id_map.include?(:primary_category_id)
           relationships[:primaryCategory] = {
             data: primary_category_id ? { type: "appCategories", id: primary_category_id } : nil
           }
         end
 
+        # Only update if key is included (otherwise category will be removed)
         if category_id_map.include?(:primary_subcategory_one_id)
           relationships[:primarySubcategoryOne] = {
             data: primary_subcategory_one_id ? { type: "appCategories", id: primary_subcategory_one_id } : nil
           }
         end
 
+        # Only update if key is included (otherwise category will be removed)
         if category_id_map.include?(:primary_subcategory_two_id)
           relationships[:primarySubcategoryTwo] = {
             data: primary_subcategory_two_id ? { type: "appCategories", id: primary_subcategory_two_id } : nil
           }
         end
 
+        # Only update if key is included (otherwise category will be removed)
         if category_id_map.include?(:secondary_category_id)
           relationships[:secondaryCategory] = {
             data: secondary_category_id ? { type: "appCategories", id: secondary_category_id } : nil
           }
         end
 
+        # Only update if key is included (otherwise category will be removed)
         if category_id_map.include?(:secondary_subcategory_one_id)
           relationships[:secondarySubcategoryOne] = {
             data: secondary_subcategory_one_id ? { type: "appCategories", id: secondary_subcategory_one_id } : nil
           }
         end
 
+        # Only update if key is included (otherwise category will be removed)
         if category_id_map.include?(:secondary_subcategory_two_id)
           relationships[:secondarySubcategoryTwo] = {
             data: secondary_subcategory_two_id ? { type: "appCategories", id: secondary_subcategory_two_id } : nil
