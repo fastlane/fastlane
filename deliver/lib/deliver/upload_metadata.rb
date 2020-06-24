@@ -399,7 +399,7 @@ module Deliver
 
       localizations = app_info.get_app_info_localizations
 
-      languages = options[:languages] || []
+      languages = (options[:languages] || []).reject { |lang| lang == "default" }
       locales_to_enable = languages - localizations.map(&:locale)
 
       if locales_to_enable.count > 0
@@ -434,7 +434,7 @@ module Deliver
 
       localizations = version.get_app_store_version_localizations
 
-      languages = options[:languages] || []
+      languages = (options[:languages] || []).reject { |lang| lang == "default" }
       locales_to_enable = languages - localizations.map(&:locale)
 
       if locales_to_enable.count > 0
