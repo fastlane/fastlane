@@ -47,8 +47,9 @@ module Deliver
                 begin
                   screenshot.delete!
                   UI.verbose("Deleted screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
-                rescue
-                  errors << "Failed to delete screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}"
+                rescue => error
+                  UI.verbose("Failed to delete screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
+                  errors << error
                 end
               end
             end
@@ -64,7 +65,7 @@ module Deliver
 
           # Crash if any errors happen while deleting
           unless errors.empty?
-            UI.crash!(errors.join("\n"))
+            UI.crash!(errors.map(&:message).join("\n"))
           end
         end
       end

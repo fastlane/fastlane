@@ -1,4 +1,6 @@
 require_relative '../model'
+require_relative '../file_uploader'
+
 module Spaceship
   class ConnectAPI
     class AppScreenshot
@@ -76,30 +78,8 @@ module Spaceship
 
         post_resp = Spaceship::ConnectAPI.post_app_screenshot(app_screenshot_set_id: app_screenshot_set_id, attributes: post_attributes).to_models.first
 
-        # {
-        #   "method": "PUT",
-        #   "url": "https://some-url-apple-gives-us",
-        #   "length": 57365,
-        #   "offset": 0,
-        #   "requestHeaders": [
-        #     {
-        #       "name": "Content-Type",
-        #       "value": "image/png"
-        #     }
-        #   ]
-        # }
         upload_operation = post_resp.upload_operations.first
-
-        headers = {}
-        upload_operation["requestHeaders"].each do |hash|
-          headers[hash["name"]] = hash["value"]
-        end
-
-        Faraday.put(
-          upload_operation["url"],
-          payload,
-          headers
-        )
+        Spaceship::ConnectAPI::FileUploader.upload(upload_operation, payload)
 
         patch_attributes = {
           uploaded: true,

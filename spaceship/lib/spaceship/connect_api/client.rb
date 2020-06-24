@@ -134,15 +134,12 @@ module Spaceship
 
         if [504].include?(status)
           msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
-
-          puts(msg)
-          logger.warn(msg)
-
           raise msg
         end
 
         return response
-      rescue
+      rescue => error
+        puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
           return response
         else
