@@ -203,6 +203,7 @@ module Spaceship
       }
       @current_team_id = current_team_id
       @cookie = cookie || HTTP::CookieJar.new
+
       @client = Faraday.new(self.class.hostname, options) do |c|
         c.response(:json, content_type: /\bjson$/)
         c.response(:xml, content_type: /\bxml$/)

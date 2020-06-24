@@ -78,45 +78,75 @@ module Spaceship
       end
 
       def get(url_or_path, params = nil)
-        response = request(:get) do |req|
-          req.url(url_or_path)
-          req.options.params_encoder = Faraday::NestedParamsEncoder
-          req.params = params if params
-          req.headers['Content-Type'] = 'application/json'
+        response = with_asc_retry do
+          request(:get) do |req|
+            req.url(url_or_path)
+            req.options.params_encoder = Faraday::NestedParamsEncoder
+            req.params = params if params
+            req.headers['Content-Type'] = 'application/json'
+          end
         end
         handle_response(response)
       end
 
       def post(url_or_path, body)
-        response = request(:post) do |req|
-          req.url(url_or_path)
-          req.body = body.to_json
-          req.headers['Content-Type'] = 'application/json'
+        response = with_asc_retry do
+          request(:post) do |req|
+            req.url(url_or_path)
+            req.body = body.to_json
+            req.headers['Content-Type'] = 'application/json'
+          end
         end
         handle_response(response)
       end
 
       def patch(url_or_path, body)
-        response = request(:patch) do |req|
-          req.url(url_or_path)
-          req.body = body.to_json
-          req.headers['Content-Type'] = 'application/json'
+        response = with_asc_retry do
+          request(:patch) do |req|
+            req.url(url_or_path)
+            req.body = body.to_json
+            req.headers['Content-Type'] = 'application/json'
+          end
         end
         handle_response(response)
       end
 
       def delete(url_or_path, params = nil, body = nil)
-        response = request(:delete) do |req|
-          req.url(url_or_path)
-          req.options.params_encoder = Faraday::NestedParamsEncoder if params
-          req.params = params if params
-          req.body = body.to_json if body
-          req.headers['Content-Type'] = 'application/json' if body
+        response = with_asc_retry do
+          request(:delete) do |req|
+            req.url(url_or_path)
+            req.options.params_encoder = Faraday::NestedParamsEncoder if params
+            req.params = params if params
+            req.body = body.to_json if body
+            req.headers['Content-Type'] = 'application/json' if body
+          end
         end
         handle_response(response)
       end
 
       protected
+
+      def with_asc_retry(tries = 5, &_block)
+        tries = 1 if Object.const_defined?("SpecHelper")
+        response = yield
+
+        tries -= 1
+        status = response.status if response
+
+        if [504].include?(status)
+          msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
+          raise msg
+        end
+
+        return response
+      rescue => error
+        puts(error) if Spaceship::Globals.verbose?
+        if tries.zero?
+          return response
+        else
+          retry
+        end
+      end
 
       def handle_response(response)
         if (200...300).cover?(response.status) && (response.body.nil? || response.body.empty?)
