@@ -127,10 +127,11 @@ module Spaceship
       protected
 
       def with_asc_retry(tries = 5, &_block)
+        tries = 1 if Object.const_defined?("SpecHelper")
         response = yield
 
         tries -= 1
-        status = response.status
+        status = response.status if response
 
         if [504].include?(status)
           msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
