@@ -34,12 +34,37 @@ module Deliver
 
           # Iterate over all screenshots for each set and delete
           screenshot_sets = localization.get_app_screenshot_sets
+
+          # Multi threading delete on single localization
+          threads = []
+          errors = []
+
           screenshot_sets.each do |screenshot_set|
             UI.message("Removing all previously uploaded screenshots for '#{localization.locale}' '#{screenshot_set.screenshot_display_type}'...")
             screenshot_set.app_screenshots.each do |screenshot|
               UI.verbose("Deleting screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
-              screenshot.delete!
+              threads << Thread.new do
+                begin
+                  screenshot.delete!
+                  UI.verbose("Deleted screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
+                rescue
+                  errors << "Failed to delete screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}"
+                end
+              end
             end
+          end
+
+          sleep(1) # Feels bad but sleeping a bit to let the threads catchup
+
+          unless threads.empty?
+            Helper.show_loading_indicator("Waiting for screenshots to be deleted for '#{localization.locale}'... (might be slow)") unless FastlaneCore::Globals.verbose?
+            threads.each(&:join)
+            Helper.hide_loading_indicator unless FastlaneCore::Globals.verbose?
+          end
+
+          # Crash if any errors happen while deleting
+          unless errors.empty?
+            UI.crash!(errors.join("\n"))
           end
         end
       end
