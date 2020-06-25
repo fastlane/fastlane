@@ -28,7 +28,7 @@ module Spaceship
       # app
       #
 
-      def post_app(name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil, territory_ids: nil, available_in_new_territories: true)
+      def post_app(name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil)
         included = []
         included << {
           type: "appInfos",
@@ -109,8 +109,7 @@ module Spaceship
             attributes: {
               sku: sku,
               primaryLocale: primary_locale,
-              bundleId: bundle_id,
-              availableInNewTerritories: !!available_in_new_territories
+              bundleId: bundle_id
             },
             relationships: relationships
           },

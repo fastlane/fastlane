@@ -58,12 +58,10 @@ module Spaceship
         Spaceship::ConnectAPI.post_app(
           name: name,
           version_string: version_string,
-          sku: sku, primary_locale:
-          primary_locale,
+          sku: sku,
+          primary_locale: primary_locale,
           bundle_id: bundle_id,
-          platforms: platforms,
-          territory_ids: territory_ids,
-          available_in_new_territories: available_in_new_territories
+          platforms: platforms
         )
       end
 
