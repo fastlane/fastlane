@@ -11,14 +11,36 @@ module Spaceship
       attr_accessor :app_previews
 
       module PreviewType
+        IPHONE_35 = "IPHONE_35"
+        IPHONE_40 = "IPHONE_40"
+        IPHONE_47 = "IPHONE_47"
+        IPHONE_55 = "IPHONE_55"
+        IPHONE_58 = "IPHONE_58"
         IPHONE_65 = "IPHONE_65"
 
+        IPAD_97 = "IPAD_97"
+        IPAD_105 = "IPAD_105"
+        IPAD_PRO_3GEN_11 = "IPAD_PRO_3GEN_11"
+        IPAD_PRO_129 = "IPAD_PRO_129"
         IPAD_PRO_3GEN_129 = "IPAD_PRO_3GEN_129"
 
+        DESKTOP = "DESKTOP"
+
         ALL = [
+          IPHONE_35,
+          IPHONE_40,
+          IPHONE_47,
+          IPHONE_55,
+          IPHONE_58,
           IPHONE_65,
 
-          IPAD_PRO_3GEN_129
+          IPAD_97,
+          IPAD_105,
+          IPAD_PRO_3GEN_11,
+          IPAD_PRO_129,
+          IPAD_PRO_3GEN_129,
+
+          DESKTOP
         ]
       end
 
