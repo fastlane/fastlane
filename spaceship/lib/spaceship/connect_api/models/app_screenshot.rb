@@ -1,6 +1,8 @@
 require_relative '../model'
 require_relative '../file_uploader'
 
+require 'digest/md5'
+
 module Spaceship
   class ConnectAPI
     class AppScreenshot
@@ -14,36 +16,6 @@ module Spaceship
       attr_accessor :upload_operations
       attr_accessor :asset_delivery_state
       attr_accessor :uploaded
-
-      # "fileSize": 92542,
-      #   "fileName": "ftl_3241d62418767c0aa9b889b020c4f8db_45455763d4aaf7b18ee0045bc787f3de.png",
-      #   "sourceFileChecksum": "c237fd7852ed8f9285d16d9a28d2ec25",
-      #   "imageAsset": {
-      #     "templateUrl": "https://is4-ssl.mzstatic.com/image/thumb/Purple113/v4/61/18/68/61186886-b234-5bd0-1f4a-563124f18511/pr_source.png/{w}x{h}bb.{f}",
-      #     "width": 2048,
-      #     "height": 2732
-      #   },
-      #   "assetToken": "Purple113/v4/61/18/68/61186886-b234-5bd0-1f4a-563124f18511/pr_source.png",
-      #   "assetType": "SortedJ99ScreenShot",
-      #   "uploadOperations": null,
-      #   "assetDeliveryState": {
-      #     "errors": [],
-      #     "warnings": null,
-      #     "state": "COMPLETE"
-      #   },
-      #   "uploaded": null
-
-      # "assetDeliveryState": {
-      #   "errors": [],
-      #   "warnings": null,
-      #   "state": "AWAITING_UPLOAD"
-      # },
-
-      # "assetDeliveryState": {
-      #   "errors": [],
-      #   "warnings": null,
-      #   "state": "UPLOAD_COMPLETE"
-      # },
 
       attr_mapping({
         "fileName" => "file_name",
@@ -69,24 +41,30 @@ module Spaceship
 
         filename = File.basename(path)
         filesize = File.size(path)
-        payload = File.binread(path)
+        bytes = File.binread(path)
 
         post_attributes = {
           fileSize: filesize,
           fileName: filename
         }
 
-        post_resp = Spaceship::ConnectAPI.post_app_screenshot(app_screenshot_set_id: app_screenshot_set_id, attributes: post_attributes).to_models.first
+        post_resp = Spaceship::ConnectAPI.post_app_screenshot(
+          app_screenshot_set_id: app_screenshot_set_id,
+          attributes: post_attributes
+        ).to_models.first
 
-        upload_operation = post_resp.upload_operations.first
-        Spaceship::ConnectAPI::FileUploader.upload(upload_operation, payload)
+        upload_operations = post_resp.upload_operations
+        Spaceship::ConnectAPI::FileUploader.upload(upload_operations, bytes)
 
         patch_attributes = {
           uploaded: true,
-          sourceFileChecksum: "checksum-holder"
+          sourceFileChecksum: Digest::MD5.hexdigest(bytes)
         }
 
-        Spaceship::ConnectAPI.patch_app_screenshot(app_screenshot_id: post_resp.id, attributes: patch_attributes).to_models.first
+        Spaceship::ConnectAPI.patch_app_screenshot(
+          app_screenshot_id: post_resp.id,
+          attributes: patch_attributes
+        ).to_models.first
       end
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)

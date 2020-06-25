@@ -188,6 +188,11 @@ module Spaceship
       # appPreview
       #
 
+      def get_app_preview(app_preview_id: nil)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+        Client.instance.get("appPreviews/#{app_preview_id}", params)
+      end
+
       def post_app_preview(app_preview_set_id: nil, attributes: {})
         body = {
           data: {

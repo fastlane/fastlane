@@ -1,5 +1,8 @@
 require_relative '../model'
 require_relative '../file_uploader'
+require 'spaceship/globals'
+
+require 'digest/md5'
 
 module Spaceship
   class ConnectAPI
@@ -38,12 +41,16 @@ module Spaceship
       # API
       #
 
-      def self.create(app_preview_set_id: nil, path: nil)
+      def self.get(app_preview_id: nil)
+        Spaceship::ConnectAPI.get_app_preview(app_preview_id: app_preview_id).first
+      end
+
+      def self.create(app_preview_set_id: nil, path: nil, frame_time_code: nil)
         require 'faraday'
 
         filename = File.basename(path)
         filesize = File.size(path)
-        payload = File.binread(path)
+        bytes = File.binread(path)
 
         post_attributes = {
           fileSize: filesize,
@@ -55,18 +62,43 @@ module Spaceship
           attributes: post_attributes
         ).to_models.first
 
-        upload_operation = post_resp.upload_operations.first
-        Spaceship::ConnectAPI::FileUploader.upload(upload_operation, payload)
+        upload_operations = post_resp.upload_operations
+        Spaceship::ConnectAPI::FileUploader.upload(upload_operations, bytes)
 
         patch_attributes = {
           uploaded: true,
-          sourceFileChecksum: "checksum-holder"
+          sourceFileChecksum: Digest::MD5.hexdigest(bytes)
         }
 
-        Spaceship::ConnectAPI.patch_app_preview(
+        preview = Spaceship::ConnectAPI.patch_app_preview(
           app_preview_id: post_resp.id,
           attributes: patch_attributes
         ).to_models.first
+
+        unless frame_time_code.nil?
+          loop do
+            unless preview.video_url.nil?
+              puts("Preview processing complete!") if Spaceship::Globals.verbose?
+              preview = preview.update(attributes: {
+                previewFrameTimeCode: frame_time_code
+              })
+              puts("Updated preview frame time code!") if Spaceship::Globals.verbose?
+              break
+            end
+
+            sleep_time = 30
+            puts("Waiting #{sleep_time} seconds before checking status of processing...") if Spaceship::Globals.verbose?
+            sleep(sleep_time)
+
+            preview = Spaceship::ConnectAPI::AppPreview.get(app_preview_id: preview.id)
+          end
+        end
+
+        preview
+      end
+
+      def update(attributes: nil)
+        Spaceship::ConnectAPI.patch_app_preview(app_preview_id: id, attributes: attributes)
       end
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
