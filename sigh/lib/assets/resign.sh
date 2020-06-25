@@ -528,6 +528,21 @@ function resign {
         PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$APP_PATH/Info.plist"
     fi
 
+    # Check for and resign OnDemandResource folders
+    ODR_DIR="$(dirname $APP_PATH)/OnDemandResources"
+    if [ -d "$ODR_DIR" ]; then
+        for assetpack in "$ODR_DIR"/*
+        do
+            if [[ "$assetpack" == *.assetpack ]]; then
+                rm -rf $assetpack/_CodeSignature
+                /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$assetpack"
+                checkStatus
+            else
+                log "Ignoring non-assetpack: $assetpack"
+            fi
+        done
+    fi
+
     # Check for and resign any embedded frameworks (new feature for iOS 8 and above apps)
     FRAMEWORKS_DIR="$APP_PATH/Frameworks"
     if [ -d "$FRAMEWORKS_DIR" ]; then
