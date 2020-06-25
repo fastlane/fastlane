@@ -38,31 +38,7 @@ describe Match do
           destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
           fake_storage = "fake_storage"
-          expect(Match::Storage::GitStorage).to receive(:configure).with(
-            git_url: git_url,
-            shallow_clone: true,
-            skip_docs: false,
-            git_branch: "master",
-            git_full_name: nil,
-            git_user_email: nil,
-            clone_branch_directly: false,
-            git_basic_authorization: nil,
-            git_bearer_authorization: nil,
-            type: config[:type],
-            generate_apple_certs: generate_apple_certs,
-            platform: config[:platform],
-            google_cloud_bucket_name: "",
-            google_cloud_keys_file: "",
-            google_cloud_project_id: "",
-            s3_region: "",
-            s3_access_key: "",
-            s3_secret_access_key: "",
-            s3_bucket: "",
-            readonly: false,
-            username: values[:username],
-            team_id: nil,
-            team_name: nil
-          ).and_return(fake_storage)
+          expect(Match::Storage).to receive(:for_mode).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
@@ -119,31 +95,7 @@ describe Match do
           key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
 
           fake_storage = "fake_storage"
-          expect(Match::Storage::GitStorage).to receive(:configure).with(
-            git_url: git_url,
-            shallow_clone: false,
-            skip_docs: false,
-            git_branch: "master",
-            git_full_name: nil,
-            git_user_email: nil,
-            clone_branch_directly: false,
-            git_basic_authorization: nil,
-            git_bearer_authorization: nil,
-            type: config[:type],
-            generate_apple_certs: generate_apple_certs,
-            platform: config[:platform],
-            google_cloud_bucket_name: "",
-            google_cloud_keys_file: "",
-            google_cloud_project_id: "",
-            s3_region: "",
-            s3_access_key: "",
-            s3_secret_access_key: "",
-            s3_bucket: "",
-            readonly: false,
-            username: values[:username],
-            team_id: nil,
-            team_name: nil
-          ).and_return(fake_storage)
+          expect(Match::Storage).to receive(:for_mode).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
@@ -199,31 +151,7 @@ describe Match do
           key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
 
           fake_storage = "fake_storage"
-          expect(Match::Storage::GitStorage).to receive(:configure).with(
-            git_url: git_url,
-            shallow_clone: false,
-            skip_docs: false,
-            git_branch: "master",
-            git_full_name: nil,
-            git_user_email: nil,
-            clone_branch_directly: false,
-            git_basic_authorization: nil,
-            git_bearer_authorization: nil,
-            type: config[:type],
-            generate_apple_certs: generate_apple_certs,
-            platform: config[:platform],
-            google_cloud_bucket_name: "",
-            google_cloud_keys_file: "",
-            google_cloud_project_id: "",
-            s3_region: "",
-            s3_access_key: "",
-            s3_secret_access_key: "",
-            s3_bucket: "",
-            readonly: false,
-            username: values[:username],
-            team_id: nil,
-            team_name: nil
-          ).and_return(fake_storage)
+          expect(Match::Storage).to receive(:for_mode).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
@@ -265,31 +193,7 @@ describe Match do
           destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
           fake_storage = "fake_storage"
-          expect(Match::Storage::GitStorage).to receive(:configure).with(
-            git_url: git_url,
-            shallow_clone: true,
-            skip_docs: false,
-            git_branch: "master",
-            git_full_name: nil,
-            git_user_email: nil,
-            clone_branch_directly: false,
-            git_basic_authorization: nil,
-            git_bearer_authorization: nil,
-            type: config[:type],
-            generate_apple_certs: generate_apple_certs,
-            platform: config[:platform],
-            google_cloud_bucket_name: "",
-            google_cloud_keys_file: "",
-            google_cloud_project_id: "",
-            s3_region: "",
-            s3_access_key: "",
-            s3_secret_access_key: "",
-            s3_bucket: "",
-            readonly: false,
-            username: values[:username],
-            team_id: nil,
-            team_name: nil
-          ).and_return(fake_storage)
+          expect(Match::Storage).to receive(:for_mode).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
