@@ -1,4 +1,5 @@
 require_relative '../model'
+require_relative './app_preview_set'
 require_relative './app_screenshot_set'
 
 module Spaceship
@@ -49,6 +50,21 @@ module Spaceship
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
         Spaceship::ConnectAPI.delete_app_store_version_localization(app_store_version_localization_id: id)
+      end
+
+      #
+      # App Preview Sets
+      #
+
+      def get_app_preview_sets(filter: {}, includes: "appPreviews", limit: nil, sort: nil)
+        filter ||= {}
+        filter["appStoreVersionLocalization"] = id
+        return Spaceship::ConnectAPI::AppPreviewSet.all(filter: filter, includes: includes, limit: limit, sort: sort)
+      end
+
+      def create_app_preview_set(attributes: nil)
+        resp = Spaceship::ConnectAPI.post_app_preview_set(app_store_version_localization_id: id, attributes: attributes)
+        return resp.to_models.first
       end
 
       #
