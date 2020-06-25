@@ -13,7 +13,7 @@ module Spaceship
       # Instantiates a client with cookie session or a JWT token.
       def initialize(cookie: nil, current_team_id: nil, token: nil)
         if token.nil?
-          super(cookie: cookie, current_team_id: current_team_id)
+          super(cookie: cookie, current_team_id: current_team_id, timeout: 1200)
         else
           options = {
             request: {
