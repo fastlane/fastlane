@@ -82,7 +82,8 @@ module Spaceship
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PREPARE_FOR_SUBMISSION,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::DEVELOPER_REJECTED,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::REJECTED,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::METADATA_REJECTED
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::METADATA_REJECTED,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::WAITING_FOR_REVIEW
         ]
 
         resp = Spaceship::ConnectAPI.get_app_infos(app_id: id)
@@ -144,7 +145,8 @@ module Spaceship
             Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PREPARE_FOR_SUBMISSION,
             Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REJECTED,
             Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::REJECTED,
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::METADATA_REJECTED
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::METADATA_REJECTED,
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::WAITING_FOR_REVIEW
           ].join(","),
           platform: platform
         }
