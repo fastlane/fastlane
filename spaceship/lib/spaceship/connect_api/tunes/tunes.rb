@@ -186,6 +186,74 @@ module Spaceship
       end
 
       #
+      # appPreview
+      #
+
+      def post_app_preview(app_preview_set_id: nil, attributes: {})
+        body = {
+          data: {
+            type: "appPreviews",
+            attributes: attributes,
+            relationships: {
+              appPreviewSet: {
+                data: {
+                  type: "appPreviewSets",
+                  id: app_preview_set_id
+                }
+              }
+            }
+          }
+        }
+
+        Client.instance.post("appPreviews", body)
+      end
+
+      def patch_app_preview(app_preview_id: nil, attributes: {})
+        body = {
+          data: {
+            type: "appPreviews",
+            id: app_preview_id,
+            attributes: attributes
+          }
+        }
+
+        Client.instance.patch("appPreviews/#{app_preview_id}", body)
+      end
+
+      def delete_app_preview(app_preview_id: nil)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+        Client.instance.delete("appPreviews/#{app_preview_id}", params)
+      end
+
+      #
+      # appPreviewSets
+      #
+
+      def get_app_preview_sets(filter: {}, includes: nil, limit: nil, sort: nil)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("appPreviewSets", params)
+      end
+
+      def post_app_preview_set(app_store_version_localization_id: nil, attributes: {})
+        body = {
+          data: {
+            type: "appPreviewSets",
+            attributes: attributes,
+            relationships: {
+              appStoreVersionLocalization: {
+                data: {
+                  type: "appStoreVersionLocalizations",
+                  id: app_store_version_localization_id
+                }
+              }
+            }
+          }
+        }
+
+        Client.instance.post("appPreviewSets", body)
+      end
+
+      #
       # appPrices
       #
 
