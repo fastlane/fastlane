@@ -37,6 +37,10 @@ module Spaceship
         return "appPreviews"
       end
 
+      def complete?
+        (asset_delivery_state || {})["state"] == "COMPLETE"
+      end
+
       #
       # API
       #
@@ -63,13 +67,13 @@ module Spaceship
         }
 
         # Create placeholder
-        post_resp = Spaceship::ConnectAPI.post_app_preview(
+        preview = Spaceship::ConnectAPI.post_app_preview(
           app_preview_set_id: app_preview_set_id,
           attributes: post_attributes
         ).to_models.first
 
         # Upload the file
-        upload_operations = post_resp.upload_operations
+        upload_operations = preview.upload_operations
         Spaceship::ConnectAPI::FileUploader.upload(upload_operations, bytes)
 
         # Update file uploading complete
@@ -78,10 +82,17 @@ module Spaceship
           sourceFileChecksum: Digest::MD5.hexdigest(bytes)
         }
 
-        preview = Spaceship::ConnectAPI.patch_app_preview(
-          app_preview_id: post_resp.id,
-          attributes: patch_attributes
-        ).to_models.first
+        begin
+          preview = Spaceship::ConnectAPI.patch_app_preview(
+            app_preview_id: preview.id,
+            attributes: patch_attributes
+          ).to_models.first
+        rescue => error
+          puts("Failed to patch app preview. Update may have gone through so verifying") if Spaceship::Globals.verbose?
+
+          preview = Spaceship::ConnectAPI::AppPreview.get(app_preview_id: preview.id)
+          raise error unless preview.complete?
+        end
 
         # Poll for video processing completion to set still frame time
         unless frame_time_code.nil?

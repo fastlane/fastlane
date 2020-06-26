@@ -42,13 +42,13 @@ module Spaceship
         }
 
         # Create placeholder
-        post_resp = Spaceship::ConnectAPI.post_app_review_attachment(
+        attachment = Spaceship::ConnectAPI.post_app_review_attachment(
           app_store_review_detail_id: app_store_review_detail_id,
           attributes: post_attributes
         ).to_models.first
 
         # Upload the file
-        upload_operations = post_resp.upload_operations
+        upload_operations = attachment.upload_operations
         Spaceship::ConnectAPI::FileUploader.upload(upload_operations, bytes)
 
         # Update file uploading complete
@@ -58,7 +58,7 @@ module Spaceship
         }
 
         Spaceship::ConnectAPI.patch_app_review_attachment(
-          app_review_attachment_id: post_resp.id,
+          app_review_attachment_id: attachment.id,
           attributes: patch_attributes
         ).to_models.first
       end

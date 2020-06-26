@@ -1,5 +1,6 @@
 require_relative '../model'
 require_relative '../file_uploader'
+require 'spaceship/globals'
 
 require 'digest/md5'
 
@@ -32,8 +33,13 @@ module Spaceship
         return "appScreenshots"
       end
 
+      def complete?
+        (asset_delivery_state || {})["state"] == "COMPLETE"
+      end
+
       #
       # API
+      #
       #
 
       def self.create(app_screenshot_set_id: nil, path: nil)
@@ -49,13 +55,13 @@ module Spaceship
         }
 
         # Create placeholder
-        post_resp = Spaceship::ConnectAPI.post_app_screenshot(
+        screenshot = Spaceship::ConnectAPI.post_app_screenshot(
           app_screenshot_set_id: app_screenshot_set_id,
           attributes: post_attributes
-        ).to_models.first
+        ).first
 
         # Upload the file
-        upload_operations = post_resp.upload_operations
+        upload_operations = screenshot.upload_operations
         Spaceship::ConnectAPI::FileUploader.upload(upload_operations, bytes)
 
         # Update file uploading complete
@@ -64,10 +70,19 @@ module Spaceship
           sourceFileChecksum: Digest::MD5.hexdigest(bytes)
         }
 
-        Spaceship::ConnectAPI.patch_app_screenshot(
-          app_screenshot_id: post_resp.id,
-          attributes: patch_attributes
-        ).to_models.first
+        begin
+          screenshot = Spaceship::ConnectAPI.patch_app_screenshot(
+            app_screenshot_id: screenshot.id,
+            attributes: patch_attributes
+          ).first
+        rescue => error
+          puts("Failed to patch app screenshot. Update may have gone through so verifying") if Spaceship::Globals.verbose?
+
+          screenshot = Spaceship::ConnectAPI.get_app_screenshot(app_screenshot_id: screenshot.id).first
+          raise error unless screenshot.complete?
+        end
+
+        return screenshot
       end
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)

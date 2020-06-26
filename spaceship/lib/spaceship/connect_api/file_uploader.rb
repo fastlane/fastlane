@@ -30,7 +30,7 @@ module Spaceship
           offset = upload_operation["offset"]
           length = upload_operation["length"]
 
-          puts("Uploading app preview file (part #{index + 1})...") if Spaceship::Globals.verbose?
+          puts("Uploading file (part #{index + 1})...") if Spaceship::Globals.verbose?
           with_retry do
             client.send(
               upload_operation["method"].downcase,
@@ -40,7 +40,7 @@ module Spaceship
             )
           end
         end
-        puts("Uploading app preview complete!") if Spaceship::Globals.verbose?
+        puts("Uploading complete!") if Spaceship::Globals.verbose?
       end
 
       def self.with_retry(tries = 5, &_block)
