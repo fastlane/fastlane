@@ -3,14 +3,11 @@ require 'aws-sdk-s3'
 module Fastlane
   module Helper
     class S3ClientHelper
-      attr_reader :client
 
-      def initialize(access_key: nil, secret_access_key: nil, region: nil)
-        creds = Aws::Credentials.new(access_key, secret_access_key)
-        Aws.config.update(
-          region: region,
-          credentials: creds
-        )
+      attr_reader :region
+
+      def initialize(region: ENV['AWS_REGION'])
+        @region = region
       end
 
       def list_buckets
@@ -50,12 +47,13 @@ module Fastlane
 
         return bucket
       end
-    end
 
-    private
+      private
 
-    def client
-      @client ||= Aws::S3::Client.new
+      def client
+        @client ||= Aws::S3::Client.new(region: region)
+      end
+
     end
   end
 end
