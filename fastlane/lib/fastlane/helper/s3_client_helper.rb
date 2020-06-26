@@ -5,8 +5,9 @@ module Fastlane
     class S3ClientHelper
       attr_reader :region
 
-      def initialize(region: ENV['AWS_REGION'])
+      def initialize(region: ENV['AWS_REGION'], s3_client: nil)
         @region = region
+        @client = s3_client
       end
 
       def list_buckets
