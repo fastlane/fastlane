@@ -2,10 +2,12 @@ require 'faraday' # HTTP Client
 require 'faraday-cookie_jar'
 require 'faraday_middleware'
 
+require 'spaceship/globals'
+
 module Spaceship
   class ConnectAPI
     module FileUploader
-      def self.upload(upload_operation, payload)
+      def self.upload(upload_operations, bytes)
         # {
         #   "method": "PUT",
         #   "url": "https://some-url-apple-gives-us",
@@ -19,17 +21,47 @@ module Spaceship
         #   ]
         # }
 
-        headers = {}
-        upload_operation["requestHeaders"].each do |hash|
-          headers[hash["name"]] = hash["value"]
+        upload_operations.each_with_index do |upload_operation, index|
+          headers = {}
+          upload_operation["requestHeaders"].each do |hash|
+            headers[hash["name"]] = hash["value"]
+          end
+
+          offset = upload_operation["offset"]
+          length = upload_operation["length"]
+
+          puts("Uploading file (part #{index + 1})...") if Spaceship::Globals.verbose?
+          with_retry do
+            client.send(
+              upload_operation["method"].downcase,
+              upload_operation["url"],
+              bytes[offset, length],
+              headers
+            )
+          end
+        end
+        puts("Uploading complete!") if Spaceship::Globals.verbose?
+      end
+
+      def self.with_retry(tries = 5, &_block)
+        tries = 1 if Object.const_defined?("SpecHelper")
+        response = yield
+
+        tries -= 1
+
+        unless (200...300).cover?(response.status)
+          msg = "Received status of #{response.status}! Retrying after 3 seconds (remaining: #{tries})..."
+          raise msg
         end
 
-        client.send(
-          upload_operation["method"].downcase,
-          upload_operation["url"],
-          payload,
-          headers
-        )
+        return response
+      rescue => error
+        puts(error) if Spaceship::Globals.verbose?
+        if tries.zero?
+          raise "Failed to upload file after retries... Received #{response.status}"
+        else
+          retry
+        end
       end
 
       def self.client

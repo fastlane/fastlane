@@ -188,6 +188,11 @@ module Spaceship
       # appPreview
       #
 
+      def get_app_preview(app_preview_id: nil)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+        Client.instance.get("appPreviews/#{app_preview_id}", params)
+      end
+
       def post_app_preview(app_preview_set_id: nil, attributes: {})
         body = {
           data: {
@@ -337,6 +342,11 @@ module Spaceship
       #
       # appScreenshots
       #
+
+      def get_app_screenshot(app_screenshot_id: nil)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+        Client.instance.get("appScreenshots/#{app_screenshot_id}", params)
+      end
 
       def post_app_screenshot(app_screenshot_set_id: nil, attributes: {})
         body = {

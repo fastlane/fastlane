@@ -63,8 +63,8 @@ module Spaceship
         return resp.to_models
       end
 
-      def upload_preview(path: nil)
-        return Spaceship::ConnectAPI::AppPreview.create(app_preview_set_id: id, path: path)
+      def upload_preview(path: nil, frame_time_code: nil)
+        return Spaceship::ConnectAPI::AppPreview.create(app_preview_set_id: id, path: path, frame_time_code: frame_time_code)
       end
     end
   end

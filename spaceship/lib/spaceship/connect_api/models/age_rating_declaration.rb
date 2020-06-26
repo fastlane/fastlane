@@ -95,7 +95,7 @@ module Spaceship
           return value if new_value.nil?
           return new_value
         else
-          return LEGACY_RATING_VALUE_ITC_MAP[value]
+          return LEGACY_RATING_VALUE_ITC_MAP[value] || value
         end
 
         return value
