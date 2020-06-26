@@ -3,7 +3,6 @@ require 'aws-sdk-s3'
 module Fastlane
   module Helper
     class S3ClientHelper
-
       attr_reader :region
 
       def initialize(region: ENV['AWS_REGION'])
@@ -53,7 +52,6 @@ module Fastlane
       def client
         @client ||= Aws::S3::Client.new(region: region)
       end
-
     end
   end
 end
