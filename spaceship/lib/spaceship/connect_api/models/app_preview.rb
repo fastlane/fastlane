@@ -45,6 +45,11 @@ module Spaceship
         Spaceship::ConnectAPI.get_app_preview(app_preview_id: app_preview_id).first
       end
 
+      # Creates an AppPreview in an AppPreviewSet
+      # Setting the optional frame_time_code will force polling until video is done processing
+      # @param app_preview_set_id The AppPreviewSet id
+      # @param path The path of the file
+      # @param frame_time_code The time code for the preview still frame (ex: "00:00:07:01")
       def self.create(app_preview_set_id: nil, path: nil, frame_time_code: nil)
         require 'faraday'
 
@@ -57,14 +62,17 @@ module Spaceship
           fileName: filename
         }
 
+        # Create placeholder
         post_resp = Spaceship::ConnectAPI.post_app_preview(
           app_preview_set_id: app_preview_set_id,
           attributes: post_attributes
         ).to_models.first
 
+        # Upload the file
         upload_operations = post_resp.upload_operations
         Spaceship::ConnectAPI::FileUploader.upload(upload_operations, bytes)
 
+        # Update file uploading complete
         patch_attributes = {
           uploaded: true,
           sourceFileChecksum: Digest::MD5.hexdigest(bytes)
@@ -75,6 +83,7 @@ module Spaceship
           attributes: patch_attributes
         ).to_models.first
 
+        # Poll for video processing completion to set still frame time
         unless frame_time_code.nil?
           loop do
             unless preview.video_url.nil?

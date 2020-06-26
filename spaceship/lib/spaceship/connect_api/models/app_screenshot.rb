@@ -48,14 +48,17 @@ module Spaceship
           fileName: filename
         }
 
+        # Create placeholder
         post_resp = Spaceship::ConnectAPI.post_app_screenshot(
           app_screenshot_set_id: app_screenshot_set_id,
           attributes: post_attributes
         ).to_models.first
 
+        # Upload the file
         upload_operations = post_resp.upload_operations
         Spaceship::ConnectAPI::FileUploader.upload(upload_operations, bytes)
 
+        # Update file uploading complete
         patch_attributes = {
           uploaded: true,
           sourceFileChecksum: Digest::MD5.hexdigest(bytes)
