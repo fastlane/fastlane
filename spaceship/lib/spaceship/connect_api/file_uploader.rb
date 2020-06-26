@@ -58,7 +58,7 @@ module Spaceship
       rescue => error
         puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
-          return response
+          raise "Failed to upload file after retries... Received #{response.status}"
         else
           retry
         end
