@@ -21,6 +21,13 @@ module Produce
         UI.success("App '#{Produce.config[:app_identifier]}' already exists (#{application.id}), nothing to do on App Store Connect")
         # Nothing to do here
       else
+        emails = Produce.config[:itc_users] || []
+        user_ids = []
+        unless emails.empty?
+          UI.message("Verifying users exist before creating app...")
+          user_ids = find_user_ids(emails: emails)
+        end
+
         UI.success("Creating new app '#{Produce.config[:app_name]}' on App Store Connect")
 
         platforms = Produce.config[:platforms] || [Produce.config[:platform]]
@@ -29,7 +36,6 @@ module Produce
           Spaceship::ConnectAPI::Platform.map(platform)
         end
 
-        # Produce.config[:company_name]
         # Produce.config[:itc_users]
         application = Spaceship::ConnectAPI::App.create(
           name: Produce.config[:app_name],
@@ -60,10 +66,30 @@ module Produce
           application.ensure_version!(Produce.config[:app_version], platform: platform) if Produce.config[:app_version]
         end
 
+        # Add users to app
+        unless user_ids.empty?
+          application.add_users(user_ids: user_ids)
+          UI.message("Successfuly added #{user_ids.size} #{user_ids.count == 1 ? 'user' : 'users'} to app")
+        end
+
         UI.success("Successfully created new app '#{Produce.config[:app_name]}' on App Store Connect with ID #{application.id}")
       end
 
       return application.id
+    end
+
+    def find_user_ids(emails: nil)
+      emails ||= []
+      users = Spaceship::ConnectAPI::User.all.select do |user|
+        emails.include?(user.email)
+      end
+
+      diff_emails = emails - users.map(&:email)
+      unless diff_emails.empty?
+        raise "Could not find users with emails of: #{diff_emails.join(',')}"
+      end
+
+      return users.map(&:id)
     end
 
     private

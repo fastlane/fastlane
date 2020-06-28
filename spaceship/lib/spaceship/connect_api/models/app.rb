@@ -231,6 +231,16 @@ module Spaceship
         ).all_pages
         return resps.flat_map(&:to_models).first
       end
+
+      #
+      # Users
+      #
+
+      def add_users(user_ids: nil)
+        user_ids.each do |user_id|
+          Spaceship::ConnectAPI.add_user_visible_apps(user_id: user_id, app_ids: [id])
+        end
+      end
     end
   end
 end
