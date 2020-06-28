@@ -87,7 +87,8 @@ module Spaceship
           Spaceship::ConnectAPI::AppInfo::AppStoreState::INVALID_BINARY
         ]
 
-        resp = Spaceship::ConnectAPI.get_app_infos(app_id: id)
+        filter = { app: id }
+        resp = Spaceship::ConnectAPI.get_app_infos(filter: filter)
         return resp.to_models.select do |model|
           states.include?(model.app_store_state)
         end.first

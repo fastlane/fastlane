@@ -388,9 +388,9 @@ module Spaceship
       # appInfos
       #
 
-      def get_app_infos(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def get_app_infos(filter: {}, includes: nil, limit: nil, sort: nil)
         params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        Client.instance.get("apps/#{app_id}/appInfos", params)
+        Client.instance.get("appInfos", params)
       end
 
       def patch_app_info(app_info_id: nil, attributes: {})

@@ -1,4 +1,5 @@
 require 'spaceship/tunes/tunes'
+require 'digest/md5'
 
 require_relative 'app_screenshot'
 require_relative 'module'
@@ -91,6 +92,10 @@ module Deliver
         localizations = version.get_app_store_version_localizations
       end
 
+      upload_screenshots(screenshots_per_language, localizations)
+    end
+
+    def upload_screenshots(screenshots_per_language, localizations)
       # Upload screenshots
       indized = {} # per language and device type
 
@@ -114,7 +119,13 @@ module Deliver
           app_screenshot_sets_map[app_screenshot_set.screenshot_display_type] = app_screenshot_set
 
           # Set initial screnshot count
-          indized[localization.locale][app_screenshot_set.screenshot_display_type] ||= app_screenshot_set.app_screenshots.size
+          indized[localization.locale][app_screenshot_set.screenshot_display_type] ||= {
+            count: app_screenshot_set.app_screenshots.size,
+            checksums: []
+          }
+
+          checksums = app_screenshot_set.app_screenshots.map(&:source_file_checksum).uniq
+          indized[localization.locale][app_screenshot_set.screenshot_display_type][:checksums] = checksums
         end
 
         UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
@@ -133,21 +144,30 @@ module Deliver
             })
             app_screenshot_sets_map[display_type] = set
 
-            indized[localization.locale][set.screenshot_display_type] = 0
+            indized[localization.locale][set.screenshot_display_type] = {
+              count: 0,
+              checksums: []
+            }
           end
 
-          index = indized[localization.locale][set.screenshot_display_type]
+          index = indized[localization.locale][set.screenshot_display_type][:count]
 
           if index >= 10
-            UI.error("Too many screenshots found for device '#{screenshot.formatted_name}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
+            UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
             next
           end
 
-          indized[localization.locale][set.screenshot_display_type] += 1
+          bytes = File.binread(screenshot.path)
+          checksum = Digest::MD5.hexdigest(bytes)
+          duplicate = indized[localization.locale][set.screenshot_display_type][:checksums].include?(checksum)
 
-          # Also.. what is the messages type even for?
-          UI.message("Uploading '#{screenshot.path}'...")
-          set.upload_screenshot(path: screenshot.path)
+          if duplicate
+            UI.message("Previous uploaded. Skipping '#{screenshot.path}'...")
+          else
+            indized[localization.locale][set.screenshot_display_type][:count] += 1
+            UI.message("Uploading '#{screenshot.path}'...")
+            set.upload_screenshot(path: screenshot.path)
+          end
         end
       end
       UI.success("Successfully uploaded screenshots to App Store Connect")
