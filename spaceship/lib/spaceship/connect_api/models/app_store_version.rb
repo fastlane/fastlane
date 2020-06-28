@@ -26,6 +26,7 @@ module Spaceship
         REJECTED = "REJECTED"
         PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
         METADATA_REJECTED = "METADATA_REJECTED"
+        INVALID_BINARY = "INVALID_BINARY"
       end
 
       module ReleaseType
