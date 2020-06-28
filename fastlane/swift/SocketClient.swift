@@ -118,6 +118,7 @@ class SocketClient: NSObject {
     public func send(rubyCommand: RubyCommandable) {
         verbose(message: "sending: \(rubyCommand.json)")
         send(string: rubyCommand.json)
+        writeSemaphore.signal()
     }
     
     public func sendComplete() {
