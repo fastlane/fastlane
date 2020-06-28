@@ -26,7 +26,7 @@ describe "Build Manager" do
 
   describe ".sanitize_changelog" do
     it "removes emoji" do
-      changelog = "I'm 🦇B🏧an!"
+      changelog = "I'm 🦇B🏧an🪴!"
       changelog = Pilot::BuildManager.sanitize_changelog(changelog)
       expect(changelog).to eq("I'm Ban!")
     end
