@@ -69,6 +69,9 @@
 # new features March 2019
 # 1. two more fixes for only creating the archived-expanded-entitlements.xcent file if the version of Xcode < 9.3 as Xcode 10 does not create it.
 #
+# new features June 2020
+# 1. enable (re)signing of OnDemandResources when ipa has been built for the appstore
+#
 
 # Logging functions
 
