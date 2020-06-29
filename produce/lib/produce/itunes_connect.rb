@@ -43,7 +43,8 @@ module Produce
           sku: Produce.config[:sku].to_s,
           primary_locale: language,
           bundle_id: app_identifier,
-          platforms: platforms
+          platforms: platforms,
+          company_name: Produce.config[:company_name]
         )
 
         application = fetch_application
