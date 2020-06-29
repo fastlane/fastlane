@@ -28,7 +28,7 @@ module Spaceship
       # app
       #
 
-      def post_app(name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil)
+      def post_app(name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil, company_name: nil)
         included = []
         included << {
           type: "appInfos",
@@ -103,14 +103,17 @@ module Spaceship
           }
         }
 
+        app_attributes = {
+          sku: sku,
+          primaryLocale: primary_locale,
+          bundleId: bundle_id
+        }
+        app_attributes[:companyName] = company_name if company_name
+
         body = {
           data: {
             type: "apps",
-            attributes: {
-              sku: sku,
-              primaryLocale: primary_locale,
-              bundleId: bundle_id
-            },
+            attributes: app_attributes,
             relationships: relationships
           },
           included: included

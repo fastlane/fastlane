@@ -54,14 +54,15 @@ module Spaceship
         end
       end
 
-      def self.create(name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil)
+      def self.create(name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil, company_name: nil)
         Spaceship::ConnectAPI.post_app(
           name: name,
           version_string: version_string,
           sku: sku,
           primary_locale: primary_locale,
           bundle_id: bundle_id,
-          platforms: platforms
+          platforms: platforms,
+          company_name: company_name
         )
       end
 
@@ -230,6 +231,16 @@ module Spaceship
           public_link_limit_enabled: public_link_limit_enabled
         ).all_pages
         return resps.flat_map(&:to_models).first
+      end
+
+      #
+      # Users
+      #
+
+      def add_users(user_ids: nil)
+        user_ids.each do |user_id|
+          Spaceship::ConnectAPI.add_user_visible_apps(user_id: user_id, app_ids: [id])
+        end
       end
     end
   end
