@@ -205,7 +205,6 @@ module Spaceship
       @cookie = cookie || HTTP::CookieJar.new
       @client = Faraday.new(self.class.hostname, options) do |c|
         c.response(:json, content_type: /\bjson$/)
-        c.response(:xml, content_type: /\bxml$/)
         c.response(:plist, content_type: /\bplist$/)
         c.use(:cookie_jar, jar: @cookie)
         c.use(FaradayMiddleware::RelsMiddleware)
