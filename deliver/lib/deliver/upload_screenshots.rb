@@ -96,6 +96,12 @@ module Deliver
     end
 
     def upload_screenshots(screenshots_per_language, localizations)
+      # Check if should wait for processing
+      wait_for_processing = !FastlaneCore::Env.truthy?("DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING")
+      if wait_for_processing
+        UI.important("Set environment variable DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING=true to skip waiting for screenshots to process")
+      end
+
       # Upload screenshots
       indized = {} # per language and device type
 
@@ -166,8 +172,6 @@ module Deliver
           else
             indized[localization.locale][set.screenshot_display_type][:count] += 1
             UI.message("Uploading '#{screenshot.path}'...")
-
-            wait_for_processing = !FastlaneCore::Env.truthy?("DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING")
             set.upload_screenshot(path: screenshot.path, wait_for_processing: wait_for_processing)
           end
         end

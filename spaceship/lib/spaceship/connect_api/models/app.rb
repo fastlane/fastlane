@@ -154,7 +154,11 @@ module Spaceship
           ].join(","),
           platform: platform
         }
-        return get_app_store_versions(filter: filter, includes: includes).first
+
+        # Get the latest version
+        return get_app_store_versions(filter: filter, includes: includes)
+               .sort_by { |v| Gem::Version.new(v.version_string) }
+               .last
       end
 
       def get_app_store_versions(filter: {}, includes: nil, limit: nil, sort: nil)

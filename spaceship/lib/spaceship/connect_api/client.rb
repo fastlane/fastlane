@@ -133,7 +133,7 @@ module Spaceship
         tries -= 1
         status = response.status if response
 
-        if [504].include?(status)
+        if [500, 504].include?(status)
           msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
           raise msg
         end

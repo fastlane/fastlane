@@ -99,14 +99,17 @@ module Deliver
                            nil
                          end
 
+      updated_idfa = false
+
       # Set IDFA on version
-      UI.verbose("Updating app store version for IDFA status of '#{uses_idfa}'")
       unless uses_idfa.nil?
+        UI.verbose("Updating app store version for IDFA status of '#{uses_idfa}'")
         version = version.update(attributes: {
           usesIdfa: uses_idfa
         })
+        UI.verbose("Updated app store version for IDFA status of '#{version.uses_idfa}'")
+        updated_idfa = true
       end
-      UI.verbose("Updated app store version for IDFA status of '#{version.uses_idfa}'")
 
       # Error if uses_idfa not set
       if version.uses_idfa.nil?
@@ -133,6 +136,7 @@ module Deliver
         if idfa_declaration
           UI.verbose("Deleting IDFA delcaration")
           idfa_declaration.delete!
+          updated_idfa = true
           UI.verbose("Deleted IDFA delcaration")
         end
       elsif uses_idfa == true
@@ -152,9 +156,11 @@ module Deliver
           version.create_idfa_declaration(attributes: attributes)
           UI.verbose("Created IDFA delcaration")
         end
+
+        updated_idfa = true
       end
 
-      UI.success("Successfully updated IDFA delcarations on App Store Connect")
+      UI.success("Successfully updated IDFA delcarations on App Store Connect") if updated_idfa
     end
 
     def update_submission_information(options, app)
@@ -180,6 +186,7 @@ module Deliver
 
     def wait_for_build_processing_to_be_complete(app: nil, platform: nil, options: nil)
       app_version = options[:app_version]
+
       app_version ||= FastlaneCore::IpaFileAnalyser.fetch_app_version(options[:ipa]) if options[:ipa]
       app_version ||= FastlaneCore::PkgFileAnalyser.fetch_app_version(options[:pkg]) if options[:pkg]
 
@@ -193,11 +200,14 @@ module Deliver
         build_version: app_build,
         poll_interval: 15,
         return_when_build_appears: false,
-        return_spaceship_testflight_build: false
+        return_spaceship_testflight_build: false,
+        select_latest: true
       )
 
-      unless latest_build.app_version == app_version && latest_build.version == app_build
-        UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.app_version} - #{latest_build.version}.")
+      if !app_version.nil? && !app_build.nil?
+        unless latest_build.app_version == app_version && latest_build.version == app_build
+          UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.app_version} - #{latest_build.version}.")
+        end
       end
 
       return latest_build
