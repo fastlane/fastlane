@@ -39,7 +39,23 @@ module Spaceship
         APP_WATCH_SERIES_3 = "APP_WATCH_SERIES_3"
         APP_WATCH_SERIES_4 = "APP_WATCH_SERIES_4"
 
+        APP_APPLE_TV = "APP_APPLE_TV"
+
         APP_DESKTOP = "APP_DESKTOP"
+
+        ALL_IMESSAGE = [
+          IMESSAGE_APP_IPHONE_40,
+          IMESSAGE_APP_IPHONE_47,
+          IMESSAGE_APP_IPHONE_55,
+          IMESSAGE_APP_IPHONE_58,
+          IMESSAGE_APP_IPHONE_65,
+
+          IMESSAGE_APP_IPAD_97,
+          IMESSAGE_APP_IPAD_105,
+          IMESSAGE_APP_IPAD_PRO_129,
+          IMESSAGE_APP_IPAD_PRO_3GEN_11,
+          IMESSAGE_APP_IPAD_PRO_3GEN_129
+        ]
 
         ALL = [
           APP_IPHONE_35,
@@ -84,6 +100,14 @@ module Spaceship
         return "appScreenshotSets"
       end
 
+      def apple_tv?
+        DisplayType::APP_APPLE_TV == screenshot_display_type
+      end
+
+      def imessage?
+        DisplayType::ALL_IMESSAGE.include?(screenshot_display_type)
+      end
+
       #
       # API
       #
@@ -93,8 +117,8 @@ module Spaceship
         return resp.to_models
       end
 
-      def upload_screenshot(path: nil)
-        return Spaceship::ConnectAPI::AppScreenshot.create(app_screenshot_set_id: id, path: path)
+      def upload_screenshot(path: nil, wait_for_processing: true)
+        return Spaceship::ConnectAPI::AppScreenshot.create(app_screenshot_set_id: id, path: path, wait_for_processing: wait_for_processing)
       end
     end
   end

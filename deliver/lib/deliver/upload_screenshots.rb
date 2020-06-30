@@ -166,7 +166,9 @@ module Deliver
           else
             indized[localization.locale][set.screenshot_display_type][:count] += 1
             UI.message("Uploading '#{screenshot.path}'...")
-            set.upload_screenshot(path: screenshot.path)
+
+            wait_for_processing = !FastlaneCore::Env.truthy?("DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING")
+            set.upload_screenshot(path: screenshot.path, wait_for_processing: wait_for_processing)
           end
         end
       end
