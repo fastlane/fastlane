@@ -59,6 +59,8 @@ module Deliver
 
     def update_export_compliance(options, app, build)
       submission_information = options[:submission_information] || {}
+      submission_information = submission_information.collect { |k, v| [k.to_sym, v] }.to_h
+
       uses_encryption = submission_information[:export_compliance_uses_encryption]
 
       if build.uses_non_exempt_encryption.nil?
@@ -70,6 +72,8 @@ module Deliver
             "Add information to the :submission_information option...",
             "  Docs: http://docs.fastlane.tools/actions/deliver/#compliance-and-idfa-settings",
             "  Example: submission_information: { export_compliance_uses_encryption: false }",
+            "  Example CLI:",
+            "    --submission_information \"{\\\"export_compliance_uses_encryption\\\": false}\"",
             "This can also be set in your Info.plist with key 'ITSAppUsesNonExemptEncryption'"
           ].join("\n")
           UI.user_error!(message)
@@ -85,6 +89,8 @@ module Deliver
 
     def update_idfa(options, app, version)
       submission_information = options[:submission_information] || {}
+      submission_information = submission_information.collect { |k, v| [k.to_sym, v] }.to_h
+
       uses_idfa = submission_information[:add_id_info_uses_idfa]
 
       idfa_declaration = begin
@@ -115,7 +121,9 @@ module Deliver
           "    add_id_info_serves_ads: false,",
           "    add_id_info_uses_idfa: false,",
           "    add_id_info_tracks_install: false",
-          "  }"
+          "  }",
+          "  Example CLI:",
+          "    --submission_information \"{\\\"add_id_info_uses_idfa\\\": false}\""
         ].join("\n")
         UI.user_error!(message)
       end
@@ -151,6 +159,7 @@ module Deliver
 
     def update_submission_information(options, app)
       submission_information = options[:submission_information] || {}
+      submission_information = submission_information.collect { |k, v| [k.to_sym, v] }.to_h
 
       content_rights = submission_information[:content_rights_contains_third_party_content]
 
