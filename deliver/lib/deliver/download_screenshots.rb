@@ -19,11 +19,13 @@ module Deliver
       app = Spaceship::ConnectAPI::App.get(app_id: app_id)
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
-      version = if options[:use_live_version]
-                  app.get_live_app_store_version(platform: platform)
-                else
-                  app.get_edit_app_store_version(platform: platform)
-                end
+      if options[:use_live_version]
+        version = app.get_live_app_store_version(platform: platform)
+        UI.user_error!("Could not find a live version on App Store Connect. Try using '--use_live_version false'") if version.nil?
+      else
+        version = app.get_edit_app_store_version(platform: platform)
+        UI.user_error!("Could not find an edit version on App Store Connect. Try using '--use_live_version true'") if version.nil?
+      end
 
       localizations = version.get_app_store_version_localizations
       localizations.each do |localization|
