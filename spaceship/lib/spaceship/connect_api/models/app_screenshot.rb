@@ -37,12 +37,42 @@ module Spaceship
         (asset_delivery_state || {})["state"] == "COMPLETE"
       end
 
+      def error?
+        (asset_delivery_state || {})["state"] == "FAILED"
+      end
+
+      def error_messages
+        errors = (asset_delivery_state || {})["errors"]
+        (errors || []).map do |error|
+          [error["code"], error["description"]].compact.join(" - ")
+        end
+      end
+
+      # This does not download the source image (exact image that was uploaded)
+      # This downloads a modified version.
+      # This image won't have the same checksums as source_file_checksum.
+      #
+      # There is an open radar for allowing downloading of source file.
+      # https://openradar.appspot.com/radar?id=4980344105205760
+      def image_asset_url(width: nil, height: nil, type: "png")
+        return nil if image_asset.nil?
+
+        template_url = image_asset["templateUrl"]
+        width ||= image_asset["width"]
+        height ||= image_asset["height"]
+
+        return template_url
+               .gsub("{w}", width.to_s)
+               .gsub("{h}", height.to_s)
+               .gsub("{f}", type)
+      end
+
       #
       # API
       #
       #
 
-      def self.create(app_screenshot_set_id: nil, path: nil)
+      def self.create(app_screenshot_set_id: nil, path: nil, wait_for_processing: true)
         require 'faraday'
 
         filename = File.basename(path)
@@ -70,6 +100,9 @@ module Spaceship
           sourceFileChecksum: Digest::MD5.hexdigest(bytes)
         }
 
+        # Patch screenshot that file upload is complete
+        # Catch error if patch retries due to 504. Origal patch
+        # may go through by return response as 504.
         begin
           screenshot = Spaceship::ConnectAPI.patch_app_screenshot(
             app_screenshot_id: screenshot.id,
@@ -80,6 +113,26 @@ module Spaceship
 
           screenshot = Spaceship::ConnectAPI.get_app_screenshot(app_screenshot_id: screenshot.id).first
           raise error unless screenshot.complete?
+        end
+
+        # Wait for processing
+        if wait_for_processing
+          loop do
+            if screenshot.complete?
+              puts("Screenshot processing complete!") if Spaceship::Globals.verbose?
+              break
+            elsif screenshot.error?
+              messages = ["Error processing screenshot '#{screenshot.file_name}'"] + screenshot.error_messages
+              raise messages.join(". ")
+            end
+
+            # Poll every 2 seconds
+            sleep_time = 2
+            puts("Waiting #{sleep_time} seconds before checking status of processing...") if Spaceship::Globals.verbose?
+            sleep(sleep_time)
+
+            screenshot = Spaceship::ConnectAPI.get_app_screenshot(app_screenshot_id: screenshot.id).first
+          end
         end
 
         return screenshot
