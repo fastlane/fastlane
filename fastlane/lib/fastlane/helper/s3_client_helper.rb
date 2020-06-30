@@ -3,10 +3,14 @@ require 'aws-sdk-s3'
 module Fastlane
   module Helper
     class S3ClientHelper
+      attr_reader :access_key
       attr_reader :region
 
-      def initialize(region: ENV['AWS_REGION'], s3_client: nil)
+      def initialize(access_key: nil, secret_access_key: nil, region: nil, s3_client: nil)
+        @access_key = access_key
+        @secret_access_key = secret_access_key
         @region = region
+
         @client = s3_client
       end
 
@@ -51,7 +55,21 @@ module Fastlane
       private
 
       def client
-        @client ||= Aws::S3::Client.new(region: region)
+        @client ||= Aws::S3::Client.new(
+          {
+            region: region,
+            credentials: create_credentials
+          }.compact
+        )
+      end
+
+      def create_credentials
+        return nil if access_key.nil? || @secret_access_key.nil?
+
+        Aws::Credentials.new(
+          access_key,
+          @secret_access_key
+        )
       end
     end
   end
