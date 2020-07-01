@@ -273,11 +273,6 @@ module Spaceship
       # appReviewAttachments
       #
 
-      def get_app_review_attachments(app_store_review_detail_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-        Client.instance.get("appStoreReviewDetails/#{app_store_review_detail_id}/appReviewAttachments", params)
-      end
-
       def post_app_review_attachment(app_store_review_detail_id: nil, attributes: {})
         body = {
           data: {

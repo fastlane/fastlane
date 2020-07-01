@@ -65,8 +65,8 @@ module Deliver
           end
 
           # Crash if any errors happen while deleting
-          unless errors.empty?
-            UI.crash!(errors.map(&:message).join("\n"))
+          errors.each do |error|
+            UI.error(error.message)
           end
         end
       end

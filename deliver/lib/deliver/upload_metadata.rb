@@ -550,7 +550,8 @@ module Deliver
       UI.message("Uploading app review information to App Store Connect")
       app_store_review_detail = begin
                                   version.fetch_app_store_review_detail
-                                rescue
+                                rescue => error
+                                  UI.error("Error fetching app store review detail - #{error.message}")
                                   nil
                                 end # errors if doesn't exist
       if app_store_review_detail
@@ -562,7 +563,7 @@ module Deliver
 
     def set_review_attachment_file(version, options)
       app_store_review_detail = version.fetch_app_store_review_detail
-      app_review_attachments = app_store_review_detail.fetch_app_review_attachments
+      app_review_attachments = app_store_review_detail.app_store_review_attachments || []
 
       if options[:app_review_attachment_file]
         app_review_attachments.each do |app_review_attachment|

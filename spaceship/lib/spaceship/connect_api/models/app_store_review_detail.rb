@@ -15,6 +15,8 @@ module Spaceship
       attr_accessor :demo_account_required
       attr_accessor :notes
 
+      attr_accessor :app_store_review_attachments
+
       attr_mapping({
         "contactFirstName" => "contact_first_name",
         "contactLastName" => "contact_last_name",
@@ -23,7 +25,9 @@ module Spaceship
         "demoAccountName" => "demo_account_name",
         "demoAccountPassword" => "demo_account_password",
         "demoAccountRequired" => "demo_account_required",
-        "notes" => "notes"
+        "notes" => "notes",
+
+        "appStoreReviewAttachments" => "app_store_review_attachments"
       })
 
       def self.type
@@ -33,11 +37,6 @@ module Spaceship
       #
       # API
       #
-
-      def fetch_app_review_attachments
-        resp = Spaceship::ConnectAPI.get_app_review_attachments(app_store_review_detail_id: id)
-        return resp.to_models
-      end
 
       def update(attributes: nil)
         return Spaceship::ConnectAPI.patch_app_store_review_detail(app_store_review_detail_id: id, attributes: attributes)

@@ -122,8 +122,8 @@ module Spaceship
         return resp.to_models.first
       end
 
-      def fetch_app_store_review_detail
-        resp = Spaceship::ConnectAPI.get_app_store_review_detail(app_store_version_id: id)
+      def fetch_app_store_review_detail(includes: "appStoreReviewAttachments")
+        resp = Spaceship::ConnectAPI.get_app_store_review_detail(app_store_version_id: id, includes: includes)
         return resp.to_models.first
       end
 
