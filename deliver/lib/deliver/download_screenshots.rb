@@ -32,12 +32,12 @@ module Deliver
         screenshot_sets = localization.get_app_screenshot_sets
         screenshot_sets.each do |screenshot_set|
           screenshot_set.app_screenshots.each_with_index do |screenshot, index|
-            url = screenshot.image_asset_url
-            next if url.nil?
-
             file_name = [index, screenshot_set.screenshot_display_type, index].join("_")
-            original_file_extension = File.basename(screenshot.file_name)
+            original_file_extension = File.extname(screenshot.file_name).strip.downcase[1..-1]
             file_name += "." + original_file_extension
+
+            url = screenshot.image_asset_url(type: original_file_extension)
+            next if url.nil?
 
             language = localization.locale
 
