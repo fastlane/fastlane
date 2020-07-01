@@ -80,8 +80,10 @@ module Deliver
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
 
-      app_store_version_localizations = verify_available_version_languages!(options, app) unless options[:edit_live]
-      app_info_localizations = verify_available_info_languages!(options, app) unless options[:edit_live]
+      enabled_languages = detect_languages(options)
+
+      app_store_version_localizations = verify_available_version_languages!(options, app, enabled_languages) unless options[:edit_live]
+      app_info_localizations = verify_available_info_languages!(options, app, enabled_languages) unless options[:edit_live]
 
       if options[:edit_live]
         # not all values are editable when using live_version
@@ -405,7 +407,7 @@ module Deliver
     end
 
     # Finding languages to enable
-    def verify_available_info_languages!(options, app)
+    def verify_available_info_languages!(options, app, languages)
       app_info = app.fetch_edit_app_info
 
       unless app_info
@@ -415,7 +417,7 @@ module Deliver
 
       localizations = app_info.get_app_info_localizations
 
-      languages = (options[:languages] || []).reject { |lang| lang == "default" }
+      languages = (languages || []).reject { |lang| lang == "default" }
       locales_to_enable = languages - localizations.map(&:locale)
 
       if locales_to_enable.count > 0
@@ -439,7 +441,7 @@ module Deliver
     end
 
     # Finding languages to enable
-    def verify_available_version_languages!(options, app)
+    def verify_available_version_languages!(options, app, languages)
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       version = app.get_edit_app_store_version(platform: platform)
 
@@ -450,7 +452,7 @@ module Deliver
 
       localizations = version.get_app_store_version_localizations
 
-      languages = (options[:languages] || []).reject { |lang| lang == "default" }
+      languages = (languages || []).reject { |lang| lang == "default" }
       locales_to_enable = languages - localizations.map(&:locale)
 
       if locales_to_enable.count > 0
