@@ -120,6 +120,12 @@ module Spaceship
       def upload_screenshot(path: nil, wait_for_processing: true)
         return Spaceship::ConnectAPI::AppScreenshot.create(app_screenshot_set_id: id, path: path, wait_for_processing: wait_for_processing)
       end
+
+      def reorder_screenshots(app_screenshot_ids: nil)
+        Spaceship::ConnectAPI.patch_app_screenshot_set_screenshots(app_screenshot_set_id: id, app_screenshot_ids: app_screenshot_ids)
+
+        return Spaceship::ConnectAPI.get_app_screenshot_set(app_screenshot_set_id: id, includes: "appScreenshots").first
+      end
     end
   end
 end

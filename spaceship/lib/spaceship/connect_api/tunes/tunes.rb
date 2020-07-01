@@ -323,6 +323,11 @@ module Spaceship
         Client.instance.get("appScreenshotSets", params)
       end
 
+      def get_app_screenshot_set(app_screenshot_set_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("appScreenshotSets/#{app_screenshot_set_id}", params)
+      end
+
       def post_app_screenshot_set(app_store_version_localization_id: nil, attributes: {})
         body = {
           data: {
@@ -340,6 +345,21 @@ module Spaceship
         }
 
         Client.instance.post("appScreenshotSets", body)
+      end
+
+      def patch_app_screenshot_set_screenshots(app_screenshot_set_id: nil, app_screenshot_ids: nil)
+        app_screenshot_ids ||= []
+
+        body = {
+          data: app_screenshot_ids.map do |app_screenshot_id|
+            {
+              type: "appScreenshots",
+              id: app_screenshot_id
+            }
+          end
+        }
+
+        Client.instance.patch("appScreenshotSets/#{app_screenshot_set_id}/relationships/appScreenshots", body)
       end
 
       #
