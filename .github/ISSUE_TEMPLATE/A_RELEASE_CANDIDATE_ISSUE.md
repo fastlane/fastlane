@@ -1,6 +1,6 @@
 ---
-name: ‼️ Release Candidate (Deliver) Issue (2.150.0.rc1)
-about: This is a temporary but highly imporant issue for the 2.150.0 release candidate
+name: ‼️ 2.150.0+ issue with deliver, produce, or spaceship
+about: This is a temporary but highly imporant issue for the 2.150.0
 
 ---
 
@@ -35,6 +35,7 @@ about: This is a temporary but highly imporant issue for the 2.150.0 release can
 ### Spaceship Logs
 <!-- Having logs of the API requets that Spaceship made can help in solving issues -->
 <!-- Run `bundle exec fastalane run spaceship_logs copy_to_clipboard:true` to copy the latest Spaceship logs and past below -->
+<!-- Make sure to remove some personal info if there is any :) -->
 
 <details>
   <pre>[INSERT OUTPUT HERE]</pre>
