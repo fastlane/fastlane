@@ -1,6 +1,6 @@
 ---
-name: ‼️ 2.150.0+ issue with deliver, produce, or spaceship
-about: This is a temporary but highly imporant issue for the 2.150.0
+name: ‼️ 2.150.0 (and up) issue with deliver, produce, or spaceship
+about: This is a temporary but highly imporant issue for 2.150.0 and up
 
 ---
 
