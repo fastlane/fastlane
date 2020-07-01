@@ -159,7 +159,10 @@ module Deliver
     end
 
     def reject_version_if_possible
-      app = options[:app]
+      legacy_app = options[:app]
+      app_id = legacy_app.apple_id
+      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+
       if app.reject_version_if_possible!
         UI.success("Successfully rejected previous version!")
       end

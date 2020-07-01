@@ -106,7 +106,9 @@ module Deliver
       end
 
       # Needed for to filter out release notes from being sent up
-      is_first_version = app.get_live_app_store_version(platform: platform).nil?
+      number_of_versions = app.get_app_store_versions(filter: { platform: platform }, limit: 2).size
+      is_first_version = number_of_versions == 1
+      UI.verbose("Version '#{version.version_string}' is the first version on App Store Connect") if is_first_version
 
       UI.important("Will begin uploading metadata for '#{version.version_string}' on App Store Connect")
 
@@ -158,7 +160,11 @@ module Deliver
       end
 
       release_type = if options[:auto_release_date]
-                       non_localized_version_attributes['earliestReleaseDate'] = options[:auto_release_date]
+                       # Convert time format to 2020-06-17T12:00:00-07:00
+                       time_in_ms = options[:auto_release_date]
+                       date = convert_ms_to_iso8601(time_in_ms)
+
+                       non_localized_version_attributes['earliestReleaseDate'] = date
                        Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::SCHEDULED
                      elsif options[:automatic_release]
                        Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::AFTER_APPROVAL
@@ -314,6 +320,16 @@ module Deliver
     end
 
     # rubocop:enable Metrics/PerceivedComplexity
+
+    def convert_ms_to_iso8601(time_in_ms)
+      time_in_s = time_in_ms / 1000
+
+      # Remove minutes and seconds (whole hour)
+      seconds_in_hour = 60 * 60
+      time_in_s_to_hour = (time_in_s / seconds_in_hour).to_i * seconds_in_hour
+
+      return Time.at(time_in_s_to_hour).strftime("%Y-%m-%dT%H:%M:%S%:z")
+    end
 
     # If the user is using the 'default' language, then assign values where they are needed
     def assign_defaults(options)

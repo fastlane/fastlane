@@ -19,8 +19,13 @@ module Spaceship
       attr_accessor :downloadable
       attr_accessor :created_date
 
+      attr_accessor :app_store_version_submission
+
       module AppStoreState
         READY_FOR_SALE = "READY_FOR_SALE"
+        PROCESSING_FOR_APP_STORE = "PROCESSING_FOR_APP_STORE"
+        PENDING_DEVELOPER_RELEASE = "PENDING_DEVELOPER_RELEASE"
+        IN_REVIEW = "IN_REVIEW"
         WAITING_FOR_REVIEW = "WAITING_FOR_REVIEW"
         DEVELOPER_REJECTED = "DEVELOPER_REJECTED"
         REJECTED = "REJECTED"
@@ -47,11 +52,24 @@ module Spaceship
         "usesIdfa" =>  "uses_idfa",
         "isWatchOnly" =>  "is_watch_only",
         "downloadable" =>  "downloadable",
-        "createdDate" =>  "created_date"
+        "createdDate" =>  "created_date",
+
+        "appStoreVersionSubmission" => "app_store_version_submission"
       })
 
       def self.type
         return "appStoreVersions"
+      end
+
+      def can_reject?
+        raise "No app_store_version_submission included" unless app_store_version_submission
+        return app_store_version_submission.can_reject
+      end
+
+      def reject!
+        return false unless can_reject?
+        app_store_version_submission.delete!
+        return true
       end
 
       #
