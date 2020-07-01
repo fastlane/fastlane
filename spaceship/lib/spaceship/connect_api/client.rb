@@ -13,7 +13,7 @@ module Spaceship
       # Instantiates a client with cookie session or a JWT token.
       def initialize(cookie: nil, current_team_id: nil, token: nil)
         if token.nil?
-          super(cookie: cookie, current_team_id: current_team_id)
+          super(cookie: cookie, current_team_id: current_team_id, timeout: 1200)
         else
           options = {
             request: {
@@ -78,45 +78,75 @@ module Spaceship
       end
 
       def get(url_or_path, params = nil)
-        response = request(:get) do |req|
-          req.url(url_or_path)
-          req.options.params_encoder = Faraday::NestedParamsEncoder
-          req.params = params if params
-          req.headers['Content-Type'] = 'application/json'
+        response = with_asc_retry do
+          request(:get) do |req|
+            req.url(url_or_path)
+            req.options.params_encoder = Faraday::NestedParamsEncoder
+            req.params = params if params
+            req.headers['Content-Type'] = 'application/json'
+          end
         end
         handle_response(response)
       end
 
       def post(url_or_path, body)
-        response = request(:post) do |req|
-          req.url(url_or_path)
-          req.body = body.to_json
-          req.headers['Content-Type'] = 'application/json'
+        response = with_asc_retry do
+          request(:post) do |req|
+            req.url(url_or_path)
+            req.body = body.to_json
+            req.headers['Content-Type'] = 'application/json'
+          end
         end
         handle_response(response)
       end
 
       def patch(url_or_path, body)
-        response = request(:patch) do |req|
-          req.url(url_or_path)
-          req.body = body.to_json
-          req.headers['Content-Type'] = 'application/json'
+        response = with_asc_retry do
+          request(:patch) do |req|
+            req.url(url_or_path)
+            req.body = body.to_json
+            req.headers['Content-Type'] = 'application/json'
+          end
         end
         handle_response(response)
       end
 
       def delete(url_or_path, params = nil, body = nil)
-        response = request(:delete) do |req|
-          req.url(url_or_path)
-          req.options.params_encoder = Faraday::NestedParamsEncoder if params
-          req.params = params if params
-          req.body = body.to_json if body
-          req.headers['Content-Type'] = 'application/json' if body
+        response = with_asc_retry do
+          request(:delete) do |req|
+            req.url(url_or_path)
+            req.options.params_encoder = Faraday::NestedParamsEncoder if params
+            req.params = params if params
+            req.body = body.to_json if body
+            req.headers['Content-Type'] = 'application/json' if body
+          end
         end
         handle_response(response)
       end
 
       protected
+
+      def with_asc_retry(tries = 5, &_block)
+        tries = 1 if Object.const_defined?("SpecHelper")
+        response = yield
+
+        tries -= 1
+        status = response.status if response
+
+        if [500, 504].include?(status)
+          msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
+          raise msg
+        end
+
+        return response
+      rescue => error
+        puts(error) if Spaceship::Globals.verbose?
+        if tries.zero?
+          return response
+        else
+          retry
+        end
+      end
 
       def handle_response(response)
         if (200...300).cover?(response.status) && (response.body.nil? || response.body.empty?)
@@ -141,21 +171,57 @@ module Spaceship
       def handle_errors(response)
         # Example error format
         # {
-        #   "errors" : [ {
-        #     "id" : "ce8c391e-f858-411b-a14b-5aa26e0915f2",
-        #     "status" : "400",
-        #     "code" : "PARAMETER_ERROR.INVALID",
-        #     "title" : "A parameter has an invalid value",
-        #     "detail" : "'uploadedDate3' is not a valid field name",
-        #     "source" : {
-        #       "parameter" : "sort"
+        # "errors":[
+        #     {
+        #       "id":"cbfd8674-4802-4857-bfe8-444e1ea36e32",
+        #       "status":"409",
+        #       "code":"STATE_ERROR",
+        #       "title":"The request cannot be fulfilled because of the state of another resource.",
+        #       "detail":"Submit for review errors found.",
+        #       "meta":{
+        #           "associatedErrors":{
+        #             "/v1/appScreenshots/":[
+        #                 {
+        #                   "id":"23d1734f-b81f-411a-98e4-6d3e763d54ed",
+        #                   "status":"409",
+        #                   "code":"STATE_ERROR.SCREENSHOT_REQUIRED.APP_WATCH_SERIES_4",
+        #                   "title":"App screenshot missing (APP_WATCH_SERIES_4)."
+        #                 },
+        #                 {
+        #                   "id":"db993030-0a93-48e9-9fd7-7e5676633431",
+        #                   "status":"409",
+        #                   "code":"STATE_ERROR.SCREENSHOT_REQUIRED.APP_WATCH_SERIES_4",
+        #                   "title":"App screenshot missing (APP_WATCH_SERIES_4)."
+        #                 }
+        #             ],
+        #             "/v1/builds/d710b6fa-5235-4fe4-b791-2b80d6818db0":[
+        #                 {
+        #                   "id":"e421fe6f-0e3b-464b-89dc-ba437e7bb77d",
+        #                   "status":"409",
+        #                   "code":"ENTITY_ERROR.ATTRIBUTE.REQUIRED",
+        #                   "title":"The provided entity is missing a required attribute",
+        #                   "detail":"You must provide a value for the attribute 'usesNonExemptEncryption' with this request",
+        #                   "source":{
+        #                       "pointer":"/data/attributes/usesNonExemptEncryption"
+        #                   }
+        #                 }
+        #             ]
+        #           }
+        #       }
         #     }
-        #   } ]
+        # ]
         # }
 
         return response.body['errors'].map do |error|
-          "#{error['title']} - #{error['detail']}"
-        end.join(" ")
+          messages = [[error['title'], error['detail']].compact.join(" - ")]
+
+          meta = error["meta"] || {}
+          associated_errors = meta["associatedErrors"] || {}
+
+          messages + associated_errors.values.flatten.map do |associated_error|
+            [[associated_error["title"], associated_error["detail"]].compact.join(" - ")]
+          end
+        end.flatten.join("\n")
       end
 
       private

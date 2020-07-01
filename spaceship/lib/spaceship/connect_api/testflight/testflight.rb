@@ -285,9 +285,16 @@ module Spaceship
         Client.instance.get("builds", params)
       end
 
-      def get_build(build_id: nil, includes: nil)
-        params = Client.instance.build_params(filter: nil, includes: includes, limit: nil, sort: nil, cursor: nil)
-        Client.instance.get("builds/#{build_id}", params)
+      def get_build(build_id: nil, app_store_version_id: nil, includes: nil)
+        if build_id
+          params = Client.instance.build_params(filter: nil, includes: includes, limit: nil, sort: nil, cursor: nil)
+          return Client.instance.get("builds/#{build_id}", params)
+        elsif app_store_version_id
+          params = Client.instance.build_params(filter: nil, includes: includes, limit: nil, sort: nil, cursor: nil)
+          return Client.instance.get("appStoreVersions/#{app_store_version_id}/build", params)
+        else
+          return nil
+        end
       end
 
       def patch_builds(build_id: nil, attributes: {})

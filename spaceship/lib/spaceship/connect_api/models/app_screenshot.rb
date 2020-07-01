@@ -1,0 +1,146 @@
+require_relative '../model'
+require_relative '../file_uploader'
+require 'spaceship/globals'
+
+require 'digest/md5'
+
+module Spaceship
+  class ConnectAPI
+    class AppScreenshot
+      include Spaceship::ConnectAPI::Model
+
+      attr_accessor :file_name
+      attr_accessor :source_file_checksum
+      attr_accessor :image_asset
+      attr_accessor :asset_token
+      attr_accessor :asset_type
+      attr_accessor :upload_operations
+      attr_accessor :asset_delivery_state
+      attr_accessor :uploaded
+
+      attr_mapping({
+        "fileName" => "file_name",
+        "sourceFileChecksum" => "source_file_checksum",
+        "imageAsset" => "image_asset",
+        "assetToken" => "asset_token",
+        "assetType" => "asset_type",
+        "uploadOperations" => "upload_operations",
+        "assetDeliveryState" => "asset_delivery_state",
+        "uploaded" => "uploaded"
+      })
+
+      def self.type
+        return "appScreenshots"
+      end
+
+      def complete?
+        (asset_delivery_state || {})["state"] == "COMPLETE"
+      end
+
+      def error?
+        (asset_delivery_state || {})["state"] == "FAILED"
+      end
+
+      def error_messages
+        errors = (asset_delivery_state || {})["errors"]
+        (errors || []).map do |error|
+          [error["code"], error["description"]].compact.join(" - ")
+        end
+      end
+
+      # This does not download the source image (exact image that was uploaded)
+      # This downloads a modified version.
+      # This image won't have the same checksums as source_file_checksum.
+      #
+      # There is an open radar for allowing downloading of source file.
+      # https://openradar.appspot.com/radar?id=4980344105205760
+      def image_asset_url(width: nil, height: nil, type: "png")
+        return nil if image_asset.nil?
+
+        template_url = image_asset["templateUrl"]
+        width ||= image_asset["width"]
+        height ||= image_asset["height"]
+
+        return template_url
+               .gsub("{w}", width.to_s)
+               .gsub("{h}", height.to_s)
+               .gsub("{f}", type)
+      end
+
+      #
+      # API
+      #
+      #
+
+      def self.create(app_screenshot_set_id: nil, path: nil, wait_for_processing: true)
+        require 'faraday'
+
+        filename = File.basename(path)
+        filesize = File.size(path)
+        bytes = File.binread(path)
+
+        post_attributes = {
+          fileSize: filesize,
+          fileName: filename
+        }
+
+        # Create placeholder
+        screenshot = Spaceship::ConnectAPI.post_app_screenshot(
+          app_screenshot_set_id: app_screenshot_set_id,
+          attributes: post_attributes
+        ).first
+
+        # Upload the file
+        upload_operations = screenshot.upload_operations
+        Spaceship::ConnectAPI::FileUploader.upload(upload_operations, bytes)
+
+        # Update file uploading complete
+        patch_attributes = {
+          uploaded: true,
+          sourceFileChecksum: Digest::MD5.hexdigest(bytes)
+        }
+
+        # Patch screenshot that file upload is complete
+        # Catch error if patch retries due to 504. Origal patch
+        # may go through by return response as 504.
+        begin
+          screenshot = Spaceship::ConnectAPI.patch_app_screenshot(
+            app_screenshot_id: screenshot.id,
+            attributes: patch_attributes
+          ).first
+        rescue => error
+          puts("Failed to patch app screenshot. Update may have gone through so verifying") if Spaceship::Globals.verbose?
+
+          screenshot = Spaceship::ConnectAPI.get_app_screenshot(app_screenshot_id: screenshot.id).first
+          raise error unless screenshot.complete?
+        end
+
+        # Wait for processing
+        if wait_for_processing
+          loop do
+            if screenshot.complete?
+              puts("Screenshot processing complete!") if Spaceship::Globals.verbose?
+              break
+            elsif screenshot.error?
+              messages = ["Error processing screenshot '#{screenshot.file_name}'"] + screenshot.error_messages
+              raise messages.join(". ")
+            end
+
+            # Poll every 2 seconds
+            sleep_time = 2
+            puts("Waiting #{sleep_time} seconds before checking status of processing...") if Spaceship::Globals.verbose?
+            sleep(sleep_time)
+
+            screenshot = Spaceship::ConnectAPI.get_app_screenshot(app_screenshot_id: screenshot.id).first
+          end
+        end
+
+        return screenshot
+      end
+
+      def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
+        Spaceship::ConnectAPI.delete_app_screenshot(app_screenshot_id: id)
+      end
+    end
+  end
+end

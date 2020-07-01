@@ -60,9 +60,9 @@ module Deliver
       app_details = v.application.details
 
       # All the localised metadata
-      (UploadMetadata::LOCALISED_VERSION_VALUES + UploadMetadata::LOCALISED_APP_VALUES).each do |key|
+      (UploadMetadata::LOCALISED_VERSION_VALUES.keys + UploadMetadata::LOCALISED_APP_VALUES.keys).each do |key|
         v.description.languages.each do |language|
-          if UploadMetadata::LOCALISED_VERSION_VALUES.include?(key)
+          if UploadMetadata::LOCALISED_VERSION_VALUES.keys.include?(key)
             content = v.send(key)[language].to_s
           else
             content = app_details.send(key)[language].to_s
@@ -76,8 +76,8 @@ module Deliver
       end
 
       # All non-localised metadata
-      (UploadMetadata::NON_LOCALISED_VERSION_VALUES + UploadMetadata::NON_LOCALISED_APP_VALUES).each do |key|
-        if UploadMetadata::NON_LOCALISED_VERSION_VALUES.include?(key)
+      (UploadMetadata::NON_LOCALISED_VERSION_VALUES.keys + UploadMetadata::NON_LOCALISED_APP_VALUES).each do |key|
+        if UploadMetadata::NON_LOCALISED_VERSION_VALUES.keys.include?(key)
           content = v.send(key).to_s
         else
           content = app_details.send(key).to_s
@@ -88,19 +88,8 @@ module Deliver
         UI.message("Writing to '#{resulting_path}'")
       end
 
-      # Trade Representative Contact Information
-      UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, option_name|
-        content = v.send(key).to_s
-        content += "\n"
-        base_dir = File.join(path, UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR)
-        FileUtils.mkdir_p(base_dir)
-        resulting_path = File.join(base_dir, "#{option_name}.txt")
-        File.write(resulting_path, content)
-        UI.message("Writing to '#{resulting_path}'")
-      end
-
       # Review information
-      UploadMetadata::REVIEW_INFORMATION_VALUES.each do |key, option_name|
+      UploadMetadata::REVIEW_INFORMATION_VALUES_LEGACY.each do |key, option_name|
         content = v.send(key).to_s
         content += "\n"
         base_dir = File.join(path, UploadMetadata::REVIEW_INFORMATION_DIR)
@@ -111,20 +100,6 @@ module Deliver
       end
 
       UI.success("Successfully created new configuration files.")
-
-      # get App icon + watch icon
-      if v.large_app_icon.asset_token
-        app_icon_extension = File.extname(v.large_app_icon.url)
-        app_icon_path = File.join(path, "app_icon#{app_icon_extension}")
-        File.write(app_icon_path, open(v.large_app_icon.url).read)
-        UI.success("Successfully downloaded large app icon")
-      end
-      if v.watch_app_icon.asset_token
-        watch_app_icon_extension = File.extname(v.watch_app_icon.url)
-        watch_icon_path = File.join(path, "watch_icon#{watch_app_icon_extension}")
-        File.write(watch_icon_path, open(v.watch_app_icon.url).read)
-        UI.success("Successfully downloaded watch icon")
-      end
     end
 
     def download_screenshots(path, options)

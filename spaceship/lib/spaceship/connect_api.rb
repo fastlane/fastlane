@@ -1,10 +1,12 @@
 require 'spaceship/connect_api/model'
 require 'spaceship/connect_api/response'
 require 'spaceship/connect_api/token'
+require 'spaceship/connect_api/file_uploader'
 
 require 'spaceship/connect_api/provisioning/provisioning'
 require 'spaceship/connect_api/testflight/testflight'
 require 'spaceship/connect_api/users/users'
+require 'spaceship/connect_api/tunes/tunes'
 
 require 'spaceship/connect_api/models/bundle_id_capability'
 require 'spaceship/connect_api/models/bundle_id'
@@ -30,11 +32,32 @@ require 'spaceship/connect_api/models/build_delivery'
 require 'spaceship/connect_api/models/build_beta_detail'
 require 'spaceship/connect_api/models/pre_release_version'
 
+require 'spaceship/connect_api/models/age_rating_declaration'
+require 'spaceship/connect_api/models/app_category'
+require 'spaceship/connect_api/models/app_info'
+require 'spaceship/connect_api/models/app_info_localization'
+require 'spaceship/connect_api/models/app_preview_set'
+require 'spaceship/connect_api/models/app_preview'
+require 'spaceship/connect_api/models/app_price'
+require 'spaceship/connect_api/models/app_price_tier'
+require 'spaceship/connect_api/models/app_review_attachment'
+require 'spaceship/connect_api/models/app_store_review_detail'
+require 'spaceship/connect_api/models/app_store_version_submission'
+require 'spaceship/connect_api/models/app_screenshot_set'
+require 'spaceship/connect_api/models/app_screenshot'
+require 'spaceship/connect_api/models/app_store_version_localization'
+require 'spaceship/connect_api/models/app_store_version_phased_release'
+require 'spaceship/connect_api/models/app_store_version'
+require 'spaceship/connect_api/models/idfa_declaration'
+require 'spaceship/connect_api/models/reset_ratings_request'
+require 'spaceship/connect_api/models/territory'
+
 module Spaceship
   class ConnectAPI
     extend Spaceship::ConnectAPI::Provisioning
     extend Spaceship::ConnectAPI::TestFlight
     extend Spaceship::ConnectAPI::Users
+    extend Spaceship::ConnectAPI::Tunes
 
     @token = nil
 
@@ -63,9 +86,9 @@ module Spaceship
 
         # Map from fastlane input and Spaceship::TestFlight platform values
         case platform.to_sym
-        when :appletvos
+        when :appletvos, :tvos
           return Spaceship::ConnectAPI::Platform::TV_OS
-        when :osx
+        when :osx, :macos, :mac
           return Spaceship::ConnectAPI::Platform::MAC_OS
         when :ios
           return Spaceship::ConnectAPI::Platform::IOS
