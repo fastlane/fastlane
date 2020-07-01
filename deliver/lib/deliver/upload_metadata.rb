@@ -160,7 +160,11 @@ module Deliver
       end
 
       release_type = if options[:auto_release_date]
-                       non_localized_version_attributes['earliestReleaseDate'] = options[:auto_release_date]
+                       # Convert time format to 2020-06-17T12:00:00-07:00
+                       time_in_ms = options[:auto_release_date]
+                       date = convert_ms_to_iso8601(time_in_ms)
+
+                       non_localized_version_attributes['earliestReleaseDate'] = date
                        Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::SCHEDULED
                      elsif options[:automatic_release]
                        Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::AFTER_APPROVAL
@@ -316,6 +320,16 @@ module Deliver
     end
 
     # rubocop:enable Metrics/PerceivedComplexity
+
+    def convert_ms_to_iso8601(time_in_ms)
+      time_in_s = time_in_ms / 1000
+
+      # Remove minutes and seconds (whole hour)
+      seconds_in_hour = 60 * 60
+      time_in_s_to_hour = (time_in_s / seconds_in_hour).to_i * seconds_in_hour
+
+      return Time.at(time_in_s_to_hour).strftime("%Y-%m-%dT%H:%M:%S%:z")
+    end
 
     # If the user is using the 'default' language, then assign values where they are needed
     def assign_defaults(options)

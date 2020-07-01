@@ -110,6 +110,26 @@ module Spaceship
       # App Store Versions
       #
 
+      def reject_version_if_possible!
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          appStoreState: [
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_DEVELOPER_RELEASE,
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::IN_REVIEW,
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::WAITING_FOR_REVIEW
+          ].join(","),
+          platform: platform
+        }
+
+        # Get the latest version
+        version = get_app_store_versions(filter: filter, includes: "appStoreVersionSubmission")
+                  .sort_by { |v| Gem::Version.new(v.version_string) }
+                  .last
+
+        return false if version.nil?
+        return version.reject!
+      end
+
       # Will make sure the current edit_version matches the given version number
       # This will either create a new version or change the version number
       # from an existing version
