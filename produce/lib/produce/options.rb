@@ -54,7 +54,7 @@ module Produce
                                      optional: true,
                                      default_value: "ios",
                                      verify_block: proc do |value|
-                                                     UI.user_error!("The platform can only be ios or osx") unless %('ios', 'osx').include?(value)
+                                                     UI.user_error!("The platform can only be ios or osx") unless %('ios', 'osx', 'tvos').include?(value)
                                                    end),
         FastlaneCore::ConfigItem.new(key: :platforms,
                                      short_option: "-J",
@@ -64,13 +64,13 @@ module Produce
                                      optional: true,
                                      type: Array,
                                      verify_block: proc do |values|
-                                                     types = %w(ios osx)
+                                                     types = %w(ios osx tvos)
                                                      UI.user_error!("The platform can only be #{types}") unless (values - types).empty?
                                                    end),
         FastlaneCore::ConfigItem.new(key: :language,
                                      short_option: "-m",
                                      env_name: "PRODUCE_LANGUAGE",
-                                     description: "Primary Language (e.g. 'English', 'German')",
+                                     description: "Primary Language (e.g. 'en-US', 'fr-FR')",
                                      default_value: "English",
                                      verify_block: proc do |language|
                                      end),

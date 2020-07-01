@@ -2,40 +2,38 @@ require_relative 'module'
 
 module Deliver
   # upload description, rating, etc.
+  # rubocop:disable Metrics/ClassLength
   class UploadMetadata
     # All the localised values attached to the version
-    LOCALISED_VERSION_VALUES = [:description, :keywords, :release_notes, :support_url, :marketing_url, :promotional_text]
+    LOCALISED_VERSION_VALUES = {
+      description: "description",
+      keywords: "keywords",
+      release_notes: "whatsNew",
+      support_url: "supportUrl",
+      marketing_url: "marketingUrl",
+      promotional_text: "promotionalText"
+    }
 
     # Everything attached to the version but not being localised
-    NON_LOCALISED_VERSION_VALUES = [:copyright]
+    NON_LOCALISED_VERSION_VALUES = {
+      copyright: "copyright"
+    }
 
     # Localised app details values
-    LOCALISED_APP_VALUES = [:name, :subtitle, :privacy_url, :apple_tv_privacy_policy]
+    LOCALISED_APP_VALUES = {
+      name: "name",
+      subtitle: "subtitle",
+      privacy_url: "privacyPolicyUrl",
+      apple_tv_privacy_policy: "privacyPolicyText"
+    }
 
     # Non localized app details values
     NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
                                 :primary_first_sub_category, :primary_second_sub_category,
                                 :secondary_first_sub_category, :secondary_second_sub_category]
 
-    # Trade Representative Contact Information values
-    TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES = {
-        trade_representative_trade_name: :trade_name,
-        trade_representative_first_name: :first_name,
-        trade_representative_last_name: :last_name,
-        trade_representative_address_line_1: :address_line1,
-        trade_representative_address_line_2: :address_line2,
-        trade_representative_address_line_3: :address_line3,
-        trade_representative_city_name: :city_name,
-        trade_representative_state: :state,
-        trade_representative_country: :country,
-        trade_representative_postal_code: :postal_code,
-        trade_representative_phone_number: :phone_number,
-        trade_representative_email: :email_address,
-        trade_representative_is_displayed_on_app_store: :is_displayed_on_app_store
-    }
-
     # Review information values
-    REVIEW_INFORMATION_VALUES = {
+    REVIEW_INFORMATION_VALUES_LEGACY = {
       review_first_name: :first_name,
       review_last_name: :last_name,
       review_phone_number: :phone_number,
@@ -43,6 +41,15 @@ module Deliver
       review_demo_user: :demo_user,
       review_demo_password: :demo_password,
       review_notes: :notes
+    }
+    REVIEW_INFORMATION_VALUES = {
+      first_name: "contactFirstName",
+      last_name: "contactLastName",
+      phone_number: "contactPhone",
+      email_address: "contactEmail",
+      demo_user: "demoAccountName",
+      demo_password: "demoAccountPassword",
+      notes: "notes"
     }
 
     # Localized app details values, that are editable in live state
@@ -66,35 +73,50 @@ module Deliver
     # Make sure to call `load_from_filesystem` before calling upload
     def upload(options)
       return if options[:skip_metadata]
-      # it is not possible to create new languages, because
-      # :keywords is not write-able on published versions
-      # therefore skip it.
-      verify_available_languages!(options) unless options[:edit_live]
 
-      app = options[:app]
+      legacy_app = options[:app]
+      app_id = legacy_app.apple_id
+      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
 
-      details = app.details
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+
+      enabled_languages = detect_languages(options)
+
+      app_store_version_localizations = verify_available_version_languages!(options, app, enabled_languages) unless options[:edit_live]
+      app_info_localizations = verify_available_info_languages!(options, app, enabled_languages) unless options[:edit_live]
+
       if options[:edit_live]
         # not all values are editable when using live_version
-        v = app.live_version(platform: options[:platform])
+        version = app.get_live_app_store_version(platform: platform)
         localised_options = LOCALISED_LIVE_VALUES
         non_localised_options = NON_LOCALISED_LIVE_VALUES
 
         if v.nil?
           UI.message("Couldn't find live version, editing the current version on App Store Connect instead")
-          v = app.edit_version(platform: options[:platform])
+          version = app.get_edit_app_store_version(platform: platform)
           # we don't want to update the localised_options and non_localised_options
           # as we also check for `options[:edit_live]` at other areas in the code
           # by not touching those 2 variables, deliver is more consistent with what the option says
           # in the documentation
+        else
+          UI.message("Found live version")
         end
       else
-        v = app.edit_version(platform: options[:platform])
-        localised_options = (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES)
-        non_localised_options = (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES)
+        version = app.get_edit_app_store_version(platform: platform)
+        localised_options = (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys)
+        non_localised_options = NON_LOCALISED_VERSION_VALUES.keys
       end
 
-      individual = options[:individual_metadata_items] || []
+      # Needed for to filter out release notes from being sent up
+      number_of_versions = app.get_app_store_versions(filter: { platform: platform }, limit: 2).size
+      is_first_version = number_of_versions == 1
+      UI.verbose("Version '#{version.version_string}' is the first version on App Store Connect") if is_first_version
+
+      UI.important("Will begin uploading metadata for '#{version.version_string}' on App Store Connect")
+
+      localized_version_attributes_by_locale = {}
+      localized_info_attributes_by_locale = {}
+
       localised_options.each do |key|
         current = options[key]
         next unless current
@@ -104,73 +126,212 @@ module Deliver
           next
         end
 
+        if key == :release_notes && is_first_version
+          UI.error("Skipping 'release_notes'... this is the first version of the app")
+          next
+        end
+
         current.each do |language, value|
           next unless value.to_s.length > 0
           strip_value = value.to_s.strip
-          if individual.include?(key.to_s)
-            upload_individual_item(app, v, language, key, strip_value)
-          else
-            v.send(key)[language] = strip_value if LOCALISED_VERSION_VALUES.include?(key)
-            details.send(key)[language] = strip_value if LOCALISED_APP_VALUES.include?(key)
+
+          if LOCALISED_VERSION_VALUES.include?(key) && !strip_value.empty?
+            attribute_name = LOCALISED_VERSION_VALUES[key]
+
+            localized_version_attributes_by_locale[language] ||= {}
+            localized_version_attributes_by_locale[language][attribute_name] = strip_value
           end
+
+          next unless LOCALISED_APP_VALUES.include?(key) && !strip_value.empty?
+          attribute_name = LOCALISED_APP_VALUES[key]
+
+          localized_info_attributes_by_locale[language] ||= {}
+          localized_info_attributes_by_locale[language][attribute_name] = strip_value
         end
       end
 
+      non_localized_version_attributes = {}
       non_localised_options.each do |key|
-        current = options[key].to_s.strip
-        next unless current.to_s.length > 0
-        v.send("#{key}=", current) if NON_LOCALISED_VERSION_VALUES.include?(key)
-        details.send("#{key}=", current) if NON_LOCALISED_APP_VALUES.include?(key)
-      end
+        strip_value = options[key].to_s.strip
+        next unless strip_value.to_s.length > 0
 
-      v.release_on_approval = options[:automatic_release]
-      v.auto_release_date = options[:auto_release_date] unless options[:auto_release_date].nil?
-      v.toggle_phased_release(enabled: !!options[:phased_release]) unless options[:phased_release].nil?
-
-      set_trade_representative_contact_information(v, options)
-      set_review_information(v, options)
-      set_app_rating(v, options)
-      v.ratings_reset = options[:reset_ratings] unless options[:reset_ratings].nil?
-
-      set_review_attachment_file(v, options)
-
-      Helper.show_loading_indicator("Uploading metadata to App Store Connect")
-      v.save!
-      Helper.hide_loading_indicator
-      begin
-        details.save!
-        UI.success("Successfully uploaded set of metadata to App Store Connect")
-      rescue Spaceship::TunesClient::ITunesConnectError => e
-        # This makes sure that we log invalid app names as user errors
-        # If another string needs to be checked here we should
-        # figure out a more generic way to handle these cases.
-        if e.message.include?('App Name cannot be longer than 50 characters') || e.message.include?('The app name you entered is already being used')
-          UI.error("Error in app name.  Try using 'individual_metadata_items' to identify the problem language.")
-          UI.user_error!(e.message)
-        else
-          raise e
+        if NON_LOCALISED_VERSION_VALUES.include?(key) && !strip_value.empty?
+          attribute_name = NON_LOCALISED_VERSION_VALUES[key]
+          non_localized_version_attributes[attribute_name] = strip_value
         end
       end
-    end
 
-    # Uploads metadata individually by language to help identify exactly which items have issues
-    def upload_individual_item(app, version, language, key, value)
-      details = app.details
-      version.send(key)[language] = value if LOCALISED_VERSION_VALUES.include?(key)
-      details.send(key)[language] = value if LOCALISED_APP_VALUES.include?(key)
-      Helper.show_loading_indicator("Uploading #{language} #{key} to App Store Connect")
-      version.save!
-      Helper.hide_loading_indicator
-      begin
-        details.save!
-        UI.success("Successfully uploaded #{language} #{key} to App Store Connect")
-      rescue Spaceship::TunesClient::ITunesConnectError => e
-        UI.error("Error in #{language} #{key}: \n#{value}")
-        UI.error(e.message) # Don't use user_error to allow all values to get checked
+      release_type = if options[:auto_release_date]
+                       # Convert time format to 2020-06-17T12:00:00-07:00
+                       time_in_ms = options[:auto_release_date]
+                       date = convert_ms_to_iso8601(time_in_ms)
+
+                       non_localized_version_attributes['earliestReleaseDate'] = date
+                       Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::SCHEDULED
+                     elsif options[:automatic_release]
+                       Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::AFTER_APPROVAL
+                     else
+                       Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::MANUAL
+                     end
+      non_localized_version_attributes['releaseType'] = release_type
+
+      # Update app store version localizations
+      app_store_version_localizations.each do |app_store_version_localization|
+        attributes = localized_version_attributes_by_locale[app_store_version_localization.locale]
+        if attributes
+          UI.message("Uploading metadata to App Store Connect for localized version '#{app_store_version_localization.locale}'")
+          app_store_version_localization.update(attributes: attributes)
+        end
       end
+
+      # Update app info localizations
+      app_info_localizations.each do |app_info_localization|
+        attributes = localized_info_attributes_by_locale[app_info_localization.locale]
+        if attributes
+          UI.message("Uploading metadata to App Store Connect for localized info '#{app_info_localization.locale}'")
+          app_info_localization.update(attributes: attributes)
+        end
+      end
+
+      # Update app store version
+      UI.message("Uploading metadata to App Store Connect for version")
+      version.update(attributes: non_localized_version_attributes)
+
+      # Update categories
+      app_info = app.fetch_edit_app_info
+      if app_info
+        category_id_map = {}
+
+        primary_category = options[:primary_category].to_s.strip
+        secondary_category = options[:secondary_category].to_s.strip
+        primary_first_sub_category = options[:primary_first_sub_category].to_s.strip
+        primary_second_sub_category = options[:primary_second_sub_category].to_s.strip
+        secondary_first_sub_category = options[:secondary_first_sub_category].to_s.strip
+        secondary_second_sub_category = options[:secondary_second_sub_category].to_s.strip
+
+        mapped_values = {}
+
+        # Only update primary and secondar category if explicitly set
+        unless primary_category.empty?
+          mapped = Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
+            primary_category
+          )
+
+          mapped_values[primary_category] = mapped
+          category_id_map[:primary_category_id] = mapped
+        end
+        unless secondary_category.empty?
+          mapped = Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
+            secondary_category
+          )
+
+          mapped_values[secondary_category] = mapped
+          category_id_map[:secondary_category_id] = mapped
+        end
+
+        # Only set if primary category is going to be set
+        unless primary_category.empty?
+          mapped = Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            primary_first_sub_category
+          )
+
+          mapped_values[primary_first_sub_category] = mapped
+          category_id_map[:primary_subcategory_one_id] = mapped
+        end
+        unless primary_category.empty?
+          mapped = Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            primary_second_sub_category
+          )
+
+          mapped_values[primary_second_sub_category] = mapped
+          category_id_map[:primary_subcategory_two_id] = mapped
+        end
+
+        # Only set if secondary category is going to be set
+        unless secondary_category.empty?
+          mapped = Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            secondary_first_sub_category
+          )
+
+          mapped_values[secondary_first_sub_category] = mapped
+          category_id_map[:secondary_subcategory_one_id] = mapped
+        end
+        unless secondary_category.empty?
+          mapped = Spaceship::ConnectAPI::AppCategory.map_subcategory_from_itc(
+            secondary_second_sub_category
+          )
+
+          mapped_values[secondary_second_sub_category] = mapped
+          category_id_map[:secondary_subcategory_two_id] = mapped
+        end
+
+        # Print deprecation warnings if category was mapped
+        has_mapped_values = false
+        mapped_values.each do |k, v|
+          next if k.nil? || v.nil?
+          next if k == v
+          has_mapped_values = true
+          UI.deprecated("Category '#{k}' from iTunesConnect as been deprecated. Please replace with '#{v}'")
+        end
+        UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
+
+        app_info.update_categories(category_id_map: category_id_map)
+      end
+
+      # Update phased release
+      unless options[:phased_release].nil?
+        phased_release = begin
+                           version.fetch_app_store_version_phased_release
+                         rescue
+                           nil
+                         end # returns no data error so need to rescue
+        if !!options[:phased_release]
+          unless phased_release
+            UI.message("Creating phased release on App Store Connect")
+            version.create_app_store_version_phased_release(attributes: {
+              phasedReleaseState: Spaceship::ConnectAPI::AppStoreVersionPhasedRelease::PhasedReleaseState::INACTIVE
+            })
+          end
+        elsif phased_release
+          UI.message("Removing phased release on App Store Connect")
+          phased_release.delete!
+        end
+      end
+
+      # Update rating reset
+      unless options[:reset_ratings].nil?
+        reset_rating_request = begin
+                                 version.fetch_reset_ratings_request
+                               rescue
+                                 nil
+                               end # returns no data error so need to rescue
+        if !!options[:reset_ratings]
+          unless reset_rating_request
+            UI.message("Creating reset ratings request on App Store Connect")
+            version.create_reset_ratings_request
+          end
+        elsif reset_rating_request
+          UI.message("Removing reset ratings request on App Store Connect")
+          reset_rating_request.delete!
+        end
+      end
+
+      set_review_information(version, options)
+      set_review_attachment_file(version, options)
+      set_app_rating(version, options)
     end
 
     # rubocop:enable Metrics/PerceivedComplexity
+
+    def convert_ms_to_iso8601(time_in_ms)
+      time_in_s = time_in_ms / 1000
+
+      # Remove minutes and seconds (whole hour)
+      seconds_in_hour = 60 * 60
+      time_in_s_to_hour = (time_in_s / seconds_in_hour).to_i * seconds_in_hour
+
+      return Time.at(time_in_s_to_hour).strftime("%Y-%m-%dT%H:%M:%S%:z")
+    end
 
     # If the user is using the 'default' language, then assign values where they are needed
     def assign_defaults(options)
@@ -181,7 +342,7 @@ module Deliver
       enabled_languages = detect_languages(options)
 
       # Get all languages used in existing settings
-      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
         current.each do |language, value|
@@ -200,7 +361,7 @@ module Deliver
       return unless enabled_languages.include?("default")
       UI.message("Detected languages: " + enabled_languages.to_s)
 
-      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
 
@@ -222,7 +383,7 @@ module Deliver
       enabled_languages = options[:languages] || []
 
       # Get all languages used in existing settings
-      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
         current.each do |language, value|
@@ -245,41 +406,73 @@ module Deliver
         .uniq
     end
 
-    # Makes sure all languages we need are actually created
-    def verify_available_languages!(options)
-      return if options[:skip_metadata]
+    # Finding languages to enable
+    def verify_available_info_languages!(options, app, languages)
+      app_info = app.fetch_edit_app_info
 
-      # Collect all languages we need
-      # We only care about languages from user provided values
-      # as the other languages are on iTC already anyway
-      v = options[:app].edit_version(platform: options[:platform])
-      UI.user_error!("Could not find a version to edit for app '#{options[:app].name}', the app metadata is read-only currently") unless v
-
-      enabled_languages = options[:languages] || []
-      LOCALISED_VERSION_VALUES.each do |key|
-        current = options[key]
-        next unless current && current.kind_of?(Hash)
-        current.each do |language, value|
-          language = language.to_s
-          enabled_languages << language unless enabled_languages.include?(language)
-        end
+      unless app_info
+        UI.user_error!("Cannot update languages - could not find an editable info")
+        return
       end
 
-      # Reject "default" language from getting enabled
-      # because "default" is not an iTC language
-      enabled_languages = enabled_languages.reject do |lang|
-        lang == "default"
-      end.uniq
+      localizations = app_info.get_app_info_localizations
 
-      if enabled_languages.count > 0
-        v.create_languages(enabled_languages)
+      languages = (languages || []).reject { |lang| lang == "default" }
+      locales_to_enable = languages - localizations.map(&:locale)
+
+      if locales_to_enable.count > 0
         lng_text = "language"
-        lng_text += "s" if enabled_languages.count != 1
-        Helper.show_loading_indicator("Activating #{lng_text} #{enabled_languages.join(', ')}...")
-        v.save!
+        lng_text += "s" if locales_to_enable.count != 1
+        Helper.show_loading_indicator("Activating info #{lng_text} #{locales_to_enable.join(', ')}...")
+
+        locales_to_enable.each do |locale|
+          app_info.create_app_info_localization(attributes: {
+            locale: locale
+          })
+        end
+
         Helper.hide_loading_indicator
+
+        # Refresh version localizations
+        localizations = app_info.get_app_info_localizations
       end
-      true
+
+      return localizations
+    end
+
+    # Finding languages to enable
+    def verify_available_version_languages!(options, app, languages)
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      version = app.get_edit_app_store_version(platform: platform)
+
+      unless version
+        UI.user_error!("Cannot update languages - could not find an editable version for '#{platform}'")
+        return
+      end
+
+      localizations = version.get_app_store_version_localizations
+
+      languages = (languages || []).reject { |lang| lang == "default" }
+      locales_to_enable = languages - localizations.map(&:locale)
+
+      if locales_to_enable.count > 0
+        lng_text = "language"
+        lng_text += "s" if locales_to_enable.count != 1
+        Helper.show_loading_indicator("Activating version #{lng_text} #{locales_to_enable.join(', ')}...")
+
+        locales_to_enable.each do |locale|
+          version.create_app_store_version_localization(attributes: {
+            locale: locale
+          })
+        end
+
+        Helper.hide_loading_indicator
+
+        # Refresh version localizations
+        localizations = version.get_app_store_version_localizations
+      end
+
+      return localizations
     end
 
     # Loads the metadata files and stores them into the options object
@@ -290,7 +483,7 @@ module Deliver
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
         language = File.basename(lang_folder)
-        (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+        (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
           path = File.join(lang_folder, "#{key}.txt")
           next unless File.exist?(path)
 
@@ -301,7 +494,7 @@ module Deliver
       end
 
       # Load non localised data
-      (NON_LOCALISED_VERSION_VALUES + NON_LOCALISED_APP_VALUES).each do |key|
+      (NON_LOCALISED_VERSION_VALUES.keys + NON_LOCALISED_APP_VALUES).each do |key|
         path = File.join(options[:metadata_path], "#{key}.txt")
         next unless File.exist?(path)
 
@@ -309,20 +502,9 @@ module Deliver
         options[key] ||= File.read(path)
       end
 
-      # Load trade representative contact information
-      options[:trade_representative_contact_information] ||= {}
-      TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.values.each do |option_name|
-        path = File.join(options[:metadata_path], TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR, "#{option_name}.txt")
-        next unless File.exist?(path)
-        next if options[:trade_representative_contact_information][option_name].to_s.length > 0
-
-        UI.message("Loading '#{path}'...")
-        options[:trade_representative_contact_information][option_name] ||= File.read(path)
-      end
-
       # Load review information
       options[:app_review_information] ||= {}
-      REVIEW_INFORMATION_VALUES.values.each do |option_name|
+      REVIEW_INFORMATION_VALUES.keys.each do |option_name|
         path = File.join(options[:metadata_path], REVIEW_INFORMATION_DIR, "#{option_name}.txt")
         next unless File.exist?(path)
         next if options[:app_review_information][option_name].to_s.length > 0
@@ -336,7 +518,7 @@ module Deliver
 
     # Normalizes languages keys from symbols to strings
     def normalize_language_keys(options)
-      (LOCALISED_VERSION_VALUES + LOCALISED_APP_VALUES).each do |key|
+      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
 
@@ -348,33 +530,56 @@ module Deliver
       options
     end
 
-    def set_trade_representative_contact_information(v, options)
-      return unless options[:trade_representative_contact_information]
-      info = options[:trade_representative_contact_information]
-      UI.user_error!("`trade_representative_contact_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
-
-      TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, option_name|
-        v.send("#{key}=", info[option_name].to_s.chomp) if info[option_name]
-      end
-    end
-
-    def set_review_information(v, options)
+    def set_review_information(version, options)
       return unless options[:app_review_information]
       info = options[:app_review_information]
       UI.user_error!("`app_review_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
 
-      REVIEW_INFORMATION_VALUES.each do |key, option_name|
-        v.send("#{key}=", info[option_name].to_s.chomp) if info[option_name]
+      attributes = {}
+      REVIEW_INFORMATION_VALUES.each do |key, attribute_name|
+        strip_value = info[key].to_s.strip
+        attributes[attribute_name] = strip_value unless strip_value.empty?
       end
-      v.review_user_needed = (v.review_demo_user.to_s.chomp + v.review_demo_password.to_s.chomp).length > 0
+
+      if !attributes["demoAccountName"].to_s.empty? && !attributes["demoAccountPassword"].to_s.empty?
+        attributes["demoAccountRequired"] = true
+      else
+        attributes["demoAccountRequired"] = false
+      end
+
+      UI.message("Uploading app review information to App Store Connect")
+      app_store_review_detail = begin
+                                  version.fetch_app_store_review_detail
+                                rescue => error
+                                  UI.error("Error fetching app store review detail - #{error.message}")
+                                  nil
+                                end # errors if doesn't exist
+      if app_store_review_detail
+        app_store_review_detail.update(attributes: attributes)
+      else
+        version.create_app_store_review_detail(attributes: attributes)
+      end
     end
 
-    def set_review_attachment_file(v, options)
-      return unless options[:app_review_attachment_file]
-      v.upload_review_attachment!(options[:app_review_attachment_file])
+    def set_review_attachment_file(version, options)
+      app_store_review_detail = version.fetch_app_store_review_detail
+      app_review_attachments = app_store_review_detail.app_store_review_attachments || []
+
+      if options[:app_review_attachment_file]
+        app_review_attachments.each do |app_review_attachment|
+          UI.message("Removing previous review attachment file from App Store Connect")
+          app_review_attachment.delete!
+        end
+
+        UI.message("Uploading review attachment file to App Store Connect")
+        app_store_review_detail.upload_attachment(path: options[:app_review_attachment_file])
+      else
+        app_review_attachments.each(&:delete!)
+        UI.message("Removing review attachment file to App Store Connect") unless app_review_attachments.empty?
+      end
     end
 
-    def set_app_rating(v, options)
+    def set_app_rating(version, options)
       return unless options[:app_rating_config_path]
 
       require 'json'
@@ -385,7 +590,33 @@ module Deliver
         UI.user_error!("Error parsing JSON file at path '#{options[:app_rating_config_path]}'")
       end
       UI.message("Setting the app's age rating...")
-      v.update_rating(json)
+
+      # Maping from legacy ITC values to App Store Connect Values
+      mapped_values = {}
+      attributes = {}
+      json.each do |k, v|
+        new_key = Spaceship::ConnectAPI::AgeRatingDeclaration.map_key_from_itc(k)
+        new_value = Spaceship::ConnectAPI::AgeRatingDeclaration.map_value_from_itc(new_key, v)
+
+        mapped_values[k] = new_key
+        mapped_values[v] = new_value
+
+        attributes[new_key] = new_value
+      end
+
+      # Print deprecation warnings if category was mapped
+      has_mapped_values = false
+      mapped_values.each do |k, v|
+        next if k.nil? || v.nil?
+        next if k == v
+        has_mapped_values = true
+        UI.deprecated("Age rating '#{k}' from iTunesConnect as been deprecated. Please replace with '#{v}'")
+      end
+      UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
+
+      age_rating_delcaration = version.fetch_age_rating_declaration
+      age_rating_delcaration.update(attributes: attributes)
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
