@@ -34,7 +34,7 @@ class SocketClient: NSObject {
     }
     
     static let connectTimeoutSeconds = 2
-    static let defaultCommandTimeoutSeconds = 3_600 // Hopefully 1 hr is enough ¯\_(ツ)_/¯
+    static let defaultCommandTimeoutSeconds = 10_800 // 3 hours
     static let doneToken = "done" // TODO: remove these
     static let cancelToken = "cancelFastlaneRun"
     
