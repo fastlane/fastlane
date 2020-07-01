@@ -106,7 +106,9 @@ module Deliver
       end
 
       # Needed for to filter out release notes from being sent up
-      is_first_version = app.get_live_app_store_version(platform: platform).nil?
+      number_of_versions = app.get_app_store_versions(filter: { platform: platform }, limit: 2).size
+      is_first_version = number_of_versions == 1
+      UI.verbose("Version '#{version.version_string}' is the first version on App Store Connect") if is_first_version
 
       UI.important("Will begin uploading metadata for '#{version.version_string}' on App Store Connect")
 
