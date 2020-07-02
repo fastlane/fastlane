@@ -4,7 +4,7 @@ require 'digest/md5'
 
 module Spaceship
   class ConnectAPI
-    class AppReviewAttachment
+    class AppStoreReviewAttachment
       include Spaceship::ConnectAPI::Model
 
       attr_accessor :file_name
@@ -22,7 +22,7 @@ module Spaceship
       })
 
       def self.type
-        return "appReviewAttachments"
+        return "appStoreReviewAttachments"
       end
 
       #
@@ -42,7 +42,7 @@ module Spaceship
         }
 
         # Create placeholder
-        attachment = Spaceship::ConnectAPI.post_app_review_attachment(
+        attachment = Spaceship::ConnectAPI.post_app_store_review_attachment(
           app_store_review_detail_id: app_store_review_detail_id,
           attributes: post_attributes
         ).to_models.first
@@ -57,14 +57,14 @@ module Spaceship
           sourceFileChecksum: Digest::MD5.hexdigest(bytes)
         }
 
-        Spaceship::ConnectAPI.patch_app_review_attachment(
-          app_review_attachment_id: attachment.id,
+        Spaceship::ConnectAPI.patch_app_store_review_attachment(
+          app_store_review_attachment_id: attachment.id,
           attributes: patch_attributes
         ).to_models.first
       end
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI.delete_app_review_attachment(app_review_attachment_id: id)
+        Spaceship::ConnectAPI.delete_app_store_review_attachment(app_store_review_attachment_id: id)
       end
     end
   end

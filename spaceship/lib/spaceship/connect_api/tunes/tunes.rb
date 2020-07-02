@@ -273,10 +273,10 @@ module Spaceship
       # appReviewAttachments
       #
 
-      def post_app_review_attachment(app_store_review_detail_id: nil, attributes: {})
+      def post_app_store_review_attachment(app_store_review_detail_id: nil, attributes: {})
         body = {
           data: {
-            type: "appReviewAttachments",
+            type: "appStoreReviewAttachments",
             attributes: attributes,
             relationships: {
               appStoreReviewDetail: {
@@ -289,24 +289,24 @@ module Spaceship
           }
         }
 
-        Client.instance.post("appReviewAttachments", body)
+        Client.instance.post("appStoreReviewAttachments", body)
       end
 
-      def patch_app_review_attachment(app_review_attachment_id: nil, attributes: {})
+      def patch_app_store_review_attachment(app_store_review_attachment_id: nil, attributes: {})
         body = {
           data: {
-            type: "appReviewAttachments",
-            id: app_review_attachment_id,
+            type: "appStoreReviewAttachments",
+            id: app_store_review_attachment_id,
             attributes: attributes
           }
         }
 
-        Client.instance.patch("appReviewAttachments/#{app_review_attachment_id}", body)
+        Client.instance.patch("appStoreReviewAttachments/#{app_store_review_attachment_id}", body)
       end
 
-      def delete_app_review_attachment(app_review_attachment_id: nil)
+      def delete_app_store_review_attachment(app_store_review_attachment_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-        Client.instance.delete("appReviewAttachments/#{app_review_attachment_id}", params)
+        Client.instance.delete("appStoreReviewAttachments/#{app_store_review_attachment_id}", params)
       end
 
       #

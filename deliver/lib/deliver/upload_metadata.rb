@@ -563,19 +563,19 @@ module Deliver
 
     def set_review_attachment_file(version, options)
       app_store_review_detail = version.fetch_app_store_review_detail
-      app_review_attachments = app_store_review_detail.app_store_review_attachments || []
+      app_store_review_attachments = app_store_review_detail.app_store_review_attachments || []
 
       if options[:app_review_attachment_file]
-        app_review_attachments.each do |app_review_attachment|
+        app_store_review_attachments.each do |app_store_review_attachment|
           UI.message("Removing previous review attachment file from App Store Connect")
-          app_review_attachment.delete!
+          app_store_review_attachment.delete!
         end
 
         UI.message("Uploading review attachment file to App Store Connect")
         app_store_review_detail.upload_attachment(path: options[:app_review_attachment_file])
       else
-        app_review_attachments.each(&:delete!)
-        UI.message("Removing review attachment file to App Store Connect") unless app_review_attachments.empty?
+        app_store_review_attachments.each(&:delete!)
+        UI.message("Removing review attachment file to App Store Connect") unless app_store_review_attachments.empty?
       end
     end
 
