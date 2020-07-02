@@ -24,6 +24,7 @@ describe Fastlane do
             cobertura_xml: true,
             sonarqube_xml: true,
             llvm_cov: true,
+            json: true,
             html: true,
             show: true,
             verbose: true,
@@ -53,6 +54,7 @@ describe Fastlane do
                     --cobertura-xml
                     --sonarqube-xml
                     --llvm-cov
+                    --json
                     --html
                     --show
                     --build-directory foo
@@ -94,6 +96,7 @@ describe Fastlane do
             cobertura_xml: true,
             sonarqube_xml: true,
             llvm_cov: true,
+            json: true,
             html: true,
             show: true,
             source_directory: 'baz',
@@ -118,6 +121,7 @@ describe Fastlane do
                     --cobertura-xml
                     --sonarqube-xml
                     --llvm-cov
+                    --json
                     --html
                     --show
                     --build-directory foo

@@ -6757,6 +6757,7 @@ func slackTrainStart(distance: Int = 5,
    - coberturaXml: Tell slather that it should output results as Cobertura XML format
    - sonarqubeXml: Tell slather that it should output results as SonarQube Generic XML format
    - llvmCov: Tell slather that it should output results as llvm-cov show format
+   - json: Tell slather that it should output results as static JSON report
    - html: Tell slather that it should output results as static HTML pages
    - show: Tell slather that it should open static html pages automatically
    - sourceDirectory: Tell slather the location of your source files
@@ -6791,6 +6792,7 @@ func slather(buildDirectory: String? = nil,
              coberturaXml: Bool? = nil,
              sonarqubeXml: Bool? = nil,
              llvmCov: Any? = nil,
+             json: Bool? = nil,
              html: Bool? = nil,
              show: Bool = false,
              sourceDirectory: String? = nil,
@@ -6821,6 +6823,7 @@ func slather(buildDirectory: String? = nil,
                                                                                          RubyCommand.Argument(name: "cobertura_xml", value: coberturaXml),
                                                                                          RubyCommand.Argument(name: "sonarqube_xml", value: sonarqubeXml),
                                                                                          RubyCommand.Argument(name: "llvm_cov", value: llvmCov),
+                                                                                         RubyCommand.Argument(name: "json", value: json),
                                                                                          RubyCommand.Argument(name: "html", value: html),
                                                                                          RubyCommand.Argument(name: "show", value: show),
                                                                                          RubyCommand.Argument(name: "source_directory", value: sourceDirectory),
