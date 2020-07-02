@@ -29,6 +29,11 @@ module Fastlane
           return
         end
 
+        unless Helper.operating_system == 'macOS'
+          UI.message("Skipping Keychain setup on non-macOS CI Agent")
+          return
+        end
+
         keychain_name = "fastlane_tmp_keychain"
         ENV["MATCH_KEYCHAIN_NAME"] = keychain_name
         ENV["MATCH_KEYCHAIN_PASSWORD"] = ""

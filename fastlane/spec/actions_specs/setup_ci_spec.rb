@@ -95,6 +95,14 @@ describe Fastlane do
         end
       end
 
+      context "when operating system is not macOS" do
+        it "skips the setup process" do
+          expect(Fastlane::Helper).to receive(:operating_system).and_return('Linux')
+          expect(Fastlane::UI).to receive(:message).with("Skipping Keychain setup on non-macOS CI Agent")
+          described_class.setup_keychain
+        end
+      end
+
       describe "Setting up the environment" do
         before do
           stub_const("ENV", {})
