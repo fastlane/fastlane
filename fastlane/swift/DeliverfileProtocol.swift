@@ -76,7 +76,7 @@ protocol DeliverfileProtocol: class {
   var appRatingConfigPath: String? { get }
 
   /// Extra information for the submission (e.g. compliance specifications, IDFA settings)
-  var submissionInformation: String? { get }
+  var submissionInformation: [String : Any]? { get }
 
   /// The ID of your App Store Connect team if you're in multiple teams
   var teamId: String? { get }
@@ -99,13 +99,13 @@ protocol DeliverfileProtocol: class {
   /// The default precheck rule level unless otherwise configured
   var precheckDefaultRuleLevel: String { get }
 
-  /// An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
+  /// **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
   var individualMetadataItems: [String] { get }
 
-  /// Metadata: The path to the app icon
+  /// **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - Metadata: The path to the app icon
   var appIcon: String? { get }
 
-  /// Metadata: The path to the Apple Watch app icon
+  /// **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - Metadata: The path to the Apple Watch app icon
   var appleWatchAppIcon: String? { get }
 
   /// Metadata: The copyright notice
@@ -207,7 +207,7 @@ extension DeliverfileProtocol {
   var resetRatings: Bool { return false }
   var priceTier: String? { return nil }
   var appRatingConfigPath: String? { return nil }
-  var submissionInformation: String? { return nil }
+  var submissionInformation: [String : Any]? { return nil }
   var teamId: String? { return nil }
   var teamName: String? { return nil }
   var devPortalTeamId: String? { return nil }
@@ -246,4 +246,4 @@ extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.19]
+// FastlaneRunnerAPIVersion [0.9.20]

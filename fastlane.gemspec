@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Manu Wallner",
-                        "Danielle Tomlinson",
-                        "Matthew Ellis",
-                        "Stefan Natchev",
-                        "Jimmy Dee",
+  spec.authors       = ["Joshua Liebowitz",
+                        "Luka Mirosevic",
                         "Kohki Miki",
+                        "Aaron Brager",
+                        "Matthew Ellis",
+                        "Jimmy Dee",
                         "Jorge Revuelta H",
+                        "Manu Wallner",
+                        "Josh Holtz",
+                        "Fumiya Nakamura",
+                        "Maksym Grebenets",
+                        "Jan Piotrowski",
                         "Daniel Jankowski",
+                        "Olivier Halligon",
+                        "Max Ott",
+                        "Felix Krause",
+                        "Iulian Onofrei",
+                        "Danielle Tomlinson",
                         "Jérôme Lacoste",
                         "Andrew McBurney",
-                        "Max Ott",
-                        "Iulian Onofrei",
                         "Helmut Januschka",
-                        "Jan Piotrowski",
-                        "Luka Mirosevic",
-                        "Felix Krause",
-                        "Fumiya Nakamura",
-                        "Olivier Halligon",
-                        "Maksym Grebenets",
-                        "Aaron Brager",
-                        "Josh Holtz",
-                        "Joshua Liebowitz"]
+                        "Stefan Natchev"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -84,7 +84,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
   spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
   spec.add_dependency('multi_xml', '~> 0.5')
-  spec.add_dependency('rubyzip', '>= 1.3.0', '< 2.0.0') # fix swift/ipa in gym
+  spec.add_dependency('rubyzip', '>= 2.0.0', '< 3.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
@@ -97,7 +97,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('google-api-client', '>= 0.37.0', '< 0.39.0') # Google API Client to access Play Publishing API
   spec.add_dependency('google-cloud-storage', '>= 1.15.0', '< 2.0.0') # Access Google Cloud Storage for match
 
-  spec.add_dependency('emoji_regex', '>= 0.1', '< 2.0') # Used to scan for Emoji in the changelog
+  spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
 
   spec.add_dependency('aws-sdk-s3', '~> 1.0') # Used for S3 storage in fastlane match
 
