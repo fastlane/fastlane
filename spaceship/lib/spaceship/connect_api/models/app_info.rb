@@ -63,7 +63,8 @@ module Spaceship
       end
 
       def get_app_info_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
-        return Spaceship::ConnectAPI.get_app_info_localizations(app_info_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
+        resp = Spaceship::ConnectAPI.get_app_info_localizations(app_info_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
+        return resp.to_models
       end
     end
   end
