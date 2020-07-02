@@ -1,5 +1,5 @@
 require_relative '../model'
-require_relative './app_review_attachment'
+require_relative './app_store_review_attachment'
 
 module Spaceship
   class ConnectAPI
@@ -43,7 +43,7 @@ module Spaceship
       end
 
       def upload_attachment(path: nil)
-        return Spaceship::ConnectAPI::AppReviewAttachment.create(app_store_review_detail_id: id, path: path)
+        return Spaceship::ConnectAPI::AppStoreReviewAttachment.create(app_store_review_detail_id: id, path: path)
       end
     end
   end
