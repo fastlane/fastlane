@@ -100,7 +100,7 @@ describe Fastlane do
         command << "-p tvos"
         command << File.expand_path(File.join("fastlane", dsym_path)).shellescape
 
-        expect(Fastlane::Actions).to receive(:sh).with(command.join(" "), log: false)
+        expect(Fastlane::Actions).to receive(:sh).with(command.join(" "), log: true)
 
         Fastlane::FastFile.new.parse("lane :test do
           upload_symbols_to_crashlytics(
