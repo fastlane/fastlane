@@ -9,6 +9,13 @@ module Spaceship
       attr_accessor :brazil_age_rating
       attr_accessor :kids_age_band
 
+      attr_accessor :primary_category
+      attr_accessor :primary_subcategory_one
+      attr_accessor :primary_subcategory_two
+      attr_accessor :secondary_category
+      attr_accessor :secondary_subcategory_one
+      attr_accessor :secondary_subcategory_two
+
       module AppStoreState
         READY_FOR_SALE = "READY_FOR_SALE"
         PROCESSING_FOR_APP_STORE = "PROCESSING_FOR_APP_STORE"
@@ -30,8 +37,24 @@ module Spaceship
         "appStoreState" => "app_store_state",
         "appStoreAgeRating" => "app_store_age_rating",
         "brazilAgeRating" => "brazil_age_rating",
-        "kidsAgeBand" => "kids_age_band"
+        "kidsAgeBand" => "kids_age_band",
+
+        "primaryCategory" => "primary_category",
+        "primarySubcategoryOne" => "primary_subcategory_one",
+        "primarySubcategoryTwo" => "primary_subcategory_two",
+        "secondaryCategory" => "secondary_category",
+        "secondarySubcategoryOne" => "secondary_subcategory_one",
+        "secondarySubcategoryTwo" => "secondary_subcategory_two"
       })
+
+      ESSENTIAL_INCLUDES = [
+        "primaryCategory",
+        "primarySubcategoryOne",
+        "primarySubcategoryTwo",
+        "secondaryCategory",
+        "secondarySubcategoryOne",
+        "secondarySubcategoryTwo"
+      ].join(",")
 
       def self.type
         return "appInfos"
