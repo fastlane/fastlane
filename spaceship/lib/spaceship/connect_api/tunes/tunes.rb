@@ -241,6 +241,11 @@ module Spaceship
         Client.instance.get("appPreviewSets", params)
       end
 
+      def get_app_preview_set(app_preview_set_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("appPreviewSets/#{app_preview_set_id}", params)
+      end
+
       def post_app_preview_set(app_store_version_localization_id: nil, attributes: {})
         body = {
           data: {
@@ -258,6 +263,21 @@ module Spaceship
         }
 
         Client.instance.post("appPreviewSets", body)
+      end
+
+      def patch_app_preview_set_previews(app_preview_set_id: nil, app_preview_ids: nil)
+        app_preview_ids ||= []
+
+        body = {
+          data: app_preview_ids.map do |app_preview_id|
+            {
+              type: "appPreviews",
+              id: app_preview_id
+            }
+          end
+        }
+
+        Client.instance.patch("appPreviewSets/#{app_preview_set_id}/relationships/appPreviews", body)
       end
 
       #
