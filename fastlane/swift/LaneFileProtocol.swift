@@ -49,6 +49,10 @@ public class LaneFile: NSObject, LaneFileProtocol {
         return String(laneName.prefix(laneName.count - 12))
     }
 
+    private static func trimLaneWithoutOptionsFromName(laneName: String) -> String {
+        return String(laneName.prefix(laneName.count - 16))
+    }
+
     private static var laneFunctionNames: [String] {
         var lanes: [String] = []
         var methodCount: UInt32 = 0
@@ -106,11 +110,14 @@ public class LaneFile: NSObject, LaneFileProtocol {
         let lowerCasedLaneRequested = named.lowercased()
 
         guard let laneMethod = currentLanes[lowerCasedLaneRequested] else {
-            let laneNames = self.laneFunctionNames.map { laneFuctionName in
-                if laneFuctionName.hasSuffix("lanewithoptions:") {
-                    return trimLaneWithOptionsFromName(laneName: laneFuctionName)
+            let laneNames = self.laneFunctionNames.compactMap { functionName in
+                let laneFunctionName = functionName.lowercased()
+                if laneFunctionName.hasSuffix("lane") {
+                    return trimLaneFromName(laneName: laneFunctionName)
+                } else if laneFunctionName.hasSuffix("lanewithoptions:") {
+                    return trimLaneWithoutOptionsFromName(laneName: laneFunctionName)
                 } else {
-                    return trimLaneFromName(laneName: laneFuctionName)
+                    return nil
                 }
             }.joined(separator: ", ")
 
