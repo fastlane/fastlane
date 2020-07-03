@@ -847,6 +847,31 @@ module Spaceship
       end
 
       #
+      # sandboxTesters
+      #
+
+      def get_sandbox_testers(filter: nil, includes: nil, limit: nil, sort: nil)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("sandboxTesters", params)
+      end
+
+      def post_sandbox_tester(attributes: {})
+        body = {
+          data: {
+            type: "sandboxTesters",
+            attributes: attributes
+          }
+        }
+
+        Client.instance.post("sandboxTesters", body)
+      end
+
+      def delete_sandbox_tester(sandbox_tester_id: nil)
+        params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+        Client.instance.delete("sandboxTesters/#{sandbox_tester_id}", params)
+      end
+
+      #
       # territories
       #
 
