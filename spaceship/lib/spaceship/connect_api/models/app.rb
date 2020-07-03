@@ -78,7 +78,7 @@ module Spaceship
       # App Info
       #
 
-      def fetch_edit_app_info
+      def fetch_edit_app_info(includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
         states = [
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PREPARE_FOR_SUBMISSION,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::DEVELOPER_REJECTED,
@@ -89,7 +89,7 @@ module Spaceship
         ]
 
         filter = { app: id }
-        resp = Spaceship::ConnectAPI.get_app_infos(filter: filter)
+        resp = Spaceship::ConnectAPI.get_app_infos(filter: filter, includes: includes)
         return resp.to_models.select do |model|
           states.include?(model.app_store_state)
         end.first
