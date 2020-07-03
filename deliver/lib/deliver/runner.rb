@@ -34,6 +34,11 @@ module Deliver
 
     def run
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
+
+      # Rejecting before upload meta
+      # Screenshots can not be update/deleted if in waiting for review
+      reject_version_if_possible if options[:reject_if_possible]
+
       upload_metadata
 
       has_binary = (options[:ipa] || options[:pkg])
@@ -42,8 +47,6 @@ module Deliver
       end
 
       UI.success("Finished the upload to App Store Connect") unless options[:skip_binary_upload]
-
-      reject_version_if_possible if options[:reject_if_possible]
 
       precheck_success = precheck_app
       submit_for_review if options[:submit_for_review] && precheck_success
@@ -163,7 +166,8 @@ module Deliver
       app_id = legacy_app.apple_id
       app = Spaceship::ConnectAPI::App.get(app_id: app_id)
 
-      if app.reject_version_if_possible!
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      if app.reject_version_if_possible!(platform: platform)
         UI.success("Successfully rejected previous version!")
       end
     end

@@ -110,7 +110,7 @@ module Spaceship
       # App Store Versions
       #
 
-      def reject_version_if_possible!
+      def reject_version_if_possible!(platform: nil)
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           appStoreState: [
