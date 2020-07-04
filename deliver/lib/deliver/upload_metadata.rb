@@ -330,7 +330,11 @@ module Deliver
       seconds_in_hour = 60 * 60
       time_in_s_to_hour = (time_in_s / seconds_in_hour).to_i * seconds_in_hour
 
-      return Time.at(time_in_s_to_hour).strftime("%Y-%m-%dT%H:%M:%S%:z")
+      # Remove minute offset if timezone has minute offset
+      minute_offset = Time.now.utc_offset % seconds_in_hour
+      time_in_s_to_hour -= minute_offset
+
+      return Time.at(time_in_s_to_hour).utc.strftime("%Y-%m-%dT%H:%M:%S%:z")
     end
 
     # If the user is using the 'default' language, then assign values where they are needed
