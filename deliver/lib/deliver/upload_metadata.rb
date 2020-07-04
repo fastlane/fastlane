@@ -614,8 +614,8 @@ module Deliver
       end
       UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
 
-      age_rating_delcaration = version.fetch_age_rating_declaration
-      age_rating_delcaration.update(attributes: attributes)
+      age_rating_declaration = version.fetch_age_rating_declaration
+      age_rating_declaration.update(attributes: attributes)
     end
   end
   # rubocop:enable Metrics/ClassLength
