@@ -10,6 +10,9 @@ module Spaceship
       attr_accessor :platform
       attr_accessor :serial_number
       attr_accessor :certificate_type
+      attr_accessor :requester_email
+      attr_accessor :requester_first_name
+      attr_accessor :requester_last_name
 
       attr_mapping({
         "certificateContent" => "certificate_content",
@@ -18,7 +21,10 @@ module Spaceship
         "name" => "name",
         "platform" => "platform",
         "serialNumber" => "serial_number",
-        "certificateType" => "certificate_type"
+        "certificateType" => "certificate_type",
+        "requesterEmail" => "requester_email",
+        "requesterFirstName" => "requester_first_name",
+        "requesterLastName" => "requester_last_name"
       })
 
       module CertificateType
@@ -35,6 +41,10 @@ module Spaceship
 
       def self.type
         return "certificates"
+      end
+
+      def valid?
+        Time.parse(expiration_date) > Time.now
       end
 
       #
