@@ -117,8 +117,30 @@ module Spaceship
         return resp.to_models
       end
 
-      def upload_screenshot(path: nil, wait_for_processing: true)
-        return Spaceship::ConnectAPI::AppScreenshot.create(app_screenshot_set_id: id, path: path, wait_for_processing: wait_for_processing)
+      def self.get(app_screenshot_set_id: nil, includes: "appScreenshots")
+        return Spaceship::ConnectAPI.get_app_screenshot_set(app_screenshot_set_id: app_screenshot_set_id, filter: nil, includes: includes, limit: nil, sort: nil).first
+      end
+
+      def upload_screenshot(path: nil, wait_for_processing: true, position: nil)
+        screenshot = Spaceship::ConnectAPI::AppScreenshot.create(app_screenshot_set_id: id, path: path, wait_for_processing: wait_for_processing)
+
+        # Reposition (if specified)
+        unless position.nil?
+          # Get all app preview ids
+          set = AppScreenshotSet.get(app_screenshot_set_id: id)
+          app_screenshot_ids = set.app_screenshots.map(&:id)
+
+          # Remove new uploaded screenshot
+          app_screenshot_ids.delete(screenshot.id)
+
+          # Insert screenshot at specified position
+          app_screenshot_ids = app_screenshot_ids.insert(position, screenshot.id).compact
+
+          # Reorder screenshots
+          reorder_screenshots(app_screenshot_ids: app_screenshot_ids)
+        end
+
+        return screenshot
       end
 
       def reorder_screenshots(app_screenshot_ids: nil)
