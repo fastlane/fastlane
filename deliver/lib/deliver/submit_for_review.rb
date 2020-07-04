@@ -134,10 +134,10 @@ module Deliver
       # Create, update, or delete IDFA declaration
       if uses_idfa == false
         if idfa_declaration
-          UI.verbose("Deleting IDFA delcaration")
+          UI.verbose("Deleting IDFA declaration")
           idfa_declaration.delete!
           updated_idfa = true
-          UI.verbose("Deleted IDFA delcaration")
+          UI.verbose("Deleted IDFA declaration")
         end
       elsif uses_idfa == true
         attributes = {
@@ -148,19 +148,19 @@ module Deliver
         }
 
         if idfa_declaration
-          UI.verbose("Updating IDFA delcaration")
+          UI.verbose("Updating IDFA declaration")
           idfa_declaration.update(attributes: attributes)
-          UI.verbose("Updated IDFA delcaration")
+          UI.verbose("Updated IDFA declaration")
         else
-          UI.verbose("Creating IDFA delcaration")
+          UI.verbose("Creating IDFA declaration")
           version.create_idfa_declaration(attributes: attributes)
-          UI.verbose("Created IDFA delcaration")
+          UI.verbose("Created IDFA declaration")
         end
 
         updated_idfa = true
       end
 
-      UI.success("Successfully updated IDFA delcarations on App Store Connect") if updated_idfa
+      UI.success("Successfully updated IDFA declarations on App Store Connect") if updated_idfa
     end
 
     def update_submission_information(options, app)
