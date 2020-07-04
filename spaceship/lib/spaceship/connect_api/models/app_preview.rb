@@ -54,7 +54,7 @@ module Spaceship
       # @param app_preview_set_id The AppPreviewSet id
       # @param path The path of the file
       # @param frame_time_code The time code for the preview still frame (ex: "00:00:07:01")
-      def self.create(app_preview_set_id: nil, path: nil, frame_time_code: nil)
+      def self.create(app_preview_set_id: nil, path: nil, wait_for_processing: true, frame_time_code: nil)
         require 'faraday'
 
         filename = File.basename(path)
@@ -95,7 +95,8 @@ module Spaceship
         end
 
         # Poll for video processing completion to set still frame time
-        unless frame_time_code.nil?
+        wait_for_processing = true unless frame_time_code.nil?
+        if wait_for_processing
           loop do
             unless preview.video_url.nil?
               puts("Preview processing complete!") if Spaceship::Globals.verbose?

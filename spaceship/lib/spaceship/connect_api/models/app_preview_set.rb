@@ -63,8 +63,37 @@ module Spaceship
         return resp.to_models
       end
 
-      def upload_preview(path: nil, frame_time_code: nil)
-        return Spaceship::ConnectAPI::AppPreview.create(app_preview_set_id: id, path: path, frame_time_code: frame_time_code)
+      def self.get(app_preview_set_id: nil, includes: "appPreviews")
+        return Spaceship::ConnectAPI.get_app_preview_set(app_preview_set_id: app_preview_set_id, filter: nil, includes: includes, limit: nil, sort: nil).first
+      end
+
+      def upload_preview(path: nil, wait_for_processing: true, position: nil, frame_time_code: nil)
+        # Upload preview
+        preview = Spaceship::ConnectAPI::AppPreview.create(app_preview_set_id: id, path: path, wait_for_processing: wait_for_processing, frame_time_code: frame_time_code)
+
+        # Reposition (if specified)
+        unless position.nil?
+          # Get all app preview ids
+          set = AppPreviewSet.get(app_preview_set_id: id)
+          app_preview_ids = set.app_previews.map(&:id)
+
+          # Remove new uploaded preview
+          app_preview_ids.delete(preview.id)
+
+          # Insert preview at specified position
+          app_preview_ids = app_preview_ids.insert(position, preview.id).compact
+
+          # Reorder previews
+          reorder_previews(app_preview_ids: app_preview_ids)
+        end
+
+        return preview
+      end
+
+      def reorder_previews(app_preview_ids: nil)
+        Spaceship::ConnectAPI.patch_app_preview_set_previews(app_preview_set_id: id, app_preview_ids: app_preview_ids)
+
+        return Spaceship::ConnectAPI.get_app_preview_set(app_preview_set_id: id, includes: "appPreviews").first
       end
     end
   end
