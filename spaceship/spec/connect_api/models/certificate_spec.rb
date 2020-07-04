@@ -19,6 +19,32 @@ describe Spaceship::ConnectAPI::Certificate do
       expect(model.platform).to eq("IOS")
       expect(model.serial_number).to eq("F5A44933E05F97D")
       expect(model.certificate_type).to eq("IOS_DEVELOPMENT")
+      expect(model.requester_email).to eq("email@email.com")
+      expect(model.requester_first_name).to eq("Josh")
+      expect(model.requester_last_name).to eq("Holtz")
+    end
+  end
+
+  describe '#valid?' do
+    let!(:certificate) do
+      certificates_response = JSON.parse(File.read(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'provisioning', 'certificates.json')))
+      model = Spaceship::ConnectAPI::Models.parse(certificates_response).first
+    end
+
+    context 'with past exiration_date' do
+      before { certificate.expiration_date = "1999-02-01T20:50:34.000+0000" }
+
+      it 'should be invalid' do
+        expect(certificate.valid?).to eq(false)
+      end
+    end
+
+    context 'with a future exiration_date' do
+      before { certificate.expiration_date = "9999-02-01T20:50:34.000+0000" }
+
+      it 'should be valid' do
+        expect(certificate.valid?).to eq(true)
+      end
     end
   end
 end
