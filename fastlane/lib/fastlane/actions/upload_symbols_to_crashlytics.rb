@@ -56,6 +56,9 @@ module Fastlane
         UI.message("Uploading '#{path}'...")
         command = []
         command << File.expand_path(params[:binary_path]).shellescape
+        if params[:debug]
+          command << "-d"
+        end
         if params[:app_id]
           command << "-ai #{params[:app_id].shellescape}"
         elsif params[:gsp_path]
@@ -68,7 +71,7 @@ module Fastlane
         begin
           command_to_execute = command.join(" ")
           UI.verbose("upload_dsym using command: #{command_to_execute}")
-          Actions.sh(command_to_execute, log: false)
+          Actions.sh(command_to_execute, log: params[:debug])
         rescue => ex
           UI.error(ex.to_s) # it fails, however we don't want to fail everything just for this
         end
@@ -189,7 +192,12 @@ module Fastlane
                                        verify_block: proc do |value|
                                          min_threads = 1
                                          UI.user_error!("Too few threads (#{value}) minimum number of threads: #{min_threads}") unless value >= min_threads
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :debug,
+                                       env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DEBUG",
+                                       description: "Enable debug mode for upload-symbols",
+                                       type: Boolean,
+                                       default_value: false)
         ]
       end
 

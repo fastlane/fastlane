@@ -88,6 +88,29 @@ describe Fastlane do
         end").runner.execute(:test)
       end
 
+      it "uploads dSYM files with platform and debug params" do
+        dsym_path = './spec/fixtures/dSYM/Themoji.dSYM'
+        binary_path = './spec/fixtures/screenshots/screenshot1.png'
+        gsp_path = './spec/fixtures/plist/GoogleService-Info.plist'
+
+        command = []
+        command << File.expand_path(File.join("fastlane", binary_path)).shellescape
+        command << "-d"
+        command << "-gsp #{File.expand_path(File.join('fastlane', gsp_path)).shellescape}"
+        command << "-p tvos"
+        command << File.expand_path(File.join("fastlane", dsym_path)).shellescape
+
+        expect(Fastlane::Actions).to receive(:sh).with(command.join(" "), log: true)
+
+        Fastlane::FastFile.new.parse("lane :test do
+          upload_symbols_to_crashlytics(
+            dsym_path: 'fastlane/#{dsym_path}',
+            binary_path: 'fastlane/#{binary_path}',
+            platform: 'appletvos',
+            debug: true)
+        end").runner.execute(:test)
+      end
+
       it "raises exception if no api access is given" do
         allow(Fastlane::Actions::UploadSymbolsToCrashlyticsAction).to receive(:find_gsp_path).and_return(nil)
 
