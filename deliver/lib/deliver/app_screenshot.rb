@@ -51,9 +51,9 @@ module Deliver
       # iPad iMessage
       IOS_IPAD_MESSAGES = "iOS-iPad-messages"
       # iPad 10.5 iMessage
-      IOS_IPAD_10_5_MESSAGES = "iOS-10.5-messages"
+      IOS_IPAD_10_5_MESSAGES = "iOS-iPad-10.5-messages"
       # iPad 11 iMessage
-      IOS_IPAD_11_MESSAGES = "iOS-11-messages"
+      IOS_IPAD_11_MESSAGES = "iOS-iPad-11-messages"
       # iPad Pro iMessage
       IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro-messages"
       # iPad Pro (12.9-inch) (3rd generation) iMessage
