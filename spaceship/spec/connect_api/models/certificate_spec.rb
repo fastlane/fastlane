@@ -27,7 +27,7 @@ describe Spaceship::ConnectAPI::Certificate do
 
   describe '#valid?' do
     let!(:certificate) do
-      certificates_response = JSON.parse File.read(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'provisioning', 'certificates.json'))
+      certificates_response = JSON.parse(File.read(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'provisioning', 'certificates.json')))
       model = Spaceship::ConnectAPI::Models.parse(certificates_response).first
     end
 
