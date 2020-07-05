@@ -162,6 +162,33 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
+    def xcrun_upload_command(provider_short_name = nil)
+      [
+        "xcrun iTMSTransporter",
+        "-m upload",
+        "-u #{email.shellescape}",
+        "-p #{password.shellescape}",
+        "-f /tmp/my.app.id.itmsp",
+        "-t DAV,Signiant",
+        "-k 100000",
+        ("-itc_provider #{provider_short_name}" if provider_short_name),
+        '2>&1'
+      ].compact.join(' ')
+    end
+
+    def xcrun_download_command(provider_short_name = nil)
+      [
+        "xcrun iTMSTransporter",
+        '-m lookupMetadata',
+        "-u #{email.shellescape}",
+        "-p #{password.shellescape}",
+        '-apple_id my.app.id',
+        '-destination /tmp',
+        ("-itc_provider #{provider_short_name}" if provider_short_name),
+        '2>&1'
+      ].compact.join(' ')
+    end
+
     describe "with Xcode 7.x installed" do
       before(:each) do
         allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('7.3')
@@ -368,6 +395,29 @@ describe FastlaneCore do
       end
     end
 
+    describe "with Xcode 11.x installed" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11.1')
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
+      end
+
+      describe "upload command generation" do
+        it 'generates a call to xcrun iTMSTransporter' do
+          transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+          expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command)
+        end
+      end
+
+      describe "download command generation" do
+        it 'generates a call to xcrun iTMSTransporter' do
+          transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+          expect(transporter.download('my.app.id', '/tmp')).to eq(xcrun_download_command)
+        end
+      end
+    end
+
     describe "with `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` set" do
       before(:each) do
         ENV["FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT"] = "1"
@@ -407,6 +457,8 @@ describe FastlaneCore do
           command = shell_upload_command if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_version.start_with?('6.')
           # If we are on Mac with Xcode >= 9, switch to newer java command
           command = java_upload_command_9 if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_at_least?(9)
+          # If we are on Mac with Xcode >= 11, switch to xcrun command
+          command = xcrun_upload_command if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_at_least?(11)
           expect(transporter.upload('my.app.id', '/tmp')).to eq(command)
         end
       end
@@ -421,6 +473,8 @@ describe FastlaneCore do
           command = shell_download_command if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_version.start_with?('6.')
           # If we are on Mac with Xcode >= 9, switch to newer java command
           command = java_download_command_9 if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_at_least?(9)
+          # If we are on Mac with Xcode >= 11, switch to newer xcrun command
+          command = xcrun_download_command if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_at_least?(11)
           expect(transporter.download('my.app.id', '/tmp')).to eq(command)
         end
       end

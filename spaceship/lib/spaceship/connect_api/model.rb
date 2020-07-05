@@ -15,7 +15,7 @@ module Spaceship
       end
 
       def update_attributes(attributes)
-        attributes.each do |key, value|
+        (attributes || []).each do |key, value|
           method = "#{key}=".to_sym
           self.send(method, value) if self.respond_to?(method)
         end

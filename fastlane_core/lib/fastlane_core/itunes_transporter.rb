@@ -239,64 +239,101 @@ module FastlaneCore
   # escaping problems in its accompanying shell script.
   class JavaTransporterExecutor < TransporterExecutor
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "")
-      [
-        Helper.transporter_java_executable_path.shellescape,
-        "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
-        '-XX:NewSize=2m',
-        '-Xms32m',
-        '-Xmx1024m',
-        '-Xms1024m',
-        '-Djava.awt.headless=true',
-        '-Dsun.net.http.retryPost=false',
-        java_code_option,
-        '-m upload',
-        "-u #{username.shellescape}",
-        "-p #{password.shellescape}",
-        "-f #{source.shellescape}",
-        additional_upload_parameters, # that's here, because the user might overwrite the -t option
-        '-k 100000',
-        ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
-        '2>&1' # cause stderr to be written to stdout
-      ].compact.join(' ') # compact gets rid of the possibly nil ENV value
+      if Helper.mac? && Helper.xcode_at_least?(11)
+        [
+          'xcrun iTMSTransporter',
+          '-m upload',
+          "-u #{username.shellescape}",
+          "-p #{password.shellescape}",
+          "-f #{source.shellescape}",
+          additional_upload_parameters, # that's here, because the user might overwrite the -t option
+          '-k 100000',
+          ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
+          '2>&1' # cause stderr to be written to stdout
+        ].compact.join(' ') # compact gets rid of the possibly nil ENV value
+      else
+        [
+          Helper.transporter_java_executable_path.shellescape,
+          "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
+          '-XX:NewSize=2m',
+          '-Xms32m',
+          '-Xmx1024m',
+          '-Xms1024m',
+          '-Djava.awt.headless=true',
+          '-Dsun.net.http.retryPost=false',
+          java_code_option,
+          '-m upload',
+          "-u #{username.shellescape}",
+          "-p #{password.shellescape}",
+          "-f #{source.shellescape}",
+          additional_upload_parameters, # that's here, because the user might overwrite the -t option
+          '-k 100000',
+          ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
+          '2>&1' # cause stderr to be written to stdout
+        ].compact.join(' ') # compact gets rid of the possibly nil ENV value
+      end
     end
 
     def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "")
-      [
-        Helper.transporter_java_executable_path.shellescape,
-        "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
-        '-XX:NewSize=2m',
-        '-Xms32m',
-        '-Xmx1024m',
-        '-Xms1024m',
-        '-Djava.awt.headless=true',
-        '-Dsun.net.http.retryPost=false',
-        java_code_option,
-        '-m lookupMetadata',
-        "-u #{username.shellescape}",
-        "-p #{password.shellescape}",
-        "-apple_id #{apple_id.shellescape}",
-        "-destination #{destination.shellescape}",
-        ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
-        '2>&1' # cause stderr to be written to stdout
-      ].compact.join(' ')
+      if Helper.mac? && Helper.xcode_at_least?(11)
+        [
+          'xcrun iTMSTransporter',
+          '-m lookupMetadata',
+          "-u #{username.shellescape}",
+          "-p #{password.shellescape}",
+          "-apple_id #{apple_id.shellescape}",
+          "-destination #{destination.shellescape}",
+          ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
+          '2>&1' # cause stderr to be written to stdout
+        ].compact.join(' ')
+      else
+        [
+          Helper.transporter_java_executable_path.shellescape,
+          "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
+          '-XX:NewSize=2m',
+          '-Xms32m',
+          '-Xmx1024m',
+          '-Xms1024m',
+          '-Djava.awt.headless=true',
+          '-Dsun.net.http.retryPost=false',
+          java_code_option,
+          '-m lookupMetadata',
+          "-u #{username.shellescape}",
+          "-p #{password.shellescape}",
+          "-apple_id #{apple_id.shellescape}",
+          "-destination #{destination.shellescape}",
+          ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
+          '2>&1' # cause stderr to be written to stdout
+        ].compact.join(' ')
+      end
     end
 
     def build_provider_ids_command(username, password)
-      [
-        Helper.transporter_java_executable_path.shellescape,
-        "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
-        '-XX:NewSize=2m',
-        '-Xms32m',
-        '-Xmx1024m',
-        '-Xms1024m',
-        '-Djava.awt.headless=true',
-        '-Dsun.net.http.retryPost=false',
-        java_code_option,
-        '-m provider',
-        "-u #{username.shellescape}",
-        "-p #{password.shellescape}",
-        '2>&1' # cause stderr to be written to stdout
-      ].compact.join(' ')
+      if Helper.mac? && Helper.xcode_at_least?(11)
+        [
+          'xcrun iTMSTransporter',
+          '-m provider',
+          "-u #{username.shellescape}",
+          "-p #{password.shellescape}",
+          '2>&1' # cause stderr to be written to stdout
+        ].compact.join(' ')
+      else
+        [
+          Helper.transporter_java_executable_path.shellescape,
+          "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
+          '-XX:NewSize=2m',
+          '-Xms32m',
+          '-Xmx1024m',
+          '-Xms1024m',
+          '-Djava.awt.headless=true',
+          '-Dsun.net.http.retryPost=false',
+          java_code_option,
+          '-m provider',
+          "-u #{username.shellescape}",
+          "-p #{password.shellescape}",
+          '2>&1' # cause stderr to be written to stdout
+        ].compact.join(' ')
+      end
     end
 
     def java_code_option

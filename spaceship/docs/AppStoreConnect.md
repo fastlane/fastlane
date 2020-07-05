@@ -18,45 +18,55 @@
 
 To quickly play around with _spaceship_ launch `irb` in your terminal and execute `require "spaceship"`.
 
-In general the classes are pre-fixed with the `Tunes` module. This name is an artifact from when "App Store Connect" was still called "iTunes Connect".
+In general the classes are pre-fixed with the `ConnectAPI` module. If you want to use the legacy web API, make sure to use `Tunes`, which is an artifact from when "App Store Connect" was still called "iTunes Connect".
 
 ### Login
 
 *Note*: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
 
 ```ruby
-Spaceship::Tunes.login("felix@krausefx.com", "password")
 
-Spaceship::Tunes.select_team # call this method to let the user select a team
+token = Spaceship::ConnectAPI::Token.create(
+  key_id: 'the-key-id',
+  issuer_id: 'the-issuer-id,
+  filepath:  File.absolute_path("../AuthKey_the-key-id.p8")
+)
+
+Spaceship::ConnectAPI.token = token
+
 ```
 
 ### Applications
 
 ```ruby
 # Fetch all available applications
-all_apps = Spaceship::Tunes::Application.all
+all_apps = Spaceship::ConnectAPI::App.all
 
-# Find a specific app based on the bundle identifier or Apple ID
-app = Spaceship::Tunes::Application.find("com.krausefx.app")
-# or
-app = Spaceship::Tunes::Application.find(794902327)
+# Find a specific app based on the bundle identifier
+app = Spaceship::ConnectAPI::App.find("com.krausefx.app")
+
+app = Spaceship::ConnectAPI.get_app(app_id: 1013943394).first
 
 # Access information about the app
-app.apple_id        # => 1013943394
+app.id              # => 1013943394
 app.name            # => "Spaceship App"
 app.bundle_id       # => "com.krausefx.app"
+app.sku             # => "SpaceshipApp01"
+app.primary_locale  # => "en-US"
 
 # Show the names of all your apps
-Spaceship::Tunes::Application.all.collect do |app|
+Spaceship::ConnectAPI::App.all.collect do |app|
   app.name
 end
 
 # Create a new app
-app = Spaceship::Tunes::Application.create!(name: "App Name",
-                                primary_language: "English",
-                                         version: "1.0", # initial version
-                                             sku: 123,
-                                       bundle_id: "com.krausefx.app")
+// Not working yet
+app = Spaceship::ConnectAPI::App.create(name: "App Name",
+                                        primary_language: "English",
+                                        version_string: "1.0", # initial version
+                                        sku: "123",
+                                        bundle_id: "com.krausefx.app",
+                                        platforms: ["IOS"])
 ```
 
 To update non version specific details, use the following code

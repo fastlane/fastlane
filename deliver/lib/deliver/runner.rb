@@ -7,7 +7,6 @@ require 'fastlane_core/itunes_transporter'
 require 'spaceship'
 require_relative 'html_generator'
 require_relative 'submit_for_review'
-require_relative 'upload_assets'
 require_relative 'upload_price_tier'
 require_relative 'upload_metadata'
 require_relative 'upload_screenshots'
@@ -35,6 +34,11 @@ module Deliver
 
     def run
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
+
+      # Rejecting before upload meta
+      # Screenshots can not be update/deleted if in waiting for review
+      reject_version_if_possible if options[:reject_if_possible]
+
       upload_metadata
 
       has_binary = (options[:ipa] || options[:pkg])
@@ -43,8 +47,6 @@ module Deliver
       end
 
       UI.success("Finished the upload to App Store Connect") unless options[:skip_binary_upload]
-
-      reject_version_if_possible if options[:reject_if_possible]
 
       precheck_success = precheck_app
       submit_for_review if options[:submit_for_review] && precheck_success
@@ -87,9 +89,14 @@ module Deliver
     # If not, the new version will automatically be created
     def verify_version
       app_version = options[:app_version]
-      UI.message("Making sure the latest version on App Store Connect matches '#{app_version}' from the ipa file...")
+      UI.message("Making sure the latest version on App Store Connect matches '#{app_version}'...")
 
-      changed = options[:app].ensure_version!(app_version, platform: options[:platform])
+      legacy_app = options[:app]
+      app_id = legacy_app.apple_id
+      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      changed = app.ensure_version!(app_version, platform: platform)
 
       if changed
         UI.success("Successfully set the version to '#{app_version}'")
@@ -110,9 +117,6 @@ module Deliver
       # Assign "default" values to all languages
       upload_metadata.assign_defaults(options)
 
-      # Handle app icon / watch icon
-      prepare_app_icons(options)
-
       # Validate
       validate_html(screenshots)
 
@@ -120,21 +124,6 @@ module Deliver
       upload_metadata.upload(options)
       upload_screenshots.upload(options, screenshots)
       UploadPriceTier.new.upload(options)
-      UploadAssets.new.upload(options) # e.g. app icon
-    end
-
-    # If options[:app_icon]/options[:apple_watch_app_icon]
-    # is supplied value/path will be used.
-    # If it is unset files (app_icon/watch_icon) exists in
-    # the fastlane/metadata/ folder, those will be used
-    def prepare_app_icons(options = {})
-      return unless options[:metadata_path]
-
-      default_app_icon_path = Dir[File.join(options[:metadata_path], "app_icon.{png,jpg}")].first
-      options[:app_icon] ||= default_app_icon_path if default_app_icon_path && File.exist?(default_app_icon_path)
-
-      default_watch_icon_path = Dir[File.join(options[:metadata_path], "watch_icon.{png,jpg}")].first
-      options[:apple_watch_app_icon] ||= default_watch_icon_path if default_watch_icon_path && File.exist?(default_watch_icon_path)
     end
 
     # Upload the binary to App Store Connect
@@ -173,8 +162,12 @@ module Deliver
     end
 
     def reject_version_if_possible
-      app = options[:app]
-      if app.reject_version_if_possible!
+      legacy_app = options[:app]
+      app_id = legacy_app.apple_id
+      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      if app.reject_version_if_possible!(platform: platform)
         UI.success("Successfully rejected previous version!")
       end
     end

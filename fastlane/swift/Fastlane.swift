@@ -455,9 +455,9 @@ func appledoc(input: Any,
    - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
    - runPrecheckBeforeSubmit: Run precheck before submitting to app review
    - precheckDefaultRuleLevel: The default precheck rule level unless otherwise configured
-   - individualMetadataItems: An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
-   - appIcon: Metadata: The path to the app icon
-   - appleWatchAppIcon: Metadata: The path to the Apple Watch app icon
+   - individualMetadataItems: **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
+   - appIcon: **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - Metadata: The path to the app icon
+   - appleWatchAppIcon: **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - Metadata: The path to the Apple Watch app icon
    - copyright: Metadata: The copyright notice
    - primaryCategory: Metadata: The english name of the primary category (e.g. `Business`, `Books`)
    - secondaryCategory: Metadata: The english name of the secondary category (e.g. `Business`, `Books`)
@@ -515,7 +515,7 @@ func appstore(username: String,
               resetRatings: Bool = false,
               priceTier: Any? = nil,
               appRatingConfigPath: String? = nil,
-              submissionInformation: Any? = nil,
+              submissionInformation: [String : Any]? = nil,
               teamId: Any? = nil,
               teamName: String? = nil,
               devPortalTeamId: String? = nil,
@@ -2248,7 +2248,7 @@ func createAppOnManagedPlayStore(jsonKey: String? = nil,
    - sku: SKU Number (e.g. '1234')
    - platform: The platform to use (optional)
    - platforms: The platforms to use (optional)
-   - language: Primary Language (e.g. 'English', 'German')
+   - language: Primary Language (e.g. 'en-US', 'fr-FR')
    - companyName: The name of your company. Only required if it's the first app you create
    - skipItc: Skip the creation of the app on App Store Connect
    - itcUsers: Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles
@@ -2505,9 +2505,9 @@ func deleteKeychain(name: String? = nil,
    - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
    - runPrecheckBeforeSubmit: Run precheck before submitting to app review
    - precheckDefaultRuleLevel: The default precheck rule level unless otherwise configured
-   - individualMetadataItems: An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
-   - appIcon: Metadata: The path to the app icon
-   - appleWatchAppIcon: Metadata: The path to the Apple Watch app icon
+   - individualMetadataItems: **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
+   - appIcon: **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - Metadata: The path to the app icon
+   - appleWatchAppIcon: **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - Metadata: The path to the Apple Watch app icon
    - copyright: Metadata: The copyright notice
    - primaryCategory: Metadata: The english name of the primary category (e.g. `Business`, `Books`)
    - secondaryCategory: Metadata: The english name of the secondary category (e.g. `Business`, `Books`)
@@ -2565,7 +2565,7 @@ func deliver(username: Any = deliverfile.username,
              resetRatings: Bool = deliverfile.resetRatings,
              priceTier: Any? = deliverfile.priceTier,
              appRatingConfigPath: Any? = deliverfile.appRatingConfigPath,
-             submissionInformation: Any? = deliverfile.submissionInformation,
+             submissionInformation: [String : Any]? = deliverfile.submissionInformation,
              teamId: Any? = deliverfile.teamId,
              teamName: Any? = deliverfile.teamName,
              devPortalTeamId: Any? = deliverfile.devPortalTeamId,
@@ -5343,7 +5343,7 @@ func println(message: String? = nil) {
    - sku: SKU Number (e.g. '1234')
    - platform: The platform to use (optional)
    - platforms: The platforms to use (optional)
-   - language: Primary Language (e.g. 'English', 'German')
+   - language: Primary Language (e.g. 'en-US', 'fr-FR')
    - companyName: The name of your company. Only required if it's the first app you create
    - skipItc: Skip the creation of the app on App Store Connect
    - itcUsers: Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles
@@ -6757,6 +6757,7 @@ func slackTrainStart(distance: Int = 5,
    - coberturaXml: Tell slather that it should output results as Cobertura XML format
    - sonarqubeXml: Tell slather that it should output results as SonarQube Generic XML format
    - llvmCov: Tell slather that it should output results as llvm-cov show format
+   - json: Tell slather that it should output results as static JSON report
    - html: Tell slather that it should output results as static HTML pages
    - show: Tell slather that it should open static html pages automatically
    - sourceDirectory: Tell slather the location of your source files
@@ -6791,6 +6792,7 @@ func slather(buildDirectory: String? = nil,
              coberturaXml: Bool? = nil,
              sonarqubeXml: Bool? = nil,
              llvmCov: Any? = nil,
+             json: Bool? = nil,
              html: Bool? = nil,
              show: Bool = false,
              sourceDirectory: String? = nil,
@@ -6821,6 +6823,7 @@ func slather(buildDirectory: String? = nil,
                                                                                          RubyCommand.Argument(name: "cobertura_xml", value: coberturaXml),
                                                                                          RubyCommand.Argument(name: "sonarqube_xml", value: sonarqubeXml),
                                                                                          RubyCommand.Argument(name: "llvm_cov", value: llvmCov),
+                                                                                         RubyCommand.Argument(name: "json", value: json),
                                                                                          RubyCommand.Argument(name: "html", value: html),
                                                                                          RubyCommand.Argument(name: "show", value: show),
                                                                                          RubyCommand.Argument(name: "source_directory", value: sourceDirectory),
@@ -7097,6 +7100,7 @@ func splunkmint(dsym: String? = nil,
    - packagePath: Change working directory before any other operation
    - xcconfig: Use xcconfig file to override swift package generate-xcodeproj defaults
    - configuration: Build with configuration (debug|release) [default: debug]
+   - disableSandbox: Disable using the sandbox when executing subprocesses
    - xcprettyOutput: Specifies the output type for xcpretty. eg. 'test', or 'simple'
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf'), requires xcpretty_output to be specified also
    - verbose: Increase verbosity of informational output
@@ -7106,6 +7110,7 @@ func spm(command: String = "build",
          packagePath: String? = nil,
          xcconfig: String? = nil,
          configuration: String? = nil,
+         disableSandbox: Bool = false,
          xcprettyOutput: String? = nil,
          xcprettyArgs: String? = nil,
          verbose: Bool = false) {
@@ -7114,6 +7119,7 @@ func spm(command: String = "build",
                                                                                      RubyCommand.Argument(name: "package_path", value: packagePath),
                                                                                      RubyCommand.Argument(name: "xcconfig", value: xcconfig),
                                                                                      RubyCommand.Argument(name: "configuration", value: configuration),
+                                                                                     RubyCommand.Argument(name: "disable_sandbox", value: disableSandbox),
                                                                                      RubyCommand.Argument(name: "xcpretty_output", value: xcprettyOutput),
                                                                                      RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                      RubyCommand.Argument(name: "verbose", value: verbose)])
@@ -8099,9 +8105,9 @@ func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/api/0",
    - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
    - runPrecheckBeforeSubmit: Run precheck before submitting to app review
    - precheckDefaultRuleLevel: The default precheck rule level unless otherwise configured
-   - individualMetadataItems: An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
-   - appIcon: Metadata: The path to the app icon
-   - appleWatchAppIcon: Metadata: The path to the Apple Watch app icon
+   - individualMetadataItems: **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
+   - appIcon: **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - Metadata: The path to the app icon
+   - appleWatchAppIcon: **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - Metadata: The path to the Apple Watch app icon
    - copyright: Metadata: The copyright notice
    - primaryCategory: Metadata: The english name of the primary category (e.g. `Business`, `Books`)
    - secondaryCategory: Metadata: The english name of the secondary category (e.g. `Business`, `Books`)
@@ -8159,7 +8165,7 @@ func uploadToAppStore(username: String,
                       resetRatings: Bool = false,
                       priceTier: Any? = nil,
                       appRatingConfigPath: String? = nil,
-                      submissionInformation: Any? = nil,
+                      submissionInformation: [String : Any]? = nil,
                       teamId: Any? = nil,
                       teamName: String? = nil,
                       devPortalTeamId: String? = nil,
@@ -8960,4 +8966,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.71]
+// FastlaneRunnerAPIVersion [0.9.73]
