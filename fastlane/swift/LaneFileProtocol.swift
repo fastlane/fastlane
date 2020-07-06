@@ -16,7 +16,7 @@ import Foundation
 
 public protocol LaneFileProtocol: class {
     var fastlaneVersion: String { get }
-    static func runLane(named: String, parameters: [String : String]) -> Bool
+    static func runLane(named: String, parameters: [String: String]) -> Bool
 
     func recordLaneDescriptions()
     func beforeAll()
@@ -26,10 +26,10 @@ public protocol LaneFileProtocol: class {
 
 public extension LaneFileProtocol {
     var fastlaneVersion: String { return "" } // default "" because that means any is fine
-    func beforeAll() { } // no op by default
-    func afterAll(currentLane: String) { } // no op by default
-    func onError(currentLane: String, errorInfo: String) {} // no op by default
-    func recordLaneDescriptions() { } // no op by default
+    func beforeAll() {} // no op by default
+    func afterAll(currentLane _: String) {} // no op by default
+    func onError(currentLane _: String, errorInfo _: String) {} // no op by default
+    func recordLaneDescriptions() {} // no op by default
 }
 
 @objcMembers
@@ -53,7 +53,7 @@ public class LaneFile: NSObject, LaneFileProtocol {
         var lanes: [String] = []
         var methodCount: UInt32 = 0
         let methodList = class_copyMethodList(self, &methodCount)
-        for i in 0..<Int(methodCount) {
+        for i in 0 ..< Int(methodCount) {
             let selName = sel_getName(method_getName(methodList![i]))
             let name = String(cString: selName)
             let lowercasedName = name.lowercased()
@@ -64,9 +64,9 @@ public class LaneFile: NSObject, LaneFileProtocol {
         return lanes
     }
 
-    public static var lanes: [String : String] {
-        var laneToMethodName: [String : String] = [:]
-        self.laneFunctionNames.forEach { name in
+    public static var lanes: [String: String] {
+        var laneToMethodName: [String: String] = [:]
+        laneFunctionNames.forEach { name in
             let lowercasedName = name.lowercased()
             if lowercasedName.hasSuffix("lane") {
                 laneToMethodName[lowercasedName] = name
@@ -84,29 +84,29 @@ public class LaneFile: NSObject, LaneFileProtocol {
     }
 
     public static func loadFastfile() {
-        if self.fastfileInstance == nil {
-            let fastfileType: AnyObject.Type = NSClassFromString(self.className())!
+        if fastfileInstance == nil {
+            let fastfileType: AnyObject.Type = NSClassFromString(className())!
             let fastfileAsNSObjectType: NSObject.Type = fastfileType as! NSObject.Type
             let currentFastfileInstance: Fastfile? = fastfileAsNSObjectType.init() as? Fastfile
-            self.fastfileInstance = currentFastfileInstance
+            fastfileInstance = currentFastfileInstance
         }
     }
 
-    public static func runLane(named: String, parameters: [String : String]) -> Bool {
+    public static func runLane(named: String, parameters: [String: String]) -> Bool {
         log(message: "Running lane: \(named)")
-        self.loadFastfile()
+        loadFastfile()
 
         guard let fastfileInstance: Fastfile = self.fastfileInstance else {
-            let message = "Unable to instantiate class named: \(self.className())"
+            let message = "Unable to instantiate class named: \(className())"
             log(message: message)
             fatalError(message)
         }
 
-        let currentLanes = self.lanes
+        let currentLanes = lanes
         let lowerCasedLaneRequested = named.lowercased()
 
         guard let laneMethod = currentLanes[lowerCasedLaneRequested] else {
-            let laneNames = self.laneFunctionNames.map { laneFuctionName in
+            let laneNames = laneFunctionNames.map { laneFuctionName in
                 if laneFuctionName.hasSuffix("lanewithoptions:") {
                     return trimLaneWithOptionsFromName(laneName: laneFuctionName)
                 } else {

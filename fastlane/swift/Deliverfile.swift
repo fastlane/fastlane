@@ -9,13 +9,9 @@
 //
 
 class Deliverfile: DeliverfileProtocol {
-// If you want to enable `deliver`, run `fastlane deliver init`
-// After, this file will be replaced with a custom implementation that contains values you supplied
-// during the `init` process, and you won't see this message
+    // If you want to enable `deliver`, run `fastlane deliver init`
+    // After, this file will be replaced with a custom implementation that contains values you supplied
+    // during the `init` process, and you won't see this message
 }
-
-
-
-
 
 // Generated with fastlane 2.150.3
