@@ -1,3 +1,4 @@
+require 'babosa'
 require 'faraday' # HTTP Client
 require 'faraday-cookie_jar'
 require 'faraday_middleware'
@@ -7,7 +8,6 @@ require 'cgi'
 require 'tempfile'
 
 require 'fastlane/version'
-require_relative 'babosa_fix'
 require_relative 'helper/net_http_generic_request'
 require_relative 'helper/plist_middleware'
 require_relative 'helper/rels_middleware'
