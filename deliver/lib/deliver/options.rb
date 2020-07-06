@@ -165,7 +165,7 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :auto_release_date,
                                      env_name: "DELIVER_AUTO_RELEASE_DATE",
                                      description: "Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)",
-                                     is_string: false,
+                                     type: Integer,
                                      optional: true,
                                      conflicting_options: [:automatic_release],
                                      conflict_block: proc do |value|
