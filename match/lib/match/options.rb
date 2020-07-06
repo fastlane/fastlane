@@ -186,6 +186,10 @@ module Match
                                      env_name: "MATCH_S3_BUCKET",
                                      description: "Name of the S3 bucket",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :s3_object_prefix,
+                                     env_name: "MATCH_S3_OBJECT_PREFIX",
+                                     description: "Prefix to be used on all objects uploaded to S3",
+                                     optional: true),
 
         # Keychain
         FastlaneCore::ConfigItem.new(key: :keychain_name,
