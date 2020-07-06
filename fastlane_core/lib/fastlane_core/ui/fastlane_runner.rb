@@ -205,7 +205,7 @@ module Commander
       ui.error(" - Use Homebrew")
       ui.error("    - update brew with `brew update`")
       ui.error("    - install fastlane using:")
-      ui.error("      - `brew cask install fastlane`")
+      ui.error("      - `brew install fastlane`")
       ui.error(" - Use One-Click-Installer:")
       ui.error("    - download fastlane at https://download.fastlane.tools")
       ui.error("    - extract the archive and double click the `install`")
