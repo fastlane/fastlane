@@ -215,6 +215,10 @@ module Fastlane
       exception_array << "#{e.class}:"
       exception_array << e.backtrace
 
+      ec = e.class
+
+      em = e.message
+
       while e.respond_to?("cause") && (e = e.cause)
         exception_array << "cause: #{e.class}"
         exception_array << e.backtrace
@@ -223,7 +227,9 @@ module Fastlane
       payload = {
         payload: {
           status: "failure",
-          failure_information: exception_array.flatten
+          failure_information: exception_array.flatten,
+          failure_class: ec,
+          failure_message: em
         }
       }
       return JSON.generate(payload)
