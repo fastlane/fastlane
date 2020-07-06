@@ -229,3 +229,6 @@ If you are on multiple App Store Connect teams, iTunes Transporter may need a pr
 ## Use an Application Specific Password to upload
 
 _pilot_/`upload_to_testflight` can use an [Application Specific Password via the `FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD` envirionment variable](https://docs.fastlane.tools/best-practices/continuous-integration/#application-specific-passwords) to upload a binary if both the `skip_waiting_for_build_processing` and `apple_id` options are set. (If any of those are not set, it will use the normal Apple login process that might require 2FA authentication.)
+
+## Role for App Store Connect User
+_pilot_/`upload_to_testflight` updates build information and testers after the build has finished processing. App Store Connect requires the  "App Manager" or "Admin" role for your Apple account to update this information. The "Developer" role will allow builds to be uploaded but _will not_ allow updating of build information and testers.
