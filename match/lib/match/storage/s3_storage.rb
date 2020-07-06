@@ -167,7 +167,7 @@ module Match
       end
 
       def strip_s3_object_prefix(object_path)
-        object_path.gsub(s3_object_prefix, "")
+        object_path.gsub(/^#{s3_object_prefix}/, "")
       end
 
       def sanitize_file_name(file_name)
