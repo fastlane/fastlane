@@ -89,7 +89,7 @@ module Spaceship
       end
 
       #
-      # Age Rating Delcaration
+      # Age Rating Declaration
       #
 
       def fetch_age_rating_declaration
