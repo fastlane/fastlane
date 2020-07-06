@@ -20,7 +20,7 @@ Install _fastlane_ using
 [sudo] gem install fastlane -NV
 ```
 
-or alternatively using `brew cask install fastlane`
+or alternatively using `brew install fastlane`
 
 ### Usage
 
@@ -29,12 +29,15 @@ Navigate to your project folder and run
 ```
 fastlane match appstore
 ```
+
 ```
 fastlane match adhoc
 ```
+
 ```
 fastlane match development
 ```
+
 ```
 fastlane match enterprise
 ```
@@ -51,6 +54,6 @@ This directory contains all your certificates with their private keys
 
 This directory contains all provisioning profiles
 
-------------------------------------
+---
 
 For more information open [fastlane match git repo](https://docs.fastlane.tools/actions/match/)
