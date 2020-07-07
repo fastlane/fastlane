@@ -89,7 +89,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
   spec.add_dependency('bundler', '>= 1.12.0', '< 3.0.0') # Used for fastlane plugins
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
-  spec.add_dependency('jwt', '~> 2.1.0') # Used for generating authentication tokens for AppStore connect api
+  spec.add_dependency('jwt', '>= 2.1.0', '< 3') # Used for generating authentication tokens for App Store Connect API
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
