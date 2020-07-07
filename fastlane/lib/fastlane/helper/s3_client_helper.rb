@@ -54,6 +54,8 @@ module Fastlane
 
       private
 
+      attr_reader :secret_access_key
+
       def client
         @client ||= Aws::S3::Client.new(
           {
@@ -64,11 +66,11 @@ module Fastlane
       end
 
       def create_credentials
-        return nil if access_key.nil? || @secret_access_key.nil?
+        return nil if access_key.nil? || secret_access_key.nil?
 
         Aws::Credentials.new(
           access_key,
-          @secret_access_key
+          secret_access_key
         )
       end
     end
