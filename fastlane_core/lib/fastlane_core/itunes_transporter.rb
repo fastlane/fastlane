@@ -149,14 +149,22 @@ module FastlaneCore
     end
 
     def additional_upload_parameters
-      # Workaround because the traditional transporter broke on 1st March 2018
-      # More information https://github.com/fastlane/fastlane/issues/11958
-      # As there was no communication from Apple, we don't know if this is a temporary
-      # server outage, or something they changed without giving a heads-up
-      if ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"].to_s.length == 0
-        ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV,Signiant"
+      # As Apple recommends in Transporter User Guide we shouldn't specify the -t transport parameter
+      # and instead allow Transporter to use automatic transport discovery
+      # to determine the best transport mode for packages.
+      # It became crucial after WWDC 2020 as it leaded to "Broken pipe (Write failed)" exception
+      # More information https://github.com/fastlane/fastlane/issues/16749
+      env_deliver_additional_params = ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"]
+      if env_deliver_additional_params.to_s.empty?
+        return nil
       end
-      return ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"]
+
+      deliver_additional_params = env_deliver_additional_params.to_s.strip
+      if !deliver_additional_params.include?("-t ")
+        UI.user_error!("Invalid transport parameter")
+      else
+        return deliver_additional_params
+      end
     end
   end
 
