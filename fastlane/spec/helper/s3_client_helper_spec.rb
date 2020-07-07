@@ -1,5 +1,5 @@
 describe Fastlane::Helper::S3ClientHelper do
-  subject { described_class.new }
+  subject { described_class.new(s3_client: instance_double('Aws::S3::Client')) }
 
   describe '#find_bucket!' do
     before { class_double('Aws::S3::Bucket', new: bucket).as_stubbed_const }
