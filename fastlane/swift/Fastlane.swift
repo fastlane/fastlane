@@ -510,7 +510,7 @@ func appstore(username: String,
               submitForReview: Bool = false,
               rejectIfPossible: Bool = false,
               automaticRelease: Bool = false,
-              autoReleaseDate: Any? = nil,
+              autoReleaseDate: Int? = nil,
               phasedRelease: Bool = false,
               resetRatings: Bool = false,
               priceTier: Any? = nil,
@@ -2560,7 +2560,7 @@ func deliver(username: Any = deliverfile.username,
              submitForReview: Bool = deliverfile.submitForReview,
              rejectIfPossible: Bool = deliverfile.rejectIfPossible,
              automaticRelease: Bool = deliverfile.automaticRelease,
-             autoReleaseDate: Any? = deliverfile.autoReleaseDate,
+             autoReleaseDate: Int? = deliverfile.autoReleaseDate,
              phasedRelease: Bool = deliverfile.phasedRelease,
              resetRatings: Bool = deliverfile.resetRatings,
              priceTier: Any? = deliverfile.priceTier,
@@ -4559,6 +4559,7 @@ func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - s3AccessKey: S3 access key
    - s3SecretAccessKey: S3 secret access key
    - s3Bucket: Name of the S3 bucket
+   - s3ObjectPrefix: Prefix to be used on all objects uploaded to S3
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
    - force: Renew the provisioning profiles every time you run match
@@ -4599,6 +4600,7 @@ func match(type: Any = matchfile.type,
            s3AccessKey: Any? = matchfile.s3AccessKey,
            s3SecretAccessKey: Any? = matchfile.s3SecretAccessKey,
            s3Bucket: Any? = matchfile.s3Bucket,
+           s3ObjectPrefix: Any? = matchfile.s3ObjectPrefix,
            keychainName: Any = matchfile.keychainName,
            keychainPassword: Any? = matchfile.keychainPassword,
            force: Bool = matchfile.force,
@@ -4636,6 +4638,7 @@ func match(type: Any = matchfile.type,
                                                                                          RubyCommand.Argument(name: "s3_access_key", value: s3AccessKey),
                                                                                          RubyCommand.Argument(name: "s3_secret_access_key", value: s3SecretAccessKey),
                                                                                          RubyCommand.Argument(name: "s3_bucket", value: s3Bucket),
+                                                                                         RubyCommand.Argument(name: "s3_object_prefix", value: s3ObjectPrefix),
                                                                                          RubyCommand.Argument(name: "keychain_name", value: keychainName),
                                                                                          RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
                                                                                          RubyCommand.Argument(name: "force", value: force),
@@ -5633,7 +5636,7 @@ func resetSimulatorContents(ios: [String]? = nil,
    - shortVersion: Short version string to force resigned ipa to use (`CFBundleShortVersionString`)
    - bundleVersion: Bundle version to force resigned ipa to use (`CFBundleVersion`)
    - bundleId: Set new bundle ID during resign (`CFBundleIdentifier`)
-   - useAppEntitlements: Extract app bundle codesigning entitlements and combine with entitlements from new provisionin profile
+   - useAppEntitlements: Extract app bundle codesigning entitlements and combine with entitlements from new provisioning profile
    - keychainPath: Provide a path to a keychain file that should be used by `/usr/bin/codesign`
  */
 func resign(ipa: String,
@@ -7351,6 +7354,7 @@ func swiftlint(mode: Any = "lint",
    - s3AccessKey: S3 access key
    - s3SecretAccessKey: S3 secret access key
    - s3Bucket: Name of the S3 bucket
+   - s3ObjectPrefix: Prefix to be used on all objects uploaded to S3
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
    - force: Renew the provisioning profiles every time you run match
@@ -7391,6 +7395,7 @@ func syncCodeSigning(type: String = "development",
                      s3AccessKey: String? = nil,
                      s3SecretAccessKey: String? = nil,
                      s3Bucket: String? = nil,
+                     s3ObjectPrefix: String? = nil,
                      keychainName: String = "login.keychain",
                      keychainPassword: String? = nil,
                      force: Bool = false,
@@ -7428,6 +7433,7 @@ func syncCodeSigning(type: String = "development",
                                                                                                      RubyCommand.Argument(name: "s3_access_key", value: s3AccessKey),
                                                                                                      RubyCommand.Argument(name: "s3_secret_access_key", value: s3SecretAccessKey),
                                                                                                      RubyCommand.Argument(name: "s3_bucket", value: s3Bucket),
+                                                                                                     RubyCommand.Argument(name: "s3_object_prefix", value: s3ObjectPrefix),
                                                                                                      RubyCommand.Argument(name: "keychain_name", value: keychainName),
                                                                                                      RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
                                                                                                      RubyCommand.Argument(name: "force", value: force),
@@ -8166,7 +8172,7 @@ func uploadToAppStore(username: String,
                       submitForReview: Bool = false,
                       rejectIfPossible: Bool = false,
                       automaticRelease: Bool = false,
-                      autoReleaseDate: Any? = nil,
+                      autoReleaseDate: Int? = nil,
                       phasedRelease: Bool = false,
                       resetRatings: Bool = false,
                       priceTier: Any? = nil,
@@ -8827,7 +8833,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-11.4.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-11.5.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false) {
     let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                         RubyCommand.Argument(name: "project", value: project),
@@ -8971,4 +8977,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.74]
+// FastlaneRunnerAPIVersion [0.9.75]
