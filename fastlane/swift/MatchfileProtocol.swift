@@ -74,6 +74,9 @@ protocol MatchfileProtocol: class {
     /// Name of the S3 bucket
     var s3Bucket: String? { get }
 
+    /// Prefix to be used on all objects uploaded to S3
+    var s3ObjectPrefix: String? { get }
+
     /// Keychain the items should be imported to
     var keychainName: String { get }
 
@@ -137,6 +140,7 @@ extension MatchfileProtocol {
     var s3AccessKey: String? { return nil }
     var s3SecretAccessKey: String? { return nil }
     var s3Bucket: String? { return nil }
+    var s3ObjectPrefix: String? { return nil }
     var keychainName: String { return "login.keychain" }
     var keychainPassword: String? { return nil }
     var force: Bool { return false }
@@ -153,4 +157,4 @@ extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.18]
+// FastlaneRunnerAPIVersion [0.9.19]

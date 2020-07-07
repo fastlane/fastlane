@@ -60,7 +60,7 @@ protocol DeliverfileProtocol: class {
     var automaticRelease: Bool { get }
 
     /// Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)
-    var autoReleaseDate: String? { get }
+    var autoReleaseDate: Int? { get }
 
     /// Enable the phased release feature of iTC
     var phasedRelease: Bool { get }
@@ -201,7 +201,7 @@ extension DeliverfileProtocol {
     var submitForReview: Bool { return false }
     var rejectIfPossible: Bool { return false }
     var automaticRelease: Bool { return false }
-    var autoReleaseDate: String? { return nil }
+    var autoReleaseDate: Int? { return nil }
     var phasedRelease: Bool { return false }
     var resetRatings: Bool { return false }
     var priceTier: String? { return nil }
@@ -245,4 +245,4 @@ extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.21]
+// FastlaneRunnerAPIVersion [0.9.22]
