@@ -216,6 +216,17 @@ describe FastlaneCore do
           after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
         end
 
+        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set to empty string" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(email, password)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command)
+          end
+
+          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+        end
+
         describe "download command generation" do
           it 'generates a call to java directly' do
             transporter = FastlaneCore::ItunesTransporter.new(email, password)
@@ -379,6 +390,17 @@ describe FastlaneCore do
         after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
       end
 
+      describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set to empty string" do
+        before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+        it 'generates a call to java directly' do
+          transporter = FastlaneCore::ItunesTransporter.new(email, password)
+          expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
+        end
+
+        after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+      end
+
       describe "download command generation" do
         it 'generates a call to the shell script' do
           transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
@@ -420,6 +442,17 @@ describe FastlaneCore do
         after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
       end
 
+      describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set with empty string" do
+        before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+        it 'generates a call to java directly' do
+          transporter = FastlaneCore::ItunesTransporter.new(email, password)
+          expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command_9)
+        end
+
+        after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+      end
+
       describe "download command generation" do
         it 'generates a call to java directly' do
           transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
@@ -449,6 +482,17 @@ describe FastlaneCore do
         it 'generates a call to java directly' do
           transporter = FastlaneCore::ItunesTransporter.new(email, password)
           expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command(transporter: "-t DAV,Signiant"))
+        end
+
+        after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+      end
+
+      describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set with empty string" do
+        before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+        it 'generates a call to java directly' do
+          transporter = FastlaneCore::ItunesTransporter.new(email, password)
+          expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command)
         end
 
         after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }

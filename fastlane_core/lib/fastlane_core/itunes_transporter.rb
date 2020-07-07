@@ -155,7 +155,7 @@ module FastlaneCore
       # It became crucial after WWDC 2020 as it leaded to "Broken pipe (Write failed)" exception
       # More information https://github.com/fastlane/fastlane/issues/16749
       env_deliver_additional_params = ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"]
-      if env_deliver_additional_params.to_s.empty?
+      if env_deliver_additional_params.to_s.strip.empty?
         return nil
       end
 
