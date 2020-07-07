@@ -16,18 +16,22 @@ describe Match do
         path = Dir.mktmpdir # to have access to the actual path
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+        git_branch = "master"
         shallow_clone = true
-        command = "git clone #{git_url.shellescape} #{path.shellescape} --depth 1 --no-single-branch"
-        to_params = {
-          command: command,
-          print_all: nil,
-          print_command: nil
-        }
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
+        expected_commands = [
+          "git clone #{git_url.shellescape} #{path.shellescape} --depth 1 --no-single-branch",
+          "git --no-pager branch --list origin/#{git_branch} --no-color -r",
+          "git checkout --orphan #{git_branch}",
+          "git reset --hard"
+        ]
+        expected_commands.each do |command|
+          expect(FastlaneCore::CommandExecutor).to receive(:execute).once.with({
+            command: command,
+            print_all: nil,
+            print_command: nil
+          }).and_return("")
+        end
 
         storage = Match::Storage::GitStorage.new(
           git_url: git_url,
@@ -43,18 +47,22 @@ describe Match do
         path = Dir.mktmpdir # to have access to the actual path
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+        git_branch = "master"
         shallow_clone = false
-        command = "git clone #{git_url.shellescape} #{path.shellescape}"
-        to_params = {
-          command: command,
-          print_all: nil,
-          print_command: nil
-        }
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
+        expected_commands = [
+          "git clone #{git_url.shellescape} #{path.shellescape}",
+          "git --no-pager branch --list origin/#{git_branch} --no-color -r",
+          "git checkout --orphan #{git_branch}",
+          "git reset --hard"
+        ]
+        expected_commands.each do |command|
+          expect(FastlaneCore::CommandExecutor).to receive(:execute).once.with({
+            command: command,
+            print_all: nil,
+            print_command: nil
+          }).and_return("")
+        end
 
         storage = Match::Storage::GitStorage.new(
           git_url: git_url,
@@ -104,6 +112,7 @@ describe Match do
         path = Dir.mktmpdir # to have access to the actual path
         expect(Dir).to receive(:mktmpdir).and_return(path)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+        git_branch = "master"
         random_file = "random_file"
 
         storage = Match::Storage::GitStorage.new(
@@ -115,11 +124,14 @@ describe Match do
         )
 
         expected_commands = [
+          "git clone #{git_url.shellescape} #{path.shellescape}",
+          "git --no-pager branch --list origin/#{git_branch} --no-color -r",
+          "git checkout --orphan #{git_branch}",
+          "git reset --hard",
           "git add #{random_file}",
           "git add match_version.txt",
           "git commit -m " + '[fastlane] Updated appstore and platform ios'.shellescape,
-          "git push origin master",
-          "git clone #{git_url.shellescape} #{path.shellescape}"
+          "git push origin #{git_branch}"
         ]
 
         expected_commands.each do |command|
