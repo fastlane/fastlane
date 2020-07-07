@@ -24,6 +24,11 @@ module Fastlane
       end
 
       def self.setup_keychain
+        unless Helper.mac?
+          UI.message("Skipping Keychain setup on non-macOS CI Agent")
+          return
+        end
+
         unless ENV["MATCH_KEYCHAIN_NAME"].nil?
           UI.message("Skipping Keychain setup as a keychain was already specified")
           return
