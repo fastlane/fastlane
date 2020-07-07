@@ -1,6 +1,5 @@
 describe Fastlane do
   describe Fastlane::Actions::SetupCiAction do
-    is_macos_env = RUBY_PLATFORM.downcase.include?("darwin")
     describe "#run" do
       context "when it should run" do
         before do
@@ -8,28 +7,45 @@ describe Fastlane do
           allow(Fastlane::Actions::CreateKeychainAction).to receive(:run).and_return(nil)
         end
 
-        it "calls setup_keychain after setup_output_paths if :provider is set to circleci on Mac Agents" do
-          if is_macos_env
+        describe "calls setup_keychain after setup_output_paths if :provider is set to circleci on Mac Agents" do
+          it "runs on Mac" do
+            allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+
             # Message is asserted in reverse order, hence output of setup_output_paths is expected last
             expect(Fastlane::UI).to receive(:message).with("Enabling match readonly mode.")
             expect(Fastlane::UI).to receive(:message).with("Creating temporary keychain: \"fastlane_tmp_keychain\".")
             expect(Fastlane::UI).to receive(:message).with("Skipping Log Path setup as FL_OUTPUT_DIR is unset")
-          else
+
+            described_class.run(provider: "circleci")
+          end
+
+          it "skips on linux" do
+            allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
             expect(Fastlane::UI).to receive(:message).with("Skipping Log Path setup as FL_OUTPUT_DIR is unset")
             expect(Fastlane::UI).to receive(:message).with("Skipping Keychain setup on non-macOS CI Agent")
+
+            described_class.run(provider: "circleci")
           end
-          described_class.run(provider: "circleci")
         end
 
-        it "calls setup_keychain if no provider is be detected on Mac Agents" do
-          if is_macos_env
+        describe "calls setup_keychain if no provider is be detected on Mac Agents" do
+          it "runs on Mac" do
+            allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+
             expect(Fastlane::UI).to receive(:message).with("Enabling match readonly mode.")
             expect(Fastlane::UI).to receive(:message).with("Creating temporary keychain: \"fastlane_tmp_keychain\".")
-          else
-            expect(Fastlane::UI).to receive(:message).with("Skipping Keychain setup on non-macOS CI Agent")
+
+            described_class.run(force: true)
           end
 
-          described_class.run(force: true)
+          it "skips on linux" do
+            allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+            expect(Fastlane::UI).to receive(:message).with("Skipping Keychain setup on non-macOS CI Agent")
+
+            described_class.run(force: true)
+          end
         end
       end
     end
@@ -104,11 +120,12 @@ describe Fastlane do
         end
       end
 
-      if is_macos_env
-        describe "Setting up the environment" do
+      describe "Setting up the environment" do
+        context "when operating system is macOS" do
           before do
             stub_const("ENV", {})
             allow(Fastlane::Actions::CreateKeychainAction).to receive(:run).and_return(nil)
+            allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
           end
 
           it "sets the MATCH_KEYCHAIN_NAME env var" do
@@ -126,9 +143,12 @@ describe Fastlane do
             expect(ENV["MATCH_READONLY"]).to eql("true")
           end
         end
-      else
+
         context "when operating system is not macOS" do
           it "skips the setup process" do
+            stub_const("ENV", {})
+            allow(Fastlane::Actions::CreateKeychainAction).to receive(:run).and_return(nil)
+            allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
             expect(Fastlane::UI).to receive(:message).with("Skipping Keychain setup on non-macOS CI Agent")
             described_class.setup_keychain
           end

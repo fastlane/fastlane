@@ -2,8 +2,6 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Setup Travis Integration" do
       let(:tmp_keychain_name) { "fastlane_tmp_keychain" }
-      is_macos_env = RUBY_PLATFORM.downcase.include?("darwin")
-      expected_test_result = is_macos_env ? 'works on MacOS Environment' : 'skips outside MacOS Environment'
 
       def check_keychain_nil
         expect(ENV["MATCH_KEYCHAIN_NAME"]).to be_nil
@@ -18,6 +16,7 @@ describe Fastlane do
       end
 
       it "doesn't work outside CI" do
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
         stub_const("ENV", {})
 
         expect(UI).to receive(:message).with("Not running on CI, skipping CI setup")
@@ -29,7 +28,21 @@ describe Fastlane do
         check_keychain_nil
       end
 
-      it "#{expected_test_result} when forced" do
+      it "skips outside macOS CI agent" do
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+        stub_const("ENV", { "TRAVIS" => "true" })
+
+        expect(UI).to receive(:message).with("Skipping Keychain setup on non-macOS CI Agent")
+
+        Fastlane::FastFile.new.parse("lane :test do
+          setup_travis
+        end").runner.execute(:test)
+
+        check_keychain_nil
+      end
+
+      it "works on MacOS Environment when forced" do
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
         stub_const("ENV", {})
 
         Fastlane::FastFile.new.parse("lane :test do
@@ -38,17 +51,13 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        if is_macos_env
-          check_keychain_created
-        else
-          check_keychain_nil
-        end
+        check_keychain_created
       end
 
-      it "#{expected_test_result} inside CI" do
-        if is_macos_env
-          expect(Fastlane::Actions::CreateKeychainAction).to receive(:run).with(
-            {
+      it "works on MacOS Environment inside CI" do
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        expect(Fastlane::Actions::CreateKeychainAction).to receive(:run).with(
+          {
               name: tmp_keychain_name,
               default_keychain: true,
               unlock: true,
@@ -56,9 +65,8 @@ describe Fastlane do
               lock_when_sleeps: true,
               password: "",
               add_to_search_list: true
-            }
-          )
-        end
+          }
+        )
 
         stub_const("ENV", { "TRAVIS" => "true" })
 
@@ -66,11 +74,7 @@ describe Fastlane do
           setup_travis
         end").runner.execute(:test)
 
-        if is_macos_env
-          check_keychain_created
-        else
-          check_keychain_nil
-        end
+        check_keychain_created
       end
     end
   end
