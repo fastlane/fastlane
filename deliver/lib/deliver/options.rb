@@ -165,11 +165,17 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :auto_release_date,
                                      env_name: "DELIVER_AUTO_RELEASE_DATE",
                                      description: "Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)",
-                                     is_string: false,
+                                     type: Integer,
                                      optional: true,
                                      conflicting_options: [:automatic_release],
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'auto_release_date' and '#{value.key}' options together.")
+                                     end,
+                                     verify_block: proc do |value|
+                                       now_in_ms = Time.now.to_i * 1000
+                                       if value < now_in_ms
+                                         UI.user_error!("'#{value}' needs to be in the future and in milliseonds (current time is '#{now_in_ms}')")
+                                       end
                                      end),
         FastlaneCore::ConfigItem.new(key: :phased_release,
                                      env_name: "DELIVER_PHASED_RELEASE",
