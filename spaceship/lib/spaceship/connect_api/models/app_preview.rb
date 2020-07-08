@@ -70,7 +70,7 @@ module Spaceship
         preview = Spaceship::ConnectAPI.post_app_preview(
           app_preview_set_id: app_preview_set_id,
           attributes: post_attributes
-        ).to_models.first
+        ).first
 
         # Upload the file
         upload_operations = preview.upload_operations
@@ -86,7 +86,7 @@ module Spaceship
           preview = Spaceship::ConnectAPI.patch_app_preview(
             app_preview_id: preview.id,
             attributes: patch_attributes
-          ).to_models.first
+          ).first
         rescue => error
           puts("Failed to patch app preview. Update may have gone through so verifying") if Spaceship::Globals.verbose?
 
@@ -119,7 +119,7 @@ module Spaceship
       end
 
       def update(attributes: nil)
-        Spaceship::ConnectAPI.patch_app_preview(app_preview_id: id, attributes: attributes)
+        Spaceship::ConnectAPI.patch_app_preview(app_preview_id: id, attributes: attributes).first
       end
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
