@@ -74,7 +74,6 @@ module Spaceship
 
         @client ||= Faraday.new(options) do |c|
           c.response(:json, content_type: /\bjson$/)
-          c.response(:xml, content_type: /\bxml$/)
           c.response(:plist, content_type: /\bplist$/)
           c.adapter(Faraday.default_adapter)
 
