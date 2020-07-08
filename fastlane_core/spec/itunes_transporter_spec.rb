@@ -164,10 +164,11 @@ describe FastlaneCore do
 
     def xcrun_upload_command(provider_short_name: nil, transporter: nil)
       [
+        "ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}",
         "xcrun iTMSTransporter",
         "-m upload",
         "-u #{email.shellescape}",
-        "-p #{password.shellescape}",
+        "-p @env:ITMS_TRANSPORTER_PASSWORD",
         "-f /tmp/my.app.id.itmsp",
         (transporter.to_s if transporter),
         "-k 100000",
@@ -178,10 +179,11 @@ describe FastlaneCore do
 
     def xcrun_download_command(provider_short_name = nil)
       [
+        "ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}",
         "xcrun iTMSTransporter",
         '-m lookupMetadata',
         "-u #{email.shellescape}",
-        "-p #{password.shellescape}",
+        "-p @env:ITMS_TRANSPORTER_PASSWORD",
         '-apple_id my.app.id',
         '-destination /tmp',
         ("-itc_provider #{provider_short_name}" if provider_short_name),
