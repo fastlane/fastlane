@@ -249,10 +249,11 @@ module FastlaneCore
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "")
       if Helper.mac? && Helper.xcode_at_least?(11)
         [
+          "ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}",
           'xcrun iTMSTransporter',
           '-m upload',
           "-u #{username.shellescape}",
-          "-p #{password.shellescape}",
+          "-p @env:ITMS_TRANSPORTER_PASSWORD",
           "-f #{source.shellescape}",
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
@@ -285,10 +286,11 @@ module FastlaneCore
     def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "")
       if Helper.mac? && Helper.xcode_at_least?(11)
         [
+          "ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}",
           'xcrun iTMSTransporter',
           '-m lookupMetadata',
           "-u #{username.shellescape}",
-          "-p #{password.shellescape}",
+          "-p @env:ITMS_TRANSPORTER_PASSWORD",
           "-apple_id #{apple_id.shellescape}",
           "-destination #{destination.shellescape}",
           ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
@@ -319,10 +321,11 @@ module FastlaneCore
     def build_provider_ids_command(username, password)
       if Helper.mac? && Helper.xcode_at_least?(11)
         [
+          "ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}",
           'xcrun iTMSTransporter',
           '-m provider',
           "-u #{username.shellescape}",
-          "-p #{password.shellescape}",
+          "-p @env:ITMS_TRANSPORTER_PASSWORD",
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ')
       else
