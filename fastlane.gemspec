@@ -116,7 +116,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rubocop-require_tools', '>= 0.1.2')
   spec.add_development_dependency('rb-readline') # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency('rest-client', '>= 1.8.0')
-  spec.add_development_dependency('fakefs', '~> 0.8.1')
+  spec.add_development_dependency('fakefs', '~> 1.2.1')
   spec.add_development_dependency('sinatra', '~> 2.0.8') # Used for mock servers
   spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
   spec.add_development_dependency('climate_control', '~> 0.2.0')
