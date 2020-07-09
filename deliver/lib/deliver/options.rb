@@ -292,7 +292,7 @@ module Deliver
                                      deprecated: "Removed after the migration to the new App Store Connect API in June 2020",
                                      is_string: false,
                                      type: Array,
-                                     default_value: []),
+                                     optional: true),
 
         # Non Localised
         FastlaneCore::ConfigItem.new(key: :app_icon,
