@@ -123,7 +123,7 @@ module Deliver
           "    add_id_info_serves_ads: false,",
           "    add_id_info_tracks_install: true,",
           "    add_id_info_tracks_action: true,",
-          "    add_id_info_limits_tracking: true,",
+          "    add_id_info_limits_tracking: true",
           "  }",
           "  Example CLI:",
           "    --submission_information \"{\\\"add_id_info_uses_idfa\\\": false}\""
