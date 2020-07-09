@@ -17,7 +17,7 @@ module Spaceship
       attr_accessor :video_url
       attr_accessor :preview_image
       attr_accessor :upload_operations
-      attr_accessor :asset_deliver_state
+      attr_accessor :asset_delivery_state
       attr_accessor :upload
 
       attr_mapping({

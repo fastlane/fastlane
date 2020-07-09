@@ -112,7 +112,7 @@ module Deliver
         UI.important("Set env DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING=true to skip waiting for screenshots to process")
       else
         UI.important("Skipping the wait for screenshot image processing (which may affect submission)")
-        UI.important("Set env DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING=false to skip waiting for screenshots to process")
+        UI.important("Set env DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING=false to wait for screenshots to process")
       end
 
       # Upload screenshots
