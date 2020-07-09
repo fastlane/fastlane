@@ -27,6 +27,11 @@ Upon your first pull request to _fastlane_, the [googlebot](https://github.com/g
 
 Please be aware that we don’t accept submissions for new actions at the moment. You can find more information about that [here][submit action].
 
+### Updating Auto-Generated Swift API
+
+If your changes update any interface, documentation or behavior of _fastlane_ APIs, it's very likely these changes will require updating the Swift APIs.
+You can update the auto-generated Swift APIs by running `bundle exec fastlane generate_swift_api`. Commit the changes generated and include them in your PR.
+
 ## I want to help work on _fastlane_ by reviewing issues and PRs
 
 Thanks! We would really appreciate the help! Feel free to read our document on how to [respond to issues and PRs][responding to prs] and also check out how to become a [core contributor][core contributor].
