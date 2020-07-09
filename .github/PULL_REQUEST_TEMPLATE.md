@@ -5,7 +5,6 @@
 - [ ] I've followed the _fastlane_ code style and run `bundle exec rubocop -a` to ensure the code style is valid
 - [ ] I've read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
 - [ ] I've updated the documentation if necessary.
-- [ ] I've run `bundle exec fastlane generate_swift_api` if necessary.
 
 ### Motivation and Context
 <!-- Why is this change required? What problem does it solve? -->
