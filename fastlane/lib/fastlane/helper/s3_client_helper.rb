@@ -66,7 +66,7 @@ module Fastlane
       end
 
       def create_credentials
-        return nil if access_key.blank? || secret_access_key.blank?
+        return nil if access_key.to_s.empty? || secret_access_key.to_s.empty?
 
         Aws::Credentials.new(
           access_key,
