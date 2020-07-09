@@ -271,7 +271,7 @@ module Deliver
           next if k.nil? || v.nil?
           next if k == v
           has_mapped_values = true
-          UI.deprecated("Category '#{k}' from iTunesConnect as been deprecated. Please replace with '#{v}'")
+          UI.deprecated("Category '#{k}' from iTunesConnect has been deprecated. Please replace with '#{v}'")
         end
         UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
 
@@ -610,7 +610,7 @@ module Deliver
         next if k.nil? || v.nil?
         next if k == v
         has_mapped_values = true
-        UI.deprecated("Age rating '#{k}' from iTunesConnect as been deprecated. Please replace with '#{v}'")
+        UI.deprecated("Age rating '#{k}' from iTunesConnect has been deprecated. Please replace with '#{v}'")
       end
       UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
 
