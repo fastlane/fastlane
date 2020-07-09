@@ -181,6 +181,24 @@ module Spaceship
                .last
       end
 
+      def get_in_review_app_store_version(platform: nil, includes: nil)
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          appStoreState: [Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::IN_REVIEW].join(","),
+          platform: platform
+        }
+        return get_app_store_versions(filter: filter, includes: includes).first
+      end
+
+      def get_pending_release_app_store_version(platform: nil, includes: nil)
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          appStoreState: [Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_DEVELOPER_RELEASE].join(","),
+          platform: platform
+        }
+        return get_app_store_versions(filter: filter, includes: includes).first
+      end
+
       def get_app_store_versions(filter: {}, includes: nil, limit: nil, sort: nil)
         resps = Spaceship::ConnectAPI.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
