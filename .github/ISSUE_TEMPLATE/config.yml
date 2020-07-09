@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Feature Request
+  - name: 🚀 Feature Request
     url: https://github.com/fastlane/fastlane/discussions/new
     about: Share ideas for new features
-  - name: Ask a Question
+  - name: ❓ Ask a Question
     url: https://github.com/fastlane/fastlane/discussions/new
     about: Ask the community for help
