@@ -1,8 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Issue: 🐛 Bug Report
-    url: https://github.com/fastlane/fastlane/issues/new?template=BUG_REPORT.md
-    about: If something isn't working as expected 🤔
   - name: Feature Request
     url: https://github.com/fastlane/fastlane/discussions/new
     about: Share ideas for new features
