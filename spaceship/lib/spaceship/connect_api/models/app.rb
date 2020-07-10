@@ -155,7 +155,7 @@ module Spaceship
       def get_live_app_store_version(platform: nil, includes: nil)
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: [Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE].join(","),
+          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
           platform: platform
         }
         return get_app_store_versions(filter: filter, includes: includes).first
@@ -184,7 +184,7 @@ module Spaceship
       def get_in_review_app_store_version(platform: nil, includes: nil)
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: [Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::IN_REVIEW].join(","),
+          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::IN_REVIEW,
           platform: platform
         }
         return get_app_store_versions(filter: filter, includes: includes).first
@@ -193,7 +193,7 @@ module Spaceship
       def get_pending_release_app_store_version(platform: nil, includes: nil)
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: [Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_DEVELOPER_RELEASE].join(","),
+          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_DEVELOPER_RELEASE,
           platform: platform
         }
         return get_app_store_versions(filter: filter, includes: includes).first
