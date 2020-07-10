@@ -5,15 +5,23 @@ module Fastlane
         require 'pilot'
         require 'pilot/options'
 
+        distribute_only = values[:distribute_only]
+
         changelog = Actions.lane_context[SharedValues::FL_CHANGELOG]
         values[:changelog] ||= changelog if changelog
 
-        values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
-        values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
+        unless distribute_only
+          values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+          values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
+        end
 
         return values if Helper.test?
 
-        Pilot::BuildManager.new.upload(values) # we already have the finished config
+        if distribute_only
+          Pilot::BuildManager.new.distribute(values) # we already have the finished config
+        else
+          Pilot::BuildManager.new.upload(values) # we already have the finished config
+        end
       end
 
       #####################################################
