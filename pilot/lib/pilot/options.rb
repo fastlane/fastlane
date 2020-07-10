@@ -146,6 +146,12 @@ module Pilot
                                      default_value: false),
 
         # distribution
+        FastlaneCore::ConfigItem.new(key: :distribute_only,
+                                     short_option: "-D",
+                                     env_name: "PILOT_DISTRIBUTE_ONLY",
+                                     description: "Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)",
+                                     default_value: false,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :uses_non_exempt_encryption,
                                      short_option: "-X",
                                      env_name: "PILOT_USES_NON_EXEMPT_ENCRYPTION",
