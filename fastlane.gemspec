@@ -76,7 +76,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency('commander-fastlane', '>= 4.4.6', '< 5.0.0') # CLI parser
   spec.add_dependency('excon', '>= 0.71.0', '< 1.0.0') # Great HTTP Client
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
-  spec.add_dependency('faraday', '>= 0.17', '< 2.0') # Used for deploygate, hockey and testfairy actions
+  # The faraday gem is used for deploygate, hockey and testfairy actions.
+  # Locked under 1.0 until webmock 3.6.0 can be used to handle empty array
+  # parameters https://github.com/bblimke/webmock/blob/master/CHANGELOG.md#360,
+  # probably.
+  spec.add_dependency('faraday', '>= 0.17', '< 1.0')
   spec.add_dependency('faraday_middleware', '>= 0.13.1', '< 2.0') # Same as faraday
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
