@@ -26,14 +26,15 @@ desc "Verifies source code is in a good state"
 lane :lint_source do
   # Verifying that no debug code is in the code base
   #
-  ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: ["\.bundle"]) # debugging code
-  ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: ["\.bundle"]) # TODOs
-  ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: ["\.bundle"]) # rspec focus
-  ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: ["\.bundle"]) # Merge conflict
+  exclude_dirs = ["\.bundle", "*/vendor/bundle"]
+  ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: exclude_dirs) # debugging code
+  ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: exclude_dirs) # TODOs
+  ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: exclude_dirs) # rspec focus
+  ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: exclude_dirs) # Merge conflict
 
   # spaceship and credentials_manager don't have access to fastlane_core
-  ensure_no_debug_code(text: " UI\\.", path: "spaceship/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
-  ensure_no_debug_code(text: " UI\\.", path: "credentials_manager/lib", extension: ".rb", exclude_dirs: ["\.bundle"])
+  ensure_no_debug_code(text: " UI\\.", path: "spaceship/lib", extension: ".rb", exclude_dirs: exclude_dirs)
+  ensure_no_debug_code(text: " UI\\.", path: "credentials_manager/lib", extension: ".rb", exclude_dirs: exclude_dirs)
 
   rubocop(step_name: 'policekeeping_the_code_with_rubocop')
 
