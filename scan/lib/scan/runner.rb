@@ -39,12 +39,7 @@ module Scan
         end
       end
 
-      # We call this method, to be sure that all other simulators are killed
-      # And a correct one is freshly launched. Switching between multiple simulator
-      # in case the user specified multiple targets works with no issues
-      # This way it's okay to just call it for the first simulator we're using for
-      # the first test run
-      FastlaneCore::Simulator.launch(Scan.devices.first) if Scan.devices && Scan.config[:prelaunch_simulator]
+      prelaunch_simulators
 
       if Scan.config[:reinstall_app]
         app_identifier = Scan.config[:app_identifier]
@@ -163,6 +158,24 @@ module Scan
       cmd = "cat #{@test_command_generator.xcodebuild_log_path.shellescape} | xcpretty #{reporter_options.join(' ')} #{xcpretty_args_options} &> /dev/null"
       system(cmd)
       File.read(Scan.cache[:temp_junit_report])
+    end
+
+    def prelaunch_simulators
+      return unless Scan.devices.to_a.size > 0 # no devices selected, no sims to launch
+
+      # Return early unless the user wants to prelaunch simulators. Or if the user wants simulator logs
+      # then we must prelaunch simulators because Xcode's headless
+      # mode launches and shutsdown the simulators before we can collect the logs.
+      return unless Scan.config[:prelaunch_simulator] || Scan.config[:include_simulator_logs]
+
+      devices_to_shutdown = []
+      Scan.devices.each do |device|
+        devices_to_shutdown << device if device.state == "Shutdown"
+        device.boot
+      end
+      at_exit do
+        devices_to_shutdown.each(&:shutdown)
+      end
     end
 
     def copy_simulator_logs
