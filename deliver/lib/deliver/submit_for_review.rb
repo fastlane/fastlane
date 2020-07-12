@@ -125,6 +125,7 @@ module Deliver
           "    add_id_info_tracks_action: true,",
           "    add_id_info_limits_tracking: true",
           "  }",
+          "Note: If application uses IDFA, deliver automatically set the mandatory \"add_id_info_limits_tracking\" value to \"true\" always (agreement)",
           "  Example CLI:",
           "    --submission_information \"{\\\"add_id_info_uses_idfa\\\": false}\""
         ].join("\n")
@@ -141,7 +142,8 @@ module Deliver
         end
       elsif uses_idfa == true
         attributes = {
-          honorsLimitedAdTracking: !!submission_information[:add_id_info_limits_tracking],
+          # Application uses IDFA, before sending for submission limitsTracking key in the request JSON must be set to true (agreement).
+          honorsLimitedAdTracking: true,
           servesAds: !!submission_information[:add_id_info_serves_ads],
           attributesAppInstallationToPreviousAd: !!submission_information[:add_id_info_tracks_install],
           attributesActionWithPreviousAd: !!submission_information[:add_id_info_tracks_action]
