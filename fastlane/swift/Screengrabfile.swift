@@ -8,7 +8,7 @@
 //  new group so that it won't be marked for upgrade
 //
 
-class Screengrabfile: ScreengrabfileProtocol {
+public class Screengrabfile: ScreengrabfileProtocol {
     // If you want to enable `screengrab`, run `fastlane screengrab init`
     // After, this file will be replaced with a custom implementation that contains values you supplied
     // during the `init` process, and you won't see this message

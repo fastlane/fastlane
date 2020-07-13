@@ -8,7 +8,7 @@
 //  new group so that it won't be marked for upgrade
 //
 
-class Scanfile: ScanfileProtocol {
+public class Scanfile: ScanfileProtocol {
     // If you want to enable `scan`, run `fastlane scan init`
     // After, this file will be replaced with a custom implementation that contains values you supplied
     // during the `init` process, and you won't see this message

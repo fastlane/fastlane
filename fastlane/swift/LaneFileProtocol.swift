@@ -16,7 +16,7 @@ import Foundation
 
 public protocol LaneFileProtocol: class {
     var fastlaneVersion: String { get }
-    static func runLane(named: String, parameters: [String: String]) -> Bool
+    static func runLane(from fastfile: LaneFile?, named: String, parameters: [String: String]) -> Bool
 
     func recordLaneDescriptions()
     func beforeAll()
@@ -33,8 +33,8 @@ public extension LaneFileProtocol {
 }
 
 @objcMembers
-public class LaneFile: NSObject, LaneFileProtocol {
-    private(set) static var fastfileInstance: Fastfile?
+open class LaneFile: NSObject, LaneFileProtocol {
+    private(set) static var fastfileInstance: LaneFile?
 
     // Called before any lane is executed.
     private func setupAllTheThings() {
@@ -52,7 +52,11 @@ public class LaneFile: NSObject, LaneFileProtocol {
     private static var laneFunctionNames: [String] {
         var lanes: [String] = []
         var methodCount: UInt32 = 0
-        let methodList = class_copyMethodList(self, &methodCount)
+        #if !SWIFT_PACKAGE
+            let methodList = class_copyMethodList(self, &methodCount)
+        #else
+            let methodList = class_copyMethodList(type(of: fastfileInstance!), &methodCount)
+        #endif
         for i in 0 ..< Int(methodCount) {
             let selName = sel_getName(method_getName(methodList![i]))
             let name = String(cString: selName)
@@ -92,16 +96,25 @@ public class LaneFile: NSObject, LaneFileProtocol {
         }
     }
 
-    public static func runLane(named: String, parameters: [String: String]) -> Bool {
+    public static func runLane(from fastfile: LaneFile?, named: String, parameters: [String: String]) -> Bool {
         log(message: "Running lane: \(named)")
-        loadFastfile()
+        #if !SWIFT_PACKAGE
+            loadFastfile()
+        #endif
 
-        guard let fastfileInstance: Fastfile = self.fastfileInstance else {
-            let message = "Unable to instantiate class named: \(className())"
-            log(message: message)
-            fatalError(message)
-        }
-
+        #if !SWIFT_PACKAGE
+            guard let fastfileInstance: LaneFile = self.fastfileInstance else {
+                let message = "Unable to instantiate class named: \(className())"
+                log(message: message)
+                fatalError(message)
+            }
+        #else
+            guard let fastfileInstance: LaneFile = fastfile else {
+                log(message: "Found nil instance of fastfile")
+                preconditionFailure()
+            }
+        #endif
+        self.fastfileInstance = fastfile!
         let currentLanes = lanes
         let lowerCasedLaneRequested = named.lowercased()
 

@@ -1,5 +1,5 @@
 //
-//  main.swift
+//  mainn.swift
 //  FastlaneSwiftRunner
 //
 //  Created by Joshua Liebowitz on 8/26/17.
@@ -24,7 +24,7 @@ class MainProcess {
     @objc func connectToFastlaneAndRunLane() {
         runner.startSocketThread(port: argumentProcessor.port)
 
-        let completedRun = Fastfile.runLane(named: argumentProcessor.currentLane, parameters: argumentProcessor.laneParameters())
+        let completedRun = Fastfile.runLane(from: nil, named: argumentProcessor.currentLane, parameters: argumentProcessor.laneParameters())
         if completedRun {
             runner.disconnectFromFastlaneProcess()
         }

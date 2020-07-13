@@ -1,4 +1,4 @@
-protocol ScreengrabfileProtocol: class {
+public protocol ScreengrabfileProtocol: class {
     /// Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx
     var androidHome: String? { get }
 
@@ -66,7 +66,7 @@ protocol ScreengrabfileProtocol: class {
     var adbHost: String? { get }
 }
 
-extension ScreengrabfileProtocol {
+public extension ScreengrabfileProtocol {
     var androidHome: String? { return nil }
     var buildToolsVersion: String? { return nil }
     var locales: [String] { return ["en-US"] }
@@ -93,4 +93,4 @@ extension ScreengrabfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.22]
+// FastlaneRunnerAPIVersion [0.9.30]
