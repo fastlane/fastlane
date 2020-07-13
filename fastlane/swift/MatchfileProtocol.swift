@@ -1,4 +1,4 @@
-protocol MatchfileProtocol: class {
+public protocol MatchfileProtocol: class {
     /// Define the profile type, can be appstore, adhoc, development, enterprise, developer_id
     var type: String { get }
 
@@ -114,7 +114,7 @@ protocol MatchfileProtocol: class {
     var verbose: Bool { get }
 }
 
-extension MatchfileProtocol {
+public extension MatchfileProtocol {
     var type: String { return "development" }
     var additionalCertTypes: [String]? { return nil }
     var readonly: Bool { return false }
@@ -157,4 +157,4 @@ extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.21]
+// FastlaneRunnerAPIVersion [0.9.29]

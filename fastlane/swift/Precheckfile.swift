@@ -8,7 +8,7 @@
 //  new group so that it won't be marked for upgrade
 //
 
-class Precheckfile: PrecheckfileProtocol {
+public class Precheckfile: PrecheckfileProtocol {
     // If you want to enable `precheck`, run `fastlane precheck init`
     // After, this file will be replaced with a custom implementation that contains values you supplied
     // during the `init` process, and you won't see this message

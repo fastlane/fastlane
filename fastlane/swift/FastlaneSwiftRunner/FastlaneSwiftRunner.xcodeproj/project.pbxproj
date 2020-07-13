@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0311E387230AC1B20060BB5C /* Plugins.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0311E386230AC1B20060BB5C /* Plugins.swift */; };
 		0311E38B230AC9490060BB5C /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0311E38A230AC9490060BB5C /* Actions.swift */; };
+		1257253924B7992C00E04FA3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1257253824B7992B00E04FA3 /* main.swift */; };
 		B302067B1F5E3E9000DE6EBD /* SnapshotfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */; };
 		B302067C1F5E3E9000DE6EBD /* GymfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */; };
 		B302067D1F5E3E9000DE6EBD /* MatchfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */; };
@@ -18,7 +19,6 @@
 		B30206811F5E3E9000DE6EBD /* DeliverfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302067A1F5E3E9000DE6EBD /* DeliverfileProtocol.swift */; };
 		B3BA65A61F5A269100B34850 /* Fastlane.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA659D1F5A269100B34850 /* Fastlane.swift */; };
 		B3BA65A71F5A269100B34850 /* LaneFileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA659E1F5A269100B34850 /* LaneFileProtocol.swift */; };
-		B3BA65A81F5A269100B34850 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA659F1F5A269100B34850 /* main.swift */; };
 		B3BA65A91F5A269100B34850 /* RubyCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A01F5A269100B34850 /* RubyCommand.swift */; };
 		B3BA65AA1F5A269100B34850 /* Runner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A11F5A269100B34850 /* Runner.swift */; };
 		B3BA65AB1F5A269100B34850 /* SocketClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A21F5A269100B34850 /* SocketClient.swift */; };
@@ -42,6 +42,7 @@
 /* Begin PBXFileReference section */
 		0311E386230AC1B20060BB5C /* Plugins.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Plugins.swift; path = ../Plugins.swift; sourceTree = "<group>"; };
 		0311E38A230AC9490060BB5C /* Actions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Actions.swift; path = ../Actions.swift; sourceTree = "<group>"; };
+		1257253824B7992B00E04FA3 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = ../main.swift; sourceTree = "<group>"; };
 		B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotfileProtocol.swift; path = ../SnapshotfileProtocol.swift; sourceTree = "<group>"; };
 		B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GymfileProtocol.swift; path = ../GymfileProtocol.swift; sourceTree = "<group>"; };
 		B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MatchfileProtocol.swift; path = ../MatchfileProtocol.swift; sourceTree = "<group>"; };
@@ -55,7 +56,6 @@
 		B3144C0A200553DC00470AFE /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		B3BA659D1F5A269100B34850 /* Fastlane.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Fastlane.swift; path = ../Fastlane.swift; sourceTree = "<group>"; };
 		B3BA659E1F5A269100B34850 /* LaneFileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LaneFileProtocol.swift; path = ../LaneFileProtocol.swift; sourceTree = "<group>"; };
-		B3BA659F1F5A269100B34850 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = ../main.swift; sourceTree = "<group>"; };
 		B3BA65A01F5A269100B34850 /* RubyCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RubyCommand.swift; path = ../RubyCommand.swift; sourceTree = "<group>"; };
 		B3BA65A11F5A269100B34850 /* Runner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Runner.swift; path = ../Runner.swift; sourceTree = "<group>"; };
 		B3BA65A21F5A269100B34850 /* SocketClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketClient.swift; path = ../SocketClient.swift; sourceTree = "<group>"; };
@@ -161,9 +161,9 @@
 		D512BA011F7C7F40000D2137 /* Runner Code */ = {
 			isa = PBXGroup;
 			children = (
+				1257253824B7992B00E04FA3 /* main.swift */,
 				B3144C0A200553DC00470AFE /* README.txt */,
 				D5BAFD111F7DAAFC0030B324 /* ArgumentProcessor.swift */,
-				B3BA659F1F5A269100B34850 /* main.swift */,
 				B3BA65AE1F5A2D5C00B34850 /* RunnerArgument.swift */,
 			);
 			name = "Runner Code";
@@ -236,7 +236,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"${SRCROOT}\"\ncd ../..\ncp \"${TARGET_BUILD_DIR}/${EXECUTABLE_PATH}\" .";
+			shellScript = "cd \"${SRCROOT}\"\ncd ../..\ncp \"${TARGET_BUILD_DIR}/${EXECUTABLE_PATH}\" .\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -267,9 +267,9 @@
 				B3BA65AA1F5A269100B34850 /* Runner.swift in Sources */,
 				B3BA65AF1F5A2D5C00B34850 /* RunnerArgument.swift in Sources */,
 				D5B8A5B31FFDC49E00536B24 /* ControlCommand.swift in Sources */,
+				1257253924B7992C00E04FA3 /* main.swift in Sources */,
 				B302067E1F5E3E9000DE6EBD /* PrecheckfileProtocol.swift in Sources */,
 				B3BA65AD1F5A269100B34850 /* SocketResponse.swift in Sources */,
-				B3BA65A81F5A269100B34850 /* main.swift in Sources */,
 				D55B28C71F6C588300DC42C5 /* Scanfile.swift in Sources */,
 				0311E387230AC1B20060BB5C /* Plugins.swift in Sources */,
 				D55B28C91F6C588300DC42C5 /* Snapshotfile.swift in Sources */,

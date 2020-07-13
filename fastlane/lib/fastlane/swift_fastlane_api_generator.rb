@@ -223,7 +223,7 @@ module Fastlane
         header << "//  new group so that it won't be marked for upgrade"
         header << "//"
         header << ""
-        header << "class #{tool_detail.swift_class}: #{tool_detail.swift_protocol} {"
+        header << "public class #{tool_detail.swift_class}: #{tool_detail.swift_protocol} {"
         lanefile_implementation_opening = header.join("\n")
 
         files_generated << write_lanefile(
@@ -284,7 +284,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
 
     def generate_lanefile_tool_objects(classes: nil)
       objects = classes.map do |filename|
-        "let #{filename.downcase}: #{filename} = #{filename}()"
+        "public let #{filename.downcase}: #{filename} = #{filename}()"
       end
       return objects
     end
@@ -362,12 +362,12 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       protocol_content_array = []
       protocol_name = tool_swift_function.protocol_name
 
-      protocol_content_array << "protocol #{protocol_name}: class {"
+      protocol_content_array << "public protocol #{protocol_name}: class {"
       protocol_content_array += tool_swift_function.swift_vars
       protocol_content_array << "}"
       protocol_content_array << ""
 
-      protocol_content_array << "extension #{protocol_name} {"
+      protocol_content_array << "public extension #{protocol_name} {"
       protocol_content_array += tool_swift_function.swift_default_implementations
       protocol_content_array << "}"
       protocol_content_array << ""
