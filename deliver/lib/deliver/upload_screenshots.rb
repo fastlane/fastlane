@@ -67,6 +67,10 @@ module Deliver
             UI.error(error.message)
           end
         end
+
+        # Verify all screenshots have been deleted
+        # Sometimes API requests will fail but screenshots will still be deleted
+        verify_no_screenshots!(localizations)
       end
 
       # Finding languages to enable
@@ -91,6 +95,22 @@ module Deliver
       end
 
       upload_screenshots(screenshots_per_language, localizations, options)
+    end
+
+    def verify_no_screenshots!(localizations)
+      count = 0
+      localizations.each do |localization|
+        screenshot_sets = localization.get_app_screenshot_sets
+        screenshot_sets.each do |screenshot_set|
+          count += screenshot_set.app_screenshots.size
+        end
+      end
+
+      if count > 0
+        UI.user_error!("Failed verification of all screenshots deleted... #{count} screenshot(s) still exist")
+      else
+        UI.message("Successfully deleted all screenshots")
+      end
     end
 
     def upload_screenshots(screenshots_per_language, localizations, options)
