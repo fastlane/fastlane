@@ -176,6 +176,7 @@ module Deliver
       non_localized_version_attributes['releaseType'] = release_type
 
       # Update app store version
+      # This needs to happen before updating localizations (https://openradar.appspot.com/radar?id=4925914991296512)
       UI.message("Uploading metadata to App Store Connect for version")
       version.update(attributes: non_localized_version_attributes)
 
