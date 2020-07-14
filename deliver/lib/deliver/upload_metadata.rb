@@ -175,6 +175,11 @@ module Deliver
                      end
       non_localized_version_attributes['releaseType'] = release_type
 
+      # Update app store version
+      # This needs to happen before updating localizations (https://openradar.appspot.com/radar?id=4925914991296512)
+      UI.message("Uploading metadata to App Store Connect for version")
+      version.update(attributes: non_localized_version_attributes)
+
       # Update app store version localizations
       app_store_version_localizations.each do |app_store_version_localization|
         attributes = localized_version_attributes_by_locale[app_store_version_localization.locale]
@@ -192,10 +197,6 @@ module Deliver
           app_info_localization.update(attributes: attributes)
         end
       end
-
-      # Update app store version
-      UI.message("Uploading metadata to App Store Connect for version")
-      version.update(attributes: non_localized_version_attributes)
 
       # Update categories
       app_info = app.fetch_edit_app_info
