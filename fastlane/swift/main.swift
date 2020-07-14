@@ -1,5 +1,5 @@
 //
-//  mainn.swift
+//  main.swift
 //  FastlaneSwiftRunner
 //
 //  Created by Joshua Liebowitz on 8/26/17.
