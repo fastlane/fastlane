@@ -28,9 +28,14 @@ module Deliver
     }
 
     # Non localized app details values
-    NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
-                                :primary_first_sub_category, :primary_second_sub_category,
-                                :secondary_first_sub_category, :secondary_second_sub_category]
+    NON_LOCALISED_APP_VALUES = {
+      primary_category: :primary_category,
+      secondary_category: :secondary_category,
+      primary_first_sub_category: :primary_subcategory_one,
+      primary_second_sub_category: :primary_subcategory_two,
+      secondary_first_sub_category: :secondary_subcategory_one,
+      secondary_second_sub_category: :secondary_subcategory_two
+    }
 
     # Review information values
     REVIEW_INFORMATION_VALUES_LEGACY = {
@@ -493,7 +498,7 @@ module Deliver
       end
 
       # Load non localised data
-      (NON_LOCALISED_VERSION_VALUES.keys + NON_LOCALISED_APP_VALUES).each do |key|
+      (NON_LOCALISED_VERSION_VALUES.keys + NON_LOCALISED_APP_VALUES.keys).each do |key|
         path = File.join(options[:metadata_path], "#{key}.txt")
         next unless File.exist?(path)
 

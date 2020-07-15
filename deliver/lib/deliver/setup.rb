@@ -95,6 +95,53 @@ module Deliver
           UI.message("Writing to '#{resulting_path}'")
         end
       end
+
+      # App info (categories)
+      UploadMetadata::NON_LOCALISED_APP_VALUES.each do |file_key, attribute_name|
+        category = app_info.send(attribute_name)
+
+        content = category ? category.id.to_s : ""
+        content += "\n"
+
+        resulting_path = File.join(path, "#{file_key}.txt")
+        FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+        File.write(resulting_path, content)
+
+        UI.message("Writing to '#{resulting_path}'")
+      end
+
+      # Version
+      UploadMetadata::NON_LOCALISED_VERSION_VALUES.each do |file_key, attribute_name|
+        content = version.send(attribute_name) || ""
+        content += "\n"
+
+        resulting_path = File.join(path, "#{file_key}.txt")
+        FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+        File.write(resulting_path, content)
+
+        UI.message("Writing to '#{resulting_path}'")
+      end
+
+      # Review information
+      app_store_review_detail = begin
+                                  version.fetch_app_store_review_detail
+                                rescue => error
+                                  nil
+                                end # errors if doesn't exist
+      UploadMetadata::REVIEW_INFORMATION_VALUES.each do |file_key, attribute_name|
+        content = app_store_review_detail.send(attribute_name) || ""
+        content += "\n"
+
+        base_dir = File.join(path, UploadMetadata::REVIEW_INFORMATION_DIR)
+        FileUtils.mkdir_p(base_dir)
+
+        file_key = UploadMetadata::REVIEW_INFORMATION_VALUES_LEGACY.key(file_key)
+
+        resulting_path = File.join(base_dir, "#{file_key}.txt")
+        File.write(resulting_path, content)
+
+        UI.message("Writing to '#{resulting_path}'")
+      end
     end
 
     def generate_metadata_files_old(v, path)
