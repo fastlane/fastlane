@@ -7,6 +7,7 @@ module Snapshot
     attr_accessor :add_videos
     attr_accessor :clean
     attr_accessor :erase_simulator
+    attr_accessor :headless
     attr_accessor :localize_simulator
     attr_accessor :dark_mode
     attr_accessor :reinstall_app
@@ -34,6 +35,7 @@ module Snapshot
       @add_videos = snapshot_config[:add_videos]
       @clean = snapshot_config[:clean]
       @erase_simulator = snapshot_config[:erase_simulator]
+      @headless = snapshot_config[:headless]
       @localize_simulator = snapshot_config[:localize_simulator]
       @dark_mode = snapshot_config[:dark_mode]
       @reinstall_app = snapshot_config[:reinstall_app]

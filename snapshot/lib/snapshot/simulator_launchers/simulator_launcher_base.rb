@@ -76,6 +76,11 @@ module Snapshot
           disable_slide_to_type(type)
         end
       end
+
+      unless launcher_config.headless
+        simulator_path = File.join(Helper.xcode_path, 'Applications', 'Simulator.app')
+        Helper.backticks("open -a #{simulator_path} -g", print: FastlaneCore::Globals.verbose?)
+      end
     end
 
     # pass an array of device types
