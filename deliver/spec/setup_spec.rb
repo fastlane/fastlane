@@ -10,12 +10,12 @@ describe Deliver do
         let(:app) { double('app') }
         let(:app_info) do
           double('app_info',
-                 primary_category: nil,
-                 primary_subcategory_one: nil,
-                 primary_subcategory_two: nil,
-                 secondary_category: nil,
-                 secondary_subcategory_one: nil,
-                 secondary_subcategory_two: nil)
+                 primary_category: double('primary_category', id: 'cat1'),
+                 primary_subcategory_one: double('primary_subcategory_one', id: 'cat1sub1'),
+                 primary_subcategory_two: double('primary_subcategory_two', id: 'cat1sub2'),
+                 secondary_category: double('secondary_category', id: 'cat2'),
+                 secondary_subcategory_one: double('secondary_subcategory_one', id: 'cat2sub1'),
+                 secondary_subcategory_two: double('secondary_subcategory_two', id: 'cat2sub2'))
         end
         let(:app_info_localization_en) do
           double('app_info_localization_en',
@@ -61,6 +61,12 @@ describe Deliver do
         it 'generates metadata' do
           map = {
             "copyright" => "2020 fastlane",
+            "primary_category" => "cat1",
+            "secondary_category" => "cat2",
+            "primary_first_sub_category" => "cat1sub1",
+            "primary_second_sub_category" => "cat1sub2",
+            "secondary_first_sub_category" => "cat2sub1",
+            "secondary_second_sub_category" => "cat2sub2",
 
             "en-US/description" => "description en",
             "en-US/keywords" => "app version en",
