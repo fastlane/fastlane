@@ -196,6 +196,11 @@ describe Deliver::CommandsGenerator do
   end
 
   describe ":download_metadata option handling" do
+    let(:latest_version) do
+      double('version',
+             version_string: "1.0.0")
+    end
+
     it "can use the app_identifier flag from tool options" do
       stub_commander_runner_args(['download_metadata', '--description', 'My description', '--app_identifier', 'abcd', '-m', 'metadata/path', '--force'])
 
@@ -207,7 +212,7 @@ describe Deliver::CommandsGenerator do
       })
 
       fake_app = "fake_app"
-      expect(fake_app).to receive(:latest_version).and_return('1.0.0')
+      expect(fake_app).to receive(:get_latest_app_store_version).and_return(latest_version)
 
       expect(Deliver::Runner).to receive(:new) do |actual_options|
         expect(expected_options._values).to eq(actual_options._values)
@@ -217,8 +222,9 @@ describe Deliver::CommandsGenerator do
 
       fake_setup = "fake_setup"
       expect(Deliver::Setup).to receive(:new).and_return(fake_setup)
-      expect(fake_setup).to receive(:generate_metadata_files) do |version, metadata_path|
-        expect(version).to eq('1.0.0')
+      expect(fake_setup).to receive(:generate_metadata_files) do |app, version, metadata_path|
+        expect(app).to eq(fake_app)
+        expect(version).to eq(latest_version)
         expect(metadata_path).to eq('metadata/path')
       end
 

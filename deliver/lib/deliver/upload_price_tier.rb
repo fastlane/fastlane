@@ -9,9 +9,7 @@ module Deliver
 
       price_tier = options[:price_tier].to_s
 
-      legacy_app = options[:app]
-      app_id = legacy_app.apple_id
-      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+      app = options[:app]
 
       attributes = {}
       territory_ids = []
