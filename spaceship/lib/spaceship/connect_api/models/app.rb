@@ -71,13 +71,14 @@ module Spaceship
       end
 
       def update(attributes: nil, app_price_tier_id: nil, territory_ids: nil)
+        attributes = reverse_attr_mapping(attributes)
         return Spaceship::ConnectAPI.patch_app(app_id: id, attributes: attributes, app_price_tier_id: app_price_tier_id, territory_ids: territory_ids)
       end
 
       #
       # App Info
       #
-      
+
       def fetch_live_app_info(includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
         states = [
           Spaceship::ConnectAPI::AppInfo::AppStoreState::READY_FOR_SALE,

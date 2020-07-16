@@ -27,6 +27,7 @@ module Spaceship
       #
 
       def update(attributes: nil)
+        attributes = reverse_attr_mapping(attributes)
         Spaceship::ConnectAPI.patch_app_info_localization(app_info_localization_id: id, attributes: attributes)
       end
 

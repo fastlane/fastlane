@@ -8,10 +8,10 @@ module Deliver
     LOCALISED_VERSION_VALUES = {
       description: "description",
       keywords: "keywords",
-      release_notes: "whatsNew",
-      support_url: "supportUrl",
-      marketing_url: "marketingUrl",
-      promotional_text: "promotionalText"
+      release_notes: "whats_new",
+      support_url: "support_url",
+      marketing_url: "marketing_url",
+      promotional_text: "promotional_text"
     }
 
     # Everything attached to the version but not being localised
@@ -23,8 +23,8 @@ module Deliver
     LOCALISED_APP_VALUES = {
       name: "name",
       subtitle: "subtitle",
-      privacy_url: "privacyPolicyUrl",
-      apple_tv_privacy_policy: "privacyPolicyText"
+      privacy_url: "privacy_policy_url",
+      apple_tv_privacy_policy: "privacy_policy_text"
     }
 
     # Non localized app details values
@@ -48,12 +48,12 @@ module Deliver
       review_notes: :notes
     }
     REVIEW_INFORMATION_VALUES = {
-      first_name: "contactFirstName",
-      last_name: "contactLastName",
-      phone_number: "contactPhone",
-      email_address: "contactEmail",
-      demo_user: "demoAccountName",
-      demo_password: "demoAccountPassword",
+      first_name: "contact_first_name",
+      last_name: "contact_last_name",
+      phone_number: "contact_phone",
+      email_address: "contact_email",
+      demo_user: "demo_account_name",
+      demo_password: "demo_account_password",
       notes: "notes"
     }
 

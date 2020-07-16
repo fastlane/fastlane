@@ -68,7 +68,7 @@ module Deliver
         language = localization.locale
 
         UploadMetadata::LOCALISED_APP_VALUES.each do |file_key, attribute_name|
-          content = localization.send(attribute_name) || ""
+          content = localization.send(attribute_name.to_slug) || ""
           content += "\n"
 
           resulting_path = File.join(path, language, "#{file_key}.txt")
@@ -125,19 +125,22 @@ module Deliver
       # Review information
       app_store_review_detail = begin
                                   version.fetch_app_store_review_detail
-                                rescue => error
+                                rescue
                                   nil
                                 end # errors if doesn't exist
       UploadMetadata::REVIEW_INFORMATION_VALUES.each do |file_key, attribute_name|
-        content = app_store_review_detail.send(attribute_name) || ""
+        if app_store_review_detail
+          content = app_store_review_detail.send(attribute_name)
+        else
+          content = ""
+        end
         content += "\n"
-
-        base_dir = File.join(path, UploadMetadata::REVIEW_INFORMATION_DIR)
-        FileUtils.mkdir_p(base_dir)
 
         file_key = UploadMetadata::REVIEW_INFORMATION_VALUES_LEGACY.key(file_key)
 
+        base_dir = File.join(path, UploadMetadata::REVIEW_INFORMATION_DIR)
         resulting_path = File.join(base_dir, "#{file_key}.txt")
+        FileUtils.mkdir_p(File.expand_path('..', resulting_path))
         File.write(resulting_path, content)
 
         UI.message("Writing to '#{resulting_path}'")
