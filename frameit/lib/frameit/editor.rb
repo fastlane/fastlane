@@ -298,7 +298,7 @@ module Frameit
       resize_text(keyword)
 
       vertical_padding = vertical_frame_padding # assign padding to variable
-      spacing_between_title_and_keyword = (actual_font_size / 2)
+      spacing_between_title_and_keyword = (actual_font_size('keyword') / 2)
       title_left_space = (background.width / 2.0 - title.width / 2.0).round
       keyword_left_space = (background.width / 2.0 - keyword.width / 2.0).round
 
@@ -359,7 +359,7 @@ module Frameit
       vertical_padding = vertical_frame_padding # assign padding to variable
       left_space = (background.width / 2.0 - sum_width / 2.0).round
 
-      self.space_to_device += actual_font_size + vertical_padding
+      self.space_to_device += actual_font_size('title') + vertical_padding
 
       if title_below_image
         title_top = background.height - effective_text_height / 2 - title.height / 2
@@ -385,7 +385,10 @@ module Frameit
       background
     end
 
-    def actual_font_size
+    def actual_font_size(key)
+      font_size = @config[key.to_s]['font_size']
+      return font_size if !font_size.nil? && font_size > 0
+
       font_scale_factor = @config['font_scale_factor'] || 0.1
       UI.user_error!("Parameter 'font_scale_factor' can not be 0. Please provide a value larger than 0.0 (default = 0.1).") if font_scale_factor == 0.0
       [@image.width * font_scale_factor].max.round
@@ -393,7 +396,7 @@ module Frameit
 
     # The space between the keyword and the title
     def keyword_padding
-      (actual_font_size / 3.0).round
+      (actual_font_size('keyword') / 3.0).round
     end
 
     # This will build up to 2 individual images with the title and optional keyword, which will then be added to the real image
@@ -427,7 +430,7 @@ module Frameit
         text_image.combine_options do |i|
           i.font(current_font) if current_font
           i.gravity("Center")
-          i.pointsize(actual_font_size)
+          i.pointsize(actual_font_size(key))
           i.draw("text 0,0 '#{text}'")
           i.interline_spacing(interline_spacing) if interline_spacing
           i.fill(@config[key.to_s]['color'])
