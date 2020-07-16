@@ -471,7 +471,7 @@ _deliver_ allows for metadata to be set through `.txt` files in the metadata fol
 
 Key | Editable While Live | Directory | Filename
 ----|--------|--------|--------
-<%- (Deliver::UploadMetadata::NON_LOCALISED_VERSION_VALUES.keys + Deliver::UploadMetadata::NON_LOCALISED_APP_VALUES).each do |value| -%>
+<%- (Deliver::UploadMetadata::NON_LOCALISED_VERSION_VALUES.keys + Deliver::UploadMetadata::NON_LOCALISED_APP_VALUES.keys).each do |value| -%>
   `<%= value %>` | <%= Deliver::UploadMetadata::NON_LOCALISED_LIVE_VALUES.include?(value) ? 'Yes' : 'No' %> | `<metadata_path>` | `<%= value %>.txt`
 <%- end %>
 

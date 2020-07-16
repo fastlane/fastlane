@@ -14,9 +14,7 @@ module Deliver
     end
 
     def self.download(options, folder_path)
-      legacy_app = options[:app]
-      app_id = legacy_app.apple_id
-      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+      app = options[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       if options[:use_live_version]

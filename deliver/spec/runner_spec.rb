@@ -38,7 +38,7 @@ describe Deliver::Runner do
       ipa: 'ACME.ipa',
       app_identifier: 'com.acme.acme',
       app_version: '1.0.7',
-      app: double('app', { apple_id: 'YI8C2AS' }),
+      app: double('app', { id: 'YI8C2AS' }),
       platform: 'ios'
     }
   end

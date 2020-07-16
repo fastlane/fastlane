@@ -71,12 +71,28 @@ module Spaceship
       end
 
       def update(attributes: nil, app_price_tier_id: nil, territory_ids: nil)
+        attributes = reverse_attr_mapping(attributes)
         return Spaceship::ConnectAPI.patch_app(app_id: id, attributes: attributes, app_price_tier_id: app_price_tier_id, territory_ids: territory_ids)
       end
 
       #
       # App Info
       #
+
+      def fetch_live_app_info(includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
+        states = [
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::READY_FOR_SALE,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_DEVELOPER_RELEASE,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::PROCESSING_FOR_APP_STORE,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::IN_REVIEW
+        ]
+
+        filter = { app: id }
+        resp = Spaceship::ConnectAPI.get_app_infos(filter: filter, includes: includes)
+        return resp.to_models.select do |model|
+          states.include?(model.app_store_state)
+        end.first
+      end
 
       def fetch_edit_app_info(includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
         states = [
@@ -150,6 +166,18 @@ module Spaceship
 
           return true
         end
+      end
+
+      def get_latest_app_store_version(platform: nil, includes: nil)
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          platform: platform
+        }
+
+        # Get the latest version
+        return get_app_store_versions(filter: filter, includes: includes)
+               .sort_by { |v| Gem::Version.new(v.version_string) }
+               .last
       end
 
       def get_live_app_store_version(platform: nil, includes: nil)

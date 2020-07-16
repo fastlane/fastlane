@@ -40,6 +40,7 @@ module Deliver
       res
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
     def run
       program :name, 'deliver'
       program :version, Fastlane::VERSION
@@ -166,15 +167,17 @@ module Deliver
           return 0 unless res
 
           require 'deliver/setup'
-          v = options[:app].latest_version
+          app = options[:app]
+          platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+          v = app.get_latest_app_store_version(platform: platform)
           if options[:app_version].to_s.length > 0
-            v = options[:app].live_version if v.version != options[:app_version]
-            if v.version != options[:app_version]
+            v = app.get_live_app_store_version(platform: platform) if v.version_string != options[:app_version]
+            if v.nil? || v.version_string != options[:app_version]
               raise "Neither the current nor live version match specified app_version \"#{options[:app_version]}\""
             end
           end
 
-          Deliver::Setup.new.generate_metadata_files(v, path)
+          Deliver::Setup.new.generate_metadata_files(app, v, path)
         end
       end
 
