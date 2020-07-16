@@ -14,6 +14,7 @@ module Spaceship
       attr_accessor :removed
       attr_accessor :is_aag
       attr_accessor :available_in_new_territories
+
       attr_accessor :content_rights_declaration
       attr_accessor :app_store_versions
       attr_accessor :prices
