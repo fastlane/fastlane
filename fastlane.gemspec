@@ -76,12 +76,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency('commander-fastlane', '>= 4.4.6', '< 5.0.0') # CLI parser
   spec.add_dependency('excon', '>= 0.71.0', '< 1.0.0') # Great HTTP Client
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
-  # The faraday gem is used for deploygate, hockey and testfairy actions.
-  # Locked under 1.0 until webmock 3.6.0 can be used to handle empty array
-  # parameters https://github.com/bblimke/webmock/blob/master/CHANGELOG.md#360,
-  # probably.
-  spec.add_dependency('faraday', '>= 0.17', '< 1.0')
-  spec.add_dependency('faraday_middleware', '>= 0.13.1', '< 2.0') # Same as faraday
+  spec.add_dependency('faraday', '~> 1.0') # The faraday gem is used for deploygate, hockey and testfairy actions.
+  spec.add_dependency('faraday_middleware', '~> 1.0') # Same as faraday
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
@@ -113,8 +109,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('pry-rescue')
   spec.add_development_dependency('pry-stack_explorer')
   spec.add_development_dependency('yard', '~> 0.9.11')
-  spec.add_development_dependency('webmock', '~> 2.3.2')
-  spec.add_development_dependency('hashdiff', '< 0.4.0') # Locked under 0.4.0 until webmock bumped up to 3.6.0 or greater - HashDiff was changed to Hashdiff
+  spec.add_development_dependency('webmock', '~> 3.8')
   spec.add_development_dependency('coveralls', '~> 0.8.13')
   spec.add_development_dependency('rubocop', Fastlane::RUBOCOP_REQUIREMENT)
   spec.add_development_dependency('rubocop-require_tools', '>= 0.1.2')
