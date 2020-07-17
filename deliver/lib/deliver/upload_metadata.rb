@@ -545,10 +545,10 @@ module Deliver
         attributes[attribute_name] = strip_value unless strip_value.empty?
       end
 
-      if !attributes["demoAccountName"].to_s.empty? && !attributes["demoAccountPassword"].to_s.empty?
-        attributes["demoAccountRequired"] = true
+      if !attributes["demo_account_name"].to_s.empty? && !attributes["demo_account_password"].to_s.empty?
+        attributes["demo_account_required"] = true
       else
-        attributes["demoAccountRequired"] = false
+        attributes["demo_account_required"] = false
       end
 
       UI.message("Uploading app review information to App Store Connect")
