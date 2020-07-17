@@ -822,6 +822,28 @@ module Spaceship
       end
 
       #
+      # appStoreVersionReleaseRequests
+      #
+
+      def post_app_store_version_release_request(app_store_version_id: nil)
+        body = {
+            data: {
+                type: "appStoreVersionReleaseRequests",
+                relationships: {
+                    appStoreVersion: {
+                        data: {
+                            type: "appStoreVersions",
+                            id: app_store_version_id
+                        }
+                    }
+                }
+            }
+        }
+
+        Client.instance.post("appStoreVersionReleaseRequests", body)
+      end
+
+      #
       # idfaDeclarations
       #
 
