@@ -7,9 +7,7 @@ require 'fastlane_core/pkg_file_analyser'
 module Deliver
   class SubmitForReview
     def submit!(options)
-      legacy_app = options[:app]
-      app_id = legacy_app.apple_id
-      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+      app = options[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       version = app.get_edit_app_store_version(platform: platform)
@@ -120,10 +118,10 @@ module Deliver
           "  Example: submission_information: { add_id_info_uses_idfa: false }",
           "  Example: submission_information: {",
           "    add_id_info_uses_idfa: true,",
-          "    add_id_info_limits_tracking: false,",
           "    add_id_info_serves_ads: false,",
-          "    add_id_info_uses_idfa: false,",
-          "    add_id_info_tracks_install: false",
+          "    add_id_info_tracks_install: true,",
+          "    add_id_info_tracks_action: true,",
+          "    add_id_info_limits_tracking: true",
           "  }",
           "  Example CLI:",
           "    --submission_information \"{\\\"add_id_info_uses_idfa\\\": false}\""

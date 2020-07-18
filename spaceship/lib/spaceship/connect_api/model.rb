@@ -8,6 +8,7 @@ module Spaceship
       end
 
       attr_accessor :id
+      attr_accessor :reverse_attr_map
 
       def initialize(id, attributes)
         self.id = id
@@ -29,6 +30,7 @@ module Spaceship
       # Creates alias for :minOsVersion to :min_os_version
       #
       def attr_mapping(attr_map)
+        self.reverse_attr_map ||= attr_map.invert
         attr_map.each do |key, value|
           # Actual
           reader = value.to_sym
@@ -47,6 +49,14 @@ module Spaceship
           # Alias the API response name to attribute name
           alias_method(key_reader, reader)
           alias_method(key_writer, writer)
+        end
+      end
+
+      def reverse_attr_mapping(attributes)
+        return nil if attributes.nil?
+        attributes.each_with_object({}) do |(k, v), memo|
+          key = self.class.reverse_attr_map[k] || k
+          memo[key] = v
         end
       end
 

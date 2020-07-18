@@ -102,7 +102,7 @@ public protocol DeliverfileProtocol: class {
     var precheckDefaultRuleLevel: String { get }
 
     /// **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
-    var individualMetadataItems: [String] { get }
+    var individualMetadataItems: [String]? { get }
 
     /// **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - Metadata: The path to the app icon
     var appIcon: String? { get }
@@ -217,7 +217,7 @@ public extension DeliverfileProtocol {
     var itcProvider: String? { return nil }
     var runPrecheckBeforeSubmit: Bool { return true }
     var precheckDefaultRuleLevel: String { return "warn" }
-    var individualMetadataItems: [String] { return [] }
+    var individualMetadataItems: [String]? { return nil }
     var appIcon: String? { return nil }
     var appleWatchAppIcon: String? { return nil }
     var copyright: String? { return nil }
@@ -248,4 +248,4 @@ public extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.37]
+// FastlaneRunnerAPIVersion [0.9.25]

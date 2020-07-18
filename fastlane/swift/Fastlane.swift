@@ -5042,6 +5042,7 @@ public func pem(development: Bool = false,
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
    - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
+   - distributeOnly: Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers?
    - notifyExternalTesters: Should notify external testers?
@@ -5112,6 +5113,7 @@ public func pilot(username: String,
                                                                                          RubyCommand.Argument(name: "skip_submission", value: skipSubmission),
                                                                                          RubyCommand.Argument(name: "skip_waiting_for_build_processing", value: skipWaitingForBuildProcessing),
                                                                                          RubyCommand.Argument(name: "update_build_info_on_upload", value: updateBuildInfoOnUpload),
+                                                                                         RubyCommand.Argument(name: "distribute_only", value: distributeOnly),
                                                                                          RubyCommand.Argument(name: "uses_non_exempt_encryption", value: usesNonExemptEncryption),
                                                                                          RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
                                                                                          RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
@@ -7536,6 +7538,7 @@ public func testfairy(apiKey: String,
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
    - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
+   - distributeOnly: Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers?
    - notifyExternalTesters: Should notify external testers?
@@ -7606,6 +7609,7 @@ public func testflight(username: String,
                                                                                               RubyCommand.Argument(name: "skip_submission", value: skipSubmission),
                                                                                               RubyCommand.Argument(name: "skip_waiting_for_build_processing", value: skipWaitingForBuildProcessing),
                                                                                               RubyCommand.Argument(name: "update_build_info_on_upload", value: updateBuildInfoOnUpload),
+                                                                                              RubyCommand.Argument(name: "distribute_only", value: distributeOnly),
                                                                                               RubyCommand.Argument(name: "uses_non_exempt_encryption", value: usesNonExemptEncryption),
                                                                                               RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
                                                                                               RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
@@ -8451,6 +8455,7 @@ public func uploadToPlayStoreInternalAppSharing(packageName: String,
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
    - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
+   - distributeOnly: Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers?
    - notifyExternalTesters: Should notify external testers?
@@ -8521,6 +8526,7 @@ public func uploadToTestflight(username: String,
                                                                                                         RubyCommand.Argument(name: "skip_submission", value: skipSubmission),
                                                                                                         RubyCommand.Argument(name: "skip_waiting_for_build_processing", value: skipWaitingForBuildProcessing),
                                                                                                         RubyCommand.Argument(name: "update_build_info_on_upload", value: updateBuildInfoOnUpload),
+                                                                                                        RubyCommand.Argument(name: "distribute_only", value: distributeOnly),
                                                                                                         RubyCommand.Argument(name: "uses_non_exempt_encryption", value: usesNonExemptEncryption),
                                                                                                         RubyCommand.Argument(name: "distribute_external", value: distributeExternal),
                                                                                                         RubyCommand.Argument(name: "notify_external_testers", value: notifyExternalTesters),
@@ -8980,4 +8986,4 @@ public let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.90]
+// FastlaneRunnerAPIVersion [0.9.78]
