@@ -1,9 +1,5 @@
-//
-//  ArgumentProcessor.swift
-//  FastlaneRunner
-//
-//  Created by Joshua Liebowitz on 9/28/17.
-//
+// ArgumentProcessor.swift
+// Copyright (c) 2020 FastlaneTools
 
 //
 //  ** NOTE **

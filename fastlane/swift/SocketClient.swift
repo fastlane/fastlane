@@ -1,9 +1,5 @@
-//
-//  SocketClient.swift
-//  FastlaneSwiftRunner
-//
-//  Created by Joshua Liebowitz on 7/30/17.
-//
+// SocketClient.swift
+// Copyright (c) 2020 FastlaneTools
 
 //
 //  ** NOTE **

@@ -341,7 +341,7 @@ module Fastlane
         end
 
         "\n#{documentation}"\
-        " var #{static_var_for_parameter_name}: #{type} { get }"
+        "  var #{static_var_for_parameter_name}: #{type} { get }"
       end
 
       return swift_vars

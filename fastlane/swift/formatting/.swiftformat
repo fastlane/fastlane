@@ -30,6 +30,7 @@
 --trimwhitespace always
 --wraparguments preserve
 --wrapcollections preserve
+--header "{file}\nCopyright (c) {year} FastlaneTools"
 
 # rules
 

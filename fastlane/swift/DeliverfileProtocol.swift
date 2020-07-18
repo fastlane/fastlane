@@ -1,3 +1,6 @@
+// DeliverfileProtocol.swift
+// Copyright (c) 2020 FastlaneTools
+
 public protocol DeliverfileProtocol: class {
     /// Your Apple ID Username
     var username: String { get }
@@ -245,4 +248,4 @@ public extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.32]
+// FastlaneRunnerAPIVersion [0.9.37]

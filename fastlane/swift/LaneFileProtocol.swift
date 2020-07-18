@@ -1,9 +1,5 @@
-//
-//  LaneFileProtocol.swift
-//  FastlaneSwiftRunner
-//
-//  Created by Joshua Liebowitz on 8/4/17.
-//
+// LaneFileProtocol.swift
+// Copyright (c) 2020 FastlaneTools
 
 //
 //  ** NOTE **

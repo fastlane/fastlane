@@ -1,8 +1,5 @@
-//
-//  ControlCommand.swift
-//  FastlaneRunner
-//
-//  Created by Joshua Liebowitz on 1/3/18.
+// ControlCommand.swift
+// Copyright (c) 2020 FastlaneTools
 
 //
 //  ** NOTE **

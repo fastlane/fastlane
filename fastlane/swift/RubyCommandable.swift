@@ -1,9 +1,5 @@
-//
-//  RubyCommandable.swift
-//  FastlaneRunner
-//
-//  Created by Joshua Liebowitz on 1/4/18.
-//
+// RubyCommandable.swift
+// Copyright (c) 2020 FastlaneTools
 
 //
 //  ** NOTE **
