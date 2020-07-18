@@ -1,7 +1,5 @@
-// This class is automatically included in FastlaneRunner during build
-// If you have a custom Appfile.swift, this file will be replaced by it
-// Don't modify this file unless you are familiar with how fastlane's swift code generation works
-// *** This file will be overwritten or replaced during build time ***
+// Appfile.swift
+// Copyright (c) 2020 FastlaneTools
 
 var appIdentifier: String { return "" } // The bundle identifier of your app
 var appleID: String { return "" } // Your Apple email address

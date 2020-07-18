@@ -1,9 +1,5 @@
-//
-//  main.swift
-//  FastlaneSwiftRunner
-//
-//  Created by Joshua Liebowitz on 8/26/17.
-//
+// main.swift
+// Copyright (c) 2020 FastlaneTools
 
 //
 //  ** NOTE **

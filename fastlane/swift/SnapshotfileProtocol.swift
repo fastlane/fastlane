@@ -1,3 +1,6 @@
+// SnapshotfileProtocol.swift
+// Copyright (c) 2020 FastlaneTools
+
 public protocol SnapshotfileProtocol: class {
     /// Path the workspace file
     var workspace: String? { get }
@@ -173,4 +176,4 @@ public extension SnapshotfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.24]
+// FastlaneRunnerAPIVersion [0.9.29]
