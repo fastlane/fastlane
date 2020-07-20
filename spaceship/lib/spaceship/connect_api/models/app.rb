@@ -142,13 +142,8 @@ module Spaceship
 
       def fetch_available_territories(filter: {}, includes: nil, limit: nil, sort: nil)
         filter ||= {}
-<<<<<<< HEAD
         resps = Spaceship::ConnectAPI.get_available_territories(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
-=======
-        resp = Spaceship::ConnectAPI.get_available_territories(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
-        return resp.to_models
->>>>>>> implement endPoint availableTerritories
       end
 
       #
