@@ -1442,7 +1442,6 @@ func captureAndroidScreenshots(androidHome: String? = nil,
    - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running snapshot
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
-   - headless: Enabling this option will prevent displaying the simulator window
    - overrideStatusBar: Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
@@ -1486,7 +1485,6 @@ func captureIosScreenshots(workspace: String? = nil,
                            clearPreviousScreenshots: Bool = false,
                            reinstallApp: Bool = false,
                            eraseSimulator: Bool = false,
-                           headless: Bool = true,
                            overrideStatusBar: Bool = false,
                            localizeSimulator: Bool = false,
                            darkMode: Bool? = nil,
@@ -1529,7 +1527,6 @@ func captureIosScreenshots(workspace: String? = nil,
                                                                                                            RubyCommand.Argument(name: "clear_previous_screenshots", value: clearPreviousScreenshots),
                                                                                                            RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                                            RubyCommand.Argument(name: "erase_simulator", value: eraseSimulator),
-                                                                                                           RubyCommand.Argument(name: "headless", value: headless),
                                                                                                            RubyCommand.Argument(name: "override_status_bar", value: overrideStatusBar),
                                                                                                            RubyCommand.Argument(name: "localize_simulator", value: localizeSimulator),
                                                                                                            RubyCommand.Argument(name: "dark_mode", value: darkMode),
@@ -1579,7 +1576,6 @@ func captureIosScreenshots(workspace: String? = nil,
    - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running snapshot
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
-   - headless: Enabling this option will prevent displaying the simulator window
    - overrideStatusBar: Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
@@ -1623,7 +1619,6 @@ func captureScreenshots(workspace: String? = nil,
                         clearPreviousScreenshots: Bool = false,
                         reinstallApp: Bool = false,
                         eraseSimulator: Bool = false,
-                        headless: Bool = true,
                         overrideStatusBar: Bool = false,
                         localizeSimulator: Bool = false,
                         darkMode: Bool? = nil,
@@ -1666,7 +1661,6 @@ func captureScreenshots(workspace: String? = nil,
                                                                                                        RubyCommand.Argument(name: "clear_previous_screenshots", value: clearPreviousScreenshots),
                                                                                                        RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                                        RubyCommand.Argument(name: "erase_simulator", value: eraseSimulator),
-                                                                                                       RubyCommand.Argument(name: "headless", value: headless),
                                                                                                        RubyCommand.Argument(name: "override_status_bar", value: overrideStatusBar),
                                                                                                        RubyCommand.Argument(name: "localize_simulator", value: localizeSimulator),
                                                                                                        RubyCommand.Argument(name: "dark_mode", value: darkMode),
@@ -6873,7 +6867,6 @@ func slather(buildDirectory: String? = nil,
    - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running snapshot
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
-   - headless: Enabling this option will prevent displaying the simulator window
    - overrideStatusBar: Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
@@ -6917,7 +6910,6 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
               clearPreviousScreenshots: Bool = snapshotfile.clearPreviousScreenshots,
               reinstallApp: Bool = snapshotfile.reinstallApp,
               eraseSimulator: Bool = snapshotfile.eraseSimulator,
-              headless: Bool = snapshotfile.headless,
               overrideStatusBar: Bool = snapshotfile.overrideStatusBar,
               localizeSimulator: Bool = snapshotfile.localizeSimulator,
               darkMode: Bool? = snapshotfile.darkMode,
@@ -6960,7 +6952,6 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
                                                                                             RubyCommand.Argument(name: "clear_previous_screenshots", value: clearPreviousScreenshots),
                                                                                             RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                             RubyCommand.Argument(name: "erase_simulator", value: eraseSimulator),
-                                                                                            RubyCommand.Argument(name: "headless", value: headless),
                                                                                             RubyCommand.Argument(name: "override_status_bar", value: overrideStatusBar),
                                                                                             RubyCommand.Argument(name: "localize_simulator", value: localizeSimulator),
                                                                                             RubyCommand.Argument(name: "dark_mode", value: darkMode),
