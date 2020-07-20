@@ -22,7 +22,7 @@ module Fastlane
 
         # Process options
         version = params[:version]
-        build_number = params[:build_number]
+        build_number = params[:build_number]&.to_s
         platform = params[:platform]
         output_directory = params[:output_directory]
         wait_for_dsym_processing = params[:wait_for_dsym_processing]
@@ -258,7 +258,8 @@ module Fastlane
                                        short_option: "-b",
                                        env_name: "DOWNLOAD_DSYMS_BUILD_NUMBER",
                                        description: "The app build_number for dSYMs you wish to download",
-                                       optional: true),
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :min_version,
                                        short_option: "-m",
                                        env_name: "DOWNLOAD_DSYMS_MIN_VERSION",
@@ -308,6 +309,7 @@ module Fastlane
         [
           'download_dsyms',
           'download_dsyms(version: "1.0.0", build_number: "345")',
+          'download_dsyms(version: "1.0.1", build_number: 42)',
           'download_dsyms(version: "live")',
           'download_dsyms(min_version: "1.2.3")'
         ]
