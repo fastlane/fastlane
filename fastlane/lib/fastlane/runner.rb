@@ -216,7 +216,9 @@ module Fastlane
     end
 
     def execute_action(method_sym, class_ref, arguments, custom_dir: nil, from_action: false)
-      if custom_dir.nil?
+      if from_action == true
+        custom_dir = "." # We preserve the directory from where the previous action was called from
+      elsif custom_dir.nil?
         custom_dir ||= "." if Helper.test?
         custom_dir ||= ".."
       end
