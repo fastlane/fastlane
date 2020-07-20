@@ -12,9 +12,8 @@ module Spaceship
       attr_accessor :primary_locale
       attr_accessor :removed
       attr_accessor :is_aag
-
+      attr_accessor :available_in_new_territories
       attr_accessor :content_rights_declaration
-
       attr_accessor :app_store_versions
 
       module ContentRightsDeclaration
@@ -29,6 +28,7 @@ module Spaceship
         "primaryLocale" => "primary_locale",
         "removed" => "removed",
         "isAAG" => "is_aag",
+        "availableInNewTerritories" => "available_in_new_territories",
 
         "contentRightsDeclaration" => "content_rights_declaration",
 
@@ -109,6 +109,16 @@ module Spaceship
         return resp.to_models.select do |model|
           states.include?(model.app_store_state)
         end.first
+      end
+
+      #
+      # Available Territories
+      #
+
+      def fetch_available_territories(filter: {}, includes: nil, limit: nil, sort: nil)
+        filter ||= {}
+        resps = Spaceship::ConnectAPI.get_available_territories(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.flat_map(&:to_models)
       end
 
       #

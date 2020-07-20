@@ -281,6 +281,15 @@ module Spaceship
       end
 
       #
+      # availableTerritories
+      #
+
+      def get_available_territories(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("apps/#{app_id}/availableTerritories", params)
+      end
+
+      #
       # appPrices
       #
 
