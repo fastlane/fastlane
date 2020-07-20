@@ -120,7 +120,7 @@ module Snapshot
                                      env_name: 'SNAPSHOT_HEADLESS',
                                      description: "Enabling this option will prevent displaying the simulator window",
                                      default_value: true,
-                                     is_string: false),
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :override_status_bar,
                                      env_name: 'SNAPSHOT_OVERRIDE_STATUS_BAR',
                                      description: "Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception",
