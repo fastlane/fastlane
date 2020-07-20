@@ -22,7 +22,7 @@ module Fastlane
 
         # Process options
         version = params[:version]
-        build_number = params[:build_number].to_s if params[:build_number]
+        build_number = params[:build_number].to_s unless params[:build_number].nil?
         platform = params[:platform]
         output_directory = params[:output_directory]
         wait_for_dsym_processing = params[:wait_for_dsym_processing]
