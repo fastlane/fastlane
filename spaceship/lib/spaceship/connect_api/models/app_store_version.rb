@@ -157,6 +157,15 @@ module Spaceship
       end
 
       #
+      # App Store Version Release Requests
+      #
+
+      def create_app_store_version_release_request
+        resp = Spaceship::ConnectAPI.post_app_store_version_release_request(app_store_version_id: id)
+        return resp.to_models.first
+      end
+
+      #
       # Build
       #
 
