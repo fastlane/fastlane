@@ -199,18 +199,32 @@ module FastlaneCore
         self.name
       end
 
+      def boot
+        return unless is_simulator
+        return unless os_type == "iOS"
+
+        UI.message("Booting #{self}")
+        `xcrun simctl boot #{self.udid}` unless self.state == "Booted"
+      end
+
+      def shutdown
+        return unless is_simulator
+        return unless os_type == "iOS"
+
+        UI.message("Shutting down #{self.udid}")
+        `xcrun simctl shutdown #{self.udid}` if self.state == "Booted"
+      end
+
       def reset
         UI.message("Resetting #{self}")
-        `xcrun simctl shutdown #{self.udid}` if self.state == "Booted"
+        shutdown
         `xcrun simctl erase #{self.udid}`
-        return
       end
 
       def delete
         UI.message("Deleting #{self}")
-        `xcrun simctl shutdown #{self.udid}` unless self.state == "Shutdown"
+        shutdown
         `xcrun simctl delete #{self.udid}`
-        return
       end
 
       def disable_slide_to_type
@@ -324,10 +338,10 @@ module FastlaneCore
       def copy_logarchive(device, log_identity, logs_destination_dir)
         require 'shellwords'
 
-        logarchive_dst = File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive").shellescape
+        logarchive_dst = File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive")
         FileUtils.rm_rf(logarchive_dst)
         FileUtils.mkdir_p(File.expand_path("..", logarchive_dst))
-        command = "xcrun simctl spawn --standalone #{device.udid} log collect --output #{logarchive_dst} 2>/dev/null"
+        command = "xcrun simctl spawn #{device.udid} log collect --output #{logarchive_dst.shellescape} 2>/dev/null"
         FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
       end
     end
