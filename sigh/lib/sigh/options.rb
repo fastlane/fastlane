@@ -16,7 +16,7 @@ module Sigh
                                      default_value: false,
                                      conflicting_options: [:developer_id, :development],
                                      conflict_block: proc do |option|
-                                       UI.user_error!("You can't enable both :#{option.key} and :adhoc")
+                                       UI.user_error!("You can't pass arguments for both :#{option.key} and :adhoc")
                                      end),
         FastlaneCore::ConfigItem.new(key: :developer_id,
                                      env_name: "SIGH_DEVELOPER_ID",
@@ -25,7 +25,7 @@ module Sigh
                                      default_value: false,
                                      conflicting_options: [:adhoc, :development],
                                      conflict_block: proc do |option|
-                                       UI.user_error!("You can't enable both :#{option.key} and :developer_id")
+                                       UI.user_error!("You can't pass arguments for both :#{option.key} and :developer_id")
                                      end),
         FastlaneCore::ConfigItem.new(key: :development,
                                      env_name: "SIGH_DEVELOPMENT",
@@ -34,7 +34,7 @@ module Sigh
                                      default_value: false,
                                      conflicting_options: [:adhoc, :developer_id],
                                      conflict_block: proc do |option|
-                                       UI.user_error!("You can't enable both :#{option.key} and :development")
+                                       UI.user_error!("You can't pass arguments for both :#{option.key} and :development")
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_install,
                                      env_name: "SIGH_SKIP_INSTALL",
@@ -147,7 +147,7 @@ module Sigh
                                      default_value: false,
                                      conflicting_options: [:force],
                                      conflict_block: proc do |value|
-                                       UI.user_error!("You can't enable both :force and :readonly")
+                                       UI.user_error!("You can't pass arguments for both :force and :readonly")
                                      end),
         FastlaneCore::ConfigItem.new(key: :template_name,
                                      env_name: "SIGH_PROVISIONING_PROFILE_TEMPLATE_NAME",
