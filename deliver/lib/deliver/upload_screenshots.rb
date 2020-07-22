@@ -109,9 +109,9 @@ module Deliver
           UI.error("Failed to delete all screenshots... Tries remaining: #{tries}")
           delete_screenshots(localizations, screenshots_per_language, tries: tries)
         end
+      else
+        UI.message("Successfully deleted all screenshots")
       end
-        
-      UI.message("Successfully deleted all screenshots")
     end
 
     def count_screenshots(localizations)
