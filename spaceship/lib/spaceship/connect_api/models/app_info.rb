@@ -65,7 +65,6 @@ module Spaceship
       #
 
       def update(filter: {}, includes: nil, limit: nil, sort: nil)
-        attributes = reverse_attr_mapping(attributes)
         Spaceship::ConnectAPI.patch_app_info(app_info_id: id).first
       end
 
