@@ -156,7 +156,6 @@ module Spaceship
         error_string = "Could not set team ID to '#{team_id}', only found the following available teams:\n\n#{available_teams.map { |team| "- #{team[:team_id]} (#{team[:team_name]})" }.join("\n")}\n"
         raise Tunes::Error.new, error_string
       end
-
       response = request(:post) do |req|
         req.url("ra/v1/session/webSession")
         req.body = {
@@ -197,8 +196,10 @@ module Spaceship
     def initialize(cookie: nil, current_team_id: nil, timeout: nil)
       options = {
        request: {
-          timeout:       (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i,
-          open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i
+          timeout:        (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i,
+          open_timeout:   (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i,
+          read_timeout:   (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i,
+          write_timeout:  (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i
         }
       }
       @current_team_id = current_team_id

@@ -17,8 +17,10 @@ module Spaceship
         else
           options = {
             request: {
-              timeout:       (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
-              open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || 300).to_i
+              timeout:        (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
+              open_timeout:   (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
+              read_timeout:   (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
+              write_timeout:  (ENV["SPACESHIP_TIMEOUT"] || 300).to_i
             }
           }
           @token = token
