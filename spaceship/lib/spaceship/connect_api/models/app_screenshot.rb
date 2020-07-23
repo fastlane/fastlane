@@ -108,6 +108,8 @@ module Spaceship
           # https://github.com/fastlane/fastlane/pull/16842
           time = Time.now.to_i
 
+          timeout_minutes = (ENV["SPACESHIP_SCREENSHOT_UPLOAD_TIMEOUT"] || 20).to_i
+
           loop do
             puts("Waiting for screenshot to appear before uploading...")
             sleep(30)
@@ -123,7 +125,7 @@ module Spaceship
             break if screenshot
 
             time_diff = Time.now.to_i - time
-            raise error if time_diff >= (60 * 6)
+            raise error if time_diff >= (60 * timeout_minutes)
           end
         end
 
