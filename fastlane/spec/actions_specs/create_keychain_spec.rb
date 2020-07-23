@@ -31,6 +31,8 @@ describe Fastlane do
         expect(result[1]).to include('~/Library/Keychains/test.keychain')
         expect(result[2]).to start_with("security list-keychains -s")
         expect(result[2]).to end_with(File.expand_path('~/Library/Keychains/test.keychain').to_s)
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::KEYCHAIN_NAME]).to eq('test.keychain')
       end
 
       it "works with name and password, when keychain already exist" do
@@ -55,6 +57,8 @@ describe Fastlane do
         expect(result[0]).to_not(include('-l'))
         expect(result[0]).to_not(include('-u'))
         expect(result[0]).to include('~/Library/Keychains/test.keychain')
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::KEYCHAIN_NAME]).to eq('test.keychain')
       end
 
       it "works with name and password that contain spaces or `\"`" do
@@ -68,6 +72,8 @@ describe Fastlane do
 
         expect(result.size).to eq(3)
         expect(result[0]).to eq(%(security create-keychain -p #{password.shellescape} ~/Library/Keychains/test.keychain))
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::KEYCHAIN_NAME]).to eq('test.keychain')
       end
 
       it "works with keychain-settings and name and password" do
@@ -89,6 +95,8 @@ describe Fastlane do
         expect(result[1]).to include('-l')
         expect(result[1]).to include('-u')
         expect(result[1]).to include('~/Library/Keychains/test.keychain')
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::KEYCHAIN_NAME]).to eq('test.keychain')
       end
 
       it "works with default_keychain and name and password" do
@@ -110,6 +118,8 @@ describe Fastlane do
         expect(result[2]).to_not(include('-l'))
         expect(result[2]).to_not(include('-u'))
         expect(result[2]).to include('~/Library/Keychains/test.keychain')
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::KEYCHAIN_NAME]).to eq('test.keychain')
       end
 
       it "works with unlock and name and password" do
@@ -131,6 +141,8 @@ describe Fastlane do
         expect(result[2]).to_not(include('-l'))
         expect(result[2]).to_not(include('-u'))
         expect(result[2]).to include('~/Library/Keychains/test.keychain')
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::KEYCHAIN_NAME]).to eq('test.keychain')
       end
 
       it "works with :path param" do
@@ -157,6 +169,8 @@ describe Fastlane do
         expect(result[3]).to include('-l')
         expect(result[3]).to include('-u')
         expect(result[3]).to include('/tmp/test.keychain')
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::KEYCHAIN_NAME]).to eq('test.keychain')
       end
 
       it "works with all params" do
@@ -184,6 +198,8 @@ describe Fastlane do
         expect(result[3]).to include('-l')
         expect(result[3]).to include('-u')
         expect(result[3]).to include('~/Library/Keychains/test.keychain')
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::KEYCHAIN_NAME]).to eq('test.keychain')
       end
     end
   end

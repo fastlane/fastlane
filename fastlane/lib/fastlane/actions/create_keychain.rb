@@ -4,6 +4,7 @@ module Fastlane
   module Actions
     module SharedValues
       ORIGINAL_DEFAULT_KEYCHAIN = :ORIGINAL_DEFAULT_KEYCHAIN
+      KEYCHAIN_NAME = :KEYCHAIN_NAME
     end
 
     class CreateKeychainAction < Action
@@ -50,6 +51,8 @@ module Fastlane
         command << " #{keychain_path}"
 
         commands << Fastlane::Actions.sh(command, log: false)
+
+        Actions.lane_context[Actions::SharedValues::KEYCHAIN_NAME] = keychain_path.split('/').last
 
         if params[:add_to_search_list]
           keychains = list_keychains
