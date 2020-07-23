@@ -1,5 +1,6 @@
 require_relative '../model'
 require_relative '../file_uploader'
+require_relative './app_screenshot_set'
 require 'spaceship/globals'
 
 require 'digest/md5'
@@ -9,6 +10,7 @@ module Spaceship
     class AppScreenshot
       include Spaceship::ConnectAPI::Model
 
+      attr_accessor :file_size
       attr_accessor :file_name
       attr_accessor :source_file_checksum
       attr_accessor :image_asset
@@ -19,6 +21,7 @@ module Spaceship
       attr_accessor :uploaded
 
       attr_mapping({
+        "fileSize" => "file_size",
         "fileName" => "file_name",
         "sourceFileChecksum" => "source_file_checksum",
         "imageAsset" => "image_asset",
@@ -31,6 +34,10 @@ module Spaceship
 
       def self.type
         return "appScreenshots"
+      end
+
+      def awaiting_upload?
+        (asset_delivery_state || {})["state"] == "AWAITING_UPLOAD"
       end
 
       def complete?
@@ -84,11 +91,41 @@ module Spaceship
           fileName: filename
         }
 
-        # Create placeholder
-        screenshot = Spaceship::ConnectAPI.post_app_screenshot(
-          app_screenshot_set_id: app_screenshot_set_id,
-          attributes: post_attributes
-        ).first
+        # Create placeholder to upload screenshot
+        begin
+          screenshot = Spaceship::ConnectAPI.post_app_screenshot(
+            app_screenshot_set_id: app_screenshot_set_id,
+            attributes: post_attributes
+          ).first
+        rescue => error
+          # Sometimes creating a screenshot with the web session App Store Connect API
+          # will result in a false failure. The response will return a 503 but the database
+          # insert will eventually go through.
+          #
+          # When this is observed, we will poll until we find the matchin screenshot that
+          # is awaiting for upload and file size
+          #
+          # https://github.com/fastlane/fastlane/pull/16842
+          time = Time.now.to_i
+
+          loop do
+            puts("Waiting for screenshot to appear before uploading...")
+            sleep(30)
+
+            screenshots = Spaceship::ConnectAPI::AppScreenshotSet
+                          .get(app_screenshot_set_id: app_screenshot_set_id)
+                          .app_screenshots
+
+            screenshot = screenshots.find do |s|
+              s.awaiting_upload? && s.file_size == filesize
+            end
+
+            break if screenshot
+
+            time_diff = Time.now.to_i - time
+            raise error if time_diff >= (60 * 6)
+          end
+        end
 
         # Upload the file
         upload_operations = screenshot.upload_operations

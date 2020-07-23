@@ -88,8 +88,8 @@ module Spaceship
         handle_response(response)
       end
 
-      def post(url_or_path, body)
-        response = with_asc_retry do
+      def post(url_or_path, body, tries: 5)
+        response = with_asc_retry(tries) do
           request(:post) do |req|
             req.url(url_or_path)
             req.body = body.to_json
