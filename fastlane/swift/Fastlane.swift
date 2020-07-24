@@ -2760,7 +2760,7 @@ func downloadDsyms(username: String,
                    teamName: String? = nil,
                    platform: String = "ios",
                    version: String? = nil,
-                   buildNumber: String? = nil,
+                   buildNumber: Any? = nil,
                    minVersion: String? = nil,
                    outputDirectory: String? = nil,
                    waitForDsymProcessing: Bool = false,
@@ -2974,16 +2974,19 @@ func ensureXcodeVersion(version: String? = nil,
    - template: ERB Template File
    - destination: Destination file
    - placeholders: Placeholders given as a hash
+   - trimMode: Trim mode applied to the ERB
 
  Renders an ERB template with `:placeholders` given as a hash via parameter.
  If no `:destination` is set, it returns the rendered template as string.
  */
 func erb(template: String,
          destination: String? = nil,
-         placeholders: [String: Any] = [:]) {
+         placeholders: [String: Any] = [:],
+         trimMode: String? = nil) {
     let command = RubyCommand(commandID: "", methodName: "erb", className: nil, args: [RubyCommand.Argument(name: "template", value: template),
                                                                                        RubyCommand.Argument(name: "destination", value: destination),
-                                                                                       RubyCommand.Argument(name: "placeholders", value: placeholders)])
+                                                                                       RubyCommand.Argument(name: "placeholders", value: placeholders),
+                                                                                       RubyCommand.Argument(name: "trim_mode", value: trimMode)])
     _ = runner.executeCommand(command)
 }
 
@@ -8986,4 +8989,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.78]
+// FastlaneRunnerAPIVersion [0.9.79]
