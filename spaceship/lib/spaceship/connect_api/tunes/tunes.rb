@@ -411,7 +411,7 @@ module Spaceship
           }
         }
 
-        Client.instance.post("appScreenshots", body)
+        Client.instance.post("appScreenshots", body, tries: 1)
       end
 
       def patch_app_screenshot(app_screenshot_id: nil, attributes: {})

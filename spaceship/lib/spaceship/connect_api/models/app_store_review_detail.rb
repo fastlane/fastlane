@@ -39,6 +39,7 @@ module Spaceship
       #
 
       def update(attributes: nil)
+        attributes = reverse_attr_mapping(attributes)
         return Spaceship::ConnectAPI.patch_app_store_review_detail(app_store_review_detail_id: id, attributes: attributes)
       end
 

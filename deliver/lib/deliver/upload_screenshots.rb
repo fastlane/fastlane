@@ -26,47 +26,7 @@ module Deliver
       localizations = version.get_app_store_version_localizations
 
       if options[:overwrite_screenshots]
-        # Get localizations on version
-        localizations.each do |localization|
-          # Only delete screenshots if trying to upload
-          next unless screenshots_per_language.keys.include?(localization.locale)
-
-          # Iterate over all screenshots for each set and delete
-          screenshot_sets = localization.get_app_screenshot_sets
-
-          # Multi threading delete on single localization
-          threads = []
-          errors = []
-
-          screenshot_sets.each do |screenshot_set|
-            UI.message("Removing all previously uploaded screenshots for '#{localization.locale}' '#{screenshot_set.screenshot_display_type}'...")
-            screenshot_set.app_screenshots.each do |screenshot|
-              UI.verbose("Deleting screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
-              threads << Thread.new do
-                begin
-                  screenshot.delete!
-                  UI.verbose("Deleted screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
-                rescue => error
-                  UI.verbose("Failed to delete screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
-                  errors << error
-                end
-              end
-            end
-          end
-
-          sleep(1) # Feels bad but sleeping a bit to let the threads catchup
-
-          unless threads.empty?
-            Helper.show_loading_indicator("Waiting for screenshots to be deleted for '#{localization.locale}'... (might be slow)") unless FastlaneCore::Globals.verbose?
-            threads.each(&:join)
-            Helper.hide_loading_indicator unless FastlaneCore::Globals.verbose?
-          end
-
-          # Crash if any errors happen while deleting
-          errors.each do |error|
-            UI.error(error.message)
-          end
-        end
+        delete_screenshots(localizations, screenshots_per_language)
       end
 
       # Finding languages to enable
@@ -91,6 +51,79 @@ module Deliver
       end
 
       upload_screenshots(screenshots_per_language, localizations, options)
+    end
+
+    def delete_screenshots(localizations, screenshots_per_language, tries: 5)
+      tries -= 1
+
+      # Get localizations on version
+      localizations.each do |localization|
+        # Only delete screenshots if trying to upload
+        next unless screenshots_per_language.keys.include?(localization.locale)
+
+        # Iterate over all screenshots for each set and delete
+        screenshot_sets = localization.get_app_screenshot_sets
+
+        # Multi threading delete on single localization
+        threads = []
+        errors = []
+
+        screenshot_sets.each do |screenshot_set|
+          UI.message("Removing all previously uploaded screenshots for '#{localization.locale}' '#{screenshot_set.screenshot_display_type}'...")
+          screenshot_set.app_screenshots.each do |screenshot|
+            UI.verbose("Deleting screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
+            threads << Thread.new do
+              begin
+                screenshot.delete!
+                UI.verbose("Deleted screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
+              rescue => error
+                UI.verbose("Failed to delete screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
+                errors << error
+              end
+            end
+          end
+        end
+
+        sleep(1) # Feels bad but sleeping a bit to let the threads catchup
+
+        unless threads.empty?
+          Helper.show_loading_indicator("Waiting for screenshots to be deleted for '#{localization.locale}'... (might be slow)") unless FastlaneCore::Globals.verbose?
+          threads.each(&:join)
+          Helper.hide_loading_indicator unless FastlaneCore::Globals.verbose?
+        end
+
+        # Crash if any errors happen while deleting
+        errors.each do |error|
+          UI.error(error.message)
+        end
+      end
+
+      # Verify all screenshots have been deleted
+      # Sometimes API requests will fail but screenshots will still be deleted
+      count = count_screenshots(localizations)
+      UI.important("Number of screenshots not deleted: #{count}")
+      if count > 0
+        if tries.zero?
+          UI.user_error!("Failed verification of all screenshots deleted... #{count} screenshot(s) still exist")
+        else
+          UI.error("Failed to delete all screenshots... Tries remaining: #{tries}")
+          delete_screenshots(localizations, screenshots_per_language, tries: tries)
+        end
+      else
+        UI.message("Successfully deleted all screenshots")
+      end
+    end
+
+    def count_screenshots(localizations)
+      count = 0
+      localizations.each do |localization|
+        screenshot_sets = localization.get_app_screenshot_sets
+        screenshot_sets.each do |screenshot_set|
+          count += screenshot_set.app_screenshots.size
+        end
+      end
+
+      return count
     end
 
     def upload_screenshots(screenshots_per_language, localizations, options)
