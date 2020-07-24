@@ -1,4 +1,5 @@
 require_relative '../model'
+require_relative './app_store_review_detail'
 require_relative './app_store_version_localization'
 
 module Spaceship
@@ -119,6 +120,7 @@ module Spaceship
       #
 
       def create_app_store_review_detail(attributes: nil)
+        attributes = Spaceship::ConnectAPI::AppStoreReviewDetail.reverse_attr_mapping(attributes)
         resp = Spaceship::ConnectAPI.post_app_store_review_detail(app_store_version_id: id, attributes: attributes)
         return resp.to_models.first
       end
