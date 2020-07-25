@@ -206,7 +206,7 @@ module FastlaneCore
 
         UI.message("Booting #{self}")
 
-        `xcrun simctl boot #{self.udid}`
+        `xcrun simctl boot #{self.udid} 2>/dev/null`
         self.state = 'Booted'
       end
 
@@ -216,7 +216,7 @@ module FastlaneCore
         return if self.state != 'Booted'
 
         UI.message("Shutting down #{self.udid}")
-        `xcrun simctl shutdown #{self.udid}`
+        `xcrun simctl shutdown #{self.udid} 2>/dev/null`
         self.state = 'Shutdown'
       end
 
