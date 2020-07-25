@@ -4,7 +4,7 @@ module Fastlane
   module Actions
     module SharedValues
       ORIGINAL_DEFAULT_KEYCHAIN = :ORIGINAL_DEFAULT_KEYCHAIN
-      KEYCHAIN_NAME = :KEYCHAIN_NAME
+      KEYCHAIN_PATH = :KEYCHAIN_PATH
     end
 
     class CreateKeychainAction < Action
@@ -26,6 +26,7 @@ module Fastlane
 
         if !exists?(keychain_path)
           commands << Fastlane::Actions.sh("security create-keychain -p #{escaped_password} #{keychain_path}", log: false)
+          Actions.lane_context[Actions::SharedValues::KEYCHAIN_PATH] = keychain_path
         elsif params[:require_create]
           UI.abort_with_message!("`require_create` option passed, but found keychain '#{keychain_path}', failing create_keychain action")
         else
@@ -51,8 +52,6 @@ module Fastlane
         command << " #{keychain_path}"
 
         commands << Fastlane::Actions.sh(command, log: false)
-
-        Actions.lane_context[Actions::SharedValues::KEYCHAIN_NAME] = keychain_path.split('/').last
 
         if params[:add_to_search_list]
           keychains = list_keychains
@@ -95,7 +94,7 @@ module Fastlane
       def self.output
         [
           ['ORIGINAL_DEFAULT_KEYCHAIN', 'The path to the default keychain'],
-          ['KEYCHAIN_NAME', 'The name of the created keychain']
+          ['KEYCHAIN_PATH', 'The path of the newly created keychain'],
         ]
       end
 
