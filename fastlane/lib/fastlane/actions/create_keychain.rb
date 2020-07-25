@@ -94,7 +94,7 @@ module Fastlane
       def self.output
         [
           ['ORIGINAL_DEFAULT_KEYCHAIN', 'The path to the default keychain'],
-          ['KEYCHAIN_PATH', 'The path of the newly created keychain'],
+          ['KEYCHAIN_PATH', 'The path of the newly created keychain']
         ]
       end
 
