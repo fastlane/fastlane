@@ -129,7 +129,6 @@ module Spaceship
         tries = 1 if Object.const_defined?("SpecHelper")
         response = yield
 
-        tries -= 1
         status = response.status if response
 
         if [500, 504].include?(status)
@@ -139,6 +138,7 @@ module Spaceship
 
         return response
       rescue => error
+        tries -= 1
         puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
           return response
