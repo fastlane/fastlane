@@ -54,5 +54,54 @@ describe Frameit do
         expect(skip).to be(false)
       end
     end
+
+    describe "fetch_text" do
+      context ".strings" do
+        it "fetches strings from ../" do
+          screenshot_path = './frameit/spec/fixtures/editor/android/en-US/images/phoneScreenshots/screen1.png'
+          config = Frameit::ConfigParser.new.load('./frameit/spec/fixtures/editor/Framefile.json').fetch_value(screenshot_path)
+          screenshot = Frameit::Screenshot.new(screenshot_path, Frameit::Color::BLACK, config, nil)
+          editor = Frameit::Editor.new(screenshot, config)
+
+          # Suppress type validation error
+          allow(Fastlane::UI).to receive(:user_error!)
+
+          expect(Frameit::StringsParser).to receive(:parse).and_call_original
+
+          text = editor.send("fetch_text", "title-same-dir")
+          expect(text).to eq("Screen1 Title - same dir")
+        end
+
+        it "fetches strings from ../../" do
+          screenshot_path = './frameit/spec/fixtures/editor/android/en-US/images/phoneScreenshots/screen1.png'
+          config = Frameit::ConfigParser.new.load('./frameit/spec/fixtures/editor/Framefile.json').fetch_value(screenshot_path)
+          screenshot = Frameit::Screenshot.new(screenshot_path, Frameit::Color::BLACK, config, nil)
+          editor = Frameit::Editor.new(screenshot, config)
+
+          # Suppress type validation error
+          allow(Fastlane::UI).to receive(:user_error!)
+
+          expect(Frameit::StringsParser).to receive(:parse).and_call_original
+
+          text = editor.send("fetch_text", "title-1-up")
+          expect(text).to eq("Screen1 Title - 1 dir up")
+        end
+
+        it "fetches strings from ../../../" do
+          screenshot_path = './frameit/spec/fixtures/editor/android/en-US/images/phoneScreenshots/screen1.png'
+          config = Frameit::ConfigParser.new.load('./frameit/spec/fixtures/editor/Framefile.json').fetch_value(screenshot_path)
+          screenshot = Frameit::Screenshot.new(screenshot_path, Frameit::Color::BLACK, config, nil)
+          editor = Frameit::Editor.new(screenshot, config)
+
+          # Suppress type validation error
+          allow(Fastlane::UI).to receive(:user_error!)
+
+          expect(Frameit::StringsParser).to receive(:parse).and_call_original
+
+          text = editor.send("fetch_text", "title-2-up")
+          expect(text).to eq("Screen1 Title - 2 dir up")
+        end
+      end
+    end
   end
 end

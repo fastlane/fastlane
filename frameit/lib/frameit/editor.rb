@@ -500,7 +500,9 @@ module Frameit
       UI.user_error!("Valid parameters :keyword, :title") unless [:keyword, :title].include?(type)
 
       # Try to get it from a keyword.strings or title.strings file
-      strings_path = File.join(File.expand_path("..", screenshot.path), "#{type}.strings")
+      strings_path = File.join(File.expand_path("../", screenshot.path), "#{type}.strings")
+      strings_path = File.join(File.expand_path("../../", screenshot.path), "#{type}.strings") unless File.exist?(strings_path)
+      strings_path = File.join(File.expand_path("../../../", screenshot.path), "#{type}.strings") unless File.exist?(strings_path)
       if File.exist?(strings_path)
         parsed = StringsParser.parse(strings_path)
         text_array = parsed.find { |k, v| screenshot.path.upcase.include?(k.upcase) }
