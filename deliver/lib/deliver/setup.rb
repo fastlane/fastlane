@@ -136,8 +136,6 @@ module Deliver
         end
         content += "\n"
 
-        file_key = UploadMetadata::REVIEW_INFORMATION_VALUES_LEGACY.key(file_key)
-
         base_dir = File.join(path, UploadMetadata::REVIEW_INFORMATION_DIR)
         resulting_path = File.join(base_dir, "#{file_key}.txt")
         FileUtils.mkdir_p(File.expand_path('..', resulting_path))

@@ -507,13 +507,30 @@ module Deliver
       end
 
       # Load review information
-      options[:app_review_information] ||= {}
-      REVIEW_INFORMATION_VALUES.keys.each do |option_name|
+      # This is used to find the file path for both new and legacy review information filenames
+      resolve_review_info_path = lambda do |option_name|
         path = File.join(options[:metadata_path], REVIEW_INFORMATION_DIR, "#{option_name}.txt")
-        next unless File.exist?(path)
-        next if options[:app_review_information][option_name].to_s.length > 0
+        return nil unless File.exist?(path)
+        return nil if options[:app_review_information][option_name].to_s.length > 0
 
         UI.message("Loading '#{path}'...")
+        return path
+      end
+
+      # First try and load review information from legacy filenames
+      options[:app_review_information] ||= {}
+      REVIEW_INFORMATION_VALUES_LEGACY.each do |legacy_option_name, option_name|
+        path = resolve_review_info_path.call(legacy_option_name)
+        next if path.nil?
+        options[:app_review_information][option_name] ||= File.read(path)
+
+        UI.deprecated("Review rating option '#{legacy_option_name}' from iTunesConnect has been deprecated. Please replace with '#{option_name}'")
+      end
+
+      # Then load review information from new App Store Connect filenames
+      REVIEW_INFORMATION_VALUES.keys.each do |option_name|
+        path = resolve_review_info_path.call(option_name)
+        next if path.nil?
         options[:app_review_information][option_name] ||= File.read(path)
       end
     end
