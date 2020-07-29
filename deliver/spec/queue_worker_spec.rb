@@ -7,7 +7,7 @@ describe Deliver::QueueWorker do
     it 'should accepet any object' do
       expect { subject.enqueue(1) }.not_to(raise_error)
       expect { subject.enqueue('aaa') }.not_to(raise_error)
-      expect { subject.enqueue([1,2,3]) }.not_to(raise_error)
+      expect { subject.enqueue([1, 2, 3]) }.not_to(raise_error)
       expect { subject.enqueue(Object.new) }.not_to(raise_error)
     end
   end

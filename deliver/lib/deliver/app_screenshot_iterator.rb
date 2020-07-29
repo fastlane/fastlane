@@ -50,12 +50,12 @@ module Deliver
 
       # Iterate over all the screenshots per language and display_type
       # and then enqueue them to worker one by one if it's not duplciated on App Store Connect
-      screenshots_per_language.map { |language, screenshots_for_language|
+      screenshots_per_language.map do |language, screenshots_for_language|
         localization = @localizations.find { |l| l.locale == language }
         [localization, screenshots_for_language]
-      }.reject { |localization, _|
+      end.reject do |localization, _|
         localization.nil?
-      }.each do |localization, screenshots_for_language|
+      end.each do |localization, screenshots_for_language|
         iterate_over_screenshots_per_language(localization, screenshots_for_language, &block)
       end
     end
