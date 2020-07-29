@@ -161,17 +161,24 @@ describe Match do
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = false
         private_key = "#{path}/fastlane.match.id_dsa"
-        command = "ssh-agent bash -c 'ssh-add #{private_key.shellescape}; git clone #{git_url.shellescape} #{path.shellescape}'"
-        to_params = {
-          command: command,
-          print_all: nil,
-          print_command: nil
-        }
+        clone_command = "ssh-agent bash -c 'ssh-add #{private_key.shellescape}; git clone #{git_url.shellescape} #{path.shellescape}'"
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
+        git_branch = "master"
+
+        expected_commands = [
+          clone_command,
+          "git --no-pager branch --list origin/#{git_branch} --no-color -r",
+          "git checkout --orphan #{git_branch}",
+          "git reset --hard"
+        ]
+
+        expected_commands.each do |command|
+          expect(FastlaneCore::CommandExecutor).to receive(:execute).once.with({
+            command: command,
+            print_all: nil,
+            print_command: nil
+          }).and_return("")
+        end
 
         storage = Match::Storage::GitStorage.new(
           git_url: git_url,
@@ -191,17 +198,24 @@ describe Match do
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = false
         private_key = "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"
-        command = "ssh-agent bash -c 'ssh-add - <<< \"#{private_key}\"; git clone #{git_url.shellescape} #{path.shellescape}'"
-        to_params = {
-          command: command,
-          print_all: nil,
-          print_command: nil
-        }
+        clone_command = "ssh-agent bash -c 'ssh-add - <<< \"#{private_key}\"; git clone #{git_url.shellescape} #{path.shellescape}'"
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
+        git_branch = "master"
+
+        expected_commands = [
+          clone_command,
+          "git --no-pager branch --list origin/#{git_branch} --no-color -r",
+          "git checkout --orphan #{git_branch}",
+          "git reset --hard"
+        ]
+
+        expected_commands.each do |command|
+          expect(FastlaneCore::CommandExecutor).to receive(:execute).once.with({
+            command: command,
+            print_all: nil,
+            print_command: nil
+          }).and_return("")
+        end
 
         storage = Match::Storage::GitStorage.new(
           git_url: git_url,
