@@ -1442,6 +1442,7 @@ func captureAndroidScreenshots(androidHome: String? = nil,
    - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running snapshot
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
+   - headless: Enabling this option will prevent displaying the simulator window
    - overrideStatusBar: Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
@@ -1485,6 +1486,7 @@ func captureIosScreenshots(workspace: String? = nil,
                            clearPreviousScreenshots: Bool = false,
                            reinstallApp: Bool = false,
                            eraseSimulator: Bool = false,
+                           headless: Bool = true,
                            overrideStatusBar: Bool = false,
                            localizeSimulator: Bool = false,
                            darkMode: Bool? = nil,
@@ -1527,6 +1529,7 @@ func captureIosScreenshots(workspace: String? = nil,
                                                                                                            RubyCommand.Argument(name: "clear_previous_screenshots", value: clearPreviousScreenshots),
                                                                                                            RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                                            RubyCommand.Argument(name: "erase_simulator", value: eraseSimulator),
+                                                                                                           RubyCommand.Argument(name: "headless", value: headless),
                                                                                                            RubyCommand.Argument(name: "override_status_bar", value: overrideStatusBar),
                                                                                                            RubyCommand.Argument(name: "localize_simulator", value: localizeSimulator),
                                                                                                            RubyCommand.Argument(name: "dark_mode", value: darkMode),
@@ -1576,6 +1579,7 @@ func captureIosScreenshots(workspace: String? = nil,
    - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running snapshot
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
+   - headless: Enabling this option will prevent displaying the simulator window
    - overrideStatusBar: Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
@@ -1619,6 +1623,7 @@ func captureScreenshots(workspace: String? = nil,
                         clearPreviousScreenshots: Bool = false,
                         reinstallApp: Bool = false,
                         eraseSimulator: Bool = false,
+                        headless: Bool = true,
                         overrideStatusBar: Bool = false,
                         localizeSimulator: Bool = false,
                         darkMode: Bool? = nil,
@@ -1661,6 +1666,7 @@ func captureScreenshots(workspace: String? = nil,
                                                                                                        RubyCommand.Argument(name: "clear_previous_screenshots", value: clearPreviousScreenshots),
                                                                                                        RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                                        RubyCommand.Argument(name: "erase_simulator", value: eraseSimulator),
+                                                                                                       RubyCommand.Argument(name: "headless", value: headless),
                                                                                                        RubyCommand.Argument(name: "override_status_bar", value: overrideStatusBar),
                                                                                                        RubyCommand.Argument(name: "localize_simulator", value: localizeSimulator),
                                                                                                        RubyCommand.Argument(name: "dark_mode", value: darkMode),
@@ -1699,6 +1705,7 @@ func captureScreenshots(workspace: String? = nil,
    - dependencies: Carthage dependencies to update, build or bootstrap
    - useSsh: Use SSH for downloading GitHub repositories
    - useSubmodules: Add dependencies as Git submodules
+   - useNetrc: Use .netrc for downloading frameworks
    - useBinaries: Check out dependency repositories even when prebuilt frameworks exist
    - noCheckout: When bootstrapping Carthage do not checkout
    - noBuild: When bootstrapping Carthage do not build
@@ -1720,6 +1727,7 @@ func carthage(command: String = "bootstrap",
               dependencies: [String] = [],
               useSsh: Bool? = nil,
               useSubmodules: Bool? = nil,
+              useNetrc: Bool? = nil,
               useBinaries: Bool? = nil,
               noCheckout: Bool? = nil,
               noBuild: Bool? = nil,
@@ -1740,6 +1748,7 @@ func carthage(command: String = "bootstrap",
                                                                                             RubyCommand.Argument(name: "dependencies", value: dependencies),
                                                                                             RubyCommand.Argument(name: "use_ssh", value: useSsh),
                                                                                             RubyCommand.Argument(name: "use_submodules", value: useSubmodules),
+                                                                                            RubyCommand.Argument(name: "use_netrc", value: useNetrc),
                                                                                             RubyCommand.Argument(name: "use_binaries", value: useBinaries),
                                                                                             RubyCommand.Argument(name: "no_checkout", value: noCheckout),
                                                                                             RubyCommand.Argument(name: "no_build", value: noBuild),
@@ -3558,10 +3567,14 @@ func gitCommit(path: Any,
 /**
  Executes a simple git pull command
 
- - parameter onlyTags: Simply pull the tags, and not bring new commits to the current branch from the remote
+ - parameters:
+   - onlyTags: Simply pull the tags, and not bring new commits to the current branch from the remote
+   - rebase: Rebase on top of the remote branch instead of merge
  */
-func gitPull(onlyTags: Bool = false) {
-    let command = RubyCommand(commandID: "", methodName: "git_pull", className: nil, args: [RubyCommand.Argument(name: "only_tags", value: onlyTags)])
+func gitPull(onlyTags: Bool = false,
+             rebase: Bool = false) {
+    let command = RubyCommand(commandID: "", methodName: "git_pull", className: nil, args: [RubyCommand.Argument(name: "only_tags", value: onlyTags),
+                                                                                            RubyCommand.Argument(name: "rebase", value: rebase)])
     _ = runner.executeCommand(command)
 }
 
@@ -4555,6 +4568,7 @@ func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
    - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
    - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64
+   - gitPrivateKey: Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
    - googleCloudProjectId: ID of the Google Cloud project to use for authentication
@@ -4596,6 +4610,7 @@ func match(type: Any = matchfile.type,
            cloneBranchDirectly: Bool = matchfile.cloneBranchDirectly,
            gitBasicAuthorization: Any? = matchfile.gitBasicAuthorization,
            gitBearerAuthorization: Any? = matchfile.gitBearerAuthorization,
+           gitPrivateKey: Any? = matchfile.gitPrivateKey,
            googleCloudBucketName: Any? = matchfile.googleCloudBucketName,
            googleCloudKeysFile: Any? = matchfile.googleCloudKeysFile,
            googleCloudProjectId: Any? = matchfile.googleCloudProjectId,
@@ -4634,6 +4649,7 @@ func match(type: Any = matchfile.type,
                                                                                          RubyCommand.Argument(name: "clone_branch_directly", value: cloneBranchDirectly),
                                                                                          RubyCommand.Argument(name: "git_basic_authorization", value: gitBasicAuthorization),
                                                                                          RubyCommand.Argument(name: "git_bearer_authorization", value: gitBearerAuthorization),
+                                                                                         RubyCommand.Argument(name: "git_private_key", value: gitPrivateKey),
                                                                                          RubyCommand.Argument(name: "google_cloud_bucket_name", value: googleCloudBucketName),
                                                                                          RubyCommand.Argument(name: "google_cloud_keys_file", value: googleCloudKeysFile),
                                                                                          RubyCommand.Argument(name: "google_cloud_project_id", value: googleCloudProjectId),
@@ -5038,7 +5054,7 @@ func pem(development: Bool = false,
    - betaAppDescription: Provide the 'Beta App Description' when uploading a new build
    - betaAppFeedbackEmail: Provide the beta app email when uploading a new build
    - localizedBuildInfo: Localized beta app test info for what's new
-   - changelog: Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog
+   - changelog: Provide the 'What to Test' text when uploading a new build
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
    - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
@@ -6870,6 +6886,7 @@ func slather(buildDirectory: String? = nil,
    - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running snapshot
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
+   - headless: Enabling this option will prevent displaying the simulator window
    - overrideStatusBar: Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
@@ -6913,6 +6930,7 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
               clearPreviousScreenshots: Bool = snapshotfile.clearPreviousScreenshots,
               reinstallApp: Bool = snapshotfile.reinstallApp,
               eraseSimulator: Bool = snapshotfile.eraseSimulator,
+              headless: Bool = snapshotfile.headless,
               overrideStatusBar: Bool = snapshotfile.overrideStatusBar,
               localizeSimulator: Bool = snapshotfile.localizeSimulator,
               darkMode: Bool? = snapshotfile.darkMode,
@@ -6955,6 +6973,7 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
                                                                                             RubyCommand.Argument(name: "clear_previous_screenshots", value: clearPreviousScreenshots),
                                                                                             RubyCommand.Argument(name: "reinstall_app", value: reinstallApp),
                                                                                             RubyCommand.Argument(name: "erase_simulator", value: eraseSimulator),
+                                                                                            RubyCommand.Argument(name: "headless", value: headless),
                                                                                             RubyCommand.Argument(name: "override_status_bar", value: overrideStatusBar),
                                                                                             RubyCommand.Argument(name: "localize_simulator", value: localizeSimulator),
                                                                                             RubyCommand.Argument(name: "dark_mode", value: darkMode),
@@ -7353,6 +7372,7 @@ func swiftlint(mode: Any = "lint",
    - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
    - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
    - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64
+   - gitPrivateKey: Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
    - googleCloudProjectId: ID of the Google Cloud project to use for authentication
@@ -7394,6 +7414,7 @@ func syncCodeSigning(type: String = "development",
                      cloneBranchDirectly: Bool = false,
                      gitBasicAuthorization: String? = nil,
                      gitBearerAuthorization: String? = nil,
+                     gitPrivateKey: String? = nil,
                      googleCloudBucketName: String? = nil,
                      googleCloudKeysFile: String? = nil,
                      googleCloudProjectId: String? = nil,
@@ -7432,6 +7453,7 @@ func syncCodeSigning(type: String = "development",
                                                                                                      RubyCommand.Argument(name: "clone_branch_directly", value: cloneBranchDirectly),
                                                                                                      RubyCommand.Argument(name: "git_basic_authorization", value: gitBasicAuthorization),
                                                                                                      RubyCommand.Argument(name: "git_bearer_authorization", value: gitBearerAuthorization),
+                                                                                                     RubyCommand.Argument(name: "git_private_key", value: gitPrivateKey),
                                                                                                      RubyCommand.Argument(name: "google_cloud_bucket_name", value: googleCloudBucketName),
                                                                                                      RubyCommand.Argument(name: "google_cloud_keys_file", value: googleCloudKeysFile),
                                                                                                      RubyCommand.Argument(name: "google_cloud_project_id", value: googleCloudProjectId),
@@ -7535,7 +7557,7 @@ func testfairy(apiKey: String,
    - betaAppDescription: Provide the 'Beta App Description' when uploading a new build
    - betaAppFeedbackEmail: Provide the beta app email when uploading a new build
    - localizedBuildInfo: Localized beta app test info for what's new
-   - changelog: Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog
+   - changelog: Provide the 'What to Test' text when uploading a new build
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
    - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
@@ -8453,7 +8475,7 @@ func uploadToPlayStoreInternalAppSharing(packageName: String,
    - betaAppDescription: Provide the 'Beta App Description' when uploading a new build
    - betaAppFeedbackEmail: Provide the beta app email when uploading a new build
    - localizedBuildInfo: Localized beta app test info for what's new
-   - changelog: Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog
+   - changelog: Provide the 'What to Test' text when uploading a new build
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
    - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
@@ -8989,4 +9011,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.80]
+// FastlaneRunnerAPIVersion [0.9.81]
