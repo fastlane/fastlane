@@ -91,4 +91,178 @@ describe Deliver::UploadScreenshots do
       end.to raise_error(FastlaneCore::Interface::FastlaneError, "Unsupported screen size [3840, 2160] for path '/Screenshots/iMessage/en-GB/AppleTV-01First{3840x2160}.jpg'")
     end
   end
+
+  describe '#delete_screenshots' do
+    context 'when localization has a screenshot' do
+      it 'should delete screenshots that AppScreenshotIterator gives' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', id: 'some-id')
+        # return empty by `app_screenshots` as `each_app_screenshot_set` mocked needs it empty
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        screenshots_per_language = { 'en-US' => [] }
+
+        allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot).and_yield(localization, app_screenshot_set, app_screenshot)
+        allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set).and_return([[localization, app_screenshot_set]])
+
+        expect(app_screenshot).to receive(:delete!).once
+        described_class.new.delete_screenshots([localization], screenshots_per_language)
+      end
+    end
+
+    context 'when deletion fails once' do
+      it 'should retry to delete screenshots' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', id: 'some-id')
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        screenshots_per_language = { 'en-US' => [] }
+
+        allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot).and_yield(localization, app_screenshot_set, app_screenshot)
+        # Return an screenshot once to fail validation and then return empty next time to pass it
+        allow(app_screenshot_set).to receive(:app_screenshots).exactly(2).times.and_return([app_screenshot], [])
+        allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set).and_return([[localization, app_screenshot_set]])
+
+        # Try `delete!` twice by retry
+        expect(app_screenshot).to receive(:delete!).twice
+        described_class.new.delete_screenshots([localization], screenshots_per_language)
+      end
+    end
+  end
+
+  describe '#upload_screenshots' do
+    context 'when localization has no screenshot uploaded' do
+      it 'should upload screenshots with app_screenshot_set' do
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        local_screenshot = double('Deliver::AppScreenshot',
+                                  path: '/path/to/screenshot',
+                                  language: 'en-US',
+                                  device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshots_per_language = { 'en-US' => [local_screenshot] }
+        allow(described_class).to receive(:calculate_checksum).and_return('checksum')
+
+        expect(app_screenshot_set).to receive(:upload_screenshot).with(path: local_screenshot.path, wait_for_processing: true)
+
+        described_class.new.upload_screenshots(screenshots_per_language, [localization], { submit_for_review: true })
+      end
+    end
+
+    context 'when localization has the exact same screenshot uploaded already' do
+      it 'should skip that screenshot' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot',
+                                source_file_checksum: 'checksum')
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [app_screenshot])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        local_screenshot = double('Deliver::AppScreenshot',
+                                  path: '/path/to/screenshot',
+                                  language: 'en-US',
+                                  device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshots_per_language = { 'en-US' => [local_screenshot] }
+        allow(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')
+
+        expect(app_screenshot_set).to_not(receive(:upload_screenshot))
+        described_class.new.upload_screenshots(screenshots_per_language, [localization], { submit_for_review: true })
+      end
+    end
+
+    context 'when there are 11 screenshots to upload locally' do
+      it 'should skip 11th screenshot' do
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        local_screenshot = double('Deliver::AppScreenshot',
+                                  path: '/path/to/screenshot',
+                                  language: 'en-US',
+                                  device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshots_per_language = { 'en-US' => Array.new(11, local_screenshot) }
+        allow(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')
+
+        expect(app_screenshot_set).to receive(:upload_screenshot).exactly(10).times
+        described_class.new.upload_screenshots(screenshots_per_language, [localization], { submit_for_review: true })
+      end
+    end
+
+    context 'when localization has 10 screenshots uploaded already and try uploading another new screenshot' do
+      it 'should skip 11th screenshot' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot',
+                                source_file_checksum: 'checksum')
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: Array.new(10, app_screenshot))
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        uploaded_local_screenshot = double('Deliver::AppScreenshot',
+                                           path: '/path/to/screenshot',
+                                           language: 'en-US',
+                                           device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        new_local_screenshot = double('Deliver::AppScreenshot',
+                                      path: '/path/to/new_screenshot',
+                                      language: 'en-US',
+                                      device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshots_per_language = { 'en-US' => [*Array.new(10, uploaded_local_screenshot), new_local_screenshot] }
+        allow(described_class).to receive(:calculate_checksum).with(uploaded_local_screenshot.path).and_return('checksum')
+        allow(described_class).to receive(:calculate_checksum).with(new_local_screenshot.path).and_return('another_checksum')
+
+        expect(app_screenshot_set).to_not(receive(:upload_screenshot))
+        described_class.new.upload_screenshots(screenshots_per_language, [localization], { submit_for_review: true })
+      end
+    end
+  end
+
+  describe '#clean_up_screenshots' do
+    def make_app_screenshot(id:, file_name:, is_complete: true)
+      app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', id: id, file_name: file_name)
+      # `complete?` needed to be mocked by this way since Rubocop using 2.0 parser can't handle `{ 'complete?':  false }` format
+      allow(app_screenshot).to receive(:complete?).and_return(is_complete)
+      app_screenshot
+    end
+
+    context 'when localization has incomplete screenshots uploaded' do
+      it 'should delete screenshot' do
+        app_screenshot = make_app_screenshot(id: 'some-id', file_name: '6.5_1.jpg', is_complete: false)
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [app_screenshot])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        expect(app_screenshot).to receive(:delete!)
+        described_class.new.clean_up_screenshots([localization])
+      end
+    end
+
+    context 'when localization has screenshots uploaded in wrong order' do
+      it 'should reoder screenshots' do
+        app_screenshot1 = make_app_screenshot(id: '1', file_name: '6.5_1.jpg')
+        app_screenshot2 = make_app_screenshot(id: '2', file_name: '6.5_2.jpg')
+        app_screenshot3 = make_app_screenshot(id: '3', file_name: '6.5_3.jpg')
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [app_screenshot3, app_screenshot2, app_screenshot1])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        expect(app_screenshot_set).to receive(:reorder_screenshots).with(app_screenshot_ids: ['1', '2', '3'])
+        described_class.new.clean_up_screenshots([localization])
+      end
+    end
+  end
 end
