@@ -26,13 +26,14 @@ module Fastlane
 
         if !exists?(keychain_path)
           commands << Fastlane::Actions.sh("security create-keychain -p #{escaped_password} #{keychain_path}", log: false)
-          Actions.lane_context[Actions::SharedValues::KEYCHAIN_PATH] = keychain_path
         elsif params[:require_create]
           UI.abort_with_message!("`require_create` option passed, but found keychain '#{keychain_path}', failing create_keychain action")
         else
           UI.important("Found keychain '#{keychain_path}', creation skipped")
           UI.important("If creating a new Keychain DB is required please set the `require_create` option true to cause the action to fail")
         end
+
+        Actions.lane_context[Actions::SharedValues::KEYCHAIN_PATH] = keychain_path
 
         if params[:default_keychain]
           # if there is no default keychain - setting the original will fail - silent this error
@@ -94,7 +95,7 @@ module Fastlane
       def self.output
         [
           ['ORIGINAL_DEFAULT_KEYCHAIN', 'The path to the default keychain'],
-          ['KEYCHAIN_PATH', 'The path of the newly created keychain']
+          ['KEYCHAIN_PATH', 'The path of the keychain']
         ]
       end
 
