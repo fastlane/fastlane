@@ -19,6 +19,7 @@ module Match
       attr_accessor :platform
       attr_accessor :git_basic_authorization
       attr_accessor :git_bearer_authorization
+      attr_accessor :git_private_key
 
       def self.configure(params)
         return self.new(
@@ -32,7 +33,8 @@ module Match
           git_user_email: params[:git_user_email],
           clone_branch_directly: params[:clone_branch_directly],
           git_basic_authorization: params[:git_basic_authorization],
-          git_bearer_authorization: params[:git_bearer_authorization]
+          git_bearer_authorization: params[:git_bearer_authorization],
+          git_private_key: params[:git_private_key]
         )
       end
 
@@ -46,7 +48,8 @@ module Match
                      git_user_email: nil,
                      clone_branch_directly: false,
                      git_basic_authorization: nil,
-                     git_bearer_authorization: nil)
+                     git_bearer_authorization: nil,
+                     git_private_key: nil)
         self.git_url = git_url
         self.shallow_clone = shallow_clone
         self.skip_docs = skip_docs
@@ -56,6 +59,7 @@ module Match
         self.clone_branch_directly = clone_branch_directly
         self.git_basic_authorization = git_basic_authorization
         self.git_bearer_authorization = git_bearer_authorization
+        self.git_private_key = git_private_key
 
         self.type = type if type
         self.platform = platform if platform
@@ -83,6 +87,16 @@ module Match
           command << " --depth 1 --no-single-branch"
         elsif self.clone_branch_directly
           command += " -b #{self.branch.shellescape} --single-branch"
+        end
+
+        unless self.git_private_key.nil?
+          if File.file?(self.git_private_key)
+            ssh_add = File.expand_path(self.git_private_key).shellescape.to_s
+          else
+            UI.message("Private key file does not exist, will continue by using it as a raw key.")
+            ssh_add = "- <<< \"#{self.git_private_key}\""
+          end
+          command = "ssh-agent bash -c 'ssh-add #{ssh_add}; #{command}'"
         end
 
         UI.message("Cloning remote git repo...")

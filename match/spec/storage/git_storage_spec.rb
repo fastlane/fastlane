@@ -152,5 +152,67 @@ describe Match do
         expect(File.read(File.join(storage.working_directory, 'match_version.txt'))).to eq(Fastlane::VERSION)
       end
     end
+
+    describe "authentication" do
+      it "wraps the git command in ssh-agent shell when using a private key file" do
+        path = Dir.mktmpdir # to have access to the actual path
+        expect(Dir).to receive(:mktmpdir).and_return(path)
+        expect(File).to receive(:file?).and_return(true)
+        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+        shallow_clone = false
+        private_key = "#{path}/fastlane.match.id_dsa"
+        command = "ssh-agent bash -c 'ssh-add #{private_key.shellescape}; git clone #{git_url.shellescape} #{path.shellescape}'"
+        to_params = {
+          command: command,
+          print_all: nil,
+          print_command: nil
+        }
+
+        expect(FastlaneCore::CommandExecutor).
+          to receive(:execute).
+          with(to_params).
+          and_return(nil)
+
+        storage = Match::Storage::GitStorage.new(
+          git_url: git_url,
+          shallow_clone: shallow_clone,
+          git_private_key: private_key
+        )
+        storage.download
+
+        expect(File.directory?(storage.working_directory)).to eq(true)
+        expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
+      end
+
+      it "wraps the git command in ssh-agent shell when using a raw private key" do
+        path = Dir.mktmpdir # to have access to the actual path
+        expect(Dir).to receive(:mktmpdir).and_return(path)
+        expect(File).to receive(:file?).and_return(false)
+        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+        shallow_clone = false
+        private_key = "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"
+        command = "ssh-agent bash -c 'ssh-add - <<< \"#{private_key}\"; git clone #{git_url.shellescape} #{path.shellescape}'"
+        to_params = {
+          command: command,
+          print_all: nil,
+          print_command: nil
+        }
+
+        expect(FastlaneCore::CommandExecutor).
+          to receive(:execute).
+          with(to_params).
+          and_return(nil)
+
+        storage = Match::Storage::GitStorage.new(
+          git_url: git_url,
+          shallow_clone: shallow_clone,
+          git_private_key: private_key
+        )
+        storage.download
+
+        expect(File.directory?(storage.working_directory)).to eq(true)
+        expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
+      end
+    end
   end
 end
