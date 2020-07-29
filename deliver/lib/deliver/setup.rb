@@ -130,7 +130,7 @@ module Deliver
                                 end # errors if doesn't exist
       UploadMetadata::REVIEW_INFORMATION_VALUES.each do |file_key, attribute_name|
         if app_store_review_detail
-          content = app_store_review_detail.send(attribute_name)
+          content = app_store_review_detail.send(attribute_name) || ""
         else
           content = ""
         end
