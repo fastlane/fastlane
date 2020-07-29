@@ -75,20 +75,20 @@ describe Deliver do
             "en-US/marketing_url" => "https://fastlane.tools/en",
             "en-US/promotional_text" => "promotional text en",
 
-            "review_information/review_first_name" => "John",
-            "review_information/review_last_name" => "Smith",
-            "review_information/review_phone_number" => "+819012345678",
-            "review_information/review_email" => "deliver@example.com",
-            "review_information/review_demo_user" => "user",
-            "review_information/review_demo_password" => "password",
-            "review_information/review_notes" => "This is a note"
+            "review_information/first_name" => "John",
+            "review_information/last_name" => "Smith",
+            "review_information/phone_number" => "+819012345678",
+            "review_information/email_address" => "deliver@example.com",
+            "review_information/demo_user" => "user",
+            "review_information/demo_password" => "password",
+            "review_information/notes" => "This is a note"
           }
 
           setup.generate_metadata_files(app, version, tempdir)
           base_dir = File.join(tempdir)
           map.each do |filename, value|
             path = File.join(base_dir, "#{filename}.txt")
-            expect(File.exist?(path)).to be_truthy
+            expect(File.exist?(path)).to be_truthy, " for #{path}"
             expect(File.read(path).strip).to eq(value)
           end
         end
