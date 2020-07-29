@@ -13,6 +13,7 @@ require_relative 'error_handler'
 module Gym
   class Runner
     # @return (String) The path to the resulting ipa
+    # rubocop:disable Metrics/PerceivedComplexity
     def run
       unless Gym.config[:skip_build_archive]
         build_app
@@ -34,13 +35,16 @@ module Gym
 
         package_app
         compress_and_move_dsym
-        path = move_ipa
-        move_manifest
-        move_app_thinning
-        move_app_thinning_size_report
-        move_apps_folder
-        move_asset_packs
-        move_appstore_info
+
+        unless Gym.export_destination_upload?
+          path = move_ipa
+          move_manifest
+          move_app_thinning
+          move_app_thinning_size_report
+          move_apps_folder
+          move_asset_packs
+          move_appstore_info
+        end
       elsif is_mac
         path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
@@ -49,14 +53,17 @@ module Gym
           return path if Gym.config[:skip_package_pkg]
 
           package_app
-          path = move_pkg
-          move_appstore_info
+          unless Gym.export_destination_upload?
+            path = move_pkg
+            move_appstore_info
+          end
           return path
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
       end
       return path
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     #####################################################
     # @!group Printing out things
