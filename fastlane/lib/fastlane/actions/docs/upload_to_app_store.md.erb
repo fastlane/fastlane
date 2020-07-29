@@ -488,7 +488,7 @@ Key | Editable While Live | Directory | Filename
 Key | Editable While Live | Directory | Filename
 ----|--------|--------|--------
 <%- Deliver::UploadMetadata::REVIEW_INFORMATION_VALUES_LEGACY.each do |key, value| -%>
-  `<%= value %>` | Yes | `<metadata_path>/<%= Deliver::UploadMetadata::REVIEW_INFORMATION_DIR %>` | `<%= value %>.txt`
+  `<%= value %>` | Yes | `<metadata_path>/<%= Deliver::UploadMetadata::REVIEW_INFORMATION_DIR %>` | `<%= key %>.txt`
 <%- end %>
 
 ## Reference
