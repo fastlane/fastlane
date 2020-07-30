@@ -95,6 +95,8 @@ module Sigh
         "Development"
       when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
         "AppStore"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
+        "Direct"
       end
     end
 
