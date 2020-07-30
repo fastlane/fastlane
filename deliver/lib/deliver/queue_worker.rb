@@ -49,12 +49,12 @@ module Deliver
     def wait_for_complete
       wait_thread = Thread.new do
         loop do
-          sleep(1)
-
           if @queue.empty?
             @queue.close
             break
           end
+
+          sleep(1)
         end
       end
 
