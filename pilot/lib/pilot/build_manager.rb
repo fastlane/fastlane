@@ -372,8 +372,12 @@ module Pilot
       if options[:groups] || options[:distribute_external]
         if uploaded_build.ready_for_beta_submission?
           uploaded_build.post_beta_app_review_submission
-        else
+        elsif uploaded_build.waiting_for_beta_review?
           UI.message("Build #{uploaded_build.app_version} - #{uploaded_build.version} already submitted for review")
+        elsif uploaded_build.beta_approved?
+          UI.message("Build #{uploaded_build.app_version} - #{uploaded_build.version} already approved for beta testing")
+        else
+          UI.user_error!("Build #{uploaded_build.app_version} - #{uploaded_build.version} is not in a submittable state: #{uploaded_build.external_build_state}")
         end
       end
 
