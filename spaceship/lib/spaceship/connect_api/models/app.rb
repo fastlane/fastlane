@@ -10,6 +10,7 @@ module Spaceship
       attr_accessor :bundle_id
       attr_accessor :sku
       attr_accessor :primary_locale
+      attr_accessor :is_opted_in_to_distribute_ios_app_on_mac_app_store
       attr_accessor :removed
       attr_accessor :is_aag
       attr_accessor :available_in_new_territories
@@ -26,6 +27,7 @@ module Spaceship
         "bundleId" => "bundle_id",
         "sku" => "sku",
         "primaryLocale" => "primary_locale",
+        "isOptedInToDistributeIosAppOnMacAppStore" => "is_opted_in_to_distribute_ios_app_on_mac_app_store",
         "removed" => "removed",
         "isAAG" => "is_aag",
         "availableInNewTerritories" => "available_in_new_territories",
