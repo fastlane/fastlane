@@ -47,6 +47,8 @@ module Sigh
         ]
       end
 
+      # Filtering on 'profileType' seems to be undocumented as of 2020-07-30
+      # but works on both web session and official API
       profiles = Spaceship::ConnectAPI::Profile.all(filter: { profileType: profile_types.join(",") }, includes: "bundleId")
       download_profiles(profiles)
     end

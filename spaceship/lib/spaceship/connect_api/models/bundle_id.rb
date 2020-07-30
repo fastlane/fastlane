@@ -44,8 +44,8 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def self.find(identifier, platform: nil, includes: nil)
-        return all(filter: { identifier: identifier, platform: platform }, includes: includes).find do |app|
+      def self.find(identifier, includes: nil)
+        return all(filter: { identifier: identifier}, includes: includes).find do |app|
           app.identifier == identifier
         end
       end

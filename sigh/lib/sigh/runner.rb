@@ -85,6 +85,8 @@ module Sigh
     def fetch_profiles
       UI.message("Fetching profiles...")
 
+      # Filtering on 'profileType' seems to be undocumented as of 2020-07-30
+      # but works on both web session and official API
       results = Spaceship::ConnectAPI::Profile.all(filter: { profileType: profile_type }, includes: "bundleId,certificates").select do |profile|
         profile.bundle_id.identifier == Sigh.config[:app_identifier]
       end
@@ -241,7 +243,7 @@ module Sigh
         elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
           certificates = Spaceship.certificate.mac_app_distribution.all +
                          Spaceship.certificate.apple_distribution.all
-        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT
+        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
           certificates = Spaceship.certificate.developer_id_application.all
         else
           certificates = Spaceship.certificate.mac_app_distribution.all +
@@ -336,13 +338,10 @@ module Sigh
 
     # Makes sure the current App ID exists. If not, it will show an appropriate error message
     def ensure_app_exists!
-      if Sigh.config[:platform].to_s == 'macos'
-        platform = Spaceship::ConnectAPI::Platform::MAC_OS
-      else
-        platform = Spaceship::ConnectAPI::Platform::IOS
-      end
-
-      return if Spaceship::ConnectAPI::BundleId.find(Sigh.config[:app_identifier], platform: platform)
+      # Only ensuring by app identifier
+      # We used to ensure by platform (IOS and MAC_OS) but now apps are
+      # always UNIVERSAL as of 2020-07-30
+      return if Spaceship::ConnectAPI::BundleId.find(Sigh.config[:app_identifier])
       print_produce_command(Sigh.config)
       UI.user_error!("Could not find App with App Identifier '#{Sigh.config[:app_identifier]}'")
     end
