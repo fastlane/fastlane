@@ -228,7 +228,7 @@ describe Deliver::UploadScreenshots do
   end
 
   describe '#clean_up_screenshots' do
-    def make_app_screenshot(id:, file_name:, is_complete: true)
+    def make_app_screenshot(id: nil, file_name: nil, is_complete: true)
       app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', id: id, file_name: file_name)
       # `complete?` needed to be mocked by this way since Rubocop using 2.0 parser can't handle `{ 'complete?':  false }` format
       allow(app_screenshot).to receive(:complete?).and_return(is_complete)
