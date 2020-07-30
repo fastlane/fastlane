@@ -139,7 +139,7 @@ describe "Build Manager" do
     end
     let(:ready_to_submit_mock_build) do
       Spaceship::ConnectAPI::Build.new("123", {
-        version: '',
+        version: '123',
         uploadedDate: '',
         processingState: Spaceship::ConnectAPI::Build::ProcessingState::VALID,
         usesNonExemptEncryption: nil
@@ -361,6 +361,76 @@ describe "Build Manager" do
         expect(FastlaneCore::UI).to receive(:success).with(/Successfully distributed build to/)
 
         fake_build_manager.distribute(options, build: ready_to_submit_mock_build)
+      end
+
+      describe "#distribute_build messages" do
+        let(:distribute_options) do
+          {
+            apple_id: 'mock_apple_id',
+            app_identifier: 'mock_app_id',
+            distribute_external: true,
+            groups: ["Blue Man Group", "Green Eggs and Ham"],
+            skip_submission: false
+          }
+        end
+
+        it "successfully distribute new build" do
+          allow(app).to receive(:get_beta_groups).and_return(beta_groups)
+          allow(ready_to_submit_mock_build).to receive(:add_beta_groups)
+
+          allow(fake_build_manager).to receive(:set_export_compliance_if_needed).and_return(ready_to_submit_mock_build)
+          allow(ready_to_submit_mock_build).to receive(:ready_for_beta_submission?).and_return(true)
+
+          expect(Fastlane::UI).to receive(:message).with("Distributing new build to testers: #{ready_to_submit_mock_build.app_version} - #{ready_to_submit_mock_build.version}")
+          expect(ready_to_submit_mock_build).to receive(:post_beta_app_review_submission)
+
+          fake_build_manager.send('distribute_build', ready_to_submit_mock_build, distribute_options)
+        end
+
+        it "successfully distribute build waiting for beta" do
+          allow(app).to receive(:get_beta_groups).and_return(beta_groups)
+          allow(ready_to_submit_mock_build).to receive(:add_beta_groups)
+
+          allow(fake_build_manager).to receive(:set_export_compliance_if_needed).and_return(ready_to_submit_mock_build)
+          allow(ready_to_submit_mock_build).to receive(:ready_for_beta_submission?).and_return(false)
+          allow(ready_to_submit_mock_build).to receive(:waiting_for_beta_review?).and_return(true)
+
+          expect(Fastlane::UI).to receive(:message).with("Distributing new build to testers: #{ready_to_submit_mock_build.app_version} - #{ready_to_submit_mock_build.version}")
+          expect(Fastlane::UI).to receive(:message).with("Build #{ready_to_submit_mock_build.app_version} - #{ready_to_submit_mock_build.version} already submitted for review")
+
+          fake_build_manager.send('distribute_build', ready_to_submit_mock_build, distribute_options)
+        end
+
+        it "successfully distribute build approved for beta" do
+          allow(app).to receive(:get_beta_groups).and_return(beta_groups)
+          allow(ready_to_submit_mock_build).to receive(:add_beta_groups)
+
+          allow(fake_build_manager).to receive(:set_export_compliance_if_needed).and_return(ready_to_submit_mock_build)
+          allow(ready_to_submit_mock_build).to receive(:ready_for_beta_submission?).and_return(false)
+          allow(ready_to_submit_mock_build).to receive(:waiting_for_beta_review?).and_return(false)
+          allow(ready_to_submit_mock_build).to receive(:beta_approved?).and_return(true)
+
+          expect(Fastlane::UI).to receive(:message).with("Distributing new build to testers: #{ready_to_submit_mock_build.app_version} - #{ready_to_submit_mock_build.version}")
+          expect(Fastlane::UI).to receive(:message).with("Build #{ready_to_submit_mock_build.app_version} - #{ready_to_submit_mock_build.version} already approved for beta testing")
+
+          fake_build_manager.send('distribute_build', ready_to_submit_mock_build, distribute_options)
+        end
+
+        it "raises error for distribute build when invalid state" do
+          allow(app).to receive(:get_beta_groups).and_return(beta_groups)
+          allow(ready_to_submit_mock_build).to receive(:add_beta_groups)
+
+          allow(fake_build_manager).to receive(:set_export_compliance_if_needed).and_return(ready_to_submit_mock_build)
+          allow(ready_to_submit_mock_build).to receive(:ready_for_beta_submission?).and_return(false)
+          allow(ready_to_submit_mock_build).to receive(:waiting_for_beta_review?).and_return(false)
+          allow(ready_to_submit_mock_build).to receive(:beta_approved?).and_return(false)
+          allow(ready_to_submit_mock_build).to receive(:external_build_state).and_return("SOME_EXTERNAL_STATE")
+
+          expect(Fastlane::UI).to receive(:message).with("Distributing new build to testers: #{ready_to_submit_mock_build.app_version} - #{ready_to_submit_mock_build.version}")
+          expect(Fastlane::UI).to receive(:user_error!).with("Build #{ready_to_submit_mock_build.app_version} - #{ready_to_submit_mock_build.version} is not in a submittable state: SOME_EXTERNAL_STATE")
+
+          fake_build_manager.send('distribute_build', ready_to_submit_mock_build, distribute_options)
+        end
       end
     end
   end
