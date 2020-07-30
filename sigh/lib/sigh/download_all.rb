@@ -29,12 +29,14 @@ module Sigh
       when 'macos'
         profile_types = [
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE,
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT
         ]
       when 'catalyst'
         profile_types = [
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE,
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
         ]
       when 'tvos'
         profile_types = [

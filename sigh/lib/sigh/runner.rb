@@ -44,7 +44,7 @@ module Sigh
 
       UI.user_error!("Something went wrong fetching the latest profile") unless profile
 
-      if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE
+      if [Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE, Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE].include?(profile_type)
         ENV["SIGH_PROFILE_ENTERPRISE"] = "1"
       else
         ENV.delete("SIGH_PROFILE_ENTERPRISE")
@@ -71,12 +71,12 @@ module Sigh
       when "macos"
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT if Sigh.config[:development]
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT if Sigh.config[:developer_id]
       when "catalyst"
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT if Sigh.config[:development]
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT if Sigh.config[:developer_id]
       end
-
-      @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT if Sigh.config[:developer_id]
 
       @profile_type
     end
@@ -168,6 +168,8 @@ module Sigh
         "Development"
       when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
         "AppStore"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
+        "Direct"
       end
     end
 

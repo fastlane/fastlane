@@ -26,16 +26,21 @@ module Gym
     end
 
     def building_for_ios?
-      if !Gym.project.mac?
-        return false if building_mac_catalyst_for_mac?
-        return Gym.project.ios? || Gym.project.tvos? || Gym.project.watchos?
-      else
+      if Gym.project.mac?
+        # Can be building for iOS if mac project and catalyst
         return building_mac_catalyst_for_ios?
+      else
+        # Can be iOS project and build for mac if catalyst
+        return false if building_mac_catalyst_for_mac?
+
+        # Can be iOs project if iOS, tvOS, or watchOS
+        return Gym.project.ios? || Gym.project.tvos? || Gym.project.watchos?
       end
     end
 
     def building_for_mac?
       if Gym.project.supports_mac_catalyst?
+        # Can be a mac project and not build mac if catalyst
         return building_mac_catalyst_for_mac?
       else
         return Gym.project.mac?

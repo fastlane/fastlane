@@ -65,6 +65,8 @@ module Match
     end
 
     def profile_exists(username: nil, uuid: nil, platform: nil)
+      # App Store Connect API does not allow filter of profile by platform or uuid (as of 2020-07-30)
+      # Need to fetch all profiles and search for uuid on client side
       found = Spaceship::ConnectAPI::Profile.all.find do |profile|
         profile.uuid == uuid
       end

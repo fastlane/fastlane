@@ -245,7 +245,7 @@ module Match
                                      end),
         FastlaneCore::ConfigItem.new(key: :derive_catalyst_app_identifier,
                                      env_name: "MATCH_DERIVE_CATALYST_APP_IDENTIFIER",
-                                     description: "Enable this if you have the Mac Catalyst capability enabled. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping",
+                                     description: "Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :template_name,

@@ -47,12 +47,9 @@ module Spaceship
         TVOS_APP_STORE = "TVOS_APP_STORE"
         TVOS_APP_ADHOC = "TVOS_APP_ADHOC"
         TVOS_APP_INHOUSE = "TVOS_APP_INHOUSE"
-
-        # Not support by official App Store Connect API
-        # Only works with Developer Portal (web session) implementation
-        # Last checked: 2020-03-09
         MAC_CATALYST_APP_DEVELOPMENT = "MAC_CATALYST_APP_DEVELOPMENT"
         MAC_CATALYST_APP_STORE = "MAC_CATALYST_APP_STORE"
+        MAC_CATALYST_APP_DIRECT = "MAC_CATALYST_APP_DIRECT"
       end
 
       def self.type
