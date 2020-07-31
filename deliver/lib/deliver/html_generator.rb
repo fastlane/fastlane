@@ -51,7 +51,12 @@ module Deliver
       @app_name ||= options[:app].name
 
       @languages = options[:description].keys if options[:description]
-      @languages ||= options[:app].latest_version.description.languages
+      @languages ||= begin
+        platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+        version = options[:app].get_edit_app_store_version(platform: platform)
+
+        version.get_app_store_version_localizations.collect(&:locale)
+      end
 
       html_path = File.join(Deliver::ROOT, "lib/assets/summary.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
