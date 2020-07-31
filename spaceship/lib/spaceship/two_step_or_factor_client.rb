@@ -89,6 +89,7 @@ module Spaceship
         # }
         if ex.to_s.include?("verification code") # to have a nicer output
           puts("Error: Incorrect verification code")
+          raise "Error: Incorrect verification code" unless UI.interactive?
           return handle_two_step_for_device(device_id)
         end
 
@@ -124,6 +125,7 @@ module Spaceship
 
       puts("")
       env_2fa_sms_default_phone_number = ENV["SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER"]
+      env_2fa_sms_code = ENV["SPACESHIP_2FA_SMS_CODE"]
 
       if env_2fa_sms_default_phone_number
         raise Tunes::Error.new, "Environment variable SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER is set, but empty." if env_2fa_sms_default_phone_number.empty?
@@ -136,10 +138,13 @@ module Spaceship
         phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
         # don't request sms if no trusted devices and env default is the only trusted number,
         # code was automatically sent
-        should_request_code = !sms_automatically_sent(response)
+        should_request_code = !sms_automatically_sent(response) && !env_2fa_sms_code
         code_type = 'phone'
         body = request_two_factor_code_from_phone(phone_id, phone_number, code_length, should_request_code)
+
+        # raise "aaa2 body: #{body}"
       elsif sms_automatically_sent(response) # sms fallback, code was automatically sent
+        raise "aaa3"
         fallback_number = response.body["trustedPhoneNumbers"].first
         phone_number = fallback_number["numberWithDialCode"]
         phone_id = fallback_number["id"]
@@ -147,9 +152,11 @@ module Spaceship
         code_type = 'phone'
         body = request_two_factor_code_from_phone(phone_id, phone_number, code_length, false)
       elsif sms_fallback(response) # sms fallback but code wasn't sent bec > 1 phone number
+        raise "aaa4"
         code_type = 'phone'
         body = request_two_factor_code_from_phone_choose(response.body["trustedPhoneNumbers"], code_length)
       else
+        raise "aaa5"
         puts("(Input `sms` to escape this prompt and select a trusted phone number to send the code as a text message)")
         puts("")
         puts("(You can also set the environment variable `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` to automate this)")
@@ -194,6 +201,7 @@ module Spaceship
 
         if ex.to_s.include?("verification code") # to have a nicer output
           puts("Error: Incorrect verification code")
+          raise "Error: Incorrect verification code" unless UI.interactive?
           depth += 1
           return handle_two_factor(response, depth)
         end
@@ -222,6 +230,7 @@ module Spaceship
 
     # extracted into its own method for testing
     def ask_for_2fa_code(text)
+      raise "This code should only run in interactive mode. You can set the environment variable `SPACESHIP_2FA_SMS_CODE`." unless UI.interactive?
       ask(text)
     end
 
@@ -305,7 +314,11 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
         puts("Successfully requested text message to #{phone_number}")
       end
 
-      code = ask_for_2fa_code("Please enter the #{code_length} digit code you received at #{phone_number}:")
+      if ENV["SPACESHIP_2FA_SMS_CODE"]
+        code = ENV["SPACESHIP_2FA_SMS_CODE"]
+      else 
+        code = ask_for_2fa_code("Please enter the #{code_length} digit code you received at #{phone_number}:")
+      end
 
       return { "securityCode" => { "code" => code.to_s }, "phoneNumber" => { "id" => phone_id }, "mode" => "sms" }.to_json
     end
