@@ -125,7 +125,6 @@ module Spaceship
 
       puts("")
       env_2fa_sms_default_phone_number = ENV["SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER"]
-      env_2fa_sms_code = ENV["SPACESHIP_2FA_SMS_CODE"]
 
       if env_2fa_sms_default_phone_number
         raise Tunes::Error.new, "Environment variable SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER is set, but empty." if env_2fa_sms_default_phone_number.empty?
@@ -138,7 +137,7 @@ module Spaceship
         phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
         # don't request sms if no trusted devices and env default is the only trusted number,
         # code was automatically sent
-        should_request_code = !sms_automatically_sent(response) && !env_2fa_sms_code
+        should_request_code = !sms_automatically_sent(response) && (!ENV["SPACESHIP_2FA_SMS_CODE"] || ENV["SPACESHIP_2FA_SMS_CODE"].empty?)
         code_type = 'phone'
         body = request_two_factor_code_from_phone(phone_id, phone_number, code_length, should_request_code)
 
@@ -314,7 +313,7 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
         puts("Successfully requested text message to #{phone_number}")
       end
 
-      if ENV["SPACESHIP_2FA_SMS_CODE"]
+      if ENV["SPACESHIP_2FA_SMS_CODE"] && !ENV["SPACESHIP_2FA_SMS_CODE"].empty?
         code = ENV["SPACESHIP_2FA_SMS_CODE"]
       else 
         code = ask_for_2fa_code("Please enter the #{code_length} digit code you received at #{phone_number}:")
