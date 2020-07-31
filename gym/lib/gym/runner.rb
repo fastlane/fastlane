@@ -13,7 +13,6 @@ require_relative 'error_handler'
 module Gym
   class Runner
     # @return (String) The path to the resulting ipa
-    # rubocop:disable Metrics/PerceivedComplexity
     def run
       unless Gym.config[:skip_build_archive]
         build_app

@@ -144,33 +144,24 @@ module Sigh
 
     def profile_type_pretty_type
       case profile_type
-      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT
+      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT,
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT,
+        Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT,
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
         "Development"
-      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE
+      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE,
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE,
+        Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_STORE,
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
         "AppStore"
-      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC
+      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC,
+        Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC
         "AdHoc"
-      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE
+      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE,
+        Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
         "InHouse"
-      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT
-        "Development"
-      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE
-        "AppStore"
-      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT
-        "Direct"
-      when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT
-        "Development"
-      when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_STORE
-        "AppStore"
-      when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC
-        "AdHoc"
-      when Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
-        "InHouse"
-      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
-        "Development"
-      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
-        "AppStore"
-      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT,
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
         "Direct"
       end
     end
@@ -181,7 +172,9 @@ module Sigh
       name = Sigh.config[:provisioning_name] || [app_identifier, profile_type_pretty_type].join(' ')
 
       unless Sigh.config[:skip_fetch_profiles]
-        if Spaceship.provisioning_profile.all(mac: Sigh.config[:platform].to_s == 'macos').find { |p| p.name == name }
+        # TODO: need to fix this
+        profile = Spaceship::ConnectAPI::Profile.all.find { |p| p.name == name }
+        if profile
           UI.user_error!("The name '#{name}' is already taken, and fail_on_name_taken is true") if Sigh.config[:fail_on_name_taken]
           UI.error("The name '#{name}' is already taken, using another one.")
           name += " #{Time.now.to_i}"

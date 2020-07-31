@@ -45,7 +45,7 @@ module Spaceship
       end
 
       def self.find(identifier, includes: nil)
-        return all(filter: { identifier: identifier}, includes: includes).find do |app|
+        return all(filter: { identifier: identifier }, includes: includes).find do |app|
           app.identifier == identifier
         end
       end
