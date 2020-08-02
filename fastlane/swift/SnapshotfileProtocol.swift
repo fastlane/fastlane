@@ -47,6 +47,9 @@ public protocol SnapshotfileProtocol: class {
     /// Enabling this option will automatically erase the simulator before running the application
     var eraseSimulator: Bool { get }
 
+    /// Enabling this option will prevent displaying the simulator window
+    var headless: Bool { get }
+
     /// Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
     var overrideStatusBar: Bool { get }
 
@@ -145,6 +148,7 @@ public extension SnapshotfileProtocol {
     var clearPreviousScreenshots: Bool { return false }
     var reinstallApp: Bool { return false }
     var eraseSimulator: Bool { return false }
+    var headless: Bool { return true }
     var overrideStatusBar: Bool { return false }
     var localizeSimulator: Bool { return false }
     var darkMode: Bool? { return nil }
@@ -176,4 +180,4 @@ public extension SnapshotfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.17]
+// FastlaneRunnerAPIVersion [0.9.25]

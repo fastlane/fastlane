@@ -130,6 +130,7 @@ module Spaceship
       end
 
       def update(attributes: nil)
+        attributes = reverse_attr_mapping(attributes)
         return Spaceship::ConnectAPI.patch_builds(build_id: id, attributes: attributes).first
       end
 

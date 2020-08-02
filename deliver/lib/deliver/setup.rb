@@ -130,13 +130,11 @@ module Deliver
                                 end # errors if doesn't exist
       UploadMetadata::REVIEW_INFORMATION_VALUES.each do |file_key, attribute_name|
         if app_store_review_detail
-          content = app_store_review_detail.send(attribute_name)
+          content = app_store_review_detail.send(attribute_name) || ""
         else
           content = ""
         end
         content += "\n"
-
-        file_key = UploadMetadata::REVIEW_INFORMATION_VALUES_LEGACY.key(file_key)
 
         base_dir = File.join(path, UploadMetadata::REVIEW_INFORMATION_DIR)
         resulting_path = File.join(base_dir, "#{file_key}.txt")

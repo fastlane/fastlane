@@ -485,10 +485,10 @@ Key | Editable While Live | Directory | Filename
 
 ### Review Information Metadata
 
-Key | Editable While Live | Directory | Filename
-----|--------|--------|--------
+Key | Editable While Live | Directory | Filename | Deprecated Filename
+----|--------|--------|--------|--------
 <%- Deliver::UploadMetadata::REVIEW_INFORMATION_VALUES_LEGACY.each do |key, value| -%>
-  `<%= value %>` | Yes | `<metadata_path>/<%= Deliver::UploadMetadata::REVIEW_INFORMATION_DIR %>` | `<%= value %>.txt`
+  `<%= value %>` | Yes | `<metadata_path>/<%= Deliver::UploadMetadata::REVIEW_INFORMATION_DIR %>` | `<%= value %>.txt` | `<%= key %>.txt`
 <%- end %>
 
 ## Reference

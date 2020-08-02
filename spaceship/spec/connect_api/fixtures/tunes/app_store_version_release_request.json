@@ -1,0 +1,20 @@
+{
+    "data" : {
+      "type" : "appStoreVersionReleaseRequests",
+      "id" : "123456789",
+      "relationships" : {
+        "appStoreVersion" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/appStoreVersionReleaseRequests/123456789/relationships/appStoreVersion",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/appStoreVersionReleaseRequests/123456789/appStoreVersion"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/appStoreVersionReleaseRequests/123456789"
+      }
+    },
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/appStoreVersionReleaseRequests"
+    }
+  }

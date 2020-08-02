@@ -32,6 +32,14 @@ module Gym
     def building_mac_catalyst_for_mac?
       Gym.project.supports_mac_catalyst? && Gym.config[:catalyst_platform] == "macos"
     end
+
+    def export_destination_upload?
+      config_path = Gym.cache[:config_path]
+      return false if config_path.nil?
+
+      result = CFPropertyList.native_types(CFPropertyList::List.new(file: config_path).value)
+      return result["destination"] == "upload"
+    end
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
