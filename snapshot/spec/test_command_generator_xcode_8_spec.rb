@@ -199,6 +199,22 @@ describe Snapshot do
         end
       end
 
+      context "disable_xcpretty" do
+        it "does not include xcpretty in the pipe command when true", requires_xcode: true do
+          configure(options.merge(disable_xcpretty: true))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to_not(include("| xcpretty "))
+        end
+
+        it "includes xcpretty in the pipe command when false", requires_xcode: true do
+          configure(options.merge(disable_xcpretty: false))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("| xcpretty ")
+        end
+      end
+
       context "suppress_xcode_output" do
         it "includes /dev/null in the pipe command when true", requires_xcode: true do
           configure(options.merge(suppress_xcode_output: true))
