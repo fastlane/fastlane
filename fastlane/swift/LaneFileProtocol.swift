@@ -51,6 +51,9 @@ open class LaneFile: NSObject, LaneFileProtocol {
         #if !SWIFT_PACKAGE
             let methodList = class_copyMethodList(self, &methodCount)
         #else
+            // In SPM we're calling this functions out of the scope of the normal binary that it
+            // is being built, so self in this scope would be the SPM executable instead of the Fastfile
+            // that we'd normally expect.
             let methodList = class_copyMethodList(type(of: fastfileInstance!), &methodCount)
         #endif
         for i in 0 ..< Int(methodCount) {
@@ -95,6 +98,9 @@ open class LaneFile: NSObject, LaneFileProtocol {
     public static func runLane(from fastfile: LaneFile?, named: String, parameters: [String: String]) -> Bool {
         log(message: "Running lane: \(named)")
         #if !SWIFT_PACKAGE
+            // In SPM we do not load the Fastfile class from its `className()`, because we're in another
+            // in the executable's scope that loads the library, so in that case `className()` won't be the
+            // expected Fastfile and so, we do not dynamically load it as we do without SPM.
             loadFastfile()
         #endif
 
@@ -105,6 +111,8 @@ open class LaneFile: NSObject, LaneFileProtocol {
                 fatalError(message)
             }
         #else
+            // We load the fastfile as a Lanefile in a static way, by parameter, because the Fastlane library
+            // cannot know nothing about the caller (in this case, the executable).
             guard let fastfileInstance: LaneFile = fastfile else {
                 log(message: "Found nil instance of fastfile")
                 preconditionFailure()
