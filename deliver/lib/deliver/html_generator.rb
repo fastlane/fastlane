@@ -1,3 +1,5 @@
+require 'spaceship'
+
 require_relative 'module'
 
 module Deliver
