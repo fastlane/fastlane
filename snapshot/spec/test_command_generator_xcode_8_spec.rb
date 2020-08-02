@@ -198,6 +198,22 @@ describe Snapshot do
           expect(command.join('')).to include("-derivedDataPath 'fake/derived/path'")
         end
       end
+
+      context "suppress_xcode_output" do
+        it "includes /dev/null in the pipe command when true", requires_xcode: true do
+          configure(options.merge(suppress_xcode_output: true))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("> /dev/null")
+        end
+
+        it "does not include /dev/null in the pipe command when false", requires_xcode: true do
+          configure(options.merge(suppress_xcode_output: false))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to_not(include("> /dev/null"))
+        end
+      end
     end
 
     describe "Valid macOS Configuration" do
