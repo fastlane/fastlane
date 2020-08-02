@@ -278,6 +278,11 @@ module Snapshot
                                      env_name: "SNAPSHOT_DISABLE_XCPRETTY",
                                      description: "Disable xcpretty formatting of build",
                                      type: Boolean,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
+                                     env_name: "SNAPSHOT_SUPPRESS_XCODE_OUTPUT",
+                                     description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
+                                     type: Boolean,
                                      optional: true)
       ]
     end
