@@ -482,6 +482,17 @@ describe FastlaneCore do
       end
     end
 
+    describe "xcodebuild derived_data_path" do
+      it 'generates an xcodebuild -showBuildSettings command that includes derived_data_path if provided in options', requires_xcode: true do
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          derived_data_path: "./special/path/DerivedData"
+        })
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -derivedDataPath ./special/path/DerivedData"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
+    end
+
     describe 'xcodebuild_xcconfig option', requires_xcode: true do
       it 'generates an xcodebuild -showBuildSettings command without xcconfig by default' do
         project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
