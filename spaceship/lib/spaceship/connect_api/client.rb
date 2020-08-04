@@ -96,6 +96,7 @@ module Spaceship
             req.headers['Content-Type'] = 'application/json'
           end
         end
+        UI.message("POST #{url_or_path}")
         handle_response(response)
       end
 

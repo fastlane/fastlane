@@ -815,8 +815,7 @@ module Spaceship
               appStoreVersion: {
                 data: {
                   type: "appStoreVersions",
-                  id: app_store_version_id,
-                  whatsNew: "Improvements."
+                  id: app_store_version_id
                 }
               }
             }
