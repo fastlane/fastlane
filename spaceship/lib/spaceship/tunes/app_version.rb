@@ -665,7 +665,7 @@ module Spaceship
           description: :description,
           supportUrl: :support_url,
           marketingUrl: :marketing_url,
-          releaseNotes: :release_notes,
+          whatsNew: :release_notes,
           promotionalText: :promotional_text
         }.each do |json, attribute|
           instance_variable_set("@#{attribute}".to_sym, LanguageItem.new(json, languages))
