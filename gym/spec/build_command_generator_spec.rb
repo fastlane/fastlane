@@ -183,7 +183,7 @@ describe Gym do
                                "xcodebuild",
                                "-scheme Example",
                                "-project ./gym/examples/standard/Example.xcodeproj",
-                               "-derivedDataPath '/tmp/my/derived_data'",
+                               "-derivedDataPath /tmp/my/derived_data",
                                "-destination 'generic/platform=iOS'",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                                :archive,

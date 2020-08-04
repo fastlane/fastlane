@@ -35,8 +35,8 @@ module Scan
       options << "-sdk '#{config[:sdk]}'" if config[:sdk]
       options << destination # generated in `detect_values`
       options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
-      if config[:derived_data_path] && !options.include?("-derivedDataPath '#{config[:derived_data_path]}'")
-        options << "-derivedDataPath '#{config[:derived_data_path]}'"
+      if config[:derived_data_path] && !options.include?("-derivedDataPath #{config[:derived_data_path].shellescape}")
+        options << "-derivedDataPath #{config[:derived_data_path].shellescape}"
       end
       options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
       if FastlaneCore::Helper.xcode_at_least?(10)
