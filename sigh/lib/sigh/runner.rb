@@ -143,27 +143,7 @@ module Sigh
     end
 
     def profile_type_pretty_type
-      case profile_type
-      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT,
-        Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT,
-        Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT,
-        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
-        "Development"
-      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE,
-        Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE,
-        Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_STORE,
-        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
-        "AppStore"
-      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC,
-        Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC
-        "AdHoc"
-      when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE,
-        Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
-        "InHouse"
-      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT,
-        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
-        "Direct"
-      end
+      return Sigh.profile_pretty_type(profile_type)
     end
 
     # Create a new profile and return it
