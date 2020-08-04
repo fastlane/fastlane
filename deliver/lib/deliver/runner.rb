@@ -168,6 +168,7 @@ module Deliver
     end
 
     def submit_for_review
+      UI.message("options: #{options}")
       SubmitForReview.new.submit!(options)
     end
 
