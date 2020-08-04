@@ -488,8 +488,8 @@ module Deliver
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
         language = File.basename(lang_folder)
         (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
-          UI.message("Loading1 '#{path}'...")
           path = File.join(lang_folder, "#{key}.txt")
+          UI.message("Try to load path #{path} for key #{key}")
           next unless File.exist?(path)
 
           UI.message("Loading '#{path}'...")
