@@ -61,6 +61,43 @@ describe Sigh do
     end
 
     describe "#fetch_profiles" do
+      context "successfully" do
+        it "with skip verification" do
+          sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
+
+          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: true }
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+          profiles = fake_runner.fetch_profiles
+          expect(profiles.size).to eq(1)
+        end
+
+        it "without skip verification" do
+          sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
+
+          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: false }
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+          expect(FastlaneCore::CertChecker).to receive(:installed?).with(anything).and_return(true)
+
+          profiles = fake_runner.fetch_profiles
+          expect(profiles.size).to eq(1)
+        end
+      end
+
+      context "unsuccessfully" do
+        it "without skip verification" do
+          sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
+
+          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: false }
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+          expect(FastlaneCore::CertChecker).to receive(:installed?).with(anything).and_return(false)
+
+          profiles = fake_runner.fetch_profiles
+          expect(profiles.size).to eq(0)
+        end
+      end
     end
 
     describe "#profile_type_pretty_type" do
@@ -95,9 +132,6 @@ describe Sigh do
         it "skips fetching of profiles" do
           sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: "com.krausefx.app", all_app_identifiers: ["com.krausefx.app"])
 
-          allow(Spaceship).to receive(:client).and_return(mock_base_client)
-          allow(mock_base_client).to receive(:in_house?).and_return(false)
-
           options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true, skip_fetch_profiles: true }
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
@@ -108,10 +142,7 @@ describe Sigh do
         end
 
         it "skips fetches profiles with no duplicate name" do
-          sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: "com.krausefx.app", all_app_identifiers: ["com.krausefx.app"], profile_names: ["No dupe here"])
-
-          allow(Spaceship).to receive(:client).and_return(mock_base_client)
-          allow(mock_base_client).to receive(:in_house?).and_return(false)
+          sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: "com.krausefx.app", all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
 
           options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true, skip_fetch_profiles: true }
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
@@ -123,12 +154,9 @@ describe Sigh do
         end
 
         it "fetches profiles with duplicate name and appends timestamp" do
-          sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: "com.krausefx.app", all_app_identifiers: ["com.krausefx.app"], profile_names: ["com.krausefx.app AppStore"])
+          sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: "com.krausefx.app", all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["com.krausefx.app AppStore"] })
 
           expect(Time).to receive(:now).and_return("1234")
-
-          allow(Spaceship).to receive(:client).and_return(mock_base_client)
-          allow(mock_base_client).to receive(:in_house?).and_return(false)
 
           options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true, skip_fetch_profiles: false }
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
@@ -144,9 +172,6 @@ describe Sigh do
         it "when cannot find bundle id" do
           sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: [])
 
-          allow(Spaceship).to receive(:client).and_return(mock_base_client)
-          allow(mock_base_client).to receive(:in_house?).and_return(false)
-
           options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true, skip_fetch_profiles: true }
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
@@ -156,10 +181,7 @@ describe Sigh do
         end
 
         it "when name already taken" do
-          sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], profile_names: ["com.krausefx.app AppStore"])
-
-          allow(Spaceship).to receive(:client).and_return(mock_base_client)
-          allow(mock_base_client).to receive(:in_house?).and_return(false)
+          sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["com.krausefx.app AppStore"] })
 
           options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true, skip_fetch_profiles: false, fail_on_name_taken: true }
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
@@ -172,6 +194,65 @@ describe Sigh do
     end
 
     describe "#download_profile" do
+      it "ios" do
+        sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: [])
+
+        options = { platform: "ios", app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true, skip_fetch_profiles: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+        profile = Spaceship::ConnectAPI::Profile.new("123", {
+          profileContent: Base64.encode64("12345")
+        })
+
+        path = fake_runner.download_profile(profile)
+        expect(path).to end_with("AppStore_com.krausefx.app.mobileprovision")
+        expect(File.binread(path)).to eq("12345")
+      end
+
+      it "tvos" do
+        sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: [])
+
+        options = { platform: "tvos", app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true, skip_fetch_profiles: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+        profile = Spaceship::ConnectAPI::Profile.new("123", {
+          profileContent: Base64.encode64("12345")
+        })
+
+        path = fake_runner.download_profile(profile)
+        expect(path).to end_with("AppStore_com.krausefx.app_tvos.mobileprovision")
+        expect(File.binread(path)).to eq("12345")
+      end
+
+      it "macos" do
+        sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: [])
+
+        options = { platform: "macos", app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true, skip_fetch_profiles: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+        profile = Spaceship::ConnectAPI::Profile.new("123", {
+          profileContent: Base64.encode64("12345")
+        })
+
+        path = fake_runner.download_profile(profile)
+        expect(path).to end_with("AppStore_com.krausefx.app.provisionprofile")
+        expect(File.binread(path)).to eq("12345")
+      end
+
+      it "catalyst" do
+        sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: [])
+
+        options = { platform: "catalyst", app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true, skip_fetch_profiles: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+        profile = Spaceship::ConnectAPI::Profile.new("123", {
+          profileContent: Base64.encode64("12345")
+        })
+
+        path = fake_runner.download_profile(profile)
+        expect(path).to end_with("AppStore_com.krausefx.app_catalyst.provisionprofile")
+        expect(File.binread(path)).to eq("12345")
+      end
     end
   end
 end

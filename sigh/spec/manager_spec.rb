@@ -15,7 +15,8 @@ describe Sigh do
     end
 
     it "Successful run" do
-      sigh_stub_spaceship
+      sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: "com.krausefx.app", all_app_identifiers: ["com.krausefx.app"])
+
       options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true }
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
@@ -25,7 +26,8 @@ describe Sigh do
     end
 
     it "Invalid profile not force run" do
-      sigh_stub_spaceship(valid_profile = false, expect_create = true)
+      sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: "com.krausefx.app", all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] }, valid_profiles: false)
+
       options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true }
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
@@ -35,7 +37,8 @@ describe Sigh do
     end
 
     it "Invalid profile force run" do
-      sigh_stub_spaceship(valid_profile = false, expect_create = true, expect_delete = true)
+      sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: "com.krausefx.app", all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] }, valid_profiles: false, expect_delete: true)
+
       options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true, force: true }
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
@@ -45,7 +48,8 @@ describe Sigh do
     end
 
     it "Existing profile fail on name taken" do
-      sigh_stub_spaceship(valid_profile = true, expect_create = false, expect_delete = true, fail_delete = true)
+      sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: nil, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["com.krausefx.app AppStore"] })
+
       options = { app_identifier: "com.krausefx.app", skip_install: true, fail_on_name_taken: true, skip_certificate_verification: true, force: true }
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 

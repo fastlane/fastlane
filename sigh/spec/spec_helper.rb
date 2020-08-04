@@ -1,9 +1,14 @@
-def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: nil, all_app_identifiers: [], profile_names: [])
+def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: nil, all_app_identifiers: [], app_identifier_and_profile_names: {}, valid_profiles: true, expect_delete: false)
   allow(Spaceship).to receive(:login).and_return(nil)
   allow(Spaceship).to receive(:client).and_return("client")
   allow(Spaceship).to receive(:select_team).and_return(nil)
 
   allow(Spaceship.client).to receive(:in_house?).and_return(inhouse)
+
+  # Mock cert
+  certificate = "certificate"
+  allow(certificate).to receive(:id).and_return("id")
+  allow(certificate).to receive(:certificate_content).and_return(Base64.encode64("cert content"))
 
   bundle_ids = all_app_identifiers.map do |id|
     Spaceship::ConnectAPI::BundleId.new("123", {
@@ -20,11 +25,13 @@ def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: n
   end
 
   if create_profile_app_identifier
-    bundle_id = bundle_ids.find { |b| b.identifier == create_profile_app_identifier }
+    bundle_id = bundle_ids.find { |b| b.identifier.to_s == create_profile_app_identifier }
     expect(Spaceship::ConnectAPI::Profile).to receive(:create).with(anything) do |value|
       profile = Spaceship::ConnectAPI::Profile.new("123", {
         name: value[:name],
-        platform: "IOS"
+        platform: "IOS",
+        profileState: Spaceship::ConnectAPI::Profile::ProfileState::ACTIVE,
+        profileContent: Base64.encode64("profile content")
       })
       allow(profile).to receive(:bundle_id).and_return(bundle_id)
 
@@ -32,22 +39,29 @@ def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: n
     end
   end
 
-  allow(Spaceship::ConnectAPI::Profile).to receive(:all).and_return(
-    profile_names.map do |name|
+  profiles = []
+  app_identifier_and_profile_names.each do |app_identifier, profile_names|
+    profiles += profile_names.map do |name|
+      bundle_id = bundle_ids.find { |b| b.identifier.to_s == app_identifier.to_s }
+      raise "Could not find BundleId for #{app_identifier} in #{bundle_ids.map(&:identifier)}" unless bundle_id
       profile = Spaceship::ConnectAPI::Profile.new("123", {
         name: name,
-        platform: "IOS"
+        platform: "IOS",
+        profileState: valid_profiles ? Spaceship::ConnectAPI::Profile::ProfileState::ACTIVE : Spaceship::ConnectAPI::Profile::ProfileState::INVALID,
+        profileContent: Base64.encode64("profile content")
       })
       allow(profile).to receive(:bundle_id).and_return(bundle_id)
+      allow(profile).to receive(:certificates).and_return([certificate])
+
+      expect(profile).to receive(:delete!) if expect_delete
 
       profile
     end
-  )
+  end
+  allow(Spaceship::ConnectAPI::Profile).to receive(:all).with(anything).and_return(profiles)
+  allow(Spaceship::ConnectAPI::Profile).to receive(:all).and_return(profiles)
 
   # Stubs production to only receive certs
-  certificate = "certificate"
-  allow(certificate).to receive(:id).and_return("id")
-
   certs = [Spaceship.certificate.production]
   certs.each do |current|
     allow(current).to receive(:all).and_return([certificate])

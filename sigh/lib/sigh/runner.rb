@@ -136,6 +136,8 @@ module Sigh
           end
         end
 
+        STDERR.puts("UGH - #{installed}")
+
         # Don't need to check if certificate is valid because it comes with the
         # profile in the response
         installed
