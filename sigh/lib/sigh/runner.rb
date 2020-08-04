@@ -174,7 +174,6 @@ module Sigh
       name = Sigh.config[:provisioning_name] || [app_identifier, profile_type_pretty_type].join(' ')
 
       unless Sigh.config[:skip_fetch_profiles]
-        # TODO: need to fix this
         profile = Spaceship::ConnectAPI::Profile.all.find { |p| p.name == name }
         if profile
           UI.user_error!("The name '#{name}' is already taken, and fail_on_name_taken is true") if Sigh.config[:fail_on_name_taken]
