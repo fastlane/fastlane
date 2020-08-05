@@ -164,6 +164,8 @@ module Spaceship
 
         raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
 
+        store_csrf_tokens(response)
+
         return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, client: self)
       end
 

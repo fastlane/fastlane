@@ -235,14 +235,19 @@ module Match
         FastlaneCore::ConfigItem.new(key: :platform,
                                      short_option: '-o',
                                      env_name: "MATCH_PLATFORM",
-                                     description: "Set the provisioning profile's platform to work with (i.e. ios, tvos, macos)",
+                                     description: "Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)",
                                      default_value: default_platform,
                                      default_value_dynamic: true,
                                      verify_block: proc do |value|
                                        value = value.to_s
-                                       pt = %w(tvos ios macos)
+                                       pt = %w(tvos ios macos catalyst)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end),
+        FastlaneCore::ConfigItem.new(key: :derive_catalyst_app_identifier,
+                                     env_name: "MATCH_DERIVE_CATALYST_APP_IDENTIFIER",
+                                     description: "Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :template_name,
                                      env_name: "MATCH_PROVISIONING_PROFILE_TEMPLATE_NAME",
                                      description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",

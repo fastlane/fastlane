@@ -1,5 +1,7 @@
 require 'spaceship'
 
+require 'base64'
+
 require 'fastlane_core/print_table'
 require 'fastlane_core/cert_checker'
 require_relative 'module'
@@ -42,7 +44,7 @@ module Sigh
 
       UI.user_error!("Something went wrong fetching the latest profile") unless profile
 
-      if profile_type == Spaceship.provisioning_profile.in_house
+      if [Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE, Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE].include?(profile_type)
         ENV["SIGH_PROFILE_ENTERPRISE"] = "1"
       else
         ENV.delete("SIGH_PROFILE_ENTERPRISE")
@@ -55,11 +57,26 @@ module Sigh
     def profile_type
       return @profile_type if @profile_type
 
-      @profile_type = Spaceship.provisioning_profile.app_store
-      @profile_type = Spaceship.provisioning_profile.in_house if Spaceship.client.in_house?
-      @profile_type = Spaceship.provisioning_profile.ad_hoc if Sigh.config[:adhoc]
-      @profile_type = Spaceship.provisioning_profile.direct if Sigh.config[:developer_id]
-      @profile_type = Spaceship.provisioning_profile.development if Sigh.config[:development]
+      case Sigh.config[:platform]
+      when "ios"
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE if Spaceship.client.in_house?
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC if Sigh.config[:adhoc]
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT if Sigh.config[:development]
+      when "tvos"
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_STORE
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE if Spaceship.client.in_house?
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC if Sigh.config[:adhoc]
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT if Sigh.config[:development]
+      when "macos"
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT if Sigh.config[:development]
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT if Sigh.config[:developer_id]
+      when "catalyst"
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT if Sigh.config[:development]
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT if Sigh.config[:developer_id]
+      end
 
       @profile_type
     end
@@ -67,9 +84,13 @@ module Sigh
     # Fetches a profile matching the user's search requirements
     def fetch_profiles
       UI.message("Fetching profiles...")
-      results = profile_type.find_by_bundle_id(bundle_id: Sigh.config[:app_identifier],
-                                                     mac: Sigh.config[:platform].to_s == 'macos',
-                                            sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil)
+
+      # Filtering on 'profileType' seems to be undocumented as of 2020-07-30
+      # but works on both web session and official API
+      results = Spaceship::ConnectAPI::Profile.all(filter: { profileType: profile_type }, includes: "bundleId,certificates").select do |profile|
+        profile.bundle_id.identifier == Sigh.config[:app_identifier]
+      end
+
       results = results.find_all do |current_profile|
         if current_profile.valid? || Sigh.config[:force]
           true
@@ -93,7 +114,7 @@ module Sigh
         # "member" and not an a "admin"
         raw_certs = current_profile.certificates.map do |cert|
           begin
-            raw_cert = cert.download_raw
+            raw_cert = Base64.decode64(cert.certificate_content)
           rescue => error
             UI.important("Cannot download cert #{cert.id} - #{error.message}")
             raw_cert = nil
@@ -114,31 +135,45 @@ module Sigh
             UI.message("Certificate for Provisioning Profile '#{current_profile.name}' not available locally: #{current_cert[:cert].id}, skipping this one...")
           end
         end
-        installed && current_profile.certificate_valid?
+
+        # Don't need to check if certificate is valid because it comes with the
+        # profile in the response
+        installed
       end
+    end
+
+    def profile_type_pretty_type
+      return Sigh.profile_pretty_type(profile_type)
     end
 
     # Create a new profile and return it
     def create_profile!
-      cert = certificate_to_use
-      bundle_id = Sigh.config[:app_identifier]
-      name = Sigh.config[:provisioning_name] || [bundle_id, profile_type.pretty_type].join(' ')
+      app_identifier = Sigh.config[:app_identifier]
+      name = Sigh.config[:provisioning_name] || [app_identifier, profile_type_pretty_type].join(' ')
 
       unless Sigh.config[:skip_fetch_profiles]
-        if Spaceship.provisioning_profile.all(mac: Sigh.config[:platform].to_s == 'macos').find { |p| p.name == name }
+        profile = Spaceship::ConnectAPI::Profile.all.find { |p| p.name == name }
+        if profile
           UI.user_error!("The name '#{name}' is already taken, and fail_on_name_taken is true") if Sigh.config[:fail_on_name_taken]
           UI.error("The name '#{name}' is already taken, using another one.")
           name += " #{Time.now.to_i}"
         end
       end
 
+      bundle_id = Spaceship::ConnectAPI::BundleId.find(app_identifier)
+      unless bundle_id
+        UI.user_error!("Could not find App with App Identifier '#{Sigh.config[:app_identifier]}'")
+      end
+
       UI.important("Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}' for '#{Sigh.config[:platform]}' platform")
-      profile = profile_type.create!(name: name,
-                                bundle_id: bundle_id,
-                              certificate: cert,
-                                      mac: Sigh.config[:platform].to_s == 'macos',
-                             sub_platform: Sigh.config[:platform].to_s == 'tvos' ? 'tvOS' : nil,
-                            template_name: Sigh.config[:template_name])
+
+      profile = Spaceship::ConnectAPI::Profile.create(
+        name: name,
+        profile_type: profile_type,
+        bundle_id_id: bundle_id.id,
+        certificate_ids: [certificate_to_use.id]
+      )
+
       profile
     end
 
@@ -155,16 +190,16 @@ module Sigh
     def certificates_for_profile_and_platform
       case Sigh.config[:platform].to_s
       when 'ios', 'tvos'
-        if profile_type == Spaceship.provisioning_profile.Development
+        if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT
           certificates = Spaceship.certificate.development.all +
                          Spaceship.certificate.apple_development.all
-        elsif profile_type == Spaceship.provisioning_profile.InHouse
+        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
           # Enterprise accounts don't have access to Apple Distribution certificates
           certificates = Spaceship.certificate.in_house.all
         # handles case where the desired certificate type is adhoc but the account is an enterprise account
         # the apple dev portal api has a weird quirk in it where if you query for distribution certificates
         # for enterprise accounts, you get nothing back even if they exist.
-        elsif profile_type == Spaceship.provisioning_profile.AdHoc && Spaceship.client && Spaceship.client.in_house?
+        elsif (profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC) && Spaceship.client && Spaceship.client.in_house?
           # Enterprise accounts don't have access to Apple Distribution certificates
           certificates = Spaceship.certificate.in_house.all
         else
@@ -173,14 +208,14 @@ module Sigh
                          Spaceship.certificate.apple_distribution.all
         end
 
-      when 'macos'
-        if profile_type == Spaceship.provisioning_profile.Development
+      when 'macos', 'catalyst'
+        if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
           certificates = Spaceship.certificate.mac_development.all +
                          Spaceship.certificate.apple_development.all
-        elsif profile_type == Spaceship.provisioning_profile.AppStore
+        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
           certificates = Spaceship.certificate.mac_app_distribution.all +
                          Spaceship.certificate.apple_distribution.all
-        elsif profile_type == Spaceship.provisioning_profile.Direct
+        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
           certificates = Spaceship.certificate.developer_id_application.all
         else
           certificates = Spaceship.certificate.mac_app_distribution.all +
@@ -235,7 +270,7 @@ module Sigh
         filters << "Owner Name: '#{Sigh.config[:cert_owner_name]}' " if Sigh.config[:cert_owner_name]
         filters << "Certificate ID: '#{Sigh.config[:cert_id]}' " if Sigh.config[:cert_id]
         UI.important("No certificates for filter: #{filters}") if filters.length > 0
-        message = "Could not find a matching code signing identity for type '#{profile_type.to_s.split(':').last}'. "
+        message = "Could not find a matching code signing identity for type '#{profile_type_pretty_type}'. "
         message += "It is recommended to use match to manage code signing for you, more information on https://codesigning.guide. "
         message += "If you don't want to do so, you can also use cert to generate a new one: https://fastlane.tools/cert"
         UI.user_error!(message)
@@ -248,13 +283,15 @@ module Sigh
     # Downloads and stores the provisioning profile
     def download_profile(profile)
       UI.important("Downloading provisioning profile...")
-      profile_name ||= "#{profile_type.pretty_type}_#{Sigh.config[:app_identifier]}"
+      profile_name ||= "#{profile_type_pretty_type}_#{Sigh.config[:app_identifier]}"
 
       if Sigh.config[:platform].to_s == 'tvos'
         profile_name += "_tvos"
+      elsif Sigh.config[:platform].to_s == 'catalyst'
+        profile_name += "_catalyst"
       end
 
-      if Sigh.config[:platform].to_s == 'macos'
+      if ['macos', 'catalyst'].include?(Sigh.config[:platform].to_s)
         profile_name += '.provisionprofile'
       else
         profile_name += '.mobileprovision'
@@ -263,7 +300,8 @@ module Sigh
       tmp_path = Dir.mktmpdir("profile_download")
       output_path = File.join(tmp_path, profile_name)
       File.open(output_path, "wb") do |f|
-        f.write(profile.download)
+        content = Base64.decode64(profile.profile_content)
+        f.write(content)
       end
 
       UI.success("Successfully downloaded provisioning profile...")
@@ -272,7 +310,10 @@ module Sigh
 
     # Makes sure the current App ID exists. If not, it will show an appropriate error message
     def ensure_app_exists!
-      return if Spaceship::App.find(Sigh.config[:app_identifier], mac: Sigh.config[:platform].to_s == 'macos')
+      # Only ensuring by app identifier
+      # We used to ensure by platform (IOS and MAC_OS) but now apps are
+      # always UNIVERSAL as of 2020-07-30
+      return if Spaceship::ConnectAPI::BundleId.find(Sigh.config[:app_identifier])
       print_produce_command(Sigh.config)
       UI.user_error!("Could not find App with App Identifier '#{Sigh.config[:app_identifier]}'")
     end

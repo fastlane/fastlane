@@ -14,7 +14,13 @@ module Match
         specific_cert_type = cert_type.to_s
       end
 
+      platform = params[:platform]
+      if platform.to_s == :catalyst.to_s
+        platform = :macos.to_s
+      end
+
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
+        platform: platform,
         development: params[:type] == "development",
         type: specific_cert_type,
         generate_apple_certs: params[:generate_apple_certs],

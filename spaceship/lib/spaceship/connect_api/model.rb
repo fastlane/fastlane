@@ -152,7 +152,7 @@ module Spaceship
               id == included_data["id"] && type == included_data["type"]
             end
 
-            inflate_model(relationship_data, included)
+            inflate_model(relationship_data, included) if relationship_data
           end
 
           # Map a hash or an array of data
