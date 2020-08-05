@@ -7196,7 +7196,6 @@ func ssh(username: String,
    - obbMainFileSize: Size of 'main' expansion file in bytes
    - obbPatchReferencesVersion: References version of 'patch' expansion file
    - obbPatchFileSize: Size of 'patch' expansion file in bytes
-   - ackBundleInstallationWarning: Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 150MB
 
  More information: https://docs.fastlane.tools/actions/supply/
  */
@@ -7234,8 +7233,7 @@ func supply(packageName: String,
             obbMainReferencesVersion: String? = nil,
             obbMainFileSize: String? = nil,
             obbPatchReferencesVersion: String? = nil,
-            obbPatchFileSize: String? = nil,
-            ackBundleInstallationWarning: Bool = false) {
+            obbPatchFileSize: String? = nil) {
     let command = RubyCommand(commandID: "", methodName: "supply", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                           RubyCommand.Argument(name: "version_name", value: versionName),
                                                                                           RubyCommand.Argument(name: "version_code", value: versionCode),
@@ -7270,8 +7268,7 @@ func supply(packageName: String,
                                                                                           RubyCommand.Argument(name: "obb_main_references_version", value: obbMainReferencesVersion),
                                                                                           RubyCommand.Argument(name: "obb_main_file_size", value: obbMainFileSize),
                                                                                           RubyCommand.Argument(name: "obb_patch_references_version", value: obbPatchReferencesVersion),
-                                                                                          RubyCommand.Argument(name: "obb_patch_file_size", value: obbPatchFileSize),
-                                                                                          RubyCommand.Argument(name: "ack_bundle_installation_warning", value: ackBundleInstallationWarning)])
+                                                                                          RubyCommand.Argument(name: "obb_patch_file_size", value: obbPatchFileSize)])
     _ = runner.executeCommand(command)
 }
 
@@ -8311,7 +8308,6 @@ func uploadToAppStore(username: String,
    - obbMainFileSize: Size of 'main' expansion file in bytes
    - obbPatchReferencesVersion: References version of 'patch' expansion file
    - obbPatchFileSize: Size of 'patch' expansion file in bytes
-   - ackBundleInstallationWarning: Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 150MB
 
  More information: https://docs.fastlane.tools/actions/supply/
  */
@@ -8349,8 +8345,7 @@ func uploadToPlayStore(packageName: String,
                        obbMainReferencesVersion: String? = nil,
                        obbMainFileSize: String? = nil,
                        obbPatchReferencesVersion: String? = nil,
-                       obbPatchFileSize: String? = nil,
-                       ackBundleInstallationWarning: Bool = false) {
+                       obbPatchFileSize: String? = nil) {
     let command = RubyCommand(commandID: "", methodName: "upload_to_play_store", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                                         RubyCommand.Argument(name: "version_name", value: versionName),
                                                                                                         RubyCommand.Argument(name: "version_code", value: versionCode),
@@ -8385,8 +8380,7 @@ func uploadToPlayStore(packageName: String,
                                                                                                         RubyCommand.Argument(name: "obb_main_references_version", value: obbMainReferencesVersion),
                                                                                                         RubyCommand.Argument(name: "obb_main_file_size", value: obbMainFileSize),
                                                                                                         RubyCommand.Argument(name: "obb_patch_references_version", value: obbPatchReferencesVersion),
-                                                                                                        RubyCommand.Argument(name: "obb_patch_file_size", value: obbPatchFileSize),
-                                                                                                        RubyCommand.Argument(name: "ack_bundle_installation_warning", value: ackBundleInstallationWarning)])
+                                                                                                        RubyCommand.Argument(name: "obb_patch_file_size", value: obbPatchFileSize)])
     _ = runner.executeCommand(command)
 }
 
