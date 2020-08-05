@@ -34,7 +34,7 @@ module Snapshot
         xcpretty = "xcpretty #{Snapshot.config[:xcpretty_args]}"
         xcpretty << "--no-color" if Helper.colors_disabled?
         pipe << "| #{xcpretty}"
-        pipe << " > /dev/null" if Snapshot.config[:suppress_xcode_output]
+        pipe << "> /dev/null" if Snapshot.config[:suppress_xcode_output]
         return pipe
       end
 
