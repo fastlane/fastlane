@@ -347,7 +347,8 @@ module Supply
           current_package_name,
           self.current_edit.id,
           upload_source: path_to_aab,
-          content_type: "application/octet-stream"
+          content_type: "application/octet-stream",
+          ack_bundle_installation_warning: Supply.config[:ack_bundle_installation_warning]
         )
       end
 
