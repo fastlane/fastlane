@@ -59,7 +59,7 @@ module Deliver
 
       upload_screenshots(screenshots_per_language, localizations, options)
 
-      Helper.show_loading_indicator("Reodering screenshots uploaded...")
+      Helper.show_loading_indicator("Reordering screenshots uploaded...")
       # Wait for records created asynchronusly
       sleep(3)
       clean_up_screenshots(localizations)
