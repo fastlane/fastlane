@@ -127,6 +127,9 @@ protocol SnapshotfileProtocol: class {
 
     /// Disable xcpretty formatting of build
     var disableXcpretty: Bool? { get }
+
+    /// Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
+    var suppressXcodeOutput: Bool? { get }
 }
 
 extension SnapshotfileProtocol {
@@ -173,8 +176,9 @@ extension SnapshotfileProtocol {
     var onlyTesting: String? { return nil }
     var skipTesting: String? { return nil }
     var disableXcpretty: Bool? { return nil }
+    var suppressXcodeOutput: Bool? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.20]
+// FastlaneRunnerAPIVersion [0.9.21]
