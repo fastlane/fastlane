@@ -190,7 +190,7 @@ module Deliver
           iterator.each_app_screenshot do |_, _, app_screenshot|
             app_screenshot.delete! unless app_screenshot.complete?
           end
-          upload_screenshots(screenshots_per_language, localizations, tries: tries)
+          upload_screenshots(localizations, screenshots_per_language, tries: tries)
         end
       end
     end
