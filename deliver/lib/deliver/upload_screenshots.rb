@@ -11,7 +11,7 @@ module Deliver
   # upload screenshots to App Store Connect
   class UploadScreenshots
     DeleteScreenshotJob = Struct.new(:app_screenshot, :localization, :app_screenshot_set)
-    UploadScreenshotJob = Struct.new(:app_screenshot_set, :path, :wait_for_processing)
+    UploadScreenshotJob = Struct.new(:app_screenshot_set, :path)
 
     NUMBER_OF_THREADS = Helper.test? ? 1 : 10
 
@@ -59,10 +59,8 @@ module Deliver
 
       upload_screenshots(screenshots_per_language, localizations, options)
 
-      Helper.show_loading_indicator("Reordering screenshots uploaded...")
-      # Wait for records created asynchronusly
-      sleep(3)
-      clean_up_screenshots(localizations)
+      Helper.show_loading_indicator("Sorting screenshots uploaded...")
+      sort_screenshots(localizations)
       Helper.hide_loading_indicator
 
       UI.success("Successfully uploaded screenshots to App Store Connect")
@@ -87,7 +85,7 @@ module Deliver
       iterator = AppScreenshotIterator.new(localizations)
       iterator.each_app_screenshot do |localization, app_screenshot_set, app_screenshot|
         # Only delete screenshots if trying to upload
-        next unless screenshots_per_language.keys.include?(localization.locale)
+        # next unless screenshots_per_language.keys.include?(localization.locale)
 
         UI.verbose("Queued delete sceeenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{app_screenshot.id}")
         worker.enqueue(DeleteScreenshotJob.new(app_screenshot, localization, app_screenshot_set))
@@ -113,38 +111,22 @@ module Deliver
       end
     end
 
-    def upload_screenshots(screenshots_per_language, localizations, options)
-      # Check if should wait for processing
-      # Default to waiting if submitting for review (since needed for submission)
-      # Otherwise use enviroment variable
-      if ENV["DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING"].nil?
-        wait_for_processing = options[:submit_for_review]
-        UI.verbose("Setting wait_for_processing from ':submit_for_review' option")
-      else
-        UI.verbose("Setting wait_for_processing from 'DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING' environment variable")
-        wait_for_processing = !FastlaneCore::Env.truthy?("DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING")
-      end
-
-      if wait_for_processing
-        UI.important("Will wait for screenshot image processing")
-        UI.important("Set env DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING=true to skip waiting for screenshots to process")
-      else
-        UI.important("Skipping the wait for screenshot image processing (which may affect submission)")
-        UI.important("Set env DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING=false to wait for screenshots to process")
-      end
+    def upload_screenshots(screenshots_per_language, localizations, options, tries: 5)
+      tries -= 1
 
       # Upload screenshots
       worker = QueueWorker.new(NUMBER_OF_THREADS) do |job|
         begin
           UI.verbose("Uploading '#{job.path}'...")
           start_time = Time.now
-          job.app_screenshot_set.upload_screenshot(path: job.path, wait_for_processing: job.wait_for_processing)
+          job.app_screenshot_set.upload_screenshot(path: job.path, wait_for_processing: false)
           UI.message("Uploaded '#{job.path}'... (#{Time.now - start_time} secs)")
         rescue => error
           UI.error(error)
         end
       end
 
+      number_of_screenshots = 0
       iterator = AppScreenshotIterator.new(localizations)
       iterator.each_local_screenshot(screenshots_per_language) do |localization, app_screenshot_set, screenshot, index|
         if index >= 10
@@ -159,29 +141,68 @@ module Deliver
         if duplicate
           UI.message("Previous uploaded. Skipping '#{screenshot.path}'...")
         else
-          worker.enqueue(UploadScreenshotJob.new(app_screenshot_set, screenshot.path, wait_for_processing))
+          worker.enqueue(UploadScreenshotJob.new(app_screenshot_set, screenshot.path))
         end
+
+        number_of_screenshots += 1
       end
 
       worker.start
-    end
 
-    def clean_up_screenshots(localizations)
-      iterator = AppScreenshotIterator.new(localizations)
+      UI.verbose('Uploading jobs are completed')
 
-      # Delete bad entries that are left as placeholder for some reasons, for example
-      iterator.each_app_screenshot do |_, _, app_screenshot|
-        app_screenshot.delete! unless app_screenshot.complete?
+      # Verify all screenshots have been uploaded and processed
+      states = {}
+      loop do
+        states = iterator.each_app_screenshot.map { |_, _, app_screenshot| app_screenshot }.each_with_object({}) do |app_screenshot, hash|
+          hash[app_screenshot.asset_delivery_state['state']] ||= 0
+          hash[app_screenshot.asset_delivery_state['state']] += 1
+        end
+
+        is_processing = states.fetch('UPLOAD_COMPLETE', 0) > 0
+        break unless is_processing
+
+        UI.verbose("There are still incomplete screenshots - #{states}")
+        sleep(5)
       end
 
+      # Verify all screenshots states on App Store Connect are okay
+      is_failure = states.fetch("FAILED", 0) > 0
+      is_missing_screenshot = states.reduce(0) { |sum, (k, v)| sum + v } != number_of_screenshots
+      if is_failure || is_missing_screenshot
+        # Delete bad entries that are left as placeholder for some reasons, for example
+        iterator.each_app_screenshot do |_, _, app_screenshot|
+          app_screenshot.delete! unless app_screenshot.complete?
+        end
+
+        if tries.zero?
+          UI.user_error!("Failed verification of all screenshots uploaded... #{count} screenshot(s) still exist")
+        else
+          UI.error("Failed to upload all screenshots... Tries remaining: #{tries}")
+          upload_screenshots(screenshots_per_language, localizations, options, tries: tries)
+        end
+      end
+
+      UI.message("Successfully uploaded all screenshots")
+    end
+
+    def sort_screenshots(localizations)
+      iterator = AppScreenshotIterator.new(localizations)
+
       # Re-order screenshots within app_screenshot_set
-      iterator.each_app_screenshot_set do |localization, app_screenshot_set|
+      worker = QueueWorker.new(NUMBER_OF_THREADS) do |app_screenshot_set|
         original_ids = app_screenshot_set.app_screenshots.map(&:id)
         sorted_ids = app_screenshot_set.app_screenshots.sort_by(&:file_name).map(&:id)
         if original_ids != sorted_ids
           app_screenshot_set.reorder_screenshots(app_screenshot_ids: sorted_ids)
         end
       end
+
+      iterator.each_app_screenshot_set do |_, app_screenshot_set|
+        worker.enqueue(app_screenshot_set)
+      end
+
+      worker.start
     end
 
     def collect_screenshots(options)
