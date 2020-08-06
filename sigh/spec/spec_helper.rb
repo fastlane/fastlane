@@ -10,6 +10,10 @@ def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: n
   allow(certificate).to receive(:id).and_return("id")
   allow(certificate).to receive(:certificate_content).and_return(Base64.encode64("cert content"))
 
+  device = "device"
+  allow(device).to receive(:id).and_return(1)
+  allow(Spaceship::ConnectAPI::Device).to receive(:all).and_return([device])
+
   bundle_ids = all_app_identifiers.map do |id|
     Spaceship::ConnectAPI::BundleId.new("123", {
       identifier: id,
