@@ -85,7 +85,7 @@ module Deliver
       iterator = AppScreenshotIterator.new(localizations)
       iterator.each_app_screenshot do |localization, app_screenshot_set, app_screenshot|
         # Only delete screenshots if trying to upload
-        # next unless screenshots_per_language.keys.include?(localization.locale)
+        next unless screenshots_per_language.keys.include?(localization.locale)
 
         UI.verbose("Queued delete sceeenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{app_screenshot.id}")
         worker.enqueue(DeleteScreenshotJob.new(app_screenshot, localization, app_screenshot_set))
