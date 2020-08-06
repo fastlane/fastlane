@@ -17,7 +17,8 @@ module Deliver
       return enum_for(__method__) unless block_given?
 
       # Collect app_screenshot_sets from localizations in parallel but
-      # save the number of threads used at a time with using `lazy` and `force` controls
+      # limit the number of threads working at a time with using `lazy` and `force` controls
+      # to not attack App Store Connect
       results = @localizations.each_slice(NUMBER_OF_THREADS).lazy.map do |localizations|
         localizations.map do |localization|
           Thread.new do
