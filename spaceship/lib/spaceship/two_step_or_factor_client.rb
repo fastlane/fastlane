@@ -140,10 +140,7 @@ module Spaceship
         should_request_code = !sms_automatically_sent(response) && (!ENV["SPACESHIP_2FA_SMS_CODE"] || ENV["SPACESHIP_2FA_SMS_CODE"].empty?)
         code_type = 'phone'
         body = request_two_factor_code_from_phone(phone_id, phone_number, code_length, should_request_code)
-
-        # raise "aaa2 body: #{body}"
       elsif sms_automatically_sent(response) # sms fallback, code was automatically sent
-        raise "aaa3"
         fallback_number = response.body["trustedPhoneNumbers"].first
         phone_number = fallback_number["numberWithDialCode"]
         phone_id = fallback_number["id"]
@@ -151,11 +148,9 @@ module Spaceship
         code_type = 'phone'
         body = request_two_factor_code_from_phone(phone_id, phone_number, code_length, false)
       elsif sms_fallback(response) # sms fallback but code wasn't sent bec > 1 phone number
-        raise "aaa4"
         code_type = 'phone'
         body = request_two_factor_code_from_phone_choose(response.body["trustedPhoneNumbers"], code_length)
       else
-        raise "aaa5"
         puts("(Input `sms` to escape this prompt and select a trusted phone number to send the code as a text message)")
         puts("")
         puts("(You can also set the environment variable `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` to automate this)")
