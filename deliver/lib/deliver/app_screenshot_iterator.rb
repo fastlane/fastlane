@@ -1,6 +1,8 @@
 module Deliver
   # This is a convinient class that enumerates app store connect's screenshots in various degrees.
   class AppScreenshotIterator
+    NUMBER_OF_THREADS = Helper.test? ? 1 : 10
+
     # @param localizations [Array<Spaceship::ConnectAPI::AppStoreVersionLocalization>]
     def initialize(localizations)
       @localizations = localizations
@@ -14,8 +16,20 @@ module Deliver
     def each_app_screenshot_set(&block)
       return enum_for(__method__) unless block_given?
 
-      @localizations.each do |localization|
-        localization.get_app_screenshot_sets.each do |app_screenshot_set|
+      # Collect app_screenshot_sets from localizations in parallel but
+      # save the number of threads used at a time with using `lazy` and `force` controls
+      results = @localizations.each_slice(NUMBER_OF_THREADS).lazy.map do |localizations|
+        localizations.map do |localization|
+          Thread.new do
+            [localization, localization.get_app_screenshot_sets]
+          end
+        end
+      end.flat_map do |threads|
+        threads.map { |t| t.join.value }
+      end.force
+
+      results.each do |localization, app_screenshot_sets|
+        app_screenshot_sets.each do |app_screenshot_set|
           yield(localization, app_screenshot_set)
         end
       end
