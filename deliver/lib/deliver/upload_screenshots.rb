@@ -57,7 +57,7 @@ module Deliver
         localizations = version.get_app_store_version_localizations
       end
 
-      upload_screenshots(screenshots_per_language, localizations, options)
+      upload_screenshots(localizations, screenshots_per_language)
 
       Helper.show_loading_indicator("Sorting screenshots uploaded...")
       sort_screenshots(localizations)
@@ -111,7 +111,7 @@ module Deliver
       end
     end
 
-    def upload_screenshots(screenshots_per_language, localizations, options, tries: 5)
+    def upload_screenshots(localizations, screenshots_per_language, tries: 5)
       tries -= 1
 
       # Upload screenshots
@@ -152,7 +152,7 @@ module Deliver
       UI.verbose('Uploading jobs are completed')
 
       states = wait_for_complete(iterator)
-      retry_upload_screenshots_if_needed(iterator, states, tries)
+      retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, tries, localizations, screenshots_per_language)
 
       UI.message("Successfully uploaded all screenshots")
     end
@@ -161,8 +161,9 @@ module Deliver
     def wait_for_complete(iterator)
       loop do
         states = iterator.each_app_screenshot.map { |_, _, app_screenshot| app_screenshot }.each_with_object({}) do |app_screenshot, hash|
-          hash[app_screenshot.asset_delivery_state['state']] ||= 0
-          hash[app_screenshot.asset_delivery_state['state']] += 1
+          state = app_screenshot.asset_delivery_state['state']
+          hash[state] ||= 0
+          hash[state] += 1
         end
 
         is_processing = states.fetch('UPLOAD_COMPLETE', 0) > 0
@@ -174,19 +175,20 @@ module Deliver
     end
 
     # Verify all screenshots states on App Store Connect are okay
-    def retry_upload_screenshots_if_needed(iterator, states, tries)
+    def retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, tries, localizations, screenshots_per_language)
       is_failure = states.fetch("FAILED", 0) > 0
       is_missing_screenshot = states.reduce(0) { |sum, (k, v)| sum + v } != number_of_screenshots
       if is_failure || is_missing_screenshot
         if tries.zero?
-          UI.user_error!("Failed verification of all screenshots uploaded... #{count} screenshot(s) still exist")
+          incomplete_screenshot_count = states.reject { |k, v| k == 'COMPLETE' }.reduce(0) { |sum, (k, v)| sum + v }
+          UI.user_error!("Failed verification of all screenshots uploaded... #{incomplete_screenshot_count} incomplete screenshot(s) still exist")
         else
           UI.error("Failed to upload all screenshots... Tries remaining: #{tries}")
           # Delete bad entries before retry
           iterator.each_app_screenshot do |_, _, app_screenshot|
             app_screenshot.delete! unless app_screenshot.complete?
           end
-          upload_screenshots(screenshots_per_language, localizations, options, tries: tries)
+          upload_screenshots(screenshots_per_language, localizations, tries: tries)
         end
       end
     end
