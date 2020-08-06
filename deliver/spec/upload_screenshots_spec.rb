@@ -227,26 +227,12 @@ describe Deliver::UploadScreenshots do
     end
   end
 
-  describe '#clean_up_screenshots' do
+  describe '#sort_screenshots' do
     def make_app_screenshot(id: nil, file_name: nil, is_complete: true)
       app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', id: id, file_name: file_name)
       # `complete?` needed to be mocked by this way since Rubocop using 2.0 parser can't handle `{ 'complete?':  false }` format
       allow(app_screenshot).to receive(:complete?).and_return(is_complete)
       app_screenshot
-    end
-
-    context 'when localization has incomplete screenshots uploaded' do
-      it 'should delete screenshot' do
-        app_screenshot = make_app_screenshot(id: 'some-id', file_name: '6.5_1.jpg', is_complete: false)
-        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
-                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
-                                    app_screenshots: [app_screenshot])
-        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
-                              locale: 'en-US',
-                              get_app_screenshot_sets: [app_screenshot_set])
-        expect(app_screenshot).to receive(:delete!)
-        described_class.new.clean_up_screenshots([localization])
-      end
     end
 
     context 'when localization has screenshots uploaded in wrong order' do
@@ -261,7 +247,7 @@ describe Deliver::UploadScreenshots do
                               locale: 'en-US',
                               get_app_screenshot_sets: [app_screenshot_set])
         expect(app_screenshot_set).to receive(:reorder_screenshots).with(app_screenshot_ids: ['1', '2', '3'])
-        described_class.new.clean_up_screenshots([localization])
+        described_class.new.sort_screenshots([localization])
       end
     end
   end
