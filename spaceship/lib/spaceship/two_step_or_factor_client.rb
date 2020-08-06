@@ -1,5 +1,6 @@
 require_relative 'globals'
 require_relative 'tunes/tunes_client'
+require_relative 'fastlane_core/ui/ui'
 
 module Spaceship
   class Client
@@ -310,7 +311,7 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
 
       if ENV["SPACESHIP_2FA_SMS_CODE"] && !ENV["SPACESHIP_2FA_SMS_CODE"].empty?
         code = ENV["SPACESHIP_2FA_SMS_CODE"]
-      else 
+      else
         code = ask_for_2fa_code("Please enter the #{code_length} digit code you received at #{phone_number}:")
       end
 
