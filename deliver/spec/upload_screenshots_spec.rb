@@ -248,7 +248,7 @@ describe Deliver::UploadScreenshots do
         iterator = Deliver::AppScreenshotIterator.new([localization])
 
         expect(::Kernel).to_not(receive(:sleep))
-        subject.wait_for_complete(iterator)
+        expect(subject.wait_for_complete(iterator)).to eq('COMPLETE' => 1)
       end
     end
 
@@ -265,7 +265,7 @@ describe Deliver::UploadScreenshots do
 
         expect_any_instance_of(Object).to receive(:sleep).with(kind_of(Numeric)).once
         expect(app_screenshot).to receive(:asset_delivery_state).and_return({ 'state' => 'UPLOAD_COMPLETE' }, { 'state' => 'COMPLETE' })
-        subject.wait_for_complete(iterator)
+        expect(subject.wait_for_complete(iterator)).to eq('COMPLETE' => 1)
       end
     end
   end
