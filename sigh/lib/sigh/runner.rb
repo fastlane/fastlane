@@ -171,7 +171,8 @@ module Sigh
         name: name,
         profile_type: profile_type,
         bundle_id_id: bundle_id.id,
-        certificate_ids: [certificate_to_use.id]
+        certificate_ids: certificates_to_use.map(&:id),
+        device_ids: devices_to_use.map(&:id)
       )
 
       profile
@@ -226,8 +227,27 @@ module Sigh
       certificates
     end
 
+    def devices_to_use
+      device_class = case Sigh.config[:platform].to_s
+                     when 'ios'
+                       [
+                         Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH,
+                         Spaceship::ConnectAPI::Device::DeviceClass::IPAD,
+                         Spaceship::ConnectAPI::Device::DeviceClass::IPHONE,
+                         Spaceship::ConnectAPI::Device::DeviceClass::IPOD
+                       ].join(",")
+                     when 'tvos'
+                       Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV
+                     when 'macos', 'catalyst'
+                       Spaceship::ConnectAPI::Device::DeviceClass::MAC
+                     end
+
+      filter = { deviceClass: device_class }
+      return Spaceship::ConnectAPI::Device.all(filter: filter)
+    end
+
     # Certificate to use based on the current distribution mode
-    def certificate_to_use
+    def certificates_to_use
       certificates = certificates_for_profile_and_platform
 
       # Filter them
@@ -277,7 +297,7 @@ module Sigh
       end
 
       return certificates if Sigh.config[:development] # development profiles support multiple certificates
-      return certificates.first
+      return [certificates.first]
     end
 
     # Downloads and stores the provisioning profile

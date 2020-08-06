@@ -65,10 +65,10 @@ module Spaceship
                 end
               },
               devices: {
-                data: (devices || []).map do |certificate|
+                data: (devices || []).map do |device|
                   {
                     type: "devices",
-                    id: devices
+                    id: device
                   }
                 end
               }
