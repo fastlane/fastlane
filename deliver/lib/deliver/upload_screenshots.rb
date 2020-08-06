@@ -151,8 +151,14 @@ module Deliver
 
       UI.verbose('Uploading jobs are completed')
 
-      # Verify all screenshots have been uploaded and processed
-      states = {}
+      states = wait_for_complete(iterator)
+      retry_upload_screenshots_if_needed(iterator, states, tries)
+
+      UI.message("Successfully uploaded all screenshots")
+    end
+
+    # Verify all screenshots have been processed
+    def wait_for_complete(iterator)
       loop do
         states = iterator.each_app_screenshot.map { |_, _, app_screenshot| app_screenshot }.each_with_object({}) do |app_screenshot, hash|
           hash[app_screenshot.asset_delivery_state['state']] ||= 0
@@ -160,30 +166,29 @@ module Deliver
         end
 
         is_processing = states.fetch('UPLOAD_COMPLETE', 0) > 0
-        break unless is_processing
+        return states unless is_processing
 
         UI.verbose("There are still incomplete screenshots - #{states}")
         sleep(5)
       end
+    end
 
-      # Verify all screenshots states on App Store Connect are okay
+    # Verify all screenshots states on App Store Connect are okay
+    def retry_upload_screenshots_if_needed(iterator, states, tries)
       is_failure = states.fetch("FAILED", 0) > 0
       is_missing_screenshot = states.reduce(0) { |sum, (k, v)| sum + v } != number_of_screenshots
       if is_failure || is_missing_screenshot
-        # Delete bad entries that are left as placeholder for some reasons, for example
-        iterator.each_app_screenshot do |_, _, app_screenshot|
-          app_screenshot.delete! unless app_screenshot.complete?
-        end
-
         if tries.zero?
           UI.user_error!("Failed verification of all screenshots uploaded... #{count} screenshot(s) still exist")
         else
           UI.error("Failed to upload all screenshots... Tries remaining: #{tries}")
+          # Delete bad entries before retry
+          iterator.each_app_screenshot do |_, _, app_screenshot|
+            app_screenshot.delete! unless app_screenshot.complete?
+          end
           upload_screenshots(screenshots_per_language, localizations, options, tries: tries)
         end
       end
-
-      UI.message("Successfully uploaded all screenshots")
     end
 
     def sort_screenshots(localizations)
