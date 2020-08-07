@@ -38,7 +38,7 @@ class Runner {
 
         let secondsToWait = DispatchTimeInterval.seconds(SocketClient.defaultCommandTimeoutSeconds)
         // swiftlint:disable next
-        let timeoutResult = waitWithPolling(self.executeNext[command.id], toEventually: { $0 == true }, timeout: SocketClient.defaultCommandTimeoutSeconds)
+        let timeoutResult = Self.waitWithPolling(self.executeNext[command.id], toEventually: { $0 == true }, timeout: SocketClient.defaultCommandTimeoutSeconds)
         executeNext.removeValue(forKey: command.id)
         let failureMessage = "command didn't execute in: \(SocketClient.defaultCommandTimeoutSeconds) seconds"
         let success = testDispatchTimeoutResult(timeoutResult, failureMessage: failureMessage, timeToWait: secondsToWait)
@@ -54,7 +54,7 @@ class Runner {
         }
     }
 
-    private func waitWithPolling<T>(_ expression: @autoclosure @escaping () throws -> T, toEventually predicate: @escaping (T) -> Bool, timeout: Int, pollingInterval: DispatchTimeInterval = .milliseconds(4)) -> DispatchTimeoutResult {
+    static func waitWithPolling<T>(_ expression: @autoclosure @escaping () throws -> T, toEventually predicate: @escaping (T) -> Bool, timeout: Int, pollingInterval: DispatchTimeInterval = .milliseconds(4)) -> DispatchTimeoutResult {
         func memoizedClosure<T>(_ closure: @escaping () throws -> T) -> (Bool) throws -> T {
             var cache: T?
             return { withoutCaching in

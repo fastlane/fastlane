@@ -9,6 +9,9 @@
 //
 
 import Foundation
+#if canImport(SwiftShell)
+import SwiftShell
+#endif
 
 let argumentProcessor = ArgumentProcessor(args: CommandLine.arguments)
 let timeout = argumentProcessor.commandTimeout
@@ -16,6 +19,10 @@ let timeout = argumentProcessor.commandTimeout
 class MainProcess {
     var doneRunningLane = false
     var thread: Thread!
+    #if SWIFT_PACKAGE
+    var lastPrintDate = Date.distantFuture
+    var timeBetweenPrints = Int.min
+    #endif
 
     @objc func connectToFastlaneAndRunLane(_ fastfile: LaneFile?) {
         runner.startSocketThread(port: argumentProcessor.port)
@@ -35,7 +42,21 @@ class MainProcess {
             thread = Thread(target: self, selector: #selector(connectToFastlaneAndRunLane), object: fastFile)
         #endif
         thread.name = "worker thread"
+        #if SWIFT_PACKAGE
+        let PATH = run("/bin/bash", "-c", "-l", "eval $(/usr/libexec/path_helper -s) ; echo $PATH").stdout
+        main.env["PATH"] = PATH
+        let path = main.run(bash: "which fastlane").stdout
+        let pids = main.run("lsof", "-t", "-i", ":2000").stdout.split(separator: "\n")
+        pids.forEach { main.run("kill", "-9", $0) }
+        let command = main.runAsync(path, "socket_server", "-c", "1200")
+        lastPrintDate = Date()
+        command.stdout.onOutput { stdout in
+            print(stdout.readSome() ?? "")
+            self.timeBetweenPrints = Int(self.lastPrintDate.timeIntervalSinceNow)
+        }
+        Runner.waitWithPolling(self.timeBetweenPrints, toEventually: { $0 > 5 }, timeout: 10)
         thread.start()
+        #endif
     }
 }
 
@@ -45,6 +66,7 @@ public class Main {
     public init() {}
 
     public func run(with fastFile: LaneFile?) {
+        
         process.startFastlaneThread(with: fastFile)
 
         while !process.doneRunningLane, RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date(timeIntervalSinceNow: 2)) {
@@ -52,7 +74,3 @@ public class Main {
         }
     }
 }
-
-// Please don't remove the lines below
-// They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]

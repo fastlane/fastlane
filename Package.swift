@@ -7,11 +7,13 @@ let package = Package(
     products: [
         .library(name: "Fastlane", targets: ["Fastlane"])
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/kareman/SwiftShell", .upToNextMajor(from: "5.0.1"))
+    ],
     targets: [
         .target(
             name: "Fastlane",
-            dependencies: [],
+            dependencies: ["SwiftShell"],
             path: "./fastlane/swift",
             exclude: ["Actions.swift", "Plugins.swift", "main.swift", "formatting", "FastlaneSwiftRunner"]
         ),
