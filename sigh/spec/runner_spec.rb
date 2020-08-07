@@ -100,6 +100,48 @@ describe Sigh do
       end
     end
 
+    describe "#devices_to_use" do
+      it "no devices for app store" do
+        options = {}
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+        expect(Spaceship::ConnectAPI::Device).not_to(receive(:all))
+
+        devices = fake_runner.devices_to_use
+        expect(devices.size).to eq(0)
+      end
+
+      it "no devices for developer id" do
+        options = { developer_id: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+        expect(Spaceship::ConnectAPI::Device).not_to(receive(:all))
+
+        devices = fake_runner.devices_to_use
+        expect(devices.size).to eq(0)
+      end
+
+      it "devices for development" do
+        options = { development: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(["device"])
+
+        devices = fake_runner.devices_to_use
+        expect(devices.size).to eq(1)
+      end
+
+      it "devices for adhoc" do
+        options = { adhoc: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(["device"])
+
+        devices = fake_runner.devices_to_use
+        expect(devices.size).to eq(1)
+      end
+    end
+
     describe "#profile_type_pretty_type" do
       profile_types = {
         Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE => "AppStore",
