@@ -228,6 +228,9 @@ module Sigh
     end
 
     def devices_to_use
+      # Only use devices if development or adhoc
+      return [] if !Sigh.config[:development] && !Sigh.config[:adhoc]
+
       device_class = case Sigh.config[:platform].to_s
                      when 'ios'
                        [
