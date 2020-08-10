@@ -102,7 +102,7 @@ describe Deliver::AppScreenshotIterator do
       end
     end
 
-    context 'when local screenshots are mutiple within an app_screenshot_set' do
+    context 'when local screenshots are multiple within an app_screenshot_set' do
       it 'should give index incremented on each' do
         app_screenshot_set1 = double('Spaceship::ConnectAPI::AppScreenshotSet',
                                      app_screenshots: [],
