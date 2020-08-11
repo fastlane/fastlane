@@ -3,7 +3,25 @@ require_relative './response'
 
 module Spaceship
   class ConnectAPI
-    class Client < Spaceship::Client
+    class Client
+      attr_accessor :client
+      def initialize(cookie: nil, current_team_id: nil, token: nil, another_client: nil)
+
+        self.extend(Spaceship::ConnectAPI::TestFlight::API)
+        self.test_flight_request_client = Spaceship::ConnectAPI::TestFlight::Client.new(
+          cookie: cookie, 
+          current_team_id: current_team_id, 
+          token: token, 
+          another_client: another_client)
+
+      end
+    end
+  end
+end
+
+module Spaceship
+  class ConnectAPI
+    class APIClient < Spaceship::Client
       attr_accessor :token
 
       #####################################################
@@ -11,9 +29,13 @@ module Spaceship
       #####################################################
 
       # Instantiates a client with cookie session or a JWT token.
-      def initialize(cookie: nil, current_team_id: nil, token: nil)
+      def initialize(cookie: nil, current_team_id: nil, token: nil, another_client: nil)
         if token.nil?
-          super(cookie: cookie, current_team_id: current_team_id, timeout: 1200)
+          if another_client.nil?
+            super(cookie: cookie, current_team_id: current_team_id, timeout: 1200)
+          else
+            super(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id)
+          end
         else
           options = {
             request: {

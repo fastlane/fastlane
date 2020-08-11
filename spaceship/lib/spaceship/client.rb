@@ -194,7 +194,8 @@ module Spaceship
       self.new(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id)
     end
 
-    def initialize(cookie: nil, current_team_id: nil, timeout: nil)
+    def initialize(cookie: nil, current_team_id: nil, timeout: nil, token: nil)
+      print("HERE 2")
       options = {
        request: {
           timeout:       (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i,
@@ -682,6 +683,8 @@ module Spaceship
 
       # Before encoding the parameters, log them
       log_request(method, url_or_path, params, headers, &block)
+
+      puts "HOSTNAME: #{@client.host}"
 
       # form-encode the params only if there are params, and the block is not supplied.
       # this is so that certain requests can be made using the block for more control
