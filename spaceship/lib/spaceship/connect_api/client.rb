@@ -1,3 +1,4 @@
+require_relative './token'
 require_relative './provisioning/provisioning'
 require_relative './testflight/testflight'
 require_relative './tunes/tunes'
@@ -8,37 +9,86 @@ module Spaceship
     class Client
       attr_accessor :client
 
-      def initialize(cookie: nil, current_team_id: nil, token: nil, another_client: nil)
+      attr_accessor :tunes_client
+      attr_accessor :portal_client
+
+      def self.auth(key_id: nil, issuer_id: nil, filepath: nil)
+        token = Spaceship::ConnectAPI::Token.create(key_id: key_id, issuer_id: issuer_id, filepath: filepath)
+        return ConnectAPI::Client.new(token: token)
+      end
+
+      def self.login(user = nil, password = nil, team_id: nil, team_name: nil)
+        tunes_client = TunesClient.login(user, password)
+        portal_client = PortalClient.login(user, password)
+
+        if !team_id.nil? || !team_name.nil?
+          tunes_client.select_team(team_id: team_id, team_name: team_name)
+          portal_client.select_team(team_id: team_id, team_name: team_name)
+        end
+
+        return ConnectAPI::Client.new(tunes_client: tunes_client, portal_client: portal_client)
+      end
+
+      def initialize(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil)
+        @tunes_client = tunes_client
+        @portal_client = portal_client
+
         self.extend(Spaceship::ConnectAPI::TestFlight::API)
+        self.extend(Spaceship::ConnectAPI::Tunes::API)
+        self.extend(Spaceship::ConnectAPI::Provisioning::API)
+        self.extend(Spaceship::ConnectAPI::Users::API)
+
+        set_indvidual_clients(
+          cookie: cookie,
+          current_team_id: current_team_id,
+          token: token,
+          tunes_client: tunes_client,
+          portal_client: portal_client
+        )
+      end
+
+      def select_team(team_id: nil, team_name: nil)
+        @tunes_client.select_team(team_id: team_id, team_name: team_name)
+        @portal_client.select_team(team_id: team_id, team_name: team_name)
+
+        set_indvidual_clients(
+          cookie: nil,
+          current_team_id: nil,
+          token: nil,
+          tunes_client: tunes_client,
+          portal_client: portal_client
+        )
+      end
+
+      private
+
+      def set_indvidual_clients(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil)
         self.test_flight_request_client = Spaceship::ConnectAPI::TestFlight::Client.new(
           cookie: cookie,
           current_team_id: current_team_id,
           token: token,
-          another_client: another_client
+          another_client: tunes_client
         )
 
-        self.extend(Spaceship::ConnectAPI::Tunes::API)
         self.tunes_request_client = Spaceship::ConnectAPI::Tunes::Client.new(
           cookie: cookie,
           current_team_id: current_team_id,
           token: token,
-          another_client: another_client
+          another_client: tunes_client
         )
 
-        self.extend(Spaceship::ConnectAPI::Provisioning::API)
         self.provisioning_request_client = Spaceship::ConnectAPI::Provisioning::Client.new(
           cookie: cookie,
           current_team_id: current_team_id,
           token: token,
-          another_client: another_client
+          another_client: portal_client
         )
 
-        self.extend(Spaceship::ConnectAPI::Users::API)
         self.users_request_client = Spaceship::ConnectAPI::Users::Client.new(
           cookie: cookie,
           current_team_id: current_team_id,
           token: token,
-          another_client: another_client
+          another_client: tunes_client
         )
       end
     end

@@ -1,12 +1,10 @@
 require_relative './client'
-require_relative './token'
 
 module Spaceship
   class ConnectAPI
     class << self
       # This client stores the default client when using the lazy syntax
       # Spaceship.app instead of using the spaceship launcher
-      attr_accessor :tunes_client
       attr_accessor :client
 
       def method_missing(m, *args, &block)
@@ -18,8 +16,7 @@ module Spaceship
       end
 
       def auth(key_id: nil, issuer_id: nil, filepath: nil)
-        token = Spaceship::ConnectAPI::Token.create(key_id: key_id, issuer_id: issuer_id, filepath: filepath)
-        @client = ConnectAPI::Client.new(token: token)
+        @client = ConnectAPI::Client.auth(token: token)
       end
 
       # Authenticates with Apple's web services. This method has to be called once
@@ -35,9 +32,8 @@ module Spaceship
       # @raise InvalidUserCredentialsError: raised if authentication failed
       #
       # @return (Spaceship::Client) The client the login method was called for
-      def login(user = nil, password = nil)
-        @tunes_client = TunesClient.login(user, password)
-        @client = ConnectAPI::Client.new(another_client: @tunes_client)
+      def login(user = nil, password = nil, team_id: nil, team_name: nil)
+        @client = ConnectAPI::Client.login(user, password, team_id: team_id, team_name: team_name)
       end
 
       # Open up the team selection for the user (if necessary).
@@ -48,8 +44,7 @@ module Spaceship
       # @param team_id (String) (optional): The ID of an App Store Connect team
       # @param team_name (String) (optional): The name of an App Store Connect team
       def select_team(team_id: nil, team_name: nil)
-        @tunes_client.select_team(team_id: team_id, team_name: team_name)
-        @client = ConnectAPI::Client.new(another_client: @tunes_client)
+        @client.select_team(team_id: team_id, team_name: team_name)
       end
     end
   end
