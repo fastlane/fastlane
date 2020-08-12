@@ -1,11 +1,11 @@
 describe Spaceship::ConnectAPI::Client do
-  let(:client) { Spaceship::ConnectAPI::TestFlight::Client.instance }
+  let(:client) { Spaceship::ConnectAPI::TestFlight::Client.new }
   let(:hostname) { Spaceship::ConnectAPI::Users::Client.hostname }
   let(:username) { 'spaceship@krausefx.com' }
   let(:password) { 'so_secret' }
 
   before do
-    Spaceship::Tunes.login(username, password)
+    Spaceship::ConnectAPI.login(username, password)
   end
 
   context 'build_params' do

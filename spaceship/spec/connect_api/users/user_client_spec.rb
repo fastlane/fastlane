@@ -1,11 +1,11 @@
 describe Spaceship::ConnectAPI::Users::Client do
-  let(:client) { Spaceship::ConnectAPI::Users::Client.instance }
+  let(:client) { Spaceship::ConnectAPI::Users::Client.new }
   let(:hostname) { Spaceship::ConnectAPI::Users::Client.hostname }
   let(:username) { 'spaceship@krausefx.com' }
   let(:password) { 'so_secret' }
 
   before do
-    Spaceship::Tunes.login(username, password)
+    Spaceship::ConnectAPI.login(username, password)
   end
 
   context 'sends api request' do
@@ -46,7 +46,7 @@ describe Spaceship::ConnectAPI::Users::Client do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
-          Spaceship::ConnectAPI.get_users
+          client.get_users
         end
       end
     end

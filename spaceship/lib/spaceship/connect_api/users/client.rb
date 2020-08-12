@@ -1,4 +1,5 @@
 require_relative '../client'
+require_relative './users'
 require_relative '../../tunes/tunes_client'
 
 module Spaceship

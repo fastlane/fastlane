@@ -1,3 +1,6 @@
+require_relative './client'
+require_relative './token'
+
 module Spaceship
   class ConnectAPI
     class << self
@@ -6,14 +9,13 @@ module Spaceship
       attr_accessor :tunes_client
       attr_accessor :client
 
-      def method_missing(m, *args, &block)  
-        # TODO: I don't actually want to do this but this works for now
+      def method_missing(m, *args, &block)
         # This forwards lazy class calls onto the client
         if client.respond_to?(m)
           return client.send(m, *args, &block)
         end
-        raise ArgumentError.new("Method `#{m}` doesn't exist.")
-      end 
+        raise ArgumentError, "Method `#{m}` doesn't exist."
+      end
 
       def auth(key_id: nil, issuer_id: nil, filepath: nil)
         token = Spaceship::ConnectAPI::Token.create(key_id: key_id, issuer_id: issuer_id, filepath: filepath)

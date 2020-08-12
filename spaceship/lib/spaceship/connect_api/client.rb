@@ -7,33 +7,42 @@ module Spaceship
       attr_accessor :client
       def initialize(cookie: nil, current_team_id: nil, token: nil, another_client: nil)
 
+        require_relative './provisioning/provisioning'
+        require_relative './testflight/testflight'
+        require_relative './tunes/tunes'
+        require_relative './users/users'
+
         self.extend(Spaceship::ConnectAPI::TestFlight::API)
         self.test_flight_request_client = Spaceship::ConnectAPI::TestFlight::Client.new(
-          cookie: cookie, 
-          current_team_id: current_team_id, 
-          token: token, 
-          another_client: another_client)
+          cookie: cookie,
+          current_team_id: current_team_id,
+          token: token,
+          another_client: another_client
+        )
 
         self.extend(Spaceship::ConnectAPI::Tunes::API)
         self.tunes_request_client = Spaceship::ConnectAPI::Tunes::Client.new(
-          cookie: cookie, 
-          current_team_id: current_team_id, 
-          token: token, 
-          another_client: another_client)
+          cookie: cookie,
+          current_team_id: current_team_id,
+          token: token,
+          another_client: another_client
+        )
 
         self.extend(Spaceship::ConnectAPI::Provisioning::API)
         self.provisioning_request_client = Spaceship::ConnectAPI::Provisioning::Client.new(
-          cookie: cookie, 
-          current_team_id: current_team_id, 
-          token: token, 
-          another_client: another_client)
+          cookie: cookie,
+          current_team_id: current_team_id,
+          token: token,
+          another_client: another_client
+        )
 
         self.extend(Spaceship::ConnectAPI::Users::API)
         self.users_request_client = Spaceship::ConnectAPI::Users::Client.new(
-          cookie: cookie, 
-          current_team_id: current_team_id, 
-          token: token, 
-          another_client: another_client)
+          cookie: cookie,
+          current_team_id: current_team_id,
+          token: token,
+          another_client: another_client
+        )
       end
     end
   end

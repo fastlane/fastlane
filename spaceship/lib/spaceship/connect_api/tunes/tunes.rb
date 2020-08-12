@@ -7,10 +7,10 @@ module Spaceship
         def tunes_request_client=(tunes_request_client)
           @tunes_request_client = tunes_request_client
         end
-    
+
         def tunes_request_client
           return @tunes_request_client if @tunes_request_client
-          raise TypeError.new("You need to instantiate this module with tunes_request_client, man!")
+          raise TypeError, "You need to instantiate this module with tunes_request_client, man!"
         end
 
         #

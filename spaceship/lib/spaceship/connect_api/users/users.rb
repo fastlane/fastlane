@@ -7,10 +7,10 @@ module Spaceship
         def users_request_client=(users_request_client)
           @users_request_client = users_request_client
         end
-    
+
         def users_request_client
           return @users_request_client if @users_request_client
-          raise TypeError.new("You need to instantiate this module with users_request_client, man!")
+          raise TypeError, "You need to instantiate this module with users_request_client, man!"
         end
 
         #
