@@ -4,24 +4,14 @@ require_relative '../../portal/portal_client'
 module Spaceship
   class ConnectAPI
     module Provisioning
-      class Client < Spaceship::ConnectAPI::Client
-        def self.instance
-          # Verify there is a token or a client that can be used
-          if Spaceship::ConnectAPI.token
-            if @client.nil? || @client.token != Spaceship::ConnectAPI.token
-              @client = Spaceship::ConnectAPI::Provisioning::Client.new(token: Spaceship::ConnectAPI.token)
-            end
-          elsif Spaceship::Portal.client
-            # Initialize new client if new or if team changed
-            if @client.nil? || @client.team_id != Spaceship::Portal.client.team_id
-              @client = Spaceship::ConnectAPI::Provisioning::Client.client_with_authorization_from(Spaceship::Portal.client)
-            end
-          end
+      class Client < Spaceship::ConnectAPI::APIClient
+        def initialize(cookie: nil, current_team_id: nil, token: nil, another_client: nil)
+          another_client ||= Spaceship::Portal.client
 
-          # Need to handle not having a client but this shouldn't ever happen
-          raise "Please login using `Spaceship::Portal.login('user', 'password')`" unless @client
+          super(cookie: cookie, current_team_id: current_team_id, token: token, another_client: another_client)
 
-          @client
+          self.extend(Spaceship::ConnectAPI::Provisioning::API)
+          self.provisioning_request_client = self
         end
 
         def self.hostname

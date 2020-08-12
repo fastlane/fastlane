@@ -14,6 +14,26 @@ module Spaceship
           token: token, 
           another_client: another_client)
 
+        self.extend(Spaceship::ConnectAPI::Tunes::API)
+        self.tunes_request_client = Spaceship::ConnectAPI::Tunes::Client.new(
+          cookie: cookie, 
+          current_team_id: current_team_id, 
+          token: token, 
+          another_client: another_client)
+
+        self.extend(Spaceship::ConnectAPI::Provisioning::API)
+        self.provisioning_request_client = Spaceship::ConnectAPI::Provisioning::Client.new(
+          cookie: cookie, 
+          current_team_id: current_team_id, 
+          token: token, 
+          another_client: another_client)
+
+        self.extend(Spaceship::ConnectAPI::Users::API)
+        self.users_request_client = Spaceship::ConnectAPI::Users::Client.new(
+          cookie: cookie, 
+          current_team_id: current_team_id, 
+          token: token, 
+          another_client: another_client)
       end
     end
   end

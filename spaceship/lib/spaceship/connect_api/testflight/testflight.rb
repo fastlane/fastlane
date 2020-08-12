@@ -6,12 +6,12 @@ module Spaceship
       module API
         def test_flight_request_client=(test_flight_request_client)
           @test_flight_request_client = test_flight_request_client
-       end
+        end
     
-       def test_flight_request_client
-        return @test_flight_request_client if @test_flight_request_client
-         raise TypeError.new("You need to instantiate this module with test_flight_request_client, man!")
-       end
+        def test_flight_request_client
+          return @test_flight_request_client if @test_flight_request_client
+          raise TypeError.new("You need to instantiate this module with test_flight_request_client, man!")
+        end
 
         #
         # apps
