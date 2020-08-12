@@ -1,4 +1,4 @@
-require_relative '../client'
+require_relative '../api_client'
 require_relative './testflight'
 require_relative '../../tunes/tunes_client'
 

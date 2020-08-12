@@ -1,4 +1,4 @@
-require_relative '../client'
+require_relative '../api_client'
 require_relative './provisioning'
 require_relative '../../portal/portal_client'
 
