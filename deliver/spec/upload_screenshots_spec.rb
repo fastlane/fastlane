@@ -284,7 +284,7 @@ describe Deliver::UploadScreenshots do
         states = { 'FAILD' => 0, 'COMPLETE' => 1 }
 
         expect(subject).to_not(receive(:upload_screenshots))
-        subject.retry_upload_screenshots_if_needed(iterator, states, 1, 1, [], [])
+        subject.retry_upload_screenshots_if_needed(iterator, states, 1, 1, [], {})
       end
     end
 
@@ -302,7 +302,7 @@ describe Deliver::UploadScreenshots do
 
         expect(subject).to receive(:upload_screenshots).with(any_args)
         expect(app_screenshot).to receive(:delete!)
-        subject.retry_upload_screenshots_if_needed(iterator, states, 1, 1, [], [])
+        subject.retry_upload_screenshots_if_needed(iterator, states, 1, 1, [], {})
       end
     end
 
@@ -319,7 +319,7 @@ describe Deliver::UploadScreenshots do
         states = { 'FAILED' => 1, 'COMPLETE' => 0 }
 
         expect(subject).to receive(:upload_screenshots).with(any_args)
-        subject.retry_upload_screenshots_if_needed(iterator, states, 999, 1, [], [])
+        subject.retry_upload_screenshots_if_needed(iterator, states, 999, 1, [], {})
       end
     end
 
@@ -337,7 +337,28 @@ describe Deliver::UploadScreenshots do
 
         expect(subject).to_not(receive(:upload_screenshots).with(any_args))
         expect(UI).to receive(:user_error!)
-        subject.retry_upload_screenshots_if_needed(iterator, states, 1, 0, [], [])
+        subject.retry_upload_screenshots_if_needed(iterator, states, 1, 0, [], {})
+      end
+    end
+
+    context 'when there is nothing to upload locally but some exist on App Store Connect' do
+      let(:number_of_screenshots) { 0 }     # This is 0 since no image exists locally
+      let(:screenshots_per_language) { {} } # This is empty due to the same reason
+
+      it 'should just finish' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => true)
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [app_screenshot])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        iterator = Deliver::AppScreenshotIterator.new([localization])
+        states = { 'COMPLETE' => 1 }
+
+        expect(subject).to_not(receive(:upload_screenshots).with(any_args))
+        expect(UI).to_not(receive(:user_error!))
+        subject.retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, 0, [], screenshots_per_language)
       end
     end
   end
