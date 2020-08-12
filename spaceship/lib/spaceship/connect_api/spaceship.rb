@@ -1,22 +1,30 @@
 require_relative './client'
 
+require_relative './testflight/testflight'
+
 module Spaceship
   class ConnectAPI
     class << self
-      # This client stores the default client when using the lazy syntax
-      # Spaceship.app instead of using the spaceship launcher
+      # This client stores the global client when using the lazy syntax
       attr_accessor :client
 
-      def method_missing(m, *args, &block)
-        # This forwards lazy class calls onto the client
-        if client.respond_to?(m)
-          return client.send(m, *args, &block)
-        end
-        raise ArgumentError, "Method `#{m}` doesn't exist."
-      end
+      # Forward class calls to the global client
+      extend(Forwardable)
+      def_delegators(:client, *Spaceship::ConnectAPI::Provisioning::API.instance_methods)
+      def_delegators(:client, *Spaceship::ConnectAPI::TestFlight::API.instance_methods)
+      def_delegators(:client, *Spaceship::ConnectAPI::Tunes::API.instance_methods)
+      def_delegators(:client, *Spaceship::ConnectAPI::Users::API.instance_methods)
+
+      # def method_missing(m, *args, &block)
+      #   # This forwards lazy class calls onto the client
+      #   if client.respond_to?(m)
+      #     return client.send(m, *args, &block)
+      #   end
+      #   raise ArgumentError, "Method `#{m}` doesn't exist."
+      # end
 
       def auth(key_id: nil, issuer_id: nil, filepath: nil)
-        @client = ConnectAPI::Client.auth(token: token)
+        @client = ConnectAPI::Client.auth(key_id: key_id, issuer_id: issuer_id, filepath: filepath)
       end
 
       # Authenticates with Apple's web services. This method has to be called once
