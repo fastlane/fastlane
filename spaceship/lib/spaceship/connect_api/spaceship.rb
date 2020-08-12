@@ -15,6 +15,17 @@ module Spaceship
       def_delegators(:client, *Spaceship::ConnectAPI::Tunes::API.instance_methods(false))
       def_delegators(:client, *Spaceship::ConnectAPI::Users::API.instance_methods(false))
 
+      def client
+        # Always look for a client set explicitly by the client first
+        return @client if @client
+
+        # A client may not always be explicitly set (specially when running tools like match, sigh, pilot, etc)
+        # In that case, create a new client based on existing sessions
+        # Note: This does not perform logins on the user. It is only reusing the cookies and selected teams
+        implicit_client = ConnectAPI::Client.new(tunes_client: Spaceship::Tunes.client, portal_client: Spaceship::Portal.client)
+        return implicit_client
+      end
+
       # def method_missing(m, *args, &block)
       #   # This forwards lazy class calls onto the client
       #   if client.respond_to?(m)
