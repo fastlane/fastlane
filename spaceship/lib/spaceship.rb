@@ -4,6 +4,9 @@ require_relative 'spaceship/client'
 require_relative 'spaceship/provider'
 require_relative 'spaceship/launcher'
 
+# Middleware
+require_relative 'spaceship/stats_middleware'
+
 # Dev Portal
 require_relative 'spaceship/portal/portal'
 require_relative 'spaceship/portal/spaceship'
