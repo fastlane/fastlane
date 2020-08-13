@@ -135,7 +135,7 @@ module Deliver
         end
 
         checksum = UploadScreenshots.calculate_checksum(screenshot.path)
-        duplicate = app_screenshot_set.app_screenshots.any? { |s| s.source_file_checksum == checksum }
+        duplicate = (app_screenshot_set.app_screenshots || []).any? { |s| s.source_file_checksum == checksum }
 
         # Enqueue uploading job if it's not duplicated otherwise screenshot will be skipped
         if duplicate
