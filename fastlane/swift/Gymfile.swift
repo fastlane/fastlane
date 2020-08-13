@@ -14,4 +14,4 @@ class Gymfile: GymfileProtocol {
     // during the `init` process, and you won't see this message
 }
 
-// Generated with fastlane 2.156.0
+// Generated with fastlane 2.156.1
