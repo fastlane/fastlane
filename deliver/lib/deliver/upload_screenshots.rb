@@ -179,7 +179,8 @@ module Deliver
     # Verify all screenshots states on App Store Connect are okay
     def retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, tries, localizations, screenshots_per_language)
       is_failure = states.fetch("FAILED", 0) > 0
-      is_missing_screenshot = states.reduce(0) { |sum, (k, v)| sum + v } != number_of_screenshots
+      is_missing_screenshot = states.reduce(0) { |sum, (k, v)| sum + v } != number_of_screenshots && !screenshots_per_language.empty?
+
       if is_failure || is_missing_screenshot
         if tries.zero?
           incomplete_screenshot_count = states.reject { |k, v| k == 'COMPLETE' }.reduce(0) { |sum, (k, v)| sum + v }
