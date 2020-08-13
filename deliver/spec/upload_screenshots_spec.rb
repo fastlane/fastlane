@@ -145,6 +145,48 @@ describe Deliver::UploadScreenshots do
     end
 
     context 'when localization has no screenshot uploaded' do
+      context 'with nil' do
+        it 'should upload screenshots with app_screenshot_set' do
+          app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                      screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                      app_screenshots: nil)
+          localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                                locale: 'en-US',
+                                get_app_screenshot_sets: [app_screenshot_set])
+          local_screenshot = double('Deliver::AppScreenshot',
+                                    path: '/path/to/screenshot',
+                                    language: 'en-US',
+                                    device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+          screenshots_per_language = { 'en-US' => [local_screenshot] }
+          allow(described_class).to receive(:calculate_checksum).and_return('checksum')
+
+          expect(app_screenshot_set).to receive(:upload_screenshot).with(path: local_screenshot.path, wait_for_processing: false)
+          subject.upload_screenshots([localization], screenshots_per_language)
+        end
+      end
+
+      context 'with empty array' do
+        it 'should upload screenshots with app_screenshot_set' do
+          app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                      screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                      app_screenshots: [])
+          localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                                locale: 'en-US',
+                                get_app_screenshot_sets: [app_screenshot_set])
+          local_screenshot = double('Deliver::AppScreenshot',
+                                    path: '/path/to/screenshot',
+                                    language: 'en-US',
+                                    device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+          screenshots_per_language = { 'en-US' => [local_screenshot] }
+          allow(described_class).to receive(:calculate_checksum).and_return('checksum')
+
+          expect(app_screenshot_set).to receive(:upload_screenshot).with(path: local_screenshot.path, wait_for_processing: false)
+          subject.upload_screenshots([localization], screenshots_per_language)
+        end
+      end
+    end
+
+    context 'when localization has no screenshot uploaded' do
       it 'should upload screenshots with app_screenshot_set' do
         app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
                                     screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
