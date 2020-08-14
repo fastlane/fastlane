@@ -1,4 +1,10 @@
 describe Spaceship::ConnectAPI do
+  before(:all) do
+    Spaceship::ConnectAPI.client = nil
+    Spaceship::Tunes.client = nil
+    Spaceship::Portal.client = nil
+  end
+
   context '#client' do
     let(:mock_client) { double('mock_client') }
 
