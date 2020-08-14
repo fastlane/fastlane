@@ -6,7 +6,7 @@ module Fastlane
         require 'spaceship'
 
         rows = []
-        Spaceship::StatLogger.service_stats.each do |service, count|
+        Spaceship::StatsMiddleware.service_stats.each do |service, count|
           rows << [service.name, service.url, service.auth_type, count]
         end
 
@@ -20,7 +20,7 @@ module Fastlane
       end
 
       def self.url_name(url_prefix)
-        Spaceship::StatLogger::URL_PREFIXES[url_prefix]
+        Spaceship::StatsMiddleware::URL_PREFIXES[url_prefix]
       end
 
       def self.description

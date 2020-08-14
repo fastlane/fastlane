@@ -14,7 +14,7 @@ module Spaceship
       def_delegators(:client, *Spaceship::ConnectAPI::TestFlight::API.instance_methods(false))
       def_delegators(:client, *Spaceship::ConnectAPI::Tunes::API.instance_methods(false))
       def_delegators(:client, *Spaceship::ConnectAPI::Users::API.instance_methods(false))
-      
+
       def client
         # Always look for a client set explicitly by the client first
         return @client if @client

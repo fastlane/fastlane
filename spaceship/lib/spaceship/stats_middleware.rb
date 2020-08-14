@@ -1,7 +1,9 @@
 require 'faraday'
 
+require_relative 'globals'
+
 module Spaceship
-  class StatLogger < Faraday::Middleware
+  class StatsMiddleware < Faraday::Middleware
     ServiceOption = Struct.new(:name, :url, :auth_type)
     class << self
       def services
@@ -29,22 +31,23 @@ module Spaceship
     end
 
     def call(env)
-      if env && env.url && (uri = URI(env.url))
-        log(uri)
-      end
+      log(env)
       @app.call(env)
     end
 
-    def log(uri)
-      service = StatLogger.services.find do |s|
+    def log(env)
+      return false unless env && env.url && (uri = URI.parse(env.url))
+      service = StatsMiddleware.services.find do |s|
         uri.to_s.include?(s.url)
       end
 
-      if service.nil?
-        service = ServiceOption.new("", uri.host, "")
-      end
+      service = ServiceOption.new("", uri.host, "") if service.nil?
+      StatsMiddleware.service_stats[service] += 1
 
-      StatLogger.service_stats[service] += 1
+      return true
+    rescue => e
+      puts("Failed to log spaceship stats - #{e.message}") if Spaceship::Globals.verbose?
+      return false
     end
   end
 end

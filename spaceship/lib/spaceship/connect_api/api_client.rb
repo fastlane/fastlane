@@ -39,7 +39,7 @@ module Spaceship
             c.response(:json, content_type: /\bjson$/)
             c.response(:plist, content_type: /\bplist$/)
             c.use(FaradayMiddleware::RelsMiddleware)
-            c.use(Spaceship::StatLogger)
+            c.use(Spaceship::StatsMiddleware)
             c.adapter(Faraday.default_adapter)
             c.headers["Authorization"] = "Bearer #{token.text}"
 
