@@ -22,6 +22,8 @@ module Spaceship
         # A client may not always be explicitly set (specially when running tools like match, sigh, pilot, etc)
         # In that case, create a new client based on existing sessions
         # Note: This does not perform logins on the user. It is only reusing the cookies and selected teams
+        return nil if Spaceship::Tunes.client.nil? && Spaceship::Portal.client.nil?
+
         implicit_client = ConnectAPI::Client.new(tunes_client: Spaceship::Tunes.client, portal_client: Spaceship::Portal.client)
         return implicit_client
       end
@@ -70,7 +72,8 @@ module Spaceship
       # @param team_id (String) (optional): The ID of an App Store Connect team
       # @param team_name (String) (optional): The name of an App Store Connect team
       def select_team(team_id: nil, team_name: nil)
-        @client.select_team(team_id: team_id, team_name: team_name)
+        return if client.nil?
+        client.select_team(team_id: team_id, team_name: team_name)
       end
     end
   end

@@ -3,7 +3,6 @@ require 'faraday-cookie_jar'
 require 'faraday_middleware'
 
 require 'spaceship/globals'
-require 'spaceship/stats_middleware'
 
 module Spaceship
   class ConnectAPI
@@ -77,7 +76,6 @@ module Spaceship
           c.response(:json, content_type: /\bjson$/)
           c.response(:plist, content_type: /\bplist$/)
           c.adapter(Faraday.default_adapter)
-          c.use(Spaceship::StatLogger)
 
           if ENV['SPACESHIP_DEBUG']
             # for debugging only
