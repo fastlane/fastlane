@@ -26,31 +26,38 @@ module Spaceship
         return implicit_client
       end
 
-      # def method_missing(m, *args, &block)
-      #   # This forwards lazy class calls onto the client
-      #   if client.respond_to?(m)
-      #     return client.send(m, *args, &block)
-      #   end
-      #   raise ArgumentError, "Method `#{m}` doesn't exist."
-      # end
-
+      # Initializes client with Apple's App Store Connect JWT auth key.
+      #
+      # This method will automatically use the key id, issuer id, and filepath from environment
+      # variables if not given.
+      #
+      # All three parameters are needed to authenticate.
+      #
+      # @param key_id (String) (optional): The key id
+      # @param issuer_id (String) (optional): The issuer id
+      # @param filepath (String) (optional): The filepath
+      #
+      # @raise InvalidUserCredentialsError: raised if authentication failed
+      #
+      # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
       def auth(key_id: nil, issuer_id: nil, filepath: nil)
         @client = ConnectAPI::Client.auth(key_id: key_id, issuer_id: issuer_id, filepath: filepath)
       end
 
       # Authenticates with Apple's web services. This method has to be called once
-      # to generate a valid session. The session will automatically be used from then
-      # on.
+      # to generate a valid session.
       #
       # This method will automatically use the username from the Appfile (if available)
       # and fetch the password from the Keychain (if available)
       #
       # @param user (String) (optional): The username (usually the email address)
       # @param password (String) (optional): The password
+      # @param team_id (String) (optional): The team id
+      # @param team_name (String) (optional): The team name
       #
       # @raise InvalidUserCredentialsError: raised if authentication failed
       #
-      # @return (Spaceship::Client) The client the login method was called for
+      # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
       def login(user = nil, password = nil, team_id: nil, team_name: nil)
         @client = ConnectAPI::Client.login(user, password, team_id: team_id, team_name: team_name)
       end

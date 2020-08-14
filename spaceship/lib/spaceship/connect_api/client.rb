@@ -7,8 +7,6 @@ require_relative './users/users'
 module Spaceship
   class ConnectAPI
     class Client
-      attr_accessor :client
-
       attr_accessor :tunes_client
       attr_accessor :portal_client
 
@@ -25,7 +23,7 @@ module Spaceship
       #
       # @raise InvalidUserCredentialsError: raised if authentication failed
       #
-      # @return (Spaceship::Client) The client the login method was called for
+      # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
       def self.auth(key_id: nil, issuer_id: nil, filepath: nil)
         token = Spaceship::ConnectAPI::Token.create(key_id: key_id, issuer_id: issuer_id, filepath: filepath)
         return ConnectAPI::Client.new(token: token)
@@ -44,7 +42,7 @@ module Spaceship
       #
       # @raise InvalidUserCredentialsError: raised if authentication failed
       #
-      # @return (Spaceship::Client) The client the login method was called for
+      # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
       def self.login(user = nil, password = nil, team_id: nil, team_name: nil)
         tunes_client = TunesClient.login(user, password)
         portal_client = PortalClient.login(user, password)
