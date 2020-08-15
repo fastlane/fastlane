@@ -49,7 +49,7 @@ The previous p12 configuration is still currently supported.
 
 ## Quick Start
 
-> Before use `supply` correctly to connect with PlayStore, you'll need setup your app manually first, uploading an only build to PlayStore, at least. Take a look into [fastane/fastlane#14686](https://github.com/fastlane/fastlane/issues/14686) to have a better understanding
+> Before use supply correctly to connect with PlayStore, you'll need setup your app manually first, uploading an only build to PlayStore, at least. Take a look into [fastane/fastlane#14686](https://github.com/fastlane/fastlane/issues/14686) to have a better understanding
 
 - `cd [your_project_folder]`
 - `fastlane supply init`
