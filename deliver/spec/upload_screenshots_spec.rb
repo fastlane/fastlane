@@ -409,6 +409,50 @@ describe Deliver::UploadScreenshots do
     end
   end
 
+  describe '#verify_local_screenshots_are_uploaded' do
+    context 'when checksums for local screenshots all exist on App Store Connect' do
+      it 'should return true' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', source_file_checksum: 'checksum')
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [app_screenshot])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        iterator = Deliver::AppScreenshotIterator.new([localization])
+        local_screenshot = double('Deliver::AppScreenshot',
+                                  path: '/path/to/new_screenshot',
+                                  language: 'en-US',
+                                  device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshots_per_language = { 'en-US' => [local_screenshot] }
+
+        expect(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')
+        expect(subject.verify_local_screenshots_are_uploaded(iterator, screenshots_per_language)).to be(true)
+      end
+    end
+
+    context 'when some checksums for local screenshots don\'t exist on App Store Connect' do
+      it 'should return false' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', source_file_checksum: 'checksum_not_matched')
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [app_screenshot])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        iterator = Deliver::AppScreenshotIterator.new([localization])
+        local_screenshot = double('Deliver::AppScreenshot',
+                                  path: '/path/to/new_screenshot',
+                                  language: 'en-US',
+                                  device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshots_per_language = { 'en-US' => [local_screenshot] }
+
+        expect(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')
+        expect(subject.verify_local_screenshots_are_uploaded(iterator, screenshots_per_language)).to be(false)
+      end
+    end
+  end
+
   describe '#sort_screenshots' do
     def make_app_screenshot(id: nil, file_name: nil, is_complete: true)
       app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', id: id, file_name: file_name)
