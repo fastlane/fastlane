@@ -16,6 +16,7 @@ module Fastlane
         sonar_scanner_args << "-Dsonar.projectName=\"#{params[:project_name]}\"" if params[:project_name]
         sonar_scanner_args << "-Dsonar.projectVersion=\"#{params[:project_version]}\"" if params[:project_version]
         sonar_scanner_args << "-Dsonar.sources=\"#{params[:sources_path]}\"" if params[:sources_path]
+        sonar_scanner_args << "-Dsonar.exclusions=\"#{params[:exclusions]}\"" if params[:exclusions]
         sonar_scanner_args << "-Dsonar.language=\"#{params[:project_language]}\"" if params[:project_language]
         sonar_scanner_args << "-Dsonar.sourceEncoding=\"#{params[:source_encoding]}\"" if params[:source_encoding]
         sonar_scanner_args << "-Dsonar.login=\"#{params[:sonar_login]}\"" if params[:sonar_login]
@@ -80,6 +81,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :sources_path,
                                        env_name: "FL_SONAR_RUNNER_SOURCES_PATH",
                                        description: "Comma-separated paths to directories containing source files. Must either be specified here or inside the sonar project configuration file",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :exclusions,
+                                       env_name: "FL_SONAR_RUNNER_EXCLUSIONS",
+                                       description: "Comma-separated paths to directories to be excluded from the analysis",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :project_language,
                                        env_name: "FL_SONAR_RUNNER_PROJECT_LANGUAGE",

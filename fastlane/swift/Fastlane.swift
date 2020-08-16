@@ -7157,6 +7157,7 @@ func snapshot(workspace: Any? = snapshotfile.workspace,
    - projectName: The name of the project that gets displayed on the sonar report page. Must either be specified here or inside the sonar project configuration file
    - projectVersion: The project's version that gets displayed on the sonar report page. Must either be specified here or inside the sonar project configuration file
    - sourcesPath: Comma-separated paths to directories containing source files. Must either be specified here or inside the sonar project configuration file
+   - exclusions: Comma-separated paths to directories to be excluded from the analysis
    - projectLanguage: Language key, e.g. objc
    - sourceEncoding: Used encoding of source files, e.g., UTF-8
    - sonarRunnerArgs: Pass additional arguments to sonar-scanner. Be sure to provide the arguments with a leading `-D` e.g. FL_SONAR_RUNNER_ARGS="-Dsonar.verbose=true"
@@ -7178,6 +7179,7 @@ func sonar(projectConfigurationPath: String? = nil,
            projectName: String? = nil,
            projectVersion: String? = nil,
            sourcesPath: String? = nil,
+           exclusions: String? = nil,
            projectLanguage: String? = nil,
            sourceEncoding: String? = nil,
            sonarRunnerArgs: String? = nil,
@@ -7194,6 +7196,7 @@ func sonar(projectConfigurationPath: String? = nil,
                                                                                          RubyCommand.Argument(name: "project_name", value: projectName),
                                                                                          RubyCommand.Argument(name: "project_version", value: projectVersion),
                                                                                          RubyCommand.Argument(name: "sources_path", value: sourcesPath),
+                                                                                         RubyCommand.Argument(name: "exclusions", value: exclusions),
                                                                                          RubyCommand.Argument(name: "project_language", value: projectLanguage),
                                                                                          RubyCommand.Argument(name: "source_encoding", value: sourceEncoding),
                                                                                          RubyCommand.Argument(name: "sonar_runner_args", value: sonarRunnerArgs),
