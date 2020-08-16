@@ -332,7 +332,7 @@ describe Deliver::UploadScreenshots do
 
     context 'when one of the screenshots is FAILD state and tries reamins non zero' do
       it 'should retry upload_screenshots' do
-        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => false)
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => false, 'error?' => true)
         app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
                                     screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
                                     app_screenshots: [app_screenshot])
@@ -350,7 +350,7 @@ describe Deliver::UploadScreenshots do
 
     context 'when given number_of_screenshots doesn\'t match numbers in states in total' do
       it 'should retry upload_screenshots' do
-        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => true)
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => true, 'error?' => false)
         app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
                                     screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
                                     app_screenshots: [app_screenshot])
@@ -367,7 +367,11 @@ describe Deliver::UploadScreenshots do
 
     context 'when retry count left is 0' do
       it 'should raise error' do
-        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => true)
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot',
+                                'complete?' => false,
+                                'error?' => true,
+                                file_name: '5.5_1.jpg',
+                                error_messages: ['error_message'])
         app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
                                     screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
                                     app_screenshots: [app_screenshot])
