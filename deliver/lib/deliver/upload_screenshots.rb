@@ -202,12 +202,13 @@ module Deliver
     def verify_local_screenshots_are_uploaded(iterator, screenshots_per_language)
       # Check if local screenshots' checksum exist on App Store Connect
       checksum_to_app_screenshot = iterator.each_app_screenshot.map { |_, _, app_screenshot| [app_screenshot.source_file_checksum, app_screenshot] }.to_h
-      missing_local_screenshots = iterator.each_local_screenshot(screenshots_per_language).select do |_, _, local_screenshot|
+
+      missing_local_screenshots = iterator.each_local_screenshot(screenshots_per_language).select do |_, _, local_screenshot, index|
         checksum = UploadScreenshots.calculate_checksum(local_screenshot.path)
-        checksum_to_app_screenshot[checksum].nil?
+        checksum_to_app_screenshot[checksum].nil? && index < 10 # if index is more than 10, it's skipped
       end
 
-      missing_local_screenshots.each do |_, _, screenshot|
+      missing_local_screenshots.each do |_, _, screenshot, _|
         UI.error("#{screenshot.path} is missing on App Store Connect.")
       end
 
