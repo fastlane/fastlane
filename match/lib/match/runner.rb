@@ -207,20 +207,26 @@ module Match
       return File.basename(cert_path).gsub(".cer", "") # Certificate ID
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
     # @return [String] The UUID of the provisioning profile so we can verify it with the Apple Developer Portal
     def fetch_provisioning_profile(params: nil, certificate_id: nil, app_identifier: nil, working_directory: nil)
       prov_type = Match.profile_type_sym(params[:type])
 
       names = [Match::Generator.profile_type_name(prov_type), app_identifier]
-      if params[:platform].to_s == :tvos.to_s
+      if params[:platform].to_s == :tvos.to_s || params[:platform].to_s == :catalyst.to_s
         names.push(params[:platform])
       end
 
       profile_name = names.join("_").gsub("*", '\*') # this is important, as it shouldn't be a wildcard
       base_dir = File.join(prefixed_working_directory, "profiles", prov_type.to_s)
 
-      extension = params[:platform].to_s == :macos.to_s ? ".provisionprofile" : ".mobileprovision"
-      profiles = Dir[File.join(base_dir, "#{profile_name}#{extension}")]
+      extension = ".mobileprovision"
+      if [:macos.to_s, :catalyst.to_s].include?(params[:platform].to_s)
+        extension = ".provisionprofile"
+      end
+
+      profile_file = "#{profile_name}#{extension}"
+      profiles = Dir[File.join(base_dir, profile_file)]
       if Helper.mac?
         keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
       end
@@ -242,7 +248,7 @@ module Match
 
       if profile.nil? || force
         if params[:readonly]
-          UI.error("No matching provisioning profiles found for '#{profile_name}'")
+          UI.error("No matching provisioning profiles found for '#{profile_file}'")
           UI.error("A new one cannot be created because you enabled `readonly`")
           if Dir.exist?(base_dir) # folder for `prov_type` does not exist on first match use for that type
             all_profiles = Dir.entries(base_dir).reject { |f| f.start_with?(".") }
@@ -303,6 +309,7 @@ module Match
 
       return uuid
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def device_count_different?(profile: nil, keychain_path: nil, platform: nil)
       return false unless profile
@@ -320,7 +327,7 @@ module Match
             Spaceship.device.all_ios_profile_devices.count
           when :tvos
             Spaceship.device.all_apple_tvs.count
-          when :mac
+          when :mac, :catalyst
             Spaceship.device.all_macs.count
           else
             Spaceship.device.all.count

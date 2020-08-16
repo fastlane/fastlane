@@ -46,6 +46,10 @@ module Match
     end
 
     def certificates_exists(username: nil, certificate_ids: [], platform: nil)
+      if platform == :catalyst.to_s
+        platform = :macos.to_s
+      end
+
       Spaceship.certificate.all(mac: platform == "macos").each do |cert|
         certificate_ids.delete(cert.id)
       end
@@ -61,16 +65,10 @@ module Match
     end
 
     def profile_exists(username: nil, uuid: nil, platform: nil)
-      is_mac = platform == "macos"
-      found = Spaceship.provisioning_profile.all(mac: is_mac).find do |profile|
+      # App Store Connect API does not allow filter of profile by platform or uuid (as of 2020-07-30)
+      # Need to fetch all profiles and search for uuid on client side
+      found = Spaceship::ConnectAPI::Profile.all.find do |profile|
         profile.uuid == uuid
-      end
-
-      # Look for iOS after looking for macOS (needed for Catalyst apps)
-      if !found && is_mac
-        found = Spaceship.provisioning_profile.all(mac: false).find do |profile|
-          profile.uuid == uuid
-        end
       end
 
       unless found

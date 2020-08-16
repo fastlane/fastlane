@@ -12,7 +12,7 @@ rspec_logs.json
 test_output/
 .DS_STORE
 .keys
-*.swp 
+*.swp
 
 ## Specific to Android
 .gradle/

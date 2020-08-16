@@ -188,7 +188,7 @@ module Spaceship
 
         # Get the latest version
         return get_app_store_versions(filter: filter, includes: includes)
-               .sort_by { |v| Gem::Version.new(v.version_string) }
+               .sort_by { |v| Date.parse(v.created_date) }
                .last
       end
 

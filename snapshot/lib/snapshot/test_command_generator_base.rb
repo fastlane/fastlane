@@ -24,7 +24,9 @@ module Snapshot
         options = []
         options += project_path_array
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
-        options << "-derivedDataPath '#{derived_data_path}'"
+        if derived_data_path && !options.include?("-derivedDataPath #{derived_data_path.shellescape}")
+          options << "-derivedDataPath #{derived_data_path.shellescape}"
+        end
         options << "-resultBundlePath '#{result_bundle_path}'" if result_bundle_path
         if FastlaneCore::Helper.xcode_at_least?(11)
           options << "-testPlan '#{config[:testplan]}'" if config[:testplan]

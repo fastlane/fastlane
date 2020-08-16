@@ -1494,6 +1494,7 @@ public func captureAndroidScreenshots(androidHome: String? = nil,
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
    - disableXcpretty: Disable xcpretty formatting of build
+   - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
  */
 public func captureIosScreenshots(workspace: String? = nil,
                                   project: String? = nil,
@@ -1537,7 +1538,8 @@ public func captureIosScreenshots(workspace: String? = nil,
                                   testplan: String? = nil,
                                   onlyTesting: Any? = nil,
                                   skipTesting: Any? = nil,
-                                  disableXcpretty: Bool? = nil)
+                                  disableXcpretty: Bool? = nil,
+                                  suppressXcodeOutput: Bool? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "capture_ios_screenshots", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                                            RubyCommand.Argument(name: "project", value: project),
@@ -1581,7 +1583,8 @@ public func captureIosScreenshots(workspace: String? = nil,
                                                                                                            RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                                            RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                                            RubyCommand.Argument(name: "skip_testing", value: skipTesting),
-                                                                                                           RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty)])
+                                                                                                           RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty),
+                                                                                                           RubyCommand.Argument(name: "suppress_xcode_output", value: suppressXcodeOutput)])
     _ = runner.executeCommand(command)
 }
 
@@ -1632,6 +1635,7 @@ public func captureIosScreenshots(workspace: String? = nil,
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
    - disableXcpretty: Disable xcpretty formatting of build
+   - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
  */
 public func captureScreenshots(workspace: String? = nil,
                                project: String? = nil,
@@ -1675,7 +1679,8 @@ public func captureScreenshots(workspace: String? = nil,
                                testplan: String? = nil,
                                onlyTesting: Any? = nil,
                                skipTesting: Any? = nil,
-                               disableXcpretty: Bool? = nil)
+                               disableXcpretty: Bool? = nil,
+                               suppressXcodeOutput: Bool? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "capture_screenshots", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                                        RubyCommand.Argument(name: "project", value: project),
@@ -1719,7 +1724,8 @@ public func captureScreenshots(workspace: String? = nil,
                                                                                                        RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                                        RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                                        RubyCommand.Argument(name: "skip_testing", value: skipTesting),
-                                                                                                       RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty)])
+                                                                                                       RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty),
+                                                                                                       RubyCommand.Argument(name: "suppress_xcode_output", value: suppressXcodeOutput)])
     _ = runner.executeCommand(command)
 }
 
@@ -3444,7 +3450,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: String? = nil,
    - filename: Filename to use for the generated provisioning profile (must include .mobileprovision)
    - skipFetchProfiles: Skips the verification of existing profiles which is useful if you have thousands of profiles
    - skipCertificateVerification: Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine
-   - platform: Set the provisioning profile's platform (i.e. ios, tvos)
+   - platform: Set the provisioning profile's platform (i.e. ios, tvos, macos, catalyst)
    - readonly: Only fetch existing profile, don't generate new ones
    - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
@@ -4675,7 +4681,8 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile type 'appstore'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - skipDocs: Skip generation of a README.md for the created git repository
-   - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos)
+   - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
+   - deriveCatalystAppIdentifier: Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
    - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
@@ -4718,6 +4725,7 @@ public func match(type: Any = matchfile.type,
                   skipConfirmation: Bool = matchfile.skipConfirmation,
                   skipDocs: Bool = matchfile.skipDocs,
                   platform: Any = matchfile.platform,
+                  deriveCatalystAppIdentifier: Bool = matchfile.deriveCatalystAppIdentifier,
                   templateName: Any? = matchfile.templateName,
                   profileName: Any? = matchfile.profileName,
                   failOnNameTaken: Bool = matchfile.failOnNameTaken,
@@ -4758,6 +4766,7 @@ public func match(type: Any = matchfile.type,
                                                                                          RubyCommand.Argument(name: "skip_confirmation", value: skipConfirmation),
                                                                                          RubyCommand.Argument(name: "skip_docs", value: skipDocs),
                                                                                          RubyCommand.Argument(name: "platform", value: platform),
+                                                                                         RubyCommand.Argument(name: "derive_catalyst_app_identifier", value: deriveCatalystAppIdentifier),
                                                                                          RubyCommand.Argument(name: "template_name", value: templateName),
                                                                                          RubyCommand.Argument(name: "profile_name", value: profileName),
                                                                                          RubyCommand.Argument(name: "fail_on_name_taken", value: failOnNameTaken),
@@ -6742,7 +6751,7 @@ public func setupTravis(force: Bool = false) {
    - filename: Filename to use for the generated provisioning profile (must include .mobileprovision)
    - skipFetchProfiles: Skips the verification of existing profiles which is useful if you have thousands of profiles
    - skipCertificateVerification: Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine
-   - platform: Set the provisioning profile's platform (i.e. ios, tvos)
+   - platform: Set the provisioning profile's platform (i.e. ios, tvos, macos, catalyst)
    - readonly: Only fetch existing profile, don't generate new ones
    - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
@@ -7048,6 +7057,7 @@ public func slather(buildDirectory: String? = nil,
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
    - disableXcpretty: Disable xcpretty formatting of build
+   - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
  */
 public func snapshot(workspace: Any? = snapshotfile.workspace,
                      project: Any? = snapshotfile.project,
@@ -7091,7 +7101,8 @@ public func snapshot(workspace: Any? = snapshotfile.workspace,
                      testplan: Any? = snapshotfile.testplan,
                      onlyTesting: Any? = snapshotfile.onlyTesting,
                      skipTesting: Any? = snapshotfile.skipTesting,
-                     disableXcpretty: Bool? = snapshotfile.disableXcpretty)
+                     disableXcpretty: Bool? = snapshotfile.disableXcpretty,
+                     suppressXcodeOutput: Bool? = snapshotfile.suppressXcodeOutput)
 {
     let command = RubyCommand(commandID: "", methodName: "snapshot", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                             RubyCommand.Argument(name: "project", value: project),
@@ -7135,7 +7146,8 @@ public func snapshot(workspace: Any? = snapshotfile.workspace,
                                                                                             RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                             RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                             RubyCommand.Argument(name: "skip_testing", value: skipTesting),
-                                                                                            RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty)])
+                                                                                            RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty),
+                                                                                            RubyCommand.Argument(name: "suppress_xcode_output", value: suppressXcodeOutput)])
     _ = runner.executeCommand(command)
 }
 
@@ -7148,6 +7160,7 @@ public func snapshot(workspace: Any? = snapshotfile.workspace,
    - projectName: The name of the project that gets displayed on the sonar report page. Must either be specified here or inside the sonar project configuration file
    - projectVersion: The project's version that gets displayed on the sonar report page. Must either be specified here or inside the sonar project configuration file
    - sourcesPath: Comma-separated paths to directories containing source files. Must either be specified here or inside the sonar project configuration file
+   - exclusions: Comma-separated paths to directories to be excluded from the analysis
    - projectLanguage: Language key, e.g. objc
    - sourceEncoding: Used encoding of source files, e.g., UTF-8
    - sonarRunnerArgs: Pass additional arguments to sonar-scanner. Be sure to provide the arguments with a leading `-D` e.g. FL_SONAR_RUNNER_ARGS="-Dsonar.verbose=true"
@@ -7169,6 +7182,7 @@ public func sonar(projectConfigurationPath: String? = nil,
                   projectName: String? = nil,
                   projectVersion: String? = nil,
                   sourcesPath: String? = nil,
+                  exclusions: String? = nil,
                   projectLanguage: String? = nil,
                   sourceEncoding: String? = nil,
                   sonarRunnerArgs: String? = nil,
@@ -7185,6 +7199,7 @@ public func sonar(projectConfigurationPath: String? = nil,
                                                                                          RubyCommand.Argument(name: "project_name", value: projectName),
                                                                                          RubyCommand.Argument(name: "project_version", value: projectVersion),
                                                                                          RubyCommand.Argument(name: "sources_path", value: sourcesPath),
+                                                                                         RubyCommand.Argument(name: "exclusions", value: exclusions),
                                                                                          RubyCommand.Argument(name: "project_language", value: projectLanguage),
                                                                                          RubyCommand.Argument(name: "source_encoding", value: sourceEncoding),
                                                                                          RubyCommand.Argument(name: "sonar_runner_args", value: sonarRunnerArgs),
@@ -7364,6 +7379,7 @@ public func ssh(username: String,
    - obbMainFileSize: Size of 'main' expansion file in bytes
    - obbPatchReferencesVersion: References version of 'patch' expansion file
    - obbPatchFileSize: Size of 'patch' expansion file in bytes
+   - ackBundleInstallationWarning: Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 150MB
 
  More information: https://docs.fastlane.tools/actions/supply/
  */
@@ -7401,7 +7417,8 @@ public func supply(packageName: String,
                    obbMainReferencesVersion: String? = nil,
                    obbMainFileSize: String? = nil,
                    obbPatchReferencesVersion: String? = nil,
-                   obbPatchFileSize: String? = nil)
+                   obbPatchFileSize: String? = nil,
+                   ackBundleInstallationWarning: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "supply", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                           RubyCommand.Argument(name: "version_name", value: versionName),
@@ -7437,7 +7454,8 @@ public func supply(packageName: String,
                                                                                           RubyCommand.Argument(name: "obb_main_references_version", value: obbMainReferencesVersion),
                                                                                           RubyCommand.Argument(name: "obb_main_file_size", value: obbMainFileSize),
                                                                                           RubyCommand.Argument(name: "obb_patch_references_version", value: obbPatchReferencesVersion),
-                                                                                          RubyCommand.Argument(name: "obb_patch_file_size", value: obbPatchFileSize)])
+                                                                                          RubyCommand.Argument(name: "obb_patch_file_size", value: obbPatchFileSize),
+                                                                                          RubyCommand.Argument(name: "ack_bundle_installation_warning", value: ackBundleInstallationWarning)])
     _ = runner.executeCommand(command)
 }
 
@@ -7529,7 +7547,8 @@ public func swiftlint(mode: Any = "lint",
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile type 'appstore'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - skipDocs: Skip generation of a README.md for the created git repository
-   - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos)
+   - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
+   - deriveCatalystAppIdentifier: Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
    - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
@@ -7572,6 +7591,7 @@ public func syncCodeSigning(type: String = "development",
                             skipConfirmation: Bool = false,
                             skipDocs: Bool = false,
                             platform: String = "ios",
+                            deriveCatalystAppIdentifier: Bool = false,
                             templateName: String? = nil,
                             profileName: String? = nil,
                             failOnNameTaken: Bool = false,
@@ -7612,6 +7632,7 @@ public func syncCodeSigning(type: String = "development",
                                                                                                      RubyCommand.Argument(name: "skip_confirmation", value: skipConfirmation),
                                                                                                      RubyCommand.Argument(name: "skip_docs", value: skipDocs),
                                                                                                      RubyCommand.Argument(name: "platform", value: platform),
+                                                                                                     RubyCommand.Argument(name: "derive_catalyst_app_identifier", value: deriveCatalystAppIdentifier),
                                                                                                      RubyCommand.Argument(name: "template_name", value: templateName),
                                                                                                      RubyCommand.Argument(name: "profile_name", value: profileName),
                                                                                                      RubyCommand.Argument(name: "fail_on_name_taken", value: failOnNameTaken),
@@ -8509,6 +8530,7 @@ public func uploadToAppStore(username: String,
    - obbMainFileSize: Size of 'main' expansion file in bytes
    - obbPatchReferencesVersion: References version of 'patch' expansion file
    - obbPatchFileSize: Size of 'patch' expansion file in bytes
+   - ackBundleInstallationWarning: Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 150MB
 
  More information: https://docs.fastlane.tools/actions/supply/
  */
@@ -8546,7 +8568,8 @@ public func uploadToPlayStore(packageName: String,
                               obbMainReferencesVersion: String? = nil,
                               obbMainFileSize: String? = nil,
                               obbPatchReferencesVersion: String? = nil,
-                              obbPatchFileSize: String? = nil)
+                              obbPatchFileSize: String? = nil,
+                              ackBundleInstallationWarning: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "upload_to_play_store", className: nil, args: [RubyCommand.Argument(name: "package_name", value: packageName),
                                                                                                         RubyCommand.Argument(name: "version_name", value: versionName),
@@ -8582,7 +8605,8 @@ public func uploadToPlayStore(packageName: String,
                                                                                                         RubyCommand.Argument(name: "obb_main_references_version", value: obbMainReferencesVersion),
                                                                                                         RubyCommand.Argument(name: "obb_main_file_size", value: obbMainFileSize),
                                                                                                         RubyCommand.Argument(name: "obb_patch_references_version", value: obbPatchReferencesVersion),
-                                                                                                        RubyCommand.Argument(name: "obb_patch_file_size", value: obbPatchFileSize)])
+                                                                                                        RubyCommand.Argument(name: "obb_patch_file_size", value: obbPatchFileSize),
+                                                                                                        RubyCommand.Argument(name: "ack_bundle_installation_warning", value: ackBundleInstallationWarning)])
     _ = runner.executeCommand(command)
 }
 
@@ -9186,4 +9210,4 @@ public let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.86]
+// FastlaneRunnerAPIVersion [0.9.89]

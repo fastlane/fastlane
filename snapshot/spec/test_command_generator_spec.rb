@@ -175,7 +175,7 @@ describe Snapshot do
               "xcodebuild",
               "-scheme ExampleUITests",
               "-project ./snapshot/example/Example.xcodeproj",
-              "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+              "-derivedDataPath /tmp/path/to/snapshot_derived",
               "-destination 'platform=iOS Simulator,name=#{name},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
               :build,
@@ -203,7 +203,7 @@ describe Snapshot do
               "xcodebuild",
               "-scheme ExampleUITests",
               "-project ./snapshot/example/Example.xcodeproj",
-              "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+              "-derivedDataPath /tmp/path/to/snapshot_derived",
               "-only-testing:TestBundle/TestSuite/Screenshots",
               "-destination 'platform=iOS Simulator,name=#{name},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
@@ -232,7 +232,7 @@ describe Snapshot do
               "xcodebuild",
               "-scheme ExampleUITests",
               "-project ./snapshot/example/Example.xcodeproj",
-              "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+              "-derivedDataPath /tmp/path/to/snapshot_derived",
               "-destination 'platform=tvOS Simulator,name=#{name},OS=#{os}'",
               "FASTLANE_SNAPSHOT=YES",
               :build,
@@ -252,7 +252,7 @@ describe Snapshot do
         it 'uses the fixed derivedDataPath if given', requires_xcode: true do
           expect(Dir).not_to(receive(:mktmpdir))
           command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
-          expect(command.join('')).to include("-derivedDataPath 'fake/derived/path'")
+          expect(command.join('')).to include("-derivedDataPath fake/derived/path")
         end
       end
 
@@ -328,6 +328,22 @@ describe Snapshot do
           expect(command.join('')).to include("| xcpretty ")
         end
       end
+
+      context "suppress_xcode_output" do
+        it "includes /dev/null in the pipe command when true", requires_xcode: true do
+          configure(options.merge(suppress_xcode_output: true))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("> /dev/null")
+        end
+
+        it "does not include /dev/null in the pipe command when false", requires_xcode: true do
+          configure(options.merge(suppress_xcode_output: false))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to_not(include("> /dev/null"))
+        end
+      end
     end
 
     describe "Valid macOS Configuration" do
@@ -348,7 +364,7 @@ describe Snapshot do
             "xcodebuild",
             "-scheme ExampleMacOS",
             "-project ./snapshot/example/Example.xcodeproj",
-            "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+            "-derivedDataPath /tmp/path/to/snapshot_derived",
             "-destination 'platform=macOS'",
             "FASTLANE_SNAPSHOT=YES",
             :build,

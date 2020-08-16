@@ -66,7 +66,7 @@ module Screengrab
         run_adb_command("-s #{device_serial} root", print_all: false, print_command: true)
       end
 
-      clear_device_previous_screenshots(device_serial, device_screenshots_paths)
+      clear_device_previous_screenshots(@config[:app_package_name], device_serial, device_screenshots_paths)
 
       app_apk_path ||= select_app_apk(discovered_apk_paths)
       tests_apk_path ||= select_tests_apk(discovered_apk_paths)
@@ -157,12 +157,12 @@ module Screengrab
       end.flatten
     end
 
-    def clear_device_previous_screenshots(device_serial, device_screenshots_paths)
+    def clear_device_previous_screenshots(app_package_name, device_serial, device_screenshots_paths)
       UI.message('Cleaning screenshots on device')
 
       device_screenshots_paths.each do |device_path|
-        if_device_path_exists(device_serial, device_path) do |path|
-          run_adb_command("-s #{device_serial} shell rm -rf #{path}",
+        if_device_path_exists(app_package_name, device_serial, device_path) do |path|
+          run_adb_command("-s #{device_serial} shell run-as #{app_package_name} rm -rf #{path}",
                           print_all: true,
                           print_command: true)
         end
@@ -296,7 +296,7 @@ module Screengrab
 
       Dir.mktmpdir do |tempdir|
         device_screenshots_paths.each do |device_path|
-          if_device_path_exists(device_serial, device_path) do |path|
+          if_device_path_exists(@config[:app_package_name], device_serial, device_path) do |path|
             next unless path.include?(locale)
             run_adb_command("-s #{device_serial} pull #{path} #{tempdir}",
                             print_all: false,
@@ -361,8 +361,8 @@ module Screengrab
 
     # Some device commands fail if executed against a device path that does not exist, so this helper method
     # provides a way to conditionally execute a block only if the provided path exists on the device.
-    def if_device_path_exists(device_serial, device_path)
-      return if run_adb_command("-s #{device_serial} shell ls #{device_path}",
+    def if_device_path_exists(app_package_name, device_serial, device_path)
+      return if run_adb_command("-s #{device_serial} shell run-as #{app_package_name} ls #{device_path}",
                                 print_all: false,
                                 print_command: false).include?('No such file')
 

@@ -101,8 +101,11 @@ public protocol MatchfileProtocol: class {
     /// Skip generation of a README.md for the created git repository
     var skipDocs: Bool { get }
 
-    /// Set the provisioning profile's platform to work with (i.e. ios, tvos, macos)
+    /// Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
     var platform: String { get }
+
+    /// Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
+    var deriveCatalystAppIdentifier: Bool { get }
 
     /// The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
     var templateName: String? { get }
@@ -155,6 +158,7 @@ public extension MatchfileProtocol {
     var skipConfirmation: Bool { return false }
     var skipDocs: Bool { return false }
     var platform: String { return "ios" }
+    var deriveCatalystAppIdentifier: Bool { return false }
     var templateName: String? { return nil }
     var profileName: String? { return nil }
     var failOnNameTaken: Bool { return false }
@@ -164,4 +168,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.30]
+// FastlaneRunnerAPIVersion [0.9.33]

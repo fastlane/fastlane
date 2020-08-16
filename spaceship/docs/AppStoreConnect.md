@@ -28,7 +28,7 @@ In general the classes are pre-fixed with the `ConnectAPI` module. If you want t
 
 token = Spaceship::ConnectAPI::Token.create(
   key_id: 'the-key-id',
-  issuer_id: 'the-issuer-id,
+  issuer_id: 'the-issuer-id',
   filepath:  File.absolute_path("../AuthKey_the-key-id.p8")
 )
 

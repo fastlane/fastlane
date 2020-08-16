@@ -10,7 +10,7 @@
 
 import Foundation
 #if canImport(SwiftShell)
-import SwiftShell
+    import SwiftShell
 #endif
 
 let argumentProcessor = ArgumentProcessor(args: CommandLine.arguments)
@@ -20,8 +20,8 @@ class MainProcess {
     var doneRunningLane = false
     var thread: Thread!
     #if SWIFT_PACKAGE
-    var lastPrintDate = Date.distantFuture
-    var timeBetweenPrints = Int.min
+        var lastPrintDate = Date.distantFuture
+        var timeBetweenPrints = Int.min
     #endif
 
     @objc func connectToFastlaneAndRunLane(_ fastfile: LaneFile?) {
@@ -43,19 +43,19 @@ class MainProcess {
         #endif
         thread.name = "worker thread"
         #if SWIFT_PACKAGE
-        let PATH = run("/bin/bash", "-c", "-l", "eval $(/usr/libexec/path_helper -s) ; echo $PATH").stdout
-        main.env["PATH"] = PATH
-        let path = main.run(bash: "which fastlane").stdout
-        let pids = main.run("lsof", "-t", "-i", ":2000").stdout.split(separator: "\n")
-        pids.forEach { main.run("kill", "-9", $0) }
-        let command = main.runAsync(path, "socket_server", "-c", "1200")
-        lastPrintDate = Date()
-        command.stdout.onOutput { stdout in
-            print(stdout.readSome() ?? "")
-            self.timeBetweenPrints = Int(self.lastPrintDate.timeIntervalSinceNow)
-        }
-        Runner.waitWithPolling(self.timeBetweenPrints, toEventually: { $0 > 5 }, timeout: 10)
-        thread.start()
+            let PATH = run("/bin/bash", "-c", "-l", "eval $(/usr/libexec/path_helper -s) ; echo $PATH").stdout
+            main.env["PATH"] = PATH
+            let path = main.run(bash: "which fastlane").stdout
+            let pids = main.run("lsof", "-t", "-i", ":2000").stdout.split(separator: "\n")
+            pids.forEach { main.run("kill", "-9", $0) }
+            let command = main.runAsync(path, "socket_server", "-c", "1200")
+            lastPrintDate = Date()
+            command.stdout.onOutput { stdout in
+                print(stdout.readSome() ?? "")
+                self.timeBetweenPrints = Int(self.lastPrintDate.timeIntervalSinceNow)
+            }
+            _ = Runner.waitWithPolling(self.timeBetweenPrints, toEventually: { $0 > 5 }, timeout: 10)
+            thread.start()
         #endif
     }
 }
@@ -66,7 +66,6 @@ public class Main {
     public init() {}
 
     public func run(with fastFile: LaneFile?) {
-        
         process.startFastlaneThread(with: fastFile)
 
         while !process.doneRunningLane, RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date(timeIntervalSinceNow: 2)) {
