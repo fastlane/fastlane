@@ -17,15 +17,33 @@ module Spaceship
       attr_reader :issuer_id
       attr_reader :text
 
-      def self.create(key_id: nil, issuer_id: nil, filepath: nil)
+      def self.load_json_file(filepath)
+        json = JSON.parse(File.read(filepath))
+        json = json.each_with_object({}) { |(k, v), memo| memo[k.to_sym] = v; }
+        self.create(json)
+      end
+
+      def self.load_hash(hash)
+        key_id = hash[:key_id]
+        issuer_id = hash[:issuer_id]
+        key = hash[:key]
+
+        key = OpenSSL::PKey::EC.new(key)
+
+        self.new(key_id: key_id, issuer_id: issuer_id, key: key)
+      end
+
+      def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil)
         key_id ||= ENV['SPACESHIP_CONNECT_API_KEY_ID']
         issuer_id ||= ENV['SPACESHIP_CONNECT_API_ISSUER_ID']
         filepath ||= ENV['SPACESHIP_CONNECT_API_KEY_FILEPATH']
 
+        key ||= File.binread(filepath)
+
         self.new(
           key_id: key_id,
           issuer_id: issuer_id,
-          key: OpenSSL::PKey::EC.new(File.read(filepath))
+          key: OpenSSL::PKey::EC.new(key)
         )
       end
 
