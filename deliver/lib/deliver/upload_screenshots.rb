@@ -180,19 +180,18 @@ module Deliver
     def retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, tries, localizations, screenshots_per_language)
       is_failure = states.fetch("FAILED", 0) > 0
       is_missing_screenshot = !screenshots_per_language.empty? && !verify_local_screenshots_are_uploaded(iterator, screenshots_per_language)
+      return unless is_failure || is_missing_screenshot
 
-      if is_failure || is_missing_screenshot
-        if tries.zero?
-          incomplete_screenshot_count = states.reject { |k, v| k == 'COMPLETE' }.reduce(0) { |sum, (k, v)| sum + v }
-          UI.user_error!("Failed verification of all screenshots uploaded... #{incomplete_screenshot_count} incomplete screenshot(s) still exist")
-        else
-          UI.error("Failed to upload all screenshots... Tries remaining: #{tries}")
-          # Delete bad entries before retry
-          iterator.each_app_screenshot do |_, _, app_screenshot|
-            app_screenshot.delete! unless app_screenshot.complete?
-          end
-          upload_screenshots(localizations, screenshots_per_language, tries: tries)
+      if tries.zero?
+        incomplete_screenshot_count = states.reject { |k, v| k == 'COMPLETE' }.reduce(0) { |sum, (k, v)| sum + v }
+        UI.user_error!("Failed verification of all screenshots uploaded... #{incomplete_screenshot_count} incomplete screenshot(s) still exist")
+      else
+        UI.error("Failed to upload all screenshots... Tries remaining: #{tries}")
+        # Delete bad entries before retry
+        iterator.each_app_screenshot do |_, _, app_screenshot|
+          app_screenshot.delete! unless app_screenshot.complete?
         end
+        upload_screenshots(localizations, screenshots_per_language, tries: tries)
       end
     end
 
