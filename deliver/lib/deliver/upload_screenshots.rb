@@ -179,7 +179,7 @@ module Deliver
     # Verify all screenshots states on App Store Connect are okay
     def retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, tries, localizations, screenshots_per_language)
       is_failure = states.fetch("FAILED", 0) > 0
-      is_missing_screenshot = states.reduce(0) { |sum, (k, v)| sum + v } != number_of_screenshots && !screenshots_per_language.empty?
+      is_missing_screenshot = !screenshots_per_language.empty? && !verify_local_screenshots_are_uploaded(iterator, screenshots_per_language)
 
       if is_failure || is_missing_screenshot
         if tries.zero?
@@ -194,6 +194,22 @@ module Deliver
           upload_screenshots(localizations, screenshots_per_language, tries: tries)
         end
       end
+    end
+
+    # Return `true` if all the local screenshots are uploaded to App Store Connect
+    def verify_local_screenshots_are_uploaded(iterator, screenshots_per_language)
+      # Check if local screenshots' checksum exist on App Store Connect
+      checksum_to_app_screenshot = iterator.each_app_screenshot.map { |_, _, app_screenshot| [app_screenshot.source_file_checksum, app_screenshot] }.to_h
+      missing_local_screenshots = iterator.each_local_screenshot(screenshots_per_language).select do |_, _, local_screenshot|
+        checksum = UploadScreenshots.calculate_checksum(local_screenshot.path)
+        checksum_to_app_screenshot[checksum].nil?
+      end
+
+      missing_local_screenshots.each do |_, _, screenshot|
+        UI.error("#{screenshot.path} is missing on App Store Connect.")
+      end
+
+      missing_local_screenshots.empty?
     end
 
     def sort_screenshots(localizations)
