@@ -17,12 +17,12 @@ module Spaceship
 
         @services ||= [
           ServiceOption.new("App Store Connect API (official)", "api.appstoreconnect.apple.com", "JWT"),
-          ServiceOption.new("App Store Connect API (web session)", Spaceship::ConnectAPI::TestFlight::Client.hostname, "Web session"),
-          ServiceOption.new("App Store Connect API (web session)", Spaceship::ConnectAPI::Provisioning::Client.hostname, "Web session"),
+          ServiceOption.new("App Store Connect API (web session)", Spaceship::ConnectAPI::TestFlight::Client.hostname.gsub("https://", ""), "Web session"),
+          ServiceOption.new("App Store Connect API (web session)", Spaceship::ConnectAPI::Provisioning::Client.hostname.gsub("https://", ""), "Web session"),
           ServiceOption.new("Legacy iTunesConnect Auth", "idmsa.apple.com", "Web session"),
           ServiceOption.new("Legacy iTunesConnect Auth", "appstoreconnect.apple.com/olympus/v1/", "Web session"),
-          ServiceOption.new("Legacy iTunesConnect", Spaceship::TunesClient.hostname, "Web session"),
-          ServiceOption.new("Legacy iTunesConnect Developer Portal", Spaceship::PortalClient.hostname, "Web session")
+          ServiceOption.new("Legacy iTunesConnect", Spaceship::TunesClient.hostname.gsub("https://", ""), "Web session"),
+          ServiceOption.new("Legacy iTunesConnect Developer Portal", Spaceship::PortalClient.hostname.gsub("https://", ""), "Web session")
         ]
       end
 

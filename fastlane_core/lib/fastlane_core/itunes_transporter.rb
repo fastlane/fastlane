@@ -207,7 +207,7 @@ module FastlaneCore
         '-m provider',
         ("-u #{username.shellescape}" unless use_jwt),
         ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
-        ("-jwt #{jwt}" if use_jwt),
+        ("-jwt #{jwt}" if use_jwt)
       ].compact.join(' ')
     end
 

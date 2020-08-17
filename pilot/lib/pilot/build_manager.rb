@@ -343,7 +343,7 @@ module Pilot
       builds_to_expire.each(&:expire!)
     end
 
-    # If 
+    # If
     # If itc_provider was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
@@ -355,7 +355,7 @@ module Pilot
         return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, token.text)
       end
 
-      # Otherwise use username and password 
+      # Otherwise use username and password
       tunes_client = Spaceship::ConnectAPI.client.tunes_client
 
       generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
