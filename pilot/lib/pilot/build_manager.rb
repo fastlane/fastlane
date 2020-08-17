@@ -356,7 +356,7 @@ module Pilot
       end
 
       # Otherwise use username and password
-      tunes_client = Spaceship::ConnectAPI.client.tunes_client
+      tunes_client = Spaceship::ConnectAPI.client ? Spaceship::ConnectAPI.client.tunes_client : nil
 
       generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
       return generic_transporter if options[:itc_provider] || tunes_client.nil?

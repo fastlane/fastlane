@@ -176,7 +176,7 @@ module FastlaneCore
         '"' + Helper.transporter_path + '"',
         "-m upload",
         ("-u #{username.shellescape}" unless use_jwt),
-        ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
+        ("-p #{shell_escaped_password(password)}" unless use_jwt),
         ("-jwt #{jwt}" if use_jwt),
         "-f \"#{source}\"",
         additional_upload_parameters, # that's here, because the user might overwrite the -t option
@@ -192,7 +192,7 @@ module FastlaneCore
         '"' + Helper.transporter_path + '"',
         "-m lookupMetadata",
         ("-u #{username.shellescape}" unless use_jwt),
-        ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
+        ("-p #{shell_escaped_password(password)}" unless use_jwt),
         ("-jwt #{jwt}" if use_jwt),
         "-apple_id #{apple_id}",
         "-destination '#{destination}'",
@@ -205,8 +205,8 @@ module FastlaneCore
       [
         '"' + Helper.transporter_path + '"',
         '-m provider',
-        ("-u #{username.shellescape}" unless use_jwt),
-        ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
+        ("-u \"#{username.shellescape}\"" unless use_jwt),
+        ("-p #{shell_escaped_password(password)}" unless use_jwt),
         ("-jwt #{jwt}" if use_jwt)
       ].compact.join(' ')
     end
@@ -281,7 +281,7 @@ module FastlaneCore
           java_code_option,
           '-m upload',
           ("-u #{username.shellescape}" unless use_jwt),
-          ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
+          ("-p #{password.shellescape}" unless use_jwt),
           ("-jwt #{jwt}" if use_jwt),
           "-f #{source.shellescape}",
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
@@ -320,7 +320,7 @@ module FastlaneCore
           java_code_option,
           '-m lookupMetadata',
           ("-u #{username.shellescape}" unless use_jwt),
-          ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
+          ("-p #{password.shellescape}" unless use_jwt),
           ("-jwt #{jwt}" if use_jwt),
           "-apple_id #{apple_id.shellescape}",
           "-destination #{destination.shellescape}",
@@ -355,7 +355,7 @@ module FastlaneCore
           java_code_option,
           '-m provider',
           ("-u #{username.shellescape}" unless use_jwt),
-          ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
+          ("-p #{password.shellescape}" unless use_jwt),
           ("-jwt #{jwt}" if use_jwt),
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ')
