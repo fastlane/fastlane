@@ -7,16 +7,31 @@ module Fastlane
 
         rows = []
         Spaceship::StatsMiddleware.service_stats.each do |service, count|
-          rows << [service.name, service.url, service.auth_type, count]
+          rows << [service.name, service.auth_type, service.url, count]
         end
 
         puts("")
         puts(Terminal::Table.new(
                title: "Spaceship Stats",
-               headings: ["Service", "URL", "Auth Type", "Number of requests"],
+               headings: ["Service", "Auth Type", "Domain", "Number of requests"],
                rows: FastlaneCore::PrintTable.transform_output(rows)
         ))
         puts("")
+
+        if params[:print_request_logs]
+          log_rows = []
+          Spaceship::StatsMiddleware.request_logs.each do |request_log|
+            log_rows << [request_log.auth_type, request_log.url]
+          end
+
+          puts("")
+          puts(Terminal::Table.new(
+                 title: "Spaceship Request Log",
+                 headings: ["Auth Type", "URL"],
+                 rows: FastlaneCore::PrintTable.transform_output(log_rows)
+          ))
+          puts("")
+        end
       end
 
       def self.url_name(url_prefix)
@@ -29,6 +44,15 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.available_options
+        [
+          FastlaneCore::ConfigItem.new(key: :print_request_logs,
+                                       description: "Print all URLs requested",
+                                       type: Boolean,
+                                       default_value: false)
+        ]
       end
 
       def self.example_code

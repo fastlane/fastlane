@@ -29,6 +29,19 @@ module Spaceship
         return implicit_client
       end
 
+      def token=(token)
+        @client = ConnectAPI::Client.new(token: token)
+      end
+
+      def token
+        return nil if @client.nil?
+        return @client.token
+      end
+
+      def token?
+        (@client && @client.token)
+      end
+
       # Initializes client with Apple's App Store Connect JWT auth key.
       #
       # This method will automatically use the key id, issuer id, and filepath from environment

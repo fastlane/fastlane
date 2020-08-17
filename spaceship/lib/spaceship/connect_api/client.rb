@@ -7,6 +7,7 @@ require_relative './users/users'
 module Spaceship
   class ConnectAPI
     class Client
+      attr_accessor :token
       attr_accessor :tunes_client
       attr_accessor :portal_client
 
@@ -57,6 +58,8 @@ module Spaceship
       end
 
       def initialize(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil)
+        @token = token
+
         # If using web session...
         # Spaceship::Tunes is needed for TestFlight::API, Tunes::API, and Users::API
         # Spaceship::Portal is needed for Provisioning::API

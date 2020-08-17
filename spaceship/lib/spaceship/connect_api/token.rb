@@ -48,10 +48,15 @@ module Spaceship
       end
 
       def initialize(key_id: nil, issuer_id: nil, key: nil)
-        @expiration = Time.now + MAX_TOKEN_DURATION
         @key_id = key_id
         @key = key
         @issuer_id = issuer_id
+
+        refresh!
+      end
+
+      def refresh!
+        @expiration = Time.now + MAX_TOKEN_DURATION
 
         header = {
           kid: key_id
@@ -63,7 +68,7 @@ module Spaceship
           aud: 'appstoreconnect-v1'
         }
 
-        @text = JWT.encode(payload, key, 'ES256', header)
+        @text = JWT.encode(payload, @key, 'ES256', header)
       end
 
       def expired?

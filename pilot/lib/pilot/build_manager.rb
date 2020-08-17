@@ -343,22 +343,33 @@ module Pilot
       builds_to_expire.each(&:expire!)
     end
 
+    # If 
     # If itc_provider was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
+      # Use JWT auth
+      if Spaceship::ConnectAPI.token?
+        token = Spaceship::ConnectAPI.token
+        token.refresh! if token.expired?
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, token.text)
+      end
+
+      # Otherwise use username and password 
+      tunes_client = Spaceship::ConnectAPI.client.tunes_client
+
       generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
-      return generic_transporter if options[:itc_provider] || Spaceship::Tunes.client.nil?
-      return generic_transporter unless Spaceship::Tunes.client.teams.count > 1
+      return generic_transporter if options[:itc_provider] || tunes_client.nil?
+      return generic_transporter unless tunes_client.teams.count > 1
 
       begin
-        team = Spaceship::Tunes.client.teams.find { |t| t['contentProvider']['contentProviderId'].to_s == Spaceship::Tunes.client.team_id }
+        team = tunes_client.teams.find { |t| t['contentProvider']['contentProviderId'].to_s == tunes_client.team_id }
         name = team['contentProvider']['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
         return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
       rescue => ex
-        UI.verbose("Couldn't infer a provider short name for team with id #{Spaceship::Tunes.client.team_id} automatically: #{ex}. Proceeding without provider short name.")
+        UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")
         return generic_transporter
       end
     end

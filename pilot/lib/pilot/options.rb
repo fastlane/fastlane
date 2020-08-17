@@ -10,6 +10,23 @@ module Pilot
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
       [
+        FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                     env_name: "PILOT_API_KEY_PATH",
+                                     description: "Path to your App Store Connect API key JSON file",
+                                     optional: true,
+                                     conflicting_options: [:username],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_name: "PILOT_API_KEY",
+                                     description: "Path to your App Store Connect API key JSON file",
+                                     optional: true,
+                                     conflicting_options: [:api_key_path, :username],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+
         # app upload info
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",

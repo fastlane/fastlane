@@ -18,8 +18,8 @@ module Sigh
                                              title: "Summary for sigh #{Fastlane::VERSION}")
 
       UI.message("Starting login with user '#{Sigh.config[:username]}'")
-      Spaceship.login(Sigh.config[:username], nil)
-      Spaceship.select_team
+      Spaceship::ConnectAPI.login(Sigh.config[:username], nil)
+      Spaceship::ConnectAPI.select_team
       UI.message("Successfully logged in")
 
       profiles = [] if Sigh.config[:skip_fetch_profiles]

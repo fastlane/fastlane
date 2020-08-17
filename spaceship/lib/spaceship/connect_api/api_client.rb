@@ -44,6 +44,9 @@ module Spaceship
             c.use(FaradayMiddleware::RelsMiddleware)
             c.use(Spaceship::StatsMiddleware)
             c.adapter(Faraday.default_adapter)
+
+            # Might need to replace this with middleware that injects
+            # a refreshed token if expired
             c.headers["Authorization"] = "Bearer #{token.text}"
 
             if ENV['SPACESHIP_DEBUG']
