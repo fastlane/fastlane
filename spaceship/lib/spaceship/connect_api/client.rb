@@ -84,6 +84,16 @@ module Spaceship
         )
       end
 
+      def in_house?
+        if token
+          raise "Not implemented yet"
+        elsif @portal_client
+          return @portal_client.in_house?
+        else
+          return false
+        end
+      end
+
       def select_team(team_id: nil, team_name: nil)
         @tunes_client.select_team(team_id: team_id, team_name: team_name)
         @portal_client.select_team(team_id: team_id, team_name: team_name)

@@ -21,11 +21,12 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :api_key,
                                      env_name: "PILOT_API_KEY",
                                      description: "Path to your App Store Connect API key JSON file",
+                                     type: Hash,
                                      optional: true,
-                                     conflicting_options: [:api_key_path, :username],
-                                     verify_block: proc do |value|
-                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
-                                     end),
+                                     sensitive: true,
+                                     default_value: Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY],
+                                     default_value_dynamic: true,
+                                     conflicting_options: [:api_key_path, :username]),
 
         # app upload info
         FastlaneCore::ConfigItem.new(key: :username,

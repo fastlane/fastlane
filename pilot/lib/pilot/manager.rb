@@ -30,7 +30,7 @@ module Pilot
     end
 
     def api_token
-      return config[:api_key] if config[:api_key]
+      return Spaceship::ConnectAPI::Token.create(config[:api_key]) if config[:api_key]
       return Spaceship::ConnectAPI::Token.load_json_file(config[:api_key_path]) if config[:api_key_path]
       return nil
     end
