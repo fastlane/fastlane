@@ -24,8 +24,6 @@ module Pilot
                                      type: Hash,
                                      optional: true,
                                      sensitive: true,
-                                     default_value: Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY],
-                                     default_value_dynamic: true,
                                      conflicting_options: [:api_key_path, :username]),
 
         # app upload info
