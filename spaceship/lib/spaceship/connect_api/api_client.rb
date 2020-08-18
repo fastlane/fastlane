@@ -3,6 +3,7 @@ require_relative '../client'
 require_relative './response'
 require_relative '../client'
 require_relative './response'
+require_relative './token_refresh_middleware'
 
 require_relative '../stats_middleware'
 
@@ -43,11 +44,8 @@ module Spaceship
             c.response(:plist, content_type: /\bplist$/)
             c.use(FaradayMiddleware::RelsMiddleware)
             c.use(Spaceship::StatsMiddleware)
+            c.use(Spaceship::TokenRefreshMiddleware, token)
             c.adapter(Faraday.default_adapter)
-
-            # Might need to replace this with middleware that injects
-            # a refreshed token if expired
-            c.headers["Authorization"] = "Bearer #{token.text}"
 
             if ENV['SPACESHIP_DEBUG']
               # for debugging only
