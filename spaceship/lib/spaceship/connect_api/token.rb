@@ -19,8 +19,7 @@ module Spaceship
       attr_reader :expiration
 
       def self.load_json_file(filepath)
-        json = JSON.parse(File.read(filepath))
-        json = json.each_with_object({}) { |(k, v), memo| memo[k.to_sym] = v; }
+        json = JSON.parse(File.read(filepath), { symbolize_names: true })
         self.create(json)
       end
 

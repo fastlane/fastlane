@@ -18,7 +18,7 @@ module Pilot
 
     def login
       if api_token
-        UI.message("Creating auhtorization token for App Store Connect")
+        UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
       else
         config[:username] ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
