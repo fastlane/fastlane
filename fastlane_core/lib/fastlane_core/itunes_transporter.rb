@@ -182,7 +182,7 @@ module FastlaneCore
         additional_upload_parameters, # that's here, because the user might overwrite the -t option
         "-k 100000",
         ("-WONoPause true" if Helper.windows?), # Windows only: process instantly returns instead of waiting for key press
-        ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?)
+        ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?)
       ].compact.join(' ')
     end
 
@@ -196,7 +196,7 @@ module FastlaneCore
         ("-jwt #{jwt}" if use_jwt),
         "-apple_id #{apple_id}",
         "-destination '#{destination}'",
-        ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?)
+        ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?)
       ].compact.join(' ')
     end
 
@@ -265,7 +265,7 @@ module FastlaneCore
           "-f #{source.shellescape}",
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
-          ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
+          ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ') # compact gets rid of the possibly nil ENV value
       else
@@ -286,7 +286,7 @@ module FastlaneCore
           "-f #{source.shellescape}",
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
-          ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
+          ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ') # compact gets rid of the possibly nil ENV value
       end
@@ -304,7 +304,7 @@ module FastlaneCore
           ("-jwt #{jwt}" if use_jwt),
           "-apple_id #{apple_id.shellescape}",
           "-destination #{destination.shellescape}",
-          ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
+          ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ')
       else
@@ -324,7 +324,7 @@ module FastlaneCore
           ("-jwt #{jwt}" if use_jwt),
           "-apple_id #{apple_id.shellescape}",
           "-destination #{destination.shellescape}",
-          ("-itc_provider #{provider_short_name}" unless provider_short_name.to_s.empty?),
+          ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ')
       end
@@ -421,8 +421,10 @@ module FastlaneCore
       use_shell_script ||= Helper.windows?
       use_shell_script ||= Feature.enabled?('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT')
 
-      @user = user
-      @password = password || load_password_for_transporter
+      if jwt.to_s.empty?
+        @user = user
+        @password = password || load_password_for_transporter
+      end
 
       @jwt = jwt
 
