@@ -18,6 +18,8 @@ module Spaceship
       attr_reader :text
       attr_reader :expiration
 
+      attr_accessor :in_house
+
       def self.load_json_file(filepath)
         json = JSON.parse(File.read(filepath), { symbolize_names: true })
         self.create(json)
@@ -33,11 +35,14 @@ module Spaceship
         self.new(key_id: key_id, issuer_id: issuer_id, key: key)
       end
 
-      def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, duration: nil)
+      def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, duration: nil, in_house: nil)
         key_id ||= ENV['SPACESHIP_CONNECT_API_KEY_ID']
         issuer_id ||= ENV['SPACESHIP_CONNECT_API_ISSUER_ID']
         filepath ||= ENV['SPACESHIP_CONNECT_API_KEY_FILEPATH']
         duration ||= ENV['SPACESHIP_CONNECT_API_TOKEN_DURATION']
+
+        in_house_env = ENV['SPACESHIP_CONNECT_API_IN_HOUSE']
+        in_house ||= !["no", "false", "off", "0"].include?(in_house_env) if in_house_env
 
         key ||= File.binread(filepath)
 
@@ -45,15 +50,17 @@ module Spaceship
           key_id: key_id,
           issuer_id: issuer_id,
           key: OpenSSL::PKey::EC.new(key),
-          duration: duration
+          duration: duration,
+          in_house: in_house
         )
       end
 
-      def initialize(key_id: nil, issuer_id: nil, key: nil, duration: nil)
+      def initialize(key_id: nil, issuer_id: nil, key: nil, duration: nil, in_house: nil)
         @key_id = key_id
         @key = key
         @issuer_id = issuer_id
         @duration = duration
+        @in_house = in_house
 
         @duration ||= MAX_TOKEN_DURATION
 

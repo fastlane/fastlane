@@ -88,5 +88,48 @@ describe Spaceship::ConnectAPI::Client do
         Spaceship::ConnectAPI::Client.login(username, password, team_name: team_name)
       end
     end
+
+    context "#in_house?" do
+      context "with token" do
+        let(:mock_token) { double('token') }
+        let(:client) do
+          Spaceship::ConnectAPI::Client.new(token: mock_token)
+        end
+
+        it "raise error without in_house set" do
+          expect(mock_token).to receive(:in_house).and_return(nil)
+
+          expect do
+            client.in_house?
+          end.to raise_error(/Cannot determine if team is App Store or Enterprise via the App Store Connect API/)
+        end
+
+        it "with in_house set" do
+          expect(mock_token).to receive(:in_house).and_return(true).twice
+
+          in_house = client.in_house?
+          expect(in_house).to be(true)
+        end
+      end
+
+      it "with portal client" do
+        mock_portal_client =  double('portal client')
+        allow(mock_portal_client).to receive(:team_id)
+
+        client = Spaceship::ConnectAPI::Client.new(portal_client: mock_portal_client)
+
+        expect(mock_portal_client).to receive(:in_house?).and_return(true)
+
+        in_house = client.in_house?
+        expect(in_house).to be(true)
+      end
+
+      it "raise error with no session" do
+        client = Spaceship::ConnectAPI::Client.new
+        expect do
+          client.in_house?
+        end.to raise_error("No App Store Connect API token or Portal Client set")
+      end
+    end
   end
 end

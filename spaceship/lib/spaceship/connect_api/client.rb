@@ -86,11 +86,21 @@ module Spaceship
 
       def in_house?
         if token
-          raise "Not implemented yet"
+          if token.in_house.nil?
+            message = [
+              "Cannot determine if team is App Store or Enterprise via the App Store Connect API (yet)",
+              "Set 'in_house' on your Spaceship::ConnectAPI::Token",
+              "Or set 'in_house' in your App Store Connect API key JSON file",
+              "Or set the 'SPACESHIP_CONNECT_API_IN_HOUSE' environment variable to 'true'",
+              "View more info in the docs at https://docs.fastlane.tools/app-store-connect-api/"
+            ]
+            raise message.join('\n')
+          end
+          return !!token.in_house
         elsif @portal_client
           return @portal_client.in_house?
         else
-          return false
+          raise "No App Store Connect API token or Portal Client set"
         end
       end
 
