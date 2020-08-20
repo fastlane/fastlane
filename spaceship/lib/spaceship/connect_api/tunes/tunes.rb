@@ -299,6 +299,14 @@ module Spaceship
       end
 
       #
+      # appPricePoints
+      #
+      def get_app_price_points(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        Client.instance.get("appPricePoints", params)
+      end
+
+      #
       # appReviewAttachments
       #
 
@@ -411,7 +419,7 @@ module Spaceship
           }
         }
 
-        Client.instance.post("appScreenshots", body)
+        Client.instance.post("appScreenshots", body, tries: 1)
       end
 
       def patch_app_screenshot(app_screenshot_id: nil, attributes: {})
@@ -828,6 +836,28 @@ module Spaceship
       def delete_app_store_version_submission(app_store_version_submission_id: nil)
         params = Client.instance.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
         Client.instance.delete("appStoreVersionSubmissions/#{app_store_version_submission_id}", params)
+      end
+
+      #
+      # appStoreVersionReleaseRequests
+      #
+
+      def post_app_store_version_release_request(app_store_version_id: nil)
+        body = {
+            data: {
+                type: "appStoreVersionReleaseRequests",
+                relationships: {
+                    appStoreVersion: {
+                        data: {
+                            type: "appStoreVersions",
+                            id: app_store_version_id
+                        }
+                    }
+                }
+            }
+        }
+
+        Client.instance.post("appStoreVersionReleaseRequests", body)
       end
 
       #

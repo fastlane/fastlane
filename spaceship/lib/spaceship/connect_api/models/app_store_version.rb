@@ -1,4 +1,5 @@
 require_relative '../model'
+require_relative './app_store_review_detail'
 require_relative './app_store_version_localization'
 
 module Spaceship
@@ -85,6 +86,7 @@ module Spaceship
       end
 
       def update(attributes: nil)
+        attributes = reverse_attr_mapping(attributes)
         return Spaceship::ConnectAPI.patch_app_store_version(app_store_version_id: id, attributes: attributes).first
       end
 
@@ -118,6 +120,7 @@ module Spaceship
       #
 
       def create_app_store_review_detail(attributes: nil)
+        attributes = Spaceship::ConnectAPI::AppStoreReviewDetail.reverse_attr_mapping(attributes)
         resp = Spaceship::ConnectAPI.post_app_store_review_detail(app_store_version_id: id, attributes: attributes)
         return resp.to_models.first
       end
@@ -152,6 +155,15 @@ module Spaceship
 
       def create_app_store_version_submission
         resp = Spaceship::ConnectAPI.post_app_store_version_submission(app_store_version_id: id)
+        return resp.to_models.first
+      end
+
+      #
+      # App Store Version Release Requests
+      #
+
+      def create_app_store_version_release_request
+        resp = Spaceship::ConnectAPI.post_app_store_version_release_request(app_store_version_id: id)
         return resp.to_models.first
       end
 

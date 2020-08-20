@@ -53,6 +53,9 @@ protocol MatchfileProtocol: class {
     /// Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64
     var gitBearerAuthorization: String? { get }
 
+    /// Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof
+    var gitPrivateKey: String? { get }
+
     /// Name of the Google Cloud Storage bucket to use
     var googleCloudBucketName: String? { get }
 
@@ -95,8 +98,11 @@ protocol MatchfileProtocol: class {
     /// Skip generation of a README.md for the created git repository
     var skipDocs: Bool { get }
 
-    /// Set the provisioning profile's platform to work with (i.e. ios, tvos, macos)
+    /// Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
     var platform: String { get }
+
+    /// Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
+    var deriveCatalystAppIdentifier: Bool { get }
 
     /// The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
     var templateName: String? { get }
@@ -133,6 +139,7 @@ extension MatchfileProtocol {
     var cloneBranchDirectly: Bool { return false }
     var gitBasicAuthorization: String? { return nil }
     var gitBearerAuthorization: String? { return nil }
+    var gitPrivateKey: String? { return nil }
     var googleCloudBucketName: String? { return nil }
     var googleCloudKeysFile: String? { return nil }
     var googleCloudProjectId: String? { return nil }
@@ -148,6 +155,7 @@ extension MatchfileProtocol {
     var skipConfirmation: Bool { return false }
     var skipDocs: Bool { return false }
     var platform: String { return "ios" }
+    var deriveCatalystAppIdentifier: Bool { return false }
     var templateName: String? { return nil }
     var profileName: String? { return nil }
     var failOnNameTaken: Bool { return false }
@@ -157,4 +165,4 @@ extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.21]
+// FastlaneRunnerAPIVersion [0.9.31]

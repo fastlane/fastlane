@@ -40,9 +40,13 @@ module Deliver
     # This method takes care of creating a new 'deliver' folder, containing the app metadata
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)
-      v = options[:app].latest_version
+      app = options[:app]
+
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      v = app.get_latest_app_store_version(platform: platform)
+
       metadata_path = options[:metadata_path] || File.join(deliver_path, 'metadata')
-      generate_metadata_files(v, metadata_path)
+      generate_metadata_files(app, v, metadata_path)
 
       # Generate the final Deliverfile here
       return File.read(deliverfile_path)
@@ -56,7 +60,92 @@ module Deliver
       end
     end
 
-    def generate_metadata_files(v, path)
+    def generate_metadata_files(app, version, path)
+      # App info localizations
+      app_info = app.fetch_live_app_info || app.fetch_edit_app_info
+      app_info_localizations = app_info.get_app_info_localizations
+      app_info_localizations.each do |localization|
+        language = localization.locale
+
+        UploadMetadata::LOCALISED_APP_VALUES.each do |file_key, attribute_name|
+          content = localization.send(attribute_name.to_slug) || ""
+          content += "\n"
+
+          resulting_path = File.join(path, language, "#{file_key}.txt")
+          FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+          File.write(resulting_path, content)
+
+          UI.message("Writing to '#{resulting_path}'")
+        end
+      end
+
+      # Version localizations
+      version_localizations = version.get_app_store_version_localizations
+      version_localizations.each do |localization|
+        language = localization.locale
+
+        UploadMetadata::LOCALISED_VERSION_VALUES.each do |file_key, attribute_name|
+          content = localization.send(attribute_name) || ""
+          content += "\n"
+
+          resulting_path = File.join(path, language, "#{file_key}.txt")
+          FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+          File.write(resulting_path, content)
+
+          UI.message("Writing to '#{resulting_path}'")
+        end
+      end
+
+      # App info (categories)
+      UploadMetadata::NON_LOCALISED_APP_VALUES.each do |file_key, attribute_name|
+        category = app_info.send(attribute_name)
+
+        content = category ? category.id.to_s : ""
+        content += "\n"
+
+        resulting_path = File.join(path, "#{file_key}.txt")
+        FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+        File.write(resulting_path, content)
+
+        UI.message("Writing to '#{resulting_path}'")
+      end
+
+      # Version
+      UploadMetadata::NON_LOCALISED_VERSION_VALUES.each do |file_key, attribute_name|
+        content = version.send(attribute_name) || ""
+        content += "\n"
+
+        resulting_path = File.join(path, "#{file_key}.txt")
+        FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+        File.write(resulting_path, content)
+
+        UI.message("Writing to '#{resulting_path}'")
+      end
+
+      # Review information
+      app_store_review_detail = begin
+                                  version.fetch_app_store_review_detail
+                                rescue
+                                  nil
+                                end # errors if doesn't exist
+      UploadMetadata::REVIEW_INFORMATION_VALUES.each do |file_key, attribute_name|
+        if app_store_review_detail
+          content = app_store_review_detail.send(attribute_name) || ""
+        else
+          content = ""
+        end
+        content += "\n"
+
+        base_dir = File.join(path, UploadMetadata::REVIEW_INFORMATION_DIR)
+        resulting_path = File.join(base_dir, "#{file_key}.txt")
+        FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+        File.write(resulting_path, content)
+
+        UI.message("Writing to '#{resulting_path}'")
+      end
+    end
+
+    def generate_metadata_files_old(v, path)
       app_details = v.application.details
 
       # All the localised metadata

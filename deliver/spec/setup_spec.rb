@@ -1,97 +1,102 @@
 require 'deliver/setup'
 
-# describe Deliver do
-#   describe Deliver::Setup do
-#     it "properly downloads existing metadata" do
-#       # app = "app"
-#       # version = "version"
-#       # allow(Spaceship::Application).to receive(:find).and_return(app)
-#       # expect(app).to receive(:latest_version).and_return(version)
-#       # expect(version).to receive(:name).and_return("name")
+describe Deliver do
+  describe Deliver::Setup do
+    describe '#generate_metadata_files' do
+      context 'with review_information' do
+        let(:setup) { Deliver::Setup.new }
+        let(:tempdir) { Dir.mktmpdir }
 
-#       # options = {
-#       #   app_identifier: "tools.fastlane.app",
-#       #   username: "flapple@krausefx.com",
-#       # }
-#       # Deliver::Runner.new(options) # to login
-#       # Deliver::Setup.new.run(options)
-#     end
+        let(:app) { double('app') }
+        let(:app_info) do
+          double('app_info',
+                 primary_category: double('primary_category', id: 'cat1'),
+                 primary_subcategory_one: double('primary_subcategory_one', id: 'cat1sub1'),
+                 primary_subcategory_two: double('primary_subcategory_two', id: 'cat1sub2'),
+                 secondary_category: double('secondary_category', id: 'cat2'),
+                 secondary_subcategory_one: double('secondary_subcategory_one', id: 'cat2sub1'),
+                 secondary_subcategory_two: double('secondary_subcategory_two', id: 'cat2sub2'))
+        end
+        let(:app_info_localization_en) do
+          double('app_info_localization_en',
+                 locale: "en-US",
+                 name: "fastlane",
+                 subtitle: "the fastest lane",
+                 privacy_policy_url: "https://fastlane.tools/privacy/en",
+                 privacy_policy_text: "fastlane privacy en")
+        end
+        let(:version) do
+          double('version',
+                 copyright: "2020 fastlane")
+        end
+        let(:version_localization_en) do
+          double('version',
+                 description: "description en",
+                 locale: "en-US",
+                 keywords: "app version en",
+                 marketing_url: "https://fastlane.tools/en",
+                 promotional_text: "promotional text en",
+                 support_url: "https://fastlane.tools/support/en",
+                 whats_new: "whats new en")
+        end
+        let(:app_review_detail) do
+          double('app_review_detail',
+                 contact_first_name: 'John',
+                 contact_last_name: 'Smith',
+                 contact_phone: '+819012345678',
+                 contact_email: 'deliver@example.com',
+                 demo_account_name: 'user',
+                 demo_account_password: 'password',
+                 notes: 'This is a note')
+        end
 
-#     describe '#generate_metadata_files' do
-#       context 'with review_information' do
-#         let(:version) do
-#           double('version',
-#                  review_first_name: 'John',
-#                  review_last_name: 'Smith',
-#                  review_phone_number: '+819012345678',
-#                  review_email: 'deliver@example.com',
-#                  review_demo_user: 'user',
-#                  review_demo_password: 'password',
-#                  review_notes: 'This is a note')
-#         end
-#         let(:application) { double('application') }
-#         let(:setup) { Deliver::Setup.new }
-#         let(:tempdir) { Dir.mktmpdir }
-#         before do
-#           allow(version).to receive_message_chain('application.details').and_return(application)
-#           allow(version).to receive_message_chain('description.languages').and_return([])
-#           allow(version).to receive_message_chain('large_app_icon.asset_token').and_return(nil)
-#           allow(version).to receive_message_chain('watch_app_icon.asset_token').and_return(nil)
-#           stub_const('Deliver::UploadMetadata::NON_LOCALISED_VERSION_VALUES', [])
-#           stub_const('Deliver::UploadMetadata::NON_LOCALISED_APP_VALUES', [])
-#           stub_const('Deliver::UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES', {})
-#         end
+        before do
+          allow(app).to receive(:fetch_live_app_info).and_return(app_info)
+          allow(app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
 
-#         it 'generates review information' do
-#           setup.generate_metadata_files(version, tempdir)
-#           base_dir = File.join(tempdir, 'review_information')
-#           %w(first_name last_name phone_number email_address demo_user demo_password notes).each do |filename|
-#             expect(File.exist?(File.join(base_dir, "#{filename}.txt"))).to be_truthy
-#           end
-#         end
+          allow(version).to receive(:get_app_store_version_localizations).and_return([version_localization_en])
+          allow(version).to receive(:fetch_app_store_review_detail).and_return(app_review_detail)
+        end
 
-#         after do
-#           FileUtils.remove_entry_secure(tempdir)
-#         end
-#       end
-#       context 'with trade_representative_contact_information' do
-#         let(:version) do
-#           double('version',
-#                  trade_representative_trade_name: 'John Smith',
-#                  trade_representative_first_name: 'John',
-#                  trade_representative_last_name: 'Smith',
-#                  trade_representative_address_line_1: '1 Infinite Loop',
-#                  trade_representative_address_line_2: '',
-#                  trade_representative_address_line_3: '',
-#                  trade_representative_city_name: 'Cupertino',
-#                  trade_representative_state: 'California',
-#                  trade_representative_country: 'United States',
-#                  trade_representative_postal_code: '95014',
-#                  trade_representative_phone_number: '+819012345678',
-#                  trade_representative_email: 'deliver@example.com',
-#                  trade_representative_is_displayed_on_app_store: 'false')
-#         end
-#         let(:application) { double('application') }
-#         let(:setup) { Deliver::Setup.new }
-#         let(:tempdir) { Dir.mktmpdir }
-#         before do
-#           allow(version).to receive_message_chain('application.details').and_return(application)
-#           allow(version).to receive_message_chain('description.languages').and_return([])
-#           allow(version).to receive_message_chain('large_app_icon.asset_token').and_return(nil)
-#           allow(version).to receive_message_chain('watch_app_icon.asset_token').and_return(nil)
-#           stub_const('Deliver::UploadMetadata::NON_LOCALISED_VERSION_VALUES', [])
-#           stub_const('Deliver::UploadMetadata::NON_LOCALISED_APP_VALUES', [])
-#           stub_const('Deliver::UploadMetadata::REVIEW_INFORMATION_VALUES', {})
-#         end
+        it 'generates metadata' do
+          map = {
+            "copyright" => "2020 fastlane",
+            "primary_category" => "cat1",
+            "secondary_category" => "cat2",
+            "primary_first_sub_category" => "cat1sub1",
+            "primary_second_sub_category" => "cat1sub2",
+            "secondary_first_sub_category" => "cat2sub1",
+            "secondary_second_sub_category" => "cat2sub2",
 
-#         it 'generates trade representative contact information' do
-#           setup.generate_metadata_files(version, tempdir)
-#           base_dir = File.join(tempdir, 'trade_representative_contact_information')
-#           %w(trade_name first_name last_name address_line1 city_name state country postal_code phone_number email_address is_displayed_on_app_store).each do |filename|
-#             expect(File.exist?(File.join(base_dir, "#{filename}.txt"))).to be_truthy
-#           end
-#         end
-#       end
-#     end
-#   end
-# end
+            "en-US/description" => "description en",
+            "en-US/keywords" => "app version en",
+            "en-US/release_notes" => "whats new en",
+            "en-US/support_url" => "https://fastlane.tools/support/en",
+            "en-US/marketing_url" => "https://fastlane.tools/en",
+            "en-US/promotional_text" => "promotional text en",
+
+            "review_information/first_name" => "John",
+            "review_information/last_name" => "Smith",
+            "review_information/phone_number" => "+819012345678",
+            "review_information/email_address" => "deliver@example.com",
+            "review_information/demo_user" => "user",
+            "review_information/demo_password" => "password",
+            "review_information/notes" => "This is a note"
+          }
+
+          setup.generate_metadata_files(app, version, tempdir)
+          base_dir = File.join(tempdir)
+          map.each do |filename, value|
+            path = File.join(base_dir, "#{filename}.txt")
+            expect(File.exist?(path)).to be_truthy, " for #{path}"
+            expect(File.read(path).strip).to eq(value)
+          end
+        end
+
+        after do
+          FileUtils.remove_entry_secure(tempdir)
+        end
+      end
+    end
+  end
+end

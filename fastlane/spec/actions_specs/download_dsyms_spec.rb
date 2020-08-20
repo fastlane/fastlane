@@ -72,6 +72,17 @@ describe Fastlane do
         end
       end
 
+      context 'when build_number is an integer' do
+        it 'downloads the correct dsyms' do
+          expect(app).to receive(:tunes_all_builds_for_train).and_return([build2])
+          expect(app).to receive(:tunes_build_details).with(train: '2.0.0', build_number: '2', platform: :ios).and_return(build_detail)
+          expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, train3.version_string, build2.build_version, nil)
+          Fastlane::FastFile.new.parse("lane :test do
+              download_dsyms(username: 'user@fastlane.tools', app_identifier: 'tools.fastlane.myapp', version: '2.0.0', build_number: 2)
+          end").runner.execute(:test)
+        end
+      end
+
       context 'when version is latest' do
         before do
           # latest

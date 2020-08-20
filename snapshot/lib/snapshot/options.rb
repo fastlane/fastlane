@@ -116,6 +116,11 @@ module Snapshot
                                      description: "Enabling this option will automatically erase the simulator before running the application",
                                      default_value: false,
                                      is_string: false),
+        FastlaneCore::ConfigItem.new(key: :headless,
+                                     env_name: 'SNAPSHOT_HEADLESS',
+                                     description: "Enabling this option will prevent displaying the simulator window",
+                                     default_value: true,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :override_status_bar,
                                      env_name: 'SNAPSHOT_OVERRIDE_STATUS_BAR',
                                      description: "Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception",
@@ -272,6 +277,11 @@ module Snapshot
         FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
                                      env_name: "SNAPSHOT_DISABLE_XCPRETTY",
                                      description: "Disable xcpretty formatting of build",
+                                     type: Boolean,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
+                                     env_name: "SNAPSHOT_SUPPRESS_XCODE_OUTPUT",
+                                     description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      type: Boolean,
                                      optional: true)
       ]

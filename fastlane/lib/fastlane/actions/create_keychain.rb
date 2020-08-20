@@ -4,6 +4,7 @@ module Fastlane
   module Actions
     module SharedValues
       ORIGINAL_DEFAULT_KEYCHAIN = :ORIGINAL_DEFAULT_KEYCHAIN
+      KEYCHAIN_PATH = :KEYCHAIN_PATH
     end
 
     class CreateKeychainAction < Action
@@ -31,6 +32,8 @@ module Fastlane
           UI.important("Found keychain '#{keychain_path}', creation skipped")
           UI.important("If creating a new Keychain DB is required please set the `require_create` option true to cause the action to fail")
         end
+
+        Actions.lane_context[Actions::SharedValues::KEYCHAIN_PATH] = keychain_path
 
         if params[:default_keychain]
           # if there is no default keychain - setting the original will fail - silent this error
@@ -91,7 +94,8 @@ module Fastlane
 
       def self.output
         [
-          ['ORIGINAL_DEFAULT_KEYCHAIN', 'The path to the default keychain']
+          ['ORIGINAL_DEFAULT_KEYCHAIN', 'The path to the default keychain'],
+          ['KEYCHAIN_PATH', 'The path of the keychain']
         ]
       end
 

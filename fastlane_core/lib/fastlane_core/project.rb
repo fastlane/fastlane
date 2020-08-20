@@ -320,6 +320,7 @@ module FastlaneCore
       proj << "-scheme #{options[:scheme].shellescape}" if options[:scheme]
       proj << "-project #{options[:project].shellescape}" if options[:project]
       proj << "-configuration #{options[:configuration].shellescape}" if options[:configuration]
+      proj << "-derivedDataPath #{options[:derived_data_path].shellescape}" if options[:derived_data_path]
       proj << "-xcconfig #{options[:xcconfig].shellescape}" if options[:xcconfig]
 
       if FastlaneCore::Helper.xcode_at_least?('11.0') && options[:cloned_source_packages_path]

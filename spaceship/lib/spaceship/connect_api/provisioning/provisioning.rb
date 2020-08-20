@@ -43,6 +43,47 @@ module Spaceship
         params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
         Client.instance.get("profiles", params)
       end
+
+      def post_profiles(bundle_id_id: nil, certificates: nil, devices: nil, attributes: {})
+        body = {
+          data: {
+            attributes: attributes,
+            type: "profiles",
+            relationships: {
+              bundleId: {
+                data: {
+                  type: "bundleIds",
+                  id: bundle_id_id
+                }
+              },
+              certificates: {
+                data: certificates.map do |certificate|
+                  {
+                    type: "certificates",
+                    id: certificate
+                  }
+                end
+              },
+              devices: {
+                data: (devices || []).map do |device|
+                  {
+                    type: "devices",
+                    id: device
+                  }
+                end
+              }
+            }
+          }
+        }
+
+        Client.instance.post("profiles", body)
+      end
+
+      def delete_profile(profile_id: nil)
+        raise "Profile id is nil" if profile_id.nil?
+
+        Client.instance.delete("profiles/#{profile_id}")
+      end
     end
   end
 end

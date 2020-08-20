@@ -4,17 +4,22 @@ require 'digest/md5'
 require_relative 'app_screenshot'
 require_relative 'module'
 require_relative 'loader'
+require_relative 'queue_worker'
+require_relative 'app_screenshot_iterator'
 
 module Deliver
   # upload screenshots to App Store Connect
   class UploadScreenshots
+    DeleteScreenshotJob = Struct.new(:app_screenshot, :localization, :app_screenshot_set)
+    UploadScreenshotJob = Struct.new(:app_screenshot_set, :path)
+
+    NUMBER_OF_THREADS = Helper.test? ? 1 : [ENV.fetch("DELIVER_NUMBER_OF_THREADS", 10).to_i, 10].min
+
     def upload(options, screenshots)
       return if options[:skip_screenshots]
       return if options[:edit_live]
 
-      legacy_app = options[:app]
-      app_id = legacy_app.apple_id
-      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+      app = options[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       version = app.get_edit_app_store_version(platform: platform)
@@ -28,47 +33,7 @@ module Deliver
       localizations = version.get_app_store_version_localizations
 
       if options[:overwrite_screenshots]
-        # Get localizations on version
-        localizations.each do |localization|
-          # Only delete screenshots if trying to upload
-          next unless screenshots_per_language.keys.include?(localization.locale)
-
-          # Iterate over all screenshots for each set and delete
-          screenshot_sets = localization.get_app_screenshot_sets
-
-          # Multi threading delete on single localization
-          threads = []
-          errors = []
-
-          screenshot_sets.each do |screenshot_set|
-            UI.message("Removing all previously uploaded screenshots for '#{localization.locale}' '#{screenshot_set.screenshot_display_type}'...")
-            screenshot_set.app_screenshots.each do |screenshot|
-              UI.verbose("Deleting screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
-              threads << Thread.new do
-                begin
-                  screenshot.delete!
-                  UI.verbose("Deleted screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
-                rescue => error
-                  UI.verbose("Failed to delete screenshot - #{localization.locale} #{screenshot_set.screenshot_display_type} #{screenshot.id}")
-                  errors << error
-                end
-              end
-            end
-          end
-
-          sleep(1) # Feels bad but sleeping a bit to let the threads catchup
-
-          unless threads.empty?
-            Helper.show_loading_indicator("Waiting for screenshots to be deleted for '#{localization.locale}'... (might be slow)") unless FastlaneCore::Globals.verbose?
-            threads.each(&:join)
-            Helper.hide_loading_indicator unless FastlaneCore::Globals.verbose?
-          end
-
-          # Crash if any errors happen while deleting
-          errors.each do |error|
-            UI.error(error.message)
-          end
-        end
+        delete_screenshots(localizations, screenshots_per_language)
       end
 
       # Finding languages to enable
@@ -92,104 +57,162 @@ module Deliver
         localizations = version.get_app_store_version_localizations
       end
 
-      upload_screenshots(screenshots_per_language, localizations, options)
+      upload_screenshots(localizations, screenshots_per_language)
+
+      Helper.show_loading_indicator("Sorting screenshots uploaded...")
+      sort_screenshots(localizations)
+      Helper.hide_loading_indicator
+
+      UI.success("Successfully uploaded screenshots to App Store Connect")
     end
 
-    def upload_screenshots(screenshots_per_language, localizations, options)
-      # Check if should wait for processing
-      # Default to waiting if submitting for review (since needed for submission)
-      # Otherwise use enviroment variable
-      if ENV["DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING"].nil?
-        wait_for_processing = options[:submit_for_review]
-        UI.verbose("Setting wait_for_processing from ':submit_for_review' option")
-      else
-        UI.verbose("Setting wait_for_processing from 'DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING' environment variable")
-        wait_for_processing = !FastlaneCore::Env.truthy?("DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING")
+    def delete_screenshots(localizations, screenshots_per_language, tries: 5)
+      tries -= 1
+
+      worker = QueueWorker.new(NUMBER_OF_THREADS) do |job|
+        start_time = Time.now
+        target = "#{job.localization.locale} #{job.app_screenshot_set.screenshot_display_type} #{job.app_screenshot.id}"
+        begin
+          UI.verbose("Deleting '#{target}'")
+          job.app_screenshot.delete!
+          UI.message("Deleted '#{target}' -  (#{Time.now - start_time} secs)")
+        rescue => error
+          UI.error("Failed to delete screenshot #{target} - (#{Time.now - start_time} secs)")
+          UI.error(error.message)
+        end
       end
 
-      if wait_for_processing
-        UI.important("Will wait for screenshot image processing")
-        UI.important("Set env DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING=true to skip waiting for screenshots to process")
-      else
-        UI.important("Skipping the wait for screenshot image processing (which may affect submission)")
-        UI.important("Set env DELIVER_SKIP_WAIT_FOR_SCREENSHOT_PROCESSING=false to wait for screenshots to process")
+      iterator = AppScreenshotIterator.new(localizations)
+      iterator.each_app_screenshot do |localization, app_screenshot_set, app_screenshot|
+        # Only delete screenshots if trying to upload
+        next unless screenshots_per_language.keys.include?(localization.locale)
+
+        UI.verbose("Queued delete sceeenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{app_screenshot.id}")
+        worker.enqueue(DeleteScreenshotJob.new(app_screenshot, localization, app_screenshot_set))
       end
+
+      worker.start
+
+      # Verify all screenshots have been deleted
+      # Sometimes API requests will fail but screenshots will still be deleted
+      count = iterator.each_app_screenshot_set.map { |_, app_screenshot_set| app_screenshot_set }
+                      .reduce(0) { |sum, app_screenshot_set| sum + app_screenshot_set.app_screenshots.size }
+
+      UI.important("Number of screenshots not deleted: #{count}")
+      if count > 0
+        if tries.zero?
+          UI.user_error!("Failed verification of all screenshots deleted... #{count} screenshot(s) still exist")
+        else
+          UI.error("Failed to delete all screenshots... Tries remaining: #{tries}")
+          delete_screenshots(localizations, screenshots_per_language, tries: tries)
+        end
+      else
+        UI.message("Successfully deleted all screenshots")
+      end
+    end
+
+    def upload_screenshots(localizations, screenshots_per_language, tries: 5)
+      tries -= 1
 
       # Upload screenshots
-      indized = {} # per language and device type
-
-      screenshots_per_language.each do |language, screenshots_for_language|
-        # Find localization to upload screenshots to
-        localization = localizations.find do |l|
-          l.locale == language
+      worker = QueueWorker.new(NUMBER_OF_THREADS) do |job|
+        begin
+          UI.verbose("Uploading '#{job.path}'...")
+          start_time = Time.now
+          job.app_screenshot_set.upload_screenshot(path: job.path, wait_for_processing: false)
+          UI.message("Uploaded '#{job.path}'... (#{Time.now - start_time} secs)")
+        rescue => error
+          UI.error(error)
         end
+      end
 
-        unless localization
-          UI.error("Couldn't find localization on version for #{language}")
+      number_of_screenshots = 0
+      iterator = AppScreenshotIterator.new(localizations)
+      iterator.each_local_screenshot(screenshots_per_language) do |localization, app_screenshot_set, screenshot, index|
+        if index >= 10
+          UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
           next
         end
 
-        indized[localization.locale] ||= {}
+        checksum = UploadScreenshots.calculate_checksum(screenshot.path)
+        duplicate = (app_screenshot_set.app_screenshots || []).any? { |s| s.source_file_checksum == checksum }
 
-        # Create map to find screenshot set to add screenshot to
-        app_screenshot_sets_map = {}
-        app_screenshot_sets = localization.get_app_screenshot_sets
-        app_screenshot_sets.each do |app_screenshot_set|
-          app_screenshot_sets_map[app_screenshot_set.screenshot_display_type] = app_screenshot_set
-
-          # Set initial screnshot count
-          indized[localization.locale][app_screenshot_set.screenshot_display_type] ||= {
-            count: app_screenshot_set.app_screenshots.size,
-            checksums: []
-          }
-
-          checksums = app_screenshot_set.app_screenshots.map(&:source_file_checksum).uniq
-          indized[localization.locale][app_screenshot_set.screenshot_display_type][:checksums] = checksums
+        # Enqueue uploading job if it's not duplicated otherwise screenshot will be skipped
+        if duplicate
+          UI.message("Previous uploaded. Skipping '#{screenshot.path}'...")
+        else
+          worker.enqueue(UploadScreenshotJob.new(app_screenshot_set, screenshot.path))
         end
 
-        UI.message("Uploading #{screenshots_for_language.length} screenshots for language #{language}")
-        screenshots_for_language.each do |screenshot|
-          display_type = screenshot.device_type
-          set = app_screenshot_sets_map[display_type]
+        number_of_screenshots += 1
+      end
 
-          if display_type.nil?
-            UI.error("Error... Screenshot size #{screenshot.screen_size} not valid for App Store Connect")
-            next
+      worker.start
+
+      UI.verbose('Uploading jobs are completed')
+
+      Helper.show_loading_indicator("Waiting for all the screenshots processed...")
+      states = wait_for_complete(iterator)
+      Helper.hide_loading_indicator
+      retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, tries, localizations, screenshots_per_language)
+
+      UI.message("Successfully uploaded all screenshots")
+    end
+
+    # Verify all screenshots have been processed
+    def wait_for_complete(iterator)
+      loop do
+        states = iterator.each_app_screenshot.map { |_, _, app_screenshot| app_screenshot }.each_with_object({}) do |app_screenshot, hash|
+          state = app_screenshot.asset_delivery_state['state']
+          hash[state] ||= 0
+          hash[state] += 1
+        end
+
+        is_processing = states.fetch('UPLOAD_COMPLETE', 0) > 0
+        return states unless is_processing
+
+        UI.verbose("There are still incomplete screenshots - #{states}")
+        sleep(5)
+      end
+    end
+
+    # Verify all screenshots states on App Store Connect are okay
+    def retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, tries, localizations, screenshots_per_language)
+      is_failure = states.fetch("FAILED", 0) > 0
+      is_missing_screenshot = states.reduce(0) { |sum, (k, v)| sum + v } != number_of_screenshots && !screenshots_per_language.empty?
+
+      if is_failure || is_missing_screenshot
+        if tries.zero?
+          incomplete_screenshot_count = states.reject { |k, v| k == 'COMPLETE' }.reduce(0) { |sum, (k, v)| sum + v }
+          UI.user_error!("Failed verification of all screenshots uploaded... #{incomplete_screenshot_count} incomplete screenshot(s) still exist")
+        else
+          UI.error("Failed to upload all screenshots... Tries remaining: #{tries}")
+          # Delete bad entries before retry
+          iterator.each_app_screenshot do |_, _, app_screenshot|
+            app_screenshot.delete! unless app_screenshot.complete?
           end
-
-          unless set
-            set = localization.create_app_screenshot_set(attributes: {
-              screenshotDisplayType: display_type
-            })
-            app_screenshot_sets_map[display_type] = set
-
-            indized[localization.locale][set.screenshot_display_type] = {
-              count: 0,
-              checksums: []
-            }
-          end
-
-          index = indized[localization.locale][set.screenshot_display_type][:count]
-
-          if index >= 10
-            UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
-            next
-          end
-
-          bytes = File.binread(screenshot.path)
-          checksum = Digest::MD5.hexdigest(bytes)
-          duplicate = indized[localization.locale][set.screenshot_display_type][:checksums].include?(checksum)
-
-          if duplicate
-            UI.message("Previous uploaded. Skipping '#{screenshot.path}'...")
-          else
-            indized[localization.locale][set.screenshot_display_type][:count] += 1
-            UI.message("Uploading '#{screenshot.path}'...")
-            set.upload_screenshot(path: screenshot.path, wait_for_processing: wait_for_processing)
-          end
+          upload_screenshots(localizations, screenshots_per_language, tries: tries)
         end
       end
-      UI.success("Successfully uploaded screenshots to App Store Connect")
+    end
+
+    def sort_screenshots(localizations)
+      iterator = AppScreenshotIterator.new(localizations)
+
+      # Re-order screenshots within app_screenshot_set
+      worker = QueueWorker.new(NUMBER_OF_THREADS) do |app_screenshot_set|
+        original_ids = app_screenshot_set.app_screenshots.map(&:id)
+        sorted_ids = app_screenshot_set.app_screenshots.sort_by(&:file_name).map(&:id)
+        if original_ids != sorted_ids
+          app_screenshot_set.reorder_screenshots(app_screenshot_ids: sorted_ids)
+        end
+      end
+
+      iterator.each_app_screenshot_set do |_, app_screenshot_set|
+        worker.enqueue(app_screenshot_set)
+      end
+
+      worker.start
     end
 
     def collect_screenshots(options)
@@ -267,6 +290,12 @@ module Deliver
       else
         Spaceship::Tunes.client.available_languages
       end
+    end
+
+    # helper method to mock this step in tests
+    def self.calculate_checksum(path)
+      bytes = File.binread(path)
+      Digest::MD5.hexdigest(bytes)
     end
   end
 end

@@ -29,6 +29,7 @@ module Spaceship
       #
 
       def update(attributes: nil)
+        attributes = reverse_attr_mapping(attributes)
         Spaceship::ConnectAPI.patch_idfa_declaration(idfa_declaration_id: id, attributes: attributes)
       end
 

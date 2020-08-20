@@ -10,6 +10,7 @@ module Spaceship
       attr_accessor :bundle_id
       attr_accessor :sku
       attr_accessor :primary_locale
+      attr_accessor :is_opted_in_to_distribute_ios_app_on_mac_app_store
       attr_accessor :removed
       attr_accessor :is_aag
       attr_accessor :available_in_new_territories
@@ -26,6 +27,7 @@ module Spaceship
         "bundleId" => "bundle_id",
         "sku" => "sku",
         "primaryLocale" => "primary_locale",
+        "isOptedInToDistributeIosAppOnMacAppStore" => "is_opted_in_to_distribute_ios_app_on_mac_app_store",
         "removed" => "removed",
         "isAAG" => "is_aag",
         "availableInNewTerritories" => "available_in_new_territories",
@@ -71,12 +73,28 @@ module Spaceship
       end
 
       def update(attributes: nil, app_price_tier_id: nil, territory_ids: nil)
+        attributes = reverse_attr_mapping(attributes)
         return Spaceship::ConnectAPI.patch_app(app_id: id, attributes: attributes, app_price_tier_id: app_price_tier_id, territory_ids: territory_ids)
       end
 
       #
       # App Info
       #
+
+      def fetch_live_app_info(includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
+        states = [
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::READY_FOR_SALE,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_DEVELOPER_RELEASE,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::PROCESSING_FOR_APP_STORE,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::IN_REVIEW
+        ]
+
+        filter = { app: id }
+        resp = Spaceship::ConnectAPI.get_app_infos(filter: filter, includes: includes)
+        return resp.to_models.select do |model|
+          states.include?(model.app_store_state)
+        end.first
+      end
 
       def fetch_edit_app_info(includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
         states = [
@@ -101,8 +119,8 @@ module Spaceship
 
       def fetch_available_territories(filter: {}, includes: nil, limit: nil, sort: nil)
         filter ||= {}
-        resp = Spaceship::ConnectAPI.get_available_territories(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
-        return resp.to_models
+        resps = Spaceship::ConnectAPI.get_available_territories(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.flat_map(&:to_models)
       end
 
       #
@@ -113,6 +131,16 @@ module Spaceship
         filter ||= {}
         filter[:app] = id
         resp = Spaceship::ConnectAPI.get_app_prices(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
+        return resp.to_models
+      end
+
+      #
+      # App Pricing Point
+      #
+
+      def fetch_app_price_points(filter: {}, includes: "priceTier,territory", limit: nil, sort: nil)
+        filter ||= {}
+        resp = Spaceship::ConnectAPI.get_app_price_points(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       end
 
@@ -162,10 +190,22 @@ module Spaceship
         end
       end
 
+      def get_latest_app_store_version(platform: nil, includes: nil)
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          platform: platform
+        }
+
+        # Get the latest version
+        return get_app_store_versions(filter: filter, includes: includes)
+               .sort_by { |v| Date.parse(v.created_date) }
+               .last
+      end
+
       def get_live_app_store_version(platform: nil, includes: nil)
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: [Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE].join(","),
+          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
           platform: platform
         }
         return get_app_store_versions(filter: filter, includes: includes).first
@@ -189,6 +229,24 @@ module Spaceship
         return get_app_store_versions(filter: filter, includes: includes)
                .sort_by { |v| Gem::Version.new(v.version_string) }
                .last
+      end
+
+      def get_in_review_app_store_version(platform: nil, includes: nil)
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::IN_REVIEW,
+          platform: platform
+        }
+        return get_app_store_versions(filter: filter, includes: includes).first
+      end
+
+      def get_pending_release_app_store_version(platform: nil, includes: nil)
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_DEVELOPER_RELEASE,
+          platform: platform
+        }
+        return get_app_store_versions(filter: filter, includes: includes).first
       end
 
       def get_app_store_versions(filter: {}, includes: nil, limit: nil, sort: nil)

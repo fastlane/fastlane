@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Josh Holtz",
-                        "Matthew Ellis",
-                        "Daniel Jankowski",
-                        "Felix Krause",
+  spec.authors       = ["Aaron Brager",
                         "Luka Mirosevic",
-                        "Iulian Onofrei",
-                        "Andrew McBurney",
-                        "Fumiya Nakamura",
-                        "Jan Piotrowski",
-                        "Stefan Natchev",
-                        "Jérôme Lacoste",
-                        "Manu Wallner",
-                        "Jorge Revuelta H",
-                        "Joshua Liebowitz",
-                        "Kohki Miki",
-                        "Jimmy Dee",
-                        "Olivier Halligon",
                         "Maksym Grebenets",
-                        "Helmut Januschka",
+                        "Jorge Revuelta H",
+                        "Manu Wallner",
+                        "Stefan Natchev",
+                        "Andrew McBurney",
+                        "Matthew Ellis",
+                        "Josh Holtz",
                         "Max Ott",
+                        "Iulian Onofrei",
+                        "Joshua Liebowitz",
+                        "Jimmy Dee",
+                        "Daniel Jankowski",
+                        "Jan Piotrowski",
+                        "Kohki Miki",
+                        "Jérôme Lacoste",
+                        "Fumiya Nakamura",
+                        "Olivier Halligon",
+                        "Felix Krause",
                         "Danielle Tomlinson",
-                        "Aaron Brager"]
+                        "Helmut Januschka"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -76,12 +76,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency('commander-fastlane', '>= 4.4.6', '< 5.0.0') # CLI parser
   spec.add_dependency('excon', '>= 0.71.0', '< 1.0.0') # Great HTTP Client
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
-  # The faraday gem is used for deploygate, hockey and testfairy actions.
-  # Locked under 1.0 until webmock 3.6.0 can be used to handle empty array
-  # parameters https://github.com/bblimke/webmock/blob/master/CHANGELOG.md#360,
-  # probably.
-  spec.add_dependency('faraday', '>= 0.17', '< 1.0')
-  spec.add_dependency('faraday_middleware', '>= 0.13.1', '< 2.0') # Same as faraday
+  spec.add_dependency('faraday', '~> 1.0') # The faraday gem is used for deploygate, hockey and testfairy actions.
+  spec.add_dependency('faraday_middleware', '~> 1.0') # Same as faraday
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
@@ -106,15 +102,14 @@ Gem::Specification.new do |spec|
 
   # Development only
   spec.add_development_dependency('rake')
-  spec.add_development_dependency('rspec', '~> 3.5.0')
-  spec.add_development_dependency('rspec_junit_formatter', '~> 0.2.3')
+  spec.add_development_dependency('rspec', '~> 3.9.0')
+  spec.add_development_dependency('rspec_junit_formatter', '~> 0.4.1')
   spec.add_development_dependency('pry')
   spec.add_development_dependency('pry-byebug')
   spec.add_development_dependency('pry-rescue')
   spec.add_development_dependency('pry-stack_explorer')
   spec.add_development_dependency('yard', '~> 0.9.11')
-  spec.add_development_dependency('webmock', '~> 2.3.2')
-  spec.add_development_dependency('hashdiff', '< 0.4.0') # Locked under 0.4.0 until webmock bumped up to 3.6.0 or greater - HashDiff was changed to Hashdiff
+  spec.add_development_dependency('webmock', '~> 3.8')
   spec.add_development_dependency('coveralls', '~> 0.8.13')
   spec.add_development_dependency('rubocop', Fastlane::RUBOCOP_REQUIREMENT)
   spec.add_development_dependency('rubocop-require_tools', '>= 0.1.2')

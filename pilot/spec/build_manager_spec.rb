@@ -30,9 +30,14 @@ describe "Build Manager" do
       changelog = Pilot::BuildManager.sanitize_changelog(changelog)
       expect(changelog).to eq("I'm Ban!")
     end
-    it "removes emoji before truncating" do
+    it "removes less than symbols" do
+      changelog = "I'm <script>man<<!"
+      changelog = Pilot::BuildManager.sanitize_changelog(changelog)
+      expect(changelog).to eq("I'm script>man!")
+    end
+    it "removes prohibited symbols before truncating" do
       changelog = File.read("./pilot/spec/fixtures/build_manager/changelog_long")
-      changelog = "🎉🎉🎉#{changelog}"
+      changelog = "🎉<🎉<🎉#{changelog}🎉<🎉<🎉"
       changelog = Pilot::BuildManager.sanitize_changelog(changelog)
       expect(changelog).to eq(File.read("./pilot/spec/fixtures/build_manager/changelog_long_truncated"))
     end

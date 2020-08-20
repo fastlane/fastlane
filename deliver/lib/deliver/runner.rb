@@ -91,9 +91,7 @@ module Deliver
       app_version = options[:app_version]
       UI.message("Making sure the latest version on App Store Connect matches '#{app_version}'...")
 
-      legacy_app = options[:app]
-      app_id = legacy_app.apple_id
-      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+      app = options[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       changed = app.ensure_version!(app_version, platform: platform)
@@ -142,14 +140,14 @@ module Deliver
 
       if upload_ipa
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
-          app_id: options[:app].apple_id,
+          app_id: options[:app].id,
           ipa_path: options[:ipa],
           package_path: "/tmp",
           platform: options[:platform]
         )
       elsif upload_pkg
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
-          app_id: options[:app].apple_id,
+          app_id: options[:app].id,
           pkg_path: options[:pkg],
           package_path: "/tmp",
           platform: options[:platform]
@@ -157,15 +155,12 @@ module Deliver
       end
 
       transporter = transporter_for_selected_team
-      result = transporter.upload(options[:app].apple_id, package_path)
+      result = transporter.upload(options[:app].id, package_path)
       UI.user_error!("Could not upload binary to App Store Connect. Check out the error above", show_github_issues: true) unless result
     end
 
     def reject_version_if_possible
-      legacy_app = options[:app]
-      app_id = legacy_app.apple_id
-      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
-
+      app = options[:app]
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       if app.reject_version_if_possible!(platform: platform)
         UI.success("Successfully rejected previous version!")

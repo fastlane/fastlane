@@ -8,10 +8,10 @@ module Deliver
     LOCALISED_VERSION_VALUES = {
       description: "description",
       keywords: "keywords",
-      release_notes: "whatsNew",
-      support_url: "supportUrl",
-      marketing_url: "marketingUrl",
-      promotional_text: "promotionalText"
+      release_notes: "whats_new",
+      support_url: "support_url",
+      marketing_url: "marketing_url",
+      promotional_text: "promotional_text"
     }
 
     # Everything attached to the version but not being localised
@@ -23,14 +23,19 @@ module Deliver
     LOCALISED_APP_VALUES = {
       name: "name",
       subtitle: "subtitle",
-      privacy_url: "privacyPolicyUrl",
-      apple_tv_privacy_policy: "privacyPolicyText"
+      privacy_url: "privacy_policy_url",
+      apple_tv_privacy_policy: "privacy_policy_text"
     }
 
     # Non localized app details values
-    NON_LOCALISED_APP_VALUES = [:primary_category, :secondary_category,
-                                :primary_first_sub_category, :primary_second_sub_category,
-                                :secondary_first_sub_category, :secondary_second_sub_category]
+    NON_LOCALISED_APP_VALUES = {
+      primary_category: :primary_category,
+      secondary_category: :secondary_category,
+      primary_first_sub_category: :primary_subcategory_one,
+      primary_second_sub_category: :primary_subcategory_two,
+      secondary_first_sub_category: :secondary_subcategory_one,
+      secondary_second_sub_category: :secondary_subcategory_two
+    }
 
     # Review information values
     REVIEW_INFORMATION_VALUES_LEGACY = {
@@ -43,12 +48,12 @@ module Deliver
       review_notes: :notes
     }
     REVIEW_INFORMATION_VALUES = {
-      first_name: "contactFirstName",
-      last_name: "contactLastName",
-      phone_number: "contactPhone",
-      email_address: "contactEmail",
-      demo_user: "demoAccountName",
-      demo_password: "demoAccountPassword",
+      first_name: "contact_first_name",
+      last_name: "contact_last_name",
+      phone_number: "contact_phone",
+      email_address: "contact_email",
+      demo_user: "demo_account_name",
+      demo_password: "demo_account_password",
       notes: "notes"
     }
 
@@ -74,9 +79,7 @@ module Deliver
     def upload(options)
       return if options[:skip_metadata]
 
-      legacy_app = options[:app]
-      app_id = legacy_app.apple_id
-      app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+      app = options[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
 
@@ -175,6 +178,11 @@ module Deliver
                      end
       non_localized_version_attributes['releaseType'] = release_type
 
+      # Update app store version
+      # This needs to happen before updating localizations (https://openradar.appspot.com/radar?id=4925914991296512)
+      UI.message("Uploading metadata to App Store Connect for version")
+      version.update(attributes: non_localized_version_attributes)
+
       # Update app store version localizations
       app_store_version_localizations.each do |app_store_version_localization|
         attributes = localized_version_attributes_by_locale[app_store_version_localization.locale]
@@ -192,10 +200,6 @@ module Deliver
           app_info_localization.update(attributes: attributes)
         end
       end
-
-      # Update app store version
-      UI.message("Uploading metadata to App Store Connect for version")
-      version.update(attributes: non_localized_version_attributes)
 
       # Update categories
       app_info = app.fetch_edit_app_info
@@ -494,7 +498,7 @@ module Deliver
       end
 
       # Load non localised data
-      (NON_LOCALISED_VERSION_VALUES.keys + NON_LOCALISED_APP_VALUES).each do |key|
+      (NON_LOCALISED_VERSION_VALUES.keys + NON_LOCALISED_APP_VALUES.keys).each do |key|
         path = File.join(options[:metadata_path], "#{key}.txt")
         next unless File.exist?(path)
 
@@ -503,13 +507,30 @@ module Deliver
       end
 
       # Load review information
-      options[:app_review_information] ||= {}
-      REVIEW_INFORMATION_VALUES.keys.each do |option_name|
+      # This is used to find the file path for both new and legacy review information filenames
+      resolve_review_info_path = lambda do |option_name|
         path = File.join(options[:metadata_path], REVIEW_INFORMATION_DIR, "#{option_name}.txt")
-        next unless File.exist?(path)
-        next if options[:app_review_information][option_name].to_s.length > 0
+        return nil unless File.exist?(path)
+        return nil if options[:app_review_information][option_name].to_s.length > 0
 
         UI.message("Loading '#{path}'...")
+        return path
+      end
+
+      # First try and load review information from legacy filenames
+      options[:app_review_information] ||= {}
+      REVIEW_INFORMATION_VALUES_LEGACY.each do |legacy_option_name, option_name|
+        path = resolve_review_info_path.call(legacy_option_name)
+        next if path.nil?
+        options[:app_review_information][option_name] ||= File.read(path)
+
+        UI.deprecated("Review rating option '#{legacy_option_name}' from iTunesConnect has been deprecated. Please replace with '#{option_name}'")
+      end
+
+      # Then load review information from new App Store Connect filenames
+      REVIEW_INFORMATION_VALUES.keys.each do |option_name|
+        path = resolve_review_info_path.call(option_name)
+        next if path.nil?
         options[:app_review_information][option_name] ||= File.read(path)
       end
     end
@@ -541,10 +562,10 @@ module Deliver
         attributes[attribute_name] = strip_value unless strip_value.empty?
       end
 
-      if !attributes["demoAccountName"].to_s.empty? && !attributes["demoAccountPassword"].to_s.empty?
-        attributes["demoAccountRequired"] = true
+      if !attributes["demo_account_name"].to_s.empty? && !attributes["demo_account_password"].to_s.empty?
+        attributes["demo_account_required"] = true
       else
-        attributes["demoAccountRequired"] = false
+        attributes["demo_account_required"] = false
       end
 
       UI.message("Uploading app review information to App Store Connect")

@@ -88,8 +88,8 @@ module Spaceship
         handle_response(response)
       end
 
-      def post(url_or_path, body)
-        response = with_asc_retry do
+      def post(url_or_path, body, tries: 5)
+        response = with_asc_retry(tries) do
           request(:post) do |req|
             req.url(url_or_path)
             req.body = body.to_json
@@ -129,7 +129,6 @@ module Spaceship
         tries = 1 if Object.const_defined?("SpecHelper")
         response = yield
 
-        tries -= 1
         status = response.status if response
 
         if [500, 504].include?(status)
@@ -139,6 +138,7 @@ module Spaceship
 
         return response
       rescue => error
+        tries -= 1
         puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
           return response
@@ -163,6 +163,8 @@ module Spaceship
         raise UnexpectedResponse, handle_errors(response) if response.body['errors']
 
         raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
+
+        store_csrf_tokens(response)
 
         return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, client: self)
       end
