@@ -18,21 +18,24 @@ module Spaceship
       attr_reader :text
       attr_reader :expiration
 
+      # Temporary attribute not needed to create the JWT text
+      # There is no way to determine if the team associated with this
+      # key is for App Store or Enterprise so this is the temporary workaround
       attr_accessor :in_house
 
-      def self.load_json_file(filepath)
+      def self.from_json_file(filepath)
         json = JSON.parse(File.read(filepath), { symbolize_names: true })
+
+        missing_keys = []
+        missing_keys << 'key_id' unless json.key?(:key_id)
+        missing_keys << 'issuer_id' unless json.key?(:issuer_id)
+        missing_keys << 'key' unless json.key?(:key)
+
+        unless missing_keys.empty?
+          raise "App Store Connect API key JSON is missing field(s): #{missing_keys.join(', ')}"
+        end
+
         self.create(json)
-      end
-
-      def self.load_hash(hash)
-        key_id = hash[:key_id]
-        issuer_id = hash[:issuer_id]
-        key = hash[:key]
-
-        key = OpenSSL::PKey::EC.new(key)
-
-        self.new(key_id: key_id, issuer_id: issuer_id, key: key)
       end
 
       def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, duration: nil, in_house: nil)

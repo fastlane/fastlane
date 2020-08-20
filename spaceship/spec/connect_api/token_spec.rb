@@ -1,6 +1,60 @@
+require 'tempfile'
+
 describe Spaceship::ConnectAPI::Token do
   let(:key_id) { 'BA5176BF04' }
   let(:issuer_id) { '693fbb20-54a0-4d94-88ce-8a6caf875439' }
+
+  context '#from_json_file' do
+    let(:fake_api_key_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key.json" }
+    let(:fake_api_key_in_house_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key_in_house.json" }
+
+    it 'successfully creates token' do
+      token = Spaceship::ConnectAPI::Token.from_json_file(fake_api_key_json_path)
+
+      expect(token.key_id).to eq("D485S484")
+      expect(token.issuer_id).to eq("061966a2-5f3c-4185-af13-70e66d2263f5")
+      expect(token.in_house).to be_nil
+    end
+
+    it 'successfully creates token with in_house' do
+      token = Spaceship::ConnectAPI::Token.from_json_file(fake_api_key_in_house_json_path)
+
+      expect(token.key_id).to eq("D485S484")
+      expect(token.issuer_id).to eq("061966a2-5f3c-4185-af13-70e66d2263f5")
+      expect(token.in_house).to eq(true)
+    end
+
+    it 'raises error with invalid JSON' do
+      file = Tempfile.new('key.json')
+      file.write('abc123')
+      file.close
+
+      expect do
+        Spaceship::ConnectAPI::Token.from_json_file(file.path)
+      end.to raise_error(JSON::ParserError, /unexpected token/)
+    end
+
+    it 'raises error with missing all keys' do
+      file = Tempfile.new('key.json')
+      file.write('{"thing":"thing"}')
+      file.close
+      expect do
+        Spaceship::ConnectAPI::Token.from_json_file(file.path)
+      end.to raise_error("App Store Connect API key JSON is missing field(s): key_id, issuer_id, key")
+    end
+
+    it 'raises error with missing key' do
+      file = Tempfile.new('key.json')
+      file.write('{"key_id":"thing", "issuer_id": "thing"}')
+      file.close
+      expect do
+        Spaceship::ConnectAPI::Token.from_json_file(file.path)
+      end.to raise_error("App Store Connect API key JSON is missing field(s): key")
+    end
+  end
+
+  context '#create' do
+  end
 
   context 'init' do
     let(:private_key) do
