@@ -343,16 +343,15 @@ module Pilot
       builds_to_expire.each(&:expire!)
     end
 
-    # If
+    # If App Store Connect API token, use token.
     # If itc_provider was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
       # Use JWT auth
-      if Spaceship::ConnectAPI.token?
-        token = Spaceship::ConnectAPI.token
-        token.refresh! if token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, token.text)
+      unless api_token.nil?
+        api_token.refresh! if api_token.expired?
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)
       end
 
       # Otherwise use username and password
@@ -365,10 +364,14 @@ module Pilot
       begin
         team = tunes_client.teams.find { |t| t['contentProvider']['contentProviderId'].to_s == tunes_client.team_id }
         name = team['contentProvider']['name']
+        STDERR.puts("name: #{name}")
+        STDERR.puts("id: #{generic_transporter.provider_ids}")
         provider_id = generic_transporter.provider_ids[name]
+        STDERR.puts("provider_id: #{provider_id}")
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
         return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
       rescue => ex
+        STDERR.puts(ex.to_s)
         UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")
         return generic_transporter
       end

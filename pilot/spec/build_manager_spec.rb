@@ -425,4 +425,105 @@ describe "Build Manager" do
       end
     end
   end
+
+  describe "#transporter_for_selected_team" do
+    let(:fake_manager) { Pilot::BuildManager.new }
+    let(:fake_api_key_json_path) do
+      "./spaceship/spec/connect_api/fixtures/asc_key.json"
+    end
+
+    let(:selected_team_id) { "123" }
+    let(:selected_team_name) { "123 name" }
+    let(:selected_team) do
+      {
+        "contentProvider" => {
+          "contentProviderId" => selected_team_id,
+          "name" => selected_team_name
+        }
+      }
+    end
+    let(:unselected_team) do
+      {
+        "contentProvider" => {
+          "contentProviderId" => "456",
+          "name" => "456 name"
+        }
+      }
+    end
+
+    it "with API token" do
+      options = { api_key_path: fake_api_key_json_path }
+      fake_manager.instance_variable_set(:@config, options)
+
+      transporter = fake_manager.send(:transporter_for_selected_team, options)
+      expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
+      expect(transporter.instance_variable_get(:@user)).to be_nil
+      expect(transporter.instance_variable_get(:@password)).to be_nil
+      expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
+    end
+
+    describe "with itc_provider" do
+      it "with nil Spaceship::TunesClient" do
+        options = { username: "josh", itc_provider: "123456789" }
+        fake_manager.instance_variable_set(:@config, options)
+
+        allow(Spaceship::ConnectAPI).to receive(:client).and_return(nil)
+
+        transporter = fake_manager.send(:transporter_for_selected_team, options)
+        expect(transporter.instance_variable_get(:@jwt)).to be_nil
+        expect(transporter.instance_variable_get(:@user)).not_to(be_nil)
+        expect(transporter.instance_variable_get(:@password)).not_to(be_nil) # Loaded with spec_helper
+        expect(transporter.instance_variable_get(:@provider_short_name)).to eq("123456789")
+      end
+
+      it "with nil Spaceship::TunesClient" do
+        options = { username: "josh", itc_provider: "123456789" }
+        fake_manager.instance_variable_set(:@config, options)
+
+        allow(Spaceship::ConnectAPI).to receive(:client).and_return(double)
+        allow(Spaceship::ConnectAPI.client).to receive(:tunes_client).and_return(double)
+
+        transporter = fake_manager.send(:transporter_for_selected_team, options)
+        expect(transporter.instance_variable_get(:@jwt)).to be_nil
+        expect(transporter.instance_variable_get(:@user)).not_to(be_nil)
+        expect(transporter.instance_variable_get(:@password)).not_to(be_nil) # Loaded with spec_helper
+        expect(transporter.instance_variable_get(:@provider_short_name)).to eq("123456789")
+      end
+    end
+
+    it "with one team id" do
+      options = { username: "josh" }
+      fake_manager.instance_variable_set(:@config, options)
+
+      fake_tunes_client = double('tunes client')
+      allow(Spaceship::ConnectAPI).to receive(:client).and_return(double)
+      allow(Spaceship::ConnectAPI.client).to receive(:tunes_client).and_return(fake_tunes_client)
+      expect(fake_tunes_client).to receive(:teams).and_return([selected_team])
+
+      transporter = fake_manager.send(:transporter_for_selected_team, options)
+      expect(transporter.instance_variable_get(:@jwt)).to be_nil
+      expect(transporter.instance_variable_get(:@user)).not_to(be_nil)
+      expect(transporter.instance_variable_get(:@password)).not_to(be_nil) # Loaded with spec_helper
+      expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
+    end
+
+    it "with inferred provider id" do
+      options = { username: "josh" }
+      fake_manager.instance_variable_set(:@config, options)
+
+      fake_tunes_client = double('tunes client')
+      allow(Spaceship::ConnectAPI).to receive(:client).and_return(double)
+      allow(Spaceship::ConnectAPI.client).to receive(:tunes_client).and_return(fake_tunes_client)
+      allow(fake_tunes_client).to receive(:team_id).and_return(selected_team_id)
+      allow(fake_tunes_client).to receive(:teams).and_return([unselected_team, selected_team])
+
+      allow_any_instance_of(FastlaneCore::ItunesTransporter).to receive(:provider_ids).and_return({ selected_team_name.to_s => selected_team_id })
+
+      transporter = fake_manager.send(:transporter_for_selected_team, options)
+      expect(transporter.instance_variable_get(:@jwt)).to be_nil
+      expect(transporter.instance_variable_get(:@user)).not_to(be_nil)
+      expect(transporter.instance_variable_get(:@password)).not_to(be_nil) # Loaded with spec_helper
+      expect(transporter.instance_variable_get(:@provider_short_name)).to eq(selected_team_id)
+    end
+  end
 end
