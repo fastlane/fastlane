@@ -16,6 +16,7 @@ module Spaceship
       attr_reader :key_id
       attr_reader :issuer_id
       attr_reader :text
+      attr_reader :duration
       attr_reader :expiration
 
       # Temporary attribute not needed to create the JWT text
@@ -45,8 +46,9 @@ module Spaceship
         duration ||= ENV['SPACESHIP_CONNECT_API_TOKEN_DURATION']
 
         in_house_env = ENV['SPACESHIP_CONNECT_API_IN_HOUSE']
-        in_house ||= !["no", "false", "off", "0"].include?(in_house_env) if in_house_env
+        in_house ||= !["", "no", "false", "off", "0"].include?(in_house_env) if in_house_env
 
+        key ||= ENV['SPACESHIP_CONNECT_API_KEY']
         key ||= File.binread(filepath)
 
         self.new(
@@ -66,12 +68,13 @@ module Spaceship
         @in_house = in_house
 
         @duration ||= MAX_TOKEN_DURATION
+        @duration = @duration.to_i if @duration
 
         refresh!
       end
 
       def refresh!
-        @expiration = Time.now + @duration.to_i
+        @expiration = Time.now + @duration
 
         header = {
           kid: key_id

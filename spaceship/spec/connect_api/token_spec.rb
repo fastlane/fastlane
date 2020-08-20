@@ -54,6 +54,83 @@ describe Spaceship::ConnectAPI::Token do
   end
 
   context '#create' do
+    let(:private_key) do
+      key = OpenSSL::PKey::EC.new('prime256v1')
+      key.generate_key
+      key
+    end
+
+    it "with arguments with key" do
+      token = Spaceship::ConnectAPI::Token.create(
+        key_id: "key_id",
+        issuer_id: "issuer_id",
+        key: private_key,
+        duration: 200,
+        in_house: true
+      )
+
+      expect(token.key_id).to eq('key_id')
+      expect(token.issuer_id).to eq('issuer_id')
+      expect(token.text).not_to(be_nil)
+      expect(token.duration).to eq(200)
+      expect(token.in_house).to eq(true)
+    end
+
+    it "with arguments with filepath" do
+      expect(File).to receive(:binread).with('/path/to/file').and_return(private_key)
+      token = Spaceship::ConnectAPI::Token.create(
+        key_id: "key_id",
+        issuer_id: "issuer_id",
+        filepath: "/path/to/file",
+        duration: 200,
+        in_house: true
+      )
+
+      expect(token.key_id).to eq('key_id')
+      expect(token.issuer_id).to eq('issuer_id')
+      expect(token.text).not_to(be_nil)
+      expect(token.duration).to eq(200)
+      expect(token.in_house).to eq(true)
+    end
+
+    it "with environment variables with key" do
+      stub_const('ENV', {
+        'SPACESHIP_CONNECT_API_KEY_ID' => 'key_id',
+        'SPACESHIP_CONNECT_API_ISSUER_ID' => 'issuer_id',
+        'SPACESHIP_CONNECT_API_KEY_FILEPATH' => nil,
+        'SPACESHIP_CONNECT_API_TOKEN_DURATION' => '200',
+        'SPACESHIP_CONNECT_API_IN_HOUSE' => 'no',
+        'SPACESHIP_CONNECT_API_KEY' => private_key
+      })
+
+      token = Spaceship::ConnectAPI::Token.create
+
+      expect(token.key_id).to eq('key_id')
+      expect(token.issuer_id).to eq('issuer_id')
+      expect(token.text).not_to(be_nil)
+      expect(token.duration).to eq(200)
+      expect(token.in_house).to eq(false)
+    end
+
+    it "with environment variables with filepath" do
+      expect(File).to receive(:binread).with('/path/to/file').and_return(private_key)
+      stub_const('ENV', {
+        'SPACESHIP_CONNECT_API_KEY_ID' => 'key_id',
+        'SPACESHIP_CONNECT_API_ISSUER_ID' => 'issuer_id',
+        'SPACESHIP_CONNECT_API_KEY_FILEPATH' => '/path/to/file',
+        'SPACESHIP_CONNECT_API_TOKEN_DURATION' => '200',
+        'SPACESHIP_CONNECT_API_IN_HOUSE' => 'true',
+        'SPACESHIP_CONNECT_API_KEY' => nil
+      })
+
+      token = Spaceship::ConnectAPI::Token.create
+
+      expect(token.key_id).to eq('key_id')
+      expect(token.issuer_id).to eq('issuer_id')
+      expect(token.text).not_to(be_nil)
+      expect(token.duration).to eq(200)
+      expect(token.in_house).to eq(true)
+    end
   end
 
   context 'init' do
