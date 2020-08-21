@@ -26,6 +26,7 @@ describe Fastlane do
         }
 
         expect(result).to eq(hash)
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY]).to eq(hash)
       end
 
       it "with key_content" do

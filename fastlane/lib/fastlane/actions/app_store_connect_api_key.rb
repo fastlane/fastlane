@@ -17,6 +17,8 @@ module Fastlane
           UI.user_error!(":key_content or :key_filepath is required")
         end
 
+        # This hash matches the named arguments on
+        # the Spaceship::ConnectAPI::Token.create method
         key = {
           key_id: key_id,
           issuer_id: issuer_id,
@@ -70,7 +72,7 @@ module Fastlane
 
       def self.output
         [
-          ['APP_STORE_CONNECT_API_KEY', 'The App Store Connect API key used for authorization requests']
+          ['APP_STORE_CONNECT_API_KEY', 'The App Store Connect API key information used for authorization requests. This hash can be passed directly into the :api_key options on other tools or into Spaceship::ConnectAPI::Token.create method']
         ]
       end
 
