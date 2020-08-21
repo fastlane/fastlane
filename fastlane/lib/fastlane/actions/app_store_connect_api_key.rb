@@ -86,7 +86,7 @@ module Fastlane
 
       def self.details
         [
-          "Something"
+          "Load the App Store Connect API token to use in other fastlane tools and actions"
         ].join("\n")
       end
 
