@@ -91,9 +91,21 @@ module Fastlane
       def self.example_code
         [
           'app_store_connect_api_key(
-            id: "D83848D23",
+            key_id: "D83848D23",
             issuer_id: "227b0bbf-ada8-458c-9d62-3d8022b7d07f",
-            filepath: "D83848D23.p8"
+            key_filepath: "D83848D23.p8"
+          )',
+          'app_store_connect_api_key(
+            key_id: "D83848D23",
+            issuer_id: "227b0bbf-ada8-458c-9d62-3d8022b7d07f",
+            key_filepath: "D83848D23.p8",
+            duration: 200,
+            in_house: true
+          )',
+          'app_store_connect_api_key(
+            key_id: "D83848D23",
+            issuer_id: "227b0bbf-ada8-458c-9d62-3d8022b7d07f",
+            key_content: "-----BEGIN EC PRIVATE KEY-----\nfewfawefawfe\n-----END EC PRIVATE KEY-----"
           )'
         ]
       end
