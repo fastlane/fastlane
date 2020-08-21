@@ -10,7 +10,7 @@ module Spaceship
 
         def test_flight_request_client
           return @test_flight_request_client if @test_flight_request_client
-          raise TypeError, "You need to instantiate this module with test_flight_request_client, man!"
+          raise TypeError, "You need to instantiate this module with test_flight_request_client"
         end
 
         #

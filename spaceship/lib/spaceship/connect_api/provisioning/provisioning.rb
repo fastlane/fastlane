@@ -10,7 +10,7 @@ module Spaceship
 
         def provisioning_request_client
           return @provisioning_request_client if @provisioning_request_client
-          raise TypeError, "You need to instantiate this module with provisioning_request_client, man!"
+          raise TypeError, "You need to instantiate this module with provisioning_request_client"
         end
 
         #

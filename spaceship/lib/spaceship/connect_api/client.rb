@@ -101,39 +101,47 @@ module Spaceship
       def set_indvidual_clients(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil)
         # This was added by Spaceship::ConnectAPI::TestFlight::API and is required
         # to be set for API methods to have a client to send request on
-        self.test_flight_request_client = Spaceship::ConnectAPI::TestFlight::Client.new(
-          cookie: cookie,
-          current_team_id: current_team_id,
-          token: token,
-          another_client: tunes_client
-        )
+        if cookie || token || tunes_client
+          self.test_flight_request_client = Spaceship::ConnectAPI::TestFlight::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: tunes_client
+          )
+        end
 
         # This was added by Spaceship::ConnectAPI::Tunes::API and is required
         # to be set for API methods to have a client to send request on
-        self.tunes_request_client = Spaceship::ConnectAPI::Tunes::Client.new(
-          cookie: cookie,
-          current_team_id: current_team_id,
-          token: token,
-          another_client: tunes_client
-        )
+        if cookie || token || tunes_client
+          self.tunes_request_client = Spaceship::ConnectAPI::Tunes::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: tunes_client
+          )
+        end
 
         # This was added by Spaceship::ConnectAPI::Provisioning::API and is required
         # to be set for API methods to have a client to send request on
-        self.provisioning_request_client = Spaceship::ConnectAPI::Provisioning::Client.new(
-          cookie: cookie,
-          current_team_id: current_team_id,
-          token: token,
-          another_client: portal_client
-        )
+        if cookie || token || portal_client
+          self.provisioning_request_client = Spaceship::ConnectAPI::Provisioning::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: portal_client
+          )
+        end
 
         # This was added by Spaceship::ConnectAPI::Users::API and is required
         # to be set for API methods to have a client to send request on
-        self.users_request_client = Spaceship::ConnectAPI::Users::Client.new(
-          cookie: cookie,
-          current_team_id: current_team_id,
-          token: token,
-          another_client: tunes_client
-        )
+        if cookie || token || tunes_client
+          self.users_request_client = Spaceship::ConnectAPI::Users::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: tunes_client
+          )
+        end
       end
     end
   end

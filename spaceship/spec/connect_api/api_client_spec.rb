@@ -1,5 +1,10 @@
 describe Spaceship::ConnectAPI::APIClient do
-  let(:client) { Spaceship::ConnectAPI::APIClient.new }
+  let(:mock_token) { double('token') }
+  let(:client) { Spaceship::ConnectAPI::APIClient.new(token: mock_token) }
+
+  before(:each) do
+    allow(mock_token).to receive(:text).and_return("ewfawef")
+  end
 
   context 'build_params' do
     let(:path) { "betaAppReviewDetails" }

@@ -16,13 +16,10 @@ module Spaceship
           ServiceOption.new("Legacy iTunesConnect", "appstoreconnect.apple.com/WebObjects/iTunesConnect.woa", "Web session"),
           ServiceOption.new("Legacy iTunesConnect Developer Portal", "developer.apple.com/services-account", "Web session")
         ]
-
-        @services
       end
 
       def service_stats
         @service_stats ||= Hash.new(0)
-        @service_stats
       end
     end
 
@@ -41,7 +38,7 @@ module Spaceship
         uri.to_s.include?(s.url)
       end
 
-      service = ServiceOption.new("", uri.host, "") if service.nil?
+      service = ServiceOption.new("Unknown", uri.host, "Unknown") if service.nil?
       StatsMiddleware.service_stats[service] += 1
 
       return true

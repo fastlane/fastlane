@@ -9,6 +9,7 @@ module Spaceship
       attr_accessor :client
 
       # Forward class calls to the global client
+      # This is implemented for backwards compatibility
       extend(Forwardable)
       def_delegators(:client, *Spaceship::ConnectAPI::Provisioning::API.instance_methods(false))
       def_delegators(:client, *Spaceship::ConnectAPI::TestFlight::API.instance_methods(false))

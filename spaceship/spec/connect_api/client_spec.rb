@@ -15,7 +15,7 @@ describe Spaceship::ConnectAPI::Client do
       tunes_client = double('tunes_client')
       users_client = double('users_client')
 
-      # Creates the API clienets for the modules
+      # Creates the API clients for the modules
       expect(Spaceship::ConnectAPI::Provisioning::Client).to receive(:new).with(portal_args)
                                                                           .and_return(provisioning_client)
       expect(Spaceship::ConnectAPI::TestFlight::Client).to receive(:new).with(tunes_args)

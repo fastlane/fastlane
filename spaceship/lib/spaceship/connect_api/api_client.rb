@@ -17,12 +17,17 @@ module Spaceship
 
       # Instantiates a client with cookie session or a JWT token.
       def initialize(cookie: nil, current_team_id: nil, token: nil, another_client: nil)
+        params_count = [cookie, token, another_client].compact.size
+        if params_count != 1
+          raise "Must initialize with one of :cookie, :token, or :another_client"
+        end
+
         if token.nil?
           if another_client.nil?
             super(cookie: cookie, current_team_id: current_team_id, timeout: 1200)
-          else
-            super(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id)
+            return
           end
+          super(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id)
         else
           options = {
             request: {
@@ -32,8 +37,6 @@ module Spaceship
           }
           @token = token
           @current_team_id = current_team_id
-
-          hostname = "https://api.appstoreconnect.apple.com/v1/"
 
           @client = Faraday.new(hostname, options) do |c|
             c.response(:json, content_type: /\bjson$/)
@@ -60,8 +63,19 @@ module Spaceship
         end
       end
 
+      # Instance level hostname only used when creating
+      # App Store Connect API Farady client.
+      # Forwarding to class level if using web session.
+      def hostname
+        if @token
+          return "https://api.appstoreconnect.apple.com/v1/"
+        end
+        return self.class.hostname
+      end
+
       def self.hostname
-        return nil
+        # Implemented in subclass
+        not_implemented(__method__)
       end
 
       #
