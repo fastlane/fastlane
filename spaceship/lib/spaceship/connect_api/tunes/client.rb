@@ -7,7 +7,7 @@ module Spaceship
     module Tunes
       class Client < Spaceship::ConnectAPI::APIClient
         def initialize(cookie: nil, current_team_id: nil, token: nil, another_client: nil)
-          another_client ||= Spaceship::Tunes.client
+          another_client ||= Spaceship::Tunes.client if cookie.nil? && token.nil?
 
           super(cookie: cookie, current_team_id: current_team_id, token: token, another_client: another_client)
 
