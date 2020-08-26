@@ -5,8 +5,8 @@ module Fastlane
         require 'spaceship'
 
         UI.message("Login to App Store Connect (#{params[:username]})")
-        Spaceship::Tunes.login(params[:username])
-        Spaceship::Tunes.select_team
+        Spaceship::ConnectAPI.login(params[:username])
+        Spaceship::ConnectAPI.select_team
         UI.message("Login successful")
 
         app = Spaceship::ConnectAPI::App.find(params[:app_identifier])

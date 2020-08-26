@@ -27,8 +27,8 @@ module Deliver
 
     def login
       UI.message("Login to App Store Connect (#{options[:username]})")
-      Spaceship::Tunes.login(options[:username])
-      Spaceship::Tunes.select_team
+      Spaceship::ConnectAPI.login(options[:username])
+      Spaceship::ConnectAPI.select_team
       UI.message("Login successful")
     end
 
@@ -177,17 +177,19 @@ module Deliver
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team
+      tunes_client = Spaceship::ConnectAPI.client.tunes_client
+
       generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
-      return generic_transporter unless options[:itc_provider].nil? && Spaceship::Tunes.client.teams.count > 1
+      return generic_transporter unless options[:itc_provider].nil? && tunes_client.teams.count > 1
 
       begin
-        team = Spaceship::Tunes.client.teams.find { |t| t['contentProvider']['contentProviderId'].to_s == Spaceship::Tunes.client.team_id }
+        team = tunes_client.teams.find { |t| t['contentProvider']['contentProviderId'].to_s == tunes_client.team_id }
         name = team['contentProvider']['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
         return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
       rescue => ex
-        UI.verbose("Couldn't infer a provider short name for team with id #{Spaceship::Tunes.client.team_id} automatically: #{ex}. Proceeding without provider short name.")
+        UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")
         return generic_transporter
       end
     end

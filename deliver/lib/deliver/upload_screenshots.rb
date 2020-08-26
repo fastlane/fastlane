@@ -285,11 +285,9 @@ module Deliver
 
     # helper method so Spaceship::Tunes.client.available_languages is easier to test
     def self.available_languages
-      if Helper.test?
-        FastlaneCore::Languages::ALL_LANGUAGES
-      else
-        Spaceship::Tunes.client.available_languages
-      end
+      # 2020-08-24 - Available locales are not available as an endpoint in App Store Connect
+      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is avilable)
+      Deliver::Languages::ALL_LANGUAGES
     end
 
     # helper method to mock this step in tests

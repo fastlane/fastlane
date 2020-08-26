@@ -1,9 +1,9 @@
 def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: nil, all_app_identifiers: [], app_identifier_and_profile_names: {}, valid_profiles: true, expect_delete: false)
-  allow(Spaceship).to receive(:login).and_return(nil)
-  allow(Spaceship).to receive(:client).and_return("client")
-  allow(Spaceship).to receive(:select_team).and_return(nil)
+  allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
+  allow(Spaceship::ConnectAPI).to receive(:client).and_return("client")
+  allow(Spaceship::ConnectAPI).to receive(:select_team).and_return(nil)
 
-  allow(Spaceship.client).to receive(:in_house?).and_return(inhouse)
+  allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(inhouse)
 
   # Mock cert
   certificate = "certificate"
