@@ -13,7 +13,7 @@ module Fastlane
         puts("")
         puts(Terminal::Table.new(
                title: "Spaceship Stats",
-               headings: ["Service", "Auth Type", "Domain", "Number of requests"],
+               headings: ["Service", "Auth Type", "URL", "Number of requests"],
                rows: FastlaneCore::PrintTable.transform_output(rows)
         ))
         puts("")

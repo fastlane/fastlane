@@ -9,11 +9,11 @@ module Fastlane
         key_id = options[:key_id]
         issuer_id = options[:issuer_id]
         key_content = options[:key_content]
-        filepath = options[:key_filepath]
+        key_filepath = options[:key_filepath]
         duration = options[:duration]
         in_house = options[:in_house]
 
-        if key_content.nil? && filepath.nil?
+        if key_content.nil? && key_filepath.nil?
           UI.user_error!(":key_content or :key_filepath is required")
         end
 
@@ -22,7 +22,7 @@ module Fastlane
         key = {
           key_id: key_id,
           issuer_id: issuer_id,
-          key: key_content || File.binread(filepath),
+          key: key_content || File.binread(key_filepath),
           duration: duration,
           in_house: in_house
         }
