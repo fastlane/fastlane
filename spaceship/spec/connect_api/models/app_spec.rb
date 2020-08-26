@@ -1,5 +1,5 @@
 describe Spaceship::ConnectAPI::App do
-  before { Spaceship::ConnectAPI.login }
+  before { Spaceship::Tunes.login }
 
   describe '#Spaceship::ConnectAPI' do
     it '#get_apps' do
