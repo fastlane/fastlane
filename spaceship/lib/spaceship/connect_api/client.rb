@@ -1,245 +1,148 @@
-require_relative '../client'
-require_relative './response'
+require_relative './token'
+require_relative './provisioning/provisioning'
+require_relative './testflight/testflight'
+require_relative './tunes/tunes'
+require_relative './users/users'
 
 module Spaceship
   class ConnectAPI
-    class Client < Spaceship::Client
-      attr_accessor :token
+    class Client
+      attr_accessor :tunes_client
+      attr_accessor :portal_client
 
-      #####################################################
-      # @!group Client Init
-      #####################################################
-
-      # Instantiates a client with cookie session or a JWT token.
-      def initialize(cookie: nil, current_team_id: nil, token: nil)
-        if token.nil?
-          super(cookie: cookie, current_team_id: current_team_id, timeout: 1200)
-        else
-          options = {
-            request: {
-              timeout:       (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
-              open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || 300).to_i
-            }
-          }
-          @token = token
-          @current_team_id = current_team_id
-
-          hostname = "https://api.appstoreconnect.apple.com/v1/"
-
-          @client = Faraday.new(hostname, options) do |c|
-            c.response(:json, content_type: /\bjson$/)
-            c.response(:plist, content_type: /\bplist$/)
-            c.use(FaradayMiddleware::RelsMiddleware)
-            c.adapter(Faraday.default_adapter)
-            c.headers["Authorization"] = "Bearer #{token.text}"
-
-            if ENV['SPACESHIP_DEBUG']
-              # for debugging only
-              # This enables tracking of networking requests using Charles Web Proxy
-              c.proxy = "https://127.0.0.1:8888"
-              c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
-            elsif ENV["SPACESHIP_PROXY"]
-              c.proxy = ENV["SPACESHIP_PROXY"]
-              c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
-            end
-
-            if ENV["DEBUG"]
-              puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
-            end
-          end
-        end
-      end
-
-      def self.hostname
-        return nil
-      end
-
+      # Initializes client with Apple's App Store Connect JWT auth key.
       #
-      # Helpers
+      # This method will automatically use the key id, issuer id, and filepath from environment
+      # variables if not given.
       #
-
-      def web_session?
-        return @token.nil?
+      # All three parameters are needed to authenticate.
+      #
+      # @param key_id (String) (optional): The key id
+      # @param issuer_id (String) (optional): The issuer id
+      # @param filepath (String) (optional): The filepath
+      #
+      # @raise InvalidUserCredentialsError: raised if authentication failed
+      #
+      # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
+      def self.auth(key_id: nil, issuer_id: nil, filepath: nil)
+        token = Spaceship::ConnectAPI::Token.create(key_id: key_id, issuer_id: issuer_id, filepath: filepath)
+        return ConnectAPI::Client.new(token: token)
       end
 
-      def build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
-        params = {}
+      # Authenticates with Apple's web services. This method has to be called once
+      # to generate a valid session.
+      #
+      # This method will automatically use the username from the Appfile (if available)
+      # and fetch the password from the Keychain (if available)
+      #
+      # @param user (String) (optional): The username (usually the email address)
+      # @param password (String) (optional): The password
+      # @param team_id (String) (optional): The team id
+      # @param team_name (String) (optional): The team name
+      #
+      # @raise InvalidUserCredentialsError: raised if authentication failed
+      #
+      # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
+      def self.login(user = nil, password = nil, team_id: nil, team_name: nil)
+        tunes_client = TunesClient.login(user, password)
+        portal_client = PortalClient.login(user, password)
 
-        filter = filter.delete_if { |k, v| v.nil? } if filter
+        # The clients will automatically select the first team if none is given
+        if !team_id.nil? || !team_name.nil?
+          tunes_client.select_team(team_id: team_id, team_name: team_name)
+          portal_client.select_team(team_id: team_id, team_name: team_name)
+        end
 
-        params[:filter] = filter if filter && !filter.empty?
-        params[:include] = includes if includes
-        params[:limit] = limit if limit
-        params[:sort] = sort if sort
-        params[:cursor] = cursor if cursor
-
-        return params
+        return ConnectAPI::Client.new(tunes_client: tunes_client, portal_client: portal_client)
       end
 
-      def get(url_or_path, params = nil)
-        response = with_asc_retry do
-          request(:get) do |req|
-            req.url(url_or_path)
-            req.options.params_encoder = Faraday::NestedParamsEncoder
-            req.params = params if params
-            req.headers['Content-Type'] = 'application/json'
-          end
-        end
-        handle_response(response)
+      def initialize(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil)
+        # If using web session...
+        # Spaceship::Tunes is needed for TestFlight::API, Tunes::API, and Users::API
+        # Spaceship::Portal is needed for Provisioning::API
+        @tunes_client = tunes_client
+        @portal_client = portal_client
+
+        # Extending this instance to add API endpoints from these modules
+        # Each of these modules adds a new setter method for an instance
+        # of an ConnectAPI::APIClient
+        # These get set in set_indvidual_clients
+        self.extend(Spaceship::ConnectAPI::TestFlight::API)
+        self.extend(Spaceship::ConnectAPI::Tunes::API)
+        self.extend(Spaceship::ConnectAPI::Provisioning::API)
+        self.extend(Spaceship::ConnectAPI::Users::API)
+
+        set_indvidual_clients(
+          cookie: cookie,
+          current_team_id: current_team_id,
+          token: token,
+          tunes_client: @tunes_client,
+          portal_client: @portal_client
+        )
       end
 
-      def post(url_or_path, body, tries: 5)
-        response = with_asc_retry(tries) do
-          request(:post) do |req|
-            req.url(url_or_path)
-            req.body = body.to_json
-            req.headers['Content-Type'] = 'application/json'
-          end
-        end
-        handle_response(response)
-      end
+      def select_team(team_id: nil, team_name: nil)
+        @tunes_client.select_team(team_id: team_id, team_name: team_name)
+        @portal_client.select_team(team_id: team_id, team_name: team_name)
 
-      def patch(url_or_path, body)
-        response = with_asc_retry do
-          request(:patch) do |req|
-            req.url(url_or_path)
-            req.body = body.to_json
-            req.headers['Content-Type'] = 'application/json'
-          end
-        end
-        handle_response(response)
-      end
-
-      def delete(url_or_path, params = nil, body = nil)
-        response = with_asc_retry do
-          request(:delete) do |req|
-            req.url(url_or_path)
-            req.options.params_encoder = Faraday::NestedParamsEncoder if params
-            req.params = params if params
-            req.body = body.to_json if body
-            req.headers['Content-Type'] = 'application/json' if body
-          end
-        end
-        handle_response(response)
-      end
-
-      protected
-
-      def with_asc_retry(tries = 5, &_block)
-        tries = 1 if Object.const_defined?("SpecHelper")
-        response = yield
-
-        status = response.status if response
-
-        if [500, 504].include?(status)
-          msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
-          raise msg
-        end
-
-        return response
-      rescue => error
-        tries -= 1
-        puts(error) if Spaceship::Globals.verbose?
-        if tries.zero?
-          return response
-        else
-          retry
-        end
-      end
-
-      def handle_response(response)
-        if (200...300).cover?(response.status) && (response.body.nil? || response.body.empty?)
-          return
-        end
-
-        raise InternalServerError, "Server error got #{response.status}" if (500...600).cover?(response.status)
-
-        unless response.body.kind_of?(Hash)
-          raise UnexpectedResponse, response.body
-        end
-
-        raise UnexpectedResponse, response.body['error'] if response.body['error']
-
-        raise UnexpectedResponse, handle_errors(response) if response.body['errors']
-
-        raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
-
-        store_csrf_tokens(response)
-
-        return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, client: self)
-      end
-
-      def handle_errors(response)
-        # Example error format
-        # {
-        # "errors":[
-        #     {
-        #       "id":"cbfd8674-4802-4857-bfe8-444e1ea36e32",
-        #       "status":"409",
-        #       "code":"STATE_ERROR",
-        #       "title":"The request cannot be fulfilled because of the state of another resource.",
-        #       "detail":"Submit for review errors found.",
-        #       "meta":{
-        #           "associatedErrors":{
-        #             "/v1/appScreenshots/":[
-        #                 {
-        #                   "id":"23d1734f-b81f-411a-98e4-6d3e763d54ed",
-        #                   "status":"409",
-        #                   "code":"STATE_ERROR.SCREENSHOT_REQUIRED.APP_WATCH_SERIES_4",
-        #                   "title":"App screenshot missing (APP_WATCH_SERIES_4)."
-        #                 },
-        #                 {
-        #                   "id":"db993030-0a93-48e9-9fd7-7e5676633431",
-        #                   "status":"409",
-        #                   "code":"STATE_ERROR.SCREENSHOT_REQUIRED.APP_WATCH_SERIES_4",
-        #                   "title":"App screenshot missing (APP_WATCH_SERIES_4)."
-        #                 }
-        #             ],
-        #             "/v1/builds/d710b6fa-5235-4fe4-b791-2b80d6818db0":[
-        #                 {
-        #                   "id":"e421fe6f-0e3b-464b-89dc-ba437e7bb77d",
-        #                   "status":"409",
-        #                   "code":"ENTITY_ERROR.ATTRIBUTE.REQUIRED",
-        #                   "title":"The provided entity is missing a required attribute",
-        #                   "detail":"You must provide a value for the attribute 'usesNonExemptEncryption' with this request",
-        #                   "source":{
-        #                       "pointer":"/data/attributes/usesNonExemptEncryption"
-        #                   }
-        #                 }
-        #             ]
-        #           }
-        #       }
-        #     }
-        # ]
-        # }
-
-        return response.body['errors'].map do |error|
-          messages = [[error['title'], error['detail']].compact.join(" - ")]
-
-          meta = error["meta"] || {}
-          associated_errors = meta["associatedErrors"] || {}
-
-          messages + associated_errors.values.flatten.map do |associated_error|
-            [[associated_error["title"], associated_error["detail"]].compact.join(" - ")]
-          end
-        end.flatten.join("\n")
+        # Updating the tunes and portal clients requires resetting
+        # of the clients in the API modules
+        set_indvidual_clients(
+          cookie: nil,
+          current_team_id: nil,
+          token: nil,
+          tunes_client: tunes_client,
+          portal_client: portal_client
+        )
       end
 
       private
 
-      def local_variable_get(binding, name)
-        if binding.respond_to?(:local_variable_get)
-          binding.local_variable_get(name)
-        else
-          binding.eval(name.to_s)
+      def set_indvidual_clients(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil)
+        # This was added by Spaceship::ConnectAPI::TestFlight::API and is required
+        # to be set for API methods to have a client to send request on
+        if cookie || token || tunes_client
+          self.test_flight_request_client = Spaceship::ConnectAPI::TestFlight::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: tunes_client
+          )
         end
-      end
 
-      def provider_id
-        return team_id if self.provider.nil?
-        self.provider.provider_id
+        # This was added by Spaceship::ConnectAPI::Tunes::API and is required
+        # to be set for API methods to have a client to send request on
+        if cookie || token || tunes_client
+          self.tunes_request_client = Spaceship::ConnectAPI::Tunes::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: tunes_client
+          )
+        end
+
+        # This was added by Spaceship::ConnectAPI::Provisioning::API and is required
+        # to be set for API methods to have a client to send request on
+        if cookie || token || portal_client
+          self.provisioning_request_client = Spaceship::ConnectAPI::Provisioning::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: portal_client
+          )
+        end
+
+        # This was added by Spaceship::ConnectAPI::Users::API and is required
+        # to be set for API methods to have a client to send request on
+        if cookie || token || tunes_client
+          self.users_request_client = Spaceship::ConnectAPI::Users::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: tunes_client
+          )
+        end
       end
     end
   end
-  # rubocop:enable Metrics/ClassLength
 end

@@ -1,11 +1,11 @@
 describe Spaceship::ConnectAPI::Provisioning::Client do
-  let(:client) { Spaceship::ConnectAPI::Provisioning::Client.instance }
+  let(:client) { Spaceship::ConnectAPI::Provisioning::Client.new }
   let(:hostname) { Spaceship::ConnectAPI::Provisioning::Client.hostname }
   let(:username) { 'spaceship@krausefx.com' }
   let(:password) { 'so_secret' }
 
   before do
-    Spaceship::Portal.login(username, password)
+    Spaceship::ConnectAPI.login(username, password)
   end
 
   context 'sends api request' do
@@ -53,7 +53,7 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
           params = {}
           req_mock = test_request_body(path, params)
           expect(client).to receive(:request).with(:post).and_yield(req_mock)
-          Spaceship::ConnectAPI.get_bundle_ids
+          client.get_bundle_ids
         end
       end
     end
@@ -66,7 +66,7 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
           params = {}
           req_mock = test_request_body(path, params)
           expect(client).to receive(:request).with(:post).and_yield(req_mock)
-          Spaceship::ConnectAPI.get_certificates
+          client.get_certificates
         end
       end
     end
@@ -79,7 +79,7 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
           params = {}
           req_mock = test_request_body(path, params)
           expect(client).to receive(:request).with(:post).and_yield(req_mock)
-          Spaceship::ConnectAPI.get_devices
+          client.get_devices
         end
       end
     end
@@ -92,7 +92,7 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
           params = {}
           req_mock = test_request_body(path, params)
           expect(client).to receive(:request).with(:post).and_yield(req_mock)
-          Spaceship::ConnectAPI.get_profiles
+          client.get_profiles
         end
       end
     end
