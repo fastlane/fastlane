@@ -1,14 +1,11 @@
 describe Spaceship::ConnectAPI::Users::Client do
-  let(:mock_tunes_client) { double('tunes_client') }
-  let(:client) { Spaceship::ConnectAPI::Users::Client.new(another_client: mock_tunes_client) }
+  let(:client) { Spaceship::ConnectAPI::Users::Client.instance }
   let(:hostname) { Spaceship::ConnectAPI::Users::Client.hostname }
   let(:username) { 'spaceship@krausefx.com' }
   let(:password) { 'so_secret' }
 
   before do
-    allow(mock_tunes_client).to receive(:team_id).and_return("123")
-    allow(Spaceship::TunesClient).to receive(:login).and_return(mock_tunes_client)
-    Spaceship::ConnectAPI.login(username, password)
+    Spaceship::Tunes.login(username, password)
   end
 
   context 'sends api request' do
@@ -49,7 +46,7 @@ describe Spaceship::ConnectAPI::Users::Client do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
-          client.get_users
+          Spaceship::ConnectAPI.get_users
         end
       end
     end

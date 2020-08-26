@@ -56,8 +56,19 @@ require 'spaceship/connect_api/models/territory'
 
 module Spaceship
   class ConnectAPI
-    def self.token=(token)
-      raise "Spaceship::ConnectAPI.token is deprecated... Please switch to Spaceship::ConnectAPI.auth"
+    extend Spaceship::ConnectAPI::Provisioning
+    extend Spaceship::ConnectAPI::TestFlight
+    extend Spaceship::ConnectAPI::Users
+    extend Spaceship::ConnectAPI::Tunes
+
+    @token = nil
+
+    class << self
+      attr_writer(:token)
+    end
+
+    class << self
+      attr_reader :token
     end
 
     # Defined in the App Store Connect API docs:
