@@ -51,7 +51,8 @@ module FastlaneCore
         begin
           status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
             command_stdout.each do |l|
-              line = l.chomp.delete_prefix("\r")
+              line = l.chomp
+              line = line[1..-1] if line[0] == "\r"
               output << line
 
               next unless print_all
