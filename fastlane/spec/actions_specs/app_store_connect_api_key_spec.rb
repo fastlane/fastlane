@@ -50,6 +50,9 @@ describe Fastlane do
           in_house: true
         }
 
+        # Remove \r for windows tests
+        hash[:key] = hash[:key].gsub('\r', '')
+
         expect(result).to eq(hash)
       end
 
