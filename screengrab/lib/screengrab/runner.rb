@@ -82,7 +82,7 @@ module Screengrab
     end
 
     def select_device
-      adb = Fastlane::Helper::AdbHelper.new(adb_host: @config[:adb_host])
+      adb = Fastlane::Helper::AdbHelper.new(adb_path: @android_env.adb_path, adb_host: @config[:adb_host])
       devices = adb.load_all_devices
 
       UI.user_error!('There are no connected and authorized devices or emulators') if devices.empty?
