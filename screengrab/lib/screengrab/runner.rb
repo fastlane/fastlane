@@ -399,7 +399,7 @@ module Screengrab
         cmdout = @executor.execute(command: adb_path + "adb " + host + command,
                                   print_all: print_all,
                                   print_command: print_command,
-                                  error: raise_errors ? nil : -> { |out, status| errout = out }) || ''
+                                  error: raise_errors ? nil : proc { |out, status| errout = out }) || ''
         output = errout || cmdout
       rescue => ex
         if raise_errors
