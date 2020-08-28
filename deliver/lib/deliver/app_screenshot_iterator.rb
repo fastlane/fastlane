@@ -81,7 +81,7 @@ module Deliver
 
         screenshots_per_display_type.each do |display_type, screenshots|
           # create AppScreenshotSet for given display_type if it doesn't exsit
-          app_screenshot_set = app_screenshot_set_per_locale_and_display_type[language][display_type]
+          app_screenshot_set = (app_screenshot_set_per_locale_and_display_type[language] || {})[display_type]
           app_screenshot_set ||= localization.create_app_screenshot_set(attributes: { screenshotDisplayType: display_type })
 
           # iterate over screenshots per display size with index

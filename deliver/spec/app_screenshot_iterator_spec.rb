@@ -102,6 +102,27 @@ describe Deliver::AppScreenshotIterator do
       end
     end
 
+    context 'when a localization does not have app_screenshot_set yet (happens with new apps)' do
+      it 'should iterates app_screenshot_set with corresponding localization' do
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    app_screenshots: [],
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              get_app_screenshot_sets: [],
+                              locale: 'en-US')
+
+        screenshot = double('Deliver::AppScreenshot', device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+
+        screenshots_per_language = { 'en-US' => [screenshot] }
+
+        expect(localization).to receive(:create_app_screenshot_set)
+          .with(attributes: { screenshotDisplayType: screenshot.device_type })
+          .and_return(app_screenshot_set)
+        actual = described_class.new([localization]).each_local_screenshot(screenshots_per_language).to_a
+        expect(actual).to eq([[localization, app_screenshot_set, screenshot, 0]])
+      end
+    end
+
     context 'when local screenshots are multiple within an app_screenshot_set' do
       it 'should give index incremented on each' do
         app_screenshot_set1 = double('Spaceship::ConnectAPI::AppScreenshotSet',
