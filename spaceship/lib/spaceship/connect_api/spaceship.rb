@@ -68,14 +68,15 @@ module Spaceship
       #
       # @param user (String) (optional): The username (usually the email address)
       # @param password (String) (optional): The password
-      # @param team_id (String) (optional): The team id
+      # @param portal_team_id (String) (optional): The team id
+      # @param tunes_team_id (String) (optional): The team id
       # @param team_name (String) (optional): The team name
       #
       # @raise InvalidUserCredentialsError: raised if authentication failed
       #
       # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
-      def login(user = nil, password = nil, team_id: nil, team_name: nil)
-        @client = ConnectAPI::Client.login(user, password, team_id: team_id, team_name: team_name)
+      def login(user = nil, password = nil, use_portal: true, use_tunes: true, portal_team_id: nil, tunes_team_id: nil, team_name: nil)
+        @client = ConnectAPI::Client.login(user, password, use_portal: use_portal, use_tunes: use_tunes, portal_team_id: portal_team_id, tunes_team_id: tunes_team_id, team_name: team_name)
       end
 
       # Open up the team selection for the user (if necessary).
@@ -85,9 +86,9 @@ module Spaceship
       #
       # @param team_id (String) (optional): The ID of an App Store Connect team
       # @param team_name (String) (optional): The name of an App Store Connect team
-      def select_team(team_id: nil, team_name: nil)
+      def select_team(portal_team_id: nil, tunes_team_id: nil, team_name: nil)
         return if client.nil?
-        client.select_team(team_id: team_id, team_name: team_name)
+        client.select_team(portal_team_id: portal_team_id, tunes_team_id: tunes_team_id, team_name: team_name)
       end
     end
   end

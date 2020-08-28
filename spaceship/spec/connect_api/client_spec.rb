@@ -65,24 +65,39 @@ describe Spaceship::ConnectAPI::Client do
       let(:tunes_client) { double('tunes_client') }
       let(:portal_client) { double('portal_client') }
 
-      before(:each) do
-        expect(Spaceship::TunesClient).to receive(:login).with(username, password).and_return(tunes_client)
-        expect(Spaceship::PortalClient).to receive(:login).with(username, password).and_return(portal_client)
-
-        expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: tunes_client, portal_client: portal_client)
-      end
-
       it 'no team_id or team_name' do
+        expect(Spaceship::PortalClient).to receive(:login).with(username, password).and_return(portal_client)
+        expect(Spaceship::TunesClient).to receive(:login).with(username, password).and_return(tunes_client)
+        expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: tunes_client, portal_client: portal_client)
+
         Spaceship::ConnectAPI::Client.login(username, password)
       end
 
-      it 'with team_id' do
-        expect(tunes_client).to receive(:select_team).with(team_id: team_id, team_name: nil)
+      it 'with portal_team_id' do
+        expect(Spaceship::PortalClient).to receive(:login).with(username, password).and_return(portal_client)
+        expect(Spaceship::TunesClient).not_to(receive(:login).with(username, password))
+        expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: nil, portal_client: portal_client)
+
         expect(portal_client).to receive(:select_team).with(team_id: team_id, team_name: nil)
-        Spaceship::ConnectAPI::Client.login(username, password, team_id: team_id)
+        expect(tunes_client).not_to(receive(:select_team).with(team_id: team_id, team_name: nil))
+        Spaceship::ConnectAPI::Client.login(username, password, use_portal: true, use_tunes: false, portal_team_id: team_id)
+      end
+
+      it 'with tunes_team_id' do
+        expect(Spaceship::PortalClient).not_to(receive(:login).with(username, password))
+        expect(Spaceship::TunesClient).to receive(:login).with(username, password).and_return(tunes_client)
+        expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: tunes_client, portal_client: nil)
+
+        expect(portal_client).not_to(receive(:select_team).with(team_id: team_id, team_name: nil))
+        expect(tunes_client).to receive(:select_team).with(team_id: team_id, team_name: nil)
+        Spaceship::ConnectAPI::Client.login(username, password, use_portal: false, use_tunes: true, tunes_team_id: team_id)
       end
 
       it 'with team_name' do
+        expect(Spaceship::PortalClient).to receive(:login).with(username, password).and_return(portal_client)
+        expect(Spaceship::TunesClient).to receive(:login).with(username, password).and_return(tunes_client)
+        expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: tunes_client, portal_client: portal_client)
+
         expect(tunes_client).to receive(:select_team).with(team_id: nil, team_name: team_name)
         expect(portal_client).to receive(:select_team).with(team_id: nil, team_name: team_name)
         Spaceship::ConnectAPI::Client.login(username, password, team_name: team_name)

@@ -18,7 +18,7 @@ module Sigh
                                              title: "Summary for sigh #{Fastlane::VERSION}")
 
       UI.message("Starting login with user '#{Sigh.config[:username]}'")
-      Spaceship::ConnectAPI.login(Sigh.config[:username], nil)
+      Spaceship::ConnectAPI.login(Sigh.config[:username], nil, use_portal: true, use_tunes: false)
       Spaceship::ConnectAPI.select_team
       UI.message("Successfully logged in")
 

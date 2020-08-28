@@ -27,7 +27,7 @@ module Deliver
 
     def login
       UI.message("Login to App Store Connect (#{options[:username]})")
-      Spaceship::ConnectAPI.login(options[:username])
+      Spaceship::ConnectAPI.login(options[:username], nil, use_portal: true, use_tunes: true)
       Spaceship::ConnectAPI.select_team
       UI.message("Login successful")
     end

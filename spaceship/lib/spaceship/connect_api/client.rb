@@ -38,20 +38,23 @@ module Spaceship
       #
       # @param user (String) (optional): The username (usually the email address)
       # @param password (String) (optional): The password
-      # @param team_id (String) (optional): The team id
+      # @param portal_team_id (String) (optional): The team id
+      # @param tunes_team_id (String) (optional): The team id
       # @param team_name (String) (optional): The team name
       #
       # @raise InvalidUserCredentialsError: raised if authentication failed
       #
       # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
-      def self.login(user = nil, password = nil, team_id: nil, team_name: nil)
-        tunes_client = TunesClient.login(user, password)
-        portal_client = PortalClient.login(user, password)
+      def self.login(user = nil, password = nil, use_portal: true, use_tunes: true, portal_team_id: nil, tunes_team_id: nil, team_name: nil)
+        portal_client = PortalClient.login(user, password) if use_portal
+        tunes_client = TunesClient.login(user, password) if use_tunes
 
         # The clients will automatically select the first team if none is given
-        if !team_id.nil? || !team_name.nil?
-          tunes_client.select_team(team_id: team_id, team_name: team_name)
-          portal_client.select_team(team_id: team_id, team_name: team_name)
+        if portal_client && (!portal_team_id.nil? || !team_name.nil?)
+          portal_client.select_team(team_id: portal_team_id, team_name: team_name)
+        end
+        if tunes_client && (!tunes_team_id.nil? || !team_name.nil?)
+          tunes_client.select_team(team_id: tunes_team_id, team_name: team_name)
         end
 
         return ConnectAPI::Client.new(tunes_client: tunes_client, portal_client: portal_client)
@@ -104,9 +107,9 @@ module Spaceship
         end
       end
 
-      def select_team(team_id: nil, team_name: nil)
-        @tunes_client.select_team(team_id: team_id, team_name: team_name)
-        @portal_client.select_team(team_id: team_id, team_name: team_name)
+      def select_team(portal_team_id: nil, tunes_team_id: nil, team_name: nil)
+        @portal_client.select_team(team_id: portal_team_id, team_name: team_name) unless @portal_client.nil?
+        @tunes_client.select_team(team_id: tunes_team_id, team_name: team_name) unless @tunes_client.nil?
 
         # Updating the tunes and portal clients requires resetting
         # of the clients in the API modules
