@@ -299,9 +299,17 @@ module Screengrab
         device_screenshots_paths.each do |device_path|
           if_device_path_exists(@config[:app_package_name], device_serial, device_path) do |path|
             next unless path.include?(locale)
-            run_adb_command("-s #{device_serial} pull #{path} #{tempdir}",
-                            print_all: false,
-                            print_command: true)
+            out = run_adb_command("-s #{device_serial} pull #{path} #{tempdir}",
+                                  print_all: false,
+                                  print_command: true,
+                                  raise_errors: false)
+            if out =~ /Permission denied/
+              dir = File.dirname(path)
+              base = File.basename(path)
+              run_adb_command("-s #{device_serial} shell run-as #{@config[:app_package_name]} 'tar -cC #{dir} #{base}' | tar -xvC #{tempdir}",
+                              print_all: false,
+                              print_command: true)
+            end
           end
         end
 
@@ -381,16 +389,26 @@ module Screengrab
       packages.split("\n").map { |package| package.gsub("package:", "") }
     end
 
-    def run_adb_command(command, print_all: false, print_command: false)
+    def run_adb_command(command, print_all: false, print_command: false, raise_errors: true)
       adb_path = @android_env.adb_path.chomp("adb")
       adb_host = @config[:adb_host]
       host = adb_host.nil? ? '' : "-H #{adb_host} "
-      output = @executor.execute(command: adb_path + "adb " + host + command,
-                                 print_all: print_all,
-                                 print_command: print_command) || ''
+      output = ''
+      begin
+        errout = nil
+        cmdout = @executor.execute(command: adb_path + "adb " + host + command,
+                                  print_all: print_all,
+                                  print_command: print_command,
+                                  error: raise_errors ? nil : proc { |out, status| errout = out }) || ''
+        output = errout || cmdout
+      rescue => ex
+        if raise_errors
+          raise ex
+        end
+      end
       output.lines.reject do |line|
-        # Debug/Warning output from ADB}
-        line.start_with?('adb: ')
+        # Debug/Warning output from ADB
+        line.start_with?('adb: ') && !line.start_with?('adb: error: ')
       end.join('') # Lines retain their newline chars
     end
 
