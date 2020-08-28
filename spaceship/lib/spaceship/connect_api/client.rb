@@ -48,8 +48,8 @@ module Spaceship
       #
       # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
       def self.login(user = nil, password = nil, use_portal: true, use_tunes: true, portal_team_id: nil, tunes_team_id: nil, team_name: nil)
-        portal_client = PortalClient.login(user, password) if use_portal
-        tunes_client = TunesClient.login(user, password) if use_tunes
+        portal_client = Spaceship::Portal.login(user, password) if use_portal
+        tunes_client = Spaceship::Tunes.login(user, password) if use_tunes
 
         # The clients will automatically select the first team if none is given
         if portal_client && (!portal_team_id.nil? || !team_name.nil?)
