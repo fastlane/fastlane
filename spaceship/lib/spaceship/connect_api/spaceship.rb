@@ -68,8 +68,10 @@ module Spaceship
       #
       # @param user (String) (optional): The username (usually the email address)
       # @param password (String) (optional): The password
-      # @param portal_team_id (String) (optional): The team id
-      # @param tunes_team_id (String) (optional): The team id
+      # @param use_portal (Boolean) (optional): Whether to log in to Spaceship::Portal or not
+      # @param use_tunes (Boolean) (optional): Whether to log in to Spaceship::Tunes or not
+      # @param portal_team_id (String) (optional): The Spaceship::Portal team id
+      # @param tunes_team_id (String) (optional): The Spaceship::Tunes team id
       # @param team_name (String) (optional): The team name
       #
       # @raise InvalidUserCredentialsError: raised if authentication failed
@@ -84,7 +86,8 @@ module Spaceship
       # If the user is in multiple teams, a team selection is shown.
       # The user can then select a team by entering the number
       #
-      # @param team_id (String) (optional): The ID of an App Store Connect team
+      # @param portal_team_id (String) (optional): The Spaceship::Portal team id
+      # @param tunes_team_id (String) (optional): The Spaceship::Tunes team id
       # @param team_name (String) (optional): The name of an App Store Connect team
       def select_team(portal_team_id: nil, tunes_team_id: nil, team_name: nil)
         return if client.nil?
