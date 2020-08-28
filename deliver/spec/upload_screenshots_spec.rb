@@ -332,7 +332,7 @@ describe Deliver::UploadScreenshots do
 
     context 'when one of the screenshots is FAILD state and tries reamins non zero' do
       it 'should retry upload_screenshots' do
-        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => false)
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => false, 'error?' => true)
         app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
                                     screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
                                     app_screenshots: [app_screenshot])
@@ -350,7 +350,7 @@ describe Deliver::UploadScreenshots do
 
     context 'when given number_of_screenshots doesn\'t match numbers in states in total' do
       it 'should retry upload_screenshots' do
-        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => true)
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => true, 'error?' => false)
         app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
                                     screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
                                     app_screenshots: [app_screenshot])
@@ -367,7 +367,11 @@ describe Deliver::UploadScreenshots do
 
     context 'when retry count left is 0' do
       it 'should raise error' do
-        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => true)
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot',
+                                'complete?' => false,
+                                'error?' => true,
+                                file_name: '5.5_1.jpg',
+                                error_messages: ['error_message'])
         app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
                                     screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
                                     app_screenshots: [app_screenshot])
@@ -401,6 +405,50 @@ describe Deliver::UploadScreenshots do
         expect(subject).to_not(receive(:upload_screenshots).with(any_args))
         expect(UI).to_not(receive(:user_error!))
         subject.retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, 0, [], screenshots_per_language)
+      end
+    end
+  end
+
+  describe '#verify_local_screenshots_are_uploaded' do
+    context 'when checksums for local screenshots all exist on App Store Connect' do
+      it 'should return true' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', source_file_checksum: 'checksum')
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [app_screenshot])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        iterator = Deliver::AppScreenshotIterator.new([localization])
+        local_screenshot = double('Deliver::AppScreenshot',
+                                  path: '/path/to/new_screenshot',
+                                  language: 'en-US',
+                                  device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshots_per_language = { 'en-US' => [local_screenshot] }
+
+        expect(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')
+        expect(subject.verify_local_screenshots_are_uploaded(iterator, screenshots_per_language)).to be(true)
+      end
+    end
+
+    context 'when some checksums for local screenshots don\'t exist on App Store Connect' do
+      it 'should return false' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', source_file_checksum: 'checksum_not_matched')
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [app_screenshot])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        iterator = Deliver::AppScreenshotIterator.new([localization])
+        local_screenshot = double('Deliver::AppScreenshot',
+                                  path: '/path/to/new_screenshot',
+                                  language: 'en-US',
+                                  device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshots_per_language = { 'en-US' => [local_screenshot] }
+
+        expect(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')
+        expect(subject.verify_local_screenshots_are_uploaded(iterator, screenshots_per_language)).to be(false)
       end
     end
   end

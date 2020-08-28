@@ -13,14 +13,14 @@ module Deliver
     # @yield [localization, app_screenshot_set]
     # @yieldparam [optional, Spaceship::ConnectAPI::AppStoreVersionLocalization] localization
     # @yieldparam [optional, Spaceship::ConnectAPI::AppStoreScreenshotSet] app_screenshot_set
-    def each_app_screenshot_set(&block)
-      return enum_for(__method__) unless block_given?
+    def each_app_screenshot_set(localizations = @localizations, &block)
+      return enum_for(__method__, localizations) unless block_given?
 
       # Collect app_screenshot_sets from localizations in parallel but
       # limit the number of threads working at a time with using `lazy` and `force` controls
       # to not attack App Store Connect
-      results = @localizations.each_slice(NUMBER_OF_THREADS).lazy.map do |localizations|
-        localizations.map do |localization|
+      results = localizations.each_slice(NUMBER_OF_THREADS).lazy.map do |localizations_grouped|
+        localizations_grouped.map do |localization|
           Thread.new do
             [localization, localization.get_app_screenshot_sets]
           end
@@ -63,35 +63,32 @@ module Deliver
     def each_local_screenshot(screenshots_per_language, &block)
       return enum_for(__method__, screenshots_per_language) unless block_given?
 
-      # Iterate over all the screenshots per language and display_type
-      # and then enqueue them to worker one by one if it's not duplciated on App Store Connect
-      screenshots_per_language.map do |language, screenshots_for_language|
-        localization = @localizations.find { |l| l.locale == language }
-        [localization, screenshots_for_language]
-      end.reject do |localization, _|
-        localization.nil?
-      end.each do |localization, screenshots_for_language|
-        iterate_over_screenshots_per_language(localization, screenshots_for_language, &block)
+      # filter unnecessary localizations
+      supported_localizations = @localizations.reject { |l| screenshots_per_language[l.locale].nil? }
+
+      # build a hash that can access app_screenshot_set corresponding to given locale and display_type
+      # via parallelized each_app_screenshot_set to gain performance
+      app_screenshot_set_per_locale_and_display_type = each_app_screenshot_set(supported_localizations)
+                                                       .each_with_object({}) do |(localization, app_screenshot_set), hash|
+        hash[localization.locale] ||= {}
+        hash[localization.locale][app_screenshot_set.screenshot_display_type] = app_screenshot_set
       end
-    end
 
-    private
+      # iterate over screenshots per localization
+      screenshots_per_language.each do |language, screenshots_for_language|
+        localization = supported_localizations.find { |l| l.locale == language }
+        screenshots_per_display_type = screenshots_for_language.reject { |screenshot| screenshot.device_type.nil? }.group_by(&:device_type)
 
-    def iterate_over_screenshots_per_language(localization, screenshots_for_language, &block)
-      app_screenshot_sets_per_display_type = localization.get_app_screenshot_sets.map { |set| [set.screenshot_display_type, set] }.to_h
-      screenshots_per_display_type = screenshots_for_language.reject { |screenshot| screenshot.device_type.nil? }.group_by(&:device_type)
+        screenshots_per_display_type.each do |display_type, screenshots|
+          # create AppScreenshotSet for given display_type if it doesn't exsit
+          app_screenshot_set = (app_screenshot_set_per_locale_and_display_type[language] || {})[display_type]
+          app_screenshot_set ||= localization.create_app_screenshot_set(attributes: { screenshotDisplayType: display_type })
 
-      screenshots_per_display_type.each do |display_type, screenshots|
-        # Create AppScreenshotSet for given display_type if it doesn't exsit
-        app_screenshot_set = app_screenshot_sets_per_display_type[display_type]
-        app_screenshot_set ||= localization.create_app_screenshot_set(attributes: { screenshotDisplayType: display_type })
-        iterate_over_screenshots_per_display_type(localization, app_screenshot_set, screenshots, &block)
-      end
-    end
-
-    def iterate_over_screenshots_per_display_type(localization, app_screenshot_set, screenshots, &block)
-      screenshots.each.with_index do |screenshot, index|
-        yield(localization, app_screenshot_set, screenshot, index)
+          # iterate over screenshots per display size with index
+          screenshots.each.with_index do |screenshot, index|
+            yield(localization, app_screenshot_set, screenshot, index)
+          end
+        end
       end
     end
   end
