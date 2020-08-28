@@ -250,7 +250,8 @@ describe Screengrab::Runner do
       mock_helper = double('mock helper')
       device = Fastlane::Helper::AdbDevice.new(serial: 'e1dbf228')
 
-      expect(Fastlane::Helper::AdbHelper).to receive(:new).with(adb_host: 'device_farm').and_return(mock_helper)
+      expect(mock_android_environment).to receive(:adb_path).and_return("adb")
+      expect(Fastlane::Helper::AdbHelper).to receive(:new).with(adb_path: 'adb', adb_host: 'device_farm').and_return(mock_helper)
       expect(mock_helper).to receive(:load_all_devices).and_return([device])
 
       expect(@runner.select_device).to eq('e1dbf228')
