@@ -30,7 +30,7 @@ describe Fastlane do
       end
 
       it "with key_content" do
-        key_content = File.binread(fake_api_key_p8_path)
+        key_content = File.binread(fake_api_key_p8_path).gsub("\r", '')
 
         result = Fastlane::FastFile.new.parse("lane :test do
           app_store_connect_api_key(
