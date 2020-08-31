@@ -7,7 +7,13 @@ module Fastlane
     # Raises an exception and stop the lane execution if the repo is not in a clean state
     class EnsureGitStatusCleanAction < Action
       def self.run(params)
-        repo_status = Actions.sh("git status --porcelain")
+        if params[:ignore_file] 
+          file_for_ignore = params[:ignore_file]
+          repo_status = Actions.sh("git status --porcelain --ignored #{file_for_ignore}")
+        else
+          repo_status = Actions.sh("git status --porcelain")
+        end  
+        
         repo_clean = repo_status.empty?
 
         if repo_clean
