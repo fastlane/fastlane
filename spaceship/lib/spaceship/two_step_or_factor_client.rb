@@ -1,6 +1,6 @@
 require_relative 'globals'
 require_relative 'tunes/tunes_client'
-require_relative 'helper'
+require 'fastlane_core/ui/ui'
 
 module Spaceship
   class Client
