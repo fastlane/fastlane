@@ -309,6 +309,14 @@ module Spaceship
         end
 
         #
+        # appPricePoints
+        #
+        def get_app_price_points(filter: {}, includes: nil, limit: nil, sort: nil)
+          params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          Client.instance.get("appPricePoints", params)
+        end
+
+        #
         # appReviewAttachments
         #
 
