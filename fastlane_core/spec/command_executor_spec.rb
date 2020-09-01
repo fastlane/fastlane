@@ -41,7 +41,7 @@ describe FastlaneCore do
         fake_std_in = [
           "Shopping list:\n",
           "  - Milk\n",
-          "  - Bread\n",
+          "\r  - Bread\n",
           "  - Muffins\n"
         ]
 

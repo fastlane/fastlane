@@ -55,8 +55,14 @@ module Spaceship
         "downloadable" =>  "downloadable",
         "createdDate" =>  "created_date",
 
-        "appStoreVersionSubmission" => "app_store_version_submission"
+        "appStoreVersionSubmission" => "app_store_version_submission",
+        "build" => "build"
       })
+
+      ESSENTIAL_INCLUDES = [
+        "appStoreVersionSubmission",
+        "build"
+      ].join(",")
 
       def self.type
         return "appStoreVersions"

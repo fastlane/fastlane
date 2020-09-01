@@ -1,11 +1,14 @@
 describe Spaceship::ConnectAPI::Tunes::Client do
-  let(:client) { Spaceship::ConnectAPI::Tunes::Client.instance }
+  let(:mock_tunes_client) { double('tunes_client') }
+  let(:client) { Spaceship::ConnectAPI::Tunes::Client.new(another_client: mock_tunes_client) }
   let(:hostname) { Spaceship::ConnectAPI::Tunes::Client.hostname }
   let(:username) { 'spaceship@krausefx.com' }
   let(:password) { 'so_secret' }
 
   before do
-    Spaceship::Tunes.login(username, password)
+    allow(mock_tunes_client).to receive(:team_id).and_return("123")
+    allow(Spaceship::TunesClient).to receive(:login).and_return(mock_tunes_client)
+    Spaceship::ConnectAPI.login(username, password)
   end
 
   context 'sends api request' do
@@ -63,7 +66,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
           req_mock = test_request_body(url, body)
 
           expect(client).to receive(:request).with(:post).and_yield(req_mock)
-          Spaceship::ConnectAPI.post_app_store_version_release_request(app_store_version_id: app_store_version_id)
+          client.post_app_store_version_release_request(app_store_version_id: app_store_version_id)
         end
       end
     end

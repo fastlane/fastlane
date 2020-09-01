@@ -128,6 +128,35 @@ func appStoreBuildNumber(initialBuildNumber: Any,
 }
 
 /**
+ Load the App Store Connect API token to use in other fastlane tools and actions
+
+ - parameters:
+   - keyId: The key ID
+   - issuerId: The issuer ID
+   - keyFilepath: The path to the key p8 file
+   - keyContent: The content of the key p8 file
+   - duration: The token session duration
+   - inHouse: Is App Store or Enterprise (in house) team? App Store Connect API cannot not determine this on its own (yet)
+
+ Load the App Store Connect API token to use in other fastlane tools and actions
+ */
+func appStoreConnectApiKey(keyId: String,
+                           issuerId: String,
+                           keyFilepath: String? = nil,
+                           keyContent: String? = nil,
+                           duration: Int? = nil,
+                           inHouse: Bool? = nil)
+{
+    let command = RubyCommand(commandID: "", methodName: "app_store_connect_api_key", className: nil, args: [RubyCommand.Argument(name: "key_id", value: keyId),
+                                                                                                             RubyCommand.Argument(name: "issuer_id", value: issuerId),
+                                                                                                             RubyCommand.Argument(name: "key_filepath", value: keyFilepath),
+                                                                                                             RubyCommand.Argument(name: "key_content", value: keyContent),
+                                                                                                             RubyCommand.Argument(name: "duration", value: duration),
+                                                                                                             RubyCommand.Argument(name: "in_house", value: inHouse)])
+    _ = runner.executeCommand(command)
+}
+
+/**
  Upload your app to [Appaloosa Store](https://www.appaloosa-store.com/)
 
  - parameters:
@@ -5149,6 +5178,8 @@ func pem(development: Bool = false,
  Alias for the `upload_to_testflight` action
 
  - parameters:
+   - apiKeyPath: Path to your App Store Connect API key JSON file
+   - apiKey: Path to your App Store Connect API key JSON file
    - username: Your Apple ID Username
    - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
    - appPlatform: The platform to use (optional)
@@ -5187,7 +5218,9 @@ func pem(development: Bool = false,
  More details can be found on https://docs.fastlane.tools/actions/pilot/.
  This integration will only do the TestFlight upload.
  */
-func pilot(username: String,
+func pilot(apiKeyPath: String? = nil,
+           apiKey: [String: Any]? = nil,
+           username: String,
            appIdentifier: String? = nil,
            appPlatform: String = "ios",
            appleId: String? = nil,
@@ -5222,7 +5255,9 @@ func pilot(username: String,
            waitForUploadedBuild: Bool = false,
            rejectBuildWaitingForReview: Bool = false)
 {
-    let command = RubyCommand(commandID: "", methodName: "pilot", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
+    let command = RubyCommand(commandID: "", methodName: "pilot", className: nil, args: [RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                         RubyCommand.Argument(name: "api_key", value: apiKey),
+                                                                                         RubyCommand.Argument(name: "username", value: username),
                                                                                          RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                          RubyCommand.Argument(name: "app_platform", value: appPlatform),
                                                                                          RubyCommand.Argument(name: "apple_id", value: appleId),
@@ -7237,6 +7272,16 @@ func spaceshipLogs(latest: Bool = true,
 }
 
 /**
+ Print out Spaceship stats from this session (number of request to each domain)
+
+ - parameter printRequestLogs: Print all URLs requested
+ */
+func spaceshipStats(printRequestLogs: Bool = false) {
+    let command = RubyCommand(commandID: "", methodName: "spaceship_stats", className: nil, args: [RubyCommand.Argument(name: "print_request_logs", value: printRequestLogs)])
+    _ = runner.executeCommand(command)
+}
+
+/**
  Upload dSYM file to [Splunk MINT](https://mint.splunk.com/)
 
  - parameters:
@@ -7708,6 +7753,8 @@ func testfairy(apiKey: String,
  Alias for the `upload_to_testflight` action
 
  - parameters:
+   - apiKeyPath: Path to your App Store Connect API key JSON file
+   - apiKey: Path to your App Store Connect API key JSON file
    - username: Your Apple ID Username
    - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
    - appPlatform: The platform to use (optional)
@@ -7746,7 +7793,9 @@ func testfairy(apiKey: String,
  More details can be found on https://docs.fastlane.tools/actions/pilot/.
  This integration will only do the TestFlight upload.
  */
-func testflight(username: String,
+func testflight(apiKeyPath: String? = nil,
+                apiKey: [String: Any]? = nil,
+                username: String,
                 appIdentifier: String? = nil,
                 appPlatform: String = "ios",
                 appleId: String? = nil,
@@ -7781,7 +7830,9 @@ func testflight(username: String,
                 waitForUploadedBuild: Bool = false,
                 rejectBuildWaitingForReview: Bool = false)
 {
-    let command = RubyCommand(commandID: "", methodName: "testflight", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
+    let command = RubyCommand(commandID: "", methodName: "testflight", className: nil, args: [RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                              RubyCommand.Argument(name: "api_key", value: apiKey),
+                                                                                              RubyCommand.Argument(name: "username", value: username),
                                                                                               RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                               RubyCommand.Argument(name: "app_platform", value: appPlatform),
                                                                                               RubyCommand.Argument(name: "apple_id", value: appleId),
@@ -8651,6 +8702,8 @@ func uploadToPlayStoreInternalAppSharing(packageName: String,
  Upload new binary to App Store Connect for TestFlight beta testing (via _pilot_)
 
  - parameters:
+   - apiKeyPath: Path to your App Store Connect API key JSON file
+   - apiKey: Path to your App Store Connect API key JSON file
    - username: Your Apple ID Username
    - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
    - appPlatform: The platform to use (optional)
@@ -8689,7 +8742,9 @@ func uploadToPlayStoreInternalAppSharing(packageName: String,
  More details can be found on https://docs.fastlane.tools/actions/pilot/.
  This integration will only do the TestFlight upload.
  */
-func uploadToTestflight(username: String,
+func uploadToTestflight(apiKeyPath: String? = nil,
+                        apiKey: [String: Any]? = nil,
+                        username: String,
                         appIdentifier: String? = nil,
                         appPlatform: String = "ios",
                         appleId: String? = nil,
@@ -8724,7 +8779,9 @@ func uploadToTestflight(username: String,
                         waitForUploadedBuild: Bool = false,
                         rejectBuildWaitingForReview: Bool = false)
 {
-    let command = RubyCommand(commandID: "", methodName: "upload_to_testflight", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
+    let command = RubyCommand(commandID: "", methodName: "upload_to_testflight", className: nil, args: [RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                                        RubyCommand.Argument(name: "api_key", value: apiKey),
+                                                                                                        RubyCommand.Argument(name: "username", value: username),
                                                                                                         RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                         RubyCommand.Argument(name: "app_platform", value: appPlatform),
                                                                                                         RubyCommand.Argument(name: "apple_id", value: appleId),
@@ -9207,4 +9264,4 @@ let snapshotfile: Snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.87]
+// FastlaneRunnerAPIVersion [0.9.90]

@@ -18,8 +18,8 @@ module Sigh
                                              title: "Summary for sigh #{Fastlane::VERSION}")
 
       UI.message("Starting login with user '#{Sigh.config[:username]}'")
-      Spaceship.login(Sigh.config[:username], nil)
-      Spaceship.select_team
+      Spaceship::ConnectAPI.login(Sigh.config[:username], nil, use_portal: true, use_tunes: false)
+      Spaceship::ConnectAPI.select_team
       UI.message("Successfully logged in")
 
       profiles = [] if Sigh.config[:skip_fetch_profiles]
@@ -60,12 +60,12 @@ module Sigh
       case Sigh.config[:platform]
       when "ios"
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE
-        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE if Spaceship.client.in_house?
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE if Spaceship::ConnectAPI.client.in_house?
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC if Sigh.config[:adhoc]
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT if Sigh.config[:development]
       when "tvos"
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_STORE
-        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE if Spaceship.client.in_house?
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE if Spaceship::ConnectAPI.client.in_house?
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC if Sigh.config[:adhoc]
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT if Sigh.config[:development]
       when "macos"

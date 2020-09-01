@@ -48,9 +48,9 @@ describe Sigh do
     end
 
     it "Existing profile fail on name taken" do
-      sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: nil, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["com.krausefx.app AppStore"] })
+      sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: nil, all_app_identifiers: ["com.krausefx.app", "com.krausefx.app.other"], app_identifier_and_profile_names: { "com.krausefx.app.other" => ["com.krausefx.app AppStore"] })
 
-      options = { app_identifier: "com.krausefx.app", skip_install: true, fail_on_name_taken: true, skip_certificate_verification: true, force: true }
+      options = { app_identifier: "com.krausefx.app", skip_install: true, fail_on_name_taken: true, skip_certificate_verification: true, force: false }
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
       expect { Sigh::Manager.start }.to raise_error("The name 'com.krausefx.app AppStore' is already taken, and fail_on_name_taken is true")
