@@ -72,6 +72,9 @@
 # new features June 2020
 # 1. enable (re)signing of OnDemandResources when ipa has been built for the appstore
 #
+# new features August 2020
+# 1. fixes usage for users with GNU-sed in their $PATH
+#
 
 # Logging functions
 
@@ -762,7 +765,7 @@ function resign {
 
             # Get the entry from app's entitlements
             # Read it with PlistBuddy as XML, then strip the header and <plist></plist> part
-            ENTITLEMENTS_VALUE="$(PlistBuddy -x -c "Print $KEY" "$APP_ENTITLEMENTS" 2>/dev/null | sed -e 's,.*<plist[^>]*>\(.*\)</plist>,\1,g')"
+            ENTITLEMENTS_VALUE="$(PlistBuddy -x -c "Print $KEY" "$APP_ENTITLEMENTS" 2>/dev/null | /usr/bin/sed -e 's,.*<plist[^>]*>\(.*\)</plist>,\1,g')"
             if [[ -z "$ENTITLEMENTS_VALUE" ]]; then
                 log "No value for '$KEY'"
                 continue
@@ -780,7 +783,7 @@ function resign {
                     log "Certificate $CERTIFICATE matches a SHA1 pattern"
                     local certificate_matches="$( security find-identity -v -p codesigning | grep -m 1 "$CERTIFICATE" )"
                     if [ -n "$certificate_matches" ]; then
-                        certificate_name="$( sed -E s/[^\"]+\"\([^\"]+\)\".*/\\1/ <<< $certificate_matches )"
+                        certificate_name="$(/usr/bin/sed -E s/[^\"]+\"\([^\"]+\)\".*/\\1/ <<< $certificate_matches )"
                         log "Certificate name: $certificate_name"
                     fi
                 fi
@@ -807,18 +810,18 @@ function resign {
             # otherwise it interprets they key path as nested keys
             # TODO: Should be able to replace with echo ${KEY//\./\\\\.} and remove shellcheck disable directive
             # shellcheck disable=SC2001
-            PLUTIL_KEY=$(echo "$KEY" | sed 's/\./\\\./g')
+            PLUTIL_KEY=$(echo "$KEY" | /usr/bin/sed 's/\./\\\./g')
             plutil -insert "$PLUTIL_KEY" -xml "$ENTITLEMENTS_VALUE" "$PATCHED_ENTITLEMENTS"
 
             # Patch the ID value if specified
             if [[ "$ID_TYPE" == "APP_ID" ]]; then
                 # Replace old value with new value in patched entitlements
                 log "Replacing old app identifier prefix '$OLD_APP_ID' with new value '$NEW_APP_ID'"
-                sed -i .bak "s/$OLD_APP_ID/$NEW_APP_ID/g" "$PATCHED_ENTITLEMENTS"
+                /usr/bin/sed -i .bak "s/$OLD_APP_ID/$NEW_APP_ID/g" "$PATCHED_ENTITLEMENTS"
             elif [[ "$ID_TYPE" == "TEAM_ID" ]]; then
                 # Replace old team identifier with new value
                 log "Replacing old team ID '$OLD_TEAM_ID' with new team ID: '$NEW_TEAM_ID'"
-                sed -i .bak "s/$OLD_TEAM_ID/$NEW_TEAM_ID/g" "$PATCHED_ENTITLEMENTS"
+                /usr/bin/sed -i .bak "s/$OLD_TEAM_ID/$NEW_TEAM_ID/g" "$PATCHED_ENTITLEMENTS"
             else
                 continue
             fi
@@ -835,7 +838,7 @@ function resign {
         # e.g. <string>AB1GP98Q19.com.example.foo</string>
         #         vs
         #      com.example.foo
-        sed -i .bak "s!${OLD_BUNDLE_ID}</string>!${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
+        /usr/bin/sed -i .bak "s!${OLD_BUNDLE_ID}</string>!${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
 
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
