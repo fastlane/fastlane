@@ -61,7 +61,7 @@ module Spaceship
 
       ESSENTIAL_INCLUDES = [
         "appStoreVersionSubmission",
-        "build",
+        "build"
       ].join(",")
 
       def self.type
