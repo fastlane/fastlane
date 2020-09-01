@@ -135,16 +135,6 @@ module Spaceship
       end
 
       #
-      # App Pricing Point
-      #
-
-      def fetch_app_price_points(filter: {}, includes: "priceTier,territory", limit: nil, sort: nil)
-        filter ||= {}
-        resp = Spaceship::ConnectAPI.get_app_price_points(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
-        return resp.to_models
-      end
-
-      #
       # App Store Versions
       #
 

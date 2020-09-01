@@ -11,7 +11,6 @@ module Spaceship
       attr_accessor :price_tier
       attr_accessor :territory
 
-
       attr_mapping({
         "customerPrice" => "customer_price",
         "proceeds" => "proceeds",
