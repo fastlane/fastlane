@@ -22,6 +22,7 @@ class MainProcess {
     #if SWIFT_PACKAGE
         var lastPrintDate = Date.distantFuture
         var timeBetweenPrints = Int.min
+        var rubySocketCommand: AsyncCommand!
     #endif
 
     @objc func connectToFastlaneAndRunLane(_ fastfile: LaneFile?) {
@@ -48,10 +49,11 @@ class MainProcess {
             let path = main.run(bash: "which fastlane").stdout
             let pids = main.run("lsof", "-t", "-i", ":2000").stdout.split(separator: "\n")
             pids.forEach { main.run("kill", "-9", $0) }
-            let command = main.runAsync(path, "socket_server", "-c", "1200")
+            rubySocketCommand = main.runAsync(path, "socket_server", "-c", "1200")
             lastPrintDate = Date()
-            command.stdout.onOutput { stdout in
-                print(stdout.readSome() ?? "")
+            rubySocketCommand.stderror.onStringOutput { print($0) }
+            rubySocketCommand.stdout.onStringOutput { stdout in
+                print(stdout)
                 self.timeBetweenPrints = Int(self.lastPrintDate.timeIntervalSinceNow)
             }
             _ = Runner.waitWithPolling(self.timeBetweenPrints, toEventually: { $0 > 5 }, timeout: 10)
