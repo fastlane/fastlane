@@ -102,6 +102,56 @@ describe Spaceship::ConnectAPI::Client do
         expect(portal_client).to receive(:select_team).with(team_id: nil, team_name: team_name)
         Spaceship::ConnectAPI::Client.login(username, password, team_name: team_name)
       end
+
+      context 'with environment variables' do
+        it 'with FASTLANE_TEAM_ID' do
+          stub_const('ENV', { 'FASTLANE_TEAM_ID' => team_id })
+
+          expect(Spaceship::PortalClient).to receive(:login).with(username, password).and_return(portal_client)
+          expect(Spaceship::TunesClient).to receive(:login).with(username, password).and_return(tunes_client)
+          expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: tunes_client, portal_client: portal_client)
+
+          expect(portal_client).to receive(:select_team)
+          expect(tunes_client).not_to(receive(:select_team))
+          Spaceship::ConnectAPI::Client.login(username, password)
+        end
+
+        it 'with FASTLANE_ITC_TEAM_ID' do
+          stub_const('ENV', { 'FASTLANE_ITC_TEAM_ID' => team_id })
+
+          expect(Spaceship::PortalClient).to receive(:login).with(username, password).and_return(portal_client)
+          expect(Spaceship::TunesClient).to receive(:login).with(username, password).and_return(tunes_client)
+          expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: tunes_client, portal_client: portal_client)
+
+          expect(portal_client).not_to(receive(:select_team))
+          expect(tunes_client).to receive(:select_team)
+          Spaceship::ConnectAPI::Client.login(username, password)
+        end
+
+        it 'with FASTLANE_TEAM_NAME' do
+          stub_const('ENV', { 'FASTLANE_TEAM_NAME' => team_name })
+
+          expect(Spaceship::PortalClient).to receive(:login).with(username, password).and_return(portal_client)
+          expect(Spaceship::TunesClient).to receive(:login).with(username, password).and_return(tunes_client)
+          expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: tunes_client, portal_client: portal_client)
+
+          expect(portal_client).to receive(:select_team)
+          expect(tunes_client).not_to(receive(:select_team))
+          Spaceship::ConnectAPI::Client.login(username, password)
+        end
+
+        it 'with FASTLANE_ITC_TEAM_NAME' do
+          stub_const('ENV', { 'FASTLANE_ITC_TEAM_NAME' => team_name })
+
+          expect(Spaceship::PortalClient).to receive(:login).with(username, password).and_return(portal_client)
+          expect(Spaceship::TunesClient).to receive(:login).with(username, password).and_return(tunes_client)
+          expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: tunes_client, portal_client: portal_client)
+
+          expect(portal_client).not_to(receive(:select_team))
+          expect(tunes_client).to receive(:select_team)
+          Spaceship::ConnectAPI::Client.login(username, password)
+        end
+      end
     end
 
     context "#in_house?" do

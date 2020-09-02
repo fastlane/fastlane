@@ -51,11 +51,15 @@ module Spaceship
         portal_client = Spaceship::Portal.login(user, password) if use_portal
         tunes_client = Spaceship::Tunes.login(user, password) if use_tunes
 
+        # Check is environment variables are set for Spaceship::Portal or Spaceship::Tunes to select team
+        has_portal_team_env = !(ENV['FASTLANE_TEAM_ID'] || ENV['FASTLANE_TEAM_NAME']).to_s.strip.empty?
+        has_tunes_team_env = !(ENV['FASTLANE_ITC_TEAM_ID'] || ENV['FASTLANE_ITC_TEAM_NAME']).to_s.strip.empty?
+
         # The clients will automatically select the first team if none is given
-        if portal_client && (!portal_team_id.nil? || !team_name.nil?)
+        if portal_client && (!portal_team_id.nil? || !team_name.nil? || has_portal_team_env)
           portal_client.select_team(team_id: portal_team_id, team_name: team_name)
         end
-        if tunes_client && (!tunes_team_id.nil? || !team_name.nil?)
+        if tunes_client && (!tunes_team_id.nil? || !team_name.nil? || has_tunes_team_env)
           tunes_client.select_team(team_id: tunes_team_id, team_name: team_name)
         end
 
