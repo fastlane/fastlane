@@ -364,10 +364,7 @@ module Pilot
       begin
         team = tunes_client.teams.find { |t| t['contentProvider']['contentProviderId'].to_s == tunes_client.team_id }
         name = team['contentProvider']['name']
-        STDERR.puts("name: #{name}")
-        STDERR.puts("id: #{generic_transporter.provider_ids}")
         provider_id = generic_transporter.provider_ids[name]
-        STDERR.puts("provider_id: #{provider_id}")
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
         return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
       rescue => ex
