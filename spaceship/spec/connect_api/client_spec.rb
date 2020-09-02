@@ -66,6 +66,8 @@ describe Spaceship::ConnectAPI::Client do
       let(:portal_client) { double('portal_client') }
 
       it 'no team_id or team_name' do
+        stub_const('ENV', {})
+
         expect(Spaceship::PortalClient).to receive(:login).with(username, password).and_return(portal_client)
         expect(Spaceship::TunesClient).to receive(:login).with(username, password).and_return(tunes_client)
         expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: tunes_client, portal_client: portal_client)
@@ -74,6 +76,8 @@ describe Spaceship::ConnectAPI::Client do
       end
 
       it 'with portal_team_id' do
+        stub_const('ENV', {})
+
         expect(Spaceship::PortalClient).to receive(:login).with(username, password).and_return(portal_client)
         expect(Spaceship::TunesClient).not_to(receive(:login).with(username, password))
         expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: nil, portal_client: portal_client)
@@ -84,6 +88,8 @@ describe Spaceship::ConnectAPI::Client do
       end
 
       it 'with tunes_team_id' do
+        stub_const('ENV', {})
+
         expect(Spaceship::PortalClient).not_to(receive(:login).with(username, password))
         expect(Spaceship::TunesClient).to receive(:login).with(username, password).and_return(tunes_client)
         expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: tunes_client, portal_client: nil)
@@ -94,6 +100,8 @@ describe Spaceship::ConnectAPI::Client do
       end
 
       it 'with team_name' do
+        stub_const('ENV', {})
+
         expect(Spaceship::PortalClient).to receive(:login).with(username, password).and_return(portal_client)
         expect(Spaceship::TunesClient).to receive(:login).with(username, password).and_return(tunes_client)
         expect(Spaceship::ConnectAPI::Client).to receive(:new).with(tunes_client: tunes_client, portal_client: portal_client)
