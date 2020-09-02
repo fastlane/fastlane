@@ -19,7 +19,6 @@ module Sigh
 
       UI.message("Starting login with user '#{Sigh.config[:username]}'")
       Spaceship::ConnectAPI.login(Sigh.config[:username], nil, use_portal: true, use_tunes: false)
-      Spaceship::ConnectAPI.select_team
       UI.message("Successfully logged in")
 
       profiles = [] if Sigh.config[:skip_fetch_profiles]
