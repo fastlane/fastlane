@@ -51,7 +51,7 @@ module Spaceship
         portal_client = Spaceship::Portal.login(user, password) if use_portal
         tunes_client = Spaceship::Tunes.login(user, password) if use_tunes
 
-        # Check is environment variables are set for Spaceship::Portal or Spaceship::Tunes to select team
+        # Check if environment variables are set for Spaceship::Portal or Spaceship::Tunes to select team
         portal_team_id ||= ENV['FASTLANE_TEAM_ID']
         portal_team_name = team_name || ENV['FASTLANE_TEAM_NAME']
         tunes_team_id ||= ENV['FASTLANE_ITC_TEAM_ID']
