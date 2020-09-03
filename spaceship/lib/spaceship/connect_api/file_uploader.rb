@@ -4,6 +4,8 @@ require 'faraday_middleware'
 
 require 'spaceship/globals'
 
+require 'openssl'
+
 module Spaceship
   class ConnectAPI
     module FileUploader
