@@ -106,19 +106,19 @@ module Fastlane
           end
 
           UI.verbose("Build_version: #{asc_build_number} matches #{build_number}, grabbing dsym_url") if build_number
-          get_details_and_download_dsym(app_id: app.id, train: asc_app_version, build_number: asc_build_number, platform: itc_platform, wait_for_dsym_processing: wait_for_dsym_processing, wait_timeout: wait_timeout, output_directory: output_directory)
+          get_details_and_download_dsym(app: app, train: asc_app_version, build_number: asc_build_number, platform: itc_platform, wait_for_dsym_processing: wait_for_dsym_processing, wait_timeout: wait_timeout, output_directory: output_directory)
         end
       end
 
-      def self.get_details_and_download_dsym(app_id: nil, train: nil, build_number: nil, platform: nil, wait_for_dsym_processing: nil, wait_timeout: nil, output_directory: nil)
+      def self.get_details_and_download_dsym(app: nil, train: nil, build_number: nil, platform: nil, wait_for_dsym_processing: nil, wait_timeout: nil, output_directory: nil)
         start = Time.now
         download_url = nil
 
         loop do
           begin
-            resp = Spaceship::Tunes.client.build_details(app_id: app_id, train: train, build_number: build_number, platform: platform)
+            resp = Spaceship::Tunes.client.build_details(app_id: app.id, train: train, build_number: build_number, platform: platform)
 
-            resp['apple_id'] = app_id
+            resp['apple_id'] = app.id
             build_details = Spaceship::Tunes::BuildDetails.factory(resp)
 
             download_url = build_details.dsym_url
@@ -138,14 +138,14 @@ module Fastlane
             end
           end
 
-          return
+          break
         end
 
         if download_url
-          self.download(download_url, app.bundle_id, train.version_string, build.build_version, output_directory)
+          self.download(download_url, app.bundle_id, train, build_number, output_directory)
           return if build_number
         else
-          UI.message("No dSYM URL for #{build.build_version} (#{train.version_string})")
+          UI.message("No dSYM URL for #{build_number} (#{train})")
         end
       end
       # rubocop:enable Metrics/PerceivedComplexity

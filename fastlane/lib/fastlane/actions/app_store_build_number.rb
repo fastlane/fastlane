@@ -37,7 +37,7 @@ module Fastlane
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
           live_version = app.get_live_app_store_version(platform: platform)
-          
+
           UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on App Store Connect") unless live_version
           build_nr = live_version.build.version
 
