@@ -11,6 +11,9 @@ protocol PrecheckfileProtocol: class {
     /// The name of your App Store Connect team if you're in multiple teams
     var teamName: String? { get }
 
+    /// The platform to use (optional)
+    var platform: String { get }
+
     /// The default rule level unless otherwise configured
     var defaultRuleLevel: String { get }
 
@@ -26,6 +29,7 @@ extension PrecheckfileProtocol {
     var username: String { return "" }
     var teamId: String? { return nil }
     var teamName: String? { return nil }
+    var platform: String { return "ios" }
     var defaultRuleLevel: String { return "error" }
     var includeInAppPurchases: Bool { return true }
     var freeStuffInIap: String? { return nil }
@@ -33,4 +37,4 @@ extension PrecheckfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.35]
+// FastlaneRunnerAPIVersion [0.9.36]
