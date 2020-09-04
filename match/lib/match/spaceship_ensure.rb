@@ -18,14 +18,14 @@ module Match
         UI.important("More information https://docs.fastlane.tools/actions/match/#access-control")
       end
 
+      # Prompts select team if multiple teams and none specified
       UI.message("Verifying that the certificate and profile are still valid on the Dev Portal...")
-      Spaceship::ConnectAPI.login(use_portal: true, use_tunes: false)
-      Spaceship::ConnectAPI.select_team
+      Spaceship::ConnectAPI.login(user, use_portal: true, use_tunes: false, portal_team_id: team_id, team_name: team_name)
     end
 
     # The team ID of the currently logged in team
     def team_id
-      return Spaceship::ConnectAPI.client.team_id
+      return Spaceship::ConnectAPI.client.portal_team_id
     end
 
     def bundle_identifier_exists(username: nil, app_identifier: nil, platform: nil)

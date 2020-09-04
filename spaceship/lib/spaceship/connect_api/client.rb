@@ -57,13 +57,11 @@ module Spaceship
         tunes_team_id ||= ENV['FASTLANE_ITC_TEAM_ID']
         tunes_team_name = team_name || ENV['FASTLANE_ITC_TEAM_NAME']
 
-        # The clients will automatically select the first team if none is given
-        if portal_client && (!portal_team_id.to_s.strip.empty? || !portal_team_name.to_s.strip.empty?)
-          portal_client.select_team(team_id: portal_team_id, team_name: portal_team_name)
-        end
-        if tunes_client && (!tunes_team_id.to_s.strip.empty? || !tunes_team_name.to_s.strip.empty?)
-          tunes_client.select_team(team_id: tunes_team_id, team_name: tunes_team_name)
-        end
+        # The clients will prompt for a team selection if:
+        # 1. client exists
+        # 2. team_id and team_name are nil and user belongs to multiple teams
+        portal_client.select_team(team_id: portal_team_id, team_name: portal_team_name) if portal_client
+        tunes_client.select_team(team_id: tunes_team_id, team_name: tunes_team_name) if tunes_client
 
         return ConnectAPI::Client.new(tunes_client: tunes_client, portal_client: portal_client)
       end
@@ -93,6 +91,16 @@ module Spaceship
           tunes_client: @tunes_client,
           portal_client: @portal_client
         )
+      end
+
+      def portal_team_id
+        return nil if @portal_client.nil?
+        return @portal_client.team_id
+      end
+
+      def tunes_team_id
+        return nil if @tunes_client.nil?
+        return @tunes_client.team_id
       end
 
       def in_house?

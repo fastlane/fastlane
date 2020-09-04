@@ -26,6 +26,8 @@ module Deliver
     end
 
     def login
+      # Team selection passed though FASTLANE_TEAM_ID and FASTLANE_TEAM_NAME environment variables
+      # Prompts select team if multiple teams and none specified
       UI.message("Login to App Store Connect (#{options[:username]})")
       Spaceship::ConnectAPI.login(options[:username], nil, use_portal: false, use_tunes: true)
       UI.message("Login successful")

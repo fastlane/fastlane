@@ -10,6 +10,8 @@ module Fastlane
         require 'spaceship'
         require 'net/http'
 
+        # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
+        # Prompts select team if multiple teams and none specified
         UI.message("Login to App Store Connect (#{params[:username]})")
         Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true)
         UI.message("Login successful")
