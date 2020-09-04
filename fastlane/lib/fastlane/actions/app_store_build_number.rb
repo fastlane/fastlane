@@ -26,6 +26,7 @@ module Fastlane
       end
 
       def self.get_build_number(params)
+        # Prompts select team if multiple teams and none specified
         UI.message("Login to App Store Connect (#{params[:username]})")
         Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true, tunes_team_id: params[:team_id], team_name: params[:team_name])
         UI.message("Login successful")

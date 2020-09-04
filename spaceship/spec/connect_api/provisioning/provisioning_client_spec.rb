@@ -5,7 +5,7 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
   let(:password) { 'so_secret' }
 
   before do
-    Spaceship::ConnectAPI.login(username, password)
+    Spaceship::ConnectAPI.login(username, password, use_portal: true, use_tunes: false)
   end
 
   context 'sends api request' do
