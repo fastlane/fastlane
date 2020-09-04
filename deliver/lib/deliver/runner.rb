@@ -68,7 +68,8 @@ module Deliver
         default_rule_level: options[:precheck_default_rule_level],
         include_in_app_purchases: options[:precheck_include_in_app_purchases],
         app_identifier: options[:app_identifier],
-        username: options[:username]
+        username: options[:username],
+        platform: options[:platform]
       }
 
       precheck_config = FastlaneCore::Configuration.create(Precheck::Options.available_options, precheck_options)
