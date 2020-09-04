@@ -710,6 +710,18 @@ module Spaceship
           tunes_request_client.post("appStoreVersionPhasedReleases", body)
         end
 
+        def patch_app_store_version_phased_release(app_store_version_phased_release_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appStoreVersionPhasedReleases",
+              attributes: attributes,
+              id: app_store_version_phased_release_id
+            }
+          }
+
+          tunes_request_client.patch("appStoreVersionPhasedReleases/#{app_store_version_phased_release_id}", body)
+        end
+
         def delete_app_store_version_phased_release(app_store_version_phased_release_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
           tunes_request_client.delete("appStoreVersionPhasedReleases/#{app_store_version_phased_release_id}", params)
