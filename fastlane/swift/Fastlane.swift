@@ -2886,7 +2886,7 @@ func downloadDsyms(username: String,
 func downloadFromPlayStore(packageName: String,
                            versionName: String? = nil,
                            track: String = "production",
-                           metadataPath: String? = nil,
+                           metadataPath: String = "./metadata",
                            key: String? = nil,
                            issuer: String? = nil,
                            jsonKey: String? = nil,
@@ -7431,7 +7431,7 @@ func supply(packageName: String,
             releaseStatus: String = "completed",
             track: String = "production",
             rollout: String? = nil,
-            metadataPath: String? = nil,
+            metadataPath: String = "./metadata",
             key: String? = nil,
             issuer: String? = nil,
             jsonKey: String? = nil,
@@ -8588,7 +8588,7 @@ func uploadToPlayStore(packageName: String,
                        releaseStatus: String = "completed",
                        track: String = "production",
                        rollout: String? = nil,
-                       metadataPath: String? = nil,
+                       metadataPath: String = "./metadata",
                        key: String? = nil,
                        issuer: String? = nil,
                        jsonKey: String? = nil,
@@ -9118,7 +9118,7 @@ func xcov(workspace: String? = nil,
           coverallsServiceJobId: String? = nil,
           coverallsRepoToken: String? = nil,
           xcconfig: String? = nil,
-          ideFoundationPath: String = "/Applications/Xcode-11.5.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+          ideFoundationPath: String = "/Applications/Xcode-12.beta.5.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
           legacySupport: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -9254,14 +9254,14 @@ func parseInt(fromString: String, function: String = #function) -> Int {
     return NSString(string: fromString.trimmingCharacters(in: .punctuationCharacters)).integerValue
 }
 
-let deliverfile: Deliverfile = Deliverfile()
-let gymfile: Gymfile = Gymfile()
-let matchfile: Matchfile = Matchfile()
-let precheckfile: Precheckfile = Precheckfile()
-let scanfile: Scanfile = Scanfile()
-let screengrabfile: Screengrabfile = Screengrabfile()
-let snapshotfile: Snapshotfile = Snapshotfile()
+let deliverfile = Deliverfile()
+let gymfile = Gymfile()
+let matchfile = Matchfile()
+let precheckfile = Precheckfile()
+let scanfile = Scanfile()
+let screengrabfile = Screengrabfile()
+let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.90]
+// FastlaneRunnerAPIVersion [0.9.91]
