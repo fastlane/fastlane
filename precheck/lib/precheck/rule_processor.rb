@@ -155,6 +155,18 @@ module Precheck
                                                   is_optional: true)
       end
 
+      should_include_iap = Precheck.config[:include_in_app_purchases]
+      if should_include_iap
+        UI.message("Reading in-app purchases. If you have a lot, this might take a while")
+        UI.message("You can disable IAP checking by setting the `include_in_app_purchases` flag to `false`")
+        in_app_purchases = get_iaps(app_id: app.id)
+        in_app_purchases ||= []
+        in_app_purchases.each do |purchase|
+          items += collect_iap_language_items(purchase_edit_versions: purchase.edit.versions)
+        end
+        UI.message("Done reading in-app purchases")
+      end
+
       return items
     end
 
@@ -193,19 +205,27 @@ module Precheck
                                                  is_optional: true)
       end
 
-      should_include_iap = Precheck.config[:include_in_app_purchases]
-      if should_include_iap
-        UI.message("Reading in-app purchases. If you have a lot, this might take a while")
-        UI.message("You can disable IAP checking by setting the `include_in_app_purchases` flag to `false`")
-        # in_app_purchases = app.in_app_purchases.all
-        # in_app_purchases ||= []
-        # in_app_purchases.each do |purchase|
-        #   items += collect_iap_language_items(purchase_edit_versions: purchase.edit.versions)
-        # end
-        UI.message("Done reading in-app purchases")
-      end
-
       return items
+    end
+
+    # As of 2020-09-04, this is the only non App Store Connect call in prechecks
+    # This will need to get replaced when the API becomes available
+    def self.get_iaps(app_id: nil, include_deleted: false)
+      r = Spaceship::Tunes.client.iaps(app_id: app_id)
+      return_iaps = []
+      r.each do |product|
+        attrs = product
+
+        # This is not great but Spaceship::Tunes::IAPList.factory looks
+        # for `application.apple_id`
+        mock_application = OpenStruct.new({ apple_id: app_id })
+        attrs[:application] = mock_application
+
+        loaded_iap = Spaceship::Tunes::IAPList.factory(attrs)
+        next if loaded_iap.status == "deleted" && !include_deleted
+        return_iaps << loaded_iap
+      end
+      return return_iaps
     end
 
     def self.collect_iap_language_items(purchase_edit_versions: nil, is_optional: false)
