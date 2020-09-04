@@ -43,8 +43,8 @@ module Precheck
   class RuleProcessor
     def self.process_app_and_version(app: nil, app_version: nil, rules: nil)
       items_to_check = []
-      items_to_check += generate_text_items_to_check(app: app, app_version: app_version)
-      items_to_check += generate_url_items_to_check(app: app, app_version: app_version)
+      items_to_check += generate_app_items_to_check(app: app)
+      items_to_check += generate_version_items_to_check(app_version: app_version)
 
       return process_rules(items_to_check: items_to_check, rules: rules)
     end
@@ -125,70 +125,83 @@ module Precheck
       return rule_hash
     end
 
-    def self.generate_url_items_to_check(app: nil, app_version: nil)
+    def self.generate_app_items_to_check(app: nil)
       items = []
-      items += collect_urls_from_hash(hash: app_version.support_url,
-                                 item_name: :support_url,
-                     friendly_name_postfix: "support URL")
-      items += collect_urls_from_hash(hash: app_version.marketing_url,
-                                 item_name: :marketing_url,
-                     friendly_name_postfix: "marketing URL",
-                               is_optional: true)
 
-      items += collect_urls_from_hash(hash: app.details.privacy_url,
-                                 item_name: :privacy_url,
-                     friendly_name_postfix: "privacy URL",
-                               is_optional: true)
-      return items
-    end
+      # App info localizations
+      app_info = app.fetch_edit_app_info
+      app_info_localizations = app_info.get_app_info_localizations
+      app_info_localizations.each do |localization|
+        items << collect_text_items_from_language_item(locale: localization.locale,
+                                                        value: localization.name,
+                                                    item_name: :app_name,
+                                        friendly_name_postfix: "app name")
 
-    def self.collect_urls_from_hash(hash: nil, item_name: nil, friendly_name_postfix: nil, is_optional: false)
-      items = []
-      hash.each do |key, value|
-        items << URLItemToCheck.new(value, item_name, "#{friendly_name_postfix}: (#{key})", is_optional)
+        items << collect_text_items_from_language_item(locale: localization.locale,
+                                                        value: localization.subtitle,
+                                                    item_name: :app_subtitle,
+                                        friendly_name_postfix: "app name subtitle",
+                                                  is_optional: true)
+
+        items << collect_text_items_from_language_item(locale: localization.locale,
+                                                        value: localization.privacy_policy_text,
+                                                    item_name: :privacy_policy_text,
+                                        friendly_name_postfix: " tv privacy policy")
+
+        items << collect_urls_from_language_item(locale: localization.locale,
+                                                        value: localization.privacy_policy_url,
+                                                    item_name: :privacy_policy_url,
+                                        friendly_name_postfix: "privacy URL",
+                                                  is_optional: true)
       end
+
       return items
     end
 
-    def self.generate_text_items_to_check(app: nil, app_version: nil)
+    def self.generate_version_items_to_check(app_version: nil)
       items = []
 
       items << TextItemToCheck.new(app_version.copyright, :copyright, "copyright")
 
-      items += collect_text_items_from_language_item(hash: app_version.keywords,
-                                                item_name: :keywords,
-                                    friendly_name_postfix: "keywords")
+      # Version localizations
+      version_localizations = app_version.get_app_store_version_localizations
+      version_localizations.each do |localization|
+        items << collect_text_items_from_language_item(locale: localization.locale,
+                                                        value: localization.keywords,
+                                                    item_name: :keywords,
+                                        friendly_name_postfix: "keywords")
 
-      items += collect_text_items_from_language_item(hash: app_version.description,
-                                                item_name: :description,
-                                    friendly_name_postfix: "description")
+        items << collect_text_items_from_language_item(locale: localization.locale,
+                                                        value: localization.description,
+                                                    item_name: :description,
+                                        friendly_name_postfix: "description")
 
-      items += collect_text_items_from_language_item(hash: app_version.release_notes,
-                                                item_name: :release_notes,
-                                    friendly_name_postfix: "release notes")
+        items << collect_text_items_from_language_item(locale: localization.locale,
+                                                        value: localization.whats_new,
+                                                    item_name: :release_notes,
+                                        friendly_name_postfix: "what's new")
 
-      items += collect_text_items_from_language_item(hash: app.details.name,
-                                                item_name: :app_name,
-                                    friendly_name_postfix: "app name")
+        items << collect_urls_from_language_item(locale: localization.locale,
+                                                        value: localization.support_url,
+                                                    item_name: :support_url,
+                                        friendly_name_postfix: "support URL")
 
-      items += collect_text_items_from_language_item(hash: app.details.apple_tv_privacy_policy,
-                                                item_name: :app_subtitle,
-                                    friendly_name_postfix: " tv privacy policy")
-
-      items += collect_text_items_from_language_item(hash: app.details.subtitle,
-                                                item_name: :app_subtitle,
-                                    friendly_name_postfix: "app name subtitle",
-                                              is_optional: true)
+        items << collect_urls_from_language_item(locale: localization.locale,
+                                                        value: localization.marketing_url,
+                                                    item_name: :marketing_url,
+                                        friendly_name_postfix: "marketing URL",
+                                                 is_optional: true)
+      end
 
       should_include_iap = Precheck.config[:include_in_app_purchases]
       if should_include_iap
         UI.message("Reading in-app purchases. If you have a lot, this might take a while")
         UI.message("You can disable IAP checking by setting the `include_in_app_purchases` flag to `false`")
-        in_app_purchases = app.in_app_purchases.all
-        in_app_purchases ||= []
-        in_app_purchases.each do |purchase|
-          items += collect_iap_language_items(purchase_edit_versions: purchase.edit.versions)
-        end
+        # in_app_purchases = app.in_app_purchases.all
+        # in_app_purchases ||= []
+        # in_app_purchases.each do |purchase|
+        #   items += collect_iap_language_items(purchase_edit_versions: purchase.edit.versions)
+        # end
         UI.message("Done reading in-app purchases")
       end
 
@@ -207,12 +220,12 @@ module Precheck
     end
 
     # a few attributes are LanguageItem this method creates a TextItemToCheck for each pair
-    def self.collect_text_items_from_language_item(hash: nil, item_name: nil, friendly_name_postfix: nil, is_optional: false)
-      items = []
-      hash.each do |key, value|
-        items << TextItemToCheck.new(value, item_name, "#{friendly_name_postfix}: (#{key})", is_optional)
-      end
-      return items
+    def self.collect_text_items_from_language_item(locale: nil, value: nil, item_name: nil, friendly_name_postfix: nil, is_optional: false)
+      return TextItemToCheck.new(value, item_name, "#{friendly_name_postfix}: (#{locale})", is_optional)
+    end
+
+    def self.collect_urls_from_language_item(locale: nil, value: nil, item_name: nil, friendly_name_postfix: nil, is_optional: false)
+      return URLItemToCheck.new(value, item_name, "#{friendly_name_postfix}: (#{locale})", is_optional)
     end
   end
 end
