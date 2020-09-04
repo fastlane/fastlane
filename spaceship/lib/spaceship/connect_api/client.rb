@@ -93,6 +93,16 @@ module Spaceship
         )
       end
 
+      def portal_team_id
+        return nil if @portal_client.nil?
+        return @portal_client.team_id
+      end
+
+      def tunes_team_id
+        return nil if @tunes_client.nil?
+        return @tunes_client.team_id
+      end
+
       def in_house?
         if token
           if token.in_house.nil?
