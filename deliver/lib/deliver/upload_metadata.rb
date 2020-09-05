@@ -111,7 +111,7 @@ module Deliver
       end
 
       # Needed for to filter out release notes from being sent up
-      number_of_versions = app.get_app_store_versions(filter: { platform: platform }, limit: 2).size
+      number_of_versions = app.get_app_store_versions_count(filter: { platform: platform }, limit: 2)
       is_first_version = number_of_versions == 1
       UI.verbose("Version '#{version.version_string}' is the first version on App Store Connect") if is_first_version
 
