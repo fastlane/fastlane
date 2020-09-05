@@ -191,7 +191,7 @@ describe Deliver::UploadMetadata do
         }
 
         # Get number of verions (used for if whats_new should be sent)
-        expect(app).to receive(:get_app_store_versions).and_return([])
+        expect(app).to receive(:get_app_store_versions_count).and_return(0)
 
         expect(version).to receive(:update).with(attributes: {
           "releaseType" => "MANUAL"
@@ -224,7 +224,7 @@ describe Deliver::UploadMetadata do
         }
 
         # Get number of verions (used for if whats_new should be sent)
-        expect(app).to receive(:get_app_store_versions).and_return([])
+        expect(app).to receive(:get_app_store_versions_count).and_return(0)
 
         expect(version).to receive(:update).with(attributes: {
           "releaseType" => "SCHEDULED",
@@ -248,7 +248,7 @@ describe Deliver::UploadMetadata do
         }
 
         # Get number of verions (used for if whats_new should be sent)
-        expect(app).to receive(:get_app_store_versions).and_return([])
+        expect(app).to receive(:get_app_store_versions_count).and_return(0)
 
         # Defaults to release type manual
         expect(version).to receive(:update).with(attributes: {
@@ -278,7 +278,7 @@ describe Deliver::UploadMetadata do
         }
 
         # Get number of verions (used for if whats_new should be sent)
-        expect(app).to receive(:get_app_store_versions).and_return([])
+        expect(app).to receive(:get_app_store_versions_count).and_return(0)
 
         # Defaults to release type manual
         expect(version).to receive(:update).with(attributes: {
@@ -309,7 +309,7 @@ describe Deliver::UploadMetadata do
         }
 
         # Get number of verions (used for if whats_new should be sent)
-        expect(app).to receive(:get_app_store_versions).and_return([])
+        expect(app).to receive(:get_app_store_versions_count).and_return(0)
 
         # Defaults to release type manual
         expect(version).to receive(:update).with(attributes: {
@@ -337,7 +337,7 @@ describe Deliver::UploadMetadata do
         }
 
         # Get number of verions (used for if whats_new should be sent)
-        expect(app).to receive(:get_app_store_versions).and_return([])
+        expect(app).to receive(:get_app_store_versions_count).and_return(0)
 
         # Defaults to release type manual
         expect(version).to receive(:update).with(attributes: {
