@@ -77,7 +77,7 @@ module Fastlane
                                        description: "The flag whether to ignore file the git status if the repo is dirty",
                                        optional: true,
                                        default_value: false,
-                                       is_string: false)
+                                       is_string: true)
         ]
       end
 
