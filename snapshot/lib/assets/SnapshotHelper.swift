@@ -165,12 +165,7 @@ open class Snapshot: NSObject {
             }
 
             let screenshot = XCUIScreen.main.screenshot()
-            let image: UIImage
-            if #available(iOS 10.0, *) {
-                 image = XCUIDevice.shared.orientation.isLandscape ?  fixLandscapeOrientation(image: screenshot.image) : screenshot.image
-             } else {
-                 image = screenshot.image
-             }
+            let image = XCUIDevice.shared.orientation.isLandscape ?  fixLandscapeOrientation(image: screenshot.image) : screenshot.image
 
             guard var simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
 
@@ -190,11 +185,15 @@ open class Snapshot: NSObject {
     }
 
     class func fixLandscapeOrientation(image: UIImage) -> UIImage {
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = image.scale
-        let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
-        return renderer.image { context in
-            image.draw(in: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
+        if #available(iOS 10.0, *) {
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = image.scale
+            let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
+            return renderer.image { context in
+                image.draw(in: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
+            }
+        } else {
+            return image
         }
     }
 
