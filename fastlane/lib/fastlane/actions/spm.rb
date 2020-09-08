@@ -5,6 +5,7 @@ module Fastlane
         cmd = ["swift"]
 
         cmd << (package_commands.include?(params[:command]) ? "package" : params[:command])
+        cmd << "--enable-code-coverage" if params[:enable_code_coverage] && params[:command].include?(generate_xcode_proj)
         cmd << "--build-path #{params[:build_path]}" if params[:build_path]
         cmd << "--package-path #{params[:package_path]}" if params[:package_path]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
@@ -44,6 +45,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid command. Use one of the following: #{available_commands.join(', ')}") unless available_commands.include?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :enable_code_coverage,
+                                       env_name: "FL_SPM_ENABLE_CODE_COVERAGE",
+                                       description: "Enables code coverage for the generated Xcode project when using the generate-xcodeproj command",
+                                       is_string: false,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :build_path,
                                        env_name: "FL_SPM_BUILD_PATH",
                                        description: "Specify build/cache directory [default: ./.build]",
