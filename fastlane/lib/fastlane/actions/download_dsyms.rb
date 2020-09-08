@@ -159,7 +159,7 @@ module Fastlane
         latest_build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion").first
 
         if latest_build.nil?
-          UI.user_error!("Could not find latest bulid for version #{version}")
+          UI.user_error!("Could not find latest build for version #{version}")
         end
 
         return latest_build
