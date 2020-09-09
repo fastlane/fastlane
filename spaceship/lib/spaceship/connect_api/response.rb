@@ -20,12 +20,6 @@ module Spaceship
         return links["next"]
       end
 
-      def paged_resources_count
-        return nil if body.nil? || !body["meta"].kind_of?(Hash)
-        paging = body["meta"]["paging"] || {}
-        return paging["total"]
-      end
-
       def next_page
         url = next_url
         return nil if url.nil?

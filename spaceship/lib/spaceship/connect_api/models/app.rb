@@ -244,14 +244,6 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def get_app_store_versions_count(filter: {}, limit: nil)
-        return Spaceship::ConnectAPI.get_app_store_versions(
-          app_id: id,
-          filter: filter,
-          includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES,
-          limit: limit
-        ).paged_resources_count
-      end
       #
       # Beta Feedback
       #
