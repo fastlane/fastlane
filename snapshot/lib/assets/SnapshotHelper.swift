@@ -165,6 +165,8 @@ open class Snapshot: NSObject {
             }
 
             let screenshot = XCUIScreen.main.screenshot()
+            let image = XCUIDevice.shared.orientation.isLandscape ?  fixLandscapeOrientation(image: screenshot.image) : screenshot.image
+
             guard var simulator = ProcessInfo().environment["SIMULATOR_DEVICE_NAME"], let screenshotsDir = screenshotsDirectory else { return }
 
             do {
@@ -174,12 +176,25 @@ open class Snapshot: NSObject {
                 simulator = regex.stringByReplacingMatches(in: simulator, range: range, withTemplate: "")
 
                 let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
-                try screenshot.pngRepresentation.write(to: path)
+                try image.pngData()?.write(to: path, options: .atomic)
             } catch let error {
                 NSLog("Problem writing screenshot: \(name) to \(screenshotsDir)/\(simulator)-\(name).png")
                 NSLog(error.localizedDescription)
             }
         #endif
+    }
+
+    class func fixLandscapeOrientation(image: UIImage) -> UIImage {
+        if #available(iOS 10.0, *) {
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = image.scale
+            let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
+            return renderer.image { context in
+                image.draw(in: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
+            }
+        } else {
+            return image
+        }
     }
 
     class func waitForLoadingIndicatorToDisappear(within timeout: TimeInterval) {
@@ -279,4 +294,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.23]
+// SnapshotHelperVersion [1.24]
