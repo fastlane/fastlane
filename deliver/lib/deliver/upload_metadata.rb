@@ -114,7 +114,6 @@ module Deliver
       number_of_versions = Spaceship::ConnectAPI.get_app_store_versions(
         app_id: app.id,
         filter: { platform: platform },
-        includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES,
         limit: 2
       ).count
       is_first_version = number_of_versions == 1
