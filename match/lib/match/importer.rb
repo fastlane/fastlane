@@ -2,6 +2,7 @@ require_relative 'spaceship_ensure'
 require_relative 'encryption'
 require_relative 'storage'
 require_relative 'module'
+require_relative 'generator'
 require 'fastlane_core/provisioning_profile'
 require 'fileutils'
 
