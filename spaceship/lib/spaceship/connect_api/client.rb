@@ -43,25 +43,28 @@ module Spaceship
       # @param portal_team_id (String) (optional): The Spaceship::Portal team id
       # @param tunes_team_id (String) (optional): The Spaceship::Tunes team id
       # @param team_name (String) (optional): The team name
+      # @param skip_select_team (Boolean) (optional): Whether to skip automatic selection or prompt for team
       #
       # @raise InvalidUserCredentialsError: raised if authentication failed
       #
       # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
-      def self.login(user = nil, password = nil, use_portal: true, use_tunes: true, portal_team_id: nil, tunes_team_id: nil, team_name: nil)
+      def self.login(user = nil, password = nil, use_portal: true, use_tunes: true, portal_team_id: nil, tunes_team_id: nil, team_name: nil, skip_select_team: false)
         portal_client = Spaceship::Portal.login(user, password) if use_portal
         tunes_client = Spaceship::Tunes.login(user, password) if use_tunes
 
-        # Check if environment variables are set for Spaceship::Portal or Spaceship::Tunes to select team
-        portal_team_id ||= ENV['FASTLANE_TEAM_ID']
-        portal_team_name = team_name || ENV['FASTLANE_TEAM_NAME']
-        tunes_team_id ||= ENV['FASTLANE_ITC_TEAM_ID']
-        tunes_team_name = team_name || ENV['FASTLANE_ITC_TEAM_NAME']
+        unless skip_select_team
+          # Check if environment variables are set for Spaceship::Portal or Spaceship::Tunes to select team
+          portal_team_id ||= ENV['FASTLANE_TEAM_ID']
+          portal_team_name = team_name || ENV['FASTLANE_TEAM_NAME']
+          tunes_team_id ||= ENV['FASTLANE_ITC_TEAM_ID']
+          tunes_team_name = team_name || ENV['FASTLANE_ITC_TEAM_NAME']
 
-        # The clients will prompt for a team selection if:
-        # 1. client exists
-        # 2. team_id and team_name are nil and user belongs to multiple teams
-        portal_client.select_team(team_id: portal_team_id, team_name: portal_team_name) if portal_client
-        tunes_client.select_team(team_id: tunes_team_id, team_name: tunes_team_name) if tunes_client
+          # The clients will prompt for a team selection if:
+          # 1. client exists
+          # 2. team_id and team_name are nil and user belongs to multiple teams
+          portal_client.select_team(team_id: portal_team_id, team_name: portal_team_name) if portal_client
+          tunes_client.select_team(team_id: tunes_team_id, team_name: tunes_team_name) if tunes_client
+        end
 
         return ConnectAPI::Client.new(tunes_client: tunes_client, portal_client: portal_client)
       end
@@ -101,6 +104,16 @@ module Spaceship
       def tunes_team_id
         return nil if @tunes_client.nil?
         return @tunes_client.team_id
+      end
+
+      def portal_teams
+        return nil if @portal_client.nil?
+        return @portal_client.teams
+      end
+
+      def tunes_teams
+        return nil if @tunes_client.nil?
+        return @tunes_client.teams
       end
 
       def in_house?
