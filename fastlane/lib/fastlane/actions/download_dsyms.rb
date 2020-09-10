@@ -6,16 +6,18 @@ module Fastlane
     class DownloadDsymsAction < Action
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
+        require 'openssl'
         require 'spaceship'
         require 'net/http'
 
+        # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
+        # Prompts select team if multiple teams and none specified
         UI.message("Login to App Store Connect (#{params[:username]})")
-        Spaceship::Tunes.login(params[:username])
-        Spaceship::Tunes.select_team
+        Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true)
         UI.message("Login successful")
 
         # Get App
-        app = Spaceship::Application.find(params[:app_identifier])
+        app = Spaceship::ConnectAPI::App.find(params[:app_identifier])
         unless app
           UI.user_error!("Could not find app with bundle identifier '#{params[:app_identifier]}' on account #{params[:username]}")
         end
@@ -23,38 +25,35 @@ module Fastlane
         # Process options
         version = params[:version]
         build_number = params[:build_number].to_s unless params[:build_number].nil?
-        platform = params[:platform]
+        itc_platform = params[:platform]
         output_directory = params[:output_directory]
         wait_for_dsym_processing = params[:wait_for_dsym_processing]
         wait_timeout = params[:wait_timeout]
         min_version = Gem::Version.new(params[:min_version]) if params[:min_version]
 
+        platform = Spaceship::ConnectAPI::Platform.map(itc_platform)
+
         # Set version if it is latest
         if version == 'latest'
           # Try to grab the edit version first, else fallback to live version
           UI.message("Looking for latest version...")
-          latest_version = app.edit_version(platform: platform) || app.live_version(platform: platform)
+          latest_version = app.get_edit_app_store_version(platform: platform) || app.get_live_app_store_version(platform: platform)
 
-          UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.version.nil?
+          UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.nil?
 
-          latest_candidate_build = latest_version.candidate_builds.max_by(&:upload_date)
-          if latest_candidate_build.nil?
-            version = latest_version.version
-            build_number = latest_version.build_version
-          else
-            # The build_version of a candidate build does not always match the one in latest_version so get the version and build number from the same place.
-            version = latest_candidate_build.train_version
-            build_number = latest_candidate_build.build_version
-          end
+          latest_build = get_latest_build!(app_id: app.id, version: latest_version.version_string, platform: platform)
+
+          version = latest_build.app_version
+          build_number = latest_build.version
         elsif version == 'live'
           UI.message("Looking for live version...")
-          live_version = app.live_version(platform: platform)
+          live_version = app.get_live_app_store_version(platform: platform)
 
           UI.user_error!("Could not find live version for your app, please try setting 'latest' or a specific version") if live_version.nil?
 
           # No need to search for candidates, because released App Store version should only have one build
-          version = live_version.version
-          build_number = live_version.build_version
+          version = live_version.version_string
+          build_number = live_version.build.version
         end
 
         # Remove leading zeros from version string (eg. 1.02 -> 1.2)
@@ -74,75 +73,97 @@ module Fastlane
         message << "(#{build_number})" if build_number
         UI.message(message.join(" "))
 
-        app.tunes_all_build_trains(platform: platform).each do |train|
+        filter = { app: app.id }
+        filter["preReleaseVersion.platform"] = platform
+        build_resps = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion").all_pages
+        builds = build_resps.flat_map(&:to_models)
+
+        builds.each do |build|
+          asc_app_version = build.app_version
+          asc_build_number = build.version
+
           message = []
-          message << "Found train (version): #{train.version_string}"
+          message << "Found train (version): #{asc_app_version}"
           message << ", comparing to supplied version: #{version}" if version
           UI.verbose(message.join(" "))
 
-          if version && version != train.version_string
-            UI.verbose("Version #{version} doesn't match: #{train.version_string}")
+          if version && version != asc_app_version
+            UI.verbose("Version #{version} doesn't match: #{asc_app_version}")
             next
           end
 
-          if min_version && min_version > Gem::Version.new(train.version_string)
-            UI.verbose("Min version #{min_version} not reached: #{train.version_string}")
+          if min_version && min_version > Gem::Version.new(asc_app_version)
+            UI.verbose("Min version #{min_version} not reached: #{asc_app_version}")
             next
           end
 
-          app.tunes_all_builds_for_train(train: train.version_string, platform: platform).each do |build|
-            message = []
-            message << "Found build version: #{build.build_version}"
-            message << ", comparing to supplied build_number: #{build_number}" if build_number
-            UI.verbose(message.join(" "))
+          message = []
+          message << "Found build version: #{asc_build_number}"
+          message << ", comparing to supplied build_number: #{build_number}" if build_number
+          UI.verbose(message.join(" "))
 
-            if build_number && build.build_version != build_number
-              UI.verbose("build_version: #{build.build_version} doesn't match: #{build_number}")
+          if build_number && asc_build_number != build_number
+            UI.verbose("build_version: #{asc_build_number} doesn't match: #{build_number}")
+            next
+          end
+
+          UI.verbose("Build_version: #{asc_build_number} matches #{build_number}, grabbing dsym_url") if build_number
+          get_details_and_download_dsym(app: app, train: asc_app_version, build_number: asc_build_number, platform: itc_platform, wait_for_dsym_processing: wait_for_dsym_processing, wait_timeout: wait_timeout, output_directory: output_directory)
+        end
+      end
+
+      def self.get_details_and_download_dsym(app: nil, train: nil, build_number: nil, platform: nil, wait_for_dsym_processing: nil, wait_timeout: nil, output_directory: nil)
+        start = Time.now
+        download_url = nil
+
+        loop do
+          begin
+            resp = Spaceship::Tunes.client.build_details(app_id: app.id, train: train, build_number: build_number, platform: platform)
+
+            resp['apple_id'] = app.id
+            build_details = Spaceship::Tunes::BuildDetails.factory(resp)
+
+            download_url = build_details.dsym_url
+            UI.verbose("dsym_url: #{download_url}")
+          rescue Spaceship::TunesClient::ITunesConnectError => ex
+            UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
+          end
+
+          unless download_url
+            if !wait_for_dsym_processing || (Time.now - start) > wait_timeout
+              # In some cases, AppStoreConnect does not process the dSYMs, thus no error should be thrown.
+              UI.message("Could not find any dSYM for #{build_number} (#{train})")
+            else
+              UI.message("Waiting for dSYM file to appear...")
+              sleep(30)
               next
             end
-
-            UI.verbose("Build_version: #{build.build_version} matches #{build_number}, grabbing dsym_url") if build_number
-
-            start = Time.now
-            download_url = nil
-
-            loop do
-              begin
-                build_details = app.tunes_build_details(train: train.version_string, build_number: build.build_version, platform: platform)
-                download_url = build_details.dsym_url
-                UI.verbose("dsym_url: #{download_url}")
-              rescue Spaceship::TunesClient::ITunesConnectError => ex
-                UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
-              end
-
-              unless download_url
-                if !wait_for_dsym_processing || (Time.now - start) > wait_timeout
-                  # In some cases, AppStoreConnect does not process the dSYMs, thus no error should be thrown.
-                  UI.message("Could not find any dSYM for #{build.build_version} (#{train.version_string})")
-                else
-                  UI.message("Waiting for dSYM file to appear...")
-                  sleep(30)
-                  next
-                end
-              end
-
-              break
-            end
-
-            if download_url
-              self.download(download_url, app.bundle_id, train.version_string, build.build_version, output_directory)
-              break if build_number
-            else
-              UI.message("No dSYM URL for #{build.build_version} (#{train.version_string})")
-            end
           end
+
+          break
         end
 
-        if (Actions.lane_context[SharedValues::DSYM_PATHS] || []).count == 0
-          UI.error("No dSYM files found on App Store Connect - this usually happens when no recompiling has happened yet")
+        if download_url
+          self.download(download_url, app.bundle_id, train, build_number, output_directory)
+          return if build_number
+        else
+          UI.message("No dSYM URL for #{build_number} (#{train})")
         end
       end
       # rubocop:enable Metrics/PerceivedComplexity
+
+      def self.get_latest_build!(app_id: nil, version: nil, platform: nil)
+        filter = { app: app_id }
+        filter["preReleaseVersion.version"] = version
+        filter["preReleaseVersion.platform"] = platform
+        latest_build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion").first
+
+        if latest_build.nil?
+          UI.user_error!("Could not find latest build for version #{version}")
+        end
+
+        return latest_build
+      end
 
       def self.download(download_url, bundle_id, train_number, build_version, output_directory)
         result = self.download_file(download_url)

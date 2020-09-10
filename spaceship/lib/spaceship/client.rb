@@ -6,6 +6,7 @@ require 'logger'
 require 'tmpdir'
 require 'cgi'
 require 'tempfile'
+require 'openssl'
 
 require 'fastlane/version'
 require_relative 'helper/net_http_generic_request'

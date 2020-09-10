@@ -1955,6 +1955,7 @@ public func chatwork(apiToken: String,
    - username: Your Apple ID Username
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
+   - platform: The platform to use (optional)
    - defaultRuleLevel: The default rule level unless otherwise configured
    - includeInAppPurchases: Should check in-app purchases?
    - negativeAppleSentiment: mentioning  in a way that could be considered negative
@@ -1976,6 +1977,7 @@ public func checkAppStoreMetadata(appIdentifier: String,
                                   username: String,
                                   teamId: String? = nil,
                                   teamName: String? = nil,
+                                  platform: String = "ios",
                                   defaultRuleLevel: Any = "error",
                                   includeInAppPurchases: Bool = true,
                                   negativeAppleSentiment: Any? = nil,
@@ -1993,6 +1995,7 @@ public func checkAppStoreMetadata(appIdentifier: String,
                                                                                                             RubyCommand.Argument(name: "username", value: username),
                                                                                                             RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                             RubyCommand.Argument(name: "team_name", value: teamName),
+                                                                                                            RubyCommand.Argument(name: "platform", value: platform),
                                                                                                             RubyCommand.Argument(name: "default_rule_level", value: defaultRuleLevel),
                                                                                                             RubyCommand.Argument(name: "include_in_app_purchases", value: includeInAppPurchases),
                                                                                                             RubyCommand.Argument(name: "negative_apple_sentiment", value: negativeAppleSentiment),
@@ -5473,6 +5476,7 @@ public func podioItem(clientId: String,
    - username: Your Apple ID Username
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
+   - platform: The platform to use (optional)
    - defaultRuleLevel: The default rule level unless otherwise configured
    - includeInAppPurchases: Should check in-app purchases?
    - freeStuffInIap: using text indicating that your IAP is free
@@ -5485,6 +5489,7 @@ public func precheck(appIdentifier: Any = precheckfile.appIdentifier,
                      username: Any = precheckfile.username,
                      teamId: Any? = precheckfile.teamId,
                      teamName: Any? = precheckfile.teamName,
+                     platform: Any = precheckfile.platform,
                      defaultRuleLevel: Any = precheckfile.defaultRuleLevel,
                      includeInAppPurchases: Bool = precheckfile.includeInAppPurchases,
                      freeStuffInIap: Any? = precheckfile.freeStuffInIap)
@@ -5493,6 +5498,7 @@ public func precheck(appIdentifier: Any = precheckfile.appIdentifier,
                                                                                             RubyCommand.Argument(name: "username", value: username),
                                                                                             RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                             RubyCommand.Argument(name: "team_name", value: teamName),
+                                                                                            RubyCommand.Argument(name: "platform", value: platform),
                                                                                             RubyCommand.Argument(name: "default_rule_level", value: defaultRuleLevel),
                                                                                             RubyCommand.Argument(name: "include_in_app_purchases", value: includeInAppPurchases),
                                                                                             RubyCommand.Argument(name: "free_stuff_in_iap", value: freeStuffInIap)])
@@ -9257,14 +9263,14 @@ func parseInt(fromString: String, function: String = #function) -> Int {
     return NSString(string: fromString.trimmingCharacters(in: .punctuationCharacters)).integerValue
 }
 
-public let deliverfile: Deliverfile = Deliverfile()
-public let gymfile: Gymfile = Gymfile()
-public let matchfile: Matchfile = Matchfile()
-public let precheckfile: Precheckfile = Precheckfile()
-public let scanfile: Scanfile = Scanfile()
-public let screengrabfile: Screengrabfile = Screengrabfile()
-public let snapshotfile: Snapshotfile = Snapshotfile()
+public let deliverfile = Deliverfile()
+public let gymfile = Gymfile()
+public let matchfile = Matchfile()
+public let precheckfile = Precheckfile()
+public let scanfile = Scanfile()
+public let screengrabfile = Screengrabfile()
+public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.90]
+// FastlaneRunnerAPIVersion [0.9.94]

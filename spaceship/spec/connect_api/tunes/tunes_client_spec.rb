@@ -7,8 +7,9 @@ describe Spaceship::ConnectAPI::Tunes::Client do
 
   before do
     allow(mock_tunes_client).to receive(:team_id).and_return("123")
+    allow(mock_tunes_client).to receive(:select_team)
     allow(Spaceship::TunesClient).to receive(:login).and_return(mock_tunes_client)
-    Spaceship::ConnectAPI.login(username, password)
+    Spaceship::ConnectAPI.login(username, password, use_portal: false, use_tunes: true)
   end
 
   context 'sends api request' do

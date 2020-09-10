@@ -55,7 +55,7 @@ describe Match do
         files_to_commit: [
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.cer"),
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.p12"),
-          File.join(repo_dir, "profiles", "distribution", "Distribution_tools.fastlane.app.mobileprovision")
+          File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.mobileprovision")
         ]
       )
 
@@ -73,7 +73,7 @@ describe Match do
         files_to_commit: [
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.cer"),
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.p12"),
-          File.join(repo_dir, "profiles", "distribution", "Distribution_tools.fastlane.app.provisionprofile")
+          File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.provisionprofile")
         ]
       )
 

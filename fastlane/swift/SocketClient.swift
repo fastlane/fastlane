@@ -36,7 +36,7 @@ class SocketClient: NSObject {
     fileprivate var inputStream: InputStream!
     fileprivate var outputStream: OutputStream!
     fileprivate var cleaningUpAfterDone = false
-    fileprivate let dispatchGroup: DispatchGroup = DispatchGroup()
+    fileprivate let dispatchGroup = DispatchGroup()
     fileprivate let readSemaphore = DispatchSemaphore(value: 1)
     fileprivate let writeSemaphore = DispatchSemaphore(value: 1)
     fileprivate let commandTimeoutSeconds: Int

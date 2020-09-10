@@ -17,9 +17,10 @@ module Sigh
                                          hide_keys: [:output_path],
                                              title: "Summary for sigh #{Fastlane::VERSION}")
 
+      # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
+      # Prompts select team if multiple teams and none specified
       UI.message("Starting login with user '#{Sigh.config[:username]}'")
       Spaceship::ConnectAPI.login(Sigh.config[:username], nil, use_portal: true, use_tunes: false)
-      Spaceship::ConnectAPI.select_team
       UI.message("Successfully logged in")
 
       profiles = [] if Sigh.config[:skip_fetch_profiles]

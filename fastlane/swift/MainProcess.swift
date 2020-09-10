@@ -63,7 +63,7 @@ class MainProcess {
 }
 
 public class Main {
-    let process: MainProcess = MainProcess()
+    let process = MainProcess()
 
     public init() {}
 

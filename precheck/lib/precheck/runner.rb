@@ -19,9 +19,10 @@ module Precheck
                                              title: "Summary for precheck #{Fastlane::VERSION}")
 
       unless Spaceship::Tunes.client
+        # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
+        # Prompts select team if multiple teams and none specified
         UI.message("Starting login with user '#{Precheck.config[:username]}'")
-        Spaceship::Tunes.login(Precheck.config[:username])
-        Spaceship::Tunes.select_team
+        Spaceship::ConnectAPI.login(Precheck.config[:username], use_portal: false, use_tunes: true)
 
         UI.message("Successfully logged in")
       end
@@ -160,11 +161,12 @@ module Precheck
     end
 
     def app
-      Spaceship::Tunes::Application.find(Precheck.config[:app_identifier])
+      Spaceship::ConnectAPI::App.find(Precheck.config[:app_identifier])
     end
 
     def latest_app_version
-      @latest_version ||= app.latest_version
+      platform = Spaceship::ConnectAPI::Platform.map(Precheck.config[:platform])
+      @latest_version ||= app.get_edit_app_store_version(platform: platform)
     end
 
     # Makes sure the current App ID exists. If not, it will show an appropriate error message

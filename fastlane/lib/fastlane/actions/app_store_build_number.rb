@@ -26,27 +26,31 @@ module Fastlane
       end
 
       def self.get_build_number(params)
+        # Prompts select team if multiple teams and none specified
         UI.message("Login to App Store Connect (#{params[:username]})")
-        Spaceship::Tunes.login(params[:username])
-        Spaceship::Tunes.select_team(team_id: params[:team_id], team_name: params[:team_name])
+        Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true, tunes_team_id: params[:team_id], team_name: params[:team_name])
         UI.message("Login successful")
 
-        app = Spaceship::Tunes::Application.find(params[:app_identifier], mac: params[:platform] == "osx")
+        platform = Spaceship::ConnectAPI::Platform.map(params[:platform])
+
+        app = Spaceship::ConnectAPI::App.find(params[:app_identifier])
         UI.user_error!("Could not find an app on App Store Connect with app_identifier: #{params[:app_identifier]}") unless app
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
-          UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on iTC") unless app.live_version
-          build_nr = app.live_version.current_build_number
+          live_version = app.get_live_app_store_version(platform: platform)
 
-          UI.message("Latest upload for live-version #{app.live_version.version} is build: #{build_nr}")
+          UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on App Store Connect") unless live_version
+          build_nr = live_version.build.version
 
-          return OpenStruct.new({ build_nr: build_nr, build_v: app.live_version.version })
+          UI.message("Latest upload for live-version #{live_version.version_string} is build: #{build_nr}")
+
+          return OpenStruct.new({ build_nr: build_nr, build_v: live_version.version_string })
         else
           version_number = params[:version]
           platform = params[:platform]
 
           # Create filter for get_builds with optional version number
-          filter = { app: app.apple_id }
+          filter = { app: app.id }
           if version_number
             filter["preReleaseVersion.version"] = version_number
             version_number_message = "version #{version_number}"

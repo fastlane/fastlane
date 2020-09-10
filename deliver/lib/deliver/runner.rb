@@ -26,9 +26,10 @@ module Deliver
     end
 
     def login
+      # Team selection passed though FASTLANE_TEAM_ID and FASTLANE_TEAM_NAME environment variables
+      # Prompts select team if multiple teams and none specified
       UI.message("Login to App Store Connect (#{options[:username]})")
       Spaceship::ConnectAPI.login(options[:username], nil, use_portal: false, use_tunes: true)
-      Spaceship::ConnectAPI.select_team
       UI.message("Login successful")
     end
 
@@ -67,7 +68,8 @@ module Deliver
         default_rule_level: options[:precheck_default_rule_level],
         include_in_app_purchases: options[:precheck_include_in_app_purchases],
         app_identifier: options[:app_identifier],
-        username: options[:username]
+        username: options[:username],
+        platform: options[:platform]
       }
 
       precheck_config = FastlaneCore::Configuration.create(Precheck::Options.available_options, precheck_options)

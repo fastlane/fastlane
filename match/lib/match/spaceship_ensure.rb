@@ -18,18 +18,18 @@ module Match
         UI.important("More information https://docs.fastlane.tools/actions/match/#access-control")
       end
 
+      # Prompts select team if multiple teams and none specified
       UI.message("Verifying that the certificate and profile are still valid on the Dev Portal...")
-      Spaceship.login(user)
-      Spaceship.select_team(team_id: team_id, team_name: team_name)
+      Spaceship::ConnectAPI.login(user, use_portal: true, use_tunes: false, portal_team_id: team_id, team_name: team_name)
     end
 
     # The team ID of the currently logged in team
     def team_id
-      return Spaceship.client.team_id
+      return Spaceship::ConnectAPI.client.portal_team_id
     end
 
     def bundle_identifier_exists(username: nil, app_identifier: nil, platform: nil)
-      found = Spaceship.app.find(app_identifier, mac: platform == "macos")
+      found = Spaceship::ConnectAPI::BundleId.find(app_identifier)
       return if found
 
       require 'sigh/runner'
@@ -39,7 +39,7 @@ module Match
       })
       UI.error("An app with that bundle ID needs to exist in order to create a provisioning profile for it")
       UI.error("================================================================")
-      available_apps = Spaceship.app.all.collect { |a| "#{a.bundle_id} (#{a.name})" }
+      available_apps = Spaceship::ConnectAPI::BundleId.all.collect { |a| "#{a.identifier} (#{a.name})" }
       UI.message("Available apps:\n- #{available_apps.join("\n- ")}")
       UI.error("Make sure to run `fastlane match` with the same user and team every time.")
       UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")

@@ -32,7 +32,7 @@ For all commands, you can either use an [API Key](#app-store-connect-api-key) or
 
 The App Store Connect API Key is the preferred authentication method (if you are able to use it).
 
-- Uses offial App Store Connect API
+- Uses official App Store Connect API
 - No need for 2FA
 - Better performance over Apple ID
 

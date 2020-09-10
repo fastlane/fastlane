@@ -35,7 +35,7 @@ class MainProcess {
     }
 }
 
-let process: MainProcess = MainProcess()
+let process = MainProcess()
 process.startFastlaneThread()
 
 while !process.doneRunningLane, RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date(timeIntervalSinceNow: 2)) {

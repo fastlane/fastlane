@@ -9,8 +9,9 @@ module Produce
       @full_bundle_identifier = app_identifier
       @full_bundle_identifier.gsub!('*', Produce.config[:bundle_identifier_suffix].to_s) if wildcard_bundle?
 
+      # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
+      # Prompts select team if multiple teams and none specified
       Spaceship::ConnectAPI.login(Produce.config[:username], nil, use_portal: false, use_tunes: true)
-      Spaceship::ConnectAPI.client.select_team
 
       create_new_app
     end

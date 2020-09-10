@@ -309,6 +309,14 @@ module Spaceship
         end
 
         #
+        # appPricePoints
+        #
+        def get_app_price_points(filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appPricePoints", params)
+        end
+
+        #
         # appReviewAttachments
         #
 
@@ -700,6 +708,18 @@ module Spaceship
           }
 
           tunes_request_client.post("appStoreVersionPhasedReleases", body)
+        end
+
+        def patch_app_store_version_phased_release(app_store_version_phased_release_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appStoreVersionPhasedReleases",
+              attributes: attributes,
+              id: app_store_version_phased_release_id
+            }
+          }
+
+          tunes_request_client.patch("appStoreVersionPhasedReleases/#{app_store_version_phased_release_id}", body)
         end
 
         def delete_app_store_version_phased_release(app_store_version_phased_release_id: nil)

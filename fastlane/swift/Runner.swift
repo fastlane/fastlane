@@ -25,7 +25,7 @@ func desc(_: String) {
 class Runner {
     private var thread: Thread!
     private var socketClient: SocketClient!
-    private let dispatchGroup: DispatchGroup = DispatchGroup()
+    private let dispatchGroup = DispatchGroup()
     private var returnValue: String? // lol, so safe
     private var currentlyExecutingCommand: RubyCommandable?
     private var shouldLeaveDispatchGroupDuringDisconnect = false

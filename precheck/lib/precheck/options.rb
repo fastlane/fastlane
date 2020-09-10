@@ -60,6 +60,15 @@ module Precheck
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
                                      end),
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     short_option: "-j",
+                                     env_name: "PRECHECK_PLATFORM",
+                                     description: "The platform to use (optional)",
+                                     optional: true,
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :default_rule_level,
                                      short_option: "-r",
                                      env_name: "PRECHECK_DEFAULT_RULE_LEVEL",
