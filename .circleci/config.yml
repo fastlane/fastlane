@@ -242,7 +242,6 @@ workflows:
   version: 2
   build:
     jobs:
-      - 'Execute tests on macOS (Xcode 9.4.1, Ruby 2.4)'
       - 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)'
       - 'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)'
       - 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)'
