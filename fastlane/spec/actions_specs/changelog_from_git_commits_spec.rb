@@ -174,7 +174,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         tag_name = %W(git rev-list --tags=#{tag_match_pattern} --max-count=1).shelljoin
-        describe = %W(git describe --tags #{tag_name}).shelljoin
+        describe = %W(git describe --tags #{tag_name} --match #{tag_match_pattern}).shelljoin
         changelog = %W(git log --pretty=%B #{describe}...HEAD).shelljoin
         expect(result).to eq(changelog)
       end
