@@ -73,7 +73,7 @@ describe Spaceship::ConnectAPI do
           team_id = 'team_id'
           team_name = 'team_name'
 
-          expect(Spaceship::ConnectAPI::Client).to receive(:login).with(user, password, use_portal: true, use_tunes: false, portal_team_id: team_id, tunes_team_id: nil, team_name: team_name).and_return(mock_client)
+          expect(Spaceship::ConnectAPI::Client).to receive(:login).with(user, password, use_portal: true, use_tunes: false, portal_team_id: team_id, tunes_team_id: nil, team_name: team_name, skip_select_team: false).and_return(mock_client)
 
           client = Spaceship::ConnectAPI.login(user, password, use_portal: true, use_tunes: false, portal_team_id: team_id, team_name: team_name)
           expect(client).to eq(Spaceship::ConnectAPI.client)
@@ -85,7 +85,7 @@ describe Spaceship::ConnectAPI do
           team_id = 'team_id'
           team_name = 'team_name'
 
-          expect(Spaceship::ConnectAPI::Client).to receive(:login).with(user, password, use_portal: false, use_tunes: true, portal_team_id: nil, tunes_team_id: team_id, team_name: team_name).and_return(mock_client)
+          expect(Spaceship::ConnectAPI::Client).to receive(:login).with(user, password, use_portal: false, use_tunes: true, portal_team_id: nil, tunes_team_id: team_id, team_name: team_name, skip_select_team: false).and_return(mock_client)
 
           client = Spaceship::ConnectAPI.login(user, password, use_portal: false, use_tunes: true, tunes_team_id: team_id, team_name: team_name)
           expect(client).to eq(Spaceship::ConnectAPI.client)
@@ -97,7 +97,7 @@ describe Spaceship::ConnectAPI do
           team_id = 'team_id'
           team_name = 'team_name'
 
-          expect(Spaceship::ConnectAPI::Client).to receive(:login).with(user, password, use_portal: true, use_tunes: true, portal_team_id: team_id, tunes_team_id: team_id, team_name: team_name).and_return(mock_client)
+          expect(Spaceship::ConnectAPI::Client).to receive(:login).with(user, password, use_portal: true, use_tunes: true, portal_team_id: team_id, tunes_team_id: team_id, team_name: team_name, skip_select_team: false).and_return(mock_client)
 
           client = Spaceship::ConnectAPI.login(user, password, use_portal: true, use_tunes: true, portal_team_id: team_id, tunes_team_id: team_id, team_name: team_name)
           expect(client).to eq(Spaceship::ConnectAPI.client)

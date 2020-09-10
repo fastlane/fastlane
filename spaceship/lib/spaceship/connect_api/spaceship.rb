@@ -73,12 +73,13 @@ module Spaceship
       # @param portal_team_id (String) (optional): The Spaceship::Portal team id
       # @param tunes_team_id (String) (optional): The Spaceship::Tunes team id
       # @param team_name (String) (optional): The team name
+      # @param skip_select_team (Boolean) (optional): Whether to skip automatic selection or prompt for team
       #
       # @raise InvalidUserCredentialsError: raised if authentication failed
       #
       # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
-      def login(user = nil, password = nil, use_portal: true, use_tunes: true, portal_team_id: nil, tunes_team_id: nil, team_name: nil)
-        @client = ConnectAPI::Client.login(user, password, use_portal: use_portal, use_tunes: use_tunes, portal_team_id: portal_team_id, tunes_team_id: tunes_team_id, team_name: team_name)
+      def login(user = nil, password = nil, use_portal: true, use_tunes: true, portal_team_id: nil, tunes_team_id: nil, team_name: nil, skip_select_team: false)
+        @client = ConnectAPI::Client.login(user, password, use_portal: use_portal, use_tunes: use_tunes, portal_team_id: portal_team_id, tunes_team_id: tunes_team_id, team_name: team_name, skip_select_team: skip_select_team)
       end
 
       # Open up the team selection for the user (if necessary).
