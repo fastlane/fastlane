@@ -56,8 +56,9 @@ module Match
         UI.user_error!("Cert type '#{cert_type}' is not supported")
       end
 
+      prov_type = Match.profile_type_sym(params[:type])
       output_dir_certs = File.join(storage.prefixed_working_directory, "certs", cert_type.to_s)
-      output_dir_profiles = File.join(storage.prefixed_working_directory, "profiles", cert_type.to_s)
+      output_dir_profiles = File.join(storage.prefixed_working_directory, "profiles", prov_type.to_s)
 
       # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
       Spaceship::Portal.login(params[:username])
@@ -86,7 +87,8 @@ module Match
         FileUtils.mkdir_p(output_dir_profiles)
         bundle_id = FastlaneCore::ProvisioningProfile.bundle_id(profile_path)
         profile_extension = FastlaneCore::ProvisioningProfile.profile_extension(profile_path)
-        dest_profile_path = File.join(output_dir_profiles, "#{cert_type.to_s.capitalize}_#{bundle_id}#{profile_extension}")
+        profile_type_name = Match::Generator.profile_type_name(prov_type)
+        dest_profile_path = File.join(output_dir_profiles, "#{profile_type_name}_#{bundle_id}#{profile_extension}")
         files_to_commit.push(dest_profile_path)
         IO.copy_stream(profile_path, dest_profile_path)
       end
