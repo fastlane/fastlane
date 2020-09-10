@@ -63,51 +63,6 @@ aliases:
 version: 2
 
 jobs:
-  'Execute tests on macOS (Xcode 9.4.1, Ruby 2.4)': &tests_macos  # define alias
-    macos:
-      xcode: '9.4.1'
-    environment:
-      CIRCLE_TEST_REPORTS: '~/test-reports'
-      LC_ALL: 'en_US.UTF-8'
-      LANG: 'en_US.UTF-8'
-      _RUBY_VERSION: '2.4'
-    shell: '/bin/bash --login -eo pipefail'
-    steps:
-      - *cache_restore_git
-      - checkout
-      - *cache_save_git
-      - *cache_restore_bundler
-      - *cache_restore_homebrew
-      - *set_ruby
-      - run:
-          name: debug | ruby version
-          command: |
-            ruby -v
-      - run:
-          name: Setup Build
-          command: |
-            mkdir -p ~/test-reports
-            brew update
-            brew untap caskroom/versions || true
-            brew install shellcheck
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-      - *cache_save_homebrew
-      - *cache_save_bundler
-      - run:
-          name: Check PR Metadata
-          command: bundle exec danger || echo "danger failed"
-      - *cache_restore_rubocop
-      - run: bundle exec fastlane execute_tests
-      - *cache_save_rubocop
-      - store_test_results:
-          path: ~/test-reports
-      - store_artifacts:
-          path: ~/test-reports/rspec
-          destination: test-reports
-      - run:
-          name: Post Test Results to GitHub
-          command: bundle exec danger || echo "danger failed"
-          when: always  # Run this even when tests fail
   'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)':
     <<: *tests_macos
     macos:
