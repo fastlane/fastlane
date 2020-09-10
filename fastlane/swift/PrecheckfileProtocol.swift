@@ -1,4 +1,7 @@
-protocol PrecheckfileProtocol: class {
+// PrecheckfileProtocol.swift
+// Copyright (c) 2020 FastlaneTools
+
+public protocol PrecheckfileProtocol: class {
     /// The bundle identifier of your app
     var appIdentifier: String { get }
 
@@ -24,7 +27,7 @@ protocol PrecheckfileProtocol: class {
     var freeStuffInIap: String? { get }
 }
 
-extension PrecheckfileProtocol {
+public extension PrecheckfileProtocol {
     var appIdentifier: String { return "" }
     var username: String { return "" }
     var teamId: String? { return nil }
@@ -37,4 +40,4 @@ extension PrecheckfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.36]
+// FastlaneRunnerAPIVersion [0.9.37]

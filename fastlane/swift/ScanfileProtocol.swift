@@ -1,4 +1,7 @@
-protocol ScanfileProtocol: class {
+// ScanfileProtocol.swift
+// Copyright (c) 2020 FastlaneTools
+
+public protocol ScanfileProtocol: class {
     /// Path to the workspace file
     var workspace: String? { get }
 
@@ -189,7 +192,7 @@ protocol ScanfileProtocol: class {
     var failBuild: Bool { get }
 }
 
-extension ScanfileProtocol {
+public extension ScanfileProtocol {
     var workspace: String? { return nil }
     var project: String? { return nil }
     var scheme: String? { return nil }
@@ -257,4 +260,4 @@ extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.48]
+// FastlaneRunnerAPIVersion [0.9.49]

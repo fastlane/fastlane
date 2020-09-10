@@ -206,7 +206,7 @@ module Fastlane
       # This just creates a string with as many spaces are necessary given whether or not
       # the function has a 'discardableResult' annotation, the 'func' keyword, function name
       # and the opening paren.
-      function_keyword_definition = 'func '
+      function_keyword_definition = 'public func '
       open_paren = '('
       closed_paren = ')'
       indent = ' ' * (discardable_result.length + function_name.length + function_keyword_definition.length + open_paren.length)
