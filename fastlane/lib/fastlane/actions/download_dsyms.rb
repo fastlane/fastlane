@@ -186,8 +186,7 @@ module Fastlane
           Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE] ||= uploaded_date
           current_latest = Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE]
           Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE] = [current_latest, uploaded_date].max
-          UI.message("Build upload date #{uploaded_date}")
-          UI.message("Latest uploaded date #{Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE]}")
+          UI.verbose("Most recent build uploaded_date #{Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE]}")
         end
       end
 
