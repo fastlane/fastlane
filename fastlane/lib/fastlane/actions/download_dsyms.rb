@@ -5,6 +5,7 @@ module Fastlane
       DSYM_LATEST_UPLOADED_DATE = :DSYM_LATEST_UPLOADED_DATE
     end
     class DownloadDsymsAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         require 'openssl'
         require 'spaceship'
