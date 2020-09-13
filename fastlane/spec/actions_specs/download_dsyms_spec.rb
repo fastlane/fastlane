@@ -24,6 +24,13 @@ describe Fastlane do
       let(:empty_build_detail) { double('empty_build_detail') }
 
       let(:download_url) { 'https://example.com/myapp-dsym' }
+      
+      date1 = '2020-09-12T10:00:00+01:00'
+      date2 = '2020-09-12T11:00:00+01:00'
+      date3 = '2020-09-12T12:00:00+01:00'
+      date4 = '2020-09-12T13:00:00+01:00'
+      date5 = '2020-09-12T14:00:00+01:00'
+      date6 = '2020-09-12T15:00:00+01:00'
 
       before do
         allow(Spaceship::Tunes).to receive(:client).and_return(tunes_client)
@@ -73,12 +80,12 @@ describe Fastlane do
         it 'downloads all dsyms of all builds in all trains' do
           expect(build_resp).to receive(:to_models).and_return([build1, build2, build3, build4, build5, build6])
 
-          [[build1, '1.0.0', '1', '2020-09-12T10:00:00+01:00'],
-           [build2, '1.0.0', '2', '2020-09-12T11:00:00+01:00'],
-           [build3, '1.7.0', '4', '2020-09-12T12:00:00+01:00'],
-           [build4, '2.0.0', '1', '2020-09-12T13:00:00+01:00'],
-           [build5, '2.0.0', '2', '2020-09-12T14:00:00+01:00'],
-           [build6, '2.0.0', '5', '2020-09-12T15:00:00+01:00']].each do |build, version, build_number, uploaded_date|
+          [[build1, '1.0.0', '1', date1],
+           [build2, '1.0.0', '2', date2],
+           [build3, '1.7.0', '4', date3],
+           [build4, '2.0.0', '1', date4],
+           [build5, '2.0.0', '2', date5],
+           [build6, '2.0.0', '5', date6]].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
@@ -99,7 +106,7 @@ describe Fastlane do
         it 'downloads all dsyms of all builds in train 1.07.0' do
           expect(build_resp).to receive(:to_models).and_return([build1])
 
-          [[build1, '1.7.0', '3', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
+          [[build1, '1.7.0', '3', date1]].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
@@ -118,7 +125,7 @@ describe Fastlane do
         it 'downloads the correct dsyms' do
           expect(build_resp).to receive(:to_models).and_return([build1])
 
-          [[build1, '2.0.0', '2', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
+          [[build1, '2.0.0', '2', date1]].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
@@ -142,13 +149,13 @@ describe Fastlane do
 
           expect(build_resp).to receive(:to_models).and_return([build1, build2])
 
-          [[build1, '2.0.0', '2', '2020-09-12T10:00:00+01:00']].each do |build, version, build_number, uploaded_date|
+          [[build1, '2.0.0', '2', date1]].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
           end
 
-          [[build2, '2.0.0', '3', '2020-09-12T11:00:00+01:00']].each do |build, version, build_number, uploaded_date|
+          [[build2, '2.0.0', '3', date2]].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version).twice
             expect(build).to receive(:version).and_return(build_number).twice
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
@@ -174,13 +181,13 @@ describe Fastlane do
 
           expect(build_resp).to receive(:to_models).and_return([build1, build2])
 
-          [[build1, '1.0.0', '33', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
+          [[build1, '1.0.0', '33', date1]].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
           end
 
-          [[build2, '1.0.0', '42', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
+          [[build2, '1.0.0', '42', date2]].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
@@ -200,13 +207,13 @@ describe Fastlane do
         it 'downloads only dsyms of trains newer than or equal min_version' do
           expect(build_resp).to receive(:to_models).and_return([build1, build2])
 
-          [[build1, '1.0.0', '33', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
+          [[build1, '1.0.0', '33', date1]].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
           end
 
-          [[build2, '2.0.0', '42', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
+          [[build2, '2.0.0', '42', date2]].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
@@ -226,17 +233,17 @@ describe Fastlane do
         it 'downloads dsyms with more recent uploaded_date' do
           expect(build_resp).to receive(:to_models).and_return([build1, build2, build3, build4, build5, build6])
 
-          [[build1, '1.0.0', '1', '2020-09-12T10:00:00+01:00'],
-           [build2, '1.0.0', '2', '2020-09-12T11:00:00+01:00'],
-           [build3, '1.7.0', '4', '2020-09-12T12:00:00+01:00'],
-           [build4, '2.0.0', '1', '2020-09-12T13:00:00+01:00']].each do |build, verison, build_number, uploaded_date|
+          [[build1, '1.0.0', '1', date1],
+           [build2, '1.0.0', '2', date2],
+           [build3, '1.7.0', '4', date3],
+           [build4, '2.0.0', '1', date4]].each do |build, verison, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
           end
 
-          [[build5, '2.0.0', '2', '2020-09-12T14:00:00+01:00'],
-           [build6, '2.0.0', '5', '2020-09-12T15:00:00+01:00']].each do |build, version, build_number, uploaded_date|
+          [[build5, '2.0.0', '2', date5],
+           [build6, '2.0.0', '5', date6]].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
@@ -248,7 +255,7 @@ describe Fastlane do
           expect(Fastlane::Actions::DownloadDsymsAction).not_to(receive(:download))
 
           Fastlane::FastFile.new.parse("lane :test do
-            download_dsyms(username: 'user@fastlane.tools', app_identifier: 'tools.fastlane.myapp', after_uploaded_date: '2020-09-12T13:00:00+01:00')
+                                       download_dsyms(username: 'user@fastlane.tools', app_identifier: 'tools.fastlane.myapp', after_uploaded_date: '#{date4}')
           end").runner.execute(:test)
         end
       end
