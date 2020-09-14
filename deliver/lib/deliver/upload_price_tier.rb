@@ -14,9 +14,11 @@ module Deliver
       attributes = {}
       territory_ids = []
 
-      app_prices = app.fetch_app_prices
+      app_prices = app.prices
       if app_prices.first
-        old_price = app_prices.first.price_tier.id
+        app_price = Spaceship::ConnectAPI.get_app_price(app_price_id: app_prices.first.id, includes: "priceTier").first
+
+        old_price = app_price.price_tier.id
       else
         UI.message("App has no prices yet... Enabling all countries in App Store Connect")
         territory_ids = Spaceship::ConnectAPI::Territory.all.map(&:id)

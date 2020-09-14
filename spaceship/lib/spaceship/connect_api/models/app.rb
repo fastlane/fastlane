@@ -16,6 +16,7 @@ module Spaceship
       attr_accessor :available_in_new_territories
       attr_accessor :content_rights_declaration
       attr_accessor :app_store_versions
+      attr_accessor :prices
 
       module ContentRightsDeclaration
         USES_THIRD_PARTY_CONTENT = "USES_THIRD_PARTY_CONTENT"
@@ -34,7 +35,8 @@ module Spaceship
 
         "contentRightsDeclaration" => "content_rights_declaration",
 
-        "appStoreVersions" => "app_store_versions"
+        "appStoreVersions" => "app_store_versions",
+        "prices" => "prices"
       })
 
       def self.type
@@ -45,7 +47,7 @@ module Spaceship
       # Apps
       #
 
-      def self.all(filter: {}, includes: "appStoreVersions", limit: nil, sort: nil)
+      def self.all(filter: {}, includes: "appStoreVersions,prices", limit: nil, sort: nil)
         resps = Spaceship::ConnectAPI.get_apps(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
@@ -106,8 +108,7 @@ module Spaceship
           Spaceship::ConnectAPI::AppInfo::AppStoreState::INVALID_BINARY
         ]
 
-        filter = { app: id }
-        resp = Spaceship::ConnectAPI.get_app_infos(filter: filter, includes: includes)
+        resp = Spaceship::ConnectAPI.get_app_infos(app_id: id, includes: includes)
         return resp.to_models.select do |model|
           states.include?(model.app_store_state)
         end.first
@@ -128,8 +129,6 @@ module Spaceship
       #
 
       def fetch_app_prices(filter: {}, includes: "priceTier", limit: nil, sort: nil)
-        filter ||= {}
-        filter[:app] = id
         resp = Spaceship::ConnectAPI.get_app_prices(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       end

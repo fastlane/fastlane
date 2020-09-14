@@ -308,6 +308,11 @@ module Spaceship
           tunes_request_client.get("appPrices", params)
         end
 
+        def get_app_price(app_price_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appPrices/#{app_price_id}", params)
+        end
+
         #
         # appPricePoints
         #
@@ -360,9 +365,9 @@ module Spaceship
         # appScreenshotSets
         #
 
-        def get_app_screenshot_sets(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_app_screenshot_sets(app_store_version_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appScreenshotSets", params)
+          tunes_request_client.get("appStoreVersionLocalizations/#{app_store_version_localization_id}/appScreenshotSets", params)
         end
 
         def get_app_screenshot_set(app_screenshot_set_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
@@ -453,9 +458,9 @@ module Spaceship
         # appInfos
         #
 
-        def get_app_infos(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_app_infos(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appInfos", params)
+          tunes_request_client.get("apps/#{app_id}/appInfos", params)
         end
 
         def patch_app_info(app_info_id: nil, attributes: {})
@@ -641,9 +646,9 @@ module Spaceship
         # appStoreVersionLocalizations
         #
 
-        def get_app_store_version_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_app_store_version_localizations(app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appStoreVersionLocalizations", params)
+          tunes_request_client.get("appStoreVersions/#{app_store_version_id}/appStoreVersionLocalizations", params)
         end
 
         def post_app_store_version_localization(app_store_version_id: nil, attributes: {})
