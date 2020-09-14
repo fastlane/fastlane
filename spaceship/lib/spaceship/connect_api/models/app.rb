@@ -91,8 +91,7 @@ module Spaceship
           Spaceship::ConnectAPI::AppInfo::AppStoreState::IN_REVIEW
         ]
 
-        filter = { app: id }
-        resp = Spaceship::ConnectAPI.get_app_infos(filter: filter, includes: includes)
+        resp = Spaceship::ConnectAPI.get_app_infos(app_id: id, includes: includes)
         return resp.to_models.select do |model|
           states.include?(model.app_store_state)
         end.first
