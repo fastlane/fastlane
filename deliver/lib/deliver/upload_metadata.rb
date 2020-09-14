@@ -96,7 +96,7 @@ module Deliver
 
         if v.nil?
           UI.message("Couldn't find live version, editing the current version on App Store Connect instead")
-          version = fetch_edit_app_store_version(app, platform) 
+          version = fetch_edit_app_store_version(app, platform)
           # we don't want to update the localised_options and non_localised_options
           # as we also check for `options[:edit_live]` at other areas in the code
           # by not touching those 2 variables, deliver is more consistent with what the option says
@@ -105,7 +105,7 @@ module Deliver
           UI.message("Found live version")
         end
       else
-        version = fetch_edit_app_store_version(app, platform) 
+        version = fetch_edit_app_store_version(app, platform)
         localised_options = (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys)
         non_localised_options = NON_LOCALISED_VERSION_VALUES.keys
       end
@@ -449,13 +449,13 @@ module Deliver
     end
 
     def fetch_edit_app_store_version(app, platform)
-      version = retry_if_nil("Cannot find edit app store version") do
+      retry_if_nil("Cannot find edit app store version") do
         app.get_edit_app_store_version(platform: platform)
       end
     end
 
     def fetch_edit_app_info(app)
-      version = retry_if_nil("Cannot find edit app info") do
+      retry_if_nil("Cannot find edit app info") do
         app.fetch_edit_app_info
       end
     end
