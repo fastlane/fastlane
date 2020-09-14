@@ -39,6 +39,11 @@ module Spaceship
         "prices" => "prices"
       })
 
+      ESSENTIAL_INCLUDES = [
+        "appStoreVersions",
+        "prices"
+      ].join(",")
+
       def self.type
         return "apps"
       end
@@ -47,7 +52,7 @@ module Spaceship
       # Apps
       #
 
-      def self.all(filter: {}, includes: "appStoreVersions,prices", limit: nil, sort: nil)
+      def self.all(filter: {}, includes: ESSENTIAL_INCLUDES, limit: nil, sort: nil)
         resps = Spaceship::ConnectAPI.get_apps(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end

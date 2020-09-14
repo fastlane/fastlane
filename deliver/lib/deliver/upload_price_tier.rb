@@ -14,10 +14,13 @@ module Deliver
       attributes = {}
       territory_ids = []
 
+      # As of 2020-09-14:
+      # Official App Store Connect does not have an endpoint to get app prices for an app
+      # Need to get prices from the app's relationships
+      # Prices from app's relationship doess not have price tier so need to fetch app price with price tier relationship
       app_prices = app.prices
       if app_prices.first
         app_price = Spaceship::ConnectAPI.get_app_price(app_price_id: app_prices.first.id, includes: "priceTier").first
-
         old_price = app_price.price_tier.id
       else
         UI.message("App has no prices yet... Enabling all countries in App Store Connect")

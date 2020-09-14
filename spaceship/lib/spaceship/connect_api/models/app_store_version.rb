@@ -114,8 +114,6 @@ module Spaceship
         return resp.to_models.first
       end
 
-      # appScreenshotSets,appPreviewSets
-      # def get_app_store_version_localizations(filter: {}, includes: "appScreenshotSets", limit: nil, sort: nil)
       def get_app_store_version_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
         return Spaceship::ConnectAPI::AppStoreVersionLocalization.all(app_store_version_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
       end
