@@ -448,28 +448,27 @@ module Deliver
       return localizations
     end
 
-    def fetch_edit_app_store_version(app, platform)
-      retry_if_nil("Cannot find edit app store version") do
+    def fetch_edit_app_store_version(app, platform, wait_time: 10)
+      retry_if_nil("Cannot find edit app store version", wait_time: wait_time) do
         app.get_edit_app_store_version(platform: platform)
       end
     end
 
-    def fetch_edit_app_info(app)
-      retry_if_nil("Cannot find edit app info") do
+    def fetch_edit_app_info(app, wait_time: 10)
+      retry_if_nil("Cannot find edit app info", wait_time: wait_time) do
         app.fetch_edit_app_info
       end
     end
 
-    def retry_if_nil(message, tries: 5)
+    def retry_if_nil(message, tries: 5, wait_time: 10)
       loop do
         tries -= 1
 
         value = yield
         return value if value
 
-        sleep_time = 10
-        UI.message("#{message}... Retrying after #{sleep_time} seconds (remaining: #{tries})")
-        sleep(sleep_time)
+        UI.message("#{message}... Retrying after #{wait_time} seconds (remaining: #{tries})")
+        sleep(wait_time)
 
         return nil if tries.zero?
       end
