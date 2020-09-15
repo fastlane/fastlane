@@ -12,6 +12,22 @@ module Deliver
       user ||= ENV["DELIVER_USER"]
 
       [
+        FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                     env_name: "DELIVER_API_KEY_PATH",
+                                     description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                     optional: true,
+                                     conflicting_options: [:username],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_name: "DELIVER_API_KEY",
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                     type: Hash,
+                                     optional: true,
+                                     sensitive: true,
+                                     conflicting_options: [:api_key_path, :username]),
+
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "DELIVER_USERNAME",
@@ -129,7 +145,7 @@ module Deliver
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_app_version_update,
                                      env_name: "DELIVER_SKIP_APP_VERSION_UPDATE",
-                                     description: "Don't update app version for submission",
+                                     description: "Don’t create or update the app version that is being prepared for submission",
                                      is_string: false,
                                      default_value: false),
 
