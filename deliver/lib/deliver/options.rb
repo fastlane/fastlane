@@ -145,7 +145,7 @@ module Deliver
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_app_version_update,
                                      env_name: "DELIVER_SKIP_APP_VERSION_UPDATE",
-                                     description: "Don’t created or update the app version that is being prepared for submission",
+                                     description: "Don’t create or update the app version that is being prepared for submission",
                                      is_string: false,
                                      default_value: false),
 
