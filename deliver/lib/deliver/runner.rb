@@ -78,10 +78,20 @@ module Deliver
       precheck_options = {
         default_rule_level: options[:precheck_default_rule_level],
         include_in_app_purchases: options[:precheck_include_in_app_purchases],
-        app_identifier: options[:app_identifier],
-        username: options[:username],
-        platform: options[:platform]
+        app_identifier: options[:app_identifier]
       }
+
+      if options[:api_key] || options[:api_key_path]
+        if options[:precheck_include_in_app_purchases]
+          UI.user_error!("Precheck cannot check In-app purchases with the App Store Connect API Key (yet). Exclude In-app purchases from precheck or use Apple ID login")
+        end
+
+        precheck_options[:api_key] = options[:api_key]
+        precheck_options[:api_key_path] = options[:api_key_path]
+      else
+        precheck_options[:username] = options[:username]
+        precheck_options[:platform] = options[:platform]
+      end
 
       precheck_config = FastlaneCore::Configuration.create(Precheck::Options.available_options, precheck_options)
       Precheck.config = precheck_config
