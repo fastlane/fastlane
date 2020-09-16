@@ -36,6 +36,22 @@ module Spaceship
           provisioning_request_client.get("certificates", params)
         end
 
+        def get_certificate(certificate_id: nil, includes: nil)
+          params = provisioning_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
+          provisioning_request_client.get("certificates/#{certificate_id}", params)
+        end
+
+        def post_certificate(attributes: {})
+          body = {
+            data: {
+              attributes: attributes,
+              type: "certificates",
+            }
+          }
+
+          provisioning_request_client.post("certificates", body)
+        end
+
         #
         # devices
         #

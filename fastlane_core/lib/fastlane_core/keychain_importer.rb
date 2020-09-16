@@ -4,7 +4,7 @@ require 'security'
 
 module FastlaneCore
   class KeychainImporter
-    def self.import_file(path, keychain_path, keychain_password: nil, certificate_password: "", output: FastlaneCore::Globals.verbose?)
+    def self.import_file(path, keychain_path, keychain_password: nil, certificate_password: "", skip_set_partition_list: false, output: FastlaneCore::Globals.verbose?)
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
       command = "security import #{path.shellescape} -k '#{keychain_path.shellescape}'"
@@ -19,7 +19,7 @@ module FastlaneCore
         UI.command_output(stdout.read.to_s) if output
 
         # Set partition list only if success since it can be a time consuming process if a lot of keys are installed
-        if thrd.value.success?
+        if thrd.value.success? && !skip_set_partition_list
           keychain_password ||= resolve_keychain_password(keychain_path)
           set_partition_list(path, keychain_path, keychain_password: keychain_password, output: output)
         else
