@@ -76,7 +76,6 @@ module Fastlane
                                        env_name: "FL_ENSURE_GIT_STATUS_CLEAN_IGNORED_FILE",
                                        description: "The flag whether to ignore file the git status if the repo is dirty",
                                        optional: true,
-                                       default_value: false,
                                        is_string: true)
         ]
       end
