@@ -23,6 +23,7 @@ module Fastlane
 
         Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATHS] = nil
         Actions.lane_context[Actions::SharedValues::DSYM_PATHS] = nil
+        Actions.lane_context[Actions::SharedValues::DSYM_LATEST_UPLOADED_DATE] = nil
 
         UI.success('Cleaned up build artifacts 🐙')
       end

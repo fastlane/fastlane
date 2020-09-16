@@ -164,6 +164,7 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
 | `color` | The font color for the text. Specify a hex/html color code. | `#000000` (black) |
 | `font` | The font family for the text. Specify the (relative) path to the font file (e.g. an OpenType Font). | The default `imagemagick` font, which is system dependent. |
 | `font_size` | The font size for the text specified in points. If not specified or `0`, font will be scaled automatically to fit the available space. _frameit_ still shrinks the text, if it would not fit. | NA |
+| `font_weight` | The [font weight for the text](https://imagemagick.org/script/command-line-options.php#weight). Specify an integer value (e.g. 900). | NA |
 | `text` | The text that should be used for the `keyword` or `title`. <p> Note: If you want to use localised text, use [`.strings` files](#strings-files). | NA |
 
 ### Example
