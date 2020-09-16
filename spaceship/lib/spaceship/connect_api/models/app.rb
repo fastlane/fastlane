@@ -91,6 +91,7 @@ module Spaceship
       def fetch_live_app_info(includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
         states = [
           Spaceship::ConnectAPI::AppInfo::AppStoreState::READY_FOR_SALE,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_APPLE_RELEASE,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_DEVELOPER_RELEASE,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PROCESSING_FOR_APP_STORE,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::IN_REVIEW
@@ -145,6 +146,7 @@ module Spaceship
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           appStoreState: [
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_APPLE_RELEASE,
             Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_DEVELOPER_RELEASE,
             Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::IN_REVIEW,
             Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::WAITING_FOR_REVIEW
@@ -236,7 +238,10 @@ module Spaceship
       def get_pending_release_app_store_version(platform: nil, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES)
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_DEVELOPER_RELEASE,
+          appStoreState: [
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_APPLE_RELEASE,
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_DEVELOPER_RELEASE
+          ].join(','),
           platform: platform
         }
         return get_app_store_versions(filter: filter, includes: includes).first
