@@ -462,6 +462,8 @@ public func appledoc(input: Any,
  Alias for the `upload_to_app_store` action
 
  - parameters:
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
    - appIdentifier: The bundle identifier of your app
    - appVersion: The version that should be edited or created
@@ -476,7 +478,7 @@ public func appledoc(input: Any,
    - skipBinaryUpload: Skip uploading an ipa or pkg to App Store Connect
    - skipScreenshots: Don't upload the screenshots
    - skipMetadata: Don't upload the metadata (e.g. title, description). This will still upload screenshots
-   - skipAppVersionUpdate: Don't update app version for submission
+   - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip the HTML report file verification
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
    - submitForReview: Submit the new version for Review after uploading everything
@@ -530,7 +532,9 @@ public func appledoc(input: Any,
  `_upload_to_app_store_(force: true)`
  If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
  */
-public func appstore(username: String,
+public func appstore(apiKeyPath: String? = nil,
+                     apiKey: [String: Any]? = nil,
+                     username: String,
                      appIdentifier: String? = nil,
                      appVersion: String? = nil,
                      ipa: String? = nil,
@@ -591,7 +595,9 @@ public func appstore(username: String,
                      precheckIncludeInAppPurchases: Bool = true,
                      app: Any)
 {
-    let command = RubyCommand(commandID: "", methodName: "appstore", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
+    let command = RubyCommand(commandID: "", methodName: "appstore", className: nil, args: [RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                            RubyCommand.Argument(name: "api_key", value: apiKey),
+                                                                                            RubyCommand.Argument(name: "username", value: username),
                                                                                             RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                             RubyCommand.Argument(name: "app_version", value: appVersion),
                                                                                             RubyCommand.Argument(name: "ipa", value: ipa),
@@ -1951,6 +1957,8 @@ public func chatwork(apiToken: String,
  Check your app's metadata before you submit your app to review (via _precheck_)
 
  - parameters:
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - appIdentifier: The bundle identifier of your app
    - username: Your Apple ID Username
    - teamId: The ID of your App Store Connect team if you're in multiple teams
@@ -1973,7 +1981,9 @@ public func chatwork(apiToken: String,
 
  More information: https://fastlane.tools/precheck
  */
-public func checkAppStoreMetadata(appIdentifier: String,
+public func checkAppStoreMetadata(apiKeyPath: String? = nil,
+                                  apiKey: [String: Any]? = nil,
+                                  appIdentifier: String,
                                   username: String,
                                   teamId: String? = nil,
                                   teamName: String? = nil,
@@ -1991,7 +2001,9 @@ public func checkAppStoreMetadata(appIdentifier: String,
                                   copyrightDate: Any? = nil,
                                   unreachableUrls: Any? = nil)
 {
-    let command = RubyCommand(commandID: "", methodName: "check_app_store_metadata", className: nil, args: [RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
+    let command = RubyCommand(commandID: "", methodName: "check_app_store_metadata", className: nil, args: [RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                                            RubyCommand.Argument(name: "api_key", value: apiKey),
+                                                                                                            RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                             RubyCommand.Argument(name: "username", value: username),
                                                                                                             RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                             RubyCommand.Argument(name: "team_name", value: teamName),
@@ -2562,6 +2574,8 @@ public func deleteKeychain(name: String? = nil,
  Alias for the `upload_to_app_store` action
 
  - parameters:
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
    - appIdentifier: The bundle identifier of your app
    - appVersion: The version that should be edited or created
@@ -2576,7 +2590,7 @@ public func deleteKeychain(name: String? = nil,
    - skipBinaryUpload: Skip uploading an ipa or pkg to App Store Connect
    - skipScreenshots: Don't upload the screenshots
    - skipMetadata: Don't upload the metadata (e.g. title, description). This will still upload screenshots
-   - skipAppVersionUpdate: Don't update app version for submission
+   - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip the HTML report file verification
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
    - submitForReview: Submit the new version for Review after uploading everything
@@ -2630,7 +2644,9 @@ public func deleteKeychain(name: String? = nil,
  `_upload_to_app_store_(force: true)`
  If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
  */
-public func deliver(username: Any = deliverfile.username,
+public func deliver(apiKeyPath: Any? = deliverfile.apiKeyPath,
+                    apiKey: [String: Any]? = deliverfile.apiKey,
+                    username: Any = deliverfile.username,
                     appIdentifier: Any? = deliverfile.appIdentifier,
                     appVersion: Any? = deliverfile.appVersion,
                     ipa: Any? = deliverfile.ipa,
@@ -2691,7 +2707,9 @@ public func deliver(username: Any = deliverfile.username,
                     precheckIncludeInAppPurchases: Bool = deliverfile.precheckIncludeInAppPurchases,
                     app: Any = deliverfile.app)
 {
-    let command = RubyCommand(commandID: "", methodName: "deliver", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
+    let command = RubyCommand(commandID: "", methodName: "deliver", className: nil, args: [RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                           RubyCommand.Argument(name: "api_key", value: apiKey),
+                                                                                           RubyCommand.Argument(name: "username", value: username),
                                                                                            RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                            RubyCommand.Argument(name: "app_version", value: appVersion),
                                                                                            RubyCommand.Argument(name: "ipa", value: ipa),
@@ -2831,6 +2849,7 @@ public func download(url: String) {
    - version: The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs or 'live' to download only the live version dSYMs
    - buildNumber: The app build_number for dSYMs you wish to download
    - minVersion: The minimum app version for dSYMs you wish to download
+   - afterUploadedDate: The uploaded date after which you wish to download dSYMs
    - outputDirectory: Where to save the download dSYMs, defaults to the current path
    - waitForDsymProcessing: Wait for dSYMs to process
    - waitTimeout: Number of seconds to wait for dSYMs to process
@@ -2854,6 +2873,7 @@ public func downloadDsyms(username: String,
                           version: String? = nil,
                           buildNumber: Any? = nil,
                           minVersion: String? = nil,
+                          afterUploadedDate: String? = nil,
                           outputDirectory: String? = nil,
                           waitForDsymProcessing: Bool = false,
                           waitTimeout: Int = 300)
@@ -2866,6 +2886,7 @@ public func downloadDsyms(username: String,
                                                                                                   RubyCommand.Argument(name: "version", value: version),
                                                                                                   RubyCommand.Argument(name: "build_number", value: buildNumber),
                                                                                                   RubyCommand.Argument(name: "min_version", value: minVersion),
+                                                                                                  RubyCommand.Argument(name: "after_uploaded_date", value: afterUploadedDate),
                                                                                                   RubyCommand.Argument(name: "output_directory", value: outputDirectory),
                                                                                                   RubyCommand.Argument(name: "wait_for_dsym_processing", value: waitForDsymProcessing),
                                                                                                   RubyCommand.Argument(name: "wait_timeout", value: waitTimeout)])
@@ -5184,8 +5205,8 @@ public func pem(development: Bool = false,
  Alias for the `upload_to_testflight` action
 
  - parameters:
-   - apiKeyPath: Path to your App Store Connect API key JSON file
-   - apiKey: Path to your App Store Connect API key JSON file
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
    - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
    - appPlatform: The platform to use (optional)
@@ -5472,6 +5493,8 @@ public func podioItem(clientId: String,
  Alias for the `check_app_store_metadata` action
 
  - parameters:
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - appIdentifier: The bundle identifier of your app
    - username: Your Apple ID Username
    - teamId: The ID of your App Store Connect team if you're in multiple teams
@@ -5485,7 +5508,9 @@ public func podioItem(clientId: String,
 
  More information: https://fastlane.tools/precheck
  */
-public func precheck(appIdentifier: Any = precheckfile.appIdentifier,
+public func precheck(apiKeyPath: Any? = precheckfile.apiKeyPath,
+                     apiKey: [String: Any]? = precheckfile.apiKey,
+                     appIdentifier: Any = precheckfile.appIdentifier,
                      username: Any = precheckfile.username,
                      teamId: Any? = precheckfile.teamId,
                      teamName: Any? = precheckfile.teamName,
@@ -5494,7 +5519,9 @@ public func precheck(appIdentifier: Any = precheckfile.appIdentifier,
                      includeInAppPurchases: Bool = precheckfile.includeInAppPurchases,
                      freeStuffInIap: Any? = precheckfile.freeStuffInIap)
 {
-    let command = RubyCommand(commandID: "", methodName: "precheck", className: nil, args: [RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
+    let command = RubyCommand(commandID: "", methodName: "precheck", className: nil, args: [RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                            RubyCommand.Argument(name: "api_key", value: apiKey),
+                                                                                            RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                             RubyCommand.Argument(name: "username", value: username),
                                                                                             RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                             RubyCommand.Argument(name: "team_name", value: teamName),
@@ -7762,8 +7789,8 @@ public func testfairy(apiKey: String,
  Alias for the `upload_to_testflight` action
 
  - parameters:
-   - apiKeyPath: Path to your App Store Connect API key JSON file
-   - apiKey: Path to your App Store Connect API key JSON file
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
    - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
    - appPlatform: The platform to use (optional)
@@ -8356,6 +8383,8 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
  Upload metadata and binary to App Store Connect (via _deliver_)
 
  - parameters:
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
    - appIdentifier: The bundle identifier of your app
    - appVersion: The version that should be edited or created
@@ -8370,7 +8399,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - skipBinaryUpload: Skip uploading an ipa or pkg to App Store Connect
    - skipScreenshots: Don't upload the screenshots
    - skipMetadata: Don't upload the metadata (e.g. title, description). This will still upload screenshots
-   - skipAppVersionUpdate: Don't update app version for submission
+   - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip the HTML report file verification
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
    - submitForReview: Submit the new version for Review after uploading everything
@@ -8424,7 +8453,9 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
  `_upload_to_app_store_(force: true)`
  If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
  */
-public func uploadToAppStore(username: String,
+public func uploadToAppStore(apiKeyPath: String? = nil,
+                             apiKey: [String: Any]? = nil,
+                             username: String,
                              appIdentifier: String? = nil,
                              appVersion: String? = nil,
                              ipa: String? = nil,
@@ -8485,7 +8516,9 @@ public func uploadToAppStore(username: String,
                              precheckIncludeInAppPurchases: Bool = true,
                              app: Any)
 {
-    let command = RubyCommand(commandID: "", methodName: "upload_to_app_store", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
+    let command = RubyCommand(commandID: "", methodName: "upload_to_app_store", className: nil, args: [RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                                       RubyCommand.Argument(name: "api_key", value: apiKey),
+                                                                                                       RubyCommand.Argument(name: "username", value: username),
                                                                                                        RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                        RubyCommand.Argument(name: "app_version", value: appVersion),
                                                                                                        RubyCommand.Argument(name: "ipa", value: ipa),
@@ -8711,8 +8744,8 @@ public func uploadToPlayStoreInternalAppSharing(packageName: String,
  Upload new binary to App Store Connect for TestFlight beta testing (via _pilot_)
 
  - parameters:
-   - apiKeyPath: Path to your App Store Connect API key JSON file
-   - apiKey: Path to your App Store Connect API key JSON file
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
    - appIdentifier: The bundle identifier of the app to upload or manage testers (optional)
    - appPlatform: The platform to use (optional)
@@ -9273,4 +9306,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.95]
+// FastlaneRunnerAPIVersion [0.9.96]
