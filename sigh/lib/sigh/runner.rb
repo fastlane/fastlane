@@ -190,43 +190,67 @@ module Sigh
       profiles
     end
 
+    def fetch_certificates(certificate_types)
+      filter = {
+        certificateType: certificate_types.join(',')
+      }
+      return Spaceship::ConnectAPI::Certificate.all(filter: filter)
+    end
+
     def certificates_for_profile_and_platform
+      types = []
+
       case Sigh.config[:platform].to_s
       when 'ios', 'tvos'
         if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT
-          certificates = Spaceship.certificate.development.all +
-                         Spaceship.certificate.apple_development.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT,
+            Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT
+          ]
         elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
           # Enterprise accounts don't have access to Apple Distribution certificates
-          certificates = Spaceship.certificate.in_house.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION
+          ]
         # handles case where the desired certificate type is adhoc but the account is an enterprise account
         # the apple dev portal api has a weird quirk in it where if you query for distribution certificates
         # for enterprise accounts, you get nothing back even if they exist.
-        elsif (profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC) && Spaceship.client && Spaceship.client.in_house?
+        elsif (profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC) && Spaceship::ConnectAPI.client && Spaceship::ConnectAPI.client.in_house?
           # Enterprise accounts don't have access to Apple Distribution certificates
-          certificates = Spaceship.certificate.in_house.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION
+          ]
         else
-          # Ad hoc or App Store
-          certificates = Spaceship.certificate.production.all +
-                         Spaceship.certificate.apple_distribution.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION,
+            Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION
+          ]
         end
 
       when 'macos', 'catalyst'
         if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
-          certificates = Spaceship.certificate.mac_development.all +
-                         Spaceship.certificate.apple_development.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT,
+            Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DEVELOPMENT
+          ]
         elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
-          certificates = Spaceship.certificate.mac_app_distribution.all +
-                         Spaceship.certificate.apple_distribution.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION,
+            Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DISTRIBUTION
+          ]
         elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
-          certificates = Spaceship.certificate.developer_id_application.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+          ]
         else
-          certificates = Spaceship.certificate.mac_app_distribution.all +
-                         Spaceship.certificate.apple_distribution.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION,
+            Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DISTRIBUTION
+          ]
         end
       end
 
-      certificates
+      fetch_certificates(types)
     end
 
     def devices_to_use
