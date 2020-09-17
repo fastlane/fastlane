@@ -52,6 +52,12 @@ module Spaceship
           provisioning_request_client.post("certificates", body)
         end
 
+        def delete_certificate(certificate_id: nil)
+          raise "Certificate id is nil" if certificate_id.nil?
+
+          provisioning_request_client.delete("certificates/#{certificate_id}")
+        end
+
         #
         # devices
         #

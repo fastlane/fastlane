@@ -79,7 +79,7 @@ module Cert
       to_revoke.each do |certificate|
         begin
           UI.message("#{certificate.id} #{certificate.name} has expired, revoking...")
-          certificate.revoke!
+          certificate.delete!
           revoke_count += 1
         rescue => e
           UI.error("An error occurred while revoking #{certificate.id} #{certificate.name}")

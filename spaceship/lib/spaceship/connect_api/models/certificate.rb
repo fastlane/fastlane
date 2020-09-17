@@ -90,6 +90,10 @@ module Spaceship
         resp = Spaceship::ConnectAPI.get_certificate(certificate_id: certificate_id, includes: includes)
         return resp.to_models.first
       end
+
+      def delete!
+        Spaceship::ConnectAPI.delete_certificate(certificate_id: id)
+      end
     end
   end
 end
