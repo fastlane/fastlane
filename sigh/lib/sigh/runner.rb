@@ -17,11 +17,16 @@ module Sigh
                                          hide_keys: [:output_path],
                                              title: "Summary for sigh #{Fastlane::VERSION}")
 
-      # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
-      # Prompts select team if multiple teams and none specified
-      UI.message("Starting login with user '#{Sigh.config[:username]}'")
-      Spaceship::ConnectAPI.login(Sigh.config[:username], nil, use_portal: true, use_tunes: false)
-      UI.message("Successfully logged in")
+      if api_token
+        UI.message("Creating authorization token for App Store Connect API")
+        Spaceship::ConnectAPI.token = api_token
+      else
+        # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
+        # Prompts select team if multiple teams and none specified
+        UI.message("Starting login with user '#{Sigh.config[:username]}'")
+        Spaceship::ConnectAPI.login(Sigh.config[:username], nil, use_portal: true, use_tunes: false)
+        UI.message("Successfully logged in")
+      end
 
       profiles = [] if Sigh.config[:skip_fetch_profiles]
       profiles ||= fetch_profiles # download the profile if it's there
@@ -52,6 +57,12 @@ module Sigh
       end
 
       return download_profile(profile)
+    end
+
+    def api_token
+      @api_token ||= Spaceship::ConnectAPI::Token.create(Sigh.config[:api_key]) if Sigh.config[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(Sigh.config[:api_key_path]) if Sigh.config[:api_key_path]
+      return @api_token
     end
 
     # The kind of provisioning profile we're interested in
@@ -257,22 +268,28 @@ module Sigh
       # Only use devices if development or adhoc
       return [] if !Sigh.config[:development] && !Sigh.config[:adhoc]
 
-      device_class = case Sigh.config[:platform].to_s
+      device_classes = case Sigh.config[:platform].to_s
                      when 'ios'
                        [
                          Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH,
                          Spaceship::ConnectAPI::Device::DeviceClass::IPAD,
                          Spaceship::ConnectAPI::Device::DeviceClass::IPHONE,
                          Spaceship::ConnectAPI::Device::DeviceClass::IPOD
-                       ].join(",")
+                       ]
                      when 'tvos'
-                       Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV
+                       [Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV]
                      when 'macos', 'catalyst'
-                       Spaceship::ConnectAPI::Device::DeviceClass::MAC
+                       [Spaceship::ConnectAPI::Device::DeviceClass::MAC]
                      end
 
-      filter = { deviceClass: device_class }
-      return Spaceship::ConnectAPI::Device.all(filter: filter)
+      if api_token
+        return Spaceship::ConnectAPI::Device.all().select do |device|
+          device_classes.include?(device.device_class)
+        end
+      else
+        filter = { deviceClass: device_classes.join(",") }
+        return Spaceship::ConnectAPI::Device.all(filter: filter)
+      end
     end
 
     # Certificate to use based on the current distribution mode
@@ -297,7 +314,8 @@ module Sigh
         unless Sigh.config[:skip_certificate_verification]
           certificates = certificates.find_all do |c|
             file = Tempfile.new('cert')
-            file.write(c.download_raw)
+            raw_data = Base64.decode64(c.certificate_content)
+            file.write(raw_data)
             file.close
 
             FastlaneCore::CertChecker.installed?(file.path)
