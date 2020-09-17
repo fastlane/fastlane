@@ -269,21 +269,21 @@ module Sigh
       return [] if !Sigh.config[:development] && !Sigh.config[:adhoc]
 
       device_classes = case Sigh.config[:platform].to_s
-                     when 'ios'
-                       [
-                         Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH,
-                         Spaceship::ConnectAPI::Device::DeviceClass::IPAD,
-                         Spaceship::ConnectAPI::Device::DeviceClass::IPHONE,
-                         Spaceship::ConnectAPI::Device::DeviceClass::IPOD
-                       ]
-                     when 'tvos'
-                       [Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV]
-                     when 'macos', 'catalyst'
-                       [Spaceship::ConnectAPI::Device::DeviceClass::MAC]
-                     end
+                       when 'ios'
+                         [
+                           Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH,
+                           Spaceship::ConnectAPI::Device::DeviceClass::IPAD,
+                           Spaceship::ConnectAPI::Device::DeviceClass::IPHONE,
+                           Spaceship::ConnectAPI::Device::DeviceClass::IPOD
+                         ]
+                       when 'tvos'
+                         [Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV]
+                       when 'macos', 'catalyst'
+                         [Spaceship::ConnectAPI::Device::DeviceClass::MAC]
+                       end
 
       if api_token
-        return Spaceship::ConnectAPI::Device.all().select do |device|
+        return Spaceship::ConnectAPI::Device.all.select do |device|
           device_classes.include?(device.device_class)
         end
       else
