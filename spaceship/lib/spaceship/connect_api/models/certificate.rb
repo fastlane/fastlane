@@ -1,4 +1,7 @@
 require_relative '../model'
+
+require 'openssl'
+
 module Spaceship
   class ConnectAPI
     class Certificate
@@ -46,7 +49,6 @@ module Spaceship
       def valid?
         Time.parse(expiration_date) > Time.now
       end
-
 
       # Create a new code signing request that can be used to
       # generate a new certificate

@@ -45,7 +45,7 @@ module Spaceship
           body = {
             data: {
               attributes: attributes,
-              type: "certificates",
+              type: "certificates"
             }
           }
 
