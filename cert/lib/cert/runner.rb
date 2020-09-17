@@ -26,9 +26,6 @@ module Cert
       else
         UI.message("Starting login with user '#{Cert.config[:username]}'")
         Spaceship::ConnectAPI.login(Cert.config[:username], nil, use_portal: true, use_tunes: false)
-
-        Spaceship::Portal.login(Cert.config[:username], nil)
-        Spaceship::Portal.select_team
         UI.message("Successfully logged in")
       end
     end
@@ -78,11 +75,11 @@ module Cert
 
       to_revoke.each do |certificate|
         begin
-          UI.message("#{certificate.id} #{certificate.name} has expired, revoking...")
+          UI.message("#{certificate.id} #{certificate.display_name} has expired, revoking...")
           certificate.delete!
           revoke_count += 1
         rescue => e
-          UI.error("An error occurred while revoking #{certificate.id} #{certificate.name}")
+          UI.error("An error occurred while revoking #{certificate.id} #{certificate.display_name}")
           UI.error("#{e.message}\n#{e.backtrace.join("\n")}") if FastlaneCore::Globals.verbose?
         end
       end
@@ -91,7 +88,7 @@ module Cert
     end
 
     def expired_certs
-      certificates.select(&:valid?)
+      certificates.reject(&:valid?)
     end
 
     def find_existing_cert
