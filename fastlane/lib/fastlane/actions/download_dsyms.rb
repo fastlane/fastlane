@@ -208,6 +208,7 @@ module Fastlane
         else
           http = Net::HTTP.new(uri.host, uri.port)
         end
+        http.read_timeout = 300
         http.use_ssl = (uri.scheme == "https")
         res = http.get(uri.request_uri)
         res.body
