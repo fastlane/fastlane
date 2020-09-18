@@ -55,7 +55,9 @@ module Match
         readonly: params[:readonly],
         username: params[:readonly] ? nil : params[:username], # only pass username if not readonly
         team_id: params[:team_id],
-        team_name: params[:team_name]
+        team_name: params[:team_name],
+        api_key_path: params[:api_key_path],
+        api_key: params[:api_key]
       })
       storage.download
 
@@ -67,7 +69,7 @@ module Match
       encryption.decrypt_files if encryption
 
       unless params[:readonly]
-        self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
+        self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name], api_token(params))
         if params[:type] == "enterprise" && !Spaceship.client.in_house?
           UI.user_error!("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
         end
@@ -135,6 +137,12 @@ module Match
       storage.clear_changes if storage
     end
     # rubocop:enable Metrics/PerceivedComplexity
+
+    def api_token(params)
+      @api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
+      return @api_token
+    end
 
     # Used when creating a new certificate or profile
     def prefixed_working_directory
