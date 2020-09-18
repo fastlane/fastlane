@@ -102,9 +102,6 @@ open class LaneFile: NSObject, LaneFileProtocol {
             // in the executable's scope that loads the library, so in that case `className()` won't be the
             // expected Fastfile and so, we do not dynamically load it as we do without SPM.
             loadFastfile()
-        #endif
-
-        #if !SWIFT_PACKAGE
             guard let fastfileInstance: LaneFile = self.fastfileInstance else {
                 let message = "Unable to instantiate class named: \(className())"
                 log(message: message)
