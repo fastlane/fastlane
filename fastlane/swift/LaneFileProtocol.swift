@@ -117,8 +117,8 @@ open class LaneFile: NSObject, LaneFileProtocol {
                 log(message: "Found nil instance of fastfile")
                 preconditionFailure()
             }
+            self.fastfileInstance = fastfileInstance
         #endif
-        self.fastfileInstance = fastfile!
         let currentLanes = lanes
         let lowerCasedLaneRequested = named.lowercased()
 
