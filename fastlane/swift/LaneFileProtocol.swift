@@ -33,7 +33,7 @@ open class LaneFile: NSObject, LaneFileProtocol {
     private(set) static var fastfileInstance: LaneFile?
 
     // Called before any lane is executed.
-    private func setupAllTheThings() {
+    private func setUpAllTheThings() {
         LaneFile.fastfileInstance!.beforeAll()
     }
 
@@ -135,8 +135,8 @@ open class LaneFile: NSObject, LaneFileProtocol {
             return false
         }
 
-        fastfileInstance.setupAllTheThings()
         // Call all methods that need to be called before we start calling lanes.
+        fastfileInstance.setUpAllTheThings()
 
         // We need to catch all possible errors here and display a nice message.
         _ = fastfileInstance.perform(NSSelectorFromString(laneMethod), with: parameters)
