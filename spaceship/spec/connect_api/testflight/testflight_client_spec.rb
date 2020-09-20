@@ -1,9 +1,9 @@
 describe Spaceship::ConnectAPI::TestFlight::Client do
-  let(:mock_tunes_client) { double('tunes_client') }
+  let(:mock_tunes_client) { double("tunes_client") }
   let(:client) { Spaceship::ConnectAPI::TestFlight::Client.new(another_client: mock_tunes_client) }
   let(:hostname) { Spaceship::ConnectAPI::TestFlight::Client.hostname }
-  let(:username) { 'spaceship@krausefx.com' }
-  let(:password) { 'so_secret' }
+  let(:username) { "spaceship@krausefx.com" }
+  let(:password) { "so_secret" }
 
   before do
     allow(mock_tunes_client).to receive(:team_id).and_return("123")
@@ -12,7 +12,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     Spaceship::ConnectAPI.login(username, password, use_portal: false, use_tunes: true)
   end
 
-  context 'sends api request' do
+  context "sends api request" do
     before(:each) do
       allow(client).to receive(:handle_response)
     end
@@ -43,18 +43,18 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     end
 
     describe "apps" do
-      context 'get_apps' do
+      context "get_apps" do
         let(:path) { "apps" }
         let(:bundle_id) { "com.bundle.id" }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
           client.get_apps
         end
 
-        it 'succeeds with filter' do
+        it "succeeds with filter" do
           params = { filter: { bundleId: bundle_id } }
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -62,11 +62,11 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'get_app' do
+      context "get_app" do
         let(:app_id) { "123456789" }
         let(:path) { "apps/#{app_id}" }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -76,18 +76,18 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     end
 
     describe "betaAppLocalizations" do
-      context 'get_beta_app_localizations' do
+      context "get_beta_app_localizations" do
         let(:path) { "betaAppLocalizations" }
         let(:app_id) { "123" }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
           client.get_beta_app_localizations
         end
 
-        it 'succeeds with filter' do
+        it "succeeds with filter" do
           params = { filter: { app: app_id } }
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -95,7 +95,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'post_beta_app_localizations' do
+      context "post_beta_app_localizations" do
         let(:path) { "betaAppLocalizations" }
         let(:app_id) { "123" }
         let(:attributes) { { key: "value" } }
@@ -108,15 +108,15 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
                 app: {
                   data: {
                     type: "apps",
-                    id: app_id
-                  }
-                }
-              }
-            }
+                    id: app_id,
+                  },
+                },
+              },
+            },
           }
         end
 
-        it 'succeeds' do
+        it "succeeds" do
           url = path
           req_mock = test_request_body(url, body)
 
@@ -125,7 +125,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'patch_beta_app_localizations' do
+      context "patch_beta_app_localizations" do
         let(:path) { "betaAppLocalizations" }
         let(:localization_id) { "123" }
         let(:attributes) { { key: "value" } }
@@ -134,12 +134,12 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
             data: {
               attributes: attributes,
               id: localization_id,
-              type: "betaAppLocalizations"
-            }
+              type: "betaAppLocalizations",
+            },
           }
         end
 
-        it 'succeeds' do
+        it "succeeds" do
           url = "#{path}/#{localization_id}"
           req_mock = test_request_body(url, body)
 
@@ -150,18 +150,18 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     end
 
     describe "betaAppReviewDetails" do
-      context 'get_beta_app_review_detail' do
+      context "get_beta_app_review_detail" do
         let(:path) { "betaAppReviewDetails" }
         let(:app_id) { "123" }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
           client.get_beta_app_review_detail
         end
 
-        it 'succeeds with filter' do
+        it "succeeds with filter" do
           params = { filter: { app: app_id } }
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -169,7 +169,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'patch_beta_app_review_detail' do
+      context "patch_beta_app_review_detail" do
         let(:path) { "betaAppReviewDetails" }
         let(:app_id) { "123" }
         let(:attributes) { { key: "value" } }
@@ -178,12 +178,12 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
             data: {
               attributes: attributes,
               id: app_id,
-              type: "betaAppReviewDetails"
-            }
+              type: "betaAppReviewDetails",
+            },
           }
         end
 
-        it 'succeeds' do
+        it "succeeds" do
           url = "#{path}/#{app_id}"
           req_mock = test_request_body(url, body)
           expect(client).to receive(:request).with(:patch).and_yield(req_mock)
@@ -193,18 +193,18 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     end
 
     describe "betaAppReviewSubmissions" do
-      context 'get_beta_app_review_submissions' do
+      context "get_beta_app_review_submissions" do
         let(:path) { "betaAppReviewSubmissions" }
         let(:app_id) { "123" }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
           client.get_beta_app_review_submissions
         end
 
-        it 'succeeds with filter' do
+        it "succeeds with filter" do
           params = { filter: { app: app_id } }
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -212,7 +212,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'post_beta_app_review_submissions' do
+      context "post_beta_app_review_submissions" do
         let(:path) { "betaAppReviewSubmissions" }
         let(:build_id) { "123" }
         let(:body) do
@@ -223,15 +223,15 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
                 build: {
                   data: {
                     type: "builds",
-                    id: build_id
-                  }
-                }
-              }
-            }
+                    id: build_id,
+                  },
+                },
+              },
+            },
           }
         end
 
-        it 'succeeds' do
+        it "succeeds" do
           url = path
           req_mock = test_request_body(url, body)
 
@@ -240,11 +240,11 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'delete_beta_app_review_submission' do
+      context "delete_beta_app_review_submission" do
         let(:beta_app_review_submission_id) { "123" }
         let(:path) { "betaAppReviewSubmissions/#{beta_app_review_submission_id}" }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:delete).and_yield(req_mock)
@@ -254,18 +254,18 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     end
 
     describe "betaBuildLocalizations" do
-      context 'get_beta_build_localizations' do
+      context "get_beta_build_localizations" do
         let(:path) { "betaBuildLocalizations" }
         let(:build_id) { "123" }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
           client.get_beta_build_localizations
         end
 
-        it 'succeeds with filter' do
+        it "succeeds with filter" do
           params = { filter: { build: build_id } }
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -273,7 +273,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'post_beta_build_localizations' do
+      context "post_beta_build_localizations" do
         let(:path) { "betaBuildLocalizations" }
         let(:build_id) { "123" }
         let(:attributes) { { key: "value" } }
@@ -286,15 +286,15 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
                 build: {
                   data: {
                     type: "builds",
-                    id: build_id
-                  }
-                }
-              }
-            }
+                    id: build_id,
+                  },
+                },
+              },
+            },
           }
         end
 
-        it 'succeeds' do
+        it "succeeds" do
           url = path
           req_mock = test_request_body(url, body)
 
@@ -303,7 +303,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'patch_beta_build_localizations' do
+      context "patch_beta_build_localizations" do
         let(:path) { "betaBuildLocalizations" }
         let(:localization_id) { "123" }
         let(:attributes) { { key: "value" } }
@@ -312,12 +312,12 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
             data: {
               attributes: attributes,
               id: localization_id,
-              type: "betaBuildLocalizations"
-            }
+              type: "betaBuildLocalizations",
+            },
           }
         end
 
-        it 'succeeds' do
+        it "succeeds" do
           url = "#{path}/#{localization_id}"
           req_mock = test_request_body(url, body)
 
@@ -328,19 +328,19 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     end
 
     describe "betaFeedbacks" do
-      context 'get_beta_feedbacks' do
+      context "get_beta_feedbacks" do
         let(:path) { "betaFeedbacks" }
         let(:app_id) { "123456789" }
         let(:default_params) { {} }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params.merge(default_params))
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
           client.get_beta_feedback
         end
 
-        it 'succeeds with filter' do
+        it "succeeds with filter" do
           params = { filter: { "build.app" => app_id } }
           req_mock = test_request_params(path, params.merge(default_params))
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -350,19 +350,19 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     end
 
     describe "betaGroups" do
-      context 'get_beta_groups' do
+      context "get_beta_groups" do
         let(:path) { "betaGroups" }
         let(:name) { "sir group a lot" }
         let(:default_params) { {} }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params.merge(default_params))
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
           client.get_beta_groups
         end
 
-        it 'succeeds with filter' do
+        it "succeeds with filter" do
           params = { filter: { name: name } }
           req_mock = test_request_params(path, params.merge(default_params))
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -370,7 +370,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'add_beta_groups_to_build' do
+      context "add_beta_groups_to_build" do
         let(:path) { "builds" }
         let(:build_id) { "123" }
         let(:beta_group_ids) { ["123", "456"] }
@@ -379,13 +379,13 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
             data: beta_group_ids.map do |id|
               {
                 type: "betaGroups",
-                id: id
+                id: id,
               }
-            end
+            end,
           }
         end
 
-        it 'succeeds' do
+        it "succeeds" do
           url = "#{path}/#{build_id}/relationships/betaGroups"
           req_mock = test_request_body(url, body)
 
@@ -396,18 +396,18 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     end
 
     describe "betaTesters" do
-      context 'get_beta_testers' do
+      context "get_beta_testers" do
         let(:path) { "betaTesters" }
         let(:app_id) { "123" }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
           client.get_beta_testers
         end
 
-        it 'succeeds with filter' do
+        it "succeeds with filter" do
           params = { filter: { app: app_id } }
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -415,35 +415,35 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'post_bulk_beta_tester_assignments' do
+      context "post_bulk_beta_tester_assignments" do
         let(:path) { "bulkBetaTesterAssignments" }
         let(:beta_group_id) { "123" }
         let(:beta_testers) do
           [
             { email: "email1", firstName: "first1", lastName: "last1", errors: [] },
-            { email: "email2", firstName: "first2", lastName: "last2", errors: [] }
+            { email: "email2", firstName: "first2", lastName: "last2", errors: [] },
           ]
         end
         let(:body) do
           {
             data: {
               attributes: {
-                betaTesters: beta_testers
+                betaTesters: beta_testers,
               },
               relationships: {
                 betaGroup: {
                   data: {
                     type: "betaGroups",
-                    id: beta_group_id
-                  }
-                }
+                    id: beta_group_id,
+                  },
+                },
               },
-              type: "bulkBetaTesterAssignments"
-            }
+              type: "bulkBetaTesterAssignments",
+            },
           }
         end
 
-        it 'succeeds' do
+        it "succeeds" do
           url = path
           req_mock = test_request_body(url, body)
 
@@ -452,7 +452,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'delete_beta_tester_from_apps' do
+      context "delete_beta_tester_from_apps" do
         let(:beta_tester_id) { "123" }
         let(:app_ids) { ["1234", "5678"] }
         let(:path) { "betaTesters/#{beta_tester_id}/relationships/apps" }
@@ -461,13 +461,13 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
             data: app_ids.map do |id|
               {
                 type: "apps",
-                id: id
+                id: id,
               }
-            end
+            end,
           }
         end
 
-        it 'succeeds' do
+        it "succeeds" do
           url = path
           req_mock = test_request_body(url, body)
 
@@ -476,7 +476,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'delete_beta_tester_from_beta_groups' do
+      context "delete_beta_tester_from_beta_groups" do
         let(:beta_tester_id) { "123" }
         let(:beta_group_ids) { ["1234", "5678"] }
         let(:path) { "betaTesters/#{beta_tester_id}/relationships/betaGroups" }
@@ -485,13 +485,13 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
             data: beta_group_ids.map do |id|
               {
                 type: "betaGroups",
-                id: id
+                id: id,
               }
-            end
+            end,
           }
         end
 
-        it 'succeeds' do
+        it "succeeds" do
           url = path
           req_mock = test_request_body(url, body)
 
@@ -499,22 +499,46 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
           client.delete_beta_tester_from_beta_groups(beta_tester_id: beta_tester_id, beta_group_ids: beta_group_ids)
         end
       end
+
+      context "delete_beta_testers_from_app" do
+        let(:app_id) { "123" }
+        let(:beta_tester_ids) { ["1234", "5678"] }
+        let(:path) { "apps/#{app_id}/relationships/betaTesters" }
+        let(:body) do
+          {
+            data: app_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id,
+              }
+            end,
+          }
+        end
+
+        it "succeeds" do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock)
+          client.delete_beta_testers_from_app(beta_tester_ids: beta_tester_ids, app_id: app_id)
+        end
+      end
     end
 
     describe "builds" do
-      context 'get_builds' do
+      context "get_builds" do
         let(:path) { "builds" }
         let(:build_id) { "123" }
         let(:default_params) { { include: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate" } }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params.merge(default_params))
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
           client.get_builds
         end
 
-        it 'succeeds with filter' do
+        it "succeeds with filter" do
           params = { filter: { expired: false, processingState: "PROCESSING,VALID", version: "123" } }
           req_mock = test_request_params(path, params.merge(default_params))
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -522,11 +546,11 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'get_build' do
+      context "get_build" do
         let(:build_id) { "123" }
         let(:path) { "builds/#{build_id}" }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -534,7 +558,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'patch_builds' do
+      context "patch_builds" do
         let(:path) { "builds" }
         let(:build_id) { "123" }
         let(:attributes) { { name: "some_name" } }
@@ -543,12 +567,12 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
             data: {
               attributes: attributes,
               id: build_id,
-              type: "builds"
-            }
+              type: "builds",
+            },
           }
         end
 
-        it 'succeeds' do
+        it "succeeds" do
           url = "#{path}/#{build_id}"
           req_mock = test_request_body(url, body)
 
@@ -559,18 +583,18 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     end
 
     describe "buildBetaDetails" do
-      context 'get_build_beta_details' do
+      context "get_build_beta_details" do
         let(:path) { "buildBetaDetails" }
         let(:build_id) { "123" }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
           client.get_build_beta_details
         end
 
-        it 'succeeds with filter' do
+        it "succeeds with filter" do
           params = { filter: { build: build_id } }
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -578,7 +602,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'patch_build_beta_details' do
+      context "patch_build_beta_details" do
         let(:path) { "buildBetaDetails" }
         let(:build_beta_details_id) { "123" }
         let(:attributes) { { key: "value" } }
@@ -587,12 +611,12 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
             data: {
               attributes: attributes,
               id: build_beta_details_id,
-              type: "buildBetaDetails"
-            }
+              type: "buildBetaDetails",
+            },
           }
         end
 
-        it 'succeeds' do
+        it "succeeds" do
           url = "#{path}/#{build_beta_details_id}"
           req_mock = test_request_body(url, body)
 
@@ -603,19 +627,19 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     end
 
     describe "buildDeliveries" do
-      context 'get_build_deliveries' do
+      context "get_build_deliveries" do
         let(:path) { "buildDeliveries" }
         let(:version) { "189" }
         let(:default_params) { {} }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params.merge(default_params))
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
           client.get_build_deliveries
         end
 
-        it 'succeeds with filter' do
+        it "succeeds with filter" do
           params = { filter: { version: version } }
           req_mock = test_request_params(path, params.merge(default_params))
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
@@ -625,19 +649,19 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     end
 
     describe "preReleaseVersions" do
-      context 'get_pre_release_versions' do
+      context "get_pre_release_versions" do
         let(:path) { "preReleaseVersions" }
         let(:version) { "186" }
         let(:default_params) { {} }
 
-        it 'succeeds' do
+        it "succeeds" do
           params = {}
           req_mock = test_request_params(path, params.merge(default_params))
           expect(client).to receive(:request).with(:get).and_yield(req_mock)
           client.get_pre_release_versions
         end
 
-        it 'succeeds with filter' do
+        it "succeeds with filter" do
           params = { filter: { version: version } }
           req_mock = test_request_params(path, params.merge(default_params))
           expect(client).to receive(:request).with(:get).and_yield(req_mock)

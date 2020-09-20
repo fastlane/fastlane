@@ -1,4 +1,4 @@
-require 'spaceship/connect_api/testflight/client'
+require "spaceship/connect_api/testflight/client"
 
 module Spaceship
   class ConnectAPI
@@ -45,11 +45,11 @@ module Spaceship
                 app: {
                   data: {
                     type: "apps",
-                    id: app_id
-                  }
-                }
-              }
-            }
+                    id: app_id,
+                  },
+                },
+              },
+            },
           }
 
           test_flight_request_client.post("betaAppLocalizations", body)
@@ -60,8 +60,8 @@ module Spaceship
             data: {
               attributes: attributes,
               id: localization_id,
-              type: "betaAppLocalizations"
-            }
+              type: "betaAppLocalizations",
+            },
           }
 
           test_flight_request_client.patch("betaAppLocalizations/#{localization_id}", body)
@@ -81,8 +81,8 @@ module Spaceship
             data: {
               attributes: attributes,
               id: app_id,
-              type: "betaAppReviewDetails"
-            }
+              type: "betaAppReviewDetails",
+            },
           }
 
           test_flight_request_client.patch("betaAppReviewDetails/#{app_id}", body)
@@ -105,11 +105,11 @@ module Spaceship
                 build: {
                   data: {
                     type: "builds",
-                    id: build_id
-                  }
-                }
-              }
-            }
+                    id: build_id,
+                  },
+                },
+              },
+            },
           }
 
           test_flight_request_client.post("betaAppReviewSubmissions", body)
@@ -138,11 +138,11 @@ module Spaceship
                 build: {
                   data: {
                     type: "builds",
-                    id: build_id
-                  }
-                }
-              }
-            }
+                    id: build_id,
+                  },
+                },
+              },
+            },
           }
 
           test_flight_request_client.post("betaBuildLocalizations", body)
@@ -153,8 +153,8 @@ module Spaceship
             data: {
               attributes: attributes,
               id: localization_id,
-              type: "betaBuildLocalizations"
-            }
+              type: "betaBuildLocalizations",
+            },
           }
 
           test_flight_request_client.patch("betaBuildLocalizations/#{localization_id}", body)
@@ -183,9 +183,9 @@ module Spaceship
             data: beta_group_ids.map do |id|
               {
                 type: "betaGroups",
-                id: id
+                id: id,
               }
-            end
+            end,
           }
 
           test_flight_request_client.post("builds/#{build_id}/relationships/betaGroups", body)
@@ -198,18 +198,18 @@ module Spaceship
                 name: group_name,
                 publicLinkEnabled: public_link_enabled,
                 publicLinkLimit: public_link_limit,
-                publicLinkLimitEnabled: public_link_limit_enabled
+                publicLinkLimitEnabled: public_link_limit_enabled,
               },
               relationships: {
                 app: {
                   data: {
                     id: app_id,
-                    type: "apps"
-                  }
-                }
+                    type: "apps",
+                  },
+                },
               },
-              type: "betaGroups"
-            }
+              type: "betaGroups",
+            },
           }
           test_flight_request_client.post("betaGroups", body)
         end
@@ -234,18 +234,18 @@ module Spaceship
           body = {
             data: {
               attributes: {
-                betaTesters: beta_testers
+                betaTesters: beta_testers,
               },
               relationships: {
                 betaGroup: {
                   data: {
                     type: "betaGroups",
-                    id: beta_group_id
-                  }
-                }
+                    id: beta_group_id,
+                  },
+                },
               },
-              type: "bulkBetaTesterAssignments"
-            }
+              type: "bulkBetaTesterAssignments",
+            },
           }
 
           test_flight_request_client.post("bulkBetaTesterAssignments", body)
@@ -256,9 +256,9 @@ module Spaceship
             data: app_ids.map do |id|
               {
                 type: "apps",
-                id: id
+                id: id,
               }
-            end
+            end,
           }
 
           test_flight_request_client.delete("betaTesters/#{beta_tester_id}/relationships/apps", nil, body)
@@ -269,12 +269,25 @@ module Spaceship
             data: beta_group_ids.map do |id|
               {
                 type: "betaGroups",
-                id: id
+                id: id,
               }
-            end
+            end,
           }
 
           test_flight_request_client.delete("betaTesters/#{beta_tester_id}/relationships/betaGroups", nil, body)
+        end
+
+        def delete_beta_testers_from_app(beta_tester_ids: [], app_id: nil)
+          body = {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id,
+              }
+            end,
+          }
+
+          test_flight_request_client.delete("apps/#{app_id}/relationships/betaTesters", nil, body)
         end
 
         #
@@ -312,8 +325,8 @@ module Spaceship
             data: {
               attributes: attributes,
               id: build_id,
-              type: "builds"
-            }
+              type: "builds",
+            },
           }
 
           test_flight_request_client.patch("builds/#{build_id}", body)
@@ -333,8 +346,8 @@ module Spaceship
             data: {
               attributes: attributes,
               id: build_beta_details_id,
-              type: "buildBetaDetails"
-            }
+              type: "buildBetaDetails",
+            },
           }
 
           test_flight_request_client.patch("buildBetaDetails/#{build_beta_details_id}", body)
