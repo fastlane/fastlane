@@ -50,11 +50,7 @@ module Match
       UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")
     end
 
-    def certificates_exists(username: nil, certificate_ids: [], platform: nil)
-      if platform == :catalyst.to_s
-        platform = :macos.to_s
-      end
-
+    def certificates_exists(username: nil, certificate_ids: [])
       Spaceship::ConnectAPI::Certificate.all.each do |cert|
         certificate_ids.delete(cert.id)
       end

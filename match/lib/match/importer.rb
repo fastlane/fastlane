@@ -48,11 +48,25 @@ module Match
 
       case cert_type
       when :development
-        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT + "," + Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT,
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DEVELOPMENT,
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT
+        ].join(',')
       when :distribution, :enterprise
-        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION + "," + Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION,
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DISTRIBUTION,
+          Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION
+        ].join(',')
       when :developer_id_application
-        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+        ].join(',')
+      when :mac_installer_distribution
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION
+        ].join(',')
       else
         UI.user_error!("Cert type '#{cert_type}' is not supported")
       end
@@ -62,8 +76,6 @@ module Match
       output_dir_profiles = File.join(storage.prefixed_working_directory, "profiles", prov_type.to_s)
 
       # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
-      Spaceship::Portal.login(params[:username])
-      Spaceship::Portal.select_team(team_id: params[:team_id], team_name: params[:team_name])
       certs = Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: certificate_type })
 
       # Base64 encode contents to find match from API to find a cert ID

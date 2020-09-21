@@ -44,7 +44,7 @@ module Match
         s3_access_key: params[:s3_access_key].to_s,
         s3_secret_access_key: params[:s3_secret_access_key].to_s,
         s3_bucket: params[:s3_bucket].to_s,
-        team_id: params[:team_id] || Spaceship.client.team_id
+        team_id: params[:team_id] || Spaceship::ConnectAPI.client.portal_team_id
       })
       self.storage.download
 
@@ -97,10 +97,9 @@ module Match
     end
 
     def spaceship_login
-      Spaceship.login(params[:username])
-      Spaceship.select_team(team_id: params[:team_id], team_name: params[:team_name])
+      Spaceship::ConnectAPI.login(params[:username], user_portal: true, use_tunes: false, portal_team_id: params[:team_id], team_name: params[:team_name])
 
-      if Spaceship.client.in_house? && (type == "distribution" || type == "enterprise")
+      if Spaceship::ConnectAPI.client.in_house? && (type == "distribution" || type == "enterprise")
         UI.error("---")
         UI.error("⚠️ Warning: This seems to be an Enterprise account!")
         UI.error("By nuking your account's distribution, all your apps deployed via ad-hoc will stop working!") if type == "distribution"
@@ -125,8 +124,7 @@ module Match
       # Get all iOS and macOS profile
       self.profiles = []
       prov_types.each do |prov_type|
-        self.profiles += profile_type(prov_type).all(mac: false)
-        self.profiles += profile_type(prov_type).all(mac: true)
+        self.profiles += profile_types(prov_type)
       end
 
       # Gets the main and additional cert types
@@ -274,31 +272,62 @@ module Match
     def certificate_type(type)
       case type.to_sym
       when :mac_installer_distribution
-        return [Spaceship.certificate.mac_installer_distribution]
+        return [
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION
+        ]
       when :distribution
-        return [Spaceship.certificate.production, Spaceship.certificate.apple_distribution]
+        return [
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DEVELOPMENT,
+          Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION,
+          Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION
+        ]
       when :development
-        return [Spaceship.certificate.development, Spaceship.certificate.apple_development]
+        return [
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DEVELOPMENT,
+          Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT,
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT
+        ]
       when :enterprise
-        return [Spaceship.certificate.in_house]
+        return [
+          Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION
+        ]
       else
         raise "Unknown type '#{type}'"
       end
     end
 
     # The kind of provisioning profile we're interested in
-    def profile_type(prov_type)
+    def profile_types(prov_type)
       case prov_type.to_sym
       when :appstore
-        return Spaceship.provisioning_profile.app_store
+        return [
+          Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE,
+          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_STORE,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
+        ]
       when :development
-        return Spaceship.provisioning_profile.development
+        return [
+          Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT,
+          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
+        ]
       when :enterprise
-        return Spaceship.provisioning_profile.in_house
+        return [
+          Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE,
+          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
+        ]
       when :adhoc
-        return Spaceship.provisioning_profile.ad_hoc
+        return [
+          Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC,
+          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC
+        ]
       when :developer_id
-        return Spaceship.provisioning_profile.direct
+        return [
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
+        ]
       else
         raise "Unknown provisioning type '#{prov_type}'"
       end

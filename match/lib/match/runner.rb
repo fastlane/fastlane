@@ -102,7 +102,7 @@ module Match
       end
 
       cert_ids << cert_id
-      spaceship.certificates_exists(username: params[:username], certificate_ids: cert_ids, platform: params[:platform]) if spaceship
+      spaceship.certificates_exists(username: params[:username], certificate_ids: cert_ids) if spaceship
 
       # Provisioning Profiles
       unless params[:skip_provisioning_profiles]
@@ -324,7 +324,10 @@ module Match
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
-      portal_profile = Spaceship.provisioning_profile.all.detect { |i| i.uuid == uuid }
+
+      Spaceship::ConnectAPI.
+        all_profiles = Spaceship::ConnectAPI::Profile.all
+      portal_profile = all_profiles.detect { |i| i.uuid == uuid }
 
       if portal_profile
         profile_device_count = portal_profile.devices.count
@@ -332,13 +335,28 @@ module Match
         portal_device_count =
           case platform
           when :ios
-            Spaceship.device.all_ios_profile_devices.count
+            all_profiles.filter do |p|
+              [
+                Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT,
+                Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC
+              ].include?(p.profile_type).size
+            end
           when :tvos
-            Spaceship.device.all_apple_tvs.count
+            all_profiles.filter do |p|
+              [
+                Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT,
+                Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC
+              ].include?(p.profile_type).size
+            end
           when :mac, :catalyst
-            Spaceship.device.all_macs.count
+            all_profiles.filter do |p|
+              [
+                Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT,
+                Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
+              ].include?(p.profile_type).size
+            end
           else
-            Spaceship.device.all.count
+            all_profiles.size
           end
 
         return portal_device_count != profile_device_count

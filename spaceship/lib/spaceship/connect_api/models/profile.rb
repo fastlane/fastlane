@@ -27,7 +27,8 @@ module Spaceship
         "expirationDate" => "expiration_date",
 
         "bundleId" => "bundle_id",
-        "certificates" => "certificates"
+        "certificates" => "certificates",
+        "devices" => "devices"
       })
 
       module ProfileState
