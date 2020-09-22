@@ -97,7 +97,12 @@ module Match
     end
 
     def spaceship_login
-      Spaceship::ConnectAPI.login(params[:username], user_portal: true, use_tunes: false, portal_team_id: params[:team_id], team_name: params[:team_name])
+      if api_token
+        UI.message("Creating authorization token for App Store Connect API")
+        Spaceship::ConnectAPI.token = api_token
+      else
+        Spaceship::ConnectAPI.login(params[:username], use_portal: true, use_tunes: false, portal_team_id: params[:team_id], team_name: params[:team_name])
+      end
 
       if Spaceship::ConnectAPI.client.in_house? && (type == "distribution" || type == "enterprise")
         UI.error("---")
@@ -108,6 +113,12 @@ module Match
 
         UI.user_error!("Enterprise account nuke cancelled") unless UI.confirm("Do you really want to nuke your Enterprise account?")
       end
+    end
+
+    def api_token
+      @api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
+      return @api_token
     end
 
     # Collect all the certs/profiles
@@ -124,7 +135,10 @@ module Match
       # Get all iOS and macOS profile
       self.profiles = []
       prov_types.each do |prov_type|
-        self.profiles += profile_types(prov_type)
+        types = profile_types(prov_type)
+        # Filtering on 'profileType' seems to be undocumented as of 2020-07-30
+        # but works on both web session and official API
+        self.profiles += Spaceship::ConnectAPI::Profile.all(filter: { profileType: types.join(",") })
       end
 
       # Gets the main and additional cert types
@@ -136,7 +150,7 @@ module Match
       self.certs = []
       self.certs += cert_types.map do |ct|
         certificate_type(ct).flat_map do |cert|
-          cert.all(mac: false) + cert.all(mac: true)
+          Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: cert })
         end
       end.flatten
 
@@ -163,7 +177,7 @@ module Match
       puts("")
       if self.certs.count > 0
         rows = self.certs.collect do |cert|
-          cert_expiration = cert.expires.nil? ? "Unknown" : cert.expires.strftime("%Y-%m-%d")
+          cert_expiration = cert.expiration_date.nil? ? "Unknown" : Time.parse(cert.expiration_date).strftime("%Y-%m-%d")
           [cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
         end
         puts(Terminal::Table.new({
@@ -176,11 +190,11 @@ module Match
 
       if self.profiles.count > 0
         rows = self.profiles.collect do |p|
-          status = p.status == 'Active' ? p.status.green : p.status.red
+          status = p.valid? ? p.profile_state.green : p.profile_state.red
 
           # Expires is sometimes nil
-          expires = p.expires ? p.expires.strftime("%Y-%m-%d") : nil
-          [p.name, p.id, status, p.type, expires]
+          expires = p.expiration_date ? Time.parse(p.expiration_date).strftime("%Y-%m-%d") : nil
+          [p.name, p.id, status, p.profile_type, expires]
         end
         puts(Terminal::Table.new({
           title: "Provisioning Profiles that are going to be revoked".green,
@@ -225,7 +239,7 @@ module Match
       self.certs.each do |cert|
         UI.message("Revoking certificate '#{cert.name}' (#{cert.id})...")
         begin
-          cert.revoke!
+          cert.delete!
         rescue => ex
           UI.message(ex.to_s)
         end

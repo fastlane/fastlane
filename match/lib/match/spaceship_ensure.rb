@@ -5,6 +5,8 @@ module Match
   # Ensures the certificate and profiles are also available on App Store Connect
   class SpaceshipEnsure
     def initialize(user, team_id, team_name, api_token)
+      UI.message("Verifying that the certificate and profile are still valid on the Dev Portal...")
+
       if api_token
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
@@ -23,7 +25,6 @@ module Match
         end
 
         # Prompts select team if multiple teams and none specified
-        UI.message("Verifying that the certificate and profile are still valid on the Dev Portal...")
         Spaceship::ConnectAPI.login(user, use_portal: true, use_tunes: false, portal_team_id: team_id, team_name: team_name)
       end
     end
