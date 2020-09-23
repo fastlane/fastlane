@@ -77,7 +77,7 @@ module Match
                                      env_name: "SIGH_API_KEY_PATH",
                                      description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                      optional: true,
-                                     conflicting_options: [:username],
+                                     conflicting_options: [:api_key, :username],
                                      verify_block: proc do |value|
                                        UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
                                      end),
@@ -89,7 +89,7 @@ module Match
                                      sensitive: true,
                                      conflicting_options: [:api_key_path, :username]),
 
-        # Appl ID
+        # Apple ID
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "MATCH_USERNAME",

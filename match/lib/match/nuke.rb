@@ -291,7 +291,7 @@ module Match
         ]
       when :distribution
         return [
-          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DEVELOPMENT,
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DISTRIBUTION,
           Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION,
           Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION
         ]
