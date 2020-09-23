@@ -171,7 +171,7 @@ module Cert
         when 'ios', 'tvos'
           cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION
           cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION if Spaceship::ConnectAPI.client.in_house?
-          cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT if Cert.config[:development]
+          cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT if Cert.config[:development]
 
         when 'macos'
           cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DISTRIBUTION

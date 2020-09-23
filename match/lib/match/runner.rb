@@ -325,39 +325,41 @@ module Match
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
 
-      Spaceship::ConnectAPI.
-        all_profiles = Spaceship::ConnectAPI::Profile.all
+      all_profiles = Spaceship::ConnectAPI::Profile.all(includes: "devices")
       portal_profile = all_profiles.detect { |i| i.uuid == uuid }
 
       if portal_profile
-        profile_device_count = portal_profile.devices.count
+        profile_device_count = portal_profile.fetch_all_devices.count
 
-        portal_device_count =
+        device_classes =
           case platform
           when :ios
-            all_profiles.filter do |p|
-              [
-                Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT,
-                Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC
-              ].include?(p.profile_type).size
-            end
+            [
+              Spaceship::ConnectAPI::Device::DeviceClass::IPAD,
+              Spaceship::ConnectAPI::Device::DeviceClass::IPHONE,
+              Spaceship::ConnectAPI::Device::DeviceClass::IPOD,
+              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH
+            ]
           when :tvos
-            all_profiles.filter do |p|
-              [
-                Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT,
-                Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC
-              ].include?(p.profile_type).size
-            end
+            [
+              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV
+            ]
           when :mac, :catalyst
-            all_profiles.filter do |p|
-              [
-                Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT,
-                Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
-              ].include?(p.profile_type).size
-            end
+            [
+              Spaceship::ConnectAPI::Device::DeviceClass::MAC
+            ]
           else
-            all_profiles.size
+            []
           end
+
+        devices = Spaceship::ConnectAPI::Device.all
+        unless device_classes.empty?
+          devices = devices.select do |device|
+            device_classes.include?(device.device_class)
+          end
+        end
+
+        portal_device_count = devices.size
 
         return portal_device_count != profile_device_count
       end

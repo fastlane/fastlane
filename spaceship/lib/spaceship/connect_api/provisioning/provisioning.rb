@@ -62,9 +62,13 @@ module Spaceship
         # devices
         #
 
-        def get_devices(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_devices(profile_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = provisioning_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          provisioning_request_client.get("devices", params)
+          if profile_id.nil?
+            provisioning_request_client.get("devices", params)
+          else
+            provisioning_request_client.get("profiles/#{profile_id}/devices", params)
+          end
         end
 
         #
