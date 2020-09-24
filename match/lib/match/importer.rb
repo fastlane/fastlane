@@ -31,7 +31,9 @@ module Match
         readonly: params[:readonly],
         username: params[:username],
         team_id: params[:team_id],
-        team_name: params[:team_name]
+        team_name: params[:team_name],
+        api_key_path: params[:api_key_path],
+        api_key: params[:api_key]
       })
       storage.download
 
@@ -76,6 +78,7 @@ module Match
       output_dir_profiles = File.join(storage.prefixed_working_directory, "profiles", prov_type.to_s)
 
       # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
+      Spaceship::ConnectAPI.login(params[:username], use_portal: true, use_tunes: false, portal_team_id: params[:team_id], team_name: params[:team_name])
       certs = Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: certificate_type })
 
       # Base64 encode contents to find match from API to find a cert ID

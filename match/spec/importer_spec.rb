@@ -48,8 +48,7 @@ describe Match do
       repo_dir = Dir.mktmpdir
       setup_fake_storage(repo_dir, config)
 
-      expect(Spaceship::Portal).to receive(:login)
-      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI).to receive(:login)
       expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
@@ -66,8 +65,7 @@ describe Match do
       repo_dir = Dir.mktmpdir
       setup_fake_storage(repo_dir, config)
 
-      expect(Spaceship::Portal).to receive(:login)
-      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI).to receive(:login)
       expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
@@ -85,8 +83,7 @@ describe Match do
       setup_fake_storage(repo_dir, config)
 
       expect(UI).to receive(:input).and_return("")
-      expect(Spaceship::Portal).to receive(:login)
-      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI).to receive(:login)
       expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
@@ -105,8 +102,7 @@ describe Match do
       setup_fake_storage(repo_dir, developer_id_config)
 
       expect(UI).to receive(:input).and_return("")
-      expect(Spaceship::Portal).to receive(:login)
-      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI).to receive(:login)
       expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
@@ -135,7 +131,9 @@ describe Match do
         readonly: false,
         username: config[:username],
         team_id: nil,
-        team_name: nil
+        team_name: nil,
+        api_key_path: nil,
+        api_key: nil
       ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
