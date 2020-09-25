@@ -27,7 +27,7 @@ module Fastlane
           in_house: in_house
         }
 
-        Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY] = key
+        Actions.lane_context.set_sensitive(SharedValues::APP_STORE_CONNECT_API_KEY, key)
 
         return key
       end

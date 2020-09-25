@@ -6,6 +6,25 @@ module Fastlane
       ENVIRONMENT = :ENVIRONMENT
     end
 
+    class LaneContext < Hash
+      attr_accessor :sensitive_context
+
+      def initialize
+        @sensitive_context = {}
+      end
+
+      def set_sensitive(key, value)
+        sensitive_context[key] = value
+      end
+
+      def [](key)
+        if sensitive_context.key?(key)
+          return sensitive_context[key]
+        end
+        super
+      end
+    end
+
     def self.reset_aliases
       @alias_actions = nil
     end
@@ -27,7 +46,7 @@ module Fastlane
 
     # The shared hash can be accessed by any action and contains information like the screenshots path or beta URL
     def self.lane_context
-      @lane_context ||= {}
+      @lane_context ||= LaneContext.new
     end
 
     # Used in tests to get a clear lane before every test
