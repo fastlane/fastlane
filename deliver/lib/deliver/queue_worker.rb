@@ -22,43 +22,20 @@ module Deliver
     # Call this after you enqueuned all the jobs you want to process
     # This method blocks current thread until all the enqueued jobs are processed
     def start
+      @queue.close
+
       threads = []
       @concurrency.times do
         threads << Thread.new do
-          while running? && !empty?
+          job = @queue.pop
+          while job
+            @block.call(job)
             job = @queue.pop
-            @block.call(job) if job
           end
         end
       end
 
-      wait_for_complete
       threads.each(&:join)
-    end
-
-    private
-
-    def running?
-      !@queue.closed?
-    end
-
-    def empty?
-      @queue.empty?
-    end
-
-    def wait_for_complete
-      wait_thread = Thread.new do
-        loop do
-          if @queue.empty?
-            @queue.close
-            break
-          end
-
-          sleep(1)
-        end
-      end
-
-      wait_thread.join
     end
   end
 end
