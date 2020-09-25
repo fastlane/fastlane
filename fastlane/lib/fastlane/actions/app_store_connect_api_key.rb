@@ -17,6 +17,10 @@ module Fastlane
           UI.user_error!(":key_content or :key_filepath is required")
         end
 
+        # New lines don't get read properly when coming from an ENV
+        # Replacing them literal version with a new line
+        key_content = key_content.gsub('\n', "\n") if key_content
+
         # This hash matches the named arguments on
         # the Spaceship::ConnectAPI::Token.create method
         key = {
