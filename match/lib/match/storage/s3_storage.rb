@@ -188,6 +188,8 @@ module Match
           # see `prefixed_working_directory` comments for more details
           return self.team_id
         else
+          UI.user_error!("The `team_id` option is required. fastlane cannot automatically determine portal team id via the App Store Connect API (yet)") if self.team_id.to_s.empty?
+
           spaceship = SpaceshipEnsure.new(self.username, self.team_id, self.team_name, api_token)
           return spaceship.team_id
         end

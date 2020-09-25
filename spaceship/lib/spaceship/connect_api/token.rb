@@ -24,10 +24,6 @@ module Spaceship
       # key is for App Store or Enterprise so this is the temporary workaround
       attr_accessor :in_house
 
-      # Temporary attribute not needed to create the JWT text
-      # There is no way to determine the portal team id
-      attr_accessor :portal_team_id
-
       def self.from_json_file(filepath)
         json = JSON.parse(File.read(filepath), { symbolize_names: true })
 
@@ -43,7 +39,7 @@ module Spaceship
         self.create(json)
       end
 
-      def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, duration: nil, in_house: nil, portal_team_id: nil)
+      def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, duration: nil, in_house: nil)
         key_id ||= ENV['SPACESHIP_CONNECT_API_KEY_ID']
         issuer_id ||= ENV['SPACESHIP_CONNECT_API_ISSUER_ID']
         filepath ||= ENV['SPACESHIP_CONNECT_API_KEY_FILEPATH']
@@ -51,8 +47,6 @@ module Spaceship
 
         in_house_env = ENV['SPACESHIP_CONNECT_API_IN_HOUSE']
         in_house ||= !["", "no", "false", "off", "0"].include?(in_house_env) if in_house_env
-
-        portal_team_id ||= ENV['SPACESHIP_CONNECT_API_PORTAL_TEAM_ID']
 
         key ||= ENV['SPACESHIP_CONNECT_API_KEY']
         key ||= File.binread(filepath)
@@ -62,18 +56,16 @@ module Spaceship
           issuer_id: issuer_id,
           key: OpenSSL::PKey::EC.new(key),
           duration: duration,
-          in_house: in_house,
-          portal_team_id: portal_team_id
+          in_house: in_house
         )
       end
 
-      def initialize(key_id: nil, issuer_id: nil, key: nil, duration: nil, in_house: nil, portal_team_id: nil)
+      def initialize(key_id: nil, issuer_id: nil, key: nil, duration: nil, in_house: nil)
         @key_id = key_id
         @key = key
         @issuer_id = issuer_id
         @duration = duration
         @in_house = in_house
-        @portal_team_id = portal_team_id
 
         @duration ||= MAX_TOKEN_DURATION
         @duration = @duration.to_i if @duration
