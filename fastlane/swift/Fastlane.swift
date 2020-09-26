@@ -4718,7 +4718,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - shallowClone: Make a shallow clone of the repository (truncate the history to 1 revision)
    - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
    - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
-   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64
+   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64
    - gitPrivateKey: Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
@@ -7609,7 +7609,7 @@ public func swiftlint(mode: Any = "lint",
    - shallowClone: Make a shallow clone of the repository (truncate the history to 1 revision)
    - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
    - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
-   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64
+   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64
    - gitPrivateKey: Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
