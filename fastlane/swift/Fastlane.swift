@@ -3006,16 +3006,19 @@ public func ensureGitBranch(branch: String = "master") {
  - parameters:
    - showUncommittedChanges: The flag whether to show uncommitted changes if the repo is dirty
    - showDiff: The flag whether to show the git diff if the repo is dirty
+   - ignored: The flag whether to ignore file the git status if the repo is dirty
 
  A sanity check to make sure you are working in a repo that is clean.
  Especially useful to put at the beginning of your Fastfile in the `before_all` block, if some of your other actions will touch your filesystem, do things to your git repo, or just as a general reminder to save your work.
  Also needed as a prerequisite for some other actions like `reset_git_repo`.
  */
 public func ensureGitStatusClean(showUncommittedChanges: Bool = false,
-                                 showDiff: Bool = false)
+                                 showDiff: Bool = false,
+                                 ignored: String? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "ensure_git_status_clean", className: nil, args: [RubyCommand.Argument(name: "show_uncommitted_changes", value: showUncommittedChanges),
-                                                                                                           RubyCommand.Argument(name: "show_diff", value: showDiff)])
+                                                                                                           RubyCommand.Argument(name: "show_diff", value: showDiff),
+                                                                                                           RubyCommand.Argument(name: "ignored", value: ignored)])
     _ = runner.executeCommand(command)
 }
 
@@ -4718,7 +4721,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - shallowClone: Make a shallow clone of the repository (truncate the history to 1 revision)
    - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
    - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
-   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64
+   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64
    - gitPrivateKey: Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
@@ -7609,7 +7612,7 @@ public func swiftlint(mode: Any = "lint",
    - shallowClone: Make a shallow clone of the repository (truncate the history to 1 revision)
    - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
    - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
-   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64
+   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64
    - gitPrivateKey: Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
@@ -9306,4 +9309,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.96]
+// FastlaneRunnerAPIVersion [0.9.97]
