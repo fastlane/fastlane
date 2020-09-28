@@ -31,7 +31,7 @@ module Fastlane
           in_house: in_house
         }
 
-        Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY] = key
+        Actions.lane_context.set_sensitive(SharedValues::APP_STORE_CONNECT_API_KEY, key)
 
         return key
       end
@@ -59,6 +59,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :key_content,
                                        env_name: "APP_STORE_CONNECT_API_KEY_KEY",
                                        description: "The content of the key p8 file",
+                                       sensitive: true,
                                        optional: true,
                                        conflicting_options: [:filepath]),
           FastlaneCore::ConfigItem.new(key: :duration,
