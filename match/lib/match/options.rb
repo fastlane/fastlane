@@ -147,7 +147,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :git_bearer_authorization,
                                      env_name: "MATCH_GIT_BEARER_AUTHORIZATION",
                                      sensitive: true,
-                                     description: "Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64",
+                                     description: "Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64",
                                      conflicting_options: [:git_basic_authorization, :git_private_key],
                                      optional: true,
                                      default_value: nil),
