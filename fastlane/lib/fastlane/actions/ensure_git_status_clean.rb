@@ -7,7 +7,13 @@ module Fastlane
     # Raises an exception and stop the lane execution if the repo is not in a clean state
     class EnsureGitStatusCleanAction < Action
       def self.run(params)
-        repo_status = Actions.sh("git status --porcelain")
+        if params[:ignored]
+          ignored_file = params[:ignored]
+          repo_status = Actions.sh("git status --porcelain --ignored #{ignored_file}")
+        else
+          repo_status = Actions.sh("git status --porcelain")
+        end
+
         repo_clean = repo_status.empty?
 
         if repo_clean
@@ -65,7 +71,12 @@ module Fastlane
                                        description: "The flag whether to show the git diff if the repo is dirty",
                                        optional: true,
                                        default_value: false,
-                                       is_string: false)
+                                       is_string: false),
+          FastlaneCore::ConfigItem.new(key: :ignored,
+                                       env_name: "FL_ENSURE_GIT_STATUS_CLEAN_IGNORED_FILE",
+                                       description: "The flag whether to ignore file the git status if the repo is dirty",
+                                       optional: true,
+                                       is_string: true)
         ]
       end
 
