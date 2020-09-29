@@ -52,10 +52,10 @@ module Deliver
       end
     end
 
-    # Iterate given local app_screenshot over localizations and app_screenshot_sets with index within each app_screenshot_set
+    # Iterate given local app_screenshot over localizations and app_screenshot_sets
     #
     # @param screenshots_per_language [Hash<String, Array<Deliver::AppScreenshot>]
-    # @yield [localization, app_screenshot_set, app_screenshot, index]
+    # @yield [localization, app_screenshot_set, app_screenshot]
     # @yieldparam [optional, Spaceship::ConnectAPI::AppStoreVersionLocalization] localization
     # @yieldparam [optional, Spaceship::ConnectAPI::AppStoreScreenshotSet] app_screenshot_set
     # @yieldparam [optional, Deliver::AppScreenshot] screenshot
@@ -85,8 +85,8 @@ module Deliver
           app_screenshot_set ||= localization.create_app_screenshot_set(attributes: { screenshotDisplayType: display_type })
 
           # iterate over screenshots per display size with index
-          screenshots.each.with_index do |screenshot, index|
-            yield(localization, app_screenshot_set, screenshot, index)
+          screenshots.each do |screenshot|
+            yield(localization, app_screenshot_set, screenshot)
           end
         end
       end
