@@ -499,6 +499,29 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
           client.delete_beta_tester_from_beta_groups(beta_tester_id: beta_tester_id, beta_group_ids: beta_group_ids)
         end
       end
+
+      context "delete_beta_testers_from_app" do
+        let(:app_id) { "123" }
+        let(:beta_tester_ids) { ["1234", "5678"] }
+        let(:path) { "apps/#{app_id}/relationships/betaTesters" }
+        let(:body) do
+          {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+        end
+
+        it "succeeds" do
+          url = path
+          req_mock = test_request_body(url, body)
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock)
+          client.delete_beta_testers_from_app(beta_tester_ids: beta_tester_ids, app_id: app_id)
+        end
+      end
     end
 
     describe "builds" do
