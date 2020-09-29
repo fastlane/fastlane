@@ -111,7 +111,9 @@ module Spaceship
           timeout_minutes = (ENV["SPACESHIP_SCREENSHOT_UPLOAD_TIMEOUT"] || 20).to_i
 
           loop do
-            puts("Waiting for screenshot to appear before uploading...")
+            # This error handling needs to be resived since any error occured can reach here.
+            # It should handle errors based on what status code is.
+            puts("Waiting for screenshots to appear before uploading. This is unlikely to be recovered unless it's 503 error. error=\"#{error}\"")
             sleep(30)
 
             screenshots = Spaceship::ConnectAPI::AppScreenshotSet
