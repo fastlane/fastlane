@@ -28,13 +28,17 @@ module Spaceship
       # Managing invitations
       #
 
-      def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
-        resps = Spaceship::ConnectAPI.get_users(filter: filter, includes: includes).all_pages
+      def self.all(filter: {}, includes: nil, sort: nil)
+        resps = Spaceship::ConnectAPI.get_user_invitations(filter: filter, includes: includes, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
 
       def self.find(email: nil, includes: nil)
         return all(filter: { email: email }, includes: includes)
+      end
+
+      def delete!
+        Spaceship::ConnectAPI.delete_user_invitation(user_invitation_id: id)
       end
     end
   end

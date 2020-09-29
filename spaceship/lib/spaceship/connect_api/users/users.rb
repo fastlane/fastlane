@@ -71,8 +71,8 @@ module Spaceship
         end
 
         # Remove invited user from team (not yet accepted)
-        def delete_user_invitation(user_id: nil)
-          users_request_client.delete("userInvitations/#{user_id}")
+        def delete_user_invitation(user_invitation_id: nil)
+          users_request_client.delete("userInvitations/#{user_invitation_id}")
         end
       end
     end
