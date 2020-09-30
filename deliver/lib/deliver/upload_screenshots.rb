@@ -135,15 +135,17 @@ module Deliver
         # Initialize counter on each app screenshot set
         number_of_screenshots_per_set[app_screenshot_set] ||= (app_screenshot_set.app_screenshots || []).count
 
+        if number_of_screenshots_per_set[app_screenshot_set] >= 10
+          UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
+          next
+        end
+
         checksum = UploadScreenshots.calculate_checksum(screenshot.path)
         duplicate = (app_screenshot_set.app_screenshots || []).any? { |s| s.source_file_checksum == checksum }
 
         # Enqueue uploading job if it's not duplicated otherwise screenshot will be skipped
         if duplicate
           UI.message("Previous uploaded. Skipping '#{screenshot.path}'...")
-        elsif number_of_screenshots_per_set[app_screenshot_set] >= 10
-          UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
-          next
         else
           UI.verbose("Queued uplaod sceeenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{screenshot.path}")
           worker.enqueue(UploadScreenshotJob.new(app_screenshot_set, screenshot.path))
