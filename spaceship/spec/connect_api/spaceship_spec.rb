@@ -14,6 +14,8 @@ describe Spaceship::ConnectAPI do
     before(:each) do
       allow(mock_tunes_client).to receive(:team_id).and_return("team_id")
       allow(mock_portal_client).to receive(:team_id).and_return("team_id")
+      allow(mock_tunes_client).to receive(:csrf_tokens)
+      allow(mock_portal_client).to receive(:csrf_tokens)
     end
 
     context 'with implicit client' do

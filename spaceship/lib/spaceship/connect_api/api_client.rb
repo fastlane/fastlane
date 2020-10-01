@@ -17,7 +17,7 @@ module Spaceship
       #####################################################
 
       # Instantiates a client with cookie session or a JWT token.
-      def initialize(cookie: nil, current_team_id: nil, token: nil, another_client: nil)
+      def initialize(cookie: nil, current_team_id: nil, token: nil, csrf_tokens: nil, another_client: nil)
         params_count = [cookie, token, another_client].compact.size
         if params_count != 1
           raise "Must initialize with one of :cookie, :token, or :another_client"
@@ -25,10 +25,10 @@ module Spaceship
 
         if token.nil?
           if another_client.nil?
-            super(cookie: cookie, current_team_id: current_team_id, timeout: 1200)
+            super(cookie: cookie, current_team_id: current_team_id, csrf_tokens: csrf_tokens, timeout: 1200)
             return
           end
-          super(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id)
+          super(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id, csrf_tokens: another_client.csrf_tokens)
         else
           options = {
             request: {
