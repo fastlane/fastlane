@@ -191,6 +191,7 @@ describe Spaceship::ConnectAPI::Client do
       it "with portal client" do
         mock_portal_client =  double('portal client')
         allow(mock_portal_client).to receive(:team_id)
+        allow(mock_portal_client).to receive(:csrf_tokens)
 
         client = Spaceship::ConnectAPI::Client.new(portal_client: mock_portal_client)
 

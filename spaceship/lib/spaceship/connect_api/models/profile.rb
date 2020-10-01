@@ -27,7 +27,8 @@ module Spaceship
         "expirationDate" => "expiration_date",
 
         "bundleId" => "bundle_id",
-        "certificates" => "certificates"
+        "certificates" => "certificates",
+        "devices" => "devices"
       })
 
       module ProfileState
@@ -81,6 +82,11 @@ module Spaceship
           }
         )
         return resp.to_models.first
+      end
+
+      def fetch_all_devices(filter: {}, includes: nil, sort: nil)
+        resps = Spaceship::ConnectAPI.get_devices(profile_id: id, filter: filter, includes: includes).all_pages
+        return resps.flat_map(&:to_models)
       end
 
       def delete!
