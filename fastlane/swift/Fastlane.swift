@@ -1844,6 +1844,8 @@ public func carthage(command: String = "bootstrap",
    - type: Create specific certificate type (takes precedence over :development)
    - force: Create a certificate even if an existing certificate exists
    - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
@@ -1851,6 +1853,7 @@ public func carthage(command: String = "bootstrap",
    - outputPath: The path to a directory in which all certificates and private keys should be stored
    - keychainPath: Path to a custom keychain
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
+   - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - platform: Set the provisioning profile's platform (ios, macos)
 
  **Important**: It is recommended to use [match](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
@@ -1860,6 +1863,8 @@ public func cert(development: Bool = false,
                  type: String? = nil,
                  force: Bool = false,
                  generateAppleCerts: Bool = true,
+                 apiKeyPath: String? = nil,
+                 apiKey: [String: Any]? = nil,
                  username: String,
                  teamId: String? = nil,
                  teamName: String? = nil,
@@ -1867,12 +1872,15 @@ public func cert(development: Bool = false,
                  outputPath: String = ".",
                  keychainPath: String,
                  keychainPassword: String? = nil,
+                 skipSetPartitionList: Bool = false,
                  platform: String = "ios")
 {
     let command = RubyCommand(commandID: "", methodName: "cert", className: nil, args: [RubyCommand.Argument(name: "development", value: development),
                                                                                         RubyCommand.Argument(name: "type", value: type),
                                                                                         RubyCommand.Argument(name: "force", value: force),
                                                                                         RubyCommand.Argument(name: "generate_apple_certs", value: generateAppleCerts),
+                                                                                        RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                        RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                         RubyCommand.Argument(name: "username", value: username),
                                                                                         RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                         RubyCommand.Argument(name: "team_name", value: teamName),
@@ -1880,6 +1888,7 @@ public func cert(development: Bool = false,
                                                                                         RubyCommand.Argument(name: "output_path", value: outputPath),
                                                                                         RubyCommand.Argument(name: "keychain_path", value: keychainPath),
                                                                                         RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
+                                                                                        RubyCommand.Argument(name: "skip_set_partition_list", value: skipSetPartitionList),
                                                                                         RubyCommand.Argument(name: "platform", value: platform)])
     _ = runner.executeCommand(command)
 }
@@ -3323,6 +3332,8 @@ public func getBuildNumberRepository(useHgRevisionNumber: Bool = false) {
    - type: Create specific certificate type (takes precedence over :development)
    - force: Create a certificate even if an existing certificate exists
    - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
@@ -3330,6 +3341,7 @@ public func getBuildNumberRepository(useHgRevisionNumber: Bool = false) {
    - outputPath: The path to a directory in which all certificates and private keys should be stored
    - keychainPath: Path to a custom keychain
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
+   - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - platform: Set the provisioning profile's platform (ios, macos)
 
  **Important**: It is recommended to use [match](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
@@ -3339,6 +3351,8 @@ public func getCertificates(development: Bool = false,
                             type: String? = nil,
                             force: Bool = false,
                             generateAppleCerts: Bool = true,
+                            apiKeyPath: String? = nil,
+                            apiKey: [String: Any]? = nil,
                             username: String,
                             teamId: String? = nil,
                             teamName: String? = nil,
@@ -3346,12 +3360,15 @@ public func getCertificates(development: Bool = false,
                             outputPath: String = ".",
                             keychainPath: String,
                             keychainPassword: String? = nil,
+                            skipSetPartitionList: Bool = false,
                             platform: String = "ios")
 {
     let command = RubyCommand(commandID: "", methodName: "get_certificates", className: nil, args: [RubyCommand.Argument(name: "development", value: development),
                                                                                                     RubyCommand.Argument(name: "type", value: type),
                                                                                                     RubyCommand.Argument(name: "force", value: force),
                                                                                                     RubyCommand.Argument(name: "generate_apple_certs", value: generateAppleCerts),
+                                                                                                    RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                                    RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                                     RubyCommand.Argument(name: "username", value: username),
                                                                                                     RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                     RubyCommand.Argument(name: "team_name", value: teamName),
@@ -3359,6 +3376,7 @@ public func getCertificates(development: Bool = false,
                                                                                                     RubyCommand.Argument(name: "output_path", value: outputPath),
                                                                                                     RubyCommand.Argument(name: "keychain_path", value: keychainPath),
                                                                                                     RubyCommand.Argument(name: "keychain_password", value: keychainPassword),
+                                                                                                    RubyCommand.Argument(name: "skip_set_partition_list", value: skipSetPartitionList),
                                                                                                     RubyCommand.Argument(name: "platform", value: platform)])
     _ = runner.executeCommand(command)
 }
@@ -3495,6 +3513,8 @@ public func getManagedPlayStorePublishingRights(jsonKey: String? = nil,
    - skipInstall: By default, the certificate will be added to your local machine. Setting this flag will skip this action
    - force: Renew provisioning profiles regardless of its state - to automatically add all devices for ad hoc profiles
    - appIdentifier: The bundle identifier of your app
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
@@ -3521,6 +3541,8 @@ public func getProvisioningProfile(adhoc: Bool = false,
                                    skipInstall: Bool = false,
                                    force: Bool = false,
                                    appIdentifier: String,
+                                   apiKeyPath: String? = nil,
+                                   apiKey: [String: Any]? = nil,
                                    username: String,
                                    teamId: String? = nil,
                                    teamName: String? = nil,
@@ -3543,6 +3565,8 @@ public func getProvisioningProfile(adhoc: Bool = false,
                                                                                                             RubyCommand.Argument(name: "skip_install", value: skipInstall),
                                                                                                             RubyCommand.Argument(name: "force", value: force),
                                                                                                             RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
+                                                                                                            RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                                            RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                                             RubyCommand.Argument(name: "username", value: username),
                                                                                                             RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                             RubyCommand.Argument(name: "team_name", value: teamName),
@@ -4710,6 +4734,8 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
    - skipProvisioningProfiles: Skip syncing provisioning profiles
    - appIdentifier: The bundle identifier(s) of your app (comma-separated)
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
@@ -4743,6 +4769,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
    - outputPath: Path in which to export certificates, key and profile
+   - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - verbose: Print out extra information and all commands
 
  More information: https://docs.fastlane.tools/actions/match/
@@ -4753,7 +4780,9 @@ public func match(type: Any = matchfile.type,
                   generateAppleCerts: Bool = matchfile.generateAppleCerts,
                   skipProvisioningProfiles: Bool = matchfile.skipProvisioningProfiles,
                   appIdentifier: [String] = matchfile.appIdentifier,
-                  username: Any = matchfile.username,
+                  apiKeyPath: Any? = matchfile.apiKeyPath,
+                  apiKey: [String: Any]? = matchfile.apiKey,
+                  username: Any? = matchfile.username,
                   teamId: Any? = matchfile.teamId,
                   teamName: Any? = matchfile.teamName,
                   storageMode: Any = matchfile.storageMode,
@@ -4786,6 +4815,7 @@ public func match(type: Any = matchfile.type,
                   profileName: Any? = matchfile.profileName,
                   failOnNameTaken: Bool = matchfile.failOnNameTaken,
                   outputPath: Any? = matchfile.outputPath,
+                  skipSetPartitionList: Bool = matchfile.skipSetPartitionList,
                   verbose: Bool = matchfile.verbose)
 {
     let command = RubyCommand(commandID: "", methodName: "match", className: nil, args: [RubyCommand.Argument(name: "type", value: type),
@@ -4794,6 +4824,8 @@ public func match(type: Any = matchfile.type,
                                                                                          RubyCommand.Argument(name: "generate_apple_certs", value: generateAppleCerts),
                                                                                          RubyCommand.Argument(name: "skip_provisioning_profiles", value: skipProvisioningProfiles),
                                                                                          RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
+                                                                                         RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                         RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                          RubyCommand.Argument(name: "username", value: username),
                                                                                          RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                          RubyCommand.Argument(name: "team_name", value: teamName),
@@ -4827,6 +4859,7 @@ public func match(type: Any = matchfile.type,
                                                                                          RubyCommand.Argument(name: "profile_name", value: profileName),
                                                                                          RubyCommand.Argument(name: "fail_on_name_taken", value: failOnNameTaken),
                                                                                          RubyCommand.Argument(name: "output_path", value: outputPath),
+                                                                                         RubyCommand.Argument(name: "skip_set_partition_list", value: skipSetPartitionList),
                                                                                          RubyCommand.Argument(name: "verbose", value: verbose)])
     _ = runner.executeCommand(command)
 }
@@ -6811,6 +6844,8 @@ public func setupTravis(force: Bool = false) {
    - skipInstall: By default, the certificate will be added to your local machine. Setting this flag will skip this action
    - force: Renew provisioning profiles regardless of its state - to automatically add all devices for ad hoc profiles
    - appIdentifier: The bundle identifier of your app
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
@@ -6837,6 +6872,8 @@ public func sigh(adhoc: Bool = false,
                  skipInstall: Bool = false,
                  force: Bool = false,
                  appIdentifier: String,
+                 apiKeyPath: String? = nil,
+                 apiKey: [String: Any]? = nil,
                  username: String,
                  teamId: String? = nil,
                  teamName: String? = nil,
@@ -6859,6 +6896,8 @@ public func sigh(adhoc: Bool = false,
                                                                                         RubyCommand.Argument(name: "skip_install", value: skipInstall),
                                                                                         RubyCommand.Argument(name: "force", value: force),
                                                                                         RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
+                                                                                        RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                        RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                         RubyCommand.Argument(name: "username", value: username),
                                                                                         RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                         RubyCommand.Argument(name: "team_name", value: teamName),
@@ -7601,6 +7640,8 @@ public func swiftlint(mode: Any = "lint",
    - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
    - skipProvisioningProfiles: Skip syncing provisioning profiles
    - appIdentifier: The bundle identifier(s) of your app (comma-separated)
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
@@ -7634,6 +7675,7 @@ public func swiftlint(mode: Any = "lint",
    - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
    - outputPath: Path in which to export certificates, key and profile
+   - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - verbose: Print out extra information and all commands
 
  More information: https://docs.fastlane.tools/actions/match/
@@ -7644,7 +7686,9 @@ public func syncCodeSigning(type: String = "development",
                             generateAppleCerts: Bool = true,
                             skipProvisioningProfiles: Bool = false,
                             appIdentifier: [String],
-                            username: String,
+                            apiKeyPath: String? = nil,
+                            apiKey: [String: Any]? = nil,
+                            username: String? = nil,
                             teamId: String? = nil,
                             teamName: String? = nil,
                             storageMode: String = "git",
@@ -7677,6 +7721,7 @@ public func syncCodeSigning(type: String = "development",
                             profileName: String? = nil,
                             failOnNameTaken: Bool = false,
                             outputPath: String? = nil,
+                            skipSetPartitionList: Bool = false,
                             verbose: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "sync_code_signing", className: nil, args: [RubyCommand.Argument(name: "type", value: type),
@@ -7685,6 +7730,8 @@ public func syncCodeSigning(type: String = "development",
                                                                                                      RubyCommand.Argument(name: "generate_apple_certs", value: generateAppleCerts),
                                                                                                      RubyCommand.Argument(name: "skip_provisioning_profiles", value: skipProvisioningProfiles),
                                                                                                      RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
+                                                                                                     RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                                     RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                                      RubyCommand.Argument(name: "username", value: username),
                                                                                                      RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                      RubyCommand.Argument(name: "team_name", value: teamName),
@@ -7718,6 +7765,7 @@ public func syncCodeSigning(type: String = "development",
                                                                                                      RubyCommand.Argument(name: "profile_name", value: profileName),
                                                                                                      RubyCommand.Argument(name: "fail_on_name_taken", value: failOnNameTaken),
                                                                                                      RubyCommand.Argument(name: "output_path", value: outputPath),
+                                                                                                     RubyCommand.Argument(name: "skip_set_partition_list", value: skipSetPartitionList),
                                                                                                      RubyCommand.Argument(name: "verbose", value: verbose)])
     _ = runner.executeCommand(command)
 }
@@ -9309,4 +9357,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.97]
+// FastlaneRunnerAPIVersion [0.9.98]
