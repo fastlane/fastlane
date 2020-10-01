@@ -3,6 +3,7 @@ require 'spaceship/tunes/tunes'
 
 require_relative 'module'
 require_relative 'upload_metadata'
+require_relative 'languages'
 
 module Deliver
   module Loader
@@ -24,11 +25,9 @@ module Deliver
     def self.language_folders(root, ignore_validation)
       folders = Dir.glob(File.join(root, '*'))
 
-      if Helper.test?
-        available_languages = FastlaneCore::Languages::ALL_LANGUAGES
-      else
-        available_languages = Spaceship::Tunes.client.available_languages.sort
-      end
+      # 2020-08-24 - Available locales are not available as an endpoint in App Store Connect
+      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is avilable)
+      available_languages = Deliver::Languages::ALL_LANGUAGES
 
       allowed_directory_names_with_case = (available_languages + SPECIAL_DIR_NAMES)
       allowed_directory_names = allowed_directory_names_with_case.map(&:downcase).freeze

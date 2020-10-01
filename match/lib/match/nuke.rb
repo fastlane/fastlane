@@ -27,6 +27,8 @@ module Match
 
       update_optional_values_depending_on_storage_type(params)
 
+      spaceship_login
+
       self.storage = Storage.for_mode(params[:storage_mode], {
         git_url: params[:git_url],
         shallow_clone: params[:shallow_clone],
@@ -37,7 +39,12 @@ module Match
         clone_branch_directly: params[:clone_branch_directly],
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
         google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
-        google_cloud_project_id: params[:google_cloud_project_id].to_s
+        google_cloud_project_id: params[:google_cloud_project_id].to_s,
+        s3_region: params[:s3_region].to_s,
+        s3_access_key: params[:s3_access_key].to_s,
+        s3_secret_access_key: params[:s3_secret_access_key].to_s,
+        s3_bucket: params[:s3_bucket].to_s,
+        team_id: params[:team_id] || Spaceship.client.team_id
       })
       self.storage.download
 
@@ -89,18 +96,9 @@ module Match
       end
     end
 
-    # Collect all the certs/profiles
-    def prepare_list
-      UI.message("Fetching certificates and profiles...")
-      cert_type = Match.cert_type_sym(type)
-
-      prov_types = []
-      prov_types = [:development] if cert_type == :development
-      prov_types = [:appstore, :adhoc] if cert_type == :distribution
-      prov_types = [:enterprise] if cert_type == :enterprise
-
+    def spaceship_login
       Spaceship.login(params[:username])
-      Spaceship.select_team
+      Spaceship.select_team(team_id: params[:team_id], team_name: params[:team_name])
 
       if Spaceship.client.in_house? && (type == "distribution" || type == "enterprise")
         UI.error("---")
@@ -111,18 +109,52 @@ module Match
 
         UI.user_error!("Enterprise account nuke cancelled") unless UI.confirm("Do you really want to nuke your Enterprise account?")
       end
+    end
 
-      self.certs = certificate_type(cert_type).all
+    # Collect all the certs/profiles
+    def prepare_list
+      UI.message("Fetching certificates and profiles...")
+      cert_type = Match.cert_type_sym(type)
+      cert_types = [cert_type]
+
+      prov_types = []
+      prov_types = [:development] if cert_type == :development
+      prov_types = [:appstore, :adhoc, :developer_id] if cert_type == :distribution
+      prov_types = [:enterprise] if cert_type == :enterprise
+
+      # Get all iOS and macOS profile
       self.profiles = []
       prov_types.each do |prov_type|
-        self.profiles += profile_type(prov_type).all
+        self.profiles += profile_type(prov_type).all(mac: false)
+        self.profiles += profile_type(prov_type).all(mac: true)
       end
 
-      certs = Dir[File.join(self.storage.working_directory, "**", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(self.storage.working_directory, "**", cert_type.to_s, "*.p12")]
+      # Gets the main and additional cert types
+      cert_types += (params[:additional_cert_types] || []).map do |ct|
+        Match.cert_type_sym(ct)
+      end
+
+      # Gets all the certs form the cert types
+      self.certs = []
+      self.certs += cert_types.map do |ct|
+        certificate_type(ct).flat_map do |cert|
+          cert.all(mac: false) + cert.all(mac: true)
+        end
+      end.flatten
+
+      # Finds all the .cer and .p12 files in the file storage
+      certs = []
+      keys = []
+      cert_types.each do |ct|
+        certs += self.storage.list_files(file_name: ct.to_s, file_ext: "cer")
+        keys += self.storage.list_files(file_name: ct.to_s, file_ext: "p12")
+      end
+
+      # Finds all the iOS and macOS profofiles in the file storage
       profiles = []
       prov_types.each do |prov_type|
-        profiles += Dir[File.join(self.storage.working_directory, "**", prov_type.to_s, "*.mobileprovision")]
+        profiles += self.storage.list_files(file_name: prov_type.to_s, file_ext: "mobileprovision")
+        profiles += self.storage.list_files(file_name: prov_type.to_s, file_ext: "provisionprofile")
       end
 
       self.files = certs + keys + profiles
@@ -240,21 +272,36 @@ module Match
 
     # The kind of certificate we're interested in
     def certificate_type(type)
-      {
-        distribution: Spaceship.certificate.production,
-        development:  Spaceship.certificate.development,
-        enterprise:   Spaceship.certificate.in_house
-      }[type] ||= raise "Unknown type '#{type}'"
+      case type.to_sym
+      when :mac_installer_distribution
+        return [Spaceship.certificate.mac_installer_distribution]
+      when :distribution
+        return [Spaceship.certificate.production, Spaceship.certificate.apple_distribution]
+      when :development
+        return [Spaceship.certificate.development, Spaceship.certificate.apple_development]
+      when :enterprise
+        return [Spaceship.certificate.in_house]
+      else
+        raise "Unknown type '#{type}'"
+      end
     end
 
     # The kind of provisioning profile we're interested in
     def profile_type(prov_type)
-      {
-        appstore:    Spaceship.provisioning_profile.app_store,
-        development: Spaceship.provisioning_profile.development,
-        enterprise:  Spaceship.provisioning_profile.in_house,
-        adhoc:       Spaceship.provisioning_profile.ad_hoc
-      }[prov_type] ||= raise "Unknown provisioning type '#{prov_type}'"
+      case prov_type.to_sym
+      when :appstore
+        return Spaceship.provisioning_profile.app_store
+      when :development
+        return Spaceship.provisioning_profile.development
+      when :enterprise
+        return Spaceship.provisioning_profile.in_house
+      when :adhoc
+        return Spaceship.provisioning_profile.ad_hoc
+      when :developer_id
+        return Spaceship.provisioning_profile.direct
+      else
+        raise "Unknown provisioning type '#{prov_type}'"
+      end
     end
   end
 end

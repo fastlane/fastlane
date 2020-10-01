@@ -40,9 +40,13 @@ module Deliver
     # This method takes care of creating a new 'deliver' folder, containing the app metadata
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)
-      v = options[:app].latest_version
+      app = options[:app]
+
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      v = app.get_latest_app_store_version(platform: platform)
+
       metadata_path = options[:metadata_path] || File.join(deliver_path, 'metadata')
-      generate_metadata_files(v, metadata_path)
+      generate_metadata_files(app, v, metadata_path)
 
       # Generate the final Deliverfile here
       return File.read(deliverfile_path)
@@ -56,18 +60,103 @@ module Deliver
       end
     end
 
-    def generate_metadata_files(v, path)
+    def generate_metadata_files(app, version, path)
+      # App info localizations
+      app_info = app.fetch_live_app_info || app.fetch_edit_app_info
+      app_info_localizations = app_info.get_app_info_localizations
+      app_info_localizations.each do |localization|
+        language = localization.locale
+
+        UploadMetadata::LOCALISED_APP_VALUES.each do |file_key, attribute_name|
+          content = localization.send(attribute_name.to_slug) || ""
+          content += "\n"
+
+          resulting_path = File.join(path, language, "#{file_key}.txt")
+          FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+          File.write(resulting_path, content)
+
+          UI.message("Writing to '#{resulting_path}'")
+        end
+      end
+
+      # Version localizations
+      version_localizations = version.get_app_store_version_localizations
+      version_localizations.each do |localization|
+        language = localization.locale
+
+        UploadMetadata::LOCALISED_VERSION_VALUES.each do |file_key, attribute_name|
+          content = localization.send(attribute_name) || ""
+          content += "\n"
+
+          resulting_path = File.join(path, language, "#{file_key}.txt")
+          FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+          File.write(resulting_path, content)
+
+          UI.message("Writing to '#{resulting_path}'")
+        end
+      end
+
+      # App info (categories)
+      UploadMetadata::NON_LOCALISED_APP_VALUES.each do |file_key, attribute_name|
+        category = app_info.send(attribute_name)
+
+        content = category ? category.id.to_s : ""
+        content += "\n"
+
+        resulting_path = File.join(path, "#{file_key}.txt")
+        FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+        File.write(resulting_path, content)
+
+        UI.message("Writing to '#{resulting_path}'")
+      end
+
+      # Version
+      UploadMetadata::NON_LOCALISED_VERSION_VALUES.each do |file_key, attribute_name|
+        content = version.send(attribute_name) || ""
+        content += "\n"
+
+        resulting_path = File.join(path, "#{file_key}.txt")
+        FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+        File.write(resulting_path, content)
+
+        UI.message("Writing to '#{resulting_path}'")
+      end
+
+      # Review information
+      app_store_review_detail = begin
+                                  version.fetch_app_store_review_detail
+                                rescue
+                                  nil
+                                end # errors if doesn't exist
+      UploadMetadata::REVIEW_INFORMATION_VALUES.each do |file_key, attribute_name|
+        if app_store_review_detail
+          content = app_store_review_detail.send(attribute_name) || ""
+        else
+          content = ""
+        end
+        content += "\n"
+
+        base_dir = File.join(path, UploadMetadata::REVIEW_INFORMATION_DIR)
+        resulting_path = File.join(base_dir, "#{file_key}.txt")
+        FileUtils.mkdir_p(File.expand_path('..', resulting_path))
+        File.write(resulting_path, content)
+
+        UI.message("Writing to '#{resulting_path}'")
+      end
+    end
+
+    def generate_metadata_files_old(v, path)
       app_details = v.application.details
 
       # All the localised metadata
-      (UploadMetadata::LOCALISED_VERSION_VALUES + UploadMetadata::LOCALISED_APP_VALUES).each do |key|
+      (UploadMetadata::LOCALISED_VERSION_VALUES.keys + UploadMetadata::LOCALISED_APP_VALUES.keys).each do |key|
         v.description.languages.each do |language|
-          if UploadMetadata::LOCALISED_VERSION_VALUES.include?(key)
+          if UploadMetadata::LOCALISED_VERSION_VALUES.keys.include?(key)
             content = v.send(key)[language].to_s
           else
             content = app_details.send(key)[language].to_s
           end
-          content << "\n"
+          content += "\n"
           resulting_path = File.join(path, language, "#{key}.txt")
           FileUtils.mkdir_p(File.expand_path('..', resulting_path))
           File.write(resulting_path, content)
@@ -76,33 +165,22 @@ module Deliver
       end
 
       # All non-localised metadata
-      (UploadMetadata::NON_LOCALISED_VERSION_VALUES + UploadMetadata::NON_LOCALISED_APP_VALUES).each do |key|
-        if UploadMetadata::NON_LOCALISED_VERSION_VALUES.include?(key)
+      (UploadMetadata::NON_LOCALISED_VERSION_VALUES.keys + UploadMetadata::NON_LOCALISED_APP_VALUES).each do |key|
+        if UploadMetadata::NON_LOCALISED_VERSION_VALUES.keys.include?(key)
           content = v.send(key).to_s
         else
           content = app_details.send(key).to_s
         end
-        content << "\n"
+        content += "\n"
         resulting_path = File.join(path, "#{key}.txt")
         File.write(resulting_path, content)
         UI.message("Writing to '#{resulting_path}'")
       end
 
-      # Trade Representative Contact Information
-      UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_VALUES.each do |key, option_name|
-        content = v.send(key).to_s
-        content << "\n"
-        base_dir = File.join(path, UploadMetadata::TRADE_REPRESENTATIVE_CONTACT_INFORMATION_DIR)
-        FileUtils.mkdir_p(base_dir)
-        resulting_path = File.join(base_dir, "#{option_name}.txt")
-        File.write(resulting_path, content)
-        UI.message("Writing to '#{resulting_path}'")
-      end
-
       # Review information
-      UploadMetadata::REVIEW_INFORMATION_VALUES.each do |key, option_name|
+      UploadMetadata::REVIEW_INFORMATION_VALUES_LEGACY.each do |key, option_name|
         content = v.send(key).to_s
-        content << "\n"
+        content += "\n"
         base_dir = File.join(path, UploadMetadata::REVIEW_INFORMATION_DIR)
         FileUtils.mkdir_p(base_dir)
         resulting_path = File.join(base_dir, "#{option_name}.txt")
@@ -111,20 +189,6 @@ module Deliver
       end
 
       UI.success("Successfully created new configuration files.")
-
-      # get App icon + watch icon
-      if v.large_app_icon.asset_token
-        app_icon_extension = File.extname(v.large_app_icon.url)
-        app_icon_path = File.join(path, "app_icon#{app_icon_extension}")
-        File.write(app_icon_path, open(v.large_app_icon.url).read)
-        UI.success("Successfully downloaded large app icon")
-      end
-      if v.watch_app_icon.asset_token
-        watch_app_icon_extension = File.extname(v.watch_app_icon.url)
-        watch_icon_path = File.join(path, "watch_icon#{watch_app_icon_extension}")
-        File.write(watch_icon_path, open(v.watch_app_icon.url).read)
-        UI.success("Successfully downloaded watch icon")
-      end
     end
 
     def download_screenshots(path, options)

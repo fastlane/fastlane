@@ -1,178 +1,203 @@
-require_relative '../client'
-require_relative './response'
+require_relative './token'
+require_relative './provisioning/provisioning'
+require_relative './testflight/testflight'
+require_relative './tunes/tunes'
+require_relative './users/users'
 
 module Spaceship
   class ConnectAPI
-    class Client < Spaceship::Client
+    class Client
       attr_accessor :token
+      attr_accessor :tunes_client
+      attr_accessor :portal_client
 
-      #####################################################
-      # @!group Client Init
-      #####################################################
+      # Initializes client with Apple's App Store Connect JWT auth key.
+      #
+      # This method will automatically use the key id, issuer id, and filepath from environment
+      # variables if not given.
+      #
+      # All three parameters are needed to authenticate.
+      #
+      # @param key_id (String) (optional): The key id
+      # @param issuer_id (String) (optional): The issuer id
+      # @param filepath (String) (optional): The filepath
+      #
+      # @raise InvalidUserCredentialsError: raised if authentication failed
+      #
+      # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
+      def self.auth(key_id: nil, issuer_id: nil, filepath: nil)
+        token = Spaceship::ConnectAPI::Token.create(key_id: key_id, issuer_id: issuer_id, filepath: filepath)
+        return ConnectAPI::Client.new(token: token)
+      end
 
-      # Instantiates a client with cookie session or a JWT token.
-      def initialize(cookie: nil, current_team_id: nil, token: nil)
-        if token.nil?
-          super(cookie: cookie, current_team_id: current_team_id)
-        else
-          options = {
-            request: {
-              timeout:       (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
-              open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || 300).to_i
-            }
-          }
-          @token = token
-          @current_team_id = current_team_id
+      # Authenticates with Apple's web services. This method has to be called once
+      # to generate a valid session.
+      #
+      # This method will automatically use the username from the Appfile (if available)
+      # and fetch the password from the Keychain (if available)
+      #
+      # @param user (String) (optional): The username (usually the email address)
+      # @param password (String) (optional): The password
+      # @param use_portal (Boolean) (optional): Whether to log in to Spaceship::Portal or not
+      # @param use_tunes (Boolean) (optional): Whether to log in to Spaceship::Tunes or not
+      # @param portal_team_id (String) (optional): The Spaceship::Portal team id
+      # @param tunes_team_id (String) (optional): The Spaceship::Tunes team id
+      # @param team_name (String) (optional): The team name
+      # @param skip_select_team (Boolean) (optional): Whether to skip automatic selection or prompt for team
+      #
+      # @raise InvalidUserCredentialsError: raised if authentication failed
+      #
+      # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
+      def self.login(user = nil, password = nil, use_portal: true, use_tunes: true, portal_team_id: nil, tunes_team_id: nil, team_name: nil, skip_select_team: false)
+        portal_client = Spaceship::Portal.login(user, password) if use_portal
+        tunes_client = Spaceship::Tunes.login(user, password) if use_tunes
 
-          hostname = "https://api.appstoreconnect.apple.com/v1/"
+        unless skip_select_team
+          # Check if environment variables are set for Spaceship::Portal or Spaceship::Tunes to select team
+          portal_team_id ||= ENV['FASTLANE_TEAM_ID']
+          portal_team_name = team_name || ENV['FASTLANE_TEAM_NAME']
+          tunes_team_id ||= ENV['FASTLANE_ITC_TEAM_ID']
+          tunes_team_name = team_name || ENV['FASTLANE_ITC_TEAM_NAME']
 
-          @client = Faraday.new(hostname, options) do |c|
-            c.response(:json, content_type: /\bjson$/)
-            c.response(:xml, content_type: /\bxml$/)
-            c.response(:plist, content_type: /\bplist$/)
-            c.use(FaradayMiddleware::RelsMiddleware)
-            c.adapter(Faraday.default_adapter)
-            c.headers["Authorization"] = "Bearer #{token.text}"
+          # The clients will prompt for a team selection if:
+          # 1. client exists
+          # 2. team_id and team_name are nil and user belongs to multiple teams
+          portal_client.select_team(team_id: portal_team_id, team_name: portal_team_name) if portal_client
+          tunes_client.select_team(team_id: tunes_team_id, team_name: tunes_team_name) if tunes_client
+        end
 
-            if ENV['SPACESHIP_DEBUG']
-              # for debugging only
-              # This enables tracking of networking requests using Charles Web Proxy
-              c.proxy = "https://127.0.0.1:8888"
-              c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
-            elsif ENV["SPACESHIP_PROXY"]
-              c.proxy = ENV["SPACESHIP_PROXY"]
-              c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
-            end
+        return ConnectAPI::Client.new(tunes_client: tunes_client, portal_client: portal_client)
+      end
 
-            if ENV["DEBUG"]
-              puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
-            end
+      def initialize(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil)
+        @token = token
+
+        # If using web session...
+        # Spaceship::Tunes is needed for TestFlight::API, Tunes::API, and Users::API
+        # Spaceship::Portal is needed for Provisioning::API
+        @tunes_client = tunes_client
+        @portal_client = portal_client
+
+        # Extending this instance to add API endpoints from these modules
+        # Each of these modules adds a new setter method for an instance
+        # of an ConnectAPI::APIClient
+        # These get set in set_indvidual_clients
+        self.extend(Spaceship::ConnectAPI::TestFlight::API)
+        self.extend(Spaceship::ConnectAPI::Tunes::API)
+        self.extend(Spaceship::ConnectAPI::Provisioning::API)
+        self.extend(Spaceship::ConnectAPI::Users::API)
+
+        set_indvidual_clients(
+          cookie: cookie,
+          current_team_id: current_team_id,
+          token: token,
+          tunes_client: @tunes_client,
+          portal_client: @portal_client
+        )
+      end
+
+      def portal_team_id
+        return nil if @portal_client.nil?
+        return @portal_client.team_id
+      end
+
+      def tunes_team_id
+        return nil if @tunes_client.nil?
+        return @tunes_client.team_id
+      end
+
+      def portal_teams
+        return nil if @portal_client.nil?
+        return @portal_client.teams
+      end
+
+      def tunes_teams
+        return nil if @tunes_client.nil?
+        return @tunes_client.teams
+      end
+
+      def in_house?
+        if token
+          if token.in_house.nil?
+            message = [
+              "Cannot determine if team is App Store or Enterprise via the App Store Connect API (yet)",
+              "Set 'in_house' on your Spaceship::ConnectAPI::Token",
+              "Or set 'in_house' in your App Store Connect API key JSON file",
+              "Or set the 'SPACESHIP_CONNECT_API_IN_HOUSE' environment variable to 'true'",
+              "View more info in the docs at https://docs.fastlane.tools/app-store-connect-api/"
+            ]
+            raise message.join('\n')
           end
+          return !!token.in_house
+        elsif @portal_client
+          return @portal_client.in_house?
+        else
+          raise "No App Store Connect API token or Portal Client set"
         end
       end
 
-      def self.hostname
-        return nil
-      end
+      def select_team(portal_team_id: nil, tunes_team_id: nil, team_name: nil)
+        @portal_client.select_team(team_id: portal_team_id, team_name: team_name) unless @portal_client.nil?
+        @tunes_client.select_team(team_id: tunes_team_id, team_name: team_name) unless @tunes_client.nil?
 
-      #
-      # Helpers
-      #
-
-      def web_session?
-        return @token.nil?
-      end
-
-      def build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
-        params = {}
-
-        filter = filter.delete_if { |k, v| v.nil? } if filter
-
-        params[:filter] = filter if filter && !filter.empty?
-        params[:include] = includes if includes
-        params[:limit] = limit if limit
-        params[:sort] = sort if sort
-        params[:cursor] = cursor if cursor
-
-        return params
-      end
-
-      def get(url_or_path, params = nil)
-        response = request(:get) do |req|
-          req.url(url_or_path)
-          req.options.params_encoder = Faraday::NestedParamsEncoder
-          req.params = params if params
-          req.headers['Content-Type'] = 'application/json'
-        end
-        handle_response(response)
-      end
-
-      def post(url_or_path, body)
-        response = request(:post) do |req|
-          req.url(url_or_path)
-          req.body = body.to_json
-          req.headers['Content-Type'] = 'application/json'
-        end
-        handle_response(response)
-      end
-
-      def patch(url_or_path, body)
-        response = request(:patch) do |req|
-          req.url(url_or_path)
-          req.body = body.to_json
-          req.headers['Content-Type'] = 'application/json'
-        end
-        handle_response(response)
-      end
-
-      def delete(url_or_path, params = nil, body = nil)
-        response = request(:delete) do |req|
-          req.url(url_or_path)
-          req.options.params_encoder = Faraday::NestedParamsEncoder if params
-          req.params = params if params
-          req.body = body.to_json if body
-          req.headers['Content-Type'] = 'application/json' if body
-        end
-        handle_response(response)
-      end
-
-      protected
-
-      def handle_response(response)
-        if (200...300).cover?(response.status) && (response.body.nil? || response.body.empty?)
-          return
-        end
-
-        raise InternalServerError, "Server error got #{response.status}" if (500...600).cover?(response.status)
-
-        unless response.body.kind_of?(Hash)
-          raise UnexpectedResponse, response.body
-        end
-
-        raise UnexpectedResponse, response.body['error'] if response.body['error']
-
-        raise UnexpectedResponse, handle_errors(response) if response.body['errors']
-
-        raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
-
-        return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, client: self)
-      end
-
-      def handle_errors(response)
-        # Example error format
-        # {
-        #   "errors" : [ {
-        #     "id" : "ce8c391e-f858-411b-a14b-5aa26e0915f2",
-        #     "status" : "400",
-        #     "code" : "PARAMETER_ERROR.INVALID",
-        #     "title" : "A parameter has an invalid value",
-        #     "detail" : "'uploadedDate3' is not a valid field name",
-        #     "source" : {
-        #       "parameter" : "sort"
-        #     }
-        #   } ]
-        # }
-
-        return response.body['errors'].map do |error|
-          "#{error['title']} - #{error['detail']}"
-        end.join(" ")
+        # Updating the tunes and portal clients requires resetting
+        # of the clients in the API modules
+        set_indvidual_clients(
+          cookie: nil,
+          current_team_id: nil,
+          token: nil,
+          tunes_client: tunes_client,
+          portal_client: portal_client
+        )
       end
 
       private
 
-      def local_variable_get(binding, name)
-        if binding.respond_to?(:local_variable_get)
-          binding.local_variable_get(name)
-        else
-          binding.eval(name.to_s)
+      def set_indvidual_clients(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil)
+        # This was added by Spaceship::ConnectAPI::TestFlight::API and is required
+        # to be set for API methods to have a client to send request on
+        if cookie || token || tunes_client
+          self.test_flight_request_client = Spaceship::ConnectAPI::TestFlight::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: tunes_client
+          )
         end
-      end
 
-      def provider_id
-        return team_id if self.provider.nil?
-        self.provider.provider_id
+        # This was added by Spaceship::ConnectAPI::Tunes::API and is required
+        # to be set for API methods to have a client to send request on
+        if cookie || token || tunes_client
+          self.tunes_request_client = Spaceship::ConnectAPI::Tunes::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: tunes_client
+          )
+        end
+
+        # This was added by Spaceship::ConnectAPI::Provisioning::API and is required
+        # to be set for API methods to have a client to send request on
+        if cookie || token || portal_client
+          self.provisioning_request_client = Spaceship::ConnectAPI::Provisioning::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: portal_client
+          )
+        end
+
+        # This was added by Spaceship::ConnectAPI::Users::API and is required
+        # to be set for API methods to have a client to send request on
+        if cookie || token || tunes_client
+          self.users_request_client = Spaceship::ConnectAPI::Users::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: tunes_client
+          )
+        end
       end
     end
   end
-  # rubocop:enable Metrics/ClassLength
 end

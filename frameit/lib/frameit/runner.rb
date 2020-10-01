@@ -14,9 +14,8 @@ module Frameit
       end
     end
 
-    def run(path, color = nil)
+    def run(path, color = nil, platform = nil)
       unless color
-        color = Frameit::Color::BLACK
         color = Frameit::Color::SILVER if Frameit.config[:white] || Frameit.config[:silver]
         color = Frameit::Color::GOLD if Frameit.config[:gold]
         color = Frameit::Color::ROSE_GOLD if Frameit.config[:rose_gold]
@@ -29,11 +28,12 @@ module Frameit
           next if skip_path?(full_path)
 
           begin
-            screenshot = Screenshot.new(full_path, color)
+            config = create_config(full_path)
+            screenshot = Screenshot.new(full_path, color, config, platform)
 
             next if skip_up_to_date?(screenshot)
 
-            editor = editor(screenshot)
+            editor = editor(screenshot, config)
 
             if editor.should_skip?
               UI.message("Skipping framing of screenshot #{screenshot.path}.  No title provided in your Framefile.json or title.strings.")
@@ -71,12 +71,27 @@ module Frameit
       false
     end
 
-    def editor(screenshot)
+    def editor(screenshot, config)
       if screenshot.mac?
-        return MacEditor.new(screenshot)
+        return MacEditor.new(screenshot, config)
       else
-        return Editor.new(screenshot, Frameit.config[:debug_mode])
+        return Editor.new(screenshot, config, Frameit.config[:debug_mode])
       end
+    end
+
+    # Loads the config (colors, background, texts, etc.)
+    # Don't use this method to access the actual text and use `fetch_texts` instead
+    def create_config(screenshot_path)
+      # Screengrab pulls screenshots to a different folder location
+      # frameit only handles two levels of folders, to not break
+      # compatibility with Supply we look into a different path for Android
+      # Issue https://github.com/fastlane/fastlane/issues/16289
+      config_path = File.join(File.expand_path("..", screenshot_path), "Framefile.json")
+      config_path = File.join(File.expand_path("../..", screenshot_path), "Framefile.json") unless File.exist?(config_path)
+      config_path = File.join(File.expand_path("../../../..", screenshot_path), "Framefile.json") unless File.exist?(config_path)
+      file = ConfigParser.new.load(config_path)
+      return {} unless file # no config file at all
+      file.fetch_value(screenshot_path)
     end
   end
 end

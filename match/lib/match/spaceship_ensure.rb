@@ -18,18 +18,18 @@ module Match
         UI.important("More information https://docs.fastlane.tools/actions/match/#access-control")
       end
 
+      # Prompts select team if multiple teams and none specified
       UI.message("Verifying that the certificate and profile are still valid on the Dev Portal...")
-      Spaceship.login(user)
-      Spaceship.select_team(team_id: team_id, team_name: team_name)
+      Spaceship::ConnectAPI.login(user, use_portal: true, use_tunes: false, portal_team_id: team_id, team_name: team_name)
     end
 
     # The team ID of the currently logged in team
     def team_id
-      return Spaceship.client.team_id
+      return Spaceship::ConnectAPI.client.portal_team_id
     end
 
-    def bundle_identifier_exists(username: nil, app_identifier: nil)
-      found = Spaceship.app.find(app_identifier)
+    def bundle_identifier_exists(username: nil, app_identifier: nil, platform: nil)
+      found = Spaceship::ConnectAPI::BundleId.find(app_identifier)
       return if found
 
       require 'sigh/runner'
@@ -39,27 +39,35 @@ module Match
       })
       UI.error("An app with that bundle ID needs to exist in order to create a provisioning profile for it")
       UI.error("================================================================")
-      available_apps = Spaceship.app.all.collect { |a| "#{a.bundle_id} (#{a.name})" }
+      available_apps = Spaceship::ConnectAPI::BundleId.all.collect { |a| "#{a.identifier} (#{a.name})" }
       UI.message("Available apps:\n- #{available_apps.join("\n- ")}")
       UI.error("Make sure to run `fastlane match` with the same user and team every time.")
       UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")
     end
 
-    def certificate_exists(username: nil, certificate_id: nil)
-      found = Spaceship.certificate.all.find do |cert|
-        cert.id == certificate_id
+    def certificates_exists(username: nil, certificate_ids: [], platform: nil)
+      if platform == :catalyst.to_s
+        platform = :macos.to_s
       end
-      return if found
 
-      UI.error("Certificate '#{certificate_id}' (stored in your storage) is not available on the Developer Portal")
+      Spaceship.certificate.all(mac: platform == "macos").each do |cert|
+        certificate_ids.delete(cert.id)
+      end
+      return if certificate_ids.empty?
+
+      certificate_ids.each do |certificate_id|
+        UI.error("Certificate '#{certificate_id}' (stored in your storage) is not available on the Developer Portal")
+      end
       UI.error("for the user #{username}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
       UI.error("Git repository. This might be caused by revoking the certificate on the Dev Portal")
       UI.user_error!("To reset the certificates of your Apple account, you can use the `fastlane match nuke` feature, more information on https://docs.fastlane.tools/actions/match/")
     end
 
-    def profile_exists(username: nil, uuid: nil)
-      found = Spaceship.provisioning_profile.all.find do |profile|
+    def profile_exists(username: nil, uuid: nil, platform: nil)
+      # App Store Connect API does not allow filter of profile by platform or uuid (as of 2020-07-30)
+      # Need to fetch all profiles and search for uuid on client side
+      found = Spaceship::ConnectAPI::Profile.all.find do |profile|
         profile.uuid == uuid
       end
 

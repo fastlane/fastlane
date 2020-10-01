@@ -24,8 +24,8 @@ end
 
 describe Deliver::Runner do
   let(:runner) do
-    allow(Spaceship::Tunes).to receive(:login).and_return(true)
-    allow(Spaceship::Tunes).to receive(:select_team).and_return(true)
+    allow(Spaceship::ConnectAPI).to receive(:login).and_return(true)
+    allow(Spaceship::ConnectAPI).to receive(:select_team).and_return(true)
     allow(Spaceship::Tunes).to receive(:client).and_return(MockSession.new)
     allow_any_instance_of(Deliver::DetectValues).to receive(:run!) { |opt| opt }
     Deliver::Runner.new(options)
@@ -38,7 +38,7 @@ describe Deliver::Runner do
       ipa: 'ACME.ipa',
       app_identifier: 'com.acme.acme',
       app_version: '1.0.7',
-      app: double('app', { apple_id: 'YI8C2AS' }),
+      app: double('app', { id: 'YI8C2AS' }),
       platform: 'ios'
     }
   end

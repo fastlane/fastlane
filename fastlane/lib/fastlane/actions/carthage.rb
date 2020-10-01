@@ -20,7 +20,9 @@ module Fastlane
         cmd << "--output #{params[:output]}" if params[:output]
         cmd << "--use-ssh" if params[:use_ssh]
         cmd << "--use-submodules" if params[:use_submodules]
+        cmd << "--use-netrc" if params[:use_netrc]
         cmd << "--no-use-binaries" if params[:use_binaries] == false
+        cmd << "--no-checkout" if params[:no_checkout] == true
         cmd << "--no-build" if params[:no_build] == true
         cmd << "--no-skip-current" if params[:no_skip_current] == true
         cmd << "--verbose" if params[:verbose] == true
@@ -88,9 +90,21 @@ module Fastlane
                                        is_string: false,
                                        type: Boolean,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :use_netrc,
+                                       env_name: "FL_CARTHAGE_USE_NETRC",
+                                       description: "Use .netrc for downloading frameworks",
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :use_binaries,
                                        env_name: "FL_CARTHAGE_USE_BINARIES",
                                        description: "Check out dependency repositories even when prebuilt frameworks exist",
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :no_checkout,
+                                       env_name: "FL_CARTHAGE_NO_CHECKOUT",
+                                       description: "When bootstrapping Carthage do not checkout",
                                        is_string: false,
                                        type: Boolean,
                                        optional: true),

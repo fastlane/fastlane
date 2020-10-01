@@ -286,7 +286,7 @@ module Spaceship
     # @param sku (String): A unique ID for your app that is not visible on the App Store.
     # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
     #   can't be changed after you submit your first build.
-    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, itunes_connect_users: nil)
+    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, platforms: nil, itunes_connect_users: nil)
       puts("The `version` parameter is deprecated. Use `Spaceship::Tunes::Application.ensure_version!` method instead") if version
 
       # First, we need to fetch the data from Apple, which we then modify with the user's values
@@ -307,7 +307,7 @@ module Spaceship
       data['enabledPlatformsForCreation'] = { value: [platform] }
 
       data['initialPlatform'] = platform
-      data['enabledPlatformsForCreation'] = { value: [platform] }
+      data['enabledPlatformsForCreation'] = { value: platforms || [platform] }
 
       unless itunes_connect_users.nil?
         data['iTunesConnectUsers']['grantedAllUsers'] = false
@@ -352,6 +352,31 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    def post_resolution_center(app_id, platform, thread_id, version_id, version_number, from, message_body)
+      r = request(:post) do |req|
+        req.url("ra/apps/#{app_id}/platforms/#{platform}/resolutionCenter")
+        req.body = {
+          appNotes: {
+            threads: [{
+              id: thread_id,
+              versionId: version_id,
+              version: version_number,
+              messages: [{
+                from: from,
+                date: DateTime.now.strftime('%Q'),
+                body: message_body,
+                tokens: []
+              }]
+            }]
+          }
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
+    end
+
     def get_ratings(app_id, platform, version_id = '', storefront = '')
       # if storefront or version_id is empty api fails
       rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews/summary"
@@ -375,7 +400,7 @@ module Spaceship
         rating_url << "sort=REVIEW_SORT_ORDER_MOST_RECENT"
         rating_url << "&index=#{index}"
         rating_url << "&storefront=#{storefront}" unless storefront.empty?
-        rating_url << "&version_id=#{version_id}" unless version_id.empty?
+        rating_url << "&versionId=#{version_id}" unless version_id.empty?
 
         r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
@@ -602,7 +627,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def transform_to_raw_pricing_intervals(app_id = nil, purchase_id = nil, pricing_intervals = nil, subscription_price_target = nil)
+    def transform_to_raw_pricing_intervals(app_id = nil, purchase_id = nil, pricing_intervals = 5, subscription_price_target = nil)
       intervals_array = []
       if pricing_intervals
         intervals_array = pricing_intervals.map do |interval|
@@ -759,11 +784,8 @@ module Spaceship
     end
 
     def available_languages
-      r = request(:get, "ra/apps/storePreview/regionCountryLanguage")
-      response = parse_response(r, 'data')
-      response.flat_map { |region| region["storeFronts"] }
-              .flat_map { |storefront| storefront["supportedLocaleCodes"] }
-              .uniq
+      r = request(:get, "ra/ref")
+      parse_response(r, 'data')['detailLocales']
     end
 
     #####################################################
@@ -1398,6 +1420,20 @@ module Spaceship
         req.headers['Content-Type'] = 'application/json'
       end
       handle_itc_response(r.body)
+    end
+
+    # Retrieves app-specific shared secret key
+    def get_shared_secret(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/appSharedSecret")
+      data = parse_response(r, 'data')
+      data['sharedSecret']
+    end
+
+    # Generates app-specific shared secret key
+    def generate_shared_secret(app_id: nil)
+      r = request(:post, "ra/apps/#{app_id}/iaps/appSharedSecret")
+      data = parse_response(r, 'data')
+      data['sharedSecret']
     end
 
     #####################################################

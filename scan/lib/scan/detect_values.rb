@@ -45,6 +45,9 @@ module Scan
       coerce_to_array_of_strings(:only_testing)
       coerce_to_array_of_strings(:skip_testing)
 
+      coerce_to_array_of_strings(:only_test_configurations)
+      coerce_to_array_of_strings(:skip_test_configurations)
+
       return config
     end
 
@@ -108,7 +111,7 @@ module Scan
     def self.detect_simulator(devices, requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
       require 'set'
 
-      deployment_target_version = Scan.project.build_settings(key: deployment_target_key) || '0'
+      deployment_target_version = get_deployment_target_version(deployment_target_key)
 
       simulators = filter_simulators(
         FastlaneCore::DeviceManager.simulators(requested_os_type).tap do |array|
@@ -214,6 +217,11 @@ module Scan
       elsif Scan.project.mac_app?
         Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]
       end
+    end
+
+    # get deployment target version
+    def self.get_deployment_target_version(deployment_target_key)
+      Scan.config[:deployment_target_version] || Scan.project.build_settings(key: deployment_target_key) || '0'
     end
   end
 end

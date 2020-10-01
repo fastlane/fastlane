@@ -29,8 +29,8 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports. 
-        
+        # Define all options your action supports.
+
         # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :api_token,
@@ -67,13 +67,13 @@ module Fastlane
 
       def self.is_supported?(platform)
         # you can do things like
-        # 
+        #
         #  true
-        # 
+        #
         #  platform == :ios
-        # 
+        #
         #  [:ios, :mac].include?(platform)
-        # 
+        #
 
         platform == :ios
       end

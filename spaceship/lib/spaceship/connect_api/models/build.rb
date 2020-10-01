@@ -78,6 +78,10 @@ module Spaceship
         return processing_state != ProcessingState::PROCESSING
       end
 
+      def ready_for_internal_testing?
+        return build_beta_detail.nil? == false && build_beta_detail.ready_for_internal_testing?
+      end
+
       def ready_for_beta_submission?
         raise "No build_beta_detail included" unless build_beta_detail
         return build_beta_detail.ready_for_beta_submission?
@@ -109,7 +113,7 @@ module Spaceship
           sort: sort,
           limit: limit
         ).all_pages
-        models = resps.map(&:to_models).flatten
+        models = resps.flat_map(&:to_models)
 
         # Filtering after models are fetched since there is no way to do this in a query param filter
         if platform
@@ -125,6 +129,11 @@ module Spaceship
         return Spaceship::ConnectAPI.get_build(build_id: build_id, includes: includes).first
       end
 
+      def update(attributes: nil)
+        attributes = reverse_attr_mapping(attributes)
+        return Spaceship::ConnectAPI.patch_builds(build_id: id, attributes: attributes).first
+      end
+
       def add_beta_groups(beta_groups: nil)
         beta_groups ||= []
         beta_group_ids = beta_groups.map(&:id)
@@ -138,7 +147,7 @@ module Spaceship
           sort: sort,
           limit: limit
         ).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil)
@@ -148,11 +157,15 @@ module Spaceship
           sort: sort,
           limit: limit
         ).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
 
       def post_beta_app_review_submission
         return Spaceship::ConnectAPI.post_beta_app_review_submissions(build_id: id)
+      end
+
+      def expire!
+        return Spaceship::ConnectAPI.patch_builds(build_id: id, attributes: { expired: true })
       end
     end
   end

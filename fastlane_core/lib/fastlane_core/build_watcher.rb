@@ -6,7 +6,7 @@ module FastlaneCore
   class BuildWatcher
     class << self
       # @return The build we waited for. This method will always return a build
-      def wait_for_build_processing_to_be_complete(app_id: nil, platform: nil, train_version: nil, app_version: nil, build_version: nil, poll_interval: 10, strict_build_watch: false, return_spaceship_testflight_build: true)
+      def wait_for_build_processing_to_be_complete(app_id: nil, platform: nil, train_version: nil, app_version: nil, build_version: nil, poll_interval: 10, strict_build_watch: false, return_when_build_appears: false, return_spaceship_testflight_build: true, select_latest: false)
         # Warn about train_version being removed in the future
         if train_version
           UI.deprecated(":train_version is no longer a used argument on FastlaneCore::BuildWatcher. Please use :app_version instead.")
@@ -23,7 +23,7 @@ module FastlaneCore
 
         showed_info = false
         loop do
-          matched_build = matching_build(watched_app_version: app_version, watched_build_version: build_version, app_id: app_id, platform: platform)
+          matched_build = matching_build(watched_app_version: app_version, watched_build_version: build_version, app_id: app_id, platform: platform, select_latest: select_latest)
 
           if matched_build.nil? && !showed_info
             UI.important("Read more information on why this build isn't showing up yet - https://github.com/fastlane/fastlane/issues/14997")
@@ -32,7 +32,11 @@ module FastlaneCore
 
           report_status(build: matched_build)
 
-          if matched_build && matched_build.processed?
+          # Processing of builds by AppStoreConnect can be a very time consuming task and will
+          # block the worker running this task until it is completed. In some cases,
+          # having a build resource appear in AppStoreConnect (matched_build) may be enough (i.e. setting a changelog)
+          # so here we may choose to skip the full processing of the build if return_when_build_appears is true
+          if matched_build && (return_when_build_appears || matched_build.processed?)
             if return_spaceship_testflight_build
               return matched_build.to_testflight_build
             else
@@ -51,7 +55,7 @@ module FastlaneCore
         return version.instance_of?(String) ? version.split('.').map { |s| s.to_i.to_s }.join('.') : version
       end
 
-      def matching_build(watched_app_version: nil, watched_build_version: nil, app_id: nil, platform: nil)
+      def matching_build(watched_app_version: nil, watched_build_version: nil, app_id: nil, platform: nil, select_latest: false)
         # Get build deliveries (newly uploaded processing builds)
         watched_app_version = remove_version_leading_zeros(version: watched_app_version)
         watched_build_version = remove_version_leading_zeros(version: watched_build_version)
@@ -65,7 +69,7 @@ module FastlaneCore
 
         # Raise error if more than 1 build is returned
         # This should never happen but need to inform the user if it does
-        if matched_builds.size > 1
+        if matched_builds.size > 1 && !select_latest
           error_builds = matched_builds.map do |build|
             "#{build.app_version}(#{build.version}) for #{build.platform} - #{build.processing_state}"
           end.join("\n")

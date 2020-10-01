@@ -5,6 +5,11 @@ require_relative 'module'
 
 module Snapshot
   class Options
+    def self.verify_type(item_name, acceptable_types, value)
+      type_ok = [Array, String].any? { |type| value.kind_of?(type) }
+      UI.user_error!("'#{item_name}' should be of type #{acceptable_types.join(' or ')} but found: #{value.class.name}") unless type_ok
+    end
+
     def self.available_options
       output_directory = (File.directory?("fastlane") ? "fastlane/screenshots" : "screenshots")
 
@@ -111,11 +116,26 @@ module Snapshot
                                      description: "Enabling this option will automatically erase the simulator before running the application",
                                      default_value: false,
                                      is_string: false),
+        FastlaneCore::ConfigItem.new(key: :headless,
+                                     env_name: 'SNAPSHOT_HEADLESS',
+                                     description: "Enabling this option will prevent displaying the simulator window",
+                                     default_value: true,
+                                     type: Boolean),
+        FastlaneCore::ConfigItem.new(key: :override_status_bar,
+                                     env_name: 'SNAPSHOT_OVERRIDE_STATUS_BAR',
+                                     description: "Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception",
+                                     default_value: false,
+                                     is_string: false),
         FastlaneCore::ConfigItem.new(key: :localize_simulator,
                                      env_name: 'SNAPSHOT_LOCALIZE_SIMULATOR',
                                      description: "Enabling this option will configure the Simulator's system language",
                                      default_value: false,
                                      is_string: false),
+        FastlaneCore::ConfigItem.new(key: :dark_mode,
+                                    env_name: 'SNAPSHOT_DARK_MODE',
+                                    description: "Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)",
+                                    optional: true,
+                                    type: Boolean),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      env_name: 'SNAPSHOT_APP_IDENTIFIER',
                                      short_option: "-a",
@@ -136,6 +156,11 @@ module Snapshot
                                      short_option: "-u",
                                      description: "A list of videos that should be added to the simulator before running the application",
                                      type: Array,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :html_template,
+                                     env_name: 'SNAPSHOT_HTML_TEMPLATE',
+                                     short_option: "-e",
+                                     description: "A path to screenshots.html template",
                                      optional: true),
 
         # Everything around building
@@ -216,7 +241,49 @@ module Snapshot
                                      env_name: "SNAPSHOT_EXECUTE_CONCURRENT_SIMULATORS",
                                      description: "Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9",
                                      default_value: true,
-                                     is_string: false)
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :disable_slide_to_type,
+                                     env_name: "SNAPSHOT_DISABLE_SLIDE_TO_TYPE",
+                                     description: "Disable the simulator from showing the 'Slide to type' prompt",
+                                     default_value: false,
+                                     optional: true,
+                                     is_string: false),
+        FastlaneCore::ConfigItem.new(key: :cloned_source_packages_path,
+                                     env_name: "SNAPSHOT_CLONED_SOURCE_PACKAGES_PATH",
+                                     description: "Sets a custom path for Swift Package Manager dependencies",
+                                     type: String,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :testplan,
+                                     env_name: "SNAPSHOT_TESTPLAN",
+                                     description: "The testplan associated with the scheme that should be used for testing",
+                                     is_string: true,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :only_testing,
+                                     env_name: "SNAPSHOT_ONLY_TESTING",
+                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to run",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       verify_type('only_testing', [Array, String], value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :skip_testing,
+                                     env_name: "SNAPSHOT_SKIP_TESTING",
+                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to skip",
+                                     optional: true,
+                                     is_string: false,
+                                     verify_block: proc do |value|
+                                       verify_type('skip_testing', [Array, String], value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
+                                     env_name: "SNAPSHOT_DISABLE_XCPRETTY",
+                                     description: "Disable xcpretty formatting of build",
+                                     type: Boolean,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
+                                     env_name: "SNAPSHOT_SUPPRESS_XCODE_OUTPUT",
+                                     description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
+                                     type: Boolean,
+                                     optional: true)
       ]
     end
   end

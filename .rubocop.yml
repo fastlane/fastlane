@@ -294,7 +294,11 @@ CrossPlatform/ForkUsage:
 
 Lint/IsStringUsage:
   Include:
+    - 'cert/**/*'
     - 'gym/**/*'
+    - 'match/**/*'
+    - 'screengrab/**/*'
+    - 'supply/**/*'
 
 # ( ) for method calls
 Style/MethodCallWithArgsParentheses:

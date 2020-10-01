@@ -1,26 +1,43 @@
 describe "Build Manager" do
   describe ".truncate_changelog" do
-    it "Truncates Changelog" do
+    it "Truncates Changelog if it exceeds character size" do
       changelog = File.read("./pilot/spec/fixtures/build_manager/changelog_long")
       changelog = Pilot::BuildManager.truncate_changelog(changelog)
       expect(changelog).to eq(File.read("./pilot/spec/fixtures/build_manager/changelog_long_truncated"))
+    end
+    it "Truncates Changelog if it exceeds byte size" do
+      changelog = File.binread("./pilot/spec/fixtures/build_manager/changelog_bytes_long").force_encoding("UTF-8")
+      changelog = Pilot::BuildManager.truncate_changelog(changelog)
+      expect(changelog).to eq(File.binread("./pilot/spec/fixtures/build_manager/changelog_bytes_long_truncated").force_encoding("UTF-8"))
     end
     it "Keeps changelog if short enough" do
       changelog = "1234"
       changelog = Pilot::BuildManager.truncate_changelog(changelog)
       expect(changelog).to eq("1234")
     end
+    it "Truncates based on bytes not characters" do
+      changelog = "ü" * 4000
+      expect(changelog.unpack("C*").length).to eq(8000)
+      changelog = Pilot::BuildManager.truncate_changelog(changelog)
+      # Truncation appends "...", so the result is 1998 two-byte characters plus "..." for 3999 bytes.
+      expect(changelog.unpack("C*").length).to eq(3999)
+    end
   end
 
   describe ".sanitize_changelog" do
     it "removes emoji" do
-      changelog = "I'm 🦇B🏧an!"
+      changelog = "I'm 🦇B🏧an🪴!"
       changelog = Pilot::BuildManager.sanitize_changelog(changelog)
       expect(changelog).to eq("I'm Ban!")
     end
-    it "removes emoji before truncating" do
+    it "removes less than symbols" do
+      changelog = "I'm <script>man<<!"
+      changelog = Pilot::BuildManager.sanitize_changelog(changelog)
+      expect(changelog).to eq("I'm script>man!")
+    end
+    it "removes prohibited symbols before truncating" do
       changelog = File.read("./pilot/spec/fixtures/build_manager/changelog_long")
-      changelog = "🎉🎉🎉#{changelog}"
+      changelog = "🎉<🎉<🎉#{changelog}🎉<🎉<🎉"
       changelog = Pilot::BuildManager.sanitize_changelog(changelog)
       expect(changelog).to eq(File.read("./pilot/spec/fixtures/build_manager/changelog_long_truncated"))
     end
@@ -98,8 +115,15 @@ describe "Build Manager" do
         })
       ]
     end
+    let(:build_beta_detail_still_processing) do
+      Spaceship::ConnectAPI::BuildBetaDetail.new("321", {
+        internal_build_state: Spaceship::ConnectAPI::BuildBetaDetail::InternalState::PROCESSING,
+        external_build_state: Spaceship::ConnectAPI::BuildBetaDetail::ExternalState::PROCESSING
+      })
+    end
     let(:build_beta_detail) do
       Spaceship::ConnectAPI::BuildBetaDetail.new("321", {
+        internal_build_state: Spaceship::ConnectAPI::BuildBetaDetail::InternalState::READY_FOR_BETA_TESTING,
         external_build_state: Spaceship::ConnectAPI::BuildBetaDetail::ExternalState::READY_FOR_BETA_SUBMISSION
       })
     end
@@ -151,6 +175,18 @@ describe "Build Manager" do
     end
 
     describe "distribute success" do
+      let(:distribute_options_skip_waiting_non_localized_changelog) do
+        {
+          apple_id: 'mock_apple_id',
+          app_identifier: 'mock_app_id',
+          distribute_external: false,
+          skip_submission: false,
+          skip_waiting_for_build_processing: true,
+          notify_external_testers: true,
+          uses_non_exempt_encryption: false,
+          changelog: "log of changing"
+        }
+      end
       let(:distribute_options_non_localized) do
         {
           apple_id: 'mock_apple_id',
@@ -177,11 +213,53 @@ describe "Build Manager" do
         # Allow build to return app, buidl_beta_detail, and pre_release_version
         # These are models that are expected to usually be included in the build passed into distribute
         allow(ready_to_submit_mock_build).to receive(:app).and_return(app)
-        allow(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail)
         allow(ready_to_submit_mock_build).to receive(:pre_release_version).and_return(pre_release_version)
       end
 
-      it "updates non-localized  demo_account_required, notify_external_testers, beta_app_feedback_email, and beta_app_description" do
+      it "updates non-localized changelog and doesn't distribute" do
+        allow(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail_still_processing)
+
+        options = distribute_options_skip_waiting_non_localized_changelog
+
+        # Expect beta build localizations to be fetched
+        expect(Spaceship::ConnectAPI).to receive(:get_beta_build_localizations).with({
+          filter: { build: ready_to_submit_mock_build.id },
+          includes: nil,
+          limit: nil,
+          sort: nil
+        }).and_return(Spaceship::ConnectAPI::Response.new)
+        expect(ready_to_submit_mock_build).to receive(:get_beta_build_localizations).and_wrap_original do |m, *args|
+          m.call(*args)
+          build_localizations
+        end
+
+        # Expect beta build localizations to be patched with a UI.success after
+        mock_api_client_beta_build_localizations.each do |localization|
+          expect(Spaceship::ConnectAPI).to receive(:patch_beta_build_localizations).with({
+            localization_id: localization['id'],
+            attributes: {
+              whatsNew: options[:changelog]
+            }
+          })
+        end
+        expect(FastlaneCore::UI).to receive(:success).with("Successfully set the changelog for build")
+
+        # Expect build beta details to be patched
+        expect(Spaceship::ConnectAPI).to receive(:patch_build_beta_details).with({
+          build_beta_details_id: build_beta_detail.id,
+          attributes: { autoNotifyEnabled: options[:notify_external_testers] }
+        })
+
+        # Don't expect success messages
+        expect(FastlaneCore::UI).to_not(receive(:message).with(/Distributing new build to testers/))
+        expect(FastlaneCore::UI).to_not(receive(:success).with(/Successfully distributed build to/))
+
+        fake_build_manager.distribute(options, build: ready_to_submit_mock_build)
+      end
+
+      it "updates non-localized demo_account_required, notify_external_testers, beta_app_feedback_email, and beta_app_description and distributes" do
+        allow(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail)
+
         options = distribute_options_non_localized
 
         # Expect App.find to be called from within Pilot::Manager
@@ -278,7 +356,7 @@ describe "Build Manager" do
           m.call(*args)
         end
 
-        # Except success messages
+        # Expect success messages
         expect(FastlaneCore::UI).to receive(:message).with(/Distributing new build to testers/)
         expect(FastlaneCore::UI).to receive(:success).with(/Successfully distributed build to/)
 
@@ -345,6 +423,107 @@ describe "Build Manager" do
 
         fake_build_manager.upload(upload_options)
       end
+    end
+  end
+
+  describe "#transporter_for_selected_team" do
+    let(:fake_manager) { Pilot::BuildManager.new }
+    let(:fake_api_key_json_path) do
+      "./spaceship/spec/connect_api/fixtures/asc_key.json"
+    end
+
+    let(:selected_team_id) { "123" }
+    let(:selected_team_name) { "123 name" }
+    let(:selected_team) do
+      {
+        "contentProvider" => {
+          "contentProviderId" => selected_team_id,
+          "name" => selected_team_name
+        }
+      }
+    end
+    let(:unselected_team) do
+      {
+        "contentProvider" => {
+          "contentProviderId" => "456",
+          "name" => "456 name"
+        }
+      }
+    end
+
+    it "with API token" do
+      options = { api_key_path: fake_api_key_json_path }
+      fake_manager.instance_variable_set(:@config, options)
+
+      transporter = fake_manager.send(:transporter_for_selected_team, options)
+      expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
+      expect(transporter.instance_variable_get(:@user)).to be_nil
+      expect(transporter.instance_variable_get(:@password)).to be_nil
+      expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
+    end
+
+    describe "with itc_provider" do
+      it "with nil Spaceship::TunesClient" do
+        options = { username: "josh", itc_provider: "123456789" }
+        fake_manager.instance_variable_set(:@config, options)
+
+        allow(Spaceship::ConnectAPI).to receive(:client).and_return(nil)
+
+        transporter = fake_manager.send(:transporter_for_selected_team, options)
+        expect(transporter.instance_variable_get(:@jwt)).to be_nil
+        expect(transporter.instance_variable_get(:@user)).not_to(be_nil)
+        expect(transporter.instance_variable_get(:@password)).not_to(be_nil) # Loaded with spec_helper
+        expect(transporter.instance_variable_get(:@provider_short_name)).to eq("123456789")
+      end
+
+      it "with nil Spaceship::TunesClient" do
+        options = { username: "josh", itc_provider: "123456789" }
+        fake_manager.instance_variable_set(:@config, options)
+
+        allow(Spaceship::ConnectAPI).to receive(:client).and_return(double)
+        allow(Spaceship::ConnectAPI.client).to receive(:tunes_client).and_return(double)
+
+        transporter = fake_manager.send(:transporter_for_selected_team, options)
+        expect(transporter.instance_variable_get(:@jwt)).to be_nil
+        expect(transporter.instance_variable_get(:@user)).not_to(be_nil)
+        expect(transporter.instance_variable_get(:@password)).not_to(be_nil) # Loaded with spec_helper
+        expect(transporter.instance_variable_get(:@provider_short_name)).to eq("123456789")
+      end
+    end
+
+    it "with one team id" do
+      options = { username: "josh" }
+      fake_manager.instance_variable_set(:@config, options)
+
+      fake_tunes_client = double('tunes client')
+      allow(Spaceship::ConnectAPI).to receive(:client).and_return(double)
+      allow(Spaceship::ConnectAPI.client).to receive(:tunes_client).and_return(fake_tunes_client)
+      expect(fake_tunes_client).to receive(:teams).and_return([selected_team])
+
+      transporter = fake_manager.send(:transporter_for_selected_team, options)
+      expect(transporter.instance_variable_get(:@jwt)).to be_nil
+      expect(transporter.instance_variable_get(:@user)).not_to(be_nil)
+      expect(transporter.instance_variable_get(:@password)).not_to(be_nil) # Loaded with spec_helper
+      expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
+    end
+
+    it "with inferred provider id" do
+      options = { username: "josh" }
+      fake_manager.instance_variable_set(:@config, options)
+
+      fake_tunes_client = double('tunes client')
+      allow(Spaceship::ConnectAPI).to receive(:client).and_return(double)
+      allow(Spaceship::ConnectAPI.client).to receive(:tunes_client).and_return(fake_tunes_client)
+      allow(fake_tunes_client).to receive(:team_id).and_return(selected_team_id)
+      allow(fake_tunes_client).to receive(:teams).and_return([unselected_team, selected_team])
+
+      allow_any_instance_of(FastlaneCore::ItunesTransporter).to receive(:provider_ids).and_return({ selected_team_name.to_s => selected_team_id })
+
+      transporter = fake_manager.send(:transporter_for_selected_team, options)
+      expect(transporter.instance_variable_get(:@jwt)).to be_nil
+      expect(transporter.instance_variable_get(:@user)).not_to(be_nil)
+      expect(transporter.instance_variable_get(:@password)).not_to(be_nil) # Loaded with spec_helper
+      expect(transporter.instance_variable_get(:@provider_short_name)).to eq(selected_team_id)
     end
   end
 end

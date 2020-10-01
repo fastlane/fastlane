@@ -76,4 +76,7 @@ module Spaceship
 
   # Raised when 504 is received from App Store Connect
   class GatewayTimeoutError < BasicPreferredInfoError; end
+
+  # Raised when 403 is received from portal request
+  class AccessForbiddenError < BasicPreferredInfoError; end
 end

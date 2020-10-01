@@ -27,6 +27,9 @@
 # remove the '#' to clear all previously generated screenshots before creating new ones
 # clear_previous_screenshots(true)
 
+# Remove the '#' to set the status bar to 9:41 AM, and show full battery and reception.
+# override_status_bar(true)
+
 # Arguments to pass to the app on launch. See https://docs.fastlane.tools/actions/snapshot/#launch-arguments
 # launch_arguments(["-favColor red"])
 

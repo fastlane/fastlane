@@ -49,8 +49,8 @@ module FastlaneCore
 
             # "    iPad (5th generation) (852A5796-63C3-4641-9825-65EBDC5C4259) (Shutdown)"
             # This line will turn the above string into
-            # ["iPad", "(5th generation)", "(852A5796-63C3-4641-9825-65EBDC5C4259)", "(Shutdown)"]
-            matches = line.strip.scan(/(.*?) (\(.*?\))/).flatten.reject(&:empty?)
+            # ["iPad (5th generation)", "(852A5796-63C3-4641-9825-65EBDC5C4259)", "(Shutdown)"]
+            matches = line.strip.scan(/^(.*?) (\([^)]*?\)) (\([^)]*?\))$/).flatten.reject(&:empty?)
             state = matches.pop.to_s.delete('(').delete(')')
             udid = matches.pop.to_s.delete('(').delete(')')
             name = matches.join(' ')
@@ -199,18 +199,50 @@ module FastlaneCore
         self.name
       end
 
+      def boot
+        return unless is_simulator
+        return unless os_type == "iOS"
+        return if self.state == 'Booted'
+
+        UI.message("Booting #{self}")
+
+        `xcrun simctl boot #{self.udid} 2>/dev/null`
+        self.state = 'Booted'
+      end
+
+      def shutdown
+        return unless is_simulator
+        return unless os_type == "iOS"
+        return if self.state != 'Booted'
+
+        UI.message("Shutting down #{self.udid}")
+        `xcrun simctl shutdown #{self.udid} 2>/dev/null`
+        self.state = 'Shutdown'
+      end
+
       def reset
         UI.message("Resetting #{self}")
-        `xcrun simctl shutdown #{self.udid}` if self.state == "Booted"
+        shutdown
         `xcrun simctl erase #{self.udid}`
-        return
       end
 
       def delete
         UI.message("Deleting #{self}")
-        `xcrun simctl shutdown #{self.udid}` unless self.state == "Shutdown"
+        shutdown
         `xcrun simctl delete #{self.udid}`
-        return
+      end
+
+      def disable_slide_to_type
+        return unless is_simulator
+        return unless os_type == "iOS"
+        return unless Gem::Version.new(os_version) >= Gem::Version.new('13.0')
+        UI.message("Disabling 'Slide to Type' #{self}")
+
+        plist_buddy = '/usr/libexec/PlistBuddy'
+        plist_buddy_cmd = "-c \"Add :KeyboardContinuousPathEnabled bool false\""
+        plist_path = File.expand_path("~/Library/Developer/CoreSimulator/Devices/#{self.udid}/data/Library/Preferences/com.apple.keyboard.ContinuousPath.plist")
+
+        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path} >/dev/null 2>&1")
       end
     end
   end
@@ -246,6 +278,13 @@ module FastlaneCore
       def delete_all_by_version(os_version: nil)
         return false unless os_version
         all.select { |device| device.os_version == os_version }.each(&:delete)
+      end
+
+      # Disable 'Slide to Type' by UDID or name and OS version
+      # Latter is useful when combined with -destination option of xcodebuild
+      def disable_slide_to_type(udid: nil, name: nil, os_version: nil)
+        match = all.detect { |device| device.udid == udid || device.name == name && device.os_version == os_version }
+        match.disable_slide_to_type if match
       end
 
       def clear_cache
@@ -304,10 +343,10 @@ module FastlaneCore
       def copy_logarchive(device, log_identity, logs_destination_dir)
         require 'shellwords'
 
-        logarchive_dst = File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive").shellescape
+        logarchive_dst = File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive")
         FileUtils.rm_rf(logarchive_dst)
         FileUtils.mkdir_p(File.expand_path("..", logarchive_dst))
-        command = "xcrun simctl spawn #{device.udid} log collect --output #{logarchive_dst} 2>/dev/null"
+        command = "xcrun simctl spawn #{device.udid} log collect --output #{logarchive_dst.shellescape} 2>/dev/null"
         FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
       end
     end

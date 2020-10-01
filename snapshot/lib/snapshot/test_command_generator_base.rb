@@ -24,9 +24,19 @@ module Snapshot
         options = []
         options += project_path_array
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
-        options << "-derivedDataPath '#{derived_data_path}'"
+        if derived_data_path && !options.include?("-derivedDataPath #{derived_data_path.shellescape}")
+          options << "-derivedDataPath #{derived_data_path.shellescape}"
+        end
         options << "-resultBundlePath '#{result_bundle_path}'" if result_bundle_path
+        if FastlaneCore::Helper.xcode_at_least?(11)
+          options << "-testPlan '#{config[:testplan]}'" if config[:testplan]
+        end
         options << config[:xcargs] if config[:xcargs]
+
+        # detect_values will ensure that these values are present as Arrays if
+        # they are present at all
+        options += config[:only_testing].map { |test_id| "-only-testing:#{test_id.shellescape}" } if config[:only_testing]
+        options += config[:skip_testing].map { |test_id| "-skip-testing:#{test_id.shellescape}" } if config[:skip_testing]
         return options
       end
 
@@ -88,7 +98,8 @@ module Snapshot
         language_key = locale || language
 
         unless Snapshot.cache[:result_bundle_path][language_key]
-          path = File.join(Snapshot.config[:output_directory], "test_output", language_key, Snapshot.config[:scheme]) + ".test_result"
+          ext = FastlaneCore::Helper.xcode_at_least?(11) ? '.xcresult' : '.test_result'
+          path = File.join(Snapshot.config[:output_directory], "test_output", language_key, Snapshot.config[:scheme]) + ext
           if File.directory?(path)
             FileUtils.remove_dir(path)
           end

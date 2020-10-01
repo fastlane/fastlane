@@ -51,6 +51,10 @@ module Fastlane
           command << "--use-modular-headers"
         end
 
+        if params[:synchronous]
+          command << "--synchronous"
+        end
+
         result = Actions.sh(command.join(' '))
         UI.success("Successfully pushed Podspec ⬆️ ")
         return result
@@ -127,7 +131,12 @@ module Fastlane
                                        description: "Use modular headers option during validation",
                                        optional: true,
                                        type: Boolean,
-                                       env_name: "FL_POD_PUSH_USE_MODULAR_HEADERS")
+                                       env_name: "FL_POD_PUSH_USE_MODULAR_HEADERS"),
+          FastlaneCore::ConfigItem.new(key: :synchronous,
+                                       description: "If validation depends on other recently pushed pods, synchronize",
+                                       optional: true,
+                                       type: Boolean,
+                                       env_name: "FL_POD_PUSH_SYNCHRONOUS")
         ]
       end
 

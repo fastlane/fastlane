@@ -133,6 +133,22 @@ describe Fastlane do
           end.to raise_error("Please pass a valid configuration: (debug|release)")
         end
 
+        it "adds disable-sandbox flag to command if disable_sandbox is set to true" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+              spm(disable_sandbox: true)
+            end").runner.execute(:test)
+
+          expect(result).to eq("swift build --disable-sandbox")
+        end
+
+        it "doesn't add a disable-sandbox flag to command if disable_sandbox is set to false" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+              spm(disable_sandbox: false)
+            end").runner.execute(:test)
+
+          expect(result).to eq("swift build")
+        end
+
         it "works with no parameters" do
           expect do
             Fastlane::FastFile.new.parse("lane :test do
@@ -220,6 +236,18 @@ describe Fastlane do
               )
             end").runner.execute(:test)
           end.to raise_error(/^Please pass a valid xcpretty output type: /)
+        end
+
+        it "passes additional arguments to xcpretty if specified" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+              spm(
+                command: '#{command}',
+                xcpretty_output: 'simple',
+                xcpretty_args: '--tap --no-utf'
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("set -o pipefail && swift package #{command} 2>&1 | xcpretty --simple --tap --no-utf")
         end
 
         it "set pipefail with xcpretty" do

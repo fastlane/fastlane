@@ -91,6 +91,14 @@ describe Fastlane do
           end
         end
       end
+
+      it "generates the correct pod push command with the synchronous parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_push(synchronous: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod trunk push --synchronous")
+      end
     end
   end
 end

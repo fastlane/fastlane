@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     class SlatherAction < Action
-      # https://github.com/SlatherOrg/slather/blob/v2.4.2/lib/slather/command/coverage_command.rb
+      # https://github.com/SlatherOrg/slather/blob/v2.4.9/lib/slather/command/coverage_command.rb
       ARGS_MAP = {
           travis: '--travis',
           travis_pro: '--travispro',
@@ -14,7 +14,9 @@ module Fastlane
           simple_output: '--simple-output',
           gutter_json: '--gutter-json',
           cobertura_xml: '--cobertura-xml',
+          sonarqube_xml: '--sonarqube-xml',
           llvm_cov: '--llvm-cov',
+          json: '--json',
           html: '--html',
           show: '--show',
 
@@ -213,10 +215,22 @@ module Fastlane
                                        is_string: false,
                                        type: Boolean,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :sonarqube_xml,
+                                       env_name: "FL_SLATHER_SONARQUBE_XML_ENABLED",
+                                       description: "Tell slather that it should output results as SonarQube Generic XML format",
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :llvm_cov,
                                        env_name: "FL_SLATHER_LLVM_COV_ENABLED",
                                        description: "Tell slather that it should output results as llvm-cov show format",
                                        is_string: false,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :json,
+                                       env_name: "FL_SLATHER_JSON_ENABLED",
+                                       description: "Tell slather that it should output results as static JSON report",
+                                       is_string: false,
+                                       type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :html,
                                        env_name: "FL_SLATHER_HTML_ENABLED",
@@ -241,7 +255,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ignore,
                                        env_name: "FL_SLATHER_IGNORE",
                                        description: "Tell slather to ignore files matching a path or any path from an array of paths",
-                                       is_string: false,
+                                       type: Array,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_SLATHER_VERBOSE",

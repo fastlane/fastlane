@@ -34,6 +34,8 @@ describe Fastlane do
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
       expect(UI).to receive(:success).with("\t * today")
+      expect(UI).to receive(:deprecated).with("The `automatic_code_signing` action has been deprecated,")
+      expect(UI).to receive(:deprecated).with("Please use `update_code_signing_settings` action instead.")
       expect(UI).to receive(:important).with("Skipping demo not selected (today)")
       result = Fastlane::FastFile.new.parse("lane :test do
         disable_automatic_code_signing(path: './fastlane/spec/fixtures/xcodeproj/automatic_code_signing.xcodeproj', targets: ['today'])
@@ -76,6 +78,8 @@ describe Fastlane do
       # G3KGXDXQL9
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
+      expect(UI).to receive(:deprecated).with("The `automatic_code_signing` action has been deprecated,")
+      expect(UI).to receive(:deprecated).with("Please use `update_code_signing_settings` action instead.")
       expect(UI).to receive(:important).with("Set Team id to: G3KGXDXQL9 for target: demo")
       expect(UI).to receive(:important).with("Set Team id to: G3KGXDXQL9 for target: today")
       result = Fastlane::FastFile.new.parse("lane :test do
@@ -106,6 +110,8 @@ describe Fastlane do
       # G3KGXDXQL9
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
+      expect(UI).to receive(:deprecated).with("The `automatic_code_signing` action has been deprecated,")
+      expect(UI).to receive(:deprecated).with("Please use `update_code_signing_settings` action instead.")
       expect(UI).to receive(:important).with("Set Team id to: G3KGXDXQL9 for target: demo")
       expect(UI).to receive(:important).with("Set Team id to: G3KGXDXQL9 for target: today")
       expect(UI).to receive(:important).with("Set Code Sign identity to: iPhone Distribution for target: demo")
@@ -142,6 +148,8 @@ describe Fastlane do
       # G3KGXDXQL9
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
+      expect(UI).to receive(:deprecated).with("The `automatic_code_signing` action has been deprecated,")
+      expect(UI).to receive(:deprecated).with("Please use `update_code_signing_settings` action instead.")
       expect(UI).to receive(:important).with("Set Team id to: G3KGXDXQL9 for target: demo")
       expect(UI).to receive(:important).with("Set Team id to: G3KGXDXQL9 for target: today")
       expect(UI).to receive(:important).with("Set Provisioning Profile name to: Mindera for target: demo")
@@ -174,6 +182,8 @@ describe Fastlane do
       # G3KGXDXQL9
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
+      expect(UI).to receive(:deprecated).with("The `automatic_code_signing` action has been deprecated,")
+      expect(UI).to receive(:deprecated).with("Please use `update_code_signing_settings` action instead.")
       expect(UI).to receive(:important).with("Set Team id to: G3KGXDXQL9 for target: demo")
       expect(UI).to receive(:important).with("Set Team id to: G3KGXDXQL9 for target: today")
       expect(UI).to receive(:important).with("Set Provisioning Profile UUID to: 1337 for target: demo")
@@ -206,6 +216,8 @@ describe Fastlane do
       # G3KGXDXQL9
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
+      expect(UI).to receive(:deprecated).with("The `automatic_code_signing` action has been deprecated,")
+      expect(UI).to receive(:deprecated).with("Please use `update_code_signing_settings` action instead.")
       expect(UI).to receive(:important).with("Set Team id to: G3KGXDXQL9 for target: demo")
       expect(UI).to receive(:important).with("Set Team id to: G3KGXDXQL9 for target: today")
       expect(UI).to receive(:important).with("Set Bundle identifier to: com.fastlane.mindera.cosigner for target: demo")
@@ -236,6 +248,8 @@ describe Fastlane do
 
     it "targets not found notice" do
       allow(UI).to receive(:important)
+      expect(UI).to receive(:deprecated).with("The `automatic_code_signing` action has been deprecated,")
+      expect(UI).to receive(:deprecated).with("Please use `update_code_signing_settings` action instead.")
       expect(UI).to receive(:important).with("None of the specified targets has been modified")
       result = Fastlane::FastFile.new.parse("lane :test do
         disable_automatic_code_signing(path: './fastlane/spec/fixtures/xcodeproj/automatic_code_signing.xcodeproj', targets: ['not_found'])

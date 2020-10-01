@@ -10,6 +10,9 @@ module Spaceship
       attr_accessor :platform
       attr_accessor :serial_number
       attr_accessor :certificate_type
+      attr_accessor :requester_email
+      attr_accessor :requester_first_name
+      attr_accessor :requester_last_name
 
       attr_mapping({
         "certificateContent" => "certificate_content",
@@ -18,10 +21,15 @@ module Spaceship
         "name" => "name",
         "platform" => "platform",
         "serialNumber" => "serial_number",
-        "certificateType" => "certificate_type"
+        "certificateType" => "certificate_type",
+        "requesterEmail" => "requester_email",
+        "requesterFirstName" => "requester_first_name",
+        "requesterLastName" => "requester_last_name"
       })
 
       module CertificateType
+        DEVELOPMENT = "DEVELOPMENT"
+        DISTRIBUTION = "DISTRIBUTION"
         IOS_DEVELOPMENT = "IOS_DEVELOPMENT"
         IOS_DISTRIBUTION = "IOS_DISTRIBUTION"
         MAC_APP_DISTRIBUTION = "MAC_APP_DISTRIBUTION"
@@ -35,13 +43,17 @@ module Spaceship
         return "certificates"
       end
 
+      def valid?
+        Time.parse(expiration_date) > Time.now
+      end
+
       #
       # API
       #
 
       def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
         resps = Spaceship::ConnectAPI.get_certificates(filter: filter, includes: includes).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
       end
     end
   end

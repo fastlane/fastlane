@@ -67,19 +67,7 @@ describe Deliver::UploadMetadata do
   describe "#set_review_information" do
     let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
     let(:version) { double("version") }
-
-    before do
-      allow(version).to receive(:review_first_name=)
-      allow(version).to receive(:review_last_name=)
-      allow(version).to receive(:review_phone_number=)
-      allow(version).to receive(:review_email=)
-      allow(version).to receive(:review_demo_user=)
-      allow(version).to receive(:review_demo_password=)
-      allow(version).to receive(:review_notes=)
-      allow(version).to receive(:review_user_needed=)
-      allow(version).to receive(:review_demo_user).and_return(app_review_information[:demo_user])
-      allow(version).to receive(:review_demo_password).and_return(app_review_information[:demo_password])
-    end
+    let(:app_store_review_detail) { double("app_store_review_detail") }
 
     context "with review_information" do
       let(:app_review_information) do
@@ -93,14 +81,19 @@ describe Deliver::UploadMetadata do
       end
 
       it "set review information" do
+        expect(version).to receive(:fetch_app_store_review_detail).and_return(app_store_review_detail)
+        expect(app_store_review_detail).to receive(:update).with(attributes: {
+          "contact_first_name" => app_review_information[:first_name],
+          "contact_last_name" => app_review_information[:last_name],
+          "contact_phone" => app_review_information[:phone_number],
+          "contact_email" => app_review_information[:email_address],
+          "demo_account_name" => app_review_information[:demo_user],
+          "demo_account_password" => app_review_information[:demo_password],
+          "demo_account_required" => true,
+          "notes" => app_review_information[:notes]
+        })
+
         uploader.send("set_review_information", version, options)
-        expect(version).to have_received(:review_first_name=).with(app_review_information[:first_name])
-        expect(version).to have_received(:review_last_name=).with(app_review_information[:last_name])
-        expect(version).to have_received(:review_phone_number=).with(app_review_information[:phone_number])
-        expect(version).to have_received(:review_email=).with(app_review_information[:email_address])
-        expect(version).to have_received(:review_demo_user=).with(app_review_information[:demo_user])
-        expect(version).to have_received(:review_demo_password=).with(app_review_information[:demo_password])
-        expect(version).to have_received(:review_notes=).with(app_review_information[:notes])
       end
     end
 
@@ -109,8 +102,14 @@ describe Deliver::UploadMetadata do
         let(:app_review_information) { { demo_user: "user", demo_password: "password" } }
 
         it "review_user_needed is true" do
+          expect(version).to receive(:fetch_app_store_review_detail).and_return(app_store_review_detail)
+          expect(app_store_review_detail).to receive(:update).with(attributes: {
+            "demo_account_name" => app_review_information[:demo_user],
+            "demo_account_password" => app_review_information[:demo_password],
+            "demo_account_required" => true
+          })
+
           uploader.send("set_review_information", version, options)
-          expect(version).to have_received(:review_user_needed=).with(true)
         end
       end
 
@@ -118,8 +117,12 @@ describe Deliver::UploadMetadata do
         let(:app_review_information) { { demo_user: "", demo_password: "" } }
 
         it "review_user_needed is false" do
+          expect(version).to receive(:fetch_app_store_review_detail).and_return(app_store_review_detail)
+          expect(app_store_review_detail).to receive(:update).with(attributes: {
+            "demo_account_required" => false
+          })
+
           uploader.send("set_review_information", version, options)
-          expect(version).to have_received(:review_user_needed=).with(false)
         end
       end
 
@@ -127,8 +130,12 @@ describe Deliver::UploadMetadata do
         let(:app_review_information) { { demo_user: "\n", demo_password: "\n" } }
 
         it "review_user_needed is false" do
+          expect(version).to receive(:fetch_app_store_review_detail).and_return(app_store_review_detail)
+          expect(app_store_review_detail).to receive(:update).with(attributes: {
+            "demo_account_required" => false
+          })
+
           uploader.send("set_review_information", version, options)
-          expect(version).to have_received(:review_user_needed=).with(false)
         end
       end
     end
@@ -136,164 +143,278 @@ describe Deliver::UploadMetadata do
 
   context "with metadata" do
     let(:app) { double('app') }
-    let(:version) { double('version') }
-    let(:details) { double('details') }
-    let(:version_info) { {} }
-    let(:details_info) { {} }
-
-    before do
-      allow(uploader).to receive(:verify_available_languages!)
-      allow(version).to receive(:save!)
-      allow(version).to receive(:release_on_approval=)
-      allow(version).to receive(:toggle_phased_release)
-      allow(version).to receive(:auto_release_date=)
-      allow(version).to receive(:ratings_reset=)
-      allow(version).to receive(:description)
-      allow(version).to receive(:send).and_return(version_info)
-      allow(app).to receive(:edit_version).and_return(version)
-      allow(app).to receive(:details).and_return(details)
-      allow(details).to receive(:save!)
-      allow(details).to receive(:send).and_return(details_info)
+    let(:id) do
+      double('id')
+    end
+    let(:version) do
+      double('version',
+             version_string: '1.0.0')
+    end
+    let(:version_localization_en) do
+      double('version_localization_en',
+             locale: 'en-US')
+    end
+    let(:app_info) { double('app_info') }
+    let(:app_info_localization_en) do
+      double('app_info_localization_en',
+             locale: 'en-US')
+    end
+    let(:app_review_detail) do
+      double('app_review_detail')
+    end
+    let(:app_store_versions) do
+      double('app_store_versions',
+             count: 0)
     end
 
-    context "normal metadata" do
-      it "saves metadata" do
-        options = {
-            app: app,
-            details: details,
-            name: { "en-US" => "App name" },
-            description: { "en-US" => "App description" }
-        }
-        uploader.upload(options)
-        expect(version_info).to eql({ "en-US" => "App description" })
-        expect(details_info).to eql({ "en-US" => "App name" })
-        expect(version).to have_received(:save!)
-        expect(details).to have_received(:save!)
+    let(:metadata_path) { Dir.mktmpdir }
+
+    context "fetch app edit" do
+      context "#fetch_edit_app_store_version" do
+        it "no retry" do
+          expect(app).to receive(:get_edit_app_store_version).and_return(version)
+
+          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', wait_time: 0.1)
+          expect(edit_version).to eq(version)
+        end
+
+        it "1 retry" do
+          expect(app).to receive(:get_edit_app_store_version).and_return(nil)
+          expect(app).to receive(:get_edit_app_store_version).and_return(version)
+
+          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', wait_time: 0.1)
+          expect(edit_version).to eq(version)
+        end
+
+        it "5 retry" do
+          expect(app).to receive(:get_edit_app_store_version).and_return(nil).exactly(5).times
+
+          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', wait_time: 0.1)
+          expect(edit_version).to eq(nil)
+        end
+      end
+
+      context "#fetch_edit_app_info" do
+        it "no retry" do
+          expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
+
+          edit_app_info = uploader.fetch_edit_app_info(app, wait_time: 0.1)
+          expect(edit_app_info).to eq(app_info)
+        end
+
+        it "1 retry" do
+          expect(app).to receive(:fetch_edit_app_info).and_return(nil)
+          expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
+
+          edit_app_info = uploader.fetch_edit_app_info(app, wait_time: 0.1)
+          expect(edit_app_info).to eq(app_info)
+        end
+
+        it "5 retry" do
+          expect(app).to receive(:fetch_edit_app_info).and_return(nil).exactly(5).times
+
+          edit_app_info = uploader.fetch_edit_app_info(app, wait_time: 0.1)
+          expect(edit_app_info).to eq(nil)
+        end
       end
     end
 
-    context "individual metadata items" do
-      it "saves individual metadata items" do
-        options = {
-            app: app,
-            details: details,
-            name: { "en-US" => "App name" },
-            description: { "en-US" => "App description" },
-            individual_metadata_items: [:name, :description]
-        }
-        uploader.upload(options)
-        expect(version_info).to eql({ "en-US" => "App description" })
-        expect(details_info).to eql({ "en-US" => "App name" })
-        expect(version).to have_received(:save!)
-        expect(details).to have_received(:save!)
+    context "#upload" do
+      before do
+        allow(uploader).to receive(:set_review_information)
+        allow(uploader).to receive(:set_review_attachment_file)
+        allow(uploader).to receive(:set_app_rating)
+
+        # Verify available languages
+        expect(app).to receive(:id).and_return(id)
+        expect(app).to receive(:get_edit_app_store_version).and_return(version)
+        expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
+
+        # Get versions
+        expect(app).to receive(:get_edit_app_store_version).and_return(version)
+        expect(version).to receive(:get_app_store_version_localizations).and_return([version_localization_en])
+
+        # Get app infos
+        expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
+        expect(app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
       end
-    end
-  end
 
-  context "with auto_release_date" do
-    let(:app) { double('app') }
-    let(:version) { double('version') }
-    let(:details) { double('details') }
-    before do
-      allow(uploader).to receive(:verify_available_languages!)
-      allow(version).to receive(:save!)
-      allow(version).to receive(:release_on_approval=)
-      allow(version).to receive(:toggle_phased_release)
-      allow(version).to receive(:auto_release_date=)
-      allow(version).to receive(:ratings_reset=)
-      allow(app).to receive(:edit_version).and_return(version)
-      allow(app).to receive(:details).and_return(details)
-      allow(details).to receive(:save!)
-    end
-    context 'with date' do
-      it "auto_release_date is called" do
-        options = { auto_release_date: 2, app: app }
-        uploader.upload(options)
-        expect(version).to have_received(:auto_release_date=).with(2)
+      context "normal metadata" do
+        it "saves metadata" do
+          options = {
+              app: app,
+              platform: "ios",
+              metadata_path: metadata_path,
+              name: { "en-US" => "App name" },
+              description: { "en-US" => "App description" }
+          }
+
+          # Get number of verions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          expect(version).to receive(:update).with(attributes: {
+            "releaseType" => "MANUAL"
+          })
+
+          # Update version localization
+          expect(version_localization_en).to receive(:update).with(attributes: {
+            "description" => options[:description]["en-US"]
+          })
+
+          # Update app info localization
+          expect(app_info_localization_en).to receive(:update).with(attributes: {
+            "name" => options[:name]["en-US"]
+          })
+
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload(options)
+        end
       end
-    end
 
-    context 'without date' do
-      it "auto_release_date is not called" do
-        options = { app: app }
-        uploader.upload(options)
-        expect(version).to_not(have_received(:auto_release_date=).with(2))
+      context "with auto_release_date" do
+        it 'with date' do
+          options = {
+              app: app,
+              platform: "ios",
+              metadata_path: metadata_path,
+              auto_release_date: 1_595_395_800_000
+          }
+
+          # Get number of verions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          expect(version).to receive(:update).with(attributes: {
+            "releaseType" => "SCHEDULED",
+            "earliestReleaseDate" => "2020-07-22T05:00:00+00:00"
+          })
+
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload(options)
+        end
       end
-    end
-  end
 
-  context "with phased_release" do
-    let(:app) { double('app') }
-    let(:version) { double('version') }
-    let(:details) { double('details') }
-    before do
-      allow(uploader).to receive(:verify_available_languages!)
-      allow(version).to receive(:save!)
-      allow(version).to receive(:release_on_approval=)
-      allow(version).to receive(:toggle_phased_release)
-      allow(version).to receive(:auto_release_date=)
-      allow(version).to receive(:ratings_reset=)
-      allow(app).to receive(:edit_version).and_return(version)
-      allow(app).to receive(:details).and_return(details)
-      allow(details).to receive(:save!)
-    end
+      context "with phased_release" do
+        it 'with true' do
+          options = {
+              app: app,
+              platform: "ios",
+              metadata_path: metadata_path,
+              phased_release: true
+          }
 
-    context 'with true' do
-      it "toggle_phased_release is called" do
-        uploader.upload(phased_release: true, app: app)
-        expect(version).to have_received(:toggle_phased_release).with(enabled: true)
+          # Get number of verions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          # Defaults to release type manual
+          expect(version).to receive(:update).with(attributes: {
+            "releaseType" => "MANUAL"
+          })
+
+          # Get phased release
+          expect(version).to receive(:fetch_app_store_version_phased_release).and_return(nil)
+
+          # Create a phased release
+          expect(version).to receive(:create_app_store_version_phased_release).with(attributes: {
+            phasedReleaseState: Spaceship::ConnectAPI::AppStoreVersionPhasedRelease::PhasedReleaseState::INACTIVE
+          })
+
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload(options)
+        end
+
+        it 'with false' do
+          options = {
+              app: app,
+              platform: "ios",
+              metadata_path: metadata_path,
+              phased_release: false
+          }
+
+          # Get number of verions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          # Defaults to release type manual
+          expect(version).to receive(:update).with(attributes: {
+            "releaseType" => "MANUAL"
+          })
+
+          # Get phased release
+          phased_release = double('phased_release')
+          expect(version).to receive(:fetch_app_store_version_phased_release).and_return(phased_release)
+
+          # Delete phased release
+          expect(phased_release).to receive(:delete!)
+
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload(options)
+        end
       end
-    end
 
-    context 'with false' do
-      it "toggle_phased_release is called" do
-        uploader.upload(phased_release: false, app: app)
-        expect(version).to have_received(:toggle_phased_release).with(enabled: false)
-      end
-    end
+      context "with reset_ratings" do
+        it 'with true' do
+          options = {
+              app: app,
+              platform: "ios",
+              metadata_path: metadata_path,
+              reset_ratings: true
+          }
 
-    context 'without value' do
-      it "toggle_phased_release is not called" do
-        uploader.upload(app: app)
-        expect(version).not_to(have_received(:toggle_phased_release).with(enabled: false))
-      end
-    end
-  end
+          # Get number of verions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
-  context "with reset_ratings" do
-    let(:app) { double('app') }
-    let(:version) { double('version') }
-    let(:details) { double('details') }
-    before do
-      allow(uploader).to receive(:verify_available_languages!)
-      allow(version).to receive(:save!)
-      allow(version).to receive(:release_on_approval=)
-      allow(version).to receive(:toggle_phased_release)
-      allow(version).to receive(:auto_release_date)
-      allow(version).to receive(:ratings_reset=)
-      allow(app).to receive(:edit_version).and_return(version)
-      allow(app).to receive(:details).and_return(details)
-      allow(details).to receive(:save!)
-    end
+          # Defaults to release type manual
+          expect(version).to receive(:update).with(attributes: {
+            "releaseType" => "MANUAL"
+          })
 
-    context 'with true' do
-      it "ratings_reset is called" do
-        uploader.upload(reset_ratings: true, app: app)
-        expect(version).to have_received(:ratings_reset=).with(true)
-      end
-    end
+          # Get reset ratings request
+          expect(version).to receive(:fetch_reset_ratings_request).and_return(nil)
 
-    context 'with false' do
-      it "ratings_reset is called" do
-        uploader.upload(reset_ratings: false, app: app)
-        expect(version).to have_received(:ratings_reset=).with(false)
-      end
-    end
+          # Create a reset ratings request
+          expect(version).to receive(:create_reset_ratings_request)
 
-    context 'without value' do
-      it "ratings_reset is not called" do
-        uploader.upload(app: app)
-        expect(version).not_to(have_received(:ratings_reset=).with(false))
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload(options)
+        end
+
+        it 'with false' do
+          options = {
+              app: app,
+              platform: "ios",
+              metadata_path: metadata_path,
+              reset_ratings: false
+          }
+
+          # Get number of verions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          # Defaults to release type manual
+          expect(version).to receive(:update).with(attributes: {
+            "releaseType" => "MANUAL"
+          })
+
+          # Get reset ratings request
+          reset_ratings_request = double('reset_ratings_request')
+          expect(version).to receive(:fetch_reset_ratings_request).and_return(reset_ratings_request)
+
+          # Delete reset ratings request
+          expect(reset_ratings_request).to receive(:delete!)
+
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload(options)
+        end
       end
     end
   end

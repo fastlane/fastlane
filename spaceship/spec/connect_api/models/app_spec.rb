@@ -1,5 +1,14 @@
 describe Spaceship::ConnectAPI::App do
-  before { Spaceship::Tunes.login }
+  let(:mock_tunes_client) { double('tunes_client') }
+  let(:username) { 'spaceship@krausefx.com' }
+  let(:password) { 'so_secret' }
+
+  before do
+    allow(mock_tunes_client).to receive(:team_id).and_return("123")
+    allow(mock_tunes_client).to receive(:select_team)
+    allow(Spaceship::TunesClient).to receive(:login).and_return(mock_tunes_client)
+    Spaceship::ConnectAPI.login(username, password, use_portal: false, use_tunes: true)
+  end
 
   describe '#Spaceship::ConnectAPI' do
     it '#get_apps' do
@@ -40,6 +49,13 @@ describe Spaceship::ConnectAPI::App do
     it 'finds app by bundle id' do
       model = Spaceship::ConnectAPI::App.find("com.joshholtz.FastlaneTest")
       expect(model.bundle_id).to eq("com.joshholtz.FastlaneTest")
+    end
+
+    it 'creates beta group' do
+      app = Spaceship::ConnectAPI::App.find("com.joshholtz.FastlaneTest")
+
+      model = app.create_beta_group(group_name: "Brand New Group", public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
+      expect(model.id).to eq("123456789")
     end
   end
 end

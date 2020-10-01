@@ -2,13 +2,14 @@ package tools.fastlane.screengrab.locale;
 
 import android.content.res.Configuration;
 import android.os.Build;
-import android.support.test.InstrumentationRegistry;
 import android.util.Log;
+
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import java.lang.reflect.Method;
 import java.util.Locale;
 
-public class LocaleUtil {
+public final class LocaleUtil {
 
     private static final String TAG =  LocaleUtil.class.getSimpleName();
 
@@ -17,6 +18,8 @@ public class LocaleUtil {
             Log.w(TAG, "Skipping setting device locale to null");
             return;
         }
+
+        Locale.setDefault(locale);
 
         try {
             Class amnClass = Class.forName("android.app.ActivityManagerNative");
@@ -37,9 +40,7 @@ public class LocaleUtil {
             config.getClass().getField("userSetLocale").setBoolean(config, true);
             config.locale = locale;
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                config.setLayoutDirection(locale);
-            }
+            config.setLayoutDirection(locale);
 
             Method updateConfigurationMethod = amnClass.getMethod("updateConfiguration", Configuration.class);
             updateConfigurationMethod.setAccessible(true);

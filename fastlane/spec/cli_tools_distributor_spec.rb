@@ -58,4 +58,37 @@ describe Fastlane::CLIToolsDistributor do
       end
     end
   end
+
+  describe "dotenv loading" do
+    require 'fastlane/helper/dotenv_helper'
+
+    it "passes --env option into DotenvHelper" do
+      FastlaneSpec::Env.with_ARGV(["lanes", "--env", "one"]) do
+        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with('one')
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
+
+    it "strips --env option" do
+      FastlaneSpec::Env.with_ARGV(["lanes", "--env", "one,two"]) do
+        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with('one,two')
+        Fastlane::CLIToolsDistributor.take_off
+        expect(ARGV).to eq(["lanes"])
+      end
+    end
+
+    it "ignores --env missing a value" do
+      FastlaneSpec::Env.with_ARGV(["lanes", "--env"]) do
+        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with(nil)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
+
+    it "passes nil when --env is not specified" do
+      FastlaneSpec::Env.with_ARGV(["lanes"]) do
+        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with(nil)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
+  end
 end

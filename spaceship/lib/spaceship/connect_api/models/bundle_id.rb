@@ -1,4 +1,5 @@
 require_relative '../model'
+require_relative './bundle_id_capability'
 module Spaceship
   class ConnectAPI
     class BundleId
@@ -20,13 +21,18 @@ module Spaceship
         "bundleIdCapabilities" => 'bundle_id_capabilities'
       })
 
-      module Platform
-        IOS = "IOS"
-        MAC_OS = "MAC_OS"
-      end
-
       def self.type
         return "bundleIds"
+      end
+
+      #
+      # Helpers
+      #
+
+      def supports_catalyst?
+        return bundle_id_capabilities.any? do |capability|
+          capability.is_type?(Spaceship::ConnectAPI::BundleIdCapability::Type::MARZIPAN)
+        end
       end
 
       #
@@ -35,7 +41,13 @@ module Spaceship
 
       def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
         resps = Spaceship::ConnectAPI.get_bundle_ids(filter: filter, includes: includes).all_pages
-        return resps.map(&:to_models).flatten
+        return resps.flat_map(&:to_models)
+      end
+
+      def self.find(identifier, includes: nil)
+        return all(filter: { identifier: identifier }, includes: includes).find do |app|
+          app.identifier == identifier
+        end
       end
 
       def self.get(bundle_id_id: nil, includes: nil)

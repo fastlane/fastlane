@@ -1,4 +1,5 @@
 require_relative 'module'
+require 'spaceship'
 require 'open-uri'
 
 module Deliver
@@ -13,26 +14,51 @@ module Deliver
     end
 
     def self.download(options, folder_path)
-      v = options[:use_live_version] ? options[:app].live_version(platform: options[:platform]) : options[:app].latest_version(platform: options[:platform])
+      app = options[:app]
 
-      v.screenshots.each do |language, screenshots|
-        screenshots.each do |screenshot|
-          file_name = [screenshot.sort_order, screenshot.device_type, screenshot.sort_order].join("_")
-          original_file_extension = File.basename(screenshot.original_file_name)
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      if options[:use_live_version]
+        version = app.get_live_app_store_version(platform: platform)
+        UI.user_error!("Could not find a live version on App Store Connect. Try using '--use_live_version false'") if version.nil?
+      else
+        version = app.get_edit_app_store_version(platform: platform)
+        UI.user_error!("Could not find an edit version on App Store Connect. Try using '--use_live_version true'") if version.nil?
+      end
+
+      localizations = version.get_app_store_version_localizations
+      threads = []
+      localizations.each do |localization|
+        threads << Thread.new do
+          download_screenshots(folder_path, localization)
+        end
+      end
+      threads.each(&:join)
+    end
+
+    def self.download_screenshots(folder_path, localization)
+      language = localization.locale
+      screenshot_sets = localization.get_app_screenshot_sets
+      screenshot_sets.each do |screenshot_set|
+        screenshot_set.app_screenshots.each_with_index do |screenshot, index|
+          file_name = [index, screenshot_set.screenshot_display_type, index].join("_")
+          original_file_extension = File.extname(screenshot.file_name).strip.downcase[1..-1]
           file_name += "." + original_file_extension
+
+          url = screenshot.image_asset_url(type: original_file_extension)
+          next if url.nil?
 
           UI.message("Downloading existing screenshot '#{file_name}' for language '#{language}'")
 
           # If the screen shot is for an appleTV we need to store it in a way that we'll know it's an appleTV
           # screen shot later as the screen size is the same as an iPhone 6 Plus in landscape.
-          if screenshot.device_type == "appleTV"
-            containing_folder = File.join(folder_path, "appleTV", screenshot.language)
+          if screenshot_set.apple_tv?
+            containing_folder = File.join(folder_path, "appleTV", language)
           else
-            containing_folder = File.join(folder_path, screenshot.language)
+            containing_folder = File.join(folder_path, language)
           end
 
-          if screenshot.is_imessage
-            containing_folder = File.join(folder_path, "iMessage", screenshot.language)
+          if screenshot_set.imessage?
+            containing_folder = File.join(folder_path, "iMessage", language)
           end
 
           begin
@@ -40,8 +66,9 @@ module Deliver
           rescue
             # if it's already there
           end
+
           path = File.join(containing_folder, file_name)
-          File.binwrite(path, open(screenshot.url).read)
+          File.binwrite(path, open(url).read)
         end
       end
     end

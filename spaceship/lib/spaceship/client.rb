@@ -1,3 +1,4 @@
+require 'babosa'
 require 'faraday' # HTTP Client
 require 'faraday-cookie_jar'
 require 'faraday_middleware'
@@ -5,9 +6,9 @@ require 'logger'
 require 'tmpdir'
 require 'cgi'
 require 'tempfile'
+require 'openssl'
 
 require 'fastlane/version'
-require_relative 'babosa_fix'
 require_relative 'helper/net_http_generic_request'
 require_relative 'helper/plist_middleware'
 require_relative 'helper/rels_middleware'
@@ -16,6 +17,7 @@ require_relative 'errors'
 require_relative 'tunes/errors'
 require_relative 'globals'
 require_relative 'provider'
+require_relative 'stats_middleware'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
@@ -54,6 +56,7 @@ module Spaceship
     GatewayTimeoutError = Spaceship::GatewayTimeoutError
     InternalServerError = Spaceship::InternalServerError
     BadGatewayError = Spaceship::BadGatewayError
+    AccessForbiddenError = Spaceship::AccessForbiddenError
 
     def self.hostname
       raise "You must implement self.hostname"
@@ -193,21 +196,22 @@ module Spaceship
       self.new(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id)
     end
 
-    def initialize(cookie: nil, current_team_id: nil)
+    def initialize(cookie: nil, current_team_id: nil, timeout: nil)
       options = {
        request: {
-          timeout:       (ENV["SPACESHIP_TIMEOUT"] || 300).to_i,
-          open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || 300).to_i
+          timeout:       (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i,
+          open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i
         }
       }
       @current_team_id = current_team_id
       @cookie = cookie || HTTP::CookieJar.new
+
       @client = Faraday.new(self.class.hostname, options) do |c|
         c.response(:json, content_type: /\bjson$/)
-        c.response(:xml, content_type: /\bxml$/)
         c.response(:plist, content_type: /\bplist$/)
         c.use(:cookie_jar, jar: @cookie)
         c.use(FaradayMiddleware::RelsMiddleware)
+        c.use(Spaceship::StatsMiddleware)
         c.adapter(Faraday.default_adapter)
 
         if ENV['SPACESHIP_DEBUG']
@@ -563,10 +567,15 @@ module Spaceship
     #####################################################
 
     def load_session_from_file
-      if File.exist?(persistent_cookie_path)
-        puts("Loading session from '#{persistent_cookie_path}'") if Spaceship::Globals.verbose?
-        @cookie.load(persistent_cookie_path)
-        return true
+      begin
+        if File.exist?(persistent_cookie_path)
+          puts("Loading session from '#{persistent_cookie_path}'") if Spaceship::Globals.verbose?
+          @cookie.load(persistent_cookie_path)
+          return true
+        end
+      rescue => ex
+        puts(ex.to_s)
+        puts("Continuing with normal login.")
       end
       return false
     end
@@ -619,11 +628,12 @@ module Spaceship
     def with_retry(tries = 5, &_block)
       return yield
     rescue \
-        Faraday::Error::ConnectionFailed,
-        Faraday::Error::TimeoutError, # New Faraday version: Faraday::TimeoutError => ex
+        Faraday::ConnectionFailed,
+        Faraday::TimeoutError,
         BadGatewayError,
         AppleTimeoutError,
-        GatewayTimeoutError => ex
+        GatewayTimeoutError,
+        AccessForbiddenError => ex
       tries -= 1
       unless tries.zero?
         msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
@@ -858,6 +868,12 @@ module Spaceship
 
         if response.body.to_s.include?("<h3>Bad Gateway</h3>")
           raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
+        end
+
+        if resp_hash[:status] == 403
+          msg = "Access forbidden"
+          logger.warn(msg)
+          raise AccessForbiddenError.new, msg
         end
 
         return response

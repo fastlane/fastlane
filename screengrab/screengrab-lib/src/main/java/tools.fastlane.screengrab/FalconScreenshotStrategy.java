@@ -1,8 +1,6 @@
 package tools.fastlane.screengrab;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.os.Build;
 
 import com.jraska.falcon.Falcon;
 
@@ -19,7 +17,6 @@ public class FalconScreenshotStrategy implements ScreenshotStrategy {
     }
 
     @Override
-    @TargetApi(Build.VERSION_CODES.GINGERBREAD_MR1)
     public void takeScreenshot(String screenshotName, ScreenshotCallback screenshotCallback) {
         screenshotCallback.screenshotCaptured(screenshotName, Falcon.takeScreenshotBitmap(activity));
     }

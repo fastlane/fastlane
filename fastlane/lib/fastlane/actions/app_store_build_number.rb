@@ -1,14 +1,18 @@
+require 'ostruct'
+
 module Fastlane
   module Actions
     module SharedValues
       LATEST_BUILD_NUMBER = :LATEST_BUILD_NUMBER
+      LATEST_VERSION = :LATEST_VERSION
     end
 
     class AppStoreBuildNumberAction < Action
       def self.run(params)
         require 'spaceship'
 
-        build_nr = get_build_number(params)
+        result = get_build_number(params)
+        build_nr = result.build_nr
 
         # Convert build_nr to int (for legacy use) if no "." in string
         if build_nr.kind_of?(String) && !build_nr.include?(".")
@@ -16,30 +20,37 @@ module Fastlane
         end
 
         Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = build_nr
+        Actions.lane_context[SharedValues::LATEST_VERSION] = result.build_v
+
+        return build_nr
       end
 
       def self.get_build_number(params)
+        # Prompts select team if multiple teams and none specified
         UI.message("Login to App Store Connect (#{params[:username]})")
-        Spaceship::Tunes.login(params[:username])
-        Spaceship::Tunes.select_team(team_id: params[:team_id], team_name: params[:team_name])
+        Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true, tunes_team_id: params[:team_id], team_name: params[:team_name])
         UI.message("Login successful")
 
-        app = Spaceship::Tunes::Application.find(params[:app_identifier])
+        platform = Spaceship::ConnectAPI::Platform.map(params[:platform])
+
+        app = Spaceship::ConnectAPI::App.find(params[:app_identifier])
         UI.user_error!("Could not find an app on App Store Connect with app_identifier: #{params[:app_identifier]}") unless app
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
-          UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on iTC") unless app.live_version
-          build_nr = app.live_version.current_build_number
+          live_version = app.get_live_app_store_version(platform: platform)
 
-          UI.message("Latest upload for live-version #{app.live_version.version} is build: #{build_nr}")
+          UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on App Store Connect") unless live_version
+          build_nr = live_version.build.version
 
-          return build_nr
+          UI.message("Latest upload for live-version #{live_version.version_string} is build: #{build_nr}")
+
+          return OpenStruct.new({ build_nr: build_nr, build_v: live_version.version_string })
         else
           version_number = params[:version]
           platform = params[:platform]
 
           # Create filter for get_builds with optional version number
-          filter = { app: app.apple_id }
+          filter = { app: app.id }
           if version_number
             filter["preReleaseVersion.version"] = version_number
             version_number_message = "version #{version_number}"
@@ -61,7 +72,7 @@ module Fastlane
           if build
             build_nr = build.version
             UI.message("Latest upload for version #{build.app_version} on #{platform_message} is build: #{build_nr}")
-            return build_nr
+            return OpenStruct.new({ build_nr: build_nr, build_v: build.app_version })
           end
 
           # Let user know that build couldn't be found
@@ -72,7 +83,7 @@ module Fastlane
           else
             build_nr = params[:initial_build_number]
             UI.message("Using initial build number of #{build_nr}")
-            return build_nr
+            return OpenStruct.new({ build_nr: build_nr, build_v: version_number })
           end
         end
       end
@@ -159,7 +170,8 @@ module Fastlane
 
       def self.output
         [
-          ['LATEST_BUILD_NUMBER', 'The latest build number of either live or testflight version']
+          ['LATEST_BUILD_NUMBER', 'The latest build number of either live or testflight version'],
+          ['LATEST_VERSION', 'The version of the latest build number']
         ]
       end
 

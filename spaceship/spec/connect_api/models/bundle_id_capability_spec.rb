@@ -1,5 +1,14 @@
 describe Spaceship::ConnectAPI::BundleIdCapability do
-  before { Spaceship::Portal.login }
+  let(:mock_portal_client) { double('portal_client') }
+  let(:username) { 'spaceship@krausefx.com' }
+  let(:password) { 'so_secret' }
+
+  before do
+    allow(mock_portal_client).to receive(:team_id).and_return("123")
+    allow(mock_portal_client).to receive(:select_team)
+    allow(Spaceship::PortalClient).to receive(:login).and_return(mock_portal_client)
+    Spaceship::ConnectAPI.login(username, password, use_portal: true, use_tunes: false)
+  end
 
   describe '#client' do
     it 'through #get_bundle_id' do

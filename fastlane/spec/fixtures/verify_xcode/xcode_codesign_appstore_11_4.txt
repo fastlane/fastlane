@@ -1,0 +1,17 @@
+Executable=/Applications/Xcode.app/Contents/MacOS/Xcode
+Identifier=com.apple.dt.Xcode
+Format=app bundle with Mach-O thin (x86_64)
+CodeDirectory v=20200 size=322 flags=0x200(kill) hashes=7+5 location=embedded
+Hash type=sha1 size=20
+CandidateCDHash sha1=1bf95c3d5e168d5cd63b041d05962ba3fd6c5e44
+Hash choices=sha1
+CDHash=1bf95c3d5e168d5cd63b041d05962ba3fd6c5e44
+Signature size=4167
+Authority=Apple Mac OS Application Signing
+Authority=Apple Worldwide Developer Relations Certification Authority
+Authority=Apple Root CA
+Info.plist entries=34
+TeamIdentifier=APPLECOMPUTER
+Sealed Resources version=2 rules=12 fil
+es=401968
+Internal requirements count=1 size=108

@@ -8,6 +8,7 @@ module Fastlane
         cmd << "--build-path #{params[:build_path]}" if params[:build_path]
         cmd << "--package-path #{params[:package_path]}" if params[:package_path]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
+        cmd << "--disable-sandbox" if params[:disable_sandbox]
         cmd << "--verbose" if params[:verbose]
         cmd << params[:command] if package_commands.include?(params[:command])
         if params[:xcconfig]
@@ -15,6 +16,9 @@ module Fastlane
         end
         if params[:xcpretty_output]
           cmd += ["2>&1", "|", "xcpretty", "--#{params[:xcpretty_output]}"]
+          if params[:xcpretty_args]
+            cmd << (params[:xcpretty_args]).to_s
+          end
           cmd = %w(set -o pipefail &&) + cmd
         end
 
@@ -60,6 +64,12 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid configuration: (debug|release)") unless valid_configurations.include?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :disable_sandbox,
+                                       env_name: "FL_SPM_DISABLE_SANDBOX",
+                                       description: "Disable using the sandbox when executing subprocesses",
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :xcpretty_output,
                                        env_name: "FL_SPM_XCPRETTY_OUTPUT",
                                        description: "Specifies the output type for xcpretty. eg. 'test', or 'simple'",
@@ -67,6 +77,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid xcpretty output type: (#{xcpretty_output_types.join('|')})") unless xcpretty_output_types.include?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :xcpretty_args,
+                                       env_name: "FL_SPM_XCPRETTY_ARGS",
+                                       description: "Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf'), requires xcpretty_output to be specified also",
+                                       type: String,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        short_option: "-v",
                                        env_name: "FL_SPM_VERBOSE",

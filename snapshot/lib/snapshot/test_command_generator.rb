@@ -16,20 +16,26 @@ module Snapshot
         parts += build_settings
         parts += actions
         parts += suffix
-        parts += pipe(language: language, locale: locale, log_path: log_path)
+        parts += pipe(log_path: log_path)
 
         return parts
       end
 
-      def pipe(language: nil, locale: nil, log_path: nil)
+      def pipe(log_path: nil)
         tee_command = ['tee']
         tee_command << '-a' if log_path && File.exist?(log_path)
         tee_command << log_path.shellescape if log_path
 
+        pipe = ["| #{tee_command.join(' ')}"]
+        if Snapshot.config[:disable_xcpretty]
+          return pipe
+        end
+
         xcpretty = "xcpretty #{Snapshot.config[:xcpretty_args]}"
         xcpretty << "--no-color" if Helper.colors_disabled?
-
-        return ["| #{tee_command.join(' ')} | #{xcpretty}"]
+        pipe << "| #{xcpretty}"
+        pipe << "> /dev/null" if Snapshot.config[:suppress_xcode_output]
+        return pipe
       end
 
       def destination(devices)

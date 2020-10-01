@@ -42,13 +42,22 @@ class TunesStubbing
         to_return(status: 200, body: "", headers: {})
 
       # 2FA: Request security code to trusted phone
-      stub_request(:put, "https://idmsa.apple.com/appleauth/auth/verify/phone").
-        with(body: "{\"phoneNumber\":{\"id\":1},\"mode\":\"sms\"}").
-        to_return(status: 200, body: "", headers: {})
+      [1, 2].each do |id|
+        stub_request(:put, "https://idmsa.apple.com/appleauth/auth/verify/phone").
+          with(body: "{\"phoneNumber\":{\"id\":#{id}},\"mode\":\"sms\"}").
+          to_return(status: 200, body: "", headers: {})
+      end
 
       # 2FA: Submit security code from trusted phone for verification
-      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode").
-        with(body: "{\"securityCode\":{\"code\":\"123\"},\"phoneNumber\":{\"id\":1},\"mode\":\"sms\"}").
+      [1, 2].each do |id|
+        stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode").
+          with(body: "{\"securityCode\":{\"code\":\"123\"},\"phoneNumber\":{\"id\":#{id}},\"mode\":\"sms\"}").
+          to_return(status: 200, body: "", headers: {})
+      end
+
+      # 2FA: Submit security code from trusted device for verification
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode").
+        with(body: "{\"securityCode\":{\"code\":\"123\"}}").
         to_return(status: 200, body: "", headers: {})
 
       # 2FA: Trust computer
@@ -105,6 +114,9 @@ class TunesStubbing
 
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews?index=0&sort=REVIEW_SORT_ORDER_MOST_RECENT&storefront=US").
         to_return(status: 200, body: itc_read_fixture_file('review_by_storefront.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews?index=0&sort=REVIEW_SORT_ORDER_MOST_RECENT&versionId=1").
+        to_return(status: 200, body: itc_read_fixture_file('review_by_version_id.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     def itc_stub_build_details
@@ -347,6 +359,16 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file("iap_price_goal_calc.json"),
                  headers: { "Content-Type" => "application/json" })
 
+      # get shared secret
+      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/appSharedSecret").
+        to_return(status: 200, body: itc_read_fixture_file("iap_shared_secret_1.json"),
+                 headers: { "Content-Type" => "application/json" })
+
+      # generate new shared secret
+      stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/appSharedSecret").
+        to_return(status: 200, body: itc_read_fixture_file("iap_shared_secret_2.json"),
+                 headers: { "Content-Type" => "application/json" })
+
       # delete iap
       stub_request(:delete, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1194457865").
         to_return(status: 200, body: "", headers: {})
@@ -382,6 +404,11 @@ class TunesStubbing
       # iap edit family
       stub_request(:put, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20373395/").
         with(body: itc_read_fixture_file("iap_family_edit.json")).
+        to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
+                headers: { "Content-Type" => "application/json" })
+      # iap edit family
+      stub_request(:put, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20373395/").
+        with(body: itc_read_fixture_file("iap_family_edit_with_de.json")).
         to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
                 headers: { "Content-Type" => "application/json" })
 

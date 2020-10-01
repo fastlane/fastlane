@@ -180,8 +180,12 @@ module Match
         false
       end
 
+      def list_files(file_name: "", file_ext: "")
+        Dir[File.join(working_directory, self.team_id, "**", file_name, "*.#{file_ext}")]
+      end
+
       def generate_matchfile_content
-        return "bucket_name(\"#{self.bucket_name}\")"
+        return "google_cloud_bucket_name(\"#{self.bucket_name}\")"
       end
 
       private
@@ -209,7 +213,7 @@ module Match
 
         return DEFAULT_KEYS_FILE_NAME if File.exist?(DEFAULT_KEYS_FILE_NAME)
 
-        fastlane_folder_gc_keys_path = File.join(FastlaneCore::FastlaneFolder.path, DEFAULT_KEYS_FILE_NAME)
+        fastlane_folder_gc_keys_path = File.join(FastlaneCore::FastlaneFolder.path || Dir.pwd, DEFAULT_KEYS_FILE_NAME)
         return fastlane_folder_gc_keys_path if File.exist?(fastlane_folder_gc_keys_path)
 
         if google_cloud_project_id.to_s.length > 0
@@ -293,6 +297,9 @@ module Match
       end
 
       def ensure_bucket_is_selected
+        # Skip the instructions if the user provided a bucket name
+        return unless self.bucket_name.to_s.length == 0
+
         created_bucket = UI.confirm("Did you already create a Google Cloud Storage bucket?")
         while self.bucket_name.to_s.length == 0
           unless created_bucket
@@ -346,7 +353,7 @@ module Match
           UI.message("\t\t 1. Click on your bucket to open it".cyan)
           UI.message("\t\t 2. Click 'Permissions'".cyan)
           UI.message("\t\t 3. Click 'Add members'".cyan)
-          UI.message("\t\t 4. Enter the email of your service account".cyan)
+          UI.message("\t\t 4. Enter the service account email address".cyan)
           UI.message("\t\t 5. Set the role to 'Storage Admin'".cyan)
           UI.message("\t\t 6. Click 'Save'".cyan)
           UI.message("")

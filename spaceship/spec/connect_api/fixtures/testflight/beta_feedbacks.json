@@ -1,0 +1,136 @@
+{
+   "data" : [ {
+     "type" : "betaFeedbacks",
+     "id" : "987654321",
+     "attributes" : {
+       "timestamp" : "2019-12-11T02:03:27.661Z",
+       "comment" : "Oohhhhh feedback!!!!",
+       "emailAddress" : "email@email.com",
+       "deviceModel" : "iPhone11_2",
+       "osVersion" : "13.2.3",
+       "bookmarked" : false,
+       "locale" : "en-US",
+       "carrier" : "T-Mobile",
+       "timezone" : "America/Chicago",
+       "architecture" : "arm64e",
+       "connectionStatus" : "WIFI",
+       "pairedAppleWatch" : null,
+       "appUptimeMillis" : null,
+       "availableDiskBytes" : "13388951552",
+       "totalDiskBytes" : "63937040384",
+       "networkType" : "LTE",
+       "batteryPercentage" : 83,
+       "screenWidth" : 375,
+       "screenHeight" : 812
+     },
+     "relationships" : {
+       "build" : {
+         "data" : {
+           "type" : "builds",
+           "id" : "b7bb9f36-e2c3-4d2f-9681-01415351814e"
+         },
+         "links" : {
+           "self" : "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks/987654321/relationships/build",
+           "related" : "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks/987654321/build"
+         }
+       },
+       "tester" : {
+         "data" : {
+           "type" : "betaTesters",
+           "id" : "e12da15f-cbc9-4577-97ea-099f2f79346e"
+         },
+         "links" : {
+           "self" : "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks/987654321/relationships/tester",
+           "related" : "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks/987654321/tester"
+         }
+       },
+       "screenshots" : {
+         "meta" : {
+           "paging" : {
+             "total" : 1,
+             "limit" : 10
+           }
+         },
+         "data" : [ {
+           "type" : "betaScreenshots",
+           "id" : "QVBmNTBNelNnLWtqNkZYM1hfVTEzNWM6MA=="
+         } ],
+         "links" : {
+           "self" : "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks/987654321/relationships/screenshots",
+           "related" : "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks/987654321/screenshots"
+         }
+       },
+       "crash" : {
+         "links" : {
+           "self" : "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks/987654321/relationships/crash",
+           "related" : "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks/987654321/crash"
+         }
+       }
+     },
+     "links" : {
+       "self" : "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks/987654321"
+     }
+   } ],
+   "included" : [ {
+     "type" : "builds",
+     "id" : "b7bb9f36-e2c3-4d2f-9681-01415351814e",
+     "attributes" : {
+       "version" : "1571678363"
+     },
+     "links" : {
+       "self" : "https://appstoreconnect.apple.com/iris/v1/builds/b7bb9f36-e2c3-4d2f-9681-01415351814e"
+     }
+   }, {
+     "type" : "betaTesters",
+     "id" : "e12da15f-cbc9-4577-97ea-099f2f79346e",
+     "attributes" : {
+       "firstName" : "Josh",
+       "lastName" : "Holtz"
+     },
+     "links" : {
+       "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/e12da15f-cbc9-4577-97ea-099f2f79346e"
+     }
+   }, {
+     "type" : "betaScreenshots",
+     "id" : "QVBmNTBNelNnLWtqNkZYM1hfVTEzNWM6MA==",
+     "attributes" : {
+       "imageAssets" : [ {
+         "url" : "https://tf-feedback.itunes.apple.com/eimg/D_g/HQ8/C4k/CPY/Ezw/ultR3bzSGG0/original.jpg?i_for=974055077&AWSAccessKeyId=MKIA9C0TVRX1ZL0VZ1YK&Expires=1576454400&Signature=NtYpXsRVKPeQNpg7eLh2xKFnmF4%3D&p_sig=8DAxqgHRlxMlhbl_LKW5EDAIAwo",
+         "width" : 3024,
+         "height" : 4032
+       }, {
+         "url" : "https://tf-feedback.itunes.apple.com/eimg/D_g/HQ8/C4k/CPY/Ezw/ultR3bzSGG0/fits512x512.jpg?i_for=974055077&AWSAccessKeyId=MKIA9C0TVRX1ZL0VZ1YK&Expires=1576454400&Signature=fHzCF%2FiEfth1CgnjPW5yjSeV08M%3D&p_sig=A2Ahg5xg41RptLiCnlqJjs-V4CQ",
+         "width" : 384,
+         "height" : 512
+       }, {
+         "url" : "https://tf-feedback.itunes.apple.com/eimg/D_g/HQ8/C4k/CPY/Ezw/ultR3bzSGG0/fits1024x1024.jpg?i_for=974055077&AWSAccessKeyId=MKIA9C0TVRX1ZL0VZ1YK&Expires=1576454400&Signature=ehrkVsmLUqaSyk4cE2bbihnJaUQ%3D&p_sig=7WL3j-uB7bkMpX_YV8-yo2N8rO0",
+         "width" : 768,
+         "height" : 1024
+       }, {
+         "url" : "https://tf-feedback.itunes.apple.com/eimg/D_g/HQ8/C4k/CPY/Ezw/ultR3bzSGG0/fits256x256.jpg?i_for=974055077&AWSAccessKeyId=MKIA9C0TVRX1ZL0VZ1YK&Expires=1576454400&Signature=f39fkPBkxSKR6wQ4lGx2ovQenNg%3D&p_sig=Pswf85AC6MORyvvl1DDOwgIrUWQ",
+         "width" : 192,
+         "height" : 256
+       } ]
+     },
+     "relationships" : {
+       "feedback" : {
+         "links" : {
+           "self" : "https://appstoreconnect.apple.com/iris/v1/betaScreenshots/QVBmNTBNelNnLWtqNkZYM1hfVTEzNWM6MA==/relationships/feedback",
+           "related" : "https://appstoreconnect.apple.com/iris/v1/betaScreenshots/QVBmNTBNelNnLWtqNkZYM1hfVTEzNWM6MA==/feedback"
+         }
+       }
+     },
+     "links" : {
+       "self" : "https://appstoreconnect.apple.com/iris/v1/betaScreenshots/QVBmNTBNelNnLWtqNkZYM1hfVTEzNWM6MA=="
+     }
+   } ],
+   "links" : {
+     "self" : "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks?include=build%2Ctester%2Cscreenshots&fields%5BbetaTesters%5D=firstName%2ClastName&filter%5Bbuild.preReleaseVersion%5D=197160d3-ed06-4dd2-a21d-ff4fad24ce1b&limit=60&filter%5Bbuild.app%5D=974055077&fields%5Bbuilds%5D=version"
+   },
+   "meta" : {
+     "paging" : {
+       "total" : 2,
+       "limit" : 60
+     }
+   }
+ }

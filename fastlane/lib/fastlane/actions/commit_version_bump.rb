@@ -220,7 +220,7 @@ module Fastlane
           'commit_version_bump',
           'commit_version_bump(
             message: "Version Bump",                    # create a commit with a custom message
-            xcodeproj: "./path/to/MyProject.xcodeproj", # optional, if you have multiple Xcode project files, you must specify your main project here
+            xcodeproj: "./path/to/MyProject.xcodeproj"  # optional, if you have multiple Xcode project files, you must specify your main project here
           )',
           'commit_version_bump(
             settings: true # Include Settings.bundle/Root.plist

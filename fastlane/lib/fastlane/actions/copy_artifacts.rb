@@ -16,7 +16,7 @@ module Fastlane
         # If any of the paths include "*", we assume that we are referring to the Unix entries
         # e.g /tmp/fastlane/* refers to all the files in /tmp/fastlane
         # We use Dir.glob to expand all those paths, this would create an array of arrays though, so flatten
-        artifacts = artifacts_to_search.map { |f| f.include?("*") ? Dir.glob(f) : f }.flatten
+        artifacts = artifacts_to_search.flat_map { |f| f.include?("*") ? Dir.glob(f) : f }
 
         UI.verbose("Copying artifacts #{artifacts.join(', ')} to #{target_path}")
         UI.verbose(params[:keep_original] ? "Keeping original files" : "Not keeping original files")

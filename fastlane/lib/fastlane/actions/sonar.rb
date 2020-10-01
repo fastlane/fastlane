@@ -16,14 +16,17 @@ module Fastlane
         sonar_scanner_args << "-Dsonar.projectName=\"#{params[:project_name]}\"" if params[:project_name]
         sonar_scanner_args << "-Dsonar.projectVersion=\"#{params[:project_version]}\"" if params[:project_version]
         sonar_scanner_args << "-Dsonar.sources=\"#{params[:sources_path]}\"" if params[:sources_path]
+        sonar_scanner_args << "-Dsonar.exclusions=\"#{params[:exclusions]}\"" if params[:exclusions]
         sonar_scanner_args << "-Dsonar.language=\"#{params[:project_language]}\"" if params[:project_language]
         sonar_scanner_args << "-Dsonar.sourceEncoding=\"#{params[:source_encoding]}\"" if params[:source_encoding]
         sonar_scanner_args << "-Dsonar.login=\"#{params[:sonar_login]}\"" if params[:sonar_login]
         sonar_scanner_args << "-Dsonar.host.url=\"#{params[:sonar_url]}\"" if params[:sonar_url]
+        sonar_scanner_args << "-Dsonar.organization=\"#{params[:sonar_organization]}\"" if params[:sonar_organization]
         sonar_scanner_args << "-Dsonar.branch.name=\"#{params[:branch_name]}\"" if params[:branch_name]
         sonar_scanner_args << "-Dsonar.pullrequest.branch=\"#{params[:pull_request_branch]}\"" if params[:pull_request_branch]
         sonar_scanner_args << "-Dsonar.pullrequest.base=\"#{params[:pull_request_base]}\"" if params[:pull_request_base]
         sonar_scanner_args << "-Dsonar.pullrequest.key=\"#{params[:pull_request_key]}\"" if params[:pull_request_key]
+
         sonar_scanner_args << params[:sonar_runner_args] if params[:sonar_runner_args]
 
         command = [
@@ -79,6 +82,10 @@ module Fastlane
                                        env_name: "FL_SONAR_RUNNER_SOURCES_PATH",
                                        description: "Comma-separated paths to directories containing source files. Must either be specified here or inside the sonar project configuration file",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :exclusions,
+                                       env_name: "FL_SONAR_RUNNER_EXCLUSIONS",
+                                       description: "Comma-separated paths to directories to be excluded from the analysis",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :project_language,
                                        env_name: "FL_SONAR_RUNNER_PROJECT_LANGUAGE",
                                        description: "Language key, e.g. objc",
@@ -100,6 +107,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :sonar_url,
                                        env_name: "FL_SONAR_URL",
                                        description: "Pass the url of the Sonar server",
+                                       optional: true,
+                                       is_string: true),
+          FastlaneCore::ConfigItem.new(key: :sonar_organization,
+                                       env_name: "FL_SONAR_ORGANIZATION",
+                                       description: "Key of the organization on SonarCloud",
                                        optional: true,
                                        is_string: true),
           FastlaneCore::ConfigItem.new(key: :branch_name,
@@ -144,6 +156,15 @@ module Fastlane
             project_version: "1.0",
             project_name: "iOS - AwesomeApp",
             sources_path: File.expand_path("../AwesomeApp")
+          )',
+          'sonar(
+            project_key: "name.gretzki.awesomeApp",
+            project_version: "1.0",
+            project_name: "iOS - AwesomeApp",
+            sources_path: File.expand_path("../AwesomeApp"),
+            sonar_organization: "myOrg",
+            sonar_login: "123456abcdef",
+            sonar_url: "https://sonarcloud.io"
           )'
         ]
       end

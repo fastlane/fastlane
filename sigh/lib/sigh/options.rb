@@ -131,12 +131,12 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :platform,
                                      short_option: '-p',
                                      env_name: "SIGH_PLATFORM",
-                                     description: "Set the provisioning profile's platform (i.e. ios, tvos)",
+                                     description: "Set the provisioning profile's platform (i.e. ios, tvos, macos, catalyst)",
                                      is_string: false,
                                      default_value: "ios",
                                      verify_block: proc do |value|
                                        value = value.to_s
-                                       pt = %w(macos tvos ios)
+                                       pt = %w(macos tvos ios catalyst)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :readonly,
@@ -153,7 +153,13 @@ module Sigh
                                      env_name: "SIGH_PROVISIONING_PROFILE_TEMPLATE_NAME",
                                      description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
                                      optional: true,
-                                     default_value: nil)
+                                     default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :fail_on_name_taken,
+                                     env_name: "SIGH_FAIL_ON_NAME_TAKEN",
+                                     description: "Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first",
+                                     optional: true,
+                                     is_string: false,
+                                     default_value: false)
       ]
     end
   end

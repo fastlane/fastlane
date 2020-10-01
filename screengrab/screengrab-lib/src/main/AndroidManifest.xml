@@ -5,6 +5,6 @@
       We will manually check for API level >= 18 before using UiAutomator.
       We will manually check for API level >= 10 before using Falcon.
     -->
-    <uses-sdk tools:overrideLibrary="android.support.test.uiautomator.v18,com.jraska.falcon" />
+    <uses-sdk tools:overrideLibrary="androidx.test.uiautomator.v18,com.jraska.falcon" />
 
 </manifest>

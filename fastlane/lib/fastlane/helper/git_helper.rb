@@ -45,6 +45,8 @@ module Fastlane
       command = %w(git describe)
       command << '--tags' if match_lightweight
       command << hash
+      command << '--match' if tag_match_pattern
+      command << tag_match_pattern if tag_match_pattern
       Actions.sh(*command.compact, log: false).chomp
     rescue
       nil

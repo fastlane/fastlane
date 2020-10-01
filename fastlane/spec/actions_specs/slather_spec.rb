@@ -22,7 +22,9 @@ describe Fastlane do
             simple_output: true,
             gutter_json: true,
             cobertura_xml: true,
+            sonarqube_xml: true,
             llvm_cov: true,
+            json: true,
             html: true,
             show: true,
             verbose: true,
@@ -50,7 +52,9 @@ describe Fastlane do
                     --simple-output
                     --gutter-json
                     --cobertura-xml
+                    --sonarqube-xml
                     --llvm-cov
+                    --json
                     --html
                     --show
                     --build-directory foo
@@ -90,7 +94,9 @@ describe Fastlane do
             simple_output: true,
             gutter_json: true,
             cobertura_xml: true,
+            sonarqube_xml: true,
             llvm_cov: true,
+            json: true,
             html: true,
             show: true,
             source_directory: 'baz',
@@ -113,7 +119,9 @@ describe Fastlane do
                     --simple-output
                     --gutter-json
                     --cobertura-xml
+                    --sonarqube-xml
                     --llvm-cov
+                    --json
                     --html
                     --show
                     --build-directory foo

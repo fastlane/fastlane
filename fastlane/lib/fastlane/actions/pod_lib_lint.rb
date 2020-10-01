@@ -26,6 +26,7 @@ module Fastlane
         command << "--platforms=#{params[:platforms]}" if params[:platforms]
         command << "--skip-import-validation" if params[:skip_import_validation]
         command << "--skip-tests" if params[:skip_tests]
+        command << "--analyze" if params[:analyze]
 
         result = Actions.sh(command.join(' '))
         UI.success("Pod lib lint Successfully ⬆️ ")
@@ -144,7 +145,12 @@ module Fastlane
                                        description: "Lint skips building and running tests during validation (available since cocoapods >= 1.3)",
                                        type: Boolean,
                                        default_value: false,
-                                       env_name: "FL_POD_LIB_LINT_SKIP_TESTS")
+                                       env_name: "FL_POD_LIB_LINT_SKIP_TESTS"),
+          FastlaneCore::ConfigItem.new(key: :analyze,
+                                       description: "Validate with the Xcode Static Analysis tool (available since cocoapods >= 1.6.1)",
+                                       type: Boolean,
+                                       default_value: false,
+                                       env_name: "FL_POD_LIB_LINT_ANALYZE")
         ]
       end
 

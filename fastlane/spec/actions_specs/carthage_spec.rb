@@ -101,6 +101,26 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap")
       end
 
+      it "adds use-netrc flag to command if use_netrc is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_netrc: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --use-netrc")
+      end
+
+      it "doesn't add a use-netrc flag to command if use_netrc is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_netrc: false
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap")
+      end
+
       it "adds no-use-binaries flag to command if use_binaries is set to false" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
@@ -119,6 +139,16 @@ describe Fastlane do
           end").runner.execute(:test)
 
         expect(result).to eq("carthage bootstrap")
+      end
+
+      it "adds no-checkout flag to command if no_checkout is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              no_checkout: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --no-checkout")
       end
 
       it "adds no-build flag to command if no_build is set to true" do

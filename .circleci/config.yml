@@ -1,206 +1,220 @@
+---
+
+aliases:
+  # common - cache
+  - &cache_restore_git
+    restore_cache:
+      name: cache | restore git
+      keys:
+        - src-v1-{{ arch }}-{{ .Branch }}-{{ .Revision }}
+        - src-v1-{{ arch }}-{{ .Branch }}-
+        - src-v1-{{ arch }}
+  - &cache_save_git
+    save_cache:
+      name: cache | save git
+      key: src-v1-{{ arch }}-{{ .Branch }}-{{ .Revision }}
+      paths:
+        - ".git"
+
+  - &cache_restore_bundler
+    restore_cache:
+      name: cache | restore bundle
+      key: v2-gems-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+  - &cache_save_bundler
+    save_cache:
+      name: cache | store bundle
+      key: v2-gems-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+      paths:
+        - ".bundle"
+
+  - &cache_restore_homebrew
+    restore_cache:
+      name: cache | restore homebrew
+      keys:
+        - v3-homebrew-{{ epoch }}
+        - v3-homebrew
+  - &cache_save_homebrew
+    save_cache:
+      name: cache | store homebrew
+      key: v3-homebrew-{{ epoch }}
+      paths:
+        - "/usr/local/Homebrew"
+
+  - &cache_restore_rubocop
+    restore_cache:
+      name: cache | restore rubocop
+      keys:
+        - v1-rubocop-{{ arch }}-{{ epoch }}
+        - v1-rubocop-{{ arch }}-
+  - &cache_save_rubocop
+    save_cache:
+      name: cache | store rubocop
+      key: v1-rubocop-{{ arch }}-{{ epoch }}
+      paths:
+        - "~/.cache/rubocop_cache"
+
+  - &set_ruby
+    run:
+      name: Set Ruby version
+      command: | # see https://circleci.com/docs/2.0/testing-ios/#using-ruby
+        echo "ruby-${_RUBY_VERSION}" > ~/.ruby-version
+        echo 'chruby ruby-${_RUBY_VERSION}' >> ~/.bash_profile
+
 version: 2
 
 jobs:
-  "Execute tests on macOS (Xcode 9.0.1, Ruby 2.3)":
+  'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)': &tests_macos  # define alias
     macos:
-      xcode: "9.0.1"
+      xcode: '10.2.1'
     environment:
-      CIRCLE_TEST_REPORTS: ~/test-reports
-      LC_ALL: en_US.UTF-8
-      LANG: en_US.UTF-8
-    shell: /bin/bash --login -eo pipefail
+      CIRCLE_TEST_REPORTS: '~/test-reports'
+      LC_ALL: 'en_US.UTF-8'
+      LANG: 'en_US.UTF-8'
+      _RUBY_VERSION: '2.4'
+    shell: '/bin/bash --login -eo pipefail'
     steps:
+      - *cache_restore_git
       - checkout
-
-      - restore_cache:
-          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
-      - restore_cache:
-          keys:
-            - v3-homebrew-{{ epoch }}
-            - v3-homebrew
+      - *cache_save_git
+      - *cache_restore_bundler
+      - *cache_restore_homebrew
+      - *set_ruby
+      - run:
+          name: debug | ruby version
+          command: |
+            ruby -v
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            echo "2.3" > .ruby-version
-            gem update --system
+            brew update
+            brew untap caskroom/versions || true
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-
-      - save_cache:
-          key: v3-homebrew-{{ epoch }}
-          paths:
-            - /usr/local/Homebrew
-      - save_cache:
-          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
-          paths:
-            - .bundle
-
+      - *cache_save_homebrew
+      - *cache_save_bundler
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
-
-      - restore_cache:
-          key: v1-{{ arch }}-rubocop
-
+      - *cache_restore_rubocop
       - run: bundle exec fastlane execute_tests
-
-      - save_cache:
-          key: v1-{{ arch }}-rubocop
-          paths:
-            - ~/.cache/rubocop_cache
+      - *cache_save_rubocop
       - store_test_results:
           path: ~/test-reports
       - store_artifacts:
           path: ~/test-reports/rspec
           destination: test-reports
-
       - run:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
-          when: always # Run this even when tests fail
-
-  "Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)":
+          when: always  # Run this even when tests fail
+  'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)':
+    <<: *tests_macos
     macos:
-      xcode: "11.0.0"
+      xcode: '11.0.0'
     environment:
-      CIRCLE_TEST_REPORTS: ~/test-reports
-      LC_ALL: en_US.UTF-8
-      LANG: en_US.UTF-8
-    shell: /bin/bash --login -eo pipefail
-    steps:
-      - checkout
-
-      - restore_cache:
-          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
-      - restore_cache:
-          keys:
-            - v3-homebrew-{{ epoch }}
-            - v3-homebrew
-      - run:
-          name: Setup Build
-          command: |
-            mkdir -p ~/test-reports
-            echo "2.5" > .ruby-version
-            gem update --system
-            brew install shellcheck
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-
-      - save_cache:
-          key: v3-homebrew-{{ epoch }}
-          paths:
-            - /usr/local/Homebrew
-      - save_cache:
-          key: v1-macos-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
-          paths:
-            - .bundle
-
-      - run:
-          name: Check PR Metadata
-          command: bundle exec danger || echo "danger failed"
-
-      - restore_cache:
-          key: v1-{{ arch }}-rubocop
-
-      - run: bundle exec fastlane execute_tests
-
-      - save_cache:
-          key: v1-{{ arch }}-rubocop
-          paths:
-            - ~/.cache/rubocop_cache
-      - store_test_results:
-          path: ~/test-reports
-      - store_artifacts:
-          path: ~/test-reports/rspec
-          destination: test-reports
-
-      - run:
-          name: Post Test Results to GitHub
-          command: bundle exec danger || echo "danger failed"
-          when: always # Run this even when tests fail
-
-  "Execute tests on Ubuntu":
+      _RUBY_VERSION: '2.5'
+  'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)':
+    <<: *tests_macos
+    macos:
+      xcode: '11.4.0'
     environment:
-      CIRCLE_TEST_REPORTS: ~/test-reports
-      LC_ALL: C.UTF-8
-      LANG: C.UTF-8
+      _RUBY_VERSION: '2.6'
+
+  'Execute tests on Ubuntu':
+    environment:
+      CIRCLE_TEST_REPORTS: '~/test-reports'
+      LC_ALL: 'C.UTF-8'
+      LANG: 'C.UTF-8'
       FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
     docker:
-      - image: fastlanetools/ci:0.1.0
+      - image: 'fastlanetools/ci:0.2.0'
     steps:
+      - *cache_restore_git
       - checkout
-
-      - restore_cache:
-          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+      - *cache_save_git
+      - *cache_restore_bundler
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-      - save_cache:
-          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
-          paths:
-            - .bundle
-
+      - *cache_save_bundler
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
-
-      - restore_cache:
-          key: v1-{{ arch }}-rubocop
-
+      - *cache_restore_rubocop
       - run: bundle exec fastlane execute_tests
-
-      - save_cache:
-          key: v1-{{ arch }}-rubocop
-          paths:
-            - ~/.cache/rubocop_cache
+      - *cache_save_rubocop
       - store_test_results:
           path: ~/test-reports
       - store_artifacts:
           path: ~/test-reports/rspec
           destination: test-reports
-
       - run:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
-          when: always # Run this even when tests fail
+          when: always  # Run this even when tests fail
+
+  "Validate Fastlane.swift Generation":
+    <<: *tests_macos
+    macos:
+      xcode: '11.0.0'
+    environment:
+      _RUBY_VERSION: '2.5'
+    steps:
+      - *cache_restore_git
+      - checkout
+      - *cache_save_git
+      - *cache_restore_bundler
+      - *cache_restore_homebrew
+      - *set_ruby
+      - run:
+          name: Setup Build
+          command: |
+            mkdir -p ~/test-reports
+            brew untap caskroom/versions
+            brew install shellcheck
+            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - *cache_save_homebrew
+      - *cache_save_bundler
+      - run: bundle exec fastlane generate_swift_api
 
   "Validate Documentation":
     docker:
-      - image: circleci/ruby:2.3
+      - image: circleci/ruby:2.4
     steps:
+      - *cache_restore_git
       - checkout
-      
-      - restore_cache:
-          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
+      - *cache_save_git
+      - *cache_restore_bundler
+
       - run:
           name: Setup Build
           command: |
+            gem update --system
+            gem install bundler
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-      - save_cache:
-          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
-          paths:
-            - .bundle
+
+      - *cache_save_bundler
 
       - run: bundle exec fastlane validate_docs
 
   "Lint Source Code":
     docker:
-      - image: circleci/ruby:2.3
+      - image: circleci/ruby:2.5
     steps:
+      - *cache_restore_git
       - checkout
+      - *cache_save_git
+      - *cache_restore_bundler
 
-      - restore_cache:
-          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
       - run:
           name: Setup Build
           command: |
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-      - save_cache:
-          key: v1-ubuntu-gems-{{ checksum "Gemfile" }}
-          paths:
-            - .bundle
+
+      - *cache_save_bundler
 
       - run: bundle exec fastlane lint_source
 
@@ -209,10 +223,12 @@ jobs:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
     docker:
-      - image: circleci/ruby:2.3
+      - image: circleci/ruby:2.4
     shell: /bin/bash --login -eo pipefail
     steps:
+      - *cache_restore_git
       - checkout
+      - *cache_save_git
 
       - run:
           name: Setup Build
@@ -226,9 +242,16 @@ workflows:
   version: 2
   build:
     jobs:
-      - "Execute tests on macOS (Xcode 9.0.1, Ruby 2.3)"
-      - "Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)"
-      - "Execute tests on Ubuntu"
+      - 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)'
+      - 'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)'
+      - 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)'
+      - 'Execute tests on Ubuntu'
+
+      - "Validate Fastlane.swift Generation"
       - "Validate Documentation"
+
       - "Lint Source Code"
+
       - "Execute modules load up tests"
+
+...
