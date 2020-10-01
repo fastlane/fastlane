@@ -9,6 +9,7 @@ module Spaceship
 
       attr_accessor :certificate_content
       attr_accessor :display_name
+      attr_accessor :expiration_date
       attr_accessor :name
       attr_accessor :platform
       attr_accessor :serial_number

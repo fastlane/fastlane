@@ -9,6 +9,7 @@ def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: n
   certificate = "certificate"
   allow(certificate).to receive(:id).and_return("id")
   allow(certificate).to receive(:certificate_content).and_return(Base64.encode64("cert content"))
+  allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([certificate])
 
   device = "device"
   allow(device).to receive(:id).and_return(1)

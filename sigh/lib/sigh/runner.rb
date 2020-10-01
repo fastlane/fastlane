@@ -17,11 +17,16 @@ module Sigh
                                          hide_keys: [:output_path],
                                              title: "Summary for sigh #{Fastlane::VERSION}")
 
-      # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
-      # Prompts select team if multiple teams and none specified
-      UI.message("Starting login with user '#{Sigh.config[:username]}'")
-      Spaceship::ConnectAPI.login(Sigh.config[:username], nil, use_portal: true, use_tunes: false)
-      UI.message("Successfully logged in")
+      if api_token
+        UI.message("Creating authorization token for App Store Connect API")
+        Spaceship::ConnectAPI.token = api_token
+      else
+        # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
+        # Prompts select team if multiple teams and none specified
+        UI.message("Starting login with user '#{Sigh.config[:username]}'")
+        Spaceship::ConnectAPI.login(Sigh.config[:username], nil, use_portal: true, use_tunes: false)
+        UI.message("Successfully logged in")
+      end
 
       profiles = [] if Sigh.config[:skip_fetch_profiles]
       profiles ||= fetch_profiles # download the profile if it's there
@@ -52,6 +57,12 @@ module Sigh
       end
 
       return download_profile(profile)
+    end
+
+    def api_token
+      @api_token ||= Spaceship::ConnectAPI::Token.create(Sigh.config[:api_key]) if Sigh.config[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(Sigh.config[:api_key_path]) if Sigh.config[:api_key_path]
+      return @api_token
     end
 
     # The kind of provisioning profile we're interested in
@@ -190,65 +201,95 @@ module Sigh
       profiles
     end
 
+    def fetch_certificates(certificate_types)
+      filter = {
+        certificateType: certificate_types.join(',')
+      }
+      return Spaceship::ConnectAPI::Certificate.all(filter: filter)
+    end
+
     def certificates_for_profile_and_platform
+      types = []
+
       case Sigh.config[:platform].to_s
       when 'ios', 'tvos'
         if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT
-          certificates = Spaceship.certificate.development.all +
-                         Spaceship.certificate.apple_development.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT,
+            Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT
+          ]
         elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
           # Enterprise accounts don't have access to Apple Distribution certificates
-          certificates = Spaceship.certificate.in_house.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION
+          ]
         # handles case where the desired certificate type is adhoc but the account is an enterprise account
         # the apple dev portal api has a weird quirk in it where if you query for distribution certificates
         # for enterprise accounts, you get nothing back even if they exist.
-        elsif (profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC) && Spaceship.client && Spaceship.client.in_house?
+        elsif (profile_type == Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC) && Spaceship::ConnectAPI.client && Spaceship::ConnectAPI.client.in_house?
           # Enterprise accounts don't have access to Apple Distribution certificates
-          certificates = Spaceship.certificate.in_house.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION
+          ]
         else
-          # Ad hoc or App Store
-          certificates = Spaceship.certificate.production.all +
-                         Spaceship.certificate.apple_distribution.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION,
+            Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION
+          ]
         end
 
       when 'macos', 'catalyst'
         if profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
-          certificates = Spaceship.certificate.mac_development.all +
-                         Spaceship.certificate.apple_development.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT,
+            Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DEVELOPMENT
+          ]
         elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
-          certificates = Spaceship.certificate.mac_app_distribution.all +
-                         Spaceship.certificate.apple_distribution.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION,
+            Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DISTRIBUTION
+          ]
         elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
-          certificates = Spaceship.certificate.developer_id_application.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+          ]
         else
-          certificates = Spaceship.certificate.mac_app_distribution.all +
-                         Spaceship.certificate.apple_distribution.all
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION,
+            Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DISTRIBUTION
+          ]
         end
       end
 
-      certificates
+      fetch_certificates(types)
     end
 
     def devices_to_use
       # Only use devices if development or adhoc
       return [] if !Sigh.config[:development] && !Sigh.config[:adhoc]
 
-      device_class = case Sigh.config[:platform].to_s
-                     when 'ios'
-                       [
-                         Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH,
-                         Spaceship::ConnectAPI::Device::DeviceClass::IPAD,
-                         Spaceship::ConnectAPI::Device::DeviceClass::IPHONE,
-                         Spaceship::ConnectAPI::Device::DeviceClass::IPOD
-                       ].join(",")
-                     when 'tvos'
-                       Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV
-                     when 'macos', 'catalyst'
-                       Spaceship::ConnectAPI::Device::DeviceClass::MAC
-                     end
+      device_classes = case Sigh.config[:platform].to_s
+                       when 'ios'
+                         [
+                           Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH,
+                           Spaceship::ConnectAPI::Device::DeviceClass::IPAD,
+                           Spaceship::ConnectAPI::Device::DeviceClass::IPHONE,
+                           Spaceship::ConnectAPI::Device::DeviceClass::IPOD
+                         ]
+                       when 'tvos'
+                         [Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV]
+                       when 'macos', 'catalyst'
+                         [Spaceship::ConnectAPI::Device::DeviceClass::MAC]
+                       end
 
-      filter = { deviceClass: device_class }
-      return Spaceship::ConnectAPI::Device.all(filter: filter)
+      if api_token
+        return Spaceship::ConnectAPI::Device.all.select do |device|
+          device_classes.include?(device.device_class)
+        end
+      else
+        filter = { deviceClass: device_classes.join(",") }
+        return Spaceship::ConnectAPI::Device.all(filter: filter)
+      end
     end
 
     # Certificate to use based on the current distribution mode
@@ -273,7 +314,8 @@ module Sigh
         unless Sigh.config[:skip_certificate_verification]
           certificates = certificates.find_all do |c|
             file = Tempfile.new('cert')
-            file.write(c.download_raw)
+            raw_data = Base64.decode64(c.certificate_content)
+            file.write(raw_data)
             file.close
 
             FastlaneCore::CertChecker.installed?(file.path)
