@@ -28,7 +28,7 @@ class MainProcess {
     @objc func connectToFastlaneAndRunLane(_ fastfile: LaneFile?) {
         runner.startSocketThread(port: argumentProcessor.port)
 
-        let completedRun = Fastfile.runLane(from: fastfile, named: argumentProcessor.currentLane, parameters: argumentProcessor.laneParameters())
+        let completedRun = Fastfile.runLane(from: fastfile, named: argumentProcessor.currentLane, with: argumentProcessor.laneParameters())
         if completedRun {
             runner.disconnectFromFastlaneProcess()
         }
