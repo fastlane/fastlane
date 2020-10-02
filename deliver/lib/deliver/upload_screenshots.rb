@@ -159,7 +159,7 @@ module Deliver
 
       UI.verbose('Uploading jobs are completed')
 
-      Helper.show_loading_indicator("Waiting for all the screenshots processed...")
+      Helper.show_loading_indicator("Waiting for all the screenshots to finish being processed...")
       states = wait_for_complete(iterator)
       Helper.hide_loading_indicator
       retry_upload_screenshots_if_needed(iterator, states, total_number_of_screenshots, tries, localizations, screenshots_per_language)
