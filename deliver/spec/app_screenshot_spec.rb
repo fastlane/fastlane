@@ -36,6 +36,13 @@ describe Deliver::AppScreenshot do
       end
     end
 
+    context "when filename contains 'IPAD_PRO_3GEN_129'" do
+      it "returns iPad Pro(12.9-inch) 3rd generation" do
+        screenshot = Deliver::AppScreenshot.new("path/to/screenshot/IPAD_PRO_3GEN_129-AAABBBCCCDDD{2732x2048}.png", "de-DE")
+        expect(screenshot.screen_size).to eq(ScreenSize::IOS_IPAD_PRO_12_9)
+      end
+    end
+
     context "when filename contains 'ipadPro129'" do
       it "returns iPad Pro(12.9-inch) 3rd generation" do
         screenshot = Deliver::AppScreenshot.new("path/to/screenshot/ipadPro129-AAABBBCCCDDD{2732x2048}.png", "de-DE")
