@@ -12,18 +12,18 @@ import Foundation
 
 public protocol LaneFileProtocol: class {
     var fastlaneVersion: String { get }
-    static func runLane(from fastfile: LaneFile?, named: String, parameters: [String: String]) -> Bool
+    static func runLane(from fastfile: LaneFile?, named lane: String, with parameters: [String: String]) -> Bool
 
     func recordLaneDescriptions()
-    func beforeAll(currentLane _: String)
-    func afterAll(currentLane: String)
+    func beforeAll(with lane: String)
+    func afterAll(with lane: String)
     func onError(currentLane: String, errorInfo: String)
 }
 
 public extension LaneFileProtocol {
     var fastlaneVersion: String { return "" } // Defaults to "" because that means any is fine
-    func beforeAll(currentLane _: String) {} // No-op by default
-    func afterAll(currentLane _: String) {} // No-op by default
+    func beforeAll(with lane: String) {} // No-op by default
+    func afterAll(with lane: String) {} // No-op by default
     func onError(currentLane _: String, errorInfo _: String) {} // No-op by default
     func recordLaneDescriptions() {} // No-op by default
 }
@@ -90,8 +90,8 @@ open class LaneFile: NSObject, LaneFileProtocol {
         }
     }
 
-    public static func runLane(from fastfile: LaneFile?, named: String, parameters: [String: String]) -> Bool {
-        log(message: "Running lane: \(named)")
+    public static func runLane(from fastfile: LaneFile?, named lane: String, with parameters: [String: String]) -> Bool {
+        log(message: "Running lane: \(lane)")
         #if !SWIFT_PACKAGE
             // When not in SPM environment, we load the Fastfile from its `className()`.
             loadFastfile()
@@ -111,7 +111,7 @@ open class LaneFile: NSObject, LaneFileProtocol {
             self.fastfileInstance = fastfileInstance
         #endif
         let currentLanes = lanes
-        let lowerCasedLaneRequested = named.lowercased()
+        let lowerCasedLaneRequested = lane.lowercased()
 
         guard let laneMethod = currentLanes[lowerCasedLaneRequested] else {
             let laneNames = laneFunctionNames.map { laneFuctionName in
@@ -122,7 +122,7 @@ open class LaneFile: NSObject, LaneFileProtocol {
                 }
             }.joined(separator: ", ")
 
-            let message = "[!] Could not find lane '\(named)'. Available lanes: \(laneNames)"
+            let message = "[!] Could not find lane '\(lane)'. Available lanes: \(laneNames)"
             log(message: message)
 
             let shutdownCommand = ControlCommand(commandType: .cancel(cancelReason: .clientError), message: message)
@@ -131,15 +131,15 @@ open class LaneFile: NSObject, LaneFileProtocol {
         }
 
         // Call all methods that need to be called before we start calling lanes.
-        fastfileInstance.beforeAll(currentLane: named)
+        fastfileInstance.beforeAll(with: lane)
 
         // We need to catch all possible errors here and display a nice message.
         _ = fastfileInstance.perform(NSSelectorFromString(laneMethod), with: parameters)
 
         // Call only on success.
-        fastfileInstance.afterAll(currentLane: named)
+        fastfileInstance.afterAll(with: lane)
 
-        log(message: "Done running lane: \(named) 🚀")
+        log(message: "Done running lane: \(lane) 🚀")
         return true
     }
 }
