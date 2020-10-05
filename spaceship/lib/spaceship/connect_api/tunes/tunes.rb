@@ -185,8 +185,11 @@ module Spaceship
             type: "apps",
             id: app_id
           }
-          data[:attributes] = attributes unless attributes.empty?
           data[:relationships] = relationships unless relationships.empty?
+
+          if !attributes.nil? && !attributes.empty?
+            data[:attributes] = attributes
+          end
 
           # Body
           body = {

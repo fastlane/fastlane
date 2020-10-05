@@ -130,9 +130,9 @@ match
 
 You can find more information about GitHub basic authentication and personal token generation here: [https://developer.github.com/v3/auth/#basic-authentication](https://developer.github.com/v3/auth/#basic-authentication)
 
-##### Git Storage on Azure Devops
+##### Git Storage on Azure DevOps
 
-If you're running a pipeline on Azure Devops and using git storage in a another repository on the same project, you might want to use `bearer` token authentication.
+If you're running a pipeline on Azure DevOps and using git storage in a another repository on the same project, you might want to use `bearer` token authentication.
 
 Using parameter:
 
@@ -542,7 +542,7 @@ Storing your private keys in a Git repo may sound off-putting at first. We did a
 
 ### Google Cloud Storage
 
-All your keys and provisioning profiles are encrypted using Google managed keys. 
+All your keys and provisioning profiles are encrypted using Google managed keys.
 
 ### What could happen if someone stole a private key?
 

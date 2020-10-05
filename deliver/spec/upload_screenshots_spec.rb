@@ -274,6 +274,35 @@ describe Deliver::UploadScreenshots do
         subject.upload_screenshots([localization], screenshots_per_language)
       end
     end
+
+    context 'when localization has 10 screenshots uploaded already and try inserting another new screenshot to the top of the list' do
+      it 'should skip new screenshot' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot',
+                                source_file_checksum: 'checksum')
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: Array.new(10, app_screenshot))
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        uploaded_local_screenshot = double('Deliver::AppScreenshot',
+                                           path: 'screenshot.jpg',
+                                           language: 'en-US',
+                                           device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        new_local_screenshot = double('Deliver::AppScreenshot',
+                                      path: '0_screenshot.jpg',
+                                      language: 'en-US',
+                                      device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+
+        # The new screenshot appears prior to others in the iterator
+        screenshots_per_language = { 'en-US' => [new_local_screenshot, *Array.new(10, uploaded_local_screenshot)] }
+        allow(described_class).to receive(:calculate_checksum).with(uploaded_local_screenshot.path).and_return('checksum')
+        allow(described_class).to receive(:calculate_checksum).with(new_local_screenshot.path).and_return('another_checksum')
+
+        expect(app_screenshot_set).to_not(receive(:upload_screenshot))
+        subject.upload_screenshots([localization], screenshots_per_language)
+      end
+    end
   end
 
   describe '#wait_for_complete' do

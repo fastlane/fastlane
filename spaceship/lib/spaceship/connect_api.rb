@@ -15,6 +15,7 @@ require 'spaceship/connect_api/models/device'
 require 'spaceship/connect_api/models/profile'
 
 require 'spaceship/connect_api/models/user'
+require 'spaceship/connect_api/models/user_invitation'
 
 require 'spaceship/connect_api/models/app'
 require 'spaceship/connect_api/models/beta_app_localization'

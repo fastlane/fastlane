@@ -63,7 +63,9 @@ describe Match do
             readonly: false,
             username: values[:username],
             team_id: nil,
-            team_name: nil
+            team_name: nil,
+            api_key_path: nil,
+            api_key: nil
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
@@ -146,7 +148,9 @@ describe Match do
             readonly: false,
             username: values[:username],
             team_id: nil,
-            team_name: nil
+            team_name: nil,
+            api_key_path: nil,
+            api_key: nil
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
@@ -228,7 +232,9 @@ describe Match do
             readonly: false,
             username: values[:username],
             team_id: nil,
-            team_name: nil
+            team_name: nil,
+            api_key_path: nil,
+            api_key: nil
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
@@ -296,7 +302,9 @@ describe Match do
             readonly: false,
             username: values[:username],
             team_id: nil,
-            team_name: nil
+            team_name: nil,
+            api_key_path: nil,
+            api_key: nil
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)

@@ -28,10 +28,17 @@ module Match
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
         google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
         google_cloud_project_id: params[:google_cloud_project_id].to_s,
+        s3_bucket: params[:s3_bucket],
+        s3_region: params[:s3_region],
+        s3_access_key: params[:s3_access_key],
+        s3_secret_access_key: params[:s3_secret_access_key],
+        s3_object_prefix: params[:s3_object_prefix],
         readonly: params[:readonly],
         username: params[:username],
         team_id: params[:team_id],
-        team_name: params[:team_name]
+        team_name: params[:team_name],
+        api_key_path: params[:api_key_path],
+        api_key: params[:api_key]
       })
       storage.download
 
@@ -48,11 +55,25 @@ module Match
 
       case cert_type
       when :development
-        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT + "," + Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT,
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DEVELOPMENT,
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT
+        ].join(',')
       when :distribution, :enterprise
-        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION + "," + Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION,
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DISTRIBUTION,
+          Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION
+        ].join(',')
       when :developer_id_application
-        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+        ].join(',')
+      when :mac_installer_distribution
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION
+        ].join(',')
       else
         UI.user_error!("Cert type '#{cert_type}' is not supported")
       end
@@ -70,8 +91,14 @@ module Match
         dest_p12_path = File.join(output_dir_certs, "certificate.p12")
       else
         # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
-        Spaceship::Portal.login(params[:username])
-        Spaceship::Portal.select_team(team_id: params[:team_id], team_name: params[:team_name])
+        token = api_token(params)
+        if token
+          UI.message("Creating authorization token for App Store Connect API")
+          Spaceship::ConnectAPI.token = token
+        else
+          UI.message("Login to App Store Connect (#{params[:username]})")
+          Spaceship::ConnectAPI.login(params[:username], use_portal: true, use_tunes: false, portal_team_id: params[:team_id], team_name: params[:team_name])
+        end
         certs = Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: certificate_type })
 
         # Base64 encode contents to find match from API to find a cert ID
@@ -116,6 +143,12 @@ module Match
       file_path = File.exist?(file_path) ? file_path : nil
       UI.user_error!("#{file_description} does not exist at path: #{file_path}") unless !file_path.nil? || optional
       file_path
+    end
+
+    def api_token(params)
+      @api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
+      return @api_token
     end
   end
 end

@@ -97,8 +97,18 @@ module Spaceship
       end
 
       def portal_team_id
-        return nil if @portal_client.nil?
-        return @portal_client.team_id
+        if token
+          message = [
+            "Cannot determine portal team id via the App Store Connect API (yet)",
+            "Look to see if you can get the portal team id from somewhere else",
+            "View more info in the docs at https://docs.fastlane.tools/app-store-connect-api/"
+          ]
+          raise message.join('. ')
+        elsif @portal_client
+          return @portal_client.team_id
+        else
+          raise "No App Store Connect API token or Portal Client set"
+        end
       end
 
       def tunes_team_id
@@ -126,7 +136,7 @@ module Spaceship
               "Or set the 'SPACESHIP_CONNECT_API_IN_HOUSE' environment variable to 'true'",
               "View more info in the docs at https://docs.fastlane.tools/app-store-connect-api/"
             ]
-            raise message.join('\n')
+            raise message.join('. ')
           end
           return !!token.in_house
         elsif @portal_client

@@ -4,6 +4,25 @@ module Fastlane
       LANE_NAME = :LANE_NAME
       PLATFORM_NAME = :PLATFORM_NAME
       ENVIRONMENT = :ENVIRONMENT
+
+      # A slighly decorated hash that will store and fetch sensitive data
+      # but not display it while iterating keys and values
+      class LaneContextValues < Hash
+        def initialize
+          @sensitive_context = {}
+        end
+
+        def set_sensitive(key, value)
+          @sensitive_context[key] = value
+        end
+
+        def [](key)
+          if @sensitive_context.key?(key)
+            return @sensitive_context[key]
+          end
+          super
+        end
+      end
     end
 
     def self.reset_aliases
@@ -27,7 +46,7 @@ module Fastlane
 
     # The shared hash can be accessed by any action and contains information like the screenshots path or beta URL
     def self.lane_context
-      @lane_context ||= {}
+      @lane_context ||= SharedValues::LaneContextValues.new
     end
 
     # Used in tests to get a clear lane before every test

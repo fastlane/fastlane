@@ -62,7 +62,6 @@ module Match
                                      type: Boolean,
                                      default_value: false),
 
-        # app
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "MATCH_APP_IDENTIFIER",
@@ -72,10 +71,30 @@ module Match
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
                                      default_value_dynamic: true),
+
+        # App Store Connect API
+        FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                     env_name: "SIGH_API_KEY_PATH",
+                                     description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                     optional: true,
+                                     conflicting_options: [:api_key],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_name: "SIGH_API_KEY",
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                     type: Hash,
+                                     optional: true,
+                                     sensitive: true,
+                                     conflicting_options: [:api_key_path]),
+
+        # Apple ID
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "MATCH_USERNAME",
                                      description: "Your Apple ID Username",
+                                     optional: true,
                                      default_value: user,
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :team_id,
@@ -147,7 +166,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :git_bearer_authorization,
                                      env_name: "MATCH_GIT_BEARER_AUTHORIZATION",
                                      sensitive: true,
-                                     description: "Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64",
+                                     description: "Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64",
                                      conflicting_options: [:git_basic_authorization, :git_private_key],
                                      optional: true,
                                      default_value: nil),
@@ -274,6 +293,12 @@ module Match
                                      env_name: "MATCH_OUTPUT_PATH",
                                      description: "Path in which to export certificates, key and profile",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_set_partition_list,
+                                     short_option: "-P",
+                                     env_name: "MATCH_SKIP_SET_PARTITION_LIST",
+                                     description: "Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing",
+                                     type: Boolean,
+                                     default_value: false),
 
         # other
         FastlaneCore::ConfigItem.new(key: :verbose,

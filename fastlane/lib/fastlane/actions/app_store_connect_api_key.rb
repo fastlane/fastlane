@@ -17,6 +17,10 @@ module Fastlane
           UI.user_error!(":key_content or :key_filepath is required")
         end
 
+        # New lines don't get read properly when coming from an ENV
+        # Replacing them literal version with a new line
+        key_content = key_content.gsub('\n', "\n") if key_content
+
         # This hash matches the named arguments on
         # the Spaceship::ConnectAPI::Token.create method
         key = {
@@ -27,7 +31,7 @@ module Fastlane
           in_house: in_house
         }
 
-        Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY] = key
+        Actions.lane_context.set_sensitive(SharedValues::APP_STORE_CONNECT_API_KEY, key)
 
         return key
       end
@@ -55,6 +59,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :key_content,
                                        env_name: "APP_STORE_CONNECT_API_KEY_KEY",
                                        description: "The content of the key p8 file",
+                                       sensitive: true,
                                        optional: true,
                                        conflicting_options: [:filepath]),
           FastlaneCore::ConfigItem.new(key: :duration,
