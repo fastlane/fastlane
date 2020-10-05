@@ -181,7 +181,7 @@ module Deliver
                        Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::MANUAL
                      end
       if release_type.nil?
-        UI.important("Release type will not get because Neither `automatic_release` nor `auto_release_date` are provided. Please explicitly set one of these options if you need a release type set")
+        UI.important("Release type will not be set because neither `automatic_release` nor `auto_release_date` were provided. Please explicitly set one of these options if you need a release type set")
       else
         non_localized_version_attributes['releaseType'] = release_type
       end
