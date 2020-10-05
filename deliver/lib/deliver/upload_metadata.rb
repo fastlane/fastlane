@@ -189,7 +189,7 @@ module Deliver
       # Update app store version
       # This needs to happen before updating localizations (https://openradar.appspot.com/radar?id=4925914991296512)
       #
-      # Adding some sleeps because the API sometimes will sometimes be in a state where releaseType can't be modified
+      # Adding some sleeps because the API will sometimes be in a state where releaseType can't be modified
       #   https://github.com/fastlane/fastlane/issues/16911
       UI.message("Uploading metadata to App Store Connect for version")
       sleep(2)
