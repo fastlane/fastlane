@@ -152,6 +152,7 @@ module Spaceship
 
       def with_asc_retry(tries = 5, &_block)
         tries = 1 if Object.const_defined?("SpecHelper")
+
         response = yield
 
         status = response.status if response
@@ -192,6 +193,11 @@ module Spaceship
         store_csrf_tokens(response)
 
         return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, client: self)
+      end
+
+      def handle_401(response)
+        # Spaceship::Client has its own check for 401
+        # Overriding that handling of 401 and letting this handle_errors handle the 401
       end
 
       def handle_errors(response)
