@@ -252,9 +252,7 @@ describe Deliver::UploadMetadata do
           # Get number of verions (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
-          expect(version).to receive(:update).with(attributes: {
-            "releaseType" => "MANUAL"
-          })
+          expect(version).to receive(:update).with(attributes: {})
 
           # Update version localization
           expect(version_localization_en).to receive(:update).with(attributes: {
@@ -303,7 +301,8 @@ describe Deliver::UploadMetadata do
               app: app,
               platform: "ios",
               metadata_path: metadata_path,
-              phased_release: true
+              phased_release: true,
+              automatic_release: false
           }
 
           # Get number of verions (used for if whats_new should be sent)
@@ -340,9 +339,7 @@ describe Deliver::UploadMetadata do
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
-          expect(version).to receive(:update).with(attributes: {
-            "releaseType" => "MANUAL"
-          })
+          expect(version).to receive(:update).with(attributes: {})
 
           # Get phased release
           phased_release = double('phased_release')
@@ -371,9 +368,7 @@ describe Deliver::UploadMetadata do
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
-          expect(version).to receive(:update).with(attributes: {
-            "releaseType" => "MANUAL"
-          })
+          expect(version).to receive(:update).with(attributes: {})
 
           # Get reset ratings request
           expect(version).to receive(:fetch_reset_ratings_request).and_return(nil)
@@ -399,9 +394,7 @@ describe Deliver::UploadMetadata do
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
-          expect(version).to receive(:update).with(attributes: {
-            "releaseType" => "MANUAL"
-          })
+          expect(version).to receive(:update).with(attributes: {})
 
           # Get reset ratings request
           reset_ratings_request = double('reset_ratings_request')

@@ -175,17 +175,26 @@ module Deliver
 
                        non_localized_version_attributes['earliestReleaseDate'] = date
                        Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::SCHEDULED
-                     elsif options[:automatic_release]
+                     elsif options[:automatic_release] == true
                        Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::AFTER_APPROVAL
-                     else
+                     elsif options[:automatic_release] == false
                        Spaceship::ConnectAPI::AppStoreVersion::ReleaseType::MANUAL
                      end
-      non_localized_version_attributes['releaseType'] = release_type
+      if release_type.nil?
+        UI.important("Release type will not be set because neither `automatic_release` nor `auto_release_date` were provided. Please explicitly set one of these options if you need a release type set")
+      else
+        non_localized_version_attributes['releaseType'] = release_type
+      end
 
       # Update app store version
       # This needs to happen before updating localizations (https://openradar.appspot.com/radar?id=4925914991296512)
+      #
+      # Adding some sleeps because the API will sometimes be in a state where releaseType can't be modified
+      #   https://github.com/fastlane/fastlane/issues/16911
       UI.message("Uploading metadata to App Store Connect for version")
+      sleep(2)
       version.update(attributes: non_localized_version_attributes)
+      sleep(1)
 
       # Update app store version localizations
       app_store_version_localizations.each do |app_store_version_localization|
