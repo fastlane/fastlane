@@ -50,7 +50,7 @@ module Fastlane
       def self.example_code
         [
           'upload_to_app_store(
-            force: true, # Set to true to skip PDF verification
+            force: true, # Set to true to skip HTML verification
             itc_provider: "abcde12345" # pass a specific value to the iTMSTransporter -itc_provider option
           )',
           'deliver   # alias for "upload_to_app_store"',
