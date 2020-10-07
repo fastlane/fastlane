@@ -110,6 +110,7 @@ module Supply
       track = tracks.first
       releases = track.releases
 
+      releases = releases.reject { |r| r.version_codes.nil? || r.version_codes.empty? } if version_code
       releases = releases.select { |r| r.status == status } if status
       releases = releases.select { |r| r.version_codes.map(&:to_s).include?(version_code.to_s) } if version_code
 
