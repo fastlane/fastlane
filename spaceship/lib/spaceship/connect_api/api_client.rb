@@ -163,6 +163,10 @@ module Spaceship
         end
 
         return response
+      rescue UnauthorizedAccessError => error
+        # Catch unathorized access and re-raising
+        # There is no need to try again
+        raise error
       rescue => error
         tries -= 1
         puts(error) if Spaceship::Globals.verbose?
@@ -196,8 +200,7 @@ module Spaceship
       end
 
       def handle_401(response)
-        # Spaceship::Client has its own check for 401
-        # Overriding that handling of 401 and letting this handle_errors handle the 401
+        raise UnauthorizedAccessError, handle_errors(response) if response && (response.body || {})['errors']
       end
 
       def handle_errors(response)
