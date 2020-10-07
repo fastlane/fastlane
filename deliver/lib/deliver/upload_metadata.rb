@@ -1,4 +1,5 @@
 require_relative 'module'
+require_relative 'queue_worker'
 
 module Deliver
   # upload description, rating, etc.
@@ -197,22 +198,26 @@ module Deliver
       sleep(1)
 
       # Update app store version localizations
-      app_store_version_localizations.each do |app_store_version_localization|
+      store_version_worker = Deliver::QueueWorker.new(Helper.test? ? 1 : 10) do |app_store_version_localization|
         attributes = localized_version_attributes_by_locale[app_store_version_localization.locale]
         if attributes
           UI.message("Uploading metadata to App Store Connect for localized version '#{app_store_version_localization.locale}'")
           app_store_version_localization.update(attributes: attributes)
         end
       end
+      store_version_worker.batch_enqueue(app_store_version_localizations)
+      store_version_worker.start
 
       # Update app info localizations
-      app_info_localizations.each do |app_info_localization|
+      app_info_worker = Deliver::QueueWorker.new(Helper.test? ? 1 : 10) do |app_info_localization|
         attributes = localized_info_attributes_by_locale[app_info_localization.locale]
         if attributes
           UI.message("Uploading metadata to App Store Connect for localized info '#{app_info_localization.locale}'")
           app_info_localization.update(attributes: attributes)
         end
       end
+      app_info_worker.batch_enqueue(app_info_localizations)
+      app_info_worker.start
 
       # Update categories
       app_info = fetch_edit_app_info(app)
