@@ -12,6 +12,15 @@ describe Deliver::QueueWorker do
     end
   end
 
+  describe '#batch_enqueue' do
+    subject { described_class.new(1) { |_| } }
+
+    it 'should take an array as multiple jobs' do
+      expect { subject.batch_enqueue([1, 2, 3]) }.not_to(raise_error)
+      expect { subject.batch_enqueue(1) }.to(raise_error(ArgumentError))
+    end
+  end
+
   describe '#start' do
     it 'should dispatch enqueued items to given block in FIFO order' do
       dispatched_jobs = []

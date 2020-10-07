@@ -19,6 +19,12 @@ module Deliver
       @queue.push(job)
     end
 
+    # @param jobs (Array<Object>) - An array of arbitary object that keeps parameters
+    def batch_enqueue(jobs)
+      raise(ArgumentError, "Enqueue Array instead of #{jobs.class}") unless jobs.kind_of?(Array)
+      jobs.each { |job| enqueue(job) }
+    end
+
     # Call this after you enqueuned all the jobs you want to process
     # This method blocks current thread until all the enqueued jobs are processed
     def start
