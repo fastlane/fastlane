@@ -44,7 +44,7 @@ module Pilot
         UI.user_error!("Build #{config[:build_number]} not found.") unless builds.count == 1
         build = builds.first
       end
-      UI.success("Build: #{build.version} id: #{build.id}")
+      UI.verbose("Build: #{build.version} id: #{build.id}")
 
       app.get_beta_testers.select do |tester|
         next unless email_param == tester.email
