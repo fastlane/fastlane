@@ -36,7 +36,7 @@ module Pilot
       UI.user_error!("You must provide 1 or more emails (with the `:email` option)") unless email_param
 
       if config[:build_number].nil?
-        build = app.get_builds[0]
+        build = app.get_builds.first
       else
         builds = app.get_builds.select do |b|
           config[:build_number] == b.version
