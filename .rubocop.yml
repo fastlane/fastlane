@@ -319,6 +319,7 @@ Style/MethodCallWithArgsParentheses:
     - 'platform'
     # rspec tests code below
     - 'to'
+    - 'not_to'
     - 'describe'
     - 'it'
     - 'be'

@@ -25,31 +25,64 @@ describe Fastlane do
 
           Dir.chdir(source_directory_path) do
             `git init`
+            `git config user.email "you@example.com"`
+            `git config user.name "Your Name"`
 
             `mkdir fastlane`
-            `echo "lane :works do\n\tUI.important('Works since v1')\nend" > fastlane/Fastfile`
+            File.write('fastlane/Fastfile', <<-FASTFILE)
+              lane :works do
+                UI.important('Works since v1')
+              end
+            FASTFILE
             `git add .`
             `git commit --message "Version 1"`
             `git tag "1"`
 
-            `echo "lane :works_extra do\n\tUI.important('Works from extra since v2')\nend" > fastlane/FastfileExtra`
+            File.write('fastlane/FastfileExtra', <<-FASTFILE)
+              lane :works_extra do
+                UI.important('Works from extra since v2')
+              end
+            FASTFILE
             `git add .`
             `git commit --message "Version 2"`
             `git tag "2"`
 
-            `echo "lane :works_root do\n\tUI.important('Works from root since v3')\nend" > FastfileRoot`
+            File.write('FastfileRoot', <<-FASTFILE)
+              lane :works_root do
+                UI.important('Works from root since v3')
+              end
+            FASTFILE
             `git add .`
             `git commit --message "Version 3"`
             `git tag "3"`
 
             `mkdir fastlane/actions`
-            `echo "module Fastlane\n\tmodule Actions\n\t\tclass WorkActionAction < Action\n\t\t\tdef self.run(params)\n\t\t\t\tUI.important('Works from action since v4')\n\t\t\tend\n\n\t\t\tdef self.is_supported?(platform)\n\t\t\t\ttrue\n\t\t\tend\n\t\tend\n\tend\nend" > fastlane/actions/work_action.rb`
+            FileUtils.mkdir_p('fastlane/actions')
+            File.write('fastlane/actions/work_action.rb', <<-FASTFILE)
+              module Fastlane
+                module Actions
+                  class WorkActionAction < Action
+                    def self.run(params)
+                      UI.important('Works from action since v4')
+                    end
+
+                    def self.is_supported?(platform)
+                      true
+                    end
+                  end
+                end
+              end
+            FASTFILE
             `git add .`
             `git commit --message "Version 4"`
             `git tag "4"`
 
-            `git checkout tags/2 -b version-2.1 > /dev/null 2>&1`
-            `echo "lane :works do\n\tUI.important('Works since v2.1')\nend" > fastlane/Fastfile`
+            `git checkout tags/2 -b version-2.1 2>&1`
+            File.write('fastlane/Fastfile', <<-FASTFILE)
+              lane :works do
+                UI.important('Works since v2.1')
+              end
+            FASTFILE
             `git add .`
             `git commit --message "Version 2.1"`
           end
@@ -128,8 +161,12 @@ describe Fastlane do
         # in the local clone.
         it "works with new tags" do
           Dir.chdir(source_directory_path) do
-            `git checkout "master" > /dev/null 2>&1`
-            `echo "lane :works do\n\tUI.important('Works until v5')\nend" > fastlane/Fastfile`
+            `git checkout "master" 2>&1`
+            File.write('fastlane/Fastfile', <<-FASTFILE)
+              lane :works do
+                UI.important('Works until v5')
+              end
+            FASTFILE
             `git add .`
             `git commit --message "Version 5"`
             `git tag "5"`
@@ -157,7 +194,7 @@ describe Fastlane do
 
               works
             end").runner.execute(:test)
-          end.not_to(raise_error)
+          end.not_to raise_error
         end
 
         it "ignores it when branch is specified" do

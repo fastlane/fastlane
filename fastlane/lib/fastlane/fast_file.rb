@@ -320,7 +320,7 @@ module Fastlane
                 # Update the repo and try again before failing
                 UI.message("Updating git repo...")
                 Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-                  Actions.sh("cd #{clone_folder.shellescape} && git checkout '#{branch}' && git reset --hard && git pull --all")
+                  Actions.sh("cd #{clone_folder.shellescape} && git checkout #{branch} && git reset --hard && git pull --all")
                 end
 
                 checkout_param = find_tag(folder: clone_folder, version: version, remote: false)
