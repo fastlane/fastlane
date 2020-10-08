@@ -220,6 +220,14 @@ module Fastlane
             live: false,
             app_identifier: "app.identifier",
             version: "1.2.9"
+          )',
+          'api_key = app_store_connect_api_key(
+            key_id: "MyKeyID12345",
+            issuer_id: "00000000-0000-0000-0000-000000000000",
+            key_filepath: "./AuthKey.p8"
+          )
+          build_num = app_store_build_number(
+            api_key: api_key
           )'
         ]
       end

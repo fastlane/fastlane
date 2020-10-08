@@ -37,6 +37,21 @@ module Fastlane
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
         [
+          FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                       env_name: "PILOT_API_KEY_PATH",
+                                       description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                       optional: true,
+                                       conflicting_options: [:username],
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :api_key,
+                                       env_name: "PILOT_API_KEY",
+                                       description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                       type: Hash,
+                                       optional: true,
+                                       sensitive: true,
+                                       conflicting_options: [:api_key_path, :username]),
           FastlaneCore::ConfigItem.new(key: :live,
                                        short_option: "-l",
                                        env_name: "CURRENT_BUILD_NUMBER_LIVE",
