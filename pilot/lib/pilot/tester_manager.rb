@@ -42,7 +42,7 @@ module Pilot
           config[:build_number] == b.version
         end
         UI.user_error!("Build #{config[:build_number]} not found.") unless builds.count == 1
-        build = builds[0]
+        build = builds.first
       end
       UI.success("Build: #{build.version} id: #{build.id}")
 
