@@ -47,7 +47,7 @@ module Pilot
       UI.success("Build: #{build.version} id: #{build.id}")
 
       app.get_beta_testers.select do |tester|
-        next unless email_param.include?(tester.email)
+        next unless email_param == tester.email
         app.add_individual_testers_to_build(build_id: build.id, beta_tester_ids: [tester.id])
         UI.success("Added tester: #{tester.email} to build #{build.version} of app #{app.name}.")
       end
