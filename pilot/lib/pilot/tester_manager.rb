@@ -27,6 +27,32 @@ module Pilot
       UI.success("Successfully added tester #{config[:email]} to app #{app.name} in group(s) #{group_names}")
     end
 
+    def add_tester_to_build(options)
+      start(options)
+      app = find_app(apple_id: config[:apple_id], app_identifier: config[:app_identifier])
+      UI.user_error!("You must provide either a Apple ID for the app (with the `:apple_id` option) or app identifier (with the `:app_identifier` option)") unless app
+
+      email_param = config[:email]
+      UI.user_error!("You must provide 1 or more emails (with the `:email` option)") unless email_param
+
+      if config[:build_number].nil?
+        build = app.get_builds[0]
+      else
+        builds = app.get_builds.select do |b|
+          config[:build_number] == b.version
+        end
+        UI.user_error!("Build #{config[:build_number]} not found.") unless builds.count == 1
+        build = builds[0]
+      end
+      UI.success("Build: #{build.version} id: #{build.id}")
+
+      app.get_beta_testers.select do |tester|
+        next unless email_param.include?(tester.email)
+        app.add_individual_testers_to_build(build_id: build.id, beta_tester_ids: [tester.id])
+        UI.success("Added tester: #{tester.email} to build #{build.version} of app #{app.name}.")
+      end
+    end
+
     def find_tester(options)
       start(options)
 

@@ -73,7 +73,8 @@ describe Pilot::CommandsGenerator do
   {
     add: :add_tester,
     remove: :remove_tester,
-    find: :find_tester
+    find: :find_tester,
+    add_to_build: :add_tester_to_build
   }.each do |command, tester_manager_method|
     describe ":#{command} option handling" do
       it "can use the email short flag from tool options" do

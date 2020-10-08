@@ -102,6 +102,17 @@ module Pilot
         end
       end
 
+      command :add_to_build do |c|
+        c.syntax = "fastlane pilot add_to_build"
+        c.description = "Adds an existing external tester(s) to a specific build of an app (if given)."
+
+        FastlaneCore::CommanderGenerator.new.generate(Pilot::Options.available_options, command: c)
+
+        c.action do |args, options|
+          handle_multiple('add_tester_to_build', args, options)
+        end
+      end
+
       command :list do |c|
         c.syntax = "fastlane pilot list"
         c.description = "Lists all registered testers, both internal and external"

@@ -191,6 +191,19 @@ module Spaceship
           test_flight_request_client.post("builds/#{build_id}/relationships/betaGroups", body)
         end
 
+        def add_individual_testers_to_build(build_id: nil, beta_tester_ids: [])
+          body = {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.post("builds/#{build_id}/relationships/individualTesters", body)
+        end
+
         def create_beta_group(app_id: nil, group_name: nil, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
           body = {
             data: {
