@@ -319,6 +319,8 @@ module Fastlane
                 end
 
                 checkout_param = find_tag(folder: clone_folder, version: version, remote: false)
+              else
+                UI.message("Found tag #{checkout_param}. No git repo update needed.")
               end
             else
               checkout_param = find_tag(folder: clone_folder, version: version, remote: true)
