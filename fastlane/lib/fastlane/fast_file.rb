@@ -295,6 +295,9 @@ module Fastlane
 
           checkout_dependencies = dependencies.map(&:shellescape).join(" ")
 
+          # If the current call is eligible for caching, we check out all the
+          # files and directories. If not, we only check out the specified
+          # `path` and `dependencies`.
           checkout_path = is_eligible_for_caching ? "" : "#{path.shellescape} #{checkout_dependencies}"
 
           if Dir[clone_folder].empty?
@@ -333,6 +336,9 @@ module Fastlane
 
           Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{checkout_path}")
 
+          # Knowing that we check out all the files and directories when the
+          # current call is eligible for caching, we don't need to also
+          # explicitly check out the "actions" directory.
           unless is_eligible_for_caching
             # We also want to check out all the local actions of this fastlane setup
             containing = path.split(File::SEPARATOR)[0..-2]
