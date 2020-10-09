@@ -303,7 +303,7 @@ module Fastlane
               # When using cached clones, we need the entire repository history
               # so we can switch between tags or branches instantly, or else,
               # it would defeat the caching's purpose.
-              Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} #{is_eligible_for_caching ? '' : '--depth 1'} -n #{branch_option}")
+              Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} #{is_eligible_for_caching ? '' : '--depth 1'} --no-checkout #{branch_option}")
             end
           end
 
