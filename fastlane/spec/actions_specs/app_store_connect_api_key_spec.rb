@@ -21,6 +21,7 @@ describe Fastlane do
           key_id: key_id,
           issuer_id: issuer_id,
           key: File.binread(fake_api_key_p8_path),
+          is_key_content_base64: false,
           duration: nil,
           in_house: nil
         }
@@ -47,6 +48,7 @@ describe Fastlane do
             key_id: key_id,
             issuer_id: issuer_id,
             key: key_content,
+            is_key_content_base64: false,
             duration: 200,
             in_house: true
           }
@@ -55,13 +57,11 @@ describe Fastlane do
         end
 
         it "with base64 encoded" do
-          require 'base64'
-          key_content_base64 = Base64.encode64(key_content)
           result = Fastlane::FastFile.new.parse("lane :test do
             app_store_connect_api_key(
               key_id: '#{key_id}',
               issuer_id: '#{issuer_id}',
-              key_content: '#{key_content_base64}',
+              key_content: '#{key_content}',
               is_key_content_base64: true,
               duration: 200,
               in_house: true
@@ -72,6 +72,7 @@ describe Fastlane do
             key_id: key_id,
             issuer_id: issuer_id,
             key: key_content,
+            is_key_content_base64: true,
             duration: 200,
             in_house: true
           }

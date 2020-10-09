@@ -11,13 +11,10 @@ module Fastlane
         key_id = options[:key_id]
         issuer_id = options[:issuer_id]
         key_content = options[:key_content]
+        is_key_content_base64 = options[:is_key_content_base64]
         key_filepath = options[:key_filepath]
         duration = options[:duration]
         in_house = options[:in_house]
-
-        if !key_content.nil? && options[:is_key_content_base64]
-          key_content = Base64.decode64(key_content)
-        end
 
         if key_content.nil? && key_filepath.nil?
           UI.user_error!(":key_content or :key_filepath is required")
@@ -33,6 +30,7 @@ module Fastlane
           key_id: key_id,
           issuer_id: issuer_id,
           key: key_content || File.binread(key_filepath),
+          is_key_content_base64: is_key_content_base64,
           duration: duration,
           in_house: in_house
         }
