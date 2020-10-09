@@ -295,7 +295,7 @@ module Fastlane
 
           checkout_dependencies = dependencies.map(&:shellescape).join(" ")
 
-          checkout_path = "#{path.shellescape} #{checkout_dependencies}"
+          checkout_path = is_eligible_for_caching ? "" : "#{path.shellescape} #{checkout_dependencies}"
 
           if Dir[clone_folder].empty?
             UI.message("Cloning remote git repo...")
@@ -303,7 +303,9 @@ module Fastlane
               # When using cached clones, we need the entire repository history
               # so we can switch between tags or branches instantly, or else,
               # it would defeat the caching's purpose.
-              Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} #{is_eligible_for_caching ? '' : '--depth 1'} --no-checkout #{branch_option}")
+              depth = is_eligible_for_caching ? "" : "--depth 1"
+
+              Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} #{depth} --no-checkout #{branch_option}")
             end
           end
 
@@ -329,7 +331,7 @@ module Fastlane
             UI.user_error!("No tag found matching #{version.inspect}") if checkout_param.nil?
           end
 
-          Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{is_eligible_for_caching ? '' : checkout_path}")
+          Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{checkout_path}")
 
           unless is_eligible_for_caching
             # We also want to check out all the local actions of this fastlane setup
