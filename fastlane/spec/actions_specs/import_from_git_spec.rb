@@ -10,6 +10,8 @@ describe Fastlane do
       end
 
       describe "with caching" do
+        let(:caching_message) { "Eligible for caching" }
+
         source_directory_path = nil
 
         cache_directory_path = nil
@@ -58,11 +60,9 @@ describe Fastlane do
           FileUtils.remove_dir(missing_cache_directory_path)
         end
 
-        before :each do
-          ENV.delete("IMPORT_FROM_GIT_IS_ELIGIBLE_FOR_CACHING")
-        end
-
         it "works with version" do
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:message).with(caching_message)
           expect(UI).to receive(:important).with('Works since v1')
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -70,11 +70,11 @@ describe Fastlane do
 
             works
           end").runner.execute(:test)
-
-          expect(ENV["IMPORT_FROM_GIT_IS_ELIGIBLE_FOR_CACHING"]).to eq("1")
         end
 
         it "works with dependencies and version" do
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:message).with(caching_message)
           expect(UI).to receive(:important).with('Works from extra since v2')
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -82,11 +82,11 @@ describe Fastlane do
 
             works_extra
           end").runner.execute(:test)
-
-          expect(ENV["IMPORT_FROM_GIT_IS_ELIGIBLE_FOR_CACHING"]).to eq("1")
         end
 
         it "works with path and version" do
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:message).with(caching_message)
           expect(UI).to receive(:important).with('Works from root since v3')
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -94,11 +94,11 @@ describe Fastlane do
 
             works_root
           end").runner.execute(:test)
-
-          expect(ENV["IMPORT_FROM_GIT_IS_ELIGIBLE_FOR_CACHING"]).to eq("1")
         end
 
         it "works with actions" do
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:message).with(caching_message)
           expect(UI).to receive(:important).with('Works from action since v4')
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -106,8 +106,6 @@ describe Fastlane do
 
             work_action
           end").runner.execute(:test)
-
-          expect(ENV["IMPORT_FROM_GIT_IS_ELIGIBLE_FOR_CACHING"]).to eq("1")
         end
 
         # This is based on the fact that rspec runs the tests in the order
@@ -115,6 +113,8 @@ describe Fastlane do
         # works with an older version after a newer one was previously checked
         # out.
         it "works with older version" do
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:message).with(caching_message)
           expect(UI).to receive(:important).with('Works since v1')
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -122,8 +122,6 @@ describe Fastlane do
 
             works
           end").runner.execute(:test)
-
-          expect(ENV["IMPORT_FROM_GIT_IS_ELIGIBLE_FOR_CACHING"]).to eq("1")
         end
 
         # Meaning, a `git pull` is performed when the specified tag is not found
@@ -137,6 +135,8 @@ describe Fastlane do
             `git tag "5"`
           end
 
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:message).with(caching_message)
           expect(UI).to receive(:important).with('Works until v5')
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -144,8 +144,6 @@ describe Fastlane do
 
             works
           end").runner.execute(:test)
-
-          expect(ENV["IMPORT_FROM_GIT_IS_ELIGIBLE_FOR_CACHING"]).to eq("1")
         end
 
         # Actually, `git checkout` makes sure of this, but I think it's ok to
@@ -163,6 +161,7 @@ describe Fastlane do
         end
 
         it "ignores it when branch is specified" do
+          expect(UI).not_to receive(:message).with(caching_message)
           expect(UI).to receive(:important).with('Works since v2.1')
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -170,8 +169,6 @@ describe Fastlane do
 
             works
           end").runner.execute(:test)
-
-          expect(ENV["IMPORT_FROM_GIT_IS_ELIGIBLE_FOR_CACHING"]).to be_nil
         end
 
         # Because we don't know if the specified value represents a branch or a
@@ -179,6 +176,7 @@ describe Fastlane do
         # points to a different commit when one is added, as opposed to a tag,
         # we decided to enable caching only when used with the `version` param.
         it "ignores it when tag is specified via branch param" do
+          expect(UI).not_to receive(:message).with(caching_message)
           expect(UI).to receive(:important).with('Works since v1')
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -186,16 +184,14 @@ describe Fastlane do
 
             works
           end").runner.execute(:test)
-
-          expect(ENV["IMPORT_FROM_GIT_IS_ELIGIBLE_FOR_CACHING"]).to be_nil
         end
 
         it "ignores it when version is not specified" do
+          expect(UI).not_to receive(:message).with(caching_message)
+
           Fastlane::FastFile.new.parse("lane :test do
             import_from_git(url: '#{source_directory_path}', cache_path: '#{cache_directory_path}')
           end").runner.execute(:test)
-
-          expect(ENV["IMPORT_FROM_GIT_IS_ELIGIBLE_FOR_CACHING"]).to be_nil
         end
 
         after :all do

@@ -282,7 +282,7 @@ module Fastlane
 
         is_eligible_for_caching = !version.nil? && !cache_path.nil?
 
-        ENV["IMPORT_FROM_GIT_IS_ELIGIBLE_FOR_CACHING"] = "1" if Helper.test? && is_eligible_for_caching
+        UI.message("Eligible for caching") if is_eligible_for_caching
 
         # Checkout the repo
         repo_name = url.split("/").last
