@@ -198,7 +198,7 @@ module Deliver
       sleep(1)
 
       # Update app store version localizations
-      store_version_worker = Deliver::QueueWorker.new(Helper.test? ? 1 : 10) do |app_store_version_localization|
+      store_version_worker = Deliver::QueueWorker.new do |app_store_version_localization|
         attributes = localized_version_attributes_by_locale[app_store_version_localization.locale]
         if attributes
           UI.message("Uploading metadata to App Store Connect for localized version '#{app_store_version_localization.locale}'")
@@ -209,7 +209,7 @@ module Deliver
       store_version_worker.start
 
       # Update app info localizations
-      app_info_worker = Deliver::QueueWorker.new(Helper.test? ? 1 : 10) do |app_info_localization|
+      app_info_worker = Deliver::QueueWorker.new do |app_info_localization|
         attributes = localized_info_attributes_by_locale[app_info_localization.locale]
         if attributes
           UI.message("Uploading metadata to App Store Connect for localized info '#{app_info_localization.locale}'")

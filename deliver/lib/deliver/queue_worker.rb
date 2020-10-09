@@ -6,9 +6,11 @@ module Deliver
   # Use this when you have all the items that you'll process in advance.
   # Simply enqueue them to this and call `QueueWorker#start`.
   class QueueWorker
+    NUMBER_OF_THREADS = Helper.test? ? 1 : [ENV.fetch("DELIVER_NUMBER_OF_THREADS", 10).to_i, 10].min
+
     # @param concurrency (Numeric) - A number of threads to be created
     # @param block (Proc) - A task you want to execute with enqueued items
-    def initialize(concurrency, &block)
+    def initialize(concurrency = NUMBER_OF_THREADS, &block)
       @concurrency = concurrency
       @block = block
       @queue = Queue.new
