@@ -858,9 +858,7 @@ module Spaceship
 
         resp_hash = response.to_hash
         if resp_hash[:status] == 401
-          msg = "Auth lost"
-          logger.warn(msg)
-          raise UnauthorizedAccessError.new, "Unauthorized Access"
+          handle_401(response)
         end
 
         if response.body.to_s.include?("<title>302 Found</title>")
@@ -879,6 +877,12 @@ module Spaceship
 
         return response
       end
+    end
+
+    def handle_401(response)
+      msg = "Auth lost"
+      logger.warn(msg)
+      raise UnauthorizedAccessError.new, "Unauthorized Access"
     end
 
     def send_request_auto_paginate(method, url_or_path, params, headers, &block)
