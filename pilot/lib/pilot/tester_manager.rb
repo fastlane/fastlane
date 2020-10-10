@@ -51,6 +51,11 @@ module Pilot
         app.add_individual_testers_to_build(build_id: build.id, beta_tester_ids: [tester.id])
         UI.success("Added tester: #{tester.email} to build #{build.version} of app #{app.name}.")
       end
+
+      if Spaceship::ConnectAPI.get_beta_app_review_submission_state_for_build(build_id: build.id).nil?
+        Spaceship::ConnectAPI.post_beta_app_review_submissions(build_id: build.id)
+        UI.success("Posted build #{build.version} of app #{app.name} for beta review.")
+      end
     end
 
     def find_tester(options)

@@ -97,6 +97,18 @@ module Spaceship
           test_flight_request_client.get("betaAppReviewSubmissions", params)
         end
 
+        #
+        # betaAppReviewSubmissions
+        #
+
+        def get_beta_app_review_submission_state_for_build(build_id: nil)
+          response = test_flight_request_client.get("builds/#{build_id}/betaAppReviewSubmission", {})
+          if response.body["data"].nil?
+            return nil
+          end
+          return response.body["data"]["attributes"]["betaReviewState"]
+        end
+
         def post_beta_app_review_submissions(build_id: nil)
           body = {
             data: {
