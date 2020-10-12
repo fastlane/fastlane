@@ -86,5 +86,29 @@ module Spaceship
         end
       end
     end
+
+    # Defined in the App Store Connect API docs:
+    #
+    # Used for creating BundleId and Device
+    module BundleIdPlatform
+      IOS = "IOS"
+      MAC_OS = "MAC_OS"
+
+      ALL = [IOS, MAC_OS]
+
+      def self.map(platform)
+        return platform if ALL.include?(platform)
+
+        # Map from fastlane input and Spaceship::TestFlight platform values
+        case platform.to_sym
+        when :osx, :macos, :mac
+          return Spaceship::ConnectAPI::Platform::MAC_OS
+        when :ios
+          return Spaceship::ConnectAPI::Platform::IOS
+        else
+          raise "Cannot find a matching platform for '#{platform}' - valid values are #{ALL.join(', ')}"
+        end
+      end
+    end
   end
 end
