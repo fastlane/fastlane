@@ -98,6 +98,8 @@ public func addGitTag(tag: String? = nil,
  Returns the current build_number of either live or edit version
 
  - parameters:
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - initialBuildNumber: sets the build number to given value if no build is in current train
    - appIdentifier: The bundle identifier of your app
    - username: Your Apple ID Username
@@ -110,7 +112,9 @@ public func addGitTag(tag: String? = nil,
  Returns the current build number of either the live or testflight version - it is useful for getting the build_number of the current or ready-for-sale app version, and it also works on non-live testflight version.
  If you need to handle more build-trains please see `latest_testflight_build_number`.
  */
-public func appStoreBuildNumber(initialBuildNumber: Any,
+public func appStoreBuildNumber(apiKeyPath: String? = nil,
+                                apiKey: [String: Any]? = nil,
+                                initialBuildNumber: Any,
                                 appIdentifier: String,
                                 username: String,
                                 teamId: Any? = nil,
@@ -119,7 +123,9 @@ public func appStoreBuildNumber(initialBuildNumber: Any,
                                 platform: String = "ios",
                                 teamName: String? = nil)
 {
-    let command = RubyCommand(commandID: "", methodName: "app_store_build_number", className: nil, args: [RubyCommand.Argument(name: "initial_build_number", value: initialBuildNumber),
+    let command = RubyCommand(commandID: "", methodName: "app_store_build_number", className: nil, args: [RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                                          RubyCommand.Argument(name: "api_key", value: apiKey),
+                                                                                                          RubyCommand.Argument(name: "initial_build_number", value: initialBuildNumber),
                                                                                                           RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                           RubyCommand.Argument(name: "username", value: username),
                                                                                                           RubyCommand.Argument(name: "team_id", value: teamId),
@@ -138,6 +144,7 @@ public func appStoreBuildNumber(initialBuildNumber: Any,
    - issuerId: The issuer ID
    - keyFilepath: The path to the key p8 file
    - keyContent: The content of the key p8 file
+   - isKeyContentBase64: Whether :key_content is Base64 encoded or not
    - duration: The token session duration
    - inHouse: Is App Store or Enterprise (in house) team? App Store Connect API cannot not determine this on its own (yet)
 
@@ -147,6 +154,7 @@ public func appStoreConnectApiKey(keyId: String,
                                   issuerId: String,
                                   keyFilepath: String? = nil,
                                   keyContent: String? = nil,
+                                  isKeyContentBase64: Bool = false,
                                   duration: Int? = nil,
                                   inHouse: Bool? = nil)
 {
@@ -154,6 +162,7 @@ public func appStoreConnectApiKey(keyId: String,
                                                                                                              RubyCommand.Argument(name: "issuer_id", value: issuerId),
                                                                                                              RubyCommand.Argument(name: "key_filepath", value: keyFilepath),
                                                                                                              RubyCommand.Argument(name: "key_content", value: keyContent),
+                                                                                                             RubyCommand.Argument(name: "is_key_content_base64", value: isKeyContentBase64),
                                                                                                              RubyCommand.Argument(name: "duration", value: duration),
                                                                                                              RubyCommand.Argument(name: "in_house", value: inHouse)])
     _ = runner.executeCommand(command)
@@ -479,7 +488,7 @@ public func appledoc(input: Any,
    - skipScreenshots: Don't upload the screenshots
    - skipMetadata: Don't upload the metadata (e.g. title, description). This will still upload screenshots
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
-   - force: Skip the HTML report file verification
+   - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
    - submitForReview: Submit the new version for Review after uploading everything
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
@@ -527,7 +536,7 @@ public func appledoc(input: Any,
 
  Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
 
- If you don't want a PDF report for App Store builds, use the `:force` option.
+ If you don't want to verify an HTML preview for App Store builds, use the `:force` option.
  This is useful when running _fastlane_ on your Continuous Integration server:
  `_upload_to_app_store_(force: true)`
  If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
@@ -553,7 +562,7 @@ public func appstore(apiKeyPath: String? = nil,
                      overwriteScreenshots: Bool = false,
                      submitForReview: Bool = false,
                      rejectIfPossible: Bool = false,
-                     automaticRelease: Bool = false,
+                     automaticRelease: Bool? = nil,
                      autoReleaseDate: Int? = nil,
                      phasedRelease: Bool = false,
                      resetRatings: Bool = false,
@@ -2600,7 +2609,7 @@ public func deleteKeychain(name: String? = nil,
    - skipScreenshots: Don't upload the screenshots
    - skipMetadata: Don't upload the metadata (e.g. title, description). This will still upload screenshots
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
-   - force: Skip the HTML report file verification
+   - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
    - submitForReview: Submit the new version for Review after uploading everything
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
@@ -2648,7 +2657,7 @@ public func deleteKeychain(name: String? = nil,
 
  Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
 
- If you don't want a PDF report for App Store builds, use the `:force` option.
+ If you don't want to verify an HTML preview for App Store builds, use the `:force` option.
  This is useful when running _fastlane_ on your Continuous Integration server:
  `_upload_to_app_store_(force: true)`
  If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
@@ -2674,7 +2683,7 @@ public func deliver(apiKeyPath: Any? = deliverfile.apiKeyPath,
                     overwriteScreenshots: Bool = deliverfile.overwriteScreenshots,
                     submitForReview: Bool = deliverfile.submitForReview,
                     rejectIfPossible: Bool = deliverfile.rejectIfPossible,
-                    automaticRelease: Bool = deliverfile.automaticRelease,
+                    automaticRelease: Bool? = deliverfile.automaticRelease,
                     autoReleaseDate: Int? = deliverfile.autoReleaseDate,
                     phasedRelease: Bool = deliverfile.phasedRelease,
                     resetRatings: Bool = deliverfile.resetRatings,
@@ -4595,6 +4604,8 @@ public func jira(url: String,
  Fetches most recent build number from TestFlight
 
  - parameters:
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - live: Query the live version (ready-for-sale)
    - appIdentifier: The bundle identifier of your app
    - username: Your Apple ID Username
@@ -4609,7 +4620,9 @@ public func jira(url: String,
  Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC.
  Fetches the most recent build number from TestFlight based on the version number. Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC.
  */
-@discardableResult public func latestTestflightBuildNumber(live: Bool = false,
+@discardableResult public func latestTestflightBuildNumber(apiKeyPath: String? = nil,
+                                                           apiKey: [String: Any]? = nil,
+                                                           live: Bool = false,
                                                            appIdentifier: String,
                                                            username: String,
                                                            version: String? = nil,
@@ -4618,7 +4631,9 @@ public func jira(url: String,
                                                            teamId: Any? = nil,
                                                            teamName: String? = nil) -> Int
 {
-    let command = RubyCommand(commandID: "", methodName: "latest_testflight_build_number", className: nil, args: [RubyCommand.Argument(name: "live", value: live),
+    let command = RubyCommand(commandID: "", methodName: "latest_testflight_build_number", className: nil, args: [RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                                                  RubyCommand.Argument(name: "api_key", value: apiKey),
+                                                                                                                  RubyCommand.Argument(name: "live", value: live),
                                                                                                                   RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                                   RubyCommand.Argument(name: "username", value: username),
                                                                                                                   RubyCommand.Argument(name: "version", value: version),
@@ -5772,7 +5787,10 @@ public func recreateSchemes(project: String) {
 
  - parameters:
    - name: Provide the name of the device to register as
+   - platform: Provide the platform of the device to register as (ios, mac)
    - udid: Provide the UDID of the device to register as
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
    - username: Optional: Your Apple ID
@@ -5782,13 +5800,19 @@ public func recreateSchemes(project: String) {
  The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `:username` option.
  */
 @discardableResult public func registerDevice(name: String,
+                                              platform: String = "ios",
                                               udid: String,
+                                              apiKeyPath: String? = nil,
+                                              apiKey: [String: Any]? = nil,
                                               teamId: String? = nil,
                                               teamName: String? = nil,
-                                              username: String) -> String
+                                              username: String? = nil) -> String
 {
     let command = RubyCommand(commandID: "", methodName: "register_device", className: nil, args: [RubyCommand.Argument(name: "name", value: name),
+                                                                                                   RubyCommand.Argument(name: "platform", value: platform),
                                                                                                    RubyCommand.Argument(name: "udid", value: udid),
+                                                                                                   RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                                   RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                                    RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                    RubyCommand.Argument(name: "team_name", value: teamName),
                                                                                                    RubyCommand.Argument(name: "username", value: username)])
@@ -5801,6 +5825,8 @@ public func recreateSchemes(project: String) {
  - parameters:
    - devices: A hash of devices, with the name as key and the UDID as value
    - devicesFile: Provide a path to a file with the devices to register. For the format of the file see the examples
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
    - username: Optional: Your Apple ID
@@ -5812,6 +5838,8 @@ public func recreateSchemes(project: String) {
  */
 public func registerDevices(devices: [String: Any]? = nil,
                             devicesFile: String? = nil,
+                            apiKeyPath: String? = nil,
+                            apiKey: [String: Any]? = nil,
                             teamId: String? = nil,
                             teamName: String? = nil,
                             username: String,
@@ -5819,6 +5847,8 @@ public func registerDevices(devices: [String: Any]? = nil,
 {
     let command = RubyCommand(commandID: "", methodName: "register_devices", className: nil, args: [RubyCommand.Argument(name: "devices", value: devices),
                                                                                                     RubyCommand.Argument(name: "devices_file", value: devicesFile),
+                                                                                                    RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                                    RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                                     RubyCommand.Argument(name: "team_id", value: teamId),
                                                                                                     RubyCommand.Argument(name: "team_name", value: teamName),
                                                                                                     RubyCommand.Argument(name: "username", value: username),
@@ -8451,7 +8481,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - skipScreenshots: Don't upload the screenshots
    - skipMetadata: Don't upload the metadata (e.g. title, description). This will still upload screenshots
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
-   - force: Skip the HTML report file verification
+   - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
    - submitForReview: Submit the new version for Review after uploading everything
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
@@ -8499,7 +8529,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
 
  Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
 
- If you don't want a PDF report for App Store builds, use the `:force` option.
+ If you don't want to verify an HTML preview for App Store builds, use the `:force` option.
  This is useful when running _fastlane_ on your Continuous Integration server:
  `_upload_to_app_store_(force: true)`
  If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
@@ -8525,7 +8555,7 @@ public func uploadToAppStore(apiKeyPath: String? = nil,
                              overwriteScreenshots: Bool = false,
                              submitForReview: Bool = false,
                              rejectIfPossible: Bool = false,
-                             automaticRelease: Bool = false,
+                             automaticRelease: Bool? = nil,
                              autoReleaseDate: Int? = nil,
                              phasedRelease: Bool = false,
                              resetRatings: Bool = false,
@@ -9211,7 +9241,7 @@ public func xcov(workspace: String? = nil,
                  coverallsServiceJobId: String? = nil,
                  coverallsRepoToken: String? = nil,
                  xcconfig: String? = nil,
-                 ideFoundationPath: String = "/Applications/Xcode-11.5.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-11.7.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -9357,4 +9387,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.98]
+// FastlaneRunnerAPIVersion [0.9.99]
