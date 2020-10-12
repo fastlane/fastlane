@@ -1,3 +1,5 @@
+require 'base64'
+
 module Fastlane
   module Actions
     module SharedValues
@@ -9,6 +11,7 @@ module Fastlane
         key_id = options[:key_id]
         issuer_id = options[:issuer_id]
         key_content = options[:key_content]
+        is_key_content_base64 = options[:is_key_content_base64]
         key_filepath = options[:key_filepath]
         duration = options[:duration]
         in_house = options[:in_house]
@@ -27,6 +30,7 @@ module Fastlane
           key_id: key_id,
           issuer_id: issuer_id,
           key: key_content || File.binread(key_filepath),
+          is_key_content_base64: is_key_content_base64,
           duration: duration,
           in_house: in_house
         }
@@ -62,6 +66,11 @@ module Fastlane
                                        sensitive: true,
                                        optional: true,
                                        conflicting_options: [:filepath]),
+          FastlaneCore::ConfigItem.new(key: :is_key_content_base64,
+                                       env_name: "APP_STORE_CONNECT_API_KEY_IS_KEY_CONTENT_BASE64",
+                                       description: "Whether :key_content is Base64 encoded or not",
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :duration,
                                        env_name: "APP_STORE_CONNECT_API_KEY_DURATION",
                                        description: "The token session duration",
