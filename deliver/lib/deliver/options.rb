@@ -153,7 +153,7 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :force,
                                      short_option: "-f",
                                      env_name: "DELIVER_FORCE",
-                                     description: "Skip the HTML report file verification",
+                                     description: "Skip verification of HTML preview file",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :overwrite_screenshots,
