@@ -53,7 +53,10 @@ module Fastlane
         existing_devices = Spaceship::ConnectAPI::Device.all
 
         device_objs = new_devices.map do |device|
-          next if existing_devices.map(&:udid).include?(device[0])
+          if existing_devices.map(&:udid).map(&:downcase).include?(device[0].downcase)
+            UI.verbose("UDID #{device[0]} already exists - Skipping...")
+            next
+          end
 
           device_platform = platform
 
