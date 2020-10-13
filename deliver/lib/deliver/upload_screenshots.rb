@@ -13,8 +13,6 @@ module Deliver
     DeleteScreenshotJob = Struct.new(:app_screenshot, :localization, :app_screenshot_set)
     UploadScreenshotJob = Struct.new(:app_screenshot_set, :path)
 
-    NUMBER_OF_THREADS = Helper.test? ? 1 : [ENV.fetch("DELIVER_NUMBER_OF_THREADS", 10).to_i, 10].min
-
     def upload(options, screenshots)
       return if options[:skip_screenshots]
       return if options[:edit_live]
@@ -69,7 +67,7 @@ module Deliver
     def delete_screenshots(localizations, screenshots_per_language, tries: 5)
       tries -= 1
 
-      worker = QueueWorker.new(NUMBER_OF_THREADS) do |job|
+      worker = QueueWorker.new do |job|
         start_time = Time.now
         target = "#{job.localization.locale} #{job.app_screenshot_set.screenshot_display_type} #{job.app_screenshot.id}"
         begin
@@ -115,7 +113,7 @@ module Deliver
       tries -= 1
 
       # Upload screenshots
-      worker = QueueWorker.new(NUMBER_OF_THREADS) do |job|
+      worker = QueueWorker.new do |job|
         begin
           UI.verbose("Uploading '#{job.path}'...")
           start_time = Time.now
@@ -236,7 +234,7 @@ module Deliver
       iterator = AppScreenshotIterator.new(localizations)
 
       # Re-order screenshots within app_screenshot_set
-      worker = QueueWorker.new(NUMBER_OF_THREADS) do |app_screenshot_set|
+      worker = QueueWorker.new do |app_screenshot_set|
         original_ids = app_screenshot_set.app_screenshots.map(&:id)
         sorted_ids = app_screenshot_set.app_screenshots.sort_by(&:file_name).map(&:id)
         if original_ids != sorted_ids
