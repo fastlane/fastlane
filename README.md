@@ -18,7 +18,7 @@ _fastlane_ is a tool for iOS and Android developers to automate tedious tasks li
 </h2>
 <hr />
 
-## Need Help?
+## Need HelP
 
 Before submitting a new GitHub issue, please make sure to
 
