@@ -18,7 +18,7 @@ _fastlane_ is a tool for iOS and Android developers to automate tedious tasks li
 </h2>
 <hr />
 
-## Need Help?
+## Need Help? Read This --
 
 Before submitting a new GitHub issue, please make sure to
 
@@ -29,7 +29,7 @@ If the above doesn't help, please [submit an issue](https://github.com/fastlane/
 
 **Note**: If you want to report a regression in _fastlane_ (something that has worked before, but broke with a new release), please mark your issue title as such using `[Regression] Your title here`. This enables us to quickly detect and fix regressions.
 
-## _fastlane_ team
+## _fastlane_ team --
 
 <!-- This table is regenerated and resorted on each release -->
 <table id='team'>
@@ -178,15 +178,15 @@ If the above doesn't help, please [submit an issue](https://github.com/fastlane/
 
 Special thanks to all [contributors](https://github.com/fastlane/fastlane/graphs/contributors) for extending and improving _fastlane_.
 
-## Contribute to _fastlane_
+## Contribute to _fastlane_ --
 
 Check out [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to help with _fastlane_.
 
-## Code of Conduct
+## Code of Conduct --
 
 Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
-## Metrics
+## Metrics --
  
 _fastlane_ tracks a few key metrics to understand how developers are using the tool and to help us know what areas need improvement. No personal/sensitive information is ever collected. Metrics that are collected include: 
  
@@ -195,7 +195,7 @@ _fastlane_ tracks a few key metrics to understand how developers are using the t
  
 You can easily opt-out of metrics collection by adding `opt_out_usage` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. [Check out the metrics code on GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane_core/lib/fastlane_core/analytics)
 
-## License
+## License --
 
 This project is licensed under the terms of the MIT license. See the [LICENSE](LICENSE) file.
 
