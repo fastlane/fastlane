@@ -139,7 +139,7 @@ module Sigh
           # Skip certificates that failed to download
           next unless current_cert[:downloaded]
           file = Tempfile.new('cert')
-          file.write(current_cert[:downloaded])
+          file.write(current_cert[:downloaded].force_encoding('UTF-8'))
           file.close
           if FastlaneCore::CertChecker.installed?(file.path)
             installed = true
@@ -315,7 +315,7 @@ module Sigh
           certificates = certificates.find_all do |c|
             file = Tempfile.new('cert')
             raw_data = Base64.decode64(c.certificate_content)
-            file.write(raw_data)
+            file.write(raw_data.force_encoding("UTF-8"))
             file.close
 
             FastlaneCore::CertChecker.installed?(file.path)
