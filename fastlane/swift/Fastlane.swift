@@ -4783,6 +4783,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
+   - skipCertificateMatching: Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action
    - outputPath: Path in which to export certificates, key and profile
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - verbose: Print out extra information and all commands
@@ -4829,6 +4830,7 @@ public func match(type: Any = matchfile.type,
                   templateName: Any? = matchfile.templateName,
                   profileName: Any? = matchfile.profileName,
                   failOnNameTaken: Bool = matchfile.failOnNameTaken,
+                  skipCertificateMatching: Bool = matchfile.skipCertificateMatching,
                   outputPath: Any? = matchfile.outputPath,
                   skipSetPartitionList: Bool = matchfile.skipSetPartitionList,
                   verbose: Bool = matchfile.verbose)
@@ -4873,6 +4875,7 @@ public func match(type: Any = matchfile.type,
                                                                                          RubyCommand.Argument(name: "template_name", value: templateName),
                                                                                          RubyCommand.Argument(name: "profile_name", value: profileName),
                                                                                          RubyCommand.Argument(name: "fail_on_name_taken", value: failOnNameTaken),
+                                                                                         RubyCommand.Argument(name: "skip_certificate_matching", value: skipCertificateMatching),
                                                                                          RubyCommand.Argument(name: "output_path", value: outputPath),
                                                                                          RubyCommand.Argument(name: "skip_set_partition_list", value: skipSetPartitionList),
                                                                                          RubyCommand.Argument(name: "verbose", value: verbose)])
@@ -6612,6 +6615,8 @@ public func setBuildNumberRepository(useHgRevisionNumber: Bool = false,
  Set the changelog for all languages on App Store Connect
 
  - parameters:
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - appIdentifier: The bundle identifier of your app
    - username: Your Apple ID Username
    - version: The version number to create/update
@@ -6624,15 +6629,19 @@ public func setBuildNumberRepository(useHgRevisionNumber: Bool = false,
  You can store the changelog in `./changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same "What's new"-text for all languages.
  Defining the version is optional. _fastlane_ will try to automatically detect it if you don't provide one.
  */
-public func setChangelog(appIdentifier: String,
-                         username: String,
+public func setChangelog(apiKeyPath: String? = nil,
+                         apiKey: [String: Any]? = nil,
+                         appIdentifier: String,
+                         username: String? = nil,
                          version: String? = nil,
                          changelog: String? = nil,
                          teamId: Any? = nil,
                          teamName: String? = nil,
                          platform: String = "ios")
 {
-    let command = RubyCommand(commandID: "", methodName: "set_changelog", className: nil, args: [RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
+    let command = RubyCommand(commandID: "", methodName: "set_changelog", className: nil, args: [RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
+                                                                                                 RubyCommand.Argument(name: "api_key", value: apiKey),
+                                                                                                 RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
                                                                                                  RubyCommand.Argument(name: "username", value: username),
                                                                                                  RubyCommand.Argument(name: "version", value: version),
                                                                                                  RubyCommand.Argument(name: "changelog", value: changelog),
@@ -7704,6 +7713,7 @@ public func swiftlint(mode: Any = "lint",
    - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
+   - skipCertificateMatching: Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action
    - outputPath: Path in which to export certificates, key and profile
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - verbose: Print out extra information and all commands
@@ -7750,6 +7760,7 @@ public func syncCodeSigning(type: String = "development",
                             templateName: String? = nil,
                             profileName: String? = nil,
                             failOnNameTaken: Bool = false,
+                            skipCertificateMatching: Bool = false,
                             outputPath: String? = nil,
                             skipSetPartitionList: Bool = false,
                             verbose: Bool = false)
@@ -7794,6 +7805,7 @@ public func syncCodeSigning(type: String = "development",
                                                                                                      RubyCommand.Argument(name: "template_name", value: templateName),
                                                                                                      RubyCommand.Argument(name: "profile_name", value: profileName),
                                                                                                      RubyCommand.Argument(name: "fail_on_name_taken", value: failOnNameTaken),
+                                                                                                     RubyCommand.Argument(name: "skip_certificate_matching", value: skipCertificateMatching),
                                                                                                      RubyCommand.Argument(name: "output_path", value: outputPath),
                                                                                                      RubyCommand.Argument(name: "skip_set_partition_list", value: skipSetPartitionList),
                                                                                                      RubyCommand.Argument(name: "verbose", value: verbose)])
@@ -9387,4 +9399,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.99]
+// FastlaneRunnerAPIVersion [0.9.100]
