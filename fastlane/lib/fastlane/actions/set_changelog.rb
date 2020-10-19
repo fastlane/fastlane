@@ -6,9 +6,14 @@ module Fastlane
 
         # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
-        UI.message("Login to App Store Connect (#{params[:username]})")
-        Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true)
-        UI.message("Login successful")
+        if (token = self.api_token(params))
+          UI.message("Using App Store Connect API token...")
+          Spaceship::ConnectAPI.token = token
+        else
+          UI.message("Login to App Store Connect (#{params[:username]})")
+          Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true, tunes_team_id: params[:team_id], team_name: params[:team_name])
+          UI.message("Login successful")
+        end
 
         app = Spaceship::ConnectAPI::App.find(params[:app_identifier])
         UI.user_error!("Couldn't find app with identifier #{params[:app_identifier]}") if app.nil?
@@ -73,6 +78,13 @@ module Fastlane
         UI.success("👼  Successfully pushed the new changelog to for #{edit_version.version_string}")
       end
 
+      def self.api_token(params)
+        params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+        api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
+        return api_token
+      end
+
       def self.default_changelog_path
         File.join(FastlaneCore::FastlaneFolder.path.to_s, 'changelog.txt')
       end
@@ -98,6 +110,21 @@ module Fastlane
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
         [
+          FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                     env_name: "FL_SET_CHANGELOG_API_KEY_PATH",
+                                     description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                     optional: true,
+                                     conflicting_options: [:api_key],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+          FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_name: "FL_SET_CHANGELOG_API_KEY",
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                     type: Hash,
+                                     optional: true,
+                                     sensitive: true,
+                                     conflicting_options: [:api_key_path]),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "FASTLANE_APP_IDENTIFIER",
@@ -109,6 +136,7 @@ module Fastlane
                                      short_option: "-u",
                                      env_name: "FASTLANE_USERNAME",
                                      description: "Your Apple ID Username",
+                                     optional: true,
                                      default_value: user,
                                      default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :version,
