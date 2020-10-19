@@ -224,9 +224,7 @@ describe Spaceship::Client do
 
           # making sure we use env var for phone number selection
           it 'does not prompt user to choose number' do
-            # rubocop:disable Style/MethodCallWithArgsParentheses
             expect(subject).not_to receive(:choose_phone_number)
-            # rubocop:enable Style/MethodCallWithArgsParentheses
 
             bool = subject.handle_two_factor(response)
             expect(bool).to eq(true)

@@ -66,7 +66,7 @@ module FastlaneCore
 
     # @return true if it is enabled to execute external commands
     def self.sh_enabled?
-      !self.test?
+      !self.test? || ENV["FORCE_SH_DURING_TESTS"]
     end
 
     # @return [boolean] true if building in a known CI environment
