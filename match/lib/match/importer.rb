@@ -85,10 +85,13 @@ module Match
       should_skip_certificate_matching = params[:skip_certificate_matching]
       # In case there is no access to Apple Developer portal but we have the certificates, keys and profiles
       if should_skip_certificate_matching
+        cert_name = File.basename(cert_path, ".*")
+        p12_name = File.basename(p12_path, ".*")
+
         # Make dir if doesn't exist
         FileUtils.mkdir_p(output_dir_certs)
-        dest_cert_path = File.join(output_dir_certs, "certificate.cer")
-        dest_p12_path = File.join(output_dir_certs, "certificate.p12")
+        dest_cert_path = File.join(output_dir_certs, "#{cert_name}.cer")
+        dest_p12_path = File.join(output_dir_certs, "#{p12_name}.p12")
       else
         # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
         token = api_token(params)
