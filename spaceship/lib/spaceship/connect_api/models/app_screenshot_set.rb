@@ -113,18 +113,18 @@ module Spaceship
       #
 
       def self.all(client: nil, app_store_version_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         resp = client.get_app_screenshot_sets(app_store_version_localization_id: app_store_version_localization_id, filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       end
 
       def self.get(client: nil, app_screenshot_set_id: nil, includes: "appScreenshots")
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         return client.get_app_screenshot_set(app_screenshot_set_id: app_screenshot_set_id, filter: nil, includes: includes, limit: nil, sort: nil).first
       end
 
       def upload_screenshot(client: nil, path: nil, wait_for_processing: true, position: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         screenshot = Spaceship::ConnectAPI::AppScreenshot.create(client: client, app_screenshot_set_id: id, path: path, wait_for_processing: wait_for_processing)
 
         # Reposition (if specified)
@@ -147,7 +147,7 @@ module Spaceship
       end
 
       def reorder_screenshots(client: nil, app_screenshot_ids: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         client.patch_app_screenshot_set_screenshots(app_screenshot_set_id: id, app_screenshot_ids: app_screenshot_ids)
 
         return client.get_app_screenshot_set(app_screenshot_set_id: id, includes: "appScreenshots").first

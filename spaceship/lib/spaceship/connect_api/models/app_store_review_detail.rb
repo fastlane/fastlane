@@ -39,13 +39,13 @@ module Spaceship
       #
 
       def update(client: nil, attributes: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
         return client.patch_app_store_review_detail(app_store_review_detail_id: id, attributes: attributes)
       end
 
       def upload_attachment(client: nil, path: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         return client::AppStoreReviewAttachment.create(app_store_review_detail_id: id, path: path)
       end
     end

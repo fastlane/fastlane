@@ -40,19 +40,19 @@ module Spaceship
       #
 
       def self.all(client: nil, app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         resp = client.get_app_store_version_localizations(app_store_version_id: app_store_version_id, filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       end
 
       def update(client: nil, attributes: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
         client.patch_app_store_version_localization(app_store_version_localization_id: id, attributes: attributes)
       end
 
       def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         client.delete_app_store_version_localization(app_store_version_localization_id: id)
       end
 
@@ -61,14 +61,14 @@ module Spaceship
       #
 
       def get_app_preview_sets(client: nil, filter: {}, includes: "appPreviews", limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         filter ||= {}
         filter["appStoreVersionLocalization"] = id
         return client::AppPreviewSet.all(filter: filter, includes: includes, limit: limit, sort: sort)
       end
 
       def create_app_preview_set(client: nil, attributes: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         resp = client.post_app_preview_set(app_store_version_localization_id: id, attributes: attributes)
         return resp.to_models.first
       end
@@ -78,12 +78,12 @@ module Spaceship
       #
 
       def get_app_screenshot_sets(client: nil, filter: {}, includes: "appScreenshots", limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         return client::AppScreenshotSet.all(app_store_version_localization_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
       end
 
       def create_app_screenshot_set(client: nil, attributes: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         resp = client.post_app_screenshot_set(app_store_version_localization_id: id, attributes: attributes)
         return resp.to_models.first
       end

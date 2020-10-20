@@ -80,7 +80,7 @@ module Spaceship
       #
 
       def self.create(client: nil, app_screenshot_set_id: nil, path: nil, wait_for_processing: true)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         require 'faraday'
 
         filename = File.basename(path)
@@ -182,7 +182,7 @@ module Spaceship
       end
 
       def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         client.delete_app_screenshot(app_screenshot_id: id)
       end
     end

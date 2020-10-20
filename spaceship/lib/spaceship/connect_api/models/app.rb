@@ -70,20 +70,20 @@ module Spaceship
       #
 
       def self.all(client: nil, filter: {}, includes: ESSENTIAL_INCLUDES, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         resps = client.get_apps(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
 
-      def self.find(client: nil, bundle_id)
-        client || = Spaceship::ConnectAPI
+      def self.find(bundle_id, client: nil)
+        client ||= Spaceship::ConnectAPI
         return all(client: client, filter: { bundleId: bundle_id }).find do |app|
           app.bundle_id == bundle_id
         end
       end
 
       def self.create(client: nil, name: nil, version_string: nil, sku: nil, primary_locale: nil, bundle_id: nil, platforms: nil, company_name: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         client.post_app(
           name: name,
           version_string: version_string,
@@ -96,12 +96,12 @@ module Spaceship
       end
 
       def self.get(client: nil, app_id: nil, includes: "appStoreVersions")
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         return client.get_app(app_id: app_id, includes: includes).first
       end
 
       def update(client: nil, attributes: nil, app_price_tier_id: nil, territory_ids: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
         return client.patch_app(app_id: id, attributes: attributes, app_price_tier_id: app_price_tier_id, territory_ids: territory_ids)
       end
@@ -111,7 +111,7 @@ module Spaceship
       #
 
       def fetch_live_app_info(client: nil, includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         states = [
           Spaceship::ConnectAPI::AppInfo::AppStoreState::READY_FOR_SALE,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_APPLE_RELEASE,
@@ -127,7 +127,7 @@ module Spaceship
       end
 
       def fetch_edit_app_info(client: nil, includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         states = [
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PREPARE_FOR_SUBMISSION,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::DEVELOPER_REJECTED,
@@ -148,7 +148,7 @@ module Spaceship
       #
 
       def fetch_available_territories(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         filter ||= {}
         resps = client.get_available_territories(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
@@ -159,7 +159,7 @@ module Spaceship
       #
 
       def fetch_app_prices(client: nil, filter: {}, includes: "priceTier", limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         resp = client.get_app_prices(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       end
@@ -169,7 +169,7 @@ module Spaceship
       #
 
       def reject_version_if_possible!(client: nil, platform: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           appStoreState: [
@@ -194,8 +194,8 @@ module Spaceship
       # This will either create a new version or change the version number
       # from an existing version
       # @return (Bool) Was something changed?
-      def ensure_version!(client: nil, version_string, platform: nil)
-        client || = Spaceship::ConnectAPI
+      def ensure_version!(version_string, platform: nil, client: nil)
+        client ||= Spaceship::ConnectAPI
         app_store_version = get_edit_app_store_version(platform: platform)
 
         if app_store_version
@@ -214,7 +214,7 @@ module Spaceship
       end
 
       def get_latest_app_store_version(client: nil, platform: nil, includes: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           platform: platform
@@ -227,7 +227,7 @@ module Spaceship
       end
 
       def get_live_app_store_version(client: client, platform: nil, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
@@ -237,7 +237,7 @@ module Spaceship
       end
 
       def get_edit_app_store_version(client: client, platform: nil, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           appStoreState: [
@@ -258,7 +258,7 @@ module Spaceship
       end
 
       def get_in_review_app_store_version(client: nil, platform: nil, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::IN_REVIEW,
@@ -268,7 +268,7 @@ module Spaceship
       end
 
       def get_pending_release_app_store_version(client: nil, platform: nil, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           appStoreState: [
@@ -281,7 +281,7 @@ module Spaceship
       end
 
       def get_app_store_versions(client: nil, filter: {}, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         resps = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
@@ -309,7 +309,7 @@ module Spaceship
       #
 
       def get_beta_feedback(client: nil, filter: {}, includes: "tester,build,screenshots", limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         filter ||= {}
         filter["build.app"] = id
 
@@ -322,7 +322,7 @@ module Spaceship
       #
 
       def get_beta_testers(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         filter ||= {}
         filter[:apps] = id
 
@@ -335,7 +335,7 @@ module Spaceship
       #
 
       def get_builds(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         filter ||= {}
         filter[:app] = id
 
@@ -344,7 +344,7 @@ module Spaceship
       end
 
       def get_build_deliveries(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         filter ||= {}
         filter[:app] = id
 
@@ -353,16 +353,16 @@ module Spaceship
       end
 
       def get_beta_app_localizations(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         filter ||= {}
         filter[:app] = id
 
-        resps = client.get_beta_app_localizations(client: nil, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        resps = client.get_beta_app_localizations(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
 
       def get_beta_groups(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         filter ||= {}
         filter[:app] = id
 
@@ -371,7 +371,7 @@ module Spaceship
       end
 
       def create_beta_group(client: nil, group_name: nil, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         resps = client.create_beta_group(
           app_id: id,
           group_name: group_name,
@@ -403,7 +403,7 @@ module Spaceship
       #
 
       def add_users(client: nil, user_ids: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         user_ids.each do |user_id|
           client.add_user_visible_apps(user_id: user_id, app_ids: [id])
         end

@@ -46,7 +46,7 @@ module Spaceship
       #
 
       def self.get(client: nil, app_preview_id: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         client.get_app_preview(app_preview_id: app_preview_id).first
       end
 
@@ -56,7 +56,7 @@ module Spaceship
       # @param path The path of the file
       # @param frame_time_code The time code for the preview still frame (ex: "00:00:07:01")
       def self.create(client: nil, app_preview_set_id: nil, path: nil, wait_for_processing: true, frame_time_code: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         require 'faraday'
 
         filename = File.basename(path)
@@ -121,13 +121,13 @@ module Spaceship
       end
 
       def update(client: nil, attributes: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
         client.patch_app_preview(app_preview_id: id, attributes: attributes).first
       end
 
       def delete!(client: nil,  filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         client.delete_app_preview(app_preview_id: id)
       end
     end

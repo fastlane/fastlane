@@ -66,17 +66,17 @@ module Spaceship
       #
 
       def update(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         client.patch_app_info(app_info_id: id).first
       end
 
       def update_categories(client: nil, category_id_map: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         client.patch_app_info_categories(app_info_id: id, category_id_map: category_id_map).first
       end
 
       def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         client.delete_app_info(app_info_id: id)
       end
 
@@ -85,13 +85,13 @@ module Spaceship
       #
 
       def create_app_info_localization(client: nil, attributes: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         resp = client.post_app_info_localization(app_info_id: id, attributes: attributes)
         return resp.to_models.first
       end
 
       def get_app_info_localizations(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         resp = client.get_app_info_localizations(app_info_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       end

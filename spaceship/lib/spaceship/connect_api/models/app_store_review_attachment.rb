@@ -30,7 +30,7 @@ module Spaceship
       #
 
       def self.create(client: nil, app_store_review_detail_id: nil, path: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         require 'faraday'
 
         filename = File.basename(path)
@@ -65,7 +65,7 @@ module Spaceship
       end
 
       def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         client.delete_app_store_review_attachment(app_store_review_attachment_id: id)
       end
     end

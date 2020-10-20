@@ -43,18 +43,18 @@ module Spaceship
       #
 
       def self.all(client: nil, filter: {}, includes: nil, sort: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         resps = client.get_user_invitations(filter: filter, includes: includes, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
 
       def self.find(client: nil, email: nil, includes: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         return all(client: client, filter: { email: email }, includes: includes)
       end
 
       def delete!(client: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         client.delete_user_invitation(user_invitation_id: id)
       end
     end

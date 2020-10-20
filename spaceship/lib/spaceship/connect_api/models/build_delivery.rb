@@ -25,7 +25,7 @@ module Spaceship
       #
 
       def self.all(client: nil, app_id: nil, version: nil, build_number: nil)
-        client || = Spaceship::ConnectAPI
+        client ||= Spaceship::ConnectAPI
         resps = client.get_build_deliveries(
           filter: { app: app_id, cfBundleShortVersionString: version, cfBundleVersion: build_number },
           limit: 1
