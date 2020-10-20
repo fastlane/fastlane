@@ -36,12 +36,14 @@ module Spaceship
       # API
       #
 
-      def self.all(filter: {}, includes: nil, limit: 2000, sort: nil)
-        resps = Spaceship::ConnectAPI.get_sandbox_testers(filter: filter, includes: includes).all_pages
+      def self.all(client:nil, filter: {}, includes: nil, limit: 2000, sort: nil)
+        client || = Spaceship::ConnectAPI
+        resps = client.get_sandbox_testers(filter: filter, includes: includes).all_pages
         return resps.flat_map(&:to_models)
       end
 
-      def self.create(first_name: nil, last_name: nil, email: nil, password: nil, confirm_password: nil, secret_question: nil, secret_answer: nil, birth_date: nil, app_store_territory: nil)
+      def self.create(client:nil, first_name: nil, last_name: nil, email: nil, password: nil, confirm_password: nil, secret_question: nil, secret_answer: nil, birth_date: nil, app_store_territory: nil)
+        client || = Spaceship::ConnectAPI
         attributes = {
           firstName: first_name,
           lastName: last_name,
@@ -53,10 +55,11 @@ module Spaceship
           birthDate: birth_date,
           appStoreTerritory: app_store_territory
         }
-        return Spaceship::ConnectAPI.post_sandbox_tester(attributes: attributes).first
+        return client.post_sandbox_tester(attributes: attributes).first
       end
 
-      def delete!
+      def delete!(client: nil)
+        client || = Spaceship::ConnectAPI
         Spaceship::ConnectAPI.delete_sandbox_tester(sandbox_tester_id: id)
       end
     end

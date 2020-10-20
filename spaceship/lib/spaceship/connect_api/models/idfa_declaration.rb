@@ -28,13 +28,15 @@ module Spaceship
       # API
       #
 
-      def update(attributes: nil)
+      def update(client: nil, attributes: nil)
+        client || = Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
-        Spaceship::ConnectAPI.patch_idfa_declaration(idfa_declaration_id: id, attributes: attributes)
+        client.patch_idfa_declaration(idfa_declaration_id: id, attributes: attributes)
       end
 
-      def delete!
-        Spaceship::ConnectAPI.delete_idfa_declaration(idfa_declaration_id: id)
+      def delete!(client: nil)
+        client || = Spaceship::ConnectAPI
+        client.delete_idfa_declaration(idfa_declaration_id: id)
       end
     end
   end

@@ -18,8 +18,9 @@ module Spaceship
       # API
       #
 
-      def delete!
-        return Spaceship::ConnectAPI.delete_beta_app_review_submission(beta_app_review_submission_id: id)
+      def delete!(client: nil)
+        client || = Spaceship::ConnectAPI
+        return client.delete_beta_app_review_submission(beta_app_review_submission_id: id)
       end
     end
   end

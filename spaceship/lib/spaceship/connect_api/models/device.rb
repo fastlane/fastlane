@@ -44,13 +44,15 @@ module Spaceship
       # API
       #
 
-      def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
-        resps = Spaceship::ConnectAPI.get_devices(filter: filter, includes: includes).all_pages
+      def self.all(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client || = Spaceship::ConnectAPI
+        resps = client.get_devices(filter: filter, includes: includes).all_pages
         return resps.flat_map(&:to_models)
       end
 
-      def self.create(name: nil, platform: nil, udid: nil)
-        resp = Spaceship::ConnectAPI.post_device(name: name, platform: platform, udid: udid)
+      def self.create(client: nil, name: nil, platform: nil, udid: nil)
+        client || = Spaceship::ConnectAPI
+        resp = client.post_device(name: name, platform: platform, udid: udid)
         return resp.to_models.first
       end
     end

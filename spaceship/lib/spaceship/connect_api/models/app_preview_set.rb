@@ -58,18 +58,21 @@ module Spaceship
       # API
       #
 
-      def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
-        resp = Spaceship::ConnectAPI.get_app_preview_sets(filter: filter, includes: includes, limit: limit, sort: sort)
+      def self.all(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client || = Spaceship::ConnectAPI
+        resp = client.get_app_preview_sets(filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       end
 
-      def self.get(app_preview_set_id: nil, includes: "appPreviews")
-        return Spaceship::ConnectAPI.get_app_preview_set(app_preview_set_id: app_preview_set_id, filter: nil, includes: includes, limit: nil, sort: nil).first
+      def self.get(client: nil, app_preview_set_id: nil, includes: "appPreviews")
+        client || = Spaceship::ConnectAPI
+        return client.get_app_preview_set(app_preview_set_id: app_preview_set_id, filter: nil, includes: includes, limit: nil, sort: nil).first
       end
 
-      def upload_preview(path: nil, wait_for_processing: true, position: nil, frame_time_code: nil)
+      def upload_preview(client: nil, path: nil, wait_for_processing: true, position: nil, frame_time_code: nil)
+        client || = Spaceship::ConnectAPI
         # Upload preview
-        preview = Spaceship::ConnectAPI::AppPreview.create(app_preview_set_id: id, path: path, wait_for_processing: wait_for_processing, frame_time_code: frame_time_code)
+        preview = Spaceship::ConnectAPI::AppPreview.create(client: client, app_preview_set_id: id, path: path, wait_for_processing: wait_for_processing, frame_time_code: frame_time_code)
 
         # Reposition (if specified)
         unless position.nil?
@@ -90,10 +93,11 @@ module Spaceship
         return preview
       end
 
-      def reorder_previews(app_preview_ids: nil)
-        Spaceship::ConnectAPI.patch_app_preview_set_previews(app_preview_set_id: id, app_preview_ids: app_preview_ids)
+      def reorder_previews(client: nil, app_preview_ids: nil)
+        client || = Spaceship::ConnectAPI
+        client.patch_app_preview_set_previews(app_preview_set_id: id, app_preview_ids: app_preview_ids)
 
-        return Spaceship::ConnectAPI.get_app_preview_set(app_preview_set_id: id, includes: "appPreviews").first
+        return client.get_app_preview_set(app_preview_set_id: id, includes: "appPreviews").first
       end
     end
   end

@@ -105,9 +105,10 @@ module Spaceship
       # API
       #
 
-      def update(attributes: nil)
+      def update(client: nil, attributes: nil)
+        client || = Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
-        Spaceship::ConnectAPI.patch_age_rating_declaration(age_rating_declaration_id: id, attributes: attributes)
+        client.patch_age_rating_declaration(age_rating_declaration_id: id, attributes: attributes)
       end
     end
   end

@@ -106,8 +106,9 @@ module Spaceship
       # API
       #
 
-      def self.all(app_id: nil, version: nil, build_number: nil, platform: nil, processing_states: "PROCESSING,FAILED,INVALID,VALID", includes: ESSENTIAL_INCLUDES, sort: "-uploadedDate", limit: 30)
-        resps = Spaceship::ConnectAPI.get_builds(
+      def self.all(client: nil, app_id: nil, version: nil, build_number: nil, platform: nil, processing_states: "PROCESSING,FAILED,INVALID,VALID", includes: ESSENTIAL_INCLUDES, sort: "-uploadedDate", limit: 30)
+        client || = Spaceship::ConnectAPI
+        resps = client.get_builds(
           filter: { app: app_id, "preReleaseVersion.version" => version, version: build_number, processingState: processing_states },
           includes: includes,
           sort: sort,
@@ -125,23 +126,27 @@ module Spaceship
         return models
       end
 
-      def self.get(build_id: nil, includes: ESSENTIAL_INCLUDES)
-        return Spaceship::ConnectAPI.get_build(build_id: build_id, includes: includes).first
+      def self.get(client: nil, build_id: nil, includes: ESSENTIAL_INCLUDES)
+        client || = Spaceship::ConnectAPI
+        return client.get_build(build_id: build_id, includes: includes).first
       end
 
-      def update(attributes: nil)
+      def update(client: nil, attributes: nil)
+        client || = Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
-        return Spaceship::ConnectAPI.patch_builds(build_id: id, attributes: attributes).first
+        return client.patch_builds(build_id: id, attributes: attributes).first
       end
 
-      def add_beta_groups(beta_groups: nil)
+      def add_beta_groups(client: nil, beta_groups: nil)
+        client || = Spaceship::ConnectAPI
         beta_groups ||= []
         beta_group_ids = beta_groups.map(&:id)
-        return Spaceship::ConnectAPI.add_beta_groups_to_build(build_id: id, beta_group_ids: beta_group_ids)
+        return client.add_beta_groups_to_build(build_id: id, beta_group_ids: beta_group_ids)
       end
 
-      def get_beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
-        resps = Spaceship::ConnectAPI.get_beta_build_localizations(
+      def get_beta_build_localizations(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client || = Spaceship::ConnectAPI
+        resps = client.get_beta_build_localizations(
           filter: { build: id },
           includes: includes,
           sort: sort,
@@ -150,8 +155,9 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil)
-        resps = Spaceship::ConnectAPI.get_build_beta_details(
+      def get_build_beta_details(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client || = Spaceship::ConnectAPI
+        resps = client.get_build_beta_details(
           filter: { build: id },
           includes: includes,
           sort: sort,
@@ -160,12 +166,14 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def post_beta_app_review_submission
-        return Spaceship::ConnectAPI.post_beta_app_review_submissions(build_id: id)
+      def post_beta_app_review_submission(client: nil)
+        client || = Spaceship::ConnectAPI
+        return client.post_beta_app_review_submissions(build_id: id)
       end
 
-      def expire!
-        return Spaceship::ConnectAPI.patch_builds(build_id: id, attributes: { expired: true })
+      def expire!(client: nil)
+        client || = Spaceship::ConnectAPI
+        return client.patch_builds(client: nil, build_id: id, attributes: { expired: true })
       end
     end
   end

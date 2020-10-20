@@ -29,7 +29,8 @@ module Spaceship
       # API
       #
 
-      def self.create(app_store_review_detail_id: nil, path: nil)
+      def self.create(client: nil, app_store_review_detail_id: nil, path: nil)
+        client || = Spaceship::ConnectAPI
         require 'faraday'
 
         filename = File.basename(path)
@@ -42,7 +43,7 @@ module Spaceship
         }
 
         # Create placeholder
-        attachment = Spaceship::ConnectAPI.post_app_store_review_attachment(
+        attachment = client.post_app_store_review_attachment(
           app_store_review_detail_id: app_store_review_detail_id,
           attributes: post_attributes
         ).to_models.first
@@ -57,14 +58,15 @@ module Spaceship
           sourceFileChecksum: Digest::MD5.hexdigest(bytes)
         }
 
-        Spaceship::ConnectAPI.patch_app_store_review_attachment(
+        client.patch_app_store_review_attachment(
           app_store_review_attachment_id: attachment.id,
           attributes: patch_attributes
         ).to_models.first
       end
 
-      def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI.delete_app_store_review_attachment(app_store_review_attachment_id: id)
+      def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client || = Spaceship::ConnectAPI
+        client.delete_app_store_review_attachment(app_store_review_attachment_id: id)
       end
     end
   end
