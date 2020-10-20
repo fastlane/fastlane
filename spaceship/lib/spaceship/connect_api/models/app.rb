@@ -201,7 +201,7 @@ module Spaceship
         if app_store_version
           if version_string != app_store_version.version_string
             attributes = { versionString: version_string }
-            app_store_version.update(client: client, attributes: attributes)
+            app_store_version.update(client: nil, attributes: attributes)
             return true
           end
           return false
@@ -226,7 +226,7 @@ module Spaceship
                .last
       end
 
-      def get_live_app_store_version(client: client, platform: nil, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES)
+      def get_live_app_store_version(client: nil, platform: nil, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES)
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
@@ -236,7 +236,7 @@ module Spaceship
         return get_app_store_versions(client: client, filter: filter, includes: includes).first
       end
 
-      def get_edit_app_store_version(client: client, platform: nil, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES)
+      def get_edit_app_store_version(client: nil, platform: nil, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES)
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {

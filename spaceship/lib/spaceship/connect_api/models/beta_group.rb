@@ -33,7 +33,7 @@ module Spaceship
       #
 
       # beta_testers - [{email: "", firstName: "", lastName: ""}]
-      def post_bulk_beta_tester_assignments(client: nil , beta_testers: nil)
+      def post_bulk_beta_tester_assignments(client: nil, beta_testers: nil)
         client ||= Spaceship::ConnectAPI
         return client.post_bulk_beta_tester_assignments(beta_group_id: id, beta_testers: beta_testers)
       end

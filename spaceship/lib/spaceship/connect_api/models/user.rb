@@ -46,7 +46,7 @@ module Spaceship
 
       def self.find(client: nil, email: nil, includes: nil)
         client ||= Spaceship::ConnectAPI
-        return all(filter: { email: email }, includes: includes)
+        return all(client: client, filter: { email: email }, includes: includes)
       end
     end
   end

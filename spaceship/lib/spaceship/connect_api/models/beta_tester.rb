@@ -42,7 +42,7 @@ module Spaceship
 
       def self.find(client: nil, email: nil, includes: nil)
         client ||= Spaceship::ConnectAPI
-        return all(filter: { email: email }, includes: includes).first
+        return all(client: client, filter: { email: email }, includes: includes).first
       end
 
       def delete_from_apps(client: nil, apps: nil)

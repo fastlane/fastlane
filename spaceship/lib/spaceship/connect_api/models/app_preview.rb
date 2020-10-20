@@ -92,7 +92,7 @@ module Spaceship
         rescue => error
           puts("Failed to patch app preview. Update may have gone through so verifying") if Spaceship::Globals.verbose?
 
-          preview = Spaceship::ConnectAPI::AppPreview.get(client: client,app_preview_id: preview.id)
+          preview = Spaceship::ConnectAPI::AppPreview.get(client: nil, app_preview_id: preview.id)
           raise error unless preview.complete?
         end
 
@@ -113,7 +113,7 @@ module Spaceship
             puts("Waiting #{sleep_time} seconds before checking status of processing...") if Spaceship::Globals.verbose?
             sleep(sleep_time)
 
-            preview = Spaceship::ConnectAPI::AppPreview.get(client: client, app_preview_id: preview.id)
+            preview = Spaceship::ConnectAPI::AppPreview.get(client: nil, app_preview_id: preview.id)
           end
         end
 
@@ -126,7 +126,7 @@ module Spaceship
         client.patch_app_preview(app_preview_id: id, attributes: attributes).first
       end
 
-      def delete!(client: nil,  filter: {}, includes: nil, limit: nil, sort: nil)
+      def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         client.delete_app_preview(app_preview_id: id)
       end

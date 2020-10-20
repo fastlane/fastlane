@@ -118,7 +118,7 @@ module Spaceship
             sleep(30)
 
             screenshots = Spaceship::ConnectAPI::AppScreenshotSet
-                          .get(client: client, app_screenshot_set_id: app_screenshot_set_id)
+                          .get(client: nil, app_screenshot_set_id: app_screenshot_set_id)
                           .app_screenshots
 
             screenshot = screenshots.find do |s|
@@ -147,7 +147,7 @@ module Spaceship
         # may go through by return response as 504.
         begin
           screenshot = Spaceship::ConnectAPI.patch_app_screenshot(
-            client: client,
+            client: nil,
             app_screenshot_id: screenshot.id,
             attributes: patch_attributes
           ).first
@@ -174,7 +174,7 @@ module Spaceship
             puts("Waiting #{sleep_time} seconds before checking status of processing...") if Spaceship::Globals.verbose?
             sleep(sleep_time)
 
-            screenshot =client.get_app_screenshot(app_screenshot_id: screenshot.id).first
+            screenshot = client.get_app_screenshot(app_screenshot_id: screenshot.id).first
           end
         end
 

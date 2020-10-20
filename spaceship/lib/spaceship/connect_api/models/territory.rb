@@ -18,7 +18,7 @@ module Spaceship
       # API
       #
 
-      def self.all(client:nil, filter: {}, includes: nil, limit: 180, sort: nil)
+      def self.all(client: nil, filter: {}, includes: nil, limit: 180, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_territories(filter: {}, includes: nil, limit: nil, sort: nil).all_pages
         return resps.flat_map(&:to_models)
