@@ -224,11 +224,11 @@ module Spaceship
 
     # extracted into its own method for testing
     def ask_for_2fa_code(text)
-      fastlane_2fa_code = ENV["FASTLANE_2FA_CODE"]
-      if fastlane_2fa_code
-        puts("Got 2fa code from FASTLANE_2FA_CODE environment variable: " + fastlane_2fa_code)
-        return fastlane_2fa_code
-      end
+      # fastlane_2fa_code = ENV["FASTLANE_2FA_CODE"]
+      # if fastlane_2fa_code
+      #  puts("Got 2fa code from FASTLANE_2FA_CODE environment variable: " + fastlane_2fa_code)
+      #   return fastlane_2fa_code
+      # end
 
       puts("Asking for 2fa code ... CUSTOM CODE TEST")
       ask(text)
