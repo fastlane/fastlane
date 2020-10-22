@@ -31,6 +31,8 @@ require 'spaceship/connect_api/models/beta_tester_metric'
 require 'spaceship/connect_api/models/build'
 require 'spaceship/connect_api/models/build_delivery'
 require 'spaceship/connect_api/models/build_beta_detail'
+require 'spaceship/connect_api/models/custom_app_organization'
+require 'spaceship/connect_api/models/custom_app_user'
 require 'spaceship/connect_api/models/pre_release_version'
 
 require 'spaceship/connect_api/models/age_rating_declaration'
