@@ -158,7 +158,6 @@ module Spaceship
         puts("")
 
         code = ask_for_2fa_code("Please enter the #{code_length} digit code:")
-        puts("got final 2fa code: " + code)
         code_type = 'trusteddevice'
         body = { "securityCode" => { "code" => code.to_s } }.to_json
 
@@ -224,13 +223,12 @@ module Spaceship
 
     # extracted into its own method for testing
     def ask_for_2fa_code(text)
-      # fastlane_2fa_code = ENV["FASTLANE_2FA_CODE"]
-      # if fastlane_2fa_code
-      #  puts("Got 2fa code from FASTLANE_2FA_CODE environment variable: " + fastlane_2fa_code)
-      #   return fastlane_2fa_code
-      # end
+      fastlane_2fa_code = ENV["FASTLANE_2FA_CODE"]
+      if fastlane_2fa_code
+        puts("Using 2fa code from FASTLANE_2FA_CODE environment variable: " + fastlane_2fa_code)
+        return fastlane_2fa_code
+      end
 
-      puts("Asking for 2fa code ... CUSTOM CODE TEST")
       ask(text)
     end
 
@@ -315,7 +313,6 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
       end
 
       code = ask_for_2fa_code("Please enter the #{code_length} digit code you received at #{phone_number}:")
-      puts("Got final 2fa code: " + code)
 
       return { "securityCode" => { "code" => code.to_s }, "phoneNumber" => { "id" => phone_id }, "mode" => "sms" }.to_json
     end
