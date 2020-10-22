@@ -65,7 +65,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "MATCH_APP_IDENTIFIER",
-                                     description: "The bundle identifier(s) of your app (comma-separated)",
+                                     description: "The bundle identifier(s) of your app (comma-separated string or array of strings)",
                                      type: Array, # we actually allow String and Array here
                                      skip_type_validation: true,
                                      code_gen_sensitive: true,
