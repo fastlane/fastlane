@@ -51,10 +51,6 @@ module Spaceship
         Time.parse(expiration_date) > Time.now
       end
 
-      def owner_name
-        [requester_first_name, requester_last_name].join ' '
-      end
-
       # Create a new code signing request that can be used to
       # generate a new certificate
       # @example
