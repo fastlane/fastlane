@@ -18,9 +18,24 @@ module Spaceship
       attr_accessor :app_store_versions
       attr_accessor :prices
 
+      # Only available with Apple ID auth
+      attr_accessor :distribution_type
+      attr_accessor :educationDiscountType
+
       module ContentRightsDeclaration
         USES_THIRD_PARTY_CONTENT = "USES_THIRD_PARTY_CONTENT"
         DOES_NOT_USE_THIRD_PARTY_CONTENT = "DOES_NOT_USE_THIRD_PARTY_CONTENT"
+      end
+
+      module DistributionType
+        APP_STORE = "APP_STORE"
+        CUSTOM = "CUSTOM"
+      end
+
+      module EducationDiscountType
+        DISCOUNTED = "DISCOUNTED"
+        NOT_APPLICABLE = "NOT_APPLICABLE"
+        NOT_DISCOUNTED = "NOT_DISCOUNTED"
       end
 
       self.attr_mapping({
@@ -32,6 +47,8 @@ module Spaceship
         "removed" => "removed",
         "isAAG" => "is_aag",
         "availableInNewTerritories" => "available_in_new_territories",
+        "distributionType" => "distribution_type",
+        "educationDiscountType" => "education_discount_type",
 
         "contentRightsDeclaration" => "content_rights_declaration",
 
@@ -253,6 +270,24 @@ module Spaceship
       end
 
       #
+      # B2B
+      #
+
+      def disable_b2b
+        update(attributes: {
+          distributionType: DistributionType::APP_STORE,
+          education_discount_type: EducationDiscountType::NOT_DISCOUNTED
+        })
+      end
+
+      def enable_b2b
+        update(attributes: {
+          distributionType: App::DistributionType::CUSTOM,
+          education_discount_type: EducationDiscountType::NOT_APPLICABLE
+        })
+      end
+
+      #
       # Beta Feedback
       #
 
@@ -321,6 +356,22 @@ module Spaceship
           public_link_limit_enabled: public_link_limit_enabled
         ).all_pages
         return resps.flat_map(&:to_models).first
+      end
+
+      #
+      # Education
+      #
+
+      def disable_educational_discount
+        update(attributes: {
+          education_discount_type: EducationDiscountType::NOT_DISCOUNTED
+        })
+      end
+
+      def enable_educational_discount
+        update(attributes: {
+          education_discount_type: EducationDiscountType::DISCOUNTED
+        })
       end
 
       #

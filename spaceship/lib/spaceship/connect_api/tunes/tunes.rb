@@ -891,6 +891,77 @@ module Spaceship
         end
 
         #
+        # customAppUsers
+        #
+
+        def get_custom_app_users(app_id: nil, filter: nil, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("apps/#{app_id}/customAppUsers", params)
+        end
+
+        def post_custom_app_user(app_id: nil, apple_id: nil)
+          body = {
+              data: {
+                  type: "customAppUsers",
+                  attributes: {
+                    appleId: apple_id
+                  },
+                  relationships: {
+                      app: {
+                          data: {
+                              type: "apps",
+                              id: app_id
+                          }
+                      }
+                  }
+              }
+          }
+
+          tunes_request_client.post("customAppUsers", body)
+        end
+
+        def delete_custom_app_user(custom_app_user_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("customAppUsers/#{custom_app_user_id}", params)
+        end
+
+        #
+        # customOrganizationUsers
+        #
+
+        def get_custom_app_organization(app_id: nil, filter: nil, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("apps/#{app_id}/customAppOrganizations", params)
+        end
+
+        def post_custom_app_organization(app_id: nil, device_enrollment_program_id: nil, name: nil)
+          body = {
+              data: {
+                  type: "customAppOrganizations",
+                  attributes: {
+                    deviceEnrollmentProgramId: device_enrollment_program_id,
+                    name: name
+                  },
+                  relationships: {
+                      app: {
+                          data: {
+                              type: "apps",
+                              id: app_id
+                          }
+                      }
+                  }
+              }
+          }
+
+          tunes_request_client.post("customAppOrganizations", body)
+        end
+
+        def delete_custom_app_organization(custom_app_organization_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("customAppOrganizations/#{custom_app_organization_id}", params)
+        end
+
+        #
         # idfaDeclarations
         #
 
