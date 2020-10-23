@@ -62,7 +62,7 @@ describe Spaceship::ConnectAPI do
         issuer_id = 'issuer_id'
         filepath = 'filepath'
 
-        expect(Spaceship::ConnectAPI::Client).to receive(:auth).with(key_id: key_id, issuer_id: issuer_id, filepath: filepath).and_return(mock_client)
+        expect(Spaceship::ConnectAPI::Client).to receive(:auth).with(key_id: key_id, issuer_id: issuer_id, filepath: filepath, key: nil, duration: nil, in_house: nil).and_return(mock_client)
 
         client = Spaceship::ConnectAPI.auth(key_id: key_id, issuer_id: issuer_id, filepath: filepath)
         expect(client).to eq(Spaceship::ConnectAPI.client)
