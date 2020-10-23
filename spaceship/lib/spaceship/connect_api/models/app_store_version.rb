@@ -121,7 +121,7 @@ module Spaceship
 
       def get_app_store_version_localizations(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
-        return client::AppStoreVersionLocalization.all(app_store_version_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
+        return Spaceship::ConnectAPI::AppStoreVersionLocalization.all(client: client, app_store_version_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
       end
 
       #

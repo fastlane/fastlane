@@ -147,7 +147,6 @@ module Spaceship
         # may go through by return response as 504.
         begin
           screenshot = Spaceship::ConnectAPI.patch_app_screenshot(
-            client: nil,
             app_screenshot_id: screenshot.id,
             attributes: patch_attributes
           ).first
