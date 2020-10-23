@@ -4748,7 +4748,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - readonly: Only fetch existing certificates and profiles, don't generate new ones
    - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
    - skipProvisioningProfiles: Skip syncing provisioning profiles
-   - appIdentifier: The bundle identifier(s) of your app (comma-separated)
+   - appIdentifier: The bundle identifier(s) of your app (comma-separated string or array of strings)
    - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
@@ -7678,7 +7678,7 @@ public func swiftlint(mode: Any = "lint",
    - readonly: Only fetch existing certificates and profiles, don't generate new ones
    - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
    - skipProvisioningProfiles: Skip syncing provisioning profiles
-   - appIdentifier: The bundle identifier(s) of your app (comma-separated)
+   - appIdentifier: The bundle identifier(s) of your app (comma-separated string or array of strings)
    - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username
@@ -9253,7 +9253,7 @@ public func xcov(workspace: String? = nil,
                  coverallsServiceJobId: String? = nil,
                  coverallsRepoToken: String? = nil,
                  xcconfig: String? = nil,
-                 ideFoundationPath: String = "/Applications/Xcode-11.7.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-12.0.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -9399,4 +9399,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.100]
+// FastlaneRunnerAPIVersion [0.9.101]
