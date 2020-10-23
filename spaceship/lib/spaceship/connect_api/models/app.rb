@@ -275,7 +275,8 @@ module Spaceship
 
       def disable_b2b
         update(attributes: {
-          distributionType: DistributionType::APP_STORE
+          distributionType: DistributionType::APP_STORE,
+          education_discount_type: EducationDiscountType::NOT_DISCOUNTED
         })
       end
 
