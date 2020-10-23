@@ -17,7 +17,7 @@ public protocol MatchfileProtocol: class {
     /// Skip syncing provisioning profiles
     var skipProvisioningProfiles: Bool { get }
 
-    /// The bundle identifier(s) of your app (comma-separated)
+    /// The bundle identifier(s) of your app (comma-separated string or array of strings)
     var appIdentifier: [String] { get }
 
     /// Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
@@ -184,4 +184,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.44]
+// FastlaneRunnerAPIVersion [0.9.45]
