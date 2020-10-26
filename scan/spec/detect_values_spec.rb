@@ -16,21 +16,21 @@ describe Scan do
     end
 
     describe "#detect_destination" do
-      it "ios" do
+      it "ios", requires_xcodebuild: true do
         options = { project: "./scan/examples/standard/app.xcodeproj" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
         expect(Scan.config[:destination].first).to match(/platform=iOS/)
       end
 
       context "catalyst" do
-        it "ios" do
+        it "ios", requires_xcodebuild: true do
           options = { project: "./scan/examples/standard/app.xcodeproj" }
           expect_any_instance_of(FastlaneCore::Project).to receive(:supports_mac_catalyst?).and_return(true)
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
           expect(Scan.config[:destination].first).to match(/platform=iOS/)
         end
 
-        it "mac" do
+        it "mac", requires_xcodebuild: true do
           options = { project: "./scan/examples/standard/app.xcodeproj", catalyst_platform: "macos" }
           expect_any_instance_of(FastlaneCore::Project).to receive(:supports_mac_catalyst?).and_return(true)
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
