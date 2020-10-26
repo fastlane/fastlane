@@ -210,7 +210,7 @@ module Scan
 
       # building up the destination now
       if Scan.building_mac_catalyst_for_mac?
-        Scan.config[:destination] = "platform=macOS,variant=Mac Catalyst"
+        Scan.config[:destination] = ["platform=macOS,variant=Mac Catalyst"]
       elsif Scan.devices && Scan.devices.count > 0
         Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" }
       elsif Scan.project.mac_app?
