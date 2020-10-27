@@ -14,7 +14,7 @@ test_output/
 .keys
 *.swp
 
-## Specific to Android
+## Specific to Android 
 .gradle/
 *.iml
 local.properties
