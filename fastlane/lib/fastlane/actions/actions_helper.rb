@@ -5,7 +5,7 @@ module Fastlane
       PLATFORM_NAME = :PLATFORM_NAME
       ENVIRONMENT = :ENVIRONMENT
 
-      # A slighly decorated hash that will store and fetch sensitive data
+      # A slightly decorated hash that will store and fetch sensitive data
       # but not display it while iterating keys and values
       class LaneContextValues < Hash
         def initialize

@@ -136,7 +136,7 @@ module Fastlane
         type = "[String]"
       elsif default_value.kind_of?(Hash)
         type = "[String : Any]"
-      # Altough we can have a default value of Integer type, if param_type_override overridden that value, respect it.
+      # Although we can have a default value of Integer type, if param_type_override overridden that value, respect it.
       elsif default_value.kind_of?(Integer)
         if type == "Double" || type == "Float"
           begin

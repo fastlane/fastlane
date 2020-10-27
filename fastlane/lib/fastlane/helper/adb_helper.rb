@@ -39,7 +39,7 @@ module Fastlane
         Action.sh(command)
       end
 
-      def device_avalaible?(serial)
+      def device_available?(serial)
         UI.deprecated("Please use `device_available?` instead... This will be removed in a future version of fastlane")
         device_available?(serial)
       end
