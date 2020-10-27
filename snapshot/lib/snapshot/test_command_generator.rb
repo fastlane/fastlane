@@ -13,7 +13,7 @@ module Snapshot
         parts << "xcodebuild"
         parts += options(language, locale)
         parts += destination(devices)
-        parts += build_settings
+        parts += build_settings(language, locale)
         parts += actions
         parts += suffix
         parts += pipe(log_path: log_path)
