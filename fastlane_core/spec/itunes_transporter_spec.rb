@@ -647,13 +647,17 @@ describe FastlaneCore do
     end
 
     describe "with Xcode 11.x installed" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11.1')
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+      end
+
       describe "with username and password" do
         describe "with default itms_path" do
           before(:each) do
-            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11.1')
-            allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
-            allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
             allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
+            stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
           end
 
           describe "upload command generation" do
@@ -695,9 +699,6 @@ describe FastlaneCore do
 
         describe "with user defined itms_path" do
           before(:each) do
-            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11.1')
-            allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
-            allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
             stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/tmp' })
           end
 
@@ -718,6 +719,11 @@ describe FastlaneCore do
       end
 
       describe "with JWT" do
+        before(:each) do
+          allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+        end
+
         describe "upload command generation" do
           it 'generates a call to xcrun iTMSTransporter' do
             transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
