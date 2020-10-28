@@ -55,7 +55,7 @@ module Fastlane
 
       def self.run(params)
         unless Helper.test?
-          UI.message("Install using `brew install homebrew/boneyard/appledoc`")
+          UI.message("Install using `brew install appledoc`")
           UI.user_error!("appledoc not installed") if `which appledoc`.length == 0
         end
 
