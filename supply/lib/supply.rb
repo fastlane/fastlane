@@ -16,7 +16,7 @@ module Supply
   end
 
   AVAILABLE_METADATA_FIELDS = %w(title short_description full_description video)
-  IMAGES_TYPES = %w(featureGraphic icon promoGraphic tvBanner)
+  IMAGES_TYPES = %w(featureGraphic icon tvBanner)
   SCREENSHOT_TYPES = %w(phoneScreenshots sevenInchScreenshots tenInchScreenshots tvScreenshots wearScreenshots)
 
   IMAGES_FOLDER_NAME = "images"
