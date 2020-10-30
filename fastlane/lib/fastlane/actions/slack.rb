@@ -230,7 +230,7 @@ module Fastlane
         if Actions.git_branch && should_add_payload[:git_branch]
           slack_attachment[:fields] << {
             title: 'Git Branch',
-            value: Actions.git_branch,
+            value: git_branch(),
             short: true
           }
         end
