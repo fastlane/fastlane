@@ -193,7 +193,7 @@ _fastlane_ tracks a few key metrics to understand how developers are using the t
 * The number of _fastlane_ runs
 * A salted hash of the app identifier or package name, which helps us anonymously identify unique usage of _fastlane_
  
-You can easily opt-out of metrics collection by adding `opt_out_usage` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. [Check out the metrics code on GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane_core/lib/fastlane_core/analytics)
+You can easily opt-out of metrics collection by adding `opt_out_usage` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. Check out [the metrics code on GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane_core/lib/fastlane_core/analytics).
 
 ## License
 
