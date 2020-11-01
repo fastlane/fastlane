@@ -499,7 +499,7 @@ fastlane match import --skip_certificate_matching true
 ```
 This will skip login to Apple Developer Portal and will import the provided certificate, private key and profile directly to the certificates repo.
 
-Please be careful when using this option and ensure the certificates and profiles match the type (development, adhoc, appstore, enterprise, developer_id) and are not revoked or expired.
+Please be careful when using this option and ensure the certificates and profiles match the type (development, adhoc, appstore, enterprise, developer_id, developer_id_kext) and are not revoked or expired.
 
 ### Manual Decrypt
 

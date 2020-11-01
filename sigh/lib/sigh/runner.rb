@@ -84,10 +84,12 @@ module Sigh
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT if Sigh.config[:development]
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT if Sigh.config[:developer_id]
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT_KEXT if Sigh.config[:developer_id_kext]
       when "catalyst"
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT if Sigh.config[:development]
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT if Sigh.config[:developer_id]
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT_KEXT if Sigh.config[:developer_id_kext]
       end
 
       @profile_type
@@ -252,6 +254,10 @@ module Sigh
         elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
           types = [
             Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+          ]
+        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT_KEXT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT_KEXT
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_KEXT
           ]
         else
           types = [

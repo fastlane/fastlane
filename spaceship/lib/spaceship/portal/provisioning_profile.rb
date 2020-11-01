@@ -205,6 +205,8 @@ module Spaceship
                     InHouse
                   when 'direct'
                     Direct # Mac-only
+                  when 'direct_kext'
+                    DirectKext # Mac-only
                   else
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
@@ -269,7 +271,7 @@ module Spaceship
           # Fill in sensible default values
           name ||= [bundle_id, self.pretty_type].join(' ')
 
-          if self == AppStore || self == InHouse || self == Direct
+          if self == AppStore || self == InHouse || self == Direct || self == DirectKext
             # Distribution Profiles MUST NOT have devices
             devices = []
           end
@@ -394,6 +396,13 @@ module Spaceship
         end
       end
 
+      # Represents a Mac Developer ID profile from the Dev Portal
+      class DirectKext < ProvisioningProfile
+        def self.type
+          'direct_kext'
+        end
+      end
+
       # Download the current provisioning profile. This will *not* store
       # the provisioning profile on the file system. Instead this method
       # will return the content of the profile.
@@ -433,6 +442,8 @@ module Spaceship
               self.certificates = [Spaceship::Portal::Certificate::MacDevelopment.all.first]
             elsif self.kind_of?(Direct)
               self.certificates = [Spaceship::Portal::Certificate::DeveloperIdApplication.all.first]
+            elsif self.kind_of?(DirectKext)
+              self.certificates = [Spaceship::Portal::Certificate::DeveloperIdKext.all.first]
             else
               self.certificates = [Spaceship::Portal::Certificate::MacAppDistribution.all.first]
             end
