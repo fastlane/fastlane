@@ -190,7 +190,7 @@ module Cert
       begin
         certificate = Spaceship::ConnectAPI::Certificate.create(
           certificate_type: certificate_type,
-          csr_content: csr
+          csr_content: csr.to_pem
         )
       rescue => ex
         type_name = (Cert.config[:development] ? "Development" : "Distribution")
