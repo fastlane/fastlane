@@ -179,9 +179,6 @@ public protocol ScanfileProtocol: class {
     /// Use only if you're a pro, use the other options instead
     var destination: String? { get }
 
-    /// Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
-    var catalystPlatform: String? { get }
-
     /// **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
     var customReportFileName: String? { get }
 
@@ -255,7 +252,6 @@ public extension ScanfileProtocol {
     var skipSlack: Bool { return false }
     var slackOnlyOnFailure: Bool { return false }
     var destination: String? { return nil }
-    var catalystPlatform: String? { return nil }
     var customReportFileName: String? { return nil }
     var xcodebuildCommand: String { return "env NSUnbufferedIO=YES xcodebuild" }
     var clonedSourcePackagesPath: String? { return nil }
@@ -264,4 +260,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.57]
+// FastlaneRunnerAPIVersion [0.9.56]

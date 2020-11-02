@@ -6077,7 +6077,6 @@ public func rubyVersion() {
    - skipSlack: Don't publish to slack, even when an URL is given
    - slackOnlyOnFailure: Only post on Slack if the tests fail
    - destination: Use only if you're a pro, use the other options instead
-   - catalystPlatform: Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
@@ -6144,7 +6143,6 @@ public func runTests(workspace: String? = nil,
                      skipSlack: Bool = false,
                      slackOnlyOnFailure: Bool = false,
                      destination: Any? = nil,
-                     catalystPlatform: String? = nil,
                      customReportFileName: String? = nil,
                      xcodebuildCommand: String = "env NSUnbufferedIO=YES xcodebuild",
                      clonedSourcePackagesPath: String? = nil,
@@ -6209,7 +6207,6 @@ public func runTests(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "skip_slack", value: skipSlack),
                                                                                              RubyCommand.Argument(name: "slack_only_on_failure", value: slackOnlyOnFailure),
                                                                                              RubyCommand.Argument(name: "destination", value: destination),
-                                                                                             RubyCommand.Argument(name: "catalyst_platform", value: catalystPlatform),
                                                                                              RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
                                                                                              RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand),
                                                                                              RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
@@ -6356,7 +6353,6 @@ public func say(text: Any,
    - skipSlack: Don't publish to slack, even when an URL is given
    - slackOnlyOnFailure: Only post on Slack if the tests fail
    - destination: Use only if you're a pro, use the other options instead
-   - catalystPlatform: Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
@@ -6423,7 +6419,6 @@ public func scan(workspace: Any? = scanfile.workspace,
                  skipSlack: Bool = scanfile.skipSlack,
                  slackOnlyOnFailure: Bool = scanfile.slackOnlyOnFailure,
                  destination: Any? = scanfile.destination,
-                 catalystPlatform: Any? = scanfile.catalystPlatform,
                  customReportFileName: Any? = scanfile.customReportFileName,
                  xcodebuildCommand: Any = scanfile.xcodebuildCommand,
                  clonedSourcePackagesPath: Any? = scanfile.clonedSourcePackagesPath,
@@ -6488,7 +6483,6 @@ public func scan(workspace: Any? = scanfile.workspace,
                                                                                         RubyCommand.Argument(name: "skip_slack", value: skipSlack),
                                                                                         RubyCommand.Argument(name: "slack_only_on_failure", value: slackOnlyOnFailure),
                                                                                         RubyCommand.Argument(name: "destination", value: destination),
-                                                                                        RubyCommand.Argument(name: "catalyst_platform", value: catalystPlatform),
                                                                                         RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
                                                                                         RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand),
                                                                                         RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
@@ -9243,7 +9237,7 @@ public func xcov(workspace: String? = nil,
                  htmlReport: Bool = true,
                  markdownReport: Bool = false,
                  jsonReport: Bool = false,
-                 minimumCoveragePercentage: Int = 0,
+                 minimumCoveragePercentage: Float = 0,
                  slackUrl: String? = nil,
                  slackChannel: String? = nil,
                  skipSlack: Bool = false,
@@ -9405,4 +9399,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.102]
+// FastlaneRunnerAPIVersion [0.9.101]
