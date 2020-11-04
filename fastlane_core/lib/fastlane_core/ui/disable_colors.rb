@@ -20,6 +20,6 @@ end
 begin
   require 'colorize'
   String.disable_colorization = true
-rescue
+rescue LoadError
   # Colorize gem is not used by any plugin
 end
