@@ -95,6 +95,7 @@ Require/MissingRequireStatement:
     - '**/spec/**/*.rb'
     - '**/spec_helper.rb'
     - 'spaceship/lib/spaceship/babosa_fix.rb'
+    - 'fastlane_core/lib/fastlane_core/ui/disable_colors.rb'
     - '**/Fastfile'
     - '**/*.gemspec'
     - 'rakelib/**/*'

@@ -15,3 +15,11 @@ class String
     end
   end
 end
+
+# If a plugin uses the colorize gem, we also want to disable that
+begin
+  require 'colorize'
+  String.disable_colorization = true
+rescue LoadError
+  # Colorize gem is not used by any plugin
+end
