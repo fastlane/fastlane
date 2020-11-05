@@ -50,7 +50,8 @@ module Match
             UI.error("Couldn't decrypt the repo, please make sure you enter the right password!")
             UI.user_error!("Invalid password passed via 'MATCH_PASSWORD'") if ENV["MATCH_PASSWORD"]
             clear_password
-            self.decrypt_files # call itself
+            # After clearing the password from Keychain, retry if MATCH_PASSWORD is set
+            self.decrypt_files if ENV["MATCH_PASSWORD"]
             return
           end
           UI.success("🔓  Decrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
