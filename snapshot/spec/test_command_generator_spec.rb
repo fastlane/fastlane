@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 describe Snapshot do
   describe Snapshot::TestCommandGenerator do
     let(:os_version) { "9.3" }
@@ -248,20 +250,24 @@ describe Snapshot do
       end
 
       context 'fixed derivedDataPath' do
+        let(:temp) { Dir.mktmpdir }
+
         before do
-          configure(options.merge(derived_data_path: 'fake/derived/path'))
+          configure(options.merge(derived_data_path: temp))
         end
 
         it 'uses the fixed derivedDataPath if given', requires_xcode: true do
           expect(Dir).not_to(receive(:mktmpdir))
           command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
-          expect(command.join('')).to include("-derivedDataPath fake/derived/path")
+          expect(command.join('')).to include("-derivedDataPath #{temp}")
         end
       end
 
       context 'test-without-building' do
+        let(:temp) { Dir.mktmpdir }
+
         before do
-          configure(options.merge(derived_data_path: 'fake/derived/path', test_without_building: true))
+          configure(options.merge(derived_data_path: temp, test_without_building: true))
         end
 
         it 'uses the "test-without-building" command and not the default "build test"', requires_xcode: true do
