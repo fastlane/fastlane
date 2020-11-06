@@ -109,7 +109,7 @@ module Cert
                                      short_option: "-p",
                                      env_name: "CERT_KEYCHAIN_PASSWORD",
                                      sensitive: true,
-                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
+                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_set_partition_list,
                                      short_option: "-P",
