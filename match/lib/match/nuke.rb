@@ -252,11 +252,13 @@ module Match
 
       self.encryption.encrypt_files if self.encryption
 
-      # Now we need to commit and push all this too
-      message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
-      self.storage.save_changes!(files_to_commit: [],
-                                 files_to_delete: files_to_delete,
-                                 custom_message: message)
+      if files_to_delete.count > 0
+        # Now we need to commit and push all this too, if needed
+        message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
+        self.storage.save_changes!(files_to_commit: [],
+                                   files_to_delete: files_to_delete,
+                                   custom_message: message)
+      end
     end
 
     private
