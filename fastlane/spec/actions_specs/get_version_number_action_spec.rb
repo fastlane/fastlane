@@ -4,10 +4,26 @@ describe Fastlane do
       require 'shellwords'
 
       path = File.absolute_path("./fastlane/spec/fixtures/actions/get_version_number/get_version_number/")
+      xcodeproj_filename_without_extension = "get_version_number"
+      xcodeproj_filename_with_extension = "get_version_number.xcodeproj"
 
       it "gets the correct version number for 'TargetA'", requires_xcodeproj: true do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{path}', target: 'TargetA')
+        end").runner.execute(:test)
+        expect(result).to eq("4.3.2")
+      end
+
+      it "gets the correct version number for 'TargetA' using xcodeproj_filename without extension", requires_xcodeproj: true do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          get_version_number(xcodeproj: '#{path}', xcodeproj_dir: '#{path}', xcodeproj_filename: '#{xcodeproj_filename_without_extension}', target: 'TargetA')
+        end").runner.execute(:test)
+        expect(result).to eq("4.3.2")
+      end
+
+      it "gets the correct version number for 'TargetA' using xcodeproj_filename with extension", requires_xcodeproj: true do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          get_version_number(xcodeproj: '#{path}', xcodeproj_dir: '#{path}', xcodeproj_filename: '#{xcodeproj_filename_with_extension}', target: 'TargetA')
         end").runner.execute(:test)
         expect(result).to eq("4.3.2")
       end
@@ -200,12 +216,28 @@ describe Fastlane do
         expect(result).to eq("3.2.1")
       end
 
-      it "raises an exception when use passes workspace" do
+      it "raises an exception when user passes workspace as the xcodeproj" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             get_version_number(xcodeproj: 'project.xcworkspace')
           end").runner.execute(:test)
         end.to raise_error("Please pass the path to the project, not the workspace")
+      end
+
+      it "raises an exception when user passes workspace as the xcodeproj_dir" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj_dir: 'path/to/project.xcworkspace')
+          end").runner.execute(:test)
+        end.to raise_error("Please pass the path to the directory of the xcodeproj, not the workspace")
+      end
+
+      it "raises an exception when user passes workspace as the xcodeproj_filename" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            get_version_number(xcodeproj_filename: 'project.xcworkspace')
+          end").runner.execute(:test)
+        end.to raise_error("Please pass the filename of the project, not the workspace")
       end
     end
   end
