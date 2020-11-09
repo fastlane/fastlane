@@ -535,7 +535,7 @@ function resign {
     fi
 
     # Check for and resign OnDemandResource folders
-    ODR_DIR="$(dirname $APP_PATH)/OnDemandResources"
+    ODR_DIR="$(dirname "$APP_PATH")/OnDemandResources"
     if [ -d "$ODR_DIR" ]; then
         for assetpack in "$ODR_DIR"/*
         do

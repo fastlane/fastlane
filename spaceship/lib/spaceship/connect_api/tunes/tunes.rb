@@ -185,8 +185,11 @@ module Spaceship
             type: "apps",
             id: app_id
           }
-          data[:attributes] = attributes unless attributes.empty?
           data[:relationships] = relationships unless relationships.empty?
+
+          if !attributes.nil? && !attributes.empty?
+            data[:attributes] = attributes
+          end
 
           # Body
           body = {
@@ -308,12 +311,17 @@ module Spaceship
           tunes_request_client.get("appPrices", params)
         end
 
+        def get_app_price(app_price_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appPrices/#{app_price_id}", params)
+        end
+
         #
         # appPricePoints
         #
         def get_app_price_points(filter: {}, includes: nil, limit: nil, sort: nil)
-          params = Client.instance.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          Client.instance.get("appPricePoints", params)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appPricePoints", params)
         end
 
         #
@@ -360,9 +368,9 @@ module Spaceship
         # appScreenshotSets
         #
 
-        def get_app_screenshot_sets(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_app_screenshot_sets(app_store_version_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appScreenshotSets", params)
+          tunes_request_client.get("appStoreVersionLocalizations/#{app_store_version_localization_id}/appScreenshotSets", params)
         end
 
         def get_app_screenshot_set(app_screenshot_set_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
@@ -453,9 +461,9 @@ module Spaceship
         # appInfos
         #
 
-        def get_app_infos(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_app_infos(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appInfos", params)
+          tunes_request_client.get("apps/#{app_id}/appInfos", params)
         end
 
         def patch_app_info(app_info_id: nil, attributes: {})
@@ -641,9 +649,9 @@ module Spaceship
         # appStoreVersionLocalizations
         #
 
-        def get_app_store_version_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_app_store_version_localizations(app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appStoreVersionLocalizations", params)
+          tunes_request_client.get("appStoreVersions/#{app_store_version_id}/appStoreVersionLocalizations", params)
         end
 
         def post_app_store_version_localization(app_store_version_id: nil, attributes: {})
@@ -880,6 +888,77 @@ module Spaceship
           }
 
           tunes_request_client.post("appStoreVersionReleaseRequests", body)
+        end
+
+        #
+        # customAppUsers
+        #
+
+        def get_custom_app_users(app_id: nil, filter: nil, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("apps/#{app_id}/customAppUsers", params)
+        end
+
+        def post_custom_app_user(app_id: nil, apple_id: nil)
+          body = {
+              data: {
+                  type: "customAppUsers",
+                  attributes: {
+                    appleId: apple_id
+                  },
+                  relationships: {
+                      app: {
+                          data: {
+                              type: "apps",
+                              id: app_id
+                          }
+                      }
+                  }
+              }
+          }
+
+          tunes_request_client.post("customAppUsers", body)
+        end
+
+        def delete_custom_app_user(custom_app_user_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("customAppUsers/#{custom_app_user_id}", params)
+        end
+
+        #
+        # customOrganizationUsers
+        #
+
+        def get_custom_app_organization(app_id: nil, filter: nil, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("apps/#{app_id}/customAppOrganizations", params)
+        end
+
+        def post_custom_app_organization(app_id: nil, device_enrollment_program_id: nil, name: nil)
+          body = {
+              data: {
+                  type: "customAppOrganizations",
+                  attributes: {
+                    deviceEnrollmentProgramId: device_enrollment_program_id,
+                    name: name
+                  },
+                  relationships: {
+                      app: {
+                          data: {
+                              type: "apps",
+                              id: app_id
+                          }
+                      }
+                  }
+              }
+          }
+
+          tunes_request_client.post("customAppOrganizations", body)
+        end
+
+        def delete_custom_app_organization(custom_app_organization_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("customAppOrganizations/#{custom_app_organization_id}", params)
         end
 
         #

@@ -63,9 +63,9 @@ aliases:
 version: 2
 
 jobs:
-  'Execute tests on macOS (Xcode 9.4.1, Ruby 2.4)': &tests_macos  # define alias
+  'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)': &tests_macos  # define alias
     macos:
-      xcode: '9.4.1'
+      xcode: '10.2.1'
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'en_US.UTF-8'
@@ -87,6 +87,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
+            brew update
             brew untap caskroom/versions || true
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
@@ -107,12 +108,6 @@ jobs:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always  # Run this even when tests fail
-  'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)':
-    <<: *tests_macos
-    macos:
-      xcode: '10.2.1'
-    environment:
-      _RUBY_VERSION: '2.4'
   'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)':
     <<: *tests_macos
     macos:
@@ -247,7 +242,6 @@ workflows:
   version: 2
   build:
     jobs:
-      - 'Execute tests on macOS (Xcode 9.4.1, Ruby 2.4)'
       - 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)'
       - 'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)'
       - 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)'

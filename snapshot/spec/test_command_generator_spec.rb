@@ -105,11 +105,11 @@ describe Snapshot do
 
         expect(FastlaneCore::CommandExecutor).
           to receive(:execute).
-          with(command: "xcrun simctl spawn 33333 log collect --output /tmp/scan_results/de-DE/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null", print_all: false, print_command: true)
+          with(command: %r{xcrun simctl spawn 33333 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/de-DE/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null}, print_all: false, print_command: true)
 
         expect(FastlaneCore::CommandExecutor).
           to receive(:execute).
-          with(command: "xcrun simctl spawn 98765 log collect --output /tmp/scan_results/en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null", print_all: false, print_command: true)
+          with(command: %r{xcrun simctl spawn 98765 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null}, print_all: false, print_command: true)
 
         Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPhone 6 (10.1)"], "de-DE", nil, 0)
         Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPhone 6s (10.1)"], "en-US", nil, 0)
@@ -178,6 +178,7 @@ describe Snapshot do
               "-derivedDataPath /tmp/path/to/snapshot_derived",
               "-destination 'platform=iOS Simulator,name=#{name},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
               :build,
               :test,
               "| tee /path/to/logs",
@@ -207,6 +208,7 @@ describe Snapshot do
               "-only-testing:TestBundle/TestSuite/Screenshots",
               "-destination 'platform=iOS Simulator,name=#{name},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
               :build,
               :test,
               "| tee /path/to/logs",
@@ -235,6 +237,7 @@ describe Snapshot do
               "-derivedDataPath /tmp/path/to/snapshot_derived",
               "-destination 'platform=tvOS Simulator,name=#{name},OS=#{os}'",
               "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
               :build,
               :test,
               "| tee /path/to/logs",
@@ -367,6 +370,7 @@ describe Snapshot do
             "-derivedDataPath /tmp/path/to/snapshot_derived",
             "-destination 'platform=macOS'",
             "FASTLANE_SNAPSHOT=YES",
+            "FASTLANE_LANGUAGE=en",
             :build,
             :test,
             "| tee /path/to/logs",

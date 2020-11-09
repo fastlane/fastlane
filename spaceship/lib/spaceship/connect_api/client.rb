@@ -13,20 +13,23 @@ module Spaceship
 
       # Initializes client with Apple's App Store Connect JWT auth key.
       #
-      # This method will automatically use the key id, issuer id, and filepath from environment
+      # This method will automatically use the arguments from environment
       # variables if not given.
       #
-      # All three parameters are needed to authenticate.
+      # The key_id, issuer_id and either filepath or key are needed to authenticate.
       #
       # @param key_id (String) (optional): The key id
       # @param issuer_id (String) (optional): The issuer id
       # @param filepath (String) (optional): The filepath
+      # @param key (String) (optional): The key
+      # @param duration (Integer) (optional): How long this session should last
+      # @param in_house (Boolean) (optional): Whether this session is an Enterprise one
       #
       # @raise InvalidUserCredentialsError: raised if authentication failed
       #
       # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
-      def self.auth(key_id: nil, issuer_id: nil, filepath: nil)
-        token = Spaceship::ConnectAPI::Token.create(key_id: key_id, issuer_id: issuer_id, filepath: filepath)
+      def self.auth(key_id: nil, issuer_id: nil, filepath: nil, key: nil, duration: nil, in_house: nil)
+        token = Spaceship::ConnectAPI::Token.create(key_id: key_id, issuer_id: issuer_id, filepath: filepath, key: key, duration: duration, in_house: in_house)
         return ConnectAPI::Client.new(token: token)
       end
 
@@ -43,25 +46,28 @@ module Spaceship
       # @param portal_team_id (String) (optional): The Spaceship::Portal team id
       # @param tunes_team_id (String) (optional): The Spaceship::Tunes team id
       # @param team_name (String) (optional): The team name
+      # @param skip_select_team (Boolean) (optional): Whether to skip automatic selection or prompt for team
       #
       # @raise InvalidUserCredentialsError: raised if authentication failed
       #
       # @return (Spaceship::ConnectAPI::Client) The client the login method was called for
-      def self.login(user = nil, password = nil, use_portal: true, use_tunes: true, portal_team_id: nil, tunes_team_id: nil, team_name: nil)
+      def self.login(user = nil, password = nil, use_portal: true, use_tunes: true, portal_team_id: nil, tunes_team_id: nil, team_name: nil, skip_select_team: false)
         portal_client = Spaceship::Portal.login(user, password) if use_portal
         tunes_client = Spaceship::Tunes.login(user, password) if use_tunes
 
-        # Check if environment variables are set for Spaceship::Portal or Spaceship::Tunes to select team
-        portal_team_id ||= ENV['FASTLANE_TEAM_ID']
-        portal_team_name = team_name || ENV['FASTLANE_TEAM_NAME']
-        tunes_team_id ||= ENV['FASTLANE_ITC_TEAM_ID']
-        tunes_team_name = team_name || ENV['FASTLANE_ITC_TEAM_NAME']
+        unless skip_select_team
+          # Check if environment variables are set for Spaceship::Portal or Spaceship::Tunes to select team
+          portal_team_id ||= ENV['FASTLANE_TEAM_ID']
+          portal_team_name = team_name || ENV['FASTLANE_TEAM_NAME']
+          tunes_team_id ||= ENV['FASTLANE_ITC_TEAM_ID']
+          tunes_team_name = team_name || ENV['FASTLANE_ITC_TEAM_NAME']
 
-        # The clients will prompt for a team selection if:
-        # 1. client exists
-        # 2. team_id and team_name are nil and user belongs to multiple teams
-        portal_client.select_team(team_id: portal_team_id, team_name: portal_team_name) if portal_client
-        tunes_client.select_team(team_id: tunes_team_id, team_name: tunes_team_name) if tunes_client
+          # The clients will prompt for a team selection if:
+          # 1. client exists
+          # 2. team_id and team_name are nil and user belongs to multiple teams
+          portal_client.select_team(team_id: portal_team_id, team_name: portal_team_name) if portal_client
+          tunes_client.select_team(team_id: tunes_team_id, team_name: tunes_team_name) if tunes_client
+        end
 
         return ConnectAPI::Client.new(tunes_client: tunes_client, portal_client: portal_client)
       end
@@ -94,13 +100,33 @@ module Spaceship
       end
 
       def portal_team_id
-        return nil if @portal_client.nil?
-        return @portal_client.team_id
+        if token
+          message = [
+            "Cannot determine portal team id via the App Store Connect API (yet)",
+            "Look to see if you can get the portal team id from somewhere else",
+            "View more info in the docs at https://docs.fastlane.tools/app-store-connect-api/"
+          ]
+          raise message.join('. ')
+        elsif @portal_client
+          return @portal_client.team_id
+        else
+          raise "No App Store Connect API token or Portal Client set"
+        end
       end
 
       def tunes_team_id
         return nil if @tunes_client.nil?
         return @tunes_client.team_id
+      end
+
+      def portal_teams
+        return nil if @portal_client.nil?
+        return @portal_client.teams
+      end
+
+      def tunes_teams
+        return nil if @tunes_client.nil?
+        return @tunes_client.teams
       end
 
       def in_house?
@@ -113,7 +139,7 @@ module Spaceship
               "Or set the 'SPACESHIP_CONNECT_API_IN_HOUSE' environment variable to 'true'",
               "View more info in the docs at https://docs.fastlane.tools/app-store-connect-api/"
             ]
-            raise message.join('\n')
+            raise message.join('. ')
           end
           return !!token.in_house
         elsif @portal_client

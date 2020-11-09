@@ -12,7 +12,7 @@ module Pilot
       [
         FastlaneCore::ConfigItem.new(key: :api_key_path,
                                      env_name: "PILOT_API_KEY_PATH",
-                                     description: "Path to your App Store Connect API key JSON file",
+                                     description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                      optional: true,
                                      conflicting_options: [:username],
                                      verify_block: proc do |value|
@@ -20,7 +20,7 @@ module Pilot
                                      end),
         FastlaneCore::ConfigItem.new(key: :api_key,
                                      env_name: "PILOT_API_KEY",
-                                     description: "Path to your App Store Connect API key JSON file",
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                      type: Hash,
                                      optional: true,
                                      sensitive: true,

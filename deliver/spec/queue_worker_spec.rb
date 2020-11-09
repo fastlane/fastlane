@@ -1,6 +1,13 @@
 require 'deliver/queue_worker'
 
 describe Deliver::QueueWorker do
+  describe '#new' do
+    it 'should initialize an instance' do
+      expect(described_class.new { |_| }).to be_kind_of(described_class)
+      expect(described_class.new(1) { |_| }).to be_kind_of(described_class)
+    end
+  end
+
   describe '#enqueue' do
     subject { described_class.new(1) { |_| } }
 
@@ -9,6 +16,15 @@ describe Deliver::QueueWorker do
       expect { subject.enqueue('aaa') }.not_to(raise_error)
       expect { subject.enqueue([1, 2, 3]) }.not_to(raise_error)
       expect { subject.enqueue(Object.new) }.not_to(raise_error)
+    end
+  end
+
+  describe '#batch_enqueue' do
+    subject { described_class.new(1) { |_| } }
+
+    it 'should take an array as multiple jobs' do
+      expect { subject.batch_enqueue([1, 2, 3]) }.not_to(raise_error)
+      expect { subject.batch_enqueue(1) }.to(raise_error(ArgumentError))
     end
   end
 

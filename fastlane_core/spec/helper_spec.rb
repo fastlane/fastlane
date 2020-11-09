@@ -135,6 +135,42 @@ describe FastlaneCore do
       it "#xcode_version", requires_xcode: true do
         expect(FastlaneCore::Helper.xcode_version).to match(/^\d[\.\d]+$/)
       end
+
+      context "#user_defined_itms_path?" do
+        it "not defined", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+          expect(FastlaneCore::Helper.user_defined_itms_path?).to be(false)
+        end
+
+        it "is defined", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/some/path/to/something' })
+          expect(FastlaneCore::Helper.user_defined_itms_path?).to be(true)
+        end
+      end
+
+      context "#user_defined_itms_path" do
+        it "not defined", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+          expect(FastlaneCore::Helper.user_defined_itms_path).to be(nil)
+        end
+
+        it "is defined", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/some/path/to/something' })
+          expect(FastlaneCore::Helper.user_defined_itms_path).to eq('/some/path/to/something')
+        end
+      end
+
+      context "#itms_path" do
+        it "default", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+          expect(FastlaneCore::Helper.itms_path).to match(/itms/)
+        end
+
+        it "uses FASTLANE_ITUNES_TRANSPORTER_PATH", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/some/path/to/something' })
+          expect(FastlaneCore::Helper.itms_path).to eq('/some/path/to/something')
+        end
+      end
     end
 
     describe "#zip_directory" do

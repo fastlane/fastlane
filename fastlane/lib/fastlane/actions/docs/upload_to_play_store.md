@@ -49,7 +49,7 @@ The previous p12 configuration is still currently supported.
 
 ## Quick Start
 
-> Before using _supply_ to connect to Google Play Store, you'll need to set up your app manually first by uploading at least one build to Google Play Store. See [fastane/fastlane#14686](https://github.com/fastlane/fastlane/issues/14686) for more info.
+> Before using _supply_ to connect to Google Play Store, you'll need to set up your app manually first by uploading at least one build to Google Play Store. See [fastlane/fastlane#14686](https://github.com/fastlane/fastlane/issues/14686) for more info.
 
 - `cd [your_project_folder]`
 - `fastlane supply init`
@@ -198,6 +198,6 @@ For more information, see the `fastlane action google_play_track_version_codes` 
 - `:check_superseded_tracks`
   - Google Play will automatically remove releases that are superseded now
 - `:deactivate_on_promote`
-  - Google Play will automatically deactive a release from its previous track on promote
+  - Google Play will automatically deactivate a release from its previous track on promote
 
 :

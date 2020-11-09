@@ -429,6 +429,7 @@ module Frameit
         # Add the actual title
         text_image.combine_options do |i|
           i.font(current_font) if current_font
+          i.weight(@config[key.to_s]['font_weight']) if @config[key.to_s]['font_weight']
           i.gravity("Center")
           i.pointsize(actual_font_size(key))
           i.draw("text 0,0 '#{text}'")

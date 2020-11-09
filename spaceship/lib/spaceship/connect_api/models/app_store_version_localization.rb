@@ -39,8 +39,8 @@ module Spaceship
       # API
       #
 
-      def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
-        resp = Spaceship::ConnectAPI.get_app_store_version_localizations(filter: filter, includes: includes, limit: limit, sort: sort)
+      def self.all(app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        resp = Spaceship::ConnectAPI.get_app_store_version_localizations(app_store_version_id: app_store_version_id, filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       end
 
@@ -73,9 +73,7 @@ module Spaceship
       #
 
       def get_app_screenshot_sets(filter: {}, includes: "appScreenshots", limit: nil, sort: nil)
-        filter ||= {}
-        filter["appStoreVersionLocalization"] = id
-        return Spaceship::ConnectAPI::AppScreenshotSet.all(filter: filter, includes: includes, limit: limit, sort: sort)
+        return Spaceship::ConnectAPI::AppScreenshotSet.all(app_store_version_localization_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
       end
 
       def create_app_screenshot_set(attributes: nil)

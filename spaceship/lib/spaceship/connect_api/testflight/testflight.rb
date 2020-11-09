@@ -277,6 +277,19 @@ module Spaceship
           test_flight_request_client.delete("betaTesters/#{beta_tester_id}/relationships/betaGroups", nil, body)
         end
 
+        def delete_beta_testers_from_app(beta_tester_ids: [], app_id: nil)
+          body = {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.delete("apps/#{app_id}/relationships/betaTesters", nil, body)
+        end
+
         #
         # betaTesterMetrics
         #

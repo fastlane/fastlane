@@ -1,9 +1,5 @@
-//
-//  SocketClientDelegateProtocol.swift
-//  FastlaneSwiftRunner
-//
-//  Created by Joshua Liebowitz on 8/12/17.
-//
+// SocketClientDelegateProtocol.swift
+// Copyright (c) 2020 FastlaneTools
 
 //
 //  ** NOTE **

@@ -13,8 +13,6 @@ module Deliver
     DeleteScreenshotJob = Struct.new(:app_screenshot, :localization, :app_screenshot_set)
     UploadScreenshotJob = Struct.new(:app_screenshot_set, :path)
 
-    NUMBER_OF_THREADS = Helper.test? ? 1 : [ENV.fetch("DELIVER_NUMBER_OF_THREADS", 10).to_i, 10].min
-
     def upload(options, screenshots)
       return if options[:skip_screenshots]
       return if options[:edit_live]
@@ -69,7 +67,7 @@ module Deliver
     def delete_screenshots(localizations, screenshots_per_language, tries: 5)
       tries -= 1
 
-      worker = QueueWorker.new(NUMBER_OF_THREADS) do |job|
+      worker = QueueWorker.new do |job|
         start_time = Time.now
         target = "#{job.localization.locale} #{job.app_screenshot_set.screenshot_display_type} #{job.app_screenshot.id}"
         begin
@@ -115,7 +113,7 @@ module Deliver
       tries -= 1
 
       # Upload screenshots
-      worker = QueueWorker.new(NUMBER_OF_THREADS) do |job|
+      worker = QueueWorker.new do |job|
         begin
           UI.verbose("Uploading '#{job.path}'...")
           start_time = Time.now
@@ -126,10 +124,16 @@ module Deliver
         end
       end
 
-      number_of_screenshots = 0
+      # Each app_screenshot_set can have only 10 images
+      number_of_screenshots_per_set = {}
+      total_number_of_screenshots = 0
+
       iterator = AppScreenshotIterator.new(localizations)
-      iterator.each_local_screenshot(screenshots_per_language) do |localization, app_screenshot_set, screenshot, index|
-        if index >= 10
+      iterator.each_local_screenshot(screenshots_per_language) do |localization, app_screenshot_set, screenshot|
+        # Initialize counter on each app screenshot set
+        number_of_screenshots_per_set[app_screenshot_set] ||= (app_screenshot_set.app_screenshots || []).count
+
+        if number_of_screenshots_per_set[app_screenshot_set] >= 10
           UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
           next
         end
@@ -141,10 +145,12 @@ module Deliver
         if duplicate
           UI.message("Previous uploaded. Skipping '#{screenshot.path}'...")
         else
+          UI.verbose("Queued uplaod sceeenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{screenshot.path}")
           worker.enqueue(UploadScreenshotJob.new(app_screenshot_set, screenshot.path))
+          number_of_screenshots_per_set[app_screenshot_set] += 1
         end
 
-        number_of_screenshots += 1
+        total_number_of_screenshots += 1
       end
 
       worker.start
@@ -154,7 +160,7 @@ module Deliver
       Helper.show_loading_indicator("Waiting for all the screenshots processed...")
       states = wait_for_complete(iterator)
       Helper.hide_loading_indicator
-      retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, tries, localizations, screenshots_per_language)
+      retry_upload_screenshots_if_needed(iterator, states, total_number_of_screenshots, tries, localizations, screenshots_per_language)
 
       UI.message("Successfully uploaded all screenshots")
     end
@@ -203,12 +209,21 @@ module Deliver
       # Check if local screenshots' checksum exist on App Store Connect
       checksum_to_app_screenshot = iterator.each_app_screenshot.map { |_, _, app_screenshot| [app_screenshot.source_file_checksum, app_screenshot] }.to_h
 
-      missing_local_screenshots = iterator.each_local_screenshot(screenshots_per_language).select do |_, _, local_screenshot, index|
+      number_of_screenshots_per_set = {}
+      missing_local_screenshots = iterator.each_local_screenshot(screenshots_per_language).select do |_, app_screenshot_set, local_screenshot|
+        number_of_screenshots_per_set[app_screenshot_set] ||= (app_screenshot_set.app_screenshots || []).count
         checksum = UploadScreenshots.calculate_checksum(local_screenshot.path)
-        checksum_to_app_screenshot[checksum].nil? && index < 10 # if index is more than 10, it's skipped
+
+        if checksum_to_app_screenshot[checksum]
+          next(false)
+        else
+          is_missing = number_of_screenshots_per_set[app_screenshot_set] < 10 # if it's more than 10, it's skipped
+          number_of_screenshots_per_set[app_screenshot_set] += 1
+          next(is_missing)
+        end
       end
 
-      missing_local_screenshots.each do |_, _, screenshot, _|
+      missing_local_screenshots.each do |_, _, screenshot|
         UI.error("#{screenshot.path} is missing on App Store Connect.")
       end
 
@@ -219,7 +234,7 @@ module Deliver
       iterator = AppScreenshotIterator.new(localizations)
 
       # Re-order screenshots within app_screenshot_set
-      worker = QueueWorker.new(NUMBER_OF_THREADS) do |app_screenshot_set|
+      worker = QueueWorker.new do |app_screenshot_set|
         original_ids = app_screenshot_set.app_screenshots.map(&:id)
         sorted_ids = app_screenshot_set.app_screenshots.sort_by(&:file_name).map(&:id)
         if original_ids != sorted_ids

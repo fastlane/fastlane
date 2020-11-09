@@ -16,6 +16,7 @@ module Scan
   class Runner
     def initialize
       @test_command_generator = TestCommandGenerator.new
+      @device_boot_datetime = DateTime.now
     end
 
     def run
@@ -184,7 +185,7 @@ module Scan
       UI.header("Collecting system logs")
       Scan.devices.each do |device|
         log_identity = "#{device.name}_#{device.os_type}_#{device.os_version}"
-        FastlaneCore::Simulator.copy_logs(device, log_identity, Scan.config[:output_directory])
+        FastlaneCore::Simulator.copy_logs(device, log_identity, Scan.config[:output_directory], @device_boot_datetime)
       end
     end
 

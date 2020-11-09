@@ -66,7 +66,7 @@ module FastlaneCore
 
     # @return true if it is enabled to execute external commands
     def self.sh_enabled?
-      !self.test?
+      !self.test? || ENV["FORCE_SH_DURING_TESTS"]
     end
 
     # @return [boolean] true if building in a known CI environment
@@ -203,9 +203,17 @@ module FastlaneCore
       return File.join(self.itms_path, 'iTMSTransporter')
     end
 
+    def self.user_defined_itms_path?
+      return FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
+    end
+
+    def self.user_defined_itms_path
+      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if self.user_defined_itms_path?
+    end
+
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
-      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
+      return self.user_defined_itms_path if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
 
       if self.mac?
         # First check for manually install iTMSTransporter

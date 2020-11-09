@@ -143,6 +143,9 @@ describe Deliver::UploadMetadata do
 
   context "with metadata" do
     let(:app) { double('app') }
+    let(:id) do
+      double('id')
+    end
     let(:version) do
       double('version',
              version_string: '1.0.0')
@@ -159,202 +162,252 @@ describe Deliver::UploadMetadata do
     let(:app_review_detail) do
       double('app_review_detail')
     end
+    let(:app_store_versions) do
+      double('app_store_versions',
+             count: 0)
+    end
 
     let(:metadata_path) { Dir.mktmpdir }
 
-    before do
-      allow(uploader).to receive(:set_review_information)
-      allow(uploader).to receive(:set_review_attachment_file)
-      allow(uploader).to receive(:set_app_rating)
+    context "fetch app edit" do
+      context "#fetch_edit_app_store_version" do
+        it "no retry" do
+          expect(app).to receive(:get_edit_app_store_version).and_return(version)
 
-      # Verify available languages
-      expect(app).to receive(:get_edit_app_store_version).and_return(version)
-      expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
+          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', wait_time: 0.1)
+          expect(edit_version).to eq(version)
+        end
 
-      # Get versions
-      expect(app).to receive(:get_edit_app_store_version).and_return(version)
-      expect(version).to receive(:get_app_store_version_localizations).and_return([version_localization_en])
+        it "1 retry" do
+          expect(app).to receive(:get_edit_app_store_version).and_return(nil)
+          expect(app).to receive(:get_edit_app_store_version).and_return(version)
 
-      # Get app infos
-      expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
-      expect(app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
-    end
+          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', wait_time: 0.1)
+          expect(edit_version).to eq(version)
+        end
 
-    context "normal metadata" do
-      it "saves metadata" do
-        options = {
-            app: app,
-            platform: "ios",
-            metadata_path: metadata_path,
-            name: { "en-US" => "App name" },
-            description: { "en-US" => "App description" }
-        }
+        it "5 retry" do
+          expect(app).to receive(:get_edit_app_store_version).and_return(nil).exactly(5).times
 
-        # Get number of verions (used for if whats_new should be sent)
-        expect(app).to receive(:get_app_store_versions).and_return([])
+          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', wait_time: 0.1)
+          expect(edit_version).to eq(nil)
+        end
+      end
 
-        expect(version).to receive(:update).with(attributes: {
-          "releaseType" => "MANUAL"
-        })
+      context "#fetch_edit_app_info" do
+        it "no retry" do
+          expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
 
-        # Update version localization
-        expect(version_localization_en).to receive(:update).with(attributes: {
-          "description" => options[:description]["en-US"]
-        })
+          edit_app_info = uploader.fetch_edit_app_info(app, wait_time: 0.1)
+          expect(edit_app_info).to eq(app_info)
+        end
 
-        # Update app info localization
-        expect(app_info_localization_en).to receive(:update).with(attributes: {
-          "name" => options[:name]["en-US"]
-        })
+        it "1 retry" do
+          expect(app).to receive(:fetch_edit_app_info).and_return(nil)
+          expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
 
-        # Update app info
-        expect(app_info).to receive(:update_categories).with(category_id_map: {})
+          edit_app_info = uploader.fetch_edit_app_info(app, wait_time: 0.1)
+          expect(edit_app_info).to eq(app_info)
+        end
 
-        uploader.upload(options)
+        it "5 retry" do
+          expect(app).to receive(:fetch_edit_app_info).and_return(nil).exactly(5).times
+
+          edit_app_info = uploader.fetch_edit_app_info(app, wait_time: 0.1)
+          expect(edit_app_info).to eq(nil)
+        end
       end
     end
 
-    context "with auto_release_date" do
-      it 'with date' do
-        options = {
-            app: app,
-            platform: "ios",
-            metadata_path: metadata_path,
-            auto_release_date: 1_595_395_800_000
-        }
+    context "#upload" do
+      before do
+        allow(uploader).to receive(:set_review_information)
+        allow(uploader).to receive(:set_review_attachment_file)
+        allow(uploader).to receive(:set_app_rating)
 
-        # Get number of verions (used for if whats_new should be sent)
-        expect(app).to receive(:get_app_store_versions).and_return([])
+        # Verify available languages
+        expect(app).to receive(:id).and_return(id)
+        expect(app).to receive(:get_edit_app_store_version).and_return(version)
+        expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
 
-        expect(version).to receive(:update).with(attributes: {
-          "releaseType" => "SCHEDULED",
-          "earliestReleaseDate" => "2020-07-22T05:00:00+00:00"
-        })
+        # Get versions
+        expect(app).to receive(:get_edit_app_store_version).and_return(version)
+        expect(version).to receive(:get_app_store_version_localizations).and_return([version_localization_en])
 
-        # Update app info
-        expect(app_info).to receive(:update_categories).with(category_id_map: {})
-
-        uploader.upload(options)
-      end
-    end
-
-    context "with phased_release" do
-      it 'with true' do
-        options = {
-            app: app,
-            platform: "ios",
-            metadata_path: metadata_path,
-            phased_release: true
-        }
-
-        # Get number of verions (used for if whats_new should be sent)
-        expect(app).to receive(:get_app_store_versions).and_return([])
-
-        # Defaults to release type manual
-        expect(version).to receive(:update).with(attributes: {
-          "releaseType" => "MANUAL"
-        })
-
-        # Get phased release
-        expect(version).to receive(:fetch_app_store_version_phased_release).and_return(nil)
-
-        # Create a phased release
-        expect(version).to receive(:create_app_store_version_phased_release).with(attributes: {
-          phasedReleaseState: Spaceship::ConnectAPI::AppStoreVersionPhasedRelease::PhasedReleaseState::INACTIVE
-        })
-
-        # Update app info
-        expect(app_info).to receive(:update_categories).with(category_id_map: {})
-
-        uploader.upload(options)
+        # Get app infos
+        expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
+        expect(app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
       end
 
-      it 'with false' do
-        options = {
-            app: app,
-            platform: "ios",
-            metadata_path: metadata_path,
-            phased_release: false
-        }
+      context "normal metadata" do
+        it "saves metadata" do
+          options = {
+              app: app,
+              platform: "ios",
+              metadata_path: metadata_path,
+              name: { "en-US" => "App name" },
+              description: { "en-US" => "App description" }
+          }
 
-        # Get number of verions (used for if whats_new should be sent)
-        expect(app).to receive(:get_app_store_versions).and_return([])
+          # Get number of verions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
-        # Defaults to release type manual
-        expect(version).to receive(:update).with(attributes: {
-          "releaseType" => "MANUAL"
-        })
+          expect(version).to receive(:update).with(attributes: {})
 
-        # Get phased release
-        phased_release = double('phased_release')
-        expect(version).to receive(:fetch_app_store_version_phased_release).and_return(phased_release)
+          # Update version localization
+          expect(version_localization_en).to receive(:update).with(attributes: {
+            "description" => options[:description]["en-US"]
+          })
 
-        # Delete phased release
-        expect(phased_release).to receive(:delete!)
+          # Update app info localization
+          expect(app_info_localization_en).to receive(:update).with(attributes: {
+            "name" => options[:name]["en-US"]
+          })
 
-        # Update app info
-        expect(app_info).to receive(:update_categories).with(category_id_map: {})
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-        uploader.upload(options)
-      end
-    end
-
-    context "with reset_ratings" do
-      it 'with true' do
-        options = {
-            app: app,
-            platform: "ios",
-            metadata_path: metadata_path,
-            reset_ratings: true
-        }
-
-        # Get number of verions (used for if whats_new should be sent)
-        expect(app).to receive(:get_app_store_versions).and_return([])
-
-        # Defaults to release type manual
-        expect(version).to receive(:update).with(attributes: {
-          "releaseType" => "MANUAL"
-        })
-
-        # Get reset ratings request
-        expect(version).to receive(:fetch_reset_ratings_request).and_return(nil)
-
-        # Create a reset ratings request
-        expect(version).to receive(:create_reset_ratings_request)
-
-        # Update app info
-        expect(app_info).to receive(:update_categories).with(category_id_map: {})
-
-        uploader.upload(options)
+          uploader.upload(options)
+        end
       end
 
-      it 'with false' do
-        options = {
-            app: app,
-            platform: "ios",
-            metadata_path: metadata_path,
-            reset_ratings: false
-        }
+      context "with auto_release_date" do
+        it 'with date' do
+          options = {
+              app: app,
+              platform: "ios",
+              metadata_path: metadata_path,
+              auto_release_date: 1_595_395_800_000
+          }
 
-        # Get number of verions (used for if whats_new should be sent)
-        expect(app).to receive(:get_app_store_versions).and_return([])
+          # Get number of verions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
-        # Defaults to release type manual
-        expect(version).to receive(:update).with(attributes: {
-          "releaseType" => "MANUAL"
-        })
+          expect(version).to receive(:update).with(attributes: {
+            "releaseType" => "SCHEDULED",
+            "earliestReleaseDate" => "2020-07-22T05:00:00+00:00"
+          })
 
-        # Get reset ratings request
-        reset_ratings_request = double('reset_ratings_request')
-        expect(version).to receive(:fetch_reset_ratings_request).and_return(reset_ratings_request)
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-        # Delete reset ratings request
-        expect(reset_ratings_request).to receive(:delete!)
+          uploader.upload(options)
+        end
+      end
 
-        # Update app info
-        expect(app_info).to receive(:update_categories).with(category_id_map: {})
+      context "with phased_release" do
+        it 'with true' do
+          options = {
+              app: app,
+              platform: "ios",
+              metadata_path: metadata_path,
+              phased_release: true,
+              automatic_release: false
+          }
 
-        uploader.upload(options)
+          # Get number of verions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          # Defaults to release type manual
+          expect(version).to receive(:update).with(attributes: {
+            "releaseType" => "MANUAL"
+          })
+
+          # Get phased release
+          expect(version).to receive(:fetch_app_store_version_phased_release).and_return(nil)
+
+          # Create a phased release
+          expect(version).to receive(:create_app_store_version_phased_release).with(attributes: {
+            phasedReleaseState: Spaceship::ConnectAPI::AppStoreVersionPhasedRelease::PhasedReleaseState::INACTIVE
+          })
+
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload(options)
+        end
+
+        it 'with false' do
+          options = {
+              app: app,
+              platform: "ios",
+              metadata_path: metadata_path,
+              phased_release: false
+          }
+
+          # Get number of verions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          # Defaults to release type manual
+          expect(version).to receive(:update).with(attributes: {})
+
+          # Get phased release
+          phased_release = double('phased_release')
+          expect(version).to receive(:fetch_app_store_version_phased_release).and_return(phased_release)
+
+          # Delete phased release
+          expect(phased_release).to receive(:delete!)
+
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload(options)
+        end
+      end
+
+      context "with reset_ratings" do
+        it 'with true' do
+          options = {
+              app: app,
+              platform: "ios",
+              metadata_path: metadata_path,
+              reset_ratings: true
+          }
+
+          # Get number of verions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          # Defaults to release type manual
+          expect(version).to receive(:update).with(attributes: {})
+
+          # Get reset ratings request
+          expect(version).to receive(:fetch_reset_ratings_request).and_return(nil)
+
+          # Create a reset ratings request
+          expect(version).to receive(:create_reset_ratings_request)
+
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload(options)
+        end
+
+        it 'with false' do
+          options = {
+              app: app,
+              platform: "ios",
+              metadata_path: metadata_path,
+              reset_ratings: false
+          }
+
+          # Get number of verions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          # Defaults to release type manual
+          expect(version).to receive(:update).with(attributes: {})
+
+          # Get reset ratings request
+          reset_ratings_request = double('reset_ratings_request')
+          expect(version).to receive(:fetch_reset_ratings_request).and_return(reset_ratings_request)
+
+          # Delete reset ratings request
+          expect(reset_ratings_request).to receive(:delete!)
+
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload(options)
+        end
       end
     end
   end

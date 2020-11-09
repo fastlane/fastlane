@@ -2,6 +2,7 @@ module Fastlane
   module Actions
     module SharedValues
       DSYM_PATHS = :DSYM_PATHS
+      DSYM_LATEST_UPLOADED_DATE = :DSYM_LATEST_UPLOADED_DATE
     end
     class DownloadDsymsAction < Action
       # rubocop:disable Metrics/PerceivedComplexity
@@ -9,6 +10,7 @@ module Fastlane
         require 'openssl'
         require 'spaceship'
         require 'net/http'
+        require 'date'
 
         # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
@@ -30,6 +32,7 @@ module Fastlane
         wait_for_dsym_processing = params[:wait_for_dsym_processing]
         wait_timeout = params[:wait_timeout]
         min_version = Gem::Version.new(params[:min_version]) if params[:min_version]
+        after_uploaded_date = DateTime.parse(params[:after_uploaded_date]) unless params[:after_uploaded_date].nil?
 
         platform = Spaceship::ConnectAPI::Platform.map(itc_platform)
 
@@ -81,6 +84,7 @@ module Fastlane
         builds.each do |build|
           asc_app_version = build.app_version
           asc_build_number = build.version
+          uploaded_date = DateTime.parse(build.uploaded_date)
 
           message = []
           message << "Found train (version): #{asc_app_version}"
@@ -97,6 +101,11 @@ module Fastlane
             next
           end
 
+          if after_uploaded_date && after_uploaded_date >= uploaded_date
+            UI.verbose("Upload date #{after_uploaded_date} not reached: #{uploaded_date}")
+            next
+          end
+
           message = []
           message << "Found build version: #{asc_build_number}"
           message << ", comparing to supplied build_number: #{build_number}" if build_number
@@ -108,11 +117,11 @@ module Fastlane
           end
 
           UI.verbose("Build_version: #{asc_build_number} matches #{build_number}, grabbing dsym_url") if build_number
-          get_details_and_download_dsym(app: app, train: asc_app_version, build_number: asc_build_number, platform: itc_platform, wait_for_dsym_processing: wait_for_dsym_processing, wait_timeout: wait_timeout, output_directory: output_directory)
+          get_details_and_download_dsym(app: app, train: asc_app_version, build_number: asc_build_number, uploaded_date: uploaded_date, platform: itc_platform, wait_for_dsym_processing: wait_for_dsym_processing, wait_timeout: wait_timeout, output_directory: output_directory)
         end
       end
 
-      def self.get_details_and_download_dsym(app: nil, train: nil, build_number: nil, platform: nil, wait_for_dsym_processing: nil, wait_timeout: nil, output_directory: nil)
+      def self.get_details_and_download_dsym(app: nil, train: nil, build_number: nil, uploaded_date: nil, platform: nil, wait_for_dsym_processing: nil, wait_timeout: nil, output_directory: nil)
         start = Time.now
         download_url = nil
 
@@ -144,7 +153,7 @@ module Fastlane
         end
 
         if download_url
-          self.download(download_url, app.bundle_id, train, build_number, output_directory)
+          self.download(download_url, app.bundle_id, train, build_number, uploaded_date, output_directory)
           return if build_number
         else
           UI.message("No dSYM URL for #{build_number} (#{train})")
@@ -159,19 +168,26 @@ module Fastlane
         latest_build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion").first
 
         if latest_build.nil?
-          UI.user_error!("Could not find latest bulid for version #{version}")
+          UI.user_error!("Could not find latest build for version #{version}")
         end
 
         return latest_build
       end
 
-      def self.download(download_url, bundle_id, train_number, build_version, output_directory)
+      def self.download(download_url, bundle_id, train_number, build_version, uploaded_date, output_directory)
         result = self.download_file(download_url)
         path   = write_dsym(result, bundle_id, train_number, build_version, output_directory)
         UI.success("🔑  Successfully downloaded dSYM file for #{train_number} - #{build_version} to '#{path}'")
 
         Actions.lane_context[SharedValues::DSYM_PATHS] ||= []
         Actions.lane_context[SharedValues::DSYM_PATHS] << File.expand_path(path)
+
+        unless uploaded_date.nil?
+          Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE] ||= uploaded_date
+          current_latest = Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE]
+          Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE] = [current_latest, uploaded_date].max
+          UI.verbose("Most recent build uploaded_date #{Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE]}")
+        end
       end
 
       def self.write_dsym(data, bundle_id, train_number, build_number, output_directory)
@@ -192,6 +208,7 @@ module Fastlane
         else
           http = Net::HTTP.new(uri.host, uri.port)
         end
+        http.read_timeout = 300
         http.use_ssl = (uri.scheme == "https")
         res = http.get(uri.request_uri)
         res.body
@@ -286,6 +303,12 @@ module Fastlane
                                        env_name: "DOWNLOAD_DSYMS_MIN_VERSION",
                                        description: "The minimum app version for dSYMs you wish to download",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :after_uploaded_date,
+                                       short_option: "-d",
+                                       env_name: "DOWNLOAD_DSYMS_AFTER_UPLOADED_DATE",
+                                       description: "The uploaded date after which you wish to download dSYMs",
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :output_directory,
                                        short_option: "-s",
                                        env_name: "DOWNLOAD_DSYMS_OUTPUT_DIRECTORY",
@@ -310,7 +333,8 @@ module Fastlane
 
       def self.output
         [
-          ['DSYM_PATHS', 'An array to all the zipped dSYM files']
+          ['DSYM_PATHS', 'An array to all the zipped dSYM files'],
+          ['DSYM_LATEST_UPLOADED_DATE', 'Date of the most recent uploaded time of successfully downloaded dSYM files']
         ]
       end
 
@@ -332,7 +356,8 @@ module Fastlane
           'download_dsyms(version: "1.0.0", build_number: "345")',
           'download_dsyms(version: "1.0.1", build_number: 42)',
           'download_dsyms(version: "live")',
-          'download_dsyms(min_version: "1.2.3")'
+          'download_dsyms(min_version: "1.2.3")',
+          'download_dsyms(after_uploaded_date: "2020-09-11T19:00:00+01:00")'
         ]
       end
 

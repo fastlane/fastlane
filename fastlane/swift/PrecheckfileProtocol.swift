@@ -1,4 +1,13 @@
-protocol PrecheckfileProtocol: class {
+// PrecheckfileProtocol.swift
+// Copyright (c) 2020 FastlaneTools
+
+public protocol PrecheckfileProtocol: class {
+    /// Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+    var apiKeyPath: String? { get }
+
+    /// Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
+    var apiKey: [String: Any]? { get }
+
     /// The bundle identifier of your app
     var appIdentifier: String { get }
 
@@ -24,7 +33,9 @@ protocol PrecheckfileProtocol: class {
     var freeStuffInIap: String? { get }
 }
 
-extension PrecheckfileProtocol {
+public extension PrecheckfileProtocol {
+    var apiKeyPath: String? { return nil }
+    var apiKey: [String: Any]? { return nil }
     var appIdentifier: String { return "" }
     var username: String { return "" }
     var teamId: String? { return nil }
@@ -37,4 +48,4 @@ extension PrecheckfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.36]
+// FastlaneRunnerAPIVersion [0.9.45]

@@ -254,7 +254,7 @@ module FastlaneCore
   class JavaTransporterExecutor < TransporterExecutor
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
       use_jwt = !jwt.to_s.empty?
-      if Helper.mac? && Helper.xcode_at_least?(11)
+      if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
           ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" unless use_jwt),
           'xcrun iTMSTransporter',
@@ -294,7 +294,7 @@ module FastlaneCore
 
     def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "", jwt = nil)
       use_jwt = !jwt.to_s.empty?
-      if Helper.mac? && Helper.xcode_at_least?(11)
+      if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
           ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" unless use_jwt),
           'xcrun iTMSTransporter',
@@ -332,7 +332,7 @@ module FastlaneCore
 
     def build_provider_ids_command(username, password, jwt = nil)
       use_jwt = !jwt.to_s.empty?
-      if Helper.mac? && Helper.xcode_at_least?(11)
+      if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
           ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" unless use_jwt),
           'xcrun iTMSTransporter',

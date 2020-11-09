@@ -48,6 +48,11 @@ module Spaceship
         resps = Spaceship::ConnectAPI.get_devices(filter: filter, includes: includes).all_pages
         return resps.flat_map(&:to_models)
       end
+
+      def self.create(name: nil, platform: nil, udid: nil)
+        resp = Spaceship::ConnectAPI.post_device(name: name, platform: platform, udid: udid)
+        return resp.to_models.first
+      end
     end
   end
 end

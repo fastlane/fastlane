@@ -94,7 +94,6 @@ lane :execute_tests do
     UI.user_error!("fastlane gem is above 1 MB, make sure no additional resources are included by mistake") if size_in_mb > 1
 
     # Run the tests
-    #
     sh("bundle exec rake test_all")
   end
 end
@@ -183,13 +182,15 @@ lane :generate_swift_api do |options|
   generated_files = swift_generator.generate_swift
   Dir.chdir("swift/formatting") do
     sh("rake")
-    UI.success("Done linting fastlane.swift API")
+    UI.success("Done formatting fastlane.swift API")
   end
   UI.success("Done generating fastlane.swift API, ensuring it builds")
   gym(
     project: File.expand_path("swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj"),
     skip_package_ipa: true
   )
+  sh("swift build")
+  sh("rm -r ../.build")
   sh("rm ../FastlaneRunner")
   generated_files
 end

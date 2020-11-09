@@ -111,7 +111,7 @@ module Supply
       releases = track.releases
 
       releases = releases.select { |r| r.status == status } if status
-      releases = releases.select { |r| r.version_codes.map(&:to_s).include?(version_code.to_s) } if version_code
+      releases = releases.select { |r| (r.version_codes || []).map(&:to_s).include?(version_code.to_s) } if version_code
 
       if releases.size > 1
         UI.user_error!("More than one release found in this track. Please specify with the :version_code option to select a release.")

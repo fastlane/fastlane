@@ -1,4 +1,13 @@
-protocol DeliverfileProtocol: class {
+// DeliverfileProtocol.swift
+// Copyright (c) 2020 FastlaneTools
+
+public protocol DeliverfileProtocol: class {
+    /// Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+    var apiKeyPath: String? { get }
+
+    /// Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
+    var apiKey: [String: Any]? { get }
+
     /// Your Apple ID Username
     var username: String { get }
 
@@ -41,10 +50,10 @@ protocol DeliverfileProtocol: class {
     /// Don't upload the metadata (e.g. title, description). This will still upload screenshots
     var skipMetadata: Bool { get }
 
-    /// Don't update app version for submission
+    /// Don’t create or update the app version that is being prepared for submission
     var skipAppVersionUpdate: Bool { get }
 
-    /// Skip the HTML report file verification
+    /// Skip verification of HTML preview file
     var force: Bool { get }
 
     /// Clear all previously uploaded screenshots before uploading the new ones
@@ -57,7 +66,7 @@ protocol DeliverfileProtocol: class {
     var rejectIfPossible: Bool { get }
 
     /// Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
-    var automaticRelease: Bool { get }
+    var automaticRelease: Bool? { get }
 
     /// Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)
     var autoReleaseDate: Int? { get }
@@ -180,7 +189,9 @@ protocol DeliverfileProtocol: class {
     var app: String { get }
 }
 
-extension DeliverfileProtocol {
+public extension DeliverfileProtocol {
+    var apiKeyPath: String? { return nil }
+    var apiKey: [String: Any]? { return nil }
     var username: String { return "" }
     var appIdentifier: String? { return nil }
     var appVersion: String? { return nil }
@@ -200,7 +211,7 @@ extension DeliverfileProtocol {
     var overwriteScreenshots: Bool { return false }
     var submitForReview: Bool { return false }
     var rejectIfPossible: Bool { return false }
-    var automaticRelease: Bool { return false }
+    var automaticRelease: Bool? { return nil }
     var autoReleaseDate: Int? { return nil }
     var phasedRelease: Bool { return false }
     var resetRatings: Bool { return false }
@@ -245,4 +256,4 @@ extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.40]
+// FastlaneRunnerAPIVersion [0.9.49]

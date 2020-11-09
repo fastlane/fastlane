@@ -18,6 +18,7 @@ module Snapshot
 
     def initialize(launcher_configuration: nil)
       @launcher_config = launcher_configuration
+      @device_boot_datetime = DateTime.now
     end
 
     def collected_errors
@@ -192,7 +193,7 @@ module Snapshot
 
         UI.header("Collecting system logs #{device_name} - #{language}")
         log_identity = Digest::MD5.hexdigest(components.join("-"))
-        FastlaneCore::Simulator.copy_logs(device, log_identity, language_folder)
+        FastlaneCore::Simulator.copy_logs(device, log_identity, language_folder, @device_boot_datetime)
       end
     end
   end

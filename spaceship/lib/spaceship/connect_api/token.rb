@@ -1,4 +1,5 @@
 require 'jwt'
+require 'base64'
 require 'openssl'
 
 # extract pem from .p8
@@ -39,7 +40,7 @@ module Spaceship
         self.create(json)
       end
 
-      def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, duration: nil, in_house: nil)
+      def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, is_key_content_base64: false, duration: nil, in_house: nil)
         key_id ||= ENV['SPACESHIP_CONNECT_API_KEY_ID']
         issuer_id ||= ENV['SPACESHIP_CONNECT_API_ISSUER_ID']
         filepath ||= ENV['SPACESHIP_CONNECT_API_KEY_FILEPATH']
@@ -50,6 +51,10 @@ module Spaceship
 
         key ||= ENV['SPACESHIP_CONNECT_API_KEY']
         key ||= File.binread(filepath)
+
+        if !key.nil? && is_key_content_base64
+          key = Base64.decode64(key)
+        end
 
         self.new(
           key_id: key_id,
