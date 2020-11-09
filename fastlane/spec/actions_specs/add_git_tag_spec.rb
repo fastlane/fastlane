@@ -76,6 +76,16 @@ describe Fastlane do
         expect(result).to eq("git tag -am #{message.shellescape} #{tag.shellescape}")
       end
 
+      it "raises error if no tag or build_number are provided" do
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER] = nil
+
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            add_git_tag ({})
+          end").runner.execute(:test)
+        end.to raise_error(/No value found for 'tag' or 'build_number'. At least one of them must be provided. Note that if you do specify a tag, all other arguments are ignored./)
+      end
+
       it "specified tag overrides generate tag" do
         tag = '2.0.0'
 
