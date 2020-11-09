@@ -202,9 +202,9 @@ module Fastlane
 
       def self.example_code
         [
-          'version = get_version_number(xcodeproj: "Project.xcodeproj")',
+          'version = get_version_number(xcodeproj_filename: "Project.xcodeproj")',
           'version = get_version_number(
-            xcodeproj: "Project.xcodeproj",
+            xcodeproj_filename: "Project.xcodeproj",
             target: "App"
           )'
         ]
