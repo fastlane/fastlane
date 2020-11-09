@@ -227,7 +227,7 @@ module Match
                                      short_option: "-p",
                                      env_name: "MATCH_KEYCHAIN_PASSWORD",
                                      sensitive: true,
-                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
+                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password",
                                      optional: true),
 
         # settings
