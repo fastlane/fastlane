@@ -74,15 +74,12 @@ describe Fastlane do
         expect(result).to eq("swift package generate-xcodeproj")
       end
 
-      it "skip --enable-code-coverage if command is not generate-xcode-proj" do
+      it "skips --enable-code-coverage if command is not generate-xcode-proj" do
         result = Fastlane::FastFile.new.parse("lane :test do
-          spm(
-            command: 'build',
-            enable_code_coverage: true
-          )
+          spm(command: 'build', enable_code_coverage: true)
         end").runner.execute(:test)
 
-        expect(result).to eq("swift package build")
+        expect(result).to eq("swift build")
       end
 
       it "sets the command to resolve" do

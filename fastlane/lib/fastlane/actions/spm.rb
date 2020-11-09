@@ -5,13 +5,13 @@ module Fastlane
         cmd = ["swift"]
 
         cmd << (package_commands.include?(params[:command]) ? "package" : params[:command])
-        cmd << "--enable-code-coverage" if params[:enable_code_coverage] && params[:command].include?(generate_xcode_proj)
         cmd << "--build-path #{params[:build_path]}" if params[:build_path]
         cmd << "--package-path #{params[:package_path]}" if params[:package_path]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--disable-sandbox" if params[:disable_sandbox]
         cmd << "--verbose" if params[:verbose]
         cmd << params[:command] if package_commands.include?(params[:command])
+        cmd << "--enable-code-coverage" if params[:enable_code_coverage] && params[:command] == 'generate-xcodeproj'
         if params[:xcconfig]
           cmd << "--xcconfig-overrides #{params[:xcconfig]}"
         end
