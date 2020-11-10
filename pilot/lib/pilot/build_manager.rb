@@ -281,7 +281,7 @@ module Pilot
 
     def self.strip_emoji(changelog)
       if changelog && changelog =~ emoji_regex
-        changelog.gsub!(EmojiRegex::Regex, "")
+        changelog.gsub!(emoji_regex, "")
         UI.important("Emoji symbols have been removed from the changelog, since they're not allowed by Apple.")
       end
       changelog
