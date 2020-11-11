@@ -187,7 +187,9 @@ module Deliver
       return {
         ScreenSize::IOS_65_MESSAGES => [
           [1242, 2688],
-          [2688, 1242]
+          [2688, 1242],
+          [1284, 2778],
+          [2778, 1284]
         ],
         ScreenSize::IOS_61_MESSAGES => [
           [828, 1792],
@@ -243,7 +245,9 @@ module Deliver
       return {
         ScreenSize::IOS_65 => [
           [1242, 2688],
-          [2688, 1242]
+          [2688, 1242],
+          [1284, 2778],
+          [2778, 1284]
         ],
         ScreenSize::IOS_61 => [
           [828, 1792],
