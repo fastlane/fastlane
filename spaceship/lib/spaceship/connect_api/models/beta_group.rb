@@ -41,7 +41,7 @@ module Spaceship
         return Spaceship::ConnectAPI.delete_beta_group(group_id: id)
       end
 
-      def builds
+      def fetch_builds
         resps = Spaceship::ConnectAPI.get_builds_for_beta_group(group_id: id).all_pages
         return resps.flat_map(&:to_models)
       end
