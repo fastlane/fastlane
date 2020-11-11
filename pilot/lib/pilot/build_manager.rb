@@ -273,9 +273,15 @@ module Pilot
       changelog
     end
 
+    def self.emoji_regex
+      # EmojiRegex::RGIEmoji is now preferred over EmojiRegex::Regex which is deprecated as of 3.2.0
+      # https://github.com/ticky/ruby-emoji-regex/releases/tag/v3.2.0
+      return defined?(EmojiRegex::RGIEmoji) ? EmojiRegex::RGIEmoji : EmojiRegex::Regex
+    end
+
     def self.strip_emoji(changelog)
-      if changelog && changelog =~ EmojiRegex::Regex
-        changelog.gsub!(EmojiRegex::Regex, "")
+      if changelog && changelog =~ emoji_regex
+        changelog.gsub!(emoji_regex, "")
         UI.important("Emoji symbols have been removed from the changelog, since they're not allowed by Apple.")
       end
       changelog
