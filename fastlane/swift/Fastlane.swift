@@ -7445,7 +7445,6 @@ public func splunkmint(dsym: String? = nil,
 
  - parameters:
    - command: The swift command (one of: build, test, clean, reset, update, resolve, generate-xcodeproj, init)
-   - enableCodeCoverage: Enables code coverage for the generated Xcode project when using the generate-xcodeproj command
    - buildPath: Specify build/cache directory [default: ./.build]
    - packagePath: Change working directory before any other operation
    - xcconfig: Use xcconfig file to override swift package generate-xcodeproj defaults
@@ -7456,7 +7455,6 @@ public func splunkmint(dsym: String? = nil,
    - verbose: Increase verbosity of informational output
  */
 public func spm(command: String = "build",
-                enableCodeCoverage: Bool? = nil,
                 buildPath: String? = nil,
                 packagePath: String? = nil,
                 xcconfig: String? = nil,
@@ -7467,7 +7465,6 @@ public func spm(command: String = "build",
                 verbose: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "spm", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
-                                                                                       RubyCommand.Argument(name: "enable_code_coverage", value: enableCodeCoverage),
                                                                                        RubyCommand.Argument(name: "build_path", value: buildPath),
                                                                                        RubyCommand.Argument(name: "package_path", value: packagePath),
                                                                                        RubyCommand.Argument(name: "xcconfig", value: xcconfig),
