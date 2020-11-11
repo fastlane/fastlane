@@ -56,6 +56,8 @@ class MainProcess {
                 print(stdout)
                 self.timeBetweenPrints = Int(self.lastPrintDate.timeIntervalSinceNow)
             }
+
+            // swiftformat:disable:next redundantSelf
             _ = Runner.waitWithPolling(self.timeBetweenPrints, toEventually: { $0 > 5 }, timeout: 10)
             thread.start()
         #endif
