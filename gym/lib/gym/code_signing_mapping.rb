@@ -142,7 +142,7 @@ module Gym
               next unless specified_configuration == build_configuration.name
 
               # Catalyst apps will have some build settings that will have a configuration
-              # that is specfic for macos so going to do our best to capture those
+              # that is specific for macos so going to do our best to capture those
               #
               # There are other platform filters besides "[sdk=macosx*]" that we could use but
               # this is the default that Xcode will use so this will also be our default
