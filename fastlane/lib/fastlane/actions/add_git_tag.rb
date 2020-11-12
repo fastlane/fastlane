@@ -6,7 +6,13 @@ module Fastlane
         # lane name in lane_context could be nil because you can just call $fastlane add_git_tag which has no context
         lane_name = Actions.lane_context[Actions::SharedValues::LANE_NAME].to_s.delete(' ') # no spaces allowed
 
-        tag = options[:tag] || "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number]}#{options[:postfix]}"
+        if options[:tag]
+          tag = options[:tag]
+        elsif options[:build_number]
+          tag = "#{options[:grouping]}/#{lane_name}/#{options[:prefix]}#{options[:build_number]}#{options[:postfix]}"
+        else
+          UI.user_error!("No value found for 'tag' or 'build_number'. At least one of them must be provided. Note that if you do specify a tag, all other arguments are ignored.")
+        end
         message = options[:message] || "#{tag} (fastlane)"
 
         cmd = ['git tag']
@@ -64,7 +70,8 @@ module Fastlane
                                        description: "The build number. Defaults to the result of increment_build_number if you\'re using it",
                                        default_value: Actions.lane_context[Actions::SharedValues::BUILD_NUMBER],
                                        default_value_dynamic: true,
-                                       is_string: false),
+                                       is_string: false,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_GIT_TAG_MESSAGE",
                                        description: "The tag message. Defaults to the tag's name",
