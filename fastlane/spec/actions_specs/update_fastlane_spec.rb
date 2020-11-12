@@ -29,6 +29,7 @@ describe Fastlane do
         expect(Gem::CommandManager).to receive(:instance).and_return(mock_instance).twice
 
         # Manifest
+        expect(FastlaneCore::FastlaneFolder).to receive(:swift?).and_return(true)
         expect(UI).to receive(:success).with(%r{fastlane\/swift\/upgrade_manifest.json})
 
         # Start
@@ -69,6 +70,7 @@ describe Fastlane do
         expect(Gem::CommandManager).to receive(:instance).and_return(mock_instance).twice
 
         # Manifest
+        expect(FastlaneCore::FastlaneFolder).to receive(:swift?).and_return(true)
         expect(UI).to receive(:success).with(%r{fastlane\/swift\/upgrade_manifest.json})
 
         # Start
