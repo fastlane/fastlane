@@ -21,7 +21,17 @@ Some people might also use the [_fastlane_ tag on StackOverflow](https://stackov
 - For some more advanced tooling and debugging tips, check out [ToolsAndDebugging.md](ToolsAndDebugging.md)
 
 ### Google Contributor License Agreement (CLA)
-Upon your first pull request to _fastlane_, the [googlebot](https://github.com/googlebot) will ask you to sign the Google Contributor License Agreement. This agreement requires a Google account to sign. Once the CLA has been accepted, the PR will be available to merge and you will not be asked to sign it again unless your GitHub username or email address changes.
+Upon your first pull request to _fastlane_, the [googlebot](https://github.com/googlebot) will ask you to sign the Google Contributor License Agreement. Once the CLA has been accepted, the PR will be available to merge and you will not be asked to sign it again unless your GitHub username or email address changes.
+
+Contributions to this project must be accompanied by a Contributor License
+Agreement. You (or your employer) retain the copyright to your contribution;
+this simply gives us permission to use and redistribute your contributions as
+part of the project. Head over to <https://cla.developers.google.com/> to see
+your current agreements on file or to sign a new one.
+
+You generally only need to submit a CLA once, so if you've already submitted one
+(even if it was for a different project), you probably don't need to do it
+again.
 
 ### New Actions
 
