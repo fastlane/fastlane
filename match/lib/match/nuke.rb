@@ -253,11 +253,13 @@ module Match
       self.encryption.encrypt_files if self.encryption
 
       if files_to_delete.count > 0
-        # Now we need to commit and push all this too, if needed
+        # Now we need to save all this to the storage too, if needed
         message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
         self.storage.save_changes!(files_to_commit: [],
                                    files_to_delete: files_to_delete,
                                    custom_message: message)
+      else
+        UI.message("Your storage had no files to be deleted. This happens when you run `nuke` with an empty storage. Nothing to be worried about!")
       end
     end
 
