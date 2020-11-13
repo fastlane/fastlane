@@ -5,7 +5,7 @@
 
 import Foundation
 
-open class Fastfile: LaneFile { 
+open class Fastfile: LaneFile {
     override public init() {
         super.init()
     }

@@ -214,6 +214,18 @@ module Spaceship
           test_flight_request_client.post("betaGroups", body)
         end
 
+        def delete_beta_group(group_id: nil)
+          raise "group_id is nil" if group_id.nil?
+
+          test_flight_request_client.delete("betaGroups/#{group_id}")
+        end
+
+        def get_builds_for_beta_group(group_id: nil)
+          raise "group_id is nil" if group_id.nil?
+
+          test_flight_request_client.get("betaGroups/#{group_id}/builds")
+        end
+
         #
         # betaTesters
         #
