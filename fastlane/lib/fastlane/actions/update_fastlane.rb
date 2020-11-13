@@ -71,6 +71,11 @@ module Fastlane
           cleaner.execute
         end
 
+        if FastlaneCore::FastlaneFolder.swift?
+          upgrader = SwiftRunnerUpgrader.new
+          upgrader.upgrade_if_needed!
+        end
+
         UI.message("fastlane.tools successfully updated! I will now restart myself... 😴")
 
         # Set no_update to true so we don't try to update again
