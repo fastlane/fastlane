@@ -107,7 +107,7 @@ module FastlaneCore
 
     # Do we want to disable the colored output?
     def self.colors_disabled?
-      FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS")
+      FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS") || FastlaneCore::Env.truthy?("NO_COLOR")
     end
 
     # Does the user use the Mac stock terminal
