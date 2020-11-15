@@ -8,15 +8,15 @@ module Fastlane
       require 'shellwords'
 
       def self.run(params)
-        xcodeproj_dir = params[:xcodeproj_dir] || params[:xcodeproj]
-        folder = xcodeproj_dir ? File.join(xcodeproj_dir, '..') : '.'
+        xcodeproj_path_or_dir = params[:xcodeproj] ? "#{params[:xcodeproj]}" : "."
+        xcodeproj_dir = File.extname(xcodeproj_path_or_dir) == ".xcodeproj" ? File.dirname(xcodeproj_path_or_dir) : xcodeproj_path_or_dir
         target_name = params[:target]
         configuration = params[:configuration]
 
         # Get version_number
-        project = get_project!(folder, params[:xcodeproj_filename])
+        project = get_project!(xcodeproj_path_or_dir)
         target = get_target!(project, target_name)
-        plist_file = get_plist!(folder, target, configuration)
+        plist_file = get_plist!(xcodeproj_dir, target, configuration)
         version_number = get_version_number_from_plist!(plist_file)
 
         # Get from build settings (or project settings) if needed (ex: $(MARKETING_VERSION) is default in Xcode 11)
@@ -40,13 +40,13 @@ module Fastlane
         return version_number
       end
 
-      def self.get_project!(folder, xcodeproj_filename)
+      def self.get_project!(xcodeproj_path_or_dir)
+        puts "something something"
         require 'xcodeproj'
-        if xcodeproj_filename
-          project_filename = xcodeproj_filename.end_with?(".xcodeproj") ? xcodeproj_filename : "#{xcodeproj_filename}.xcodeproj"
-          project_path = "#{folder}/#{project_filename}"
+        if File.extname(xcodeproj_path_or_dir) == ".xcodeproj"
+          project_path = xcodeproj_path_or_dir
         else
-          project_path = Dir.glob("#{folder}/*.xcodeproj").first
+          project_path = Dir.glob("#{xcodeproj_path_or_dir}/*.xcodeproj").first
         end
 
         if project_path
@@ -154,26 +154,12 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                              env_name: "FL_VERSION_NUMBER_PROJECT",
-                             description: "Path to the main Xcode project to read version number from, optional. By default will use the first Xcode project found within the project root directory",
-                             deprecated: "Replaced by 'xcodeproj_dir'",
+                             description: "Path to the Xcode project to read version number from, or its containing directory, optional. If ommitted, or if a directory is passed instead, it will use the first Xcode project found within the given directory, or the project root directory if none is passed",
                              optional: true,
                              verify_block: proc do |value|
-                               UI.user_error!("Please pass the path to the project, not the workspace") if value.end_with?(".xcworkspace")
-                               UI.user_error!("Could not find Xcode project at path '#{File.expand_path(value)}'") if !File.exist?(value) && !Helper.test?
-                             end),
-          FastlaneCore::ConfigItem.new(key: :xcodeproj_dir,
-                             env_name: "FL_VERSION_NUMBER_PROJECT_DIR",
-                             description: "Directory of the Xcode project to read version number from, optional. By default will use the first Xcode project found within this directory, unless xcodeproj_filename is provided",
-                             optional: true,
-                             verify_block: proc do |value|
-                               UI.user_error!("Please pass the path to the directory of the xcodeproj, not the workspace") if value.end_with?(".xcworkspace")
-                             end),
-          FastlaneCore::ConfigItem.new(key: :xcodeproj_filename,
-                             env_name: "FL_VERSION_NUMBER_PROJECT_FILENAME",
-                             description: "The name of the xcodeproj file to read the version number from, optional. Including the '.xcodeproj' extension is optional",
-                             optional: true,
-                             verify_block: proc do |value|
-                               UI.user_error!("Please pass the filename of the project, not the workspace") if value.end_with?(".xcworkspace")
+                               UI.user_error!("Please pass the path to the project or its containing directory, not the workspace path") if value.end_with?(".xcworkspace")
+                               UI.user_error!("Could not find file or directory at path '#{File.expand_path(value)}'") if !(File.exist?(value))
+                               UI.user_error!("Could not find Xcode project in directory at path '#{File.expand_path(value)}'") if File.extname(value) != ".xcodeproj" && Dir.glob("#{value}/*.xcodeproj").empty?
                              end),
           FastlaneCore::ConfigItem.new(key: :target,
                              env_name: "FL_VERSION_NUMBER_TARGET",
@@ -202,9 +188,9 @@ module Fastlane
 
       def self.example_code
         [
-          'version = get_version_number(xcodeproj_filename: "Project.xcodeproj")',
+          'version = get_version_number(xcodeproj: "Project.xcodeproj")',
           'version = get_version_number(
-            xcodeproj_filename: "Project.xcodeproj",
+            xcodeproj: "Project.xcodeproj",
             target: "App"
           )'
         ]
