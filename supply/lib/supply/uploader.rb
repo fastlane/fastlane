@@ -192,9 +192,10 @@ module Supply
       release = releases.first
       track_to = client.tracks(Supply.config[:track_promote_to]).first
 
-      if Supply.config[:rollout]
+      rollout = (Supply.config[:rollout] || 0).to_f
+      if rollout > 0 && rollout < 1
         release.status = Supply::ReleaseStatus::IN_PROGRESS
-        release.user_fraction = Supply.config[:rollout]
+        release.user_fraction = rollout
       else
         release.status = Supply::ReleaseStatus::COMPLETED
         release.user_fraction = nil
