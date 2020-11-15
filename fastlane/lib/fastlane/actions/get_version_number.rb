@@ -8,7 +8,7 @@ module Fastlane
       require 'shellwords'
 
       def self.run(params)
-        xcodeproj_path_or_dir = params[:xcodeproj] ? "#{params[:xcodeproj]}" : "."
+        xcodeproj_path_or_dir = params[:xcodeproj] || '.'
         xcodeproj_dir = File.extname(xcodeproj_path_or_dir) == ".xcodeproj" ? File.dirname(xcodeproj_path_or_dir) : xcodeproj_path_or_dir
         target_name = params[:target]
         configuration = params[:configuration]
@@ -41,7 +41,6 @@ module Fastlane
       end
 
       def self.get_project!(xcodeproj_path_or_dir)
-        puts "something something"
         require 'xcodeproj'
         if File.extname(xcodeproj_path_or_dir) == ".xcodeproj"
           project_path = xcodeproj_path_or_dir
@@ -158,7 +157,7 @@ module Fastlane
                              optional: true,
                              verify_block: proc do |value|
                                UI.user_error!("Please pass the path to the project or its containing directory, not the workspace path") if value.end_with?(".xcworkspace")
-                               UI.user_error!("Could not find file or directory at path '#{File.expand_path(value)}'") if !(File.exist?(value))
+                               UI.user_error!("Could not find file or directory at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                UI.user_error!("Could not find Xcode project in directory at path '#{File.expand_path(value)}'") if File.extname(value) != ".xcodeproj" && Dir.glob("#{value}/*.xcodeproj").empty?
                              end),
           FastlaneCore::ConfigItem.new(key: :target,
