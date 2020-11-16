@@ -46,7 +46,7 @@ module Fastlane
       end
 
       def find_bucket!(bucket_name)
-        bucket = Aws::S3::Bucket.new(bucket_name, client: nil)
+        bucket = Aws::S3::Bucket.new(bucket_name)
         raise "Bucket '#{bucket_name}' not found" unless bucket.exists?
 
         return bucket
