@@ -64,6 +64,20 @@ describe Scan do
           end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed")
         end
       end
+
+      describe "with scan option :disable_xcpretty set to true" do
+        it "does not generate a temp junit report", requires_xcodebuild: true do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            project: './scan/examples/standard/app.xcodeproj',
+            disable_xcpretty: true
+          })
+
+          Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
+          @scan.handle_results(0)
+          expect(Scan.cache[:temp_junit_report]).to(eq('/var/folders/non_existent_file.junit'))
+        end
+      end
     end
 
     describe "test_results" do
@@ -103,21 +117,6 @@ describe Scan do
           Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
           expect(@scan.test_results).to_not(be_nil)
           expect(Scan.cache[:temp_junit_report]).to_not(eq('/var/folders/non_existent_file.junit'))
-        end
-      end
-
-      describe "with scan option :disable_xcpretty set to true" do
-        it "does not generate a temp junit report", requires_xcodebuild: true do
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-            output_directory: '/tmp/scan_results',
-            project: './scan/examples/standard/app.xcodeproj',
-            include_simulator_logs: false,
-            disable_xcpretty: true
-          })
-
-          Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
-          expect(@scan.test_results).to(be_nil)
-          expect(Scan.cache[:temp_junit_report]).to(eq('/var/folders/non_existent_file.junit'))
         end
       end
     end
