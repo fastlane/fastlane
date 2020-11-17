@@ -40,7 +40,7 @@ describe Spaceship::Tunes::IAPDetail do
       end
 
       context "when iap is a non-subscription product" do
-        let(:pricing_tiers) { client.pricing_tiers }
+        let(:pricing_tiers) { client.pricing_tiers(app.apple_id) }
         let(:interval) do
           { tier: 1, begin_date: nil, end_date: nil, grandfathered: nil, country: "WW" }
         end

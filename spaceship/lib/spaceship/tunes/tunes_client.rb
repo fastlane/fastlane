@@ -704,9 +704,9 @@ module Spaceship
     #     ...
     # }, {
     # ...
-    def pricing_tiers
+    def pricing_tiers(app_id)
       @pricing_tiers ||= begin
-        r = request(:get, 'ra/apps/pricing/matrix')
+        r = request(:get, "ra/apps/#{app_id}/iaps/pricing/matrix")
         data = parse_response(r, 'data')['pricingTiers']
         data.map { |tier| Spaceship::Tunes::PricingTier.factory(tier) }
       end
