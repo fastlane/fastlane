@@ -92,7 +92,7 @@ module Spaceship
         rescue => error
           puts("Failed to patch app preview. Update may have gone through so verifying") if Spaceship::Globals.verbose?
 
-          preview = Spaceship::ConnectAPI::AppPreview.get(client: nil, app_preview_id: preview.id)
+          preview = Spaceship::ConnectAPI::AppPreview.get(client: client, app_preview_id: preview.id)
           raise error unless preview.complete?
         end
 
