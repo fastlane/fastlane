@@ -113,7 +113,7 @@ module Spaceship
             puts("Waiting #{sleep_time} seconds before checking status of processing...") if Spaceship::Globals.verbose?
             sleep(sleep_time)
 
-            preview = Spaceship::ConnectAPI::AppPreview.get(client: nil, app_preview_id: preview.id)
+            preview = Spaceship::ConnectAPI::AppPreview.get(client: client, app_preview_id: preview.id)
           end
         end
 
