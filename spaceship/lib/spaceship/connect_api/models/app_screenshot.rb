@@ -118,7 +118,7 @@ module Spaceship
             sleep(30)
 
             screenshots = Spaceship::ConnectAPI::AppScreenshotSet
-                          .get(client: nil, app_screenshot_set_id: app_screenshot_set_id)
+                          .get(client: client, app_screenshot_set_id: app_screenshot_set_id)
                           .app_screenshots
 
             screenshot = screenshots.find do |s|
