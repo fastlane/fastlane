@@ -375,9 +375,7 @@ module Deliver
       # Check folder list (an empty folder signifies a language is required)
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
-        language = File.basename(lang_folder)
-        enabled_languages << language unless enabled_languages.include?(language)
+        enabled_languages << lang_folder.language unless enabled_languages.include?(lang_folder.language)
       end
 
       return unless enabled_languages.include?("default")
@@ -416,10 +414,7 @@ module Deliver
       # Check folder list (an empty folder signifies a language is required)
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
-
-        language = File.basename(lang_folder)
-        enabled_languages << language unless enabled_languages.include?(language)
+        enabled_languages << lang_folder.language unless enabled_languages.include?(lang_folder.language)
       end
 
       # Mapping to strings because :default symbol can be passed in
@@ -530,14 +525,13 @@ module Deliver
       # Load localised data
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        language = File.basename(lang_folder)
         (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
-          path = File.join(lang_folder, "#{key}.txt")
+          path = File.join(lang_folder.path, "#{key}.txt")
           next unless File.exist?(path)
 
           UI.message("Loading '#{path}'...")
           options[key] ||= {}
-          options[key][language] ||= File.read(path)
+          options[key][lang_folder.language] ||= File.read(path)
         end
       end
 
