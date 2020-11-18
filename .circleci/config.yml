@@ -182,7 +182,7 @@ jobs:
 
   "Validate Documentation":
     docker:
-      - image: circleci/ruby:2.4
+      - image: circleci/ruby:2.5
     steps:
       - *cache_restore_git
       - checkout
