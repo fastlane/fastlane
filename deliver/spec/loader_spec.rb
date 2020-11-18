@@ -54,6 +54,23 @@ describe Deliver::Loader do
       basenames = @folders.map(&:basename)
       expect(basenames.include?('fonts')).to eq(false)
     end
+
+    it 'should expand special directories when they have sub language directroies' do
+      Deliver::Loader::SPECIAL_DIR_NAMES.each do |dirname|
+        FileUtils.mkdir(File.join(@root, dirname))
+        FileUtils.mkdir(File.join(@root, dirname, @languages.first))
+      end
+
+      dirs_not_expanded = Deliver::Loader.language_folders(@root, true, false)
+      dirs_expanded = Deliver::Loader.language_folders(@root, true, true)
+
+      expect(dirs_not_expanded.any?(&:expandable?)).to be(true)
+      expect(dirs_expanded.any?(&:expandable?)).to be(false)
+
+      expanded_special_dirs = dirs_expanded.select { |d| Deliver::Loader::SPECIAL_DIR_NAMES.any? { |name| d.path.include?(name) } }
+      expect(expanded_special_dirs.size).to be(Deliver::Loader::SPECIAL_DIR_NAMES.size)
+      expect(expanded_special_dirs.map(&:basename).any? { |basename| Deliver::Loader::SPECIAL_DIR_NAMES.include?(basename) }).to be(false)
+    end
   end
 
   describe "#load_app_screenshots" do
