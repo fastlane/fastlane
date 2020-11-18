@@ -17,6 +17,21 @@ describe FastlaneCore do
       end
     end
 
+    describe '#colors_disabled?' do
+      it "should return false if no environemnt variables set" do
+        stub_const('ENV', {})
+        expect(FastlaneCore::Helper.colors_disabled?).to be(false)
+      end
+      it "should return true if FASTLANE_DISABLE_COLORS" do
+        stub_const('ENV', { "FASTLANE_DISABLE_COLORS" => "true" })
+        expect(FastlaneCore::Helper.colors_disabled?).to be(true)
+      end
+      it "should return true if NO_COLORS" do
+        stub_const('ENV', { "NO_COLOR" => 1 })
+        expect(FastlaneCore::Helper.colors_disabled?).to be(true)
+      end
+    end
+
     describe '#json_file?' do
       it "should return false on invalid json file" do
         expect(FastlaneCore::Helper.json_file?("./fastlane_core/spec/fixtures/json_file/broken")).to be(false)
