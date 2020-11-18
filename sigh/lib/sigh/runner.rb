@@ -210,6 +210,7 @@ module Sigh
       return Spaceship::ConnectAPI::Certificate.all(filter: filter)
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
     def certificates_for_profile_and_platform
       types = []
 
@@ -269,6 +270,7 @@ module Sigh
 
       fetch_certificates(types)
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def devices_to_use
       # Only use devices if development or adhoc

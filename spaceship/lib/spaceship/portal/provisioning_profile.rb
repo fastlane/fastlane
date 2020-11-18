@@ -259,6 +259,7 @@ module Spaceship
         #  The value can be found by inspecting the Entitlements drop-down when creating/editing a
         #  provisioning profile in Developer Portal.
         # @return (ProvisioningProfile): The profile that was just created
+        # rubocop:disable Metrics/PerceivedComplexity
         def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false, sub_platform: nil, template_name: nil)
           raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
           raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Portal::Certificate::Production.all.first`" if certificate.to_s.empty?
@@ -308,6 +309,7 @@ module Spaceship
 
           self.new(profile)
         end
+        # rubocop:enable Metrics/PerceivedComplexity
 
         # @return (Array) Returns all profiles registered for this account
         #  If you're calling this from a subclass (like AdHoc), this will

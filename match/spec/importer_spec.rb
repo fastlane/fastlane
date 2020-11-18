@@ -124,7 +124,6 @@ describe Match do
       Match::Importer.new.import_cert(developer_id_config, cert_path: cert_path, p12_path: p12_path)
     end
 
-
     it "imports a .cert and .p12 when the type is set to developer_id_kext" do
       repo_dir = Dir.mktmpdir
       developer_id_kext_config = FastlaneCore::Configuration.create(Match::Options.available_options, developer_id_kext_test_values)
