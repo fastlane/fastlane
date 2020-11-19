@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Matthew Ellis",
-                        "Jorge Revuelta H",
-                        "Jérôme Lacoste",
-                        "Max Ott",
-                        "Josh Holtz",
-                        "Aaron Brager",
-                        "Andrew McBurney",
-                        "Daniel Jankowski",
-                        "Fumiya Nakamura",
-                        "Jimmy Dee",
-                        "Kohki Miki",
-                        "Iulian Onofrei",
-                        "Manu Wallner",
-                        "Stefan Natchev",
-                        "Felix Krause",
-                        "Joshua Liebowitz",
-                        "Jan Piotrowski",
-                        "Olivier Halligon",
-                        "Luka Mirosevic",
+  spec.authors       = ["Aaron Brager",
                         "Danielle Tomlinson",
+                        "Matthew Ellis",
+                        "Joshua Liebowitz",
+                        "Felix Krause",
+                        "Manu Wallner",
+                        "Daniel Jankowski",
+                        "Iulian Onofrei",
+                        "Josh Holtz",
+                        "Jérôme Lacoste",
+                        "Fumiya Nakamura",
+                        "Andrew McBurney",
+                        "Max Ott",
+                        "Jan Piotrowski",
+                        "Jorge Revuelta H",
+                        "Stefan Natchev",
+                        "Luka Mirosevic",
+                        "Jimmy Dee",
+                        "Maksym Grebenets",
+                        "Kohki Miki",
                         "Helmut Januschka",
-                        "Maksym Grebenets"]
+                        "Olivier Halligon"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
