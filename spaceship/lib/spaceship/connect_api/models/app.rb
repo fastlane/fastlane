@@ -201,7 +201,7 @@ module Spaceship
         if app_store_version
           if version_string != app_store_version.version_string
             attributes = { versionString: version_string }
-            app_store_version.update(client: nil, attributes: attributes)
+            app_store_version.update(client: client, attributes: attributes)
             return true
           end
           return false
