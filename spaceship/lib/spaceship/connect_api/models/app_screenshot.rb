@@ -180,7 +180,7 @@ module Spaceship
         return screenshot
       end
 
-      def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
+      def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         client.delete_app_screenshot(app_screenshot_id: id)
       end

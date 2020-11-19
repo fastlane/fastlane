@@ -173,7 +173,7 @@ module Spaceship
 
       def expire!(client: nil)
         client ||= Spaceship::ConnectAPI
-        return client.patch_builds(client: nil, build_id: id, attributes: { expired: true })
+        return client.patch_builds(build_id: id, attributes: { expired: true })
       end
     end
   end
