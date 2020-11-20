@@ -279,7 +279,13 @@ module Gym
                                      env_name: "GYM_CLONED_SOURCE_PACKAGES_PATH",
                                      description: "Sets a custom path for Swift Package Manager dependencies",
                                      type: String,
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :use_system_scm,
+                                     env_name: "GYM_USE_SYSTEM_SCM",
+                                     description: "Lets xcodebuild use system's scm configuration",
+                                     optional: true,
+                                     is_string: false,
+                                     default_value: false)
       ]
     end
   end
