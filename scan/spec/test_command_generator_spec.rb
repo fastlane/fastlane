@@ -170,7 +170,7 @@ describe Scan do
       options = { project: "./scan/examples/standard/app.xcodeproj" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       result = @test_command_generator.generate
-      expect(result).to_not include("-scmProvider system")
+      expect(result).to_not(include("-scmProvider system"))
     end
 
     describe "Standard Example" do

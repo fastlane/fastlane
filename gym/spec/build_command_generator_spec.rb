@@ -87,7 +87,7 @@ describe Gym do
                              "--utf"
                            ])
     end
-    
+
     it "uses system scm", requires_xcodebuild: true do
       options = { project: "./gym/examples/standard/Example.xcodeproj", use_system_scm: true }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
@@ -99,7 +99,7 @@ describe Gym do
       options = { project: "./gym/examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       result = Gym::BuildCommandGenerator.generate
-      expect(result).to_not include("-scmProvider system")
+      expect(result).to_not(include("-scmProvider system"))
     end
 
     it "uses the correct build command when `skip_archive` is used", requires_xcodebuild: true do

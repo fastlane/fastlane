@@ -284,7 +284,7 @@ module Gym
                                      env_name: "GYM_USE_SYSTEM_SCM",
                                      description: "Lets xcodebuild use system's scm configuration",
                                      optional: true,
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false)
       ]
     end
