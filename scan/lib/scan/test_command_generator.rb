@@ -32,6 +32,7 @@ module Scan
 
       options = []
       options += project_path_array unless config[:xctestrun]
+      options << "-scmProvider system" if config[:use_system_scm]
       options << "-sdk '#{config[:sdk]}'" if config[:sdk]
       options << destination # generated in `detect_values`
       options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
