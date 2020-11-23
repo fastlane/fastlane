@@ -134,7 +134,7 @@ module Spaceship
 
         phone_number = env_2fa_sms_default_phone_number
         phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
-        push_mode = push_mode_from_masked_number(phone_numbers, chosen)
+        push_mode = push_mode_from_masked_number(response.body["trustedPhoneNumbers"], phone_number)
         # don't request sms if no trusted devices and env default is the only trusted number,
         # code was automatically sent
         should_request_code = !sms_automatically_sent(response)
@@ -281,6 +281,9 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
       phone_numbers.each do |phone|
         return phone['pushMode'] if phone['numberWithDialCode'] == masked_number
       end
+      
+      # If no pushMode was supplied, assume sms
+      return "sms"
     end
 
     def request_two_factor_code_from_phone_choose(phone_numbers, code_length)
