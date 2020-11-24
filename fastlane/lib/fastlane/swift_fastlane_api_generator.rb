@@ -79,7 +79,11 @@ module Fastlane
       available_external_actions = Fastlane.external_actions || []
       available_actions = []
       ActionsList.all_actions do |action|
-        next if (action.action_name rescue nil) == nil
+        next if (begin
+                   action.action_name
+                 rescue
+                   nil
+                 end).nil?
         available_actions << action.action_name unless available_external_actions.include?(action)
       end
 
@@ -109,7 +113,11 @@ module Fastlane
       # Excludes all actions that aren't pluign actions (including external actions)
       available_actions = []
       ActionsList.all_actions do |action|
-        next if (action.action_name rescue nil) == nil
+        next if (begin
+                   action.action_name
+                 rescue
+                   nil
+                 end).nil?
         available_actions << action.action_name unless available_plugins.include?(action)
       end
 
@@ -153,7 +161,11 @@ module Fastlane
 
       tool_details = []
       ActionsList.all_actions do |action|
-        next if (action.action_name rescue nil) == nil
+        next if (begin
+                   action.action_name
+                 rescue
+                   nil
+                 end).nil?
         next if self.actions_not_supported.include?(action.action_name)
 
         swift_function = process_action(action: action)
