@@ -67,7 +67,7 @@ describe Spaceship::Client do
   describe 'handle_two_factor' do
     let(:trusted_devices_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'client_appleauth_auth_2fa_response.json'), encoding: 'utf-8')) }
     let(:no_trusted_devices_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_no_trusted_devices.json'), encoding: 'utf-8')) }
-	let(:no_trusted_devices_voice_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_voice_no_trusted_devices.json'), encoding: 'utf-8')) }
+    let(:no_trusted_devices_voice_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_voice_no_trusted_devices.json'), encoding: 'utf-8')) }
     let(:no_trusted_devices_two_numbers_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_no_trusted_devices_two_numbers.json'), encoding: 'utf-8')) }
 
     context 'when SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER is not set' do
