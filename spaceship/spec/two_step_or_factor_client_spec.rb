@@ -114,7 +114,7 @@ describe Spaceship::Client do
             expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode')
             expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: 1 }, mode: "sms" })
           end
-          
+
           it "does not request sms code, and sends the correct request with voice" do
             response = OpenStruct.new
             response.body = no_trusted_devices_voice_response

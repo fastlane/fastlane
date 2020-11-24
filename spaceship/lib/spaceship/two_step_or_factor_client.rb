@@ -281,7 +281,7 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
       phone_numbers.each do |phone|
         return phone['pushMode'] if phone['numberWithDialCode'] == masked_number
       end
-      
+
       # If no pushMode was supplied, assume sms
       return "sms"
     end
