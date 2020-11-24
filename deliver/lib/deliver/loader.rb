@@ -44,7 +44,7 @@ module Deliver
       # @param nested [Boolan] Whether given path is nested of another special directory.
       #  This affects `expandable?` to return `false` when this set to `true`.
       def initialize(path, nested: false)
-        raise "Given path must be a directory path - #{path}" unless File.directory?(path)
+        raise(ArgumentError, "Given path must be a directory path - #{path}") unless File.directory?(path)
         @path = path
         @language = self.class.available_languages.find { |lang| basename.casecmp?(lang) }
         @nested = nested
