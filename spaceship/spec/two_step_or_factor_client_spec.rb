@@ -67,6 +67,7 @@ describe Spaceship::Client do
   describe 'handle_two_factor' do
     let(:trusted_devices_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'client_appleauth_auth_2fa_response.json'), encoding: 'utf-8')) }
     let(:no_trusted_devices_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_no_trusted_devices.json'), encoding: 'utf-8')) }
+	let(:no_trusted_devices_voice_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_voice_no_trusted_devices.json'), encoding: 'utf-8')) }
     let(:no_trusted_devices_two_numbers_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_no_trusted_devices_two_numbers.json'), encoding: 'utf-8')) }
 
     context 'when SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER is not set' do
@@ -112,6 +113,18 @@ describe Spaceship::Client do
             expect(WebMock).to have_not_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone')
             expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode')
             expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: 1 }, mode: "sms" })
+          end
+          
+          it "does not request sms code, and sends the correct request with voice" do
+            response = OpenStruct.new
+            response.body = no_trusted_devices_voice_response
+
+            bool = subject.handle_two_factor(response)
+            expect(bool).to eq(true)
+
+            expect(WebMock).to have_not_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone')
+            expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode')
+            expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: 1 }, mode: "voice" })
           end
         end
 
