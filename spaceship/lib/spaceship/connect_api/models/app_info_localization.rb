@@ -8,6 +8,7 @@ module Spaceship
       attr_accessor :name
       attr_accessor :subtitle
       attr_accessor :privacy_policy_url
+      attr_accessor :privacy_choices_url
       attr_accessor :privacy_policy_text
 
       attr_mapping({
@@ -15,6 +16,7 @@ module Spaceship
         "name" => "name",
         "subtitle" => "subtitle",
         "privacyPolicyUrl" => "privacy_policy_url",
+        "privacyChoicesUrl" => "privacy_choices_url",
         "privacyPolicyText" => "privacy_policy_text"
       })
 
