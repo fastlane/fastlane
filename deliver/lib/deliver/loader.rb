@@ -55,11 +55,11 @@ module Deliver
       end
 
       def valid?
-        !@language.nil? || expandable?
+        self.class.allowed_directory_names_with_case.any? { |name| name.casecmp?(basename) }
       end
 
       def expandable?
-        !nested? && SPECIAL_DIR_NAMES.map(&:downcase).include?(basename.downcase)
+        !nested? && (APPLE_TV_DIR_NAME.casecmp?(basename) || IMESSAGE_DIR_NAME.casecmp?(basename))
       end
 
       def skip?
@@ -152,7 +152,7 @@ module Deliver
                        "\n\nEnable 'ignore_language_directory_validation' to prevent this validation from happening")
       end
 
-      # Expand selected_dirs for the special directories
+      # Expand selected_folders for the special directories
       if expand_sub_folders
         selected_folders = selected_folders.flat_map do |folder|
           if folder.expandable?
