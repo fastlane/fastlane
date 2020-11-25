@@ -4,6 +4,67 @@ require 'fakefs/spec_helpers'
 describe Deliver::Loader do
   include(FakeFS::SpecHelpers)
 
+  describe Deliver::Loader::LanguageFolder do
+    let(:root) { '/some/root' }
+    before { FileUtils.mkdir_p(root) }
+
+    def directory_path(name)
+      path = File.join(root, name)
+      FileUtils.mkdir_p(path)
+      path
+    end
+
+    describe '#new' do
+      it 'should fail to initialize an instance unless given a directory path' do
+        random_path = File.join(root, 'random_file')
+        expect { described_class.new(random_path) }.to raise_error(ArgumentError)
+
+        path = directory_path('directory')
+        expect { described_class.new(path) }.not_to raise_error
+      end
+    end
+
+    describe '#language' do
+      let(:language) { FastlaneCore::Languages::ALL_LANGUAGES.sample }
+
+      it 'should be same as directory name being language name' do
+        expect(described_class.new(directory_path(language)).language).to eq(language)
+      end
+
+      it 'should be same as language name noramized even when case is different' do
+        expect(described_class.new(directory_path(language.upcase)).language).to eq(language)
+      end
+    end
+
+    describe '#valid?' do
+      it 'should be valid for allowed directory names' do
+        (FastlaneCore::Languages::ALL_LANGUAGES + Deliver::Loader::SPECIAL_DIR_NAMES).each do |name|
+          expect(described_class.new(directory_path(name)).valid?).to be(true)
+        end
+        expect(described_class.new(directory_path('random')).valid?).to be(false)
+      end
+    end
+
+    describe '#expandable?' do
+      it 'should be true for specific directroies' do
+        Deliver::Loader::EXPANDABLE_DIR_NAMES.each do |name|
+          expect(described_class.new(directory_path(name)).expandable?).to be(true)
+        end
+        expect(described_class.new(directory_path(FastlaneCore::Languages::ALL_LANGUAGES.sample)).expandable?).to be(false)
+      end
+    end
+
+    describe '#skip?' do
+      it 'should be true when exceptional directories' do
+        Deliver::Loader::EXCEPTION_DIRECTORIES.each do |name|
+          expect(described_class.new(directory_path(name)).skip?).to be(true)
+        end
+        expect(described_class.new(directory_path(FastlaneCore::Languages::ALL_LANGUAGES.sample)).skip?).to be(false)
+        expect(described_class.new(directory_path(Deliver::Loader::SPECIAL_DIR_NAMES.sample)).skip?).to be(false)
+      end
+    end
+  end
+
   describe '#language_folders' do
     before do
       @languages = FastlaneCore::Languages::ALL_LANGUAGES
@@ -71,7 +132,7 @@ describe Deliver::Loader do
         folder.path.include?(Deliver::Loader::APPLE_TV_DIR_NAME) || folder.path.include?(Deliver::Loader::IMESSAGE_DIR_NAME)
       end
       # all expanded folder should have its languge
-      expect(expanded_special_folders.map(&:language).any?(:nil?)).to be(false)
+      expect(expanded_special_folders.map(&:language).any?(&:nil?)).to be(false)
     end
   end
 

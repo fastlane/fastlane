@@ -14,6 +14,7 @@ module Deliver
     IMESSAGE_DIR_NAME = "iMessage".freeze
     DEFAULT_DIR_NAME = "default".freeze
 
+    EXPANDABLE_DIR_NAMES = [APPLE_TV_DIR_NAME, IMESSAGE_DIR_NAME].freeze
     SPECIAL_DIR_NAMES = [APPLE_TV_DIR_NAME, IMESSAGE_DIR_NAME, DEFAULT_DIR_NAME].freeze
 
     # Some exception directories may exist from other actions that should not be iterated through
@@ -59,7 +60,7 @@ module Deliver
       end
 
       def expandable?
-        !nested? && (APPLE_TV_DIR_NAME.casecmp?(basename) || IMESSAGE_DIR_NAME.casecmp?(basename))
+        !nested? && EXPANDABLE_DIR_NAMES.any? { |name| name.casecmp?(basename) }
       end
 
       def skip?
