@@ -13,13 +13,6 @@ describe Fastlane do
         expect(result).to eq("4.3.2")
       end
 
-      it "gets the correct version number for 'TargetA' using xcodeproj_filename without extension", requires_xcodeproj: true do
-        result = Fastlane::FastFile.new.parse("lane :test do
-          get_version_number(xcodeproj: '#{xcodeproj_dir}', target: 'TargetA')
-        end").runner.execute(:test)
-        expect(result).to eq("4.3.2")
-      end
-
       it "gets the correct version number for 'TargetA' using xcodeproj_filename with extension", requires_xcodeproj: true do
         result = Fastlane::FastFile.new.parse("lane :test do
           get_version_number(xcodeproj: '#{File.join(xcodeproj_dir, xcodeproj_filename)}', target: 'TargetA')
