@@ -31,7 +31,7 @@ module Deliver
 
         # Add a README to the screenshots folder
         FileUtils.mkdir_p(screenshots_path) # just in case the fetching didn't work
-        File.write(File.join(screenshots_path, 'README.md'), File.read("#{Deliver::ROOT}/lib/assets/ScreenshotsHelp"))
+        File.write(File.join(screenshots_path, 'README.txt'), File.read("#{Deliver::ROOT}/lib/assets/ScreenshotsHelp"))
       end
 
       UI.success("Successfully created new Deliverfile at path '#{file_path}'")
