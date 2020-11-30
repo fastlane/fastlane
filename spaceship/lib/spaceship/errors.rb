@@ -49,7 +49,7 @@ module Spaceship
     attr_reader :rate_limit_user
 
     def initialize(resp_hash)
-      headers = resp_hash[:response_headers]
+      headers = resp_hash[:response_headers] || {}
       @retry_after = (headers['retry-after'] || 60).to_i
       @rate_limit_user = headers['x-daiquiri-rate-limit-user']
       message = 'Apple 429 detected'
