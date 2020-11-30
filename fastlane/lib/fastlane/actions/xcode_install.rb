@@ -17,7 +17,7 @@ module Fastlane
         if installer.installed?(params[:version])
           UI.success("Xcode #{params[:version]} is already installed ✨")
         else
-          installer.install_version(params[:version], switch: true, clean: true, install: true, progress: true, url: nil, show_release_notes: true, progress_block: nil, retry_download_count: params[:download_retry_attempts])
+          installer.install_version(params[:version], true, true, true, true, nil, true, nil, params[:download_retry_attempts])
         end
 
         xcode = installer.installed_versions.find { |x| x.version == params[:version] }
