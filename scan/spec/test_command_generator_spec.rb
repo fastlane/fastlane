@@ -159,6 +159,20 @@ describe Scan do
       expect(result.last).to include("| xcpretty -f 'custom-formatter.rb'")
     end
 
+    it "uses system scm", requires_xcodebuild: true do
+      options = { project: "./scan/examples/standard/app.xcodeproj", use_system_scm: true }
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      result = @test_command_generator.generate
+      expect(result).to include("-scmProvider system")
+    end
+
+    it "defaults to Xcode scm when option is not provided", requires_xcodebuild: true do
+      options = { project: "./scan/examples/standard/app.xcodeproj" }
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      result = @test_command_generator.generate
+      expect(result).to_not(include("-scmProvider system"))
+    end
+
     describe "Standard Example" do
       before do
         options = { project: "./scan/examples/standard/app.xcodeproj" }
