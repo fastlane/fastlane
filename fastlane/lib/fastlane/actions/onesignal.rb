@@ -17,6 +17,7 @@ module Fastlane
         apns_p12_password = params[:apns_p12_password]
         android_token = params[:android_token]
         android_gcm_sender_id = params[:android_gcm_sender_id]
+        organization_id = params[:organization_id].to_s.strip
 
         has_app_id = !app_id.empty?
         has_app_name = !app_name.empty?
@@ -43,6 +44,7 @@ module Fastlane
 
         payload["gcm_key"] = android_token unless android_token.nil?
         payload["android_gcm_sender_id"] = android_gcm_sender_id unless android_gcm_sender_id.nil?
+        payload["organization_id"] = organization_id unless organization_id.nil?
 
         # here's the actual lifting - POST or PUT to OneSignal
 
@@ -135,7 +137,13 @@ module Fastlane
                                        env_name: "APNS_ENV",
                                        description: "APNS environment",
                                        optional: true,
-                                       default_value: 'production')
+                                       default_value: 'production'),
+
+          FastlaneCore::ConfigItem.new(key: :organization_id,
+                                       env_name: "ORGANIZATION_ID",
+                                       sensitive: true,
+                                       description: "ONESIGNAL ORGANIZATION ID",
+                                       optional: true)
         ]
       end
 
@@ -163,7 +171,8 @@ module Fastlane
             android_gcm_sender_id: "Your Android GCM Sender ID (optional)",
             apns_p12: "Path to Apple .p12 file (optional)",
             apns_p12_password: "Password for .p12 file (optional)",
-            apns_env: "production/sandbox (defaults to production)"
+            apns_env: "production/sandbox (defaults to production)",
+            organization_id: "Onesignal organization id (optional)"
           )',
           'onesignal(
             app_id: "Your OneSignal App ID",
@@ -173,7 +182,8 @@ module Fastlane
             android_gcm_sender_id: "Your Android GCM Sender ID (optional)",
             apns_p12: "Path to Apple .p12 file (optional)",
             apns_p12_password: "Password for .p12 file (optional)",
-            apns_env: "production/sandbox (defaults to production)"
+            apns_env: "production/sandbox (defaults to production)",
+            organization_id: "Onesignal organization id (optional)"
           )'
         ]
       end
@@ -184,3 +194,4 @@ module Fastlane
     end
   end
 end
+
