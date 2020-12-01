@@ -117,7 +117,8 @@ module Spaceship
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_APPLE_RELEASE,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_DEVELOPER_RELEASE,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PROCESSING_FOR_APP_STORE,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::IN_REVIEW
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::IN_REVIEW,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::DEVELOPER_REMOVED_FROM_SALE
         ]
 
         resp = client.get_app_infos(app_id: id, includes: includes)
@@ -230,7 +231,10 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
+          appStoreState: [
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REMOVED_FROM_SALE
+          ].join(","),
           platform: platform
         }
         return get_app_store_versions(client: client, filter: filter, includes: includes).first
