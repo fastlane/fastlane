@@ -230,7 +230,10 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
+          appStoreState: [
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REMOVED_FROM_SALE
+          ].join(","),
           platform: platform
         }
         return get_app_store_versions(client: client, filter: filter, includes: includes).first
