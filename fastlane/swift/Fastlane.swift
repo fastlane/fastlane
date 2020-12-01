@@ -981,6 +981,7 @@ public func buildAndroidApp(task: String? = nil,
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - useSystemScm: Lets xcodebuild use system's scm configuration
 
  - returns: The absolute path to the generated ipa file
 
@@ -1029,7 +1030,8 @@ public func buildApp(workspace: String? = nil,
                      analyzeBuildTime: Bool? = nil,
                      xcprettyUtf: Bool? = nil,
                      skipProfileDetection: Bool = false,
-                     clonedSourcePackagesPath: String? = nil)
+                     clonedSourcePackagesPath: String? = nil,
+                     useSystemScm: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "build_app", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                              RubyCommand.Argument(name: "project", value: project),
@@ -1074,7 +1076,8 @@ public func buildApp(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "analyze_build_time", value: analyzeBuildTime),
                                                                                              RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf),
                                                                                              RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection),
-                                                                                             RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath)])
+                                                                                             RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                             RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
 
@@ -1123,6 +1126,7 @@ public func buildApp(workspace: String? = nil,
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - useSystemScm: Lets xcodebuild use system's scm configuration
 
  - returns: The absolute path to the generated ipa file
 
@@ -1168,7 +1172,8 @@ public func buildIosApp(workspace: String? = nil,
                         analyzeBuildTime: Bool? = nil,
                         xcprettyUtf: Bool? = nil,
                         skipProfileDetection: Bool = false,
-                        clonedSourcePackagesPath: String? = nil)
+                        clonedSourcePackagesPath: String? = nil,
+                        useSystemScm: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "build_ios_app", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                                  RubyCommand.Argument(name: "project", value: project),
@@ -1210,7 +1215,8 @@ public func buildIosApp(workspace: String? = nil,
                                                                                                  RubyCommand.Argument(name: "analyze_build_time", value: analyzeBuildTime),
                                                                                                  RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf),
                                                                                                  RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection),
-                                                                                                 RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath)])
+                                                                                                 RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                                 RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
 
@@ -1260,6 +1266,7 @@ public func buildIosApp(workspace: String? = nil,
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - useSystemScm: Lets xcodebuild use system's scm configuration
 
  - returns: The absolute path to the generated ipa file
 
@@ -1306,7 +1313,8 @@ public func buildMacApp(workspace: String? = nil,
                         analyzeBuildTime: Bool? = nil,
                         xcprettyUtf: Bool? = nil,
                         skipProfileDetection: Bool = false,
-                        clonedSourcePackagesPath: String? = nil)
+                        clonedSourcePackagesPath: String? = nil,
+                        useSystemScm: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "build_mac_app", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                                  RubyCommand.Argument(name: "project", value: project),
@@ -1349,7 +1357,8 @@ public func buildMacApp(workspace: String? = nil,
                                                                                                  RubyCommand.Argument(name: "analyze_build_time", value: analyzeBuildTime),
                                                                                                  RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf),
                                                                                                  RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection),
-                                                                                                 RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath)])
+                                                                                                 RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                                 RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
 
@@ -1863,7 +1872,7 @@ public func carthage(command: String = "bootstrap",
    - keychainPath: Path to a custom keychain
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
-   - platform: Set the provisioning profile's platform (ios, macos)
+   - platform: Set the provisioning profile's platform (ios, macos, tvos)
 
  **Important**: It is recommended to use [match](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
  Use this action to download the latest code signing identity.
@@ -3351,7 +3360,7 @@ public func getBuildNumberRepository(useHgRevisionNumber: Bool = false) {
    - keychainPath: Path to a custom keychain
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
-   - platform: Set the provisioning profile's platform (ios, macos)
+   - platform: Set the provisioning profile's platform (ios, macos, tvos)
 
  **Important**: It is recommended to use [match](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
  Use this action to download the latest code signing identity.
@@ -3992,6 +4001,7 @@ public func gradle(task: String? = nil,
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - useSystemScm: Lets xcodebuild use system's scm configuration
 
  - returns: The absolute path to the generated ipa file
 
@@ -4040,7 +4050,8 @@ public func gym(workspace: Any? = gymfile.workspace,
                 analyzeBuildTime: Bool? = gymfile.analyzeBuildTime,
                 xcprettyUtf: Bool? = gymfile.xcprettyUtf,
                 skipProfileDetection: Bool = gymfile.skipProfileDetection,
-                clonedSourcePackagesPath: Any? = gymfile.clonedSourcePackagesPath)
+                clonedSourcePackagesPath: Any? = gymfile.clonedSourcePackagesPath,
+                useSystemScm: Bool = gymfile.useSystemScm)
 {
     let command = RubyCommand(commandID: "", methodName: "gym", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                        RubyCommand.Argument(name: "project", value: project),
@@ -4085,7 +4096,8 @@ public func gym(workspace: Any? = gymfile.workspace,
                                                                                        RubyCommand.Argument(name: "analyze_build_time", value: analyzeBuildTime),
                                                                                        RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf),
                                                                                        RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection),
-                                                                                       RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath)])
+                                                                                       RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                       RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
 
@@ -6081,6 +6093,7 @@ public func rubyVersion() {
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - useSystemScm: Lets xcodebuild use system's scm configuration
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
  More information: https://docs.fastlane.tools/actions/scan/
@@ -6148,6 +6161,7 @@ public func runTests(workspace: String? = nil,
                      customReportFileName: String? = nil,
                      xcodebuildCommand: String = "env NSUnbufferedIO=YES xcodebuild",
                      clonedSourcePackagesPath: String? = nil,
+                     useSystemScm: Bool = false,
                      failBuild: Bool = true)
 {
     let command = RubyCommand(commandID: "", methodName: "run_tests", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -6213,6 +6227,7 @@ public func runTests(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
                                                                                              RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand),
                                                                                              RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                             RubyCommand.Argument(name: "use_system_scm", value: useSystemScm),
                                                                                              RubyCommand.Argument(name: "fail_build", value: failBuild)])
     _ = runner.executeCommand(command)
 }
@@ -6360,6 +6375,7 @@ public func say(text: Any,
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - useSystemScm: Lets xcodebuild use system's scm configuration
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
  More information: https://docs.fastlane.tools/actions/scan/
@@ -6427,6 +6443,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                  customReportFileName: Any? = scanfile.customReportFileName,
                  xcodebuildCommand: Any = scanfile.xcodebuildCommand,
                  clonedSourcePackagesPath: Any? = scanfile.clonedSourcePackagesPath,
+                 useSystemScm: Bool = scanfile.useSystemScm,
                  failBuild: Bool = scanfile.failBuild)
 {
     let command = RubyCommand(commandID: "", methodName: "scan", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -6492,6 +6509,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                                                                                         RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
                                                                                         RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand),
                                                                                         RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                        RubyCommand.Argument(name: "use_system_scm", value: useSystemScm),
                                                                                         RubyCommand.Argument(name: "fail_build", value: failBuild)])
     _ = runner.executeCommand(command)
 }
@@ -9125,6 +9143,7 @@ public func xcexport() {
    - version: The version number of the version of Xcode to install
    - username: Your Apple ID Username
    - teamId: The ID of your team if you're in multiple teams
+   - downloadRetryAttempts: Number of times the download will be retried in case of failure
 
  - returns: The path to the newly installed Xcode version
 
@@ -9132,11 +9151,13 @@ public func xcexport() {
  */
 @discardableResult public func xcodeInstall(version: String,
                                             username: String,
-                                            teamId: String? = nil) -> String
+                                            teamId: String? = nil,
+                                            downloadRetryAttempts: Int = 3) -> String
 {
     let command = RubyCommand(commandID: "", methodName: "xcode_install", className: nil, args: [RubyCommand.Argument(name: "version", value: version),
                                                                                                  RubyCommand.Argument(name: "username", value: username),
-                                                                                                 RubyCommand.Argument(name: "team_id", value: teamId)])
+                                                                                                 RubyCommand.Argument(name: "team_id", value: teamId),
+                                                                                                 RubyCommand.Argument(name: "download_retry_attempts", value: downloadRetryAttempts)])
     return runner.executeCommand(command)
 }
 
@@ -9262,7 +9283,7 @@ public func xcov(workspace: String? = nil,
                  coverallsServiceJobId: String? = nil,
                  coverallsRepoToken: String? = nil,
                  xcconfig: String? = nil,
-                 ideFoundationPath: String = "/Applications/Xcode-11.7.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-12.2.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -9408,4 +9429,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.104]
+// FastlaneRunnerAPIVersion [0.9.105]
