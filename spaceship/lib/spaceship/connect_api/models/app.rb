@@ -117,7 +117,8 @@ module Spaceship
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_APPLE_RELEASE,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_DEVELOPER_RELEASE,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PROCESSING_FOR_APP_STORE,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::IN_REVIEW
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::IN_REVIEW,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::DEVELOPER_REMOVED_FROM_SALE
         ]
 
         resp = client.get_app_infos(app_id: id, includes: includes)
