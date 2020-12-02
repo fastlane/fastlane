@@ -142,7 +142,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :organization_id,
                                        env_name: "ORGANIZATION_ID",
                                        sensitive: true,
-                                       description: "ONESIGNAL ORGANIZATION ID",
+                                       description: "OneSignal Organization ID",
                                        optional: true)
         ]
       end
