@@ -390,7 +390,7 @@ lane :beta do
 end
 ```
 
-By using the `force_for_new_devices` parameter, _match_ will check if the device count has changed since the last time you ran _match_, and automatically re-generate the provisioning profile if necessary. You can also use `force: true` to re-generate the provisioning profile on each run.
+By using the `force_for_new_devices` parameter, _match_ will check if the (enabled) device count has changed since the last time you ran _match_, and automatically re-generate the provisioning profile if necessary. You can also use `force: true` to re-generate the provisioning profile on each run.
 
 _**Important:** The `force_for_new_devices` parameter is ignored for App Store provisioning profiles since they don't contain any device information._
 

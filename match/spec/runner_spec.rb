@@ -333,5 +333,42 @@ describe Match do
         end
       end
     end
+
+    describe "#device_count_different?" do
+      let(:profile_file) { double("profile file") }
+      let(:uuid) { "1234-1234-1234-1234" }
+      let(:parsed_profile) { { "UUID" => uuid } }
+      let(:profile) { double("profile") }
+      let(:profile_device) { double("profile_device") }
+
+      before do
+        allow(profile).to receive(:uuid).and_return(uuid)
+        allow(profile).to receive(:fetch_all_devices).and_return([profile_device])
+      end
+
+      it "device is enabled" do
+        expect(FastlaneCore::ProvisioningProfile).to receive(:parse).and_return(parsed_profile)
+        expect(Spaceship::ConnectAPI::Profile).to receive(:all).and_return([profile])
+        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return([profile_device])
+
+        expect(profile_device).to receive(:device_class).and_return(Spaceship::ConnectAPI::Device::DeviceClass::IPOD)
+        expect(profile_device).to receive(:enabled?).and_return(true)
+
+        runner = Match::Runner.new
+        expect(runner.device_count_different?(profile: profile_file, platform: :ios)).to be(false)
+      end
+
+      it "device is disabled" do
+        expect(FastlaneCore::ProvisioningProfile).to receive(:parse).and_return(parsed_profile)
+        expect(Spaceship::ConnectAPI::Profile).to receive(:all).and_return([profile])
+        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return([profile_device])
+
+        expect(profile_device).to receive(:device_class).and_return(Spaceship::ConnectAPI::Device::DeviceClass::IPOD)
+        expect(profile_device).to receive(:enabled?).and_return(false)
+
+        runner = Match::Runner.new
+        expect(runner.device_count_different?(profile: profile_file, platform: :ios)).to be(true)
+      end
+    end
   end
 end

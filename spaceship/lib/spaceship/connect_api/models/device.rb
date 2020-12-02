@@ -40,6 +40,10 @@ module Spaceship
         return "devices"
       end
 
+      def enabled?
+        return status == Status::ENABLED
+      end
+
       #
       # API
       #

@@ -20,6 +20,11 @@ describe Spaceship::ConnectAPI::Device do
       expect(model.status).to eq("ENABLED")
       expect(model.udid).to eq("184098239048390489012849018")
       expect(model.added_date).to eq("2018-10-10T01:43:27.000+0000")
+
+      expect(model.enabled?).to eq(true)
+
+      model.status = "DISABLED"
+      expect(model.enabled?).to eq(false)
     end
   end
 end
