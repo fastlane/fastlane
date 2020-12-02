@@ -17,7 +17,7 @@ module Fastlane
         apns_p12_password = params[:apns_p12_password]
         android_token = params[:android_token]
         android_gcm_sender_id = params[:android_gcm_sender_id]
-        organization_id = params[:organization_id].to_s.strip
+        organization_id = params[:organization_id]
 
         has_app_id = !app_id.empty?
         has_app_name = !app_name.empty?
