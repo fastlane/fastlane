@@ -1,0 +1,103 @@
+require 'fastimage'
+
+module Deliver
+  class AppScreenshotValidator
+    # A simple structure that holds error information as well as format error message consistently
+    # Set `true` to `to_skip` when just needing to skip uploading rather than causing a crash.
+    class ValidationError
+      # Constants that can be given to `type` param
+      INVALID_SCREEN_SIZE = 'Invalid screen size'.freeze
+      UNACCEPTABLE_DEVICE = 'Not an accepted App Store Connect device'.freeze
+      INVALID_FILE_EXTENSION = 'Invalid file extension'.freeze
+      FILE_EXTENSION_MISMATCH = 'File extension mistmaches its image format'.freeze
+
+      attr_reader :type, :path, :debug_info, :to_skip
+
+      def initialize(type: nil, path: nil, debug_info: nil, to_skip: false)
+        @type = type
+        @path = path
+        @debug_info = debug_info
+        @to_skip = to_skip
+      end
+
+      def to_s
+        "#{to_skip ? '🏃 Skipping' : '🚫 Error'}: #{path} - #{type} (#{debug_info})"
+      end
+
+      def inspect
+        "\"#{type}\""
+      end
+    end
+
+    # Access each array by symbol returned from FastImage.type
+    ALLOWED_SCREENSHOT_FILE_EXTENSION = { png: ['png', 'PNG'], jpeg: ['jpg', 'JPG', 'jpeg', 'JPEG'] }.freeze
+
+    # Validate a screenshot and inform an error message via `errors` parameters. `errors` is mutated
+    # to append the messages and each message should contain the corresponding path to let users know which file gets the error.
+    #
+    # @param screenshot [AppScreenshot]
+    # @param errors [Array<Deliver::AppScreenshotValidator::ValidationError>] Pass an array object to add validation errors when detecting errors
+    # @return [Boolean] true if given screenshot is valid
+    def self.validate(screenshot, errors)
+      # Given screenshot will be diagnosed and errors found are accumulated
+      errors_found = []
+
+      validate_screen_size(screenshot, errors_found)
+      validate_device_type(screenshot, errors_found)
+      validate_file_extension_and_format(screenshot, errors_found)
+
+      # Merge errors found into given errors array
+      errors_found.each { |error| errors.push(error) }
+      errors_found.empty?
+    end
+
+    def self.validate_screen_size(screenshot, errors_found)
+      if screenshot.screen_size.nil?
+        errors_found << ValidationError.new(type: ValidationError::INVALID_SCREEN_SIZE,
+                                            path: screenshot.path,
+                                            debug_info: "Actual size is #{get_formatted_size(screenshot)}")
+      end
+    end
+
+    # Checking if the device type exists in spaceship
+    # Ex: iPhone 6.1 inch isn't supported in App Store Connect but need
+    # to have it in there for frameit support
+    def self.validate_device_type(screenshot, errors_found)
+      if !screenshot.screen_size.nil? && screenshot.device_type.nil?
+        errors_found << ValidationError.new(type: ValidationError::UNACCEPTABLE_DEVICE,
+                                            path: screenshot.path,
+                                            debug_info: "Screen size #{screenshot.screen_size} is not accepted",
+                                            to_skip: true)
+      end
+    end
+
+    def self.validate_file_extension_and_format(screenshot, errors_found)
+      extension = File.extname(screenshot.path).delete('.')
+      valid_file_extensions = ALLOWED_SCREENSHOT_FILE_EXTENSION.values.flatten
+      is_valid_extension = valid_file_extensions.include?(extension)
+
+      unless is_valid_extension
+        errors_found << ValidationError.new(type: ValidationError::INVALID_FILE_EXTENSION,
+                                            path: screenshot.path,
+                                            debug_info: "Only #{valid_file_extensions.join(', ')} are allowed")
+      end
+
+      format = FastImage.type(screenshot.path)
+      is_extension_macthed = ALLOWED_SCREENSHOT_FILE_EXTENSION[format] &&
+                             ALLOWED_SCREENSHOT_FILE_EXTENSION[format].include?(extension)
+
+      # This error only appears when file extension is valid
+      if is_valid_extension && !is_extension_macthed
+        errors_found << ValidationError.new(type: ValidationError::FILE_EXTENSION_MISMATCH,
+                                            path: screenshot.path,
+                                            debug_info: "Actual format is #{format}")
+      end
+    end
+
+    def self.get_formatted_size(screenshot)
+      size = FastImage.size(screenshot.path)
+      return size.join('x') if size
+      nil
+    end
+  end
+end
