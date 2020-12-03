@@ -7,10 +7,9 @@ module Fastlane
       def self.run(params)
         require 'spaceship'
 
-        # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
         UI.message("Login to App Store Connect (#{params[:username]})")
-        Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true)
+        Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true, tunes_team_id: params[:team_id], team_name: params[:team_name])
         UI.message("Login successful")
 
         # Get App
@@ -18,7 +17,6 @@ module Fastlane
         unless app
           UI.user_error!("Could not find app with bundle identifier '#{params[:app_identifier]}' on account #{params[:username]}")
         end
-        puts("found app")
 
         # Attempt too load JSON file
         usages_config = load_json_file(params)
@@ -61,6 +59,7 @@ module Fastlane
           UI.user_error!("Cancelled")
         end
 
+        # Fetch categories and purposes used for generating interactive questions
         categories = Spaceship::ConnectAPI::AppDataUsageCategory.all(includes: "grouping")
         purposes = Spaceship::ConnectAPI::AppDataUsagePurpose.all
 
@@ -75,19 +74,23 @@ module Fastlane
         end
 
         categories.each do |category|
+          # Ask if using category
           next unless UI.confirm("Collect data for #{category.id}?")
 
           purpose_names = purposes.map(&:id).join(', ')
           UI.message("How will this data be used? You'll be offered with #{purpose_names}")
 
+          # Ask purposes
           selected_purposes = []
           purposes.each do |purpose|
             selected_purposes << purpose if UI.confirm("Used for #{purpose.id}?")
           end
 
+          # Ask protections
           is_linked_to_user = UI.confirm("Is #{category.id} linked to the user?")
           is_used_for_tracking = UI.confirm("Is #{category.id} used for tracking purposes?")
 
+          # Map answers to values for API requests
           protection_id = is_linked_to_user ? "DATA_LINKED_TO_YOU" : "DATA_NOT_LINKED_TO_YOU"
           tracking_id = is_used_for_tracking ? "DATA_USED_TO_TRACK_YOU" : nil
 
@@ -104,20 +107,19 @@ module Fastlane
       end
 
       def self.upload_app_data_usages(params, app, usages_config)
-        puts("before usages")
+        # Delete all existing usages for new ones
         all_usages = Spaceship::ConnectAPI::AppDataUsage.all(app_id: app.id, includes: "category,grouping,purpose,dataProtection", limit: 500)
-        puts("all usages - #{all_usages.size}")
-        all_usages.each do |usage|
-          puts("about to delete")
-          usage.delete!
-        end
+        all_usages.each(&:delete!)
 
-        puts("trying to loop")
         usages_config.each do |usage_config|
           category = usage_config[:category]
           purposes = usage_config[:purposes] || []
           data_protections = usage_config[:data_protections] || []
 
+          # There will not be an purposes if "not collecting data"
+          # However, an AppDataUsage still needs to be created for not collecting data
+          # Creating an array with nil so that purposes can be iterated over and
+          # that AppDataUsage can be created
           purposes = [nil] if purposes.empty?
 
           purposes.each do |purpose|
@@ -133,17 +135,14 @@ module Fastlane
           end
         end
 
-        puts("about to publish")
-
         # Publish
         publish_state = Spaceship::ConnectAPI::AppDataUsagesPublishState.get(app_id: app.id)
         if publish_state.published
           UI.important("App data usage is already published")
         else
-          UI.important("App data usage not published!")
-          if UI.confirm("Do you want to publish these app data usages?")
-            publish_state.publish!
-          end
+          UI.important("App data usage not published! Going to publish...")
+          publish_state.publish!
+          UI.important("App data usage is now published")
         end
       end
 
@@ -237,13 +236,11 @@ module Fastlane
 
         [
           FastlaneCore::ConfigItem.new(key: :username,
-                                       short_option: "-u",
-                                       env_name: "APP_STORE_APP_DATA_USAGES_USERNAME",
+                                       env_name: "FASTLANE_USER",
                                        description: "Your Apple ID Username for App Store Connect",
                                        default_value: user,
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
-                                       short_option: "-a",
                                        env_name: "APP_STORE_APP_DATA_USAGES_APP_IDENTIFIER",
                                        description: "The bundle identifier of your app",
                                        optional: false,
@@ -251,31 +248,21 @@ module Fastlane
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :team_id,
-                                       short_option: "-k",
-                                       env_name: "APP_STORE_APP_DATA_USAGES_TEAM_ID",
+                                       env_name: "FASTLANE_ITC_TEAM_ID",
                                        description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
                                        is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         ENV["FASTLANE_ITC_TEAM_ID"] = value.to_s
-                                       end),
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :team_name,
-                                       short_option: "-e",
-                                       env_name: "APP_STORE_APP_DATA_USAGES_TEAM_NAME",
+                                       env_name: "FASTLANE_ITC_TEAM_NAME",
                                        description: "The name of your App Store Connect team if you're in multiple teams",
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         ENV["FASTLANE_ITC_TEAM_NAME"] = value.to_s
-                                       end),
-
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :json_path,
-                                       short_option: "-g",
                                        env_name: "APP_STORE_APP_DATA_USAGES_JSON_PATH",
                                        description: "Path to the app usage data JSON path",
                                        is_string: true,
@@ -286,7 +273,6 @@ module Fastlane
                                        end),
 
           FastlaneCore::ConfigItem.new(key: :output_json_path,
-                                       short_option: "-o",
                                        env_name: "APP_STORE_APP_DATA_USAGES_OUTPUT_JSON_PATH",
                                        description: "Path to the app usage data JSON path generated by interactive questions",
                                        is_string: true,
