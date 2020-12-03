@@ -112,9 +112,9 @@ module Fastlane
         all_usages.each(&:delete!)
 
         usages_config.each do |usage_config|
-          category = usage_config[:category]
-          purposes = usage_config[:purposes] || []
-          data_protections = usage_config[:data_protections] || []
+          category = usage_config["category"]
+          purposes = usage_config["purposes"] || []
+          data_protections = usage_config["data_protections"] || []
 
           # There will not be an purposes if "not collecting data"
           # However, an AppDataUsage still needs to be created for not collecting data
