@@ -81,7 +81,7 @@ module Deliver
       end
     end
 
-    # Returns the list of valid app screenshot
+    # Returns the list of valid app screenshot. When detecting invalid screenshots, this will cause an error.
     #
     # @param root [String] A directory path
     # @param ignore_validation [String] Set false not to raise the error when finding invalid folder name
