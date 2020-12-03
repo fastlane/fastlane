@@ -18,7 +18,7 @@ module Fastlane
           UI.user_error!("Could not find app with bundle identifier '#{params[:app_identifier]}' on account #{params[:username]}")
         end
 
-        # Attempt too load JSON file
+        # Attempt to load JSON file
         usages_config = load_json_file(params)
 
         # Start interactive questions to generate and save JSON file
@@ -116,7 +116,7 @@ module Fastlane
           purposes = usage_config["purposes"] || []
           data_protections = usage_config["data_protections"] || []
 
-          # There will not be an purposes if "not collecting data"
+          # There will not be any purposes if "not collecting data"
           # However, an AppDataUsage still needs to be created for not collecting data
           # Creating an array with nil so that purposes can be iterated over and
           # that AppDataUsage can be created
