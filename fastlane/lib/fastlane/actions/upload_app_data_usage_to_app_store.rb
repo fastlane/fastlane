@@ -294,12 +294,17 @@ module Fastlane
 
       def self.example_code
         [
-          # 'chatwork(
-          #   message: "App successfully released!",
-          #   roomid: 12345,
-          #   success: true,
-          #   api_token: "Your Token"
-          # )'
+          'upload_app_data_usage_to_app_store(
+            username: "your@email.com",
+            team_name: "Your Team”,
+            app_identifier: "com.your.bundle"
+          )',
+          'upload_app_data_usage_to_app_store(
+            username: "your@email.com",
+            team_name: "Your Team”,
+            app_identifier: "com.your.bundle",
+            json_path: "fastlane/app_data_usages.json"
+          )'
         ]
       end
 
