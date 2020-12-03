@@ -82,15 +82,12 @@ module Deliver
     # @param path (String) path to the screenshot file
     # @param language (String) Language of this screenshot (e.g. English)
     # @param screen_size (Deliver::AppScreenshot::ScreenSize) the screen size, which
-    #  will automatically be calculated when you don't set it.
+    #  will automatically be calculated when you don't set it. (Deperecated)
     def initialize(path, language, screen_size = nil)
+      UI.deprecated('screen_size param for Deliver::AppScreenshot.new is deperecated.') if screen_size
       self.path = path
       self.language = language
-      screen_size ||= self.class.calculate_screen_size(path)
-
-      self.screen_size = screen_size
-
-      UI.error("Looks like the screenshot given (#{path}) does not match the requirements of #{screen_size}") unless self.is_valid?
+      self.screen_size = screen_size || self.class.calculate_screen_size(path)
     end
 
     # The iTC API requires a different notation for the device
@@ -161,6 +158,7 @@ module Deliver
 
     # Validates the given screenshots (size and format)
     def is_valid?
+      UI.deprecated('Deliver::AppScreenshot#is_valid? is depereated in favor of Deliver::AppScreenshotValidator')
       return false unless ["png", "PNG", "jpg", "JPG", "jpeg", "JPEG"].include?(self.path.split(".").last)
 
       return self.screen_size == self.class.calculate_screen_size(self.path)
@@ -350,7 +348,7 @@ module Deliver
         end
       end
 
-      UI.user_error!("Unsupported screen size #{size} for path '#{path}'")
+      nil
     end
   end
 
