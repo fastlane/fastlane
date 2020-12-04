@@ -243,7 +243,7 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :skip_publish,
                                        env_name: "UPLOAD_APP_PRIVACY_DETAILS_TO_APP_STORE_OUTPUT_SKIP_PUBLISH",
-                                       description: "Whether to skip the publishing ",
+                                       description: "Whether to skip the publishing",
                                        type: Boolean,
                                        default_value: false)
         ]
