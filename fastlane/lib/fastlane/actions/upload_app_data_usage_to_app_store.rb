@@ -108,7 +108,7 @@ module Fastlane
 
           # Map answers to values for API requests
           protection_id = is_linked_to_user ? Spaceship::ConnectAPI::AppDataUsageDataProtection::ID::DATA_LINKED_TO_YOU : Spaceship::ConnectAPI::AppDataUsageDataProtection::ID::DATA_NOT_LINKED_TO_YOU
-          tracking_id = is_used_for_tracking ? Spaceship::ConnectAPI::AppDataUsageDataProtection::ID::DATA_NOT_LINKED_TO_YOU : nil
+          tracking_id = is_used_for_tracking ? Spaceship::ConnectAPI::AppDataUsageDataProtection::ID::DATA_USED_TO_TRACK_YOU : nil
 
           json << {
             "category" => category.id,
