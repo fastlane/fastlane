@@ -32,12 +32,16 @@ module Spaceship
       # API
       #
 
-      def self.all(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def self.all(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+        raise "app_id is required " if app_id.nil?
+
         resps = Spaceship::ConnectAPI.get_app_data_usages(app_id: app_id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
 
-      def self.create(app_id: nil, app_data_usage_category_id: nil, app_data_usage_protection_id: nil, app_data_usage_purpose_id: nil)
+      def self.create(app_id:, app_data_usage_category_id: nil, app_data_usage_protection_id: nil, app_data_usage_purpose_id: nil)
+        raise "app_id is required " if app_id.nil?
+
         resp = Spaceship::ConnectAPI.post_app_data_usage(
           app_id: app_id,
           app_data_usage_category_id: app_data_usage_category_id,

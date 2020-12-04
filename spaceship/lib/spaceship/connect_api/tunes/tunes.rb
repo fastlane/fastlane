@@ -209,7 +209,9 @@ module Spaceship
           tunes_request_client.get("apps/#{app_id}/dataUsages", params)
         end
 
-        def post_app_data_usage(app_id: nil, app_data_usage_category_id: nil, app_data_usage_protection_id: nil, app_data_usage_purpose_id: nil)
+        def post_app_data_usage(app_id:, app_data_usage_category_id: nil, app_data_usage_protection_id: nil, app_data_usage_purpose_id: nil)
+          raise "app_id is required " if app_id.nil?
+
           relationships = {
             app: {
               data: {

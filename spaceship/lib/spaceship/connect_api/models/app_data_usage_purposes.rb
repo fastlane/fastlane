@@ -10,6 +10,16 @@ module Spaceship
         "deleted" => "deleted"
       })
 
+      # Found at https://appstoreconnect.apple.com/iris/v1/appDataUsagePurposes
+      module ID
+        THIRD_PARTY_ADVERTISING = "THIRD_PARTY_ADVERTISING"
+        DEVELOPERS_ADVERTISING = "DEVELOPERS_ADVERTISING"
+        ANALYTICS = "ANALYTICS"
+        PRODUCT_PERSONALIZATION = "PRODUCT_PERSONALIZATION"
+        APP_FUNCTIONALITY = "APP_FUNCTIONALITY"
+        OTHER_PURPOSES = "OTHER_PURPOSES"
+      end
+
       def self.type
         return "appDataUsagePurposes"
       end

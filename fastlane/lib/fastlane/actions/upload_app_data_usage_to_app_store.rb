@@ -25,38 +25,46 @@ module Fastlane
         unless usages_config
           usages_config = ask_interactive_questions_for_json
 
-          json = JSON.pretty_generate(usages_config)
-          path = output_path(params)
+          if params[:skip_json_file_saving]
+            UI.message("Skipping JSON file saving...")
+          else
+            json = JSON.pretty_generate(usages_config)
+            path = output_path(params)
 
-          UI.message("Writing file to #{path}")
-          File.write(path, json)
+            UI.message("Writing file to #{path}")
+            File.write(path, json)
+          end
         end
 
         # Process JSON file to save app data usages to API
-        upload_app_data_usages(params, app, usages_config)
+        if params[:skip_upload]
+          UI.message("Skipping uploading of data... (so you can verify your JSON file)")
+        else
+          upload_app_data_usages(params, app, usages_config)
+        end
       end
 
       def self.load_json_file(params)
         path = params[:json_path]
         return nil if path.nil?
-        return nil unless File.exist?(path)
         return JSON.parse(File.read(path))
       end
 
       def self.output_path(params)
-        path = params[:output_json_path] || DEFAULT_PATH
-        path = File.absolute_path(path)
-        return File.join(path, DEFAULT_FILE_NAME)
+        path = params[:output_json_path]
+        return File.absolute_path(path)
       end
 
-      def self.ask_interactive_questions_for_json
-        UI.important("You did not provide a JSON file for updating the app data usages")
-        UI.important("fastlane will now run you through interactive question to generate the JSON file")
-        UI.important("")
-        UI.important("This JSON file can be saved in source control and used in this action with the :json_file option")
+      def self.ask_interactive_questions_for_json(show_intro = true)
+        if show_intro
+          UI.important("You did not provide a JSON file for updating the app data usages")
+          UI.important("fastlane will now run you through interactive question to generate the JSON file")
+          UI.important("")
+          UI.important("This JSON file can be saved in source control and used in this action with the :json_file option")
 
-        unless UI.confirm("Ready to start?")
-          UI.user_error!("Cancelled")
+          unless UI.confirm("Ready to start?")
+            UI.user_error!("Cancelled")
+          end
         end
 
         # Fetch categories and purposes used for generating interactive questions
@@ -67,7 +75,7 @@ module Fastlane
 
         unless UI.confirm("Are you collecting data?")
           json << {
-            "data_protections" => ["DATA_NOT_COLLECTED"]
+            "data_protections" => [Spaceship::ConnectAPI::AppDataUsageDataProtection::ID::DATA_NOT_COLLECTED]
           }
 
           return json
@@ -82,17 +90,25 @@ module Fastlane
 
           # Ask purposes
           selected_purposes = []
-          purposes.each do |purpose|
-            selected_purposes << purpose if UI.confirm("Used for #{purpose.id}?")
+          loop do
+            purposes.each do |purpose|
+              selected_purposes << purpose if UI.confirm("Used for #{purpose.id}?")
+            end
+
+            break unless selected_purposes.empty?
+            break unless UI.confirm("No purposes selected. Do you want to try again?")
           end
+
+          # Skip asking protetions if purposes were skipped
+          next if selected_purposes.empty?
 
           # Ask protections
           is_linked_to_user = UI.confirm("Is #{category.id} linked to the user?")
           is_used_for_tracking = UI.confirm("Is #{category.id} used for tracking purposes?")
 
           # Map answers to values for API requests
-          protection_id = is_linked_to_user ? "DATA_LINKED_TO_YOU" : "DATA_NOT_LINKED_TO_YOU"
-          tracking_id = is_used_for_tracking ? "DATA_USED_TO_TRACK_YOU" : nil
+          protection_id = is_linked_to_user ? Spaceship::ConnectAPI::AppDataUsageDataProtection::ID::DATA_LINKED_TO_YOU : Spaceship::ConnectAPI::AppDataUsageDataProtection::ID::DATA_NOT_LINKED_TO_YOU
+          tracking_id = is_used_for_tracking ? Spaceship::ConnectAPI::AppDataUsageDataProtection::ID::DATA_NOT_LINKED_TO_YOU : nil
 
           json << {
             "category" => category.id,
@@ -103,10 +119,18 @@ module Fastlane
           }
         end
 
+        # Recursively call this method if no categories were selected for data collection
+        if json.empty?
+          UI.error("No categories were selected for data collection.")
+          json = ask_interactive_questions_for_json(false)
+        end
+
         return json
       end
 
       def self.upload_app_data_usages(params, app, usages_config)
+        UI.message("Preparing to upload App Data Usage")
+
         # Delete all existing usages for new ones
         all_usages = Spaceship::ConnectAPI::AppDataUsage.all(app_id: app.id, includes: "category,grouping,purpose,dataProtection", limit: 500)
         all_usages.each(&:delete!)
@@ -124,7 +148,12 @@ module Fastlane
 
           purposes.each do |purpose|
             data_protections.each do |data_protection|
-              UI.message("Setting #{category} and #{purpose} to #{data_protection}")
+              if data_protection == Spaceship::ConnectAPI::AppDataUsageDataProtection::ID::DATA_NOT_COLLECTED
+                UI.message("Setting #{data_protection}")
+              else
+                UI.message("Setting #{category} and #{purpose} to #{data_protection}")
+              end
+
               Spaceship::ConnectAPI::AppDataUsage.create(
                 app_id: app.id,
                 app_data_usage_category_id: category,
@@ -136,92 +165,16 @@ module Fastlane
         end
 
         # Publish
-        publish_state = Spaceship::ConnectAPI::AppDataUsagesPublishState.get(app_id: app.id)
-        if publish_state.published
-          UI.important("App data usage is already published")
+        if params[:skip_publish]
+          UI.message("Skipping app data usage publishing... (so you can verify on App Store Connect)")
         else
-          UI.important("App data usage not published! Going to publish...")
-          publish_state.publish!
-          UI.important("App data usage is now published")
-        end
-      end
-
-      def self.ask_interactive_questions(app)
-        categories = Spaceship::ConnectAPI::AppDataUsageCategory.all(includes: "grouping")
-        purposes = Spaceship::ConnectAPI::AppDataUsagePurpose.all
-        all_usages = Spaceship::ConnectAPI::AppDataUsage.all(app_id: app.id, includes: "category,grouping,purpose,dataProtection", limit: 500)
-
-        not_collected_usage = all_usages.find(&:is_not_collected?)
-
-        usages = all_usages.reject(&:is_not_collected?).sort do |a, b|
-          a.category.id <=> b.category.id
-        end
-
-        usage_categories = usages.map { |u| u.category.id }
-
-        if not_collected_usage
-          UI.important("Not collecting any data")
-        elsif !usage_categories.empty?
-          UI.important("Currently using categories: #{usage_categories.uniq.join(', ')}")
-        end
-
-        if not_collected_usage.nil?
-          if UI.confirm("Turn off data collection?")
-            usages.each(&:delete!)
-
-            Spaceship::ConnectAPI::AppDataUsage.create(app_id: app.id, app_data_usage_protection_id: "DATA_NOT_COLLECTED")
-
-            return
-          end
-        end
-
-        if UI.confirm("Add collection categories?")
-          not_collected_usage.delete! if not_collected_usage
-
-          categories.each do |category|
-            next if usage_categories.include?(category.id)
-
-            next unless UI.confirm("Collect data for #{category.id}?")
-
-            purpose_names = purposes.map(&:id).join(', ')
-            UI.message("How will this data be used? You'll be offered with #{purpose_names}")
-
-            selected_purposes = []
-            purposes.each do |purpose|
-              selected_purposes << purpose if UI.confirm("Used for #{purpose.id}?")
-            end
-
-            is_linked_to_user = UI.confirm("Is #{category.id} linked to the user?")
-            is_used_for_tracking = UI.confirm("Is #{category.id} used for tracking purposes?")
-
-            protection_id = is_linked_to_user ? "DATA_LINKED_TO_YOU" : "DATA_NOT_LINKED_TO_YOU"
-
-            selected_purposes.each do |purpose|
-              Spaceship::ConnectAPI::AppDataUsage.create(
-                app_id: app.id,
-                app_data_usage_category_id: category.id,
-                app_data_usage_protection_id: protection_id,
-                app_data_usage_purpose_id: purpose.id
-              )
-
-              next unless is_used_for_tracking
-              Spaceship::ConnectAPI::AppDataUsage.create(
-                app_id: app.id,
-                app_data_usage_category_id: category.id,
-                app_data_usage_protection_id: "DATA_USED_TO_TRACK_YOU",
-                app_data_usage_purpose_id: purpose.id
-              )
-            end
-          end
-        end
-
-        publish_state = Spaceship::ConnectAPI::AppDataUsagesPublishState.get(app_id: app.id)
-        if publish_state.published
-          UI.important("App data usage is already published")
-        else
-          UI.important("App data usage not published!")
-          if UI.confirm("Do you want to publish these app data usages?")
+          publish_state = Spaceship::ConnectAPI::AppDataUsagesPublishState.get(app_id: app.id)
+          if publish_state.published
+            UI.important("App data usage is already published")
+          else
+            UI.important("App data usage not published! Going to publish...")
             publish_state.publish!
+            UI.important("App data usage is now published")
           end
         end
       end
@@ -241,9 +194,8 @@ module Fastlane
                                        default_value: user,
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
-                                       env_name: "APP_STORE_APP_DATA_USAGES_APP_IDENTIFIER",
+                                       env_name: "UPLOAD_APP_DATA_USAGE_TO_APP_STORE_APP_IDENTIFIER",
                                        description: "The bundle identifier of your app",
-                                       optional: false,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
                                        default_value_dynamic: true),
@@ -262,8 +214,10 @@ module Fastlane
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
                                        default_value_dynamic: true),
+
+          # JSON paths
           FastlaneCore::ConfigItem.new(key: :json_path,
-                                       env_name: "APP_STORE_APP_DATA_USAGES_JSON_PATH",
+                                       env_name: "UPLOAD_APP_DATA_USAGE_TO_APP_STORE_JSON_PATH",
                                        description: "Path to the app usage data JSON path",
                                        is_string: true,
                                        optional: true,
@@ -271,12 +225,27 @@ module Fastlane
                                          UI.user_error!("Could not find JSON file at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                          UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
                                        end),
-
           FastlaneCore::ConfigItem.new(key: :output_json_path,
-                                       env_name: "APP_STORE_APP_DATA_USAGES_OUTPUT_JSON_PATH",
-                                       description: "Path to the app usage data JSON path generated by interactive questions",
-                                       is_string: true,
-                                       optional: true)
+                                       env_name: "UPLOAD_APP_DATA_USAGE_TO_APP_STORE_OUTPUT_JSON_PATH",
+                                       description: "Path to the app usage data JSON file generated by interactive questions",
+                                       default_value: File.join(DEFAULT_PATH, DEFAULT_FILE_NAME)),
+
+          # Skipping options
+          FastlaneCore::ConfigItem.new(key: :skip_json_file_saving,
+                                       env_name: "UPLOAD_APP_DATA_USAGE_TO_APP_STORE_OUTPUT_SKIP_JSON_FILE_SAVING",
+                                       description: "Whether to skip the saving of the JSON file ()",
+                                       type: Boolean,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :skip_upload,
+                                       env_name: "UPLOAD_APP_DATA_USAGE_TO_APP_STORE_OUTPUT_SKIP_UPLOAD",
+                                       description: "Whether to skip the upload and only create the JSON file with interactive questions",
+                                       type: Boolean,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :skip_publish,
+                                       env_name: "UPLOAD_APP_DATA_USAGE_TO_APP_STORE_OUTPUT_SKIP_PUBLISH",
+                                       description: "Whether to skip the publishing ",
+                                       type: Boolean,
+                                       default_value: false)
         ]
       end
 
