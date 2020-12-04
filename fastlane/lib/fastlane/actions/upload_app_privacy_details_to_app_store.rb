@@ -99,7 +99,7 @@ module Fastlane
             break unless UI.confirm("No purposes selected. Do you want to try again?")
           end
 
-          # Skip asking protetions if purposes were skipped
+          # Skip asking protections if purposes were skipped
           next if selected_purposes.empty?
 
           # Ask protections
