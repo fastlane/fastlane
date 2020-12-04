@@ -218,7 +218,7 @@ module Fastlane
           # JSON paths
           FastlaneCore::ConfigItem.new(key: :json_path,
                                        env_name: "UPLOAD_APP_PRIVACY_DETAILS_TO_APP_STORE_JSON_PATH",
-                                       description: "Path to the app usage data JSON path",
+                                       description: "Path to the app usage data JSON",
                                        is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
