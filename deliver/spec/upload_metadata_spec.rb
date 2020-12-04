@@ -439,6 +439,18 @@ describe Deliver::UploadMetadata do
 
         expect(languages.sort).to eql(['de-DE', 'el', 'en-US'])
       end
+
+      it "languages are 'en-US', 'default'" do
+        options[:languages] = []
+
+        create_filesystem_language('default')
+        create_filesystem_language('en-US')
+
+        uploader.load_from_filesystem(options)
+        languages = uploader.detect_languages(options)
+
+        expect(languages.sort).to eql(['default', 'en-US'])
+      end
     end
 
     context "detected languages with only config options" do
@@ -465,6 +477,24 @@ describe Deliver::UploadMetadata do
         languages = uploader.detect_languages(options)
 
         expect(languages.sort).to eql(['default', 'es-MX'])
+      end
+    end
+
+    context 'detect languages with file system with default folder' do
+      it "languages are 'en-US', 'default'" do
+        options[:languages] = []
+
+        create_filesystem_language('default')
+        create_filesystem_language('en-US')
+        create_metadata(
+          File.join(tmpdir, 'default', "#{Deliver::UploadMetadata::LOCALISED_VERSION_VALUES[:description]}.txt"),
+          'something'
+        )
+
+        uploader.load_from_filesystem(options)
+        languages = uploader.detect_languages(options)
+
+        expect(languages.sort).to eql(['default', 'en-US'])
       end
     end
 
