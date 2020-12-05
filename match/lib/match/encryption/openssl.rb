@@ -52,7 +52,7 @@ module Match
             UI.error("Couldn't decrypt the repo, please make sure you enter the right password!")
             UI.user_error!("Invalid password passed via 'MATCH_PASSWORD'") if ENV["MATCH_PASSWORD"]
             clear_password
-            self.decrypt_files
+            self.decrypt_files # Call itself
             return
           end
           UI.success("🔓  Decrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
