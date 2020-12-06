@@ -5,6 +5,7 @@ module Fastlane
         command = []
         command << "curl"
         command << verbose(params)
+        command << "--fail"
         command += ssl_options(params)
         command += proxy_options(params)
         command += upload_options(params)
