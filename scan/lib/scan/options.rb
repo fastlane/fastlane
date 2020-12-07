@@ -11,7 +11,7 @@ module Scan
     end
 
     def self.available_options
-      containing = FastlaneCore::Helper.fastlane_enabled_folder_path
+      containing = FastlaneCore::Helper.fastlane_enabled_folder_path || "."
 
       [
         # app to test
