@@ -366,7 +366,7 @@ lane :validate_docs do
   end
 
   # Verify docs are still working
-  verify_docs
+  verify_docs if git_branch == "master"
 end
 
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
