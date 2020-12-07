@@ -365,14 +365,8 @@ lane :validate_docs do
     generate_markdown_docs(target_path: ".")
   end
 
-  # Verify docs are still working but only if on master
-  # fastlane/docs are tied direclty to fastlane/fastlane master
-  # so it doesn't make esnse to test them on another branch
-  if git_branch == "master"
-    verify_docs
-  else
-    UI.message("Skipping testing of `veryify_docs` because not on master")
-  end
+  # Verify docs are still working
+  verify_docs
 end
 
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
