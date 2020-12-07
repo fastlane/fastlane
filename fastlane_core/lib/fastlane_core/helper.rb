@@ -14,7 +14,7 @@ module FastlaneCore
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @enabled = !FastlaneCore::FastlaneFolder.path.nil? if @enabled.nil?
+      !FastlaneCore::FastlaneFolder.path.nil?
     end
 
     # Checks if fastlane is enabled for this project and returns the folder where the configuration lives
