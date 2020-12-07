@@ -210,5 +210,17 @@ describe FastlaneCore do
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: true, print: false)
       end
     end
+
+    describe "#fastlane_enabled?" do
+      it "returns false when FastlaneCore::FastlaneFolder.path is nil" do
+        expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+        expect(FastlaneCore::Helper.fastlane_enabled?).to be(false)
+      end
+
+      it "returns true when FastlaneCore::FastlaneFolder.path is not nil" do
+        expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return('./fastlane')
+        expect(FastlaneCore::Helper.fastlane_enabled?).to be(true)
+      end
+    end
   end
 end
