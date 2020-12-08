@@ -185,7 +185,7 @@ module Fastlane
         FileUtils.cp(current_asset_path, File.join(docs_dir, "img", "actions", File.basename(current_asset_path)))
       end
 
-      UI.success("Generated new docs on path #{target_path}")
+      UI.success("Generated new docs files (actions.md, actions/*.md, mkdocs.yml, assets) on path #{target_path}")
     end
 
     private

@@ -180,7 +180,9 @@ jobs:
       - *cache_save_bundler
       - run: bundle exec fastlane generate_swift_api
 
-  "Validate Documentation":
+  "Validate docs generation":
+    environment:
+      FASTLANE_DOCS_CLONE_PATH: /tmp/validated_docs
     docker:
       - image: circleci/ruby:2.4
     steps:
@@ -200,7 +202,10 @@ jobs:
 
       - run: bundle exec fastlane validate_docs
 
-  "Lint Source Code":
+      - store_artifacts:
+          path: /tmp/validated_docs
+
+  "Lint source code":
     docker:
       - image: circleci/ruby:2.5
     steps:
@@ -247,11 +252,8 @@ workflows:
       - 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)'
       - 'Execute tests on Ubuntu'
 
+      - "Validate docs generation"
       - "Validate Fastlane.swift Generation"
-      - "Validate Documentation"
-
-      - "Lint Source Code"
+      - "Lint source code"
 
       - "Execute modules load up tests"
-
-...
