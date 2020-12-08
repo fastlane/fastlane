@@ -52,6 +52,11 @@ module Scan
       end
 
       command = @test_command_generator.generate
+
+      execute(command: command, devices: Scan.devices)
+    end
+
+    def execute(retries = 0, command: nil, devices: nil)
       prefix_hash = [
         {
           prefix: "Running Tests: ",
@@ -79,7 +84,18 @@ module Scan
                                                   raise ex
                                                 end
                                               end)
+
       exit_status
+    end
+
+    def retry_tests(retries, command, language, locale, launch_args, devices)
+      UI.important("Retrying on devices: #{devices.join(', ')}")
+      UI.important("Number of retries remaining: #{launcher_config.number_of_retries - retries - 1}")
+
+      # Clear errors so a successful retry isn't reported as an over failure
+      self.collected_errors = []
+
+      execute(retries + 1, command: command, devices: devices)
     end
 
     def handle_results(tests_exit_status)
