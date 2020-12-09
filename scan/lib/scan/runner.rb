@@ -76,7 +76,12 @@ module Scan
                                               error: proc do |error_output|
                                                 begin
                                                   exit_status = $?.exitstatus
-                                                  ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
+                                                  if retries < Scan.config[:number_of_retries]
+                                                    # If there are retries remaining, run the tests again
+                                                    retry_tests(retries, command)
+                                                  else
+                                                    ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
+                                                  end
                                                 rescue => ex
                                                   SlackPoster.new.run({
                                                     build_errors: 1
@@ -88,14 +93,10 @@ module Scan
       exit_status
     end
 
-    def retry_tests(retries, command, language, locale, launch_args, devices)
-      UI.important("Retrying on devices: #{devices.join(', ')}")
-      UI.important("Number of retries remaining: #{launcher_config.number_of_retries - retries - 1}")
+    def retry_tests(retries, command)
+      UI.important("Number of retries remaining: #{Scan.config[:number_of_retries] - retries - 1}")
 
-      # Clear errors so a successful retry isn't reported as an over failure
-      self.collected_errors = []
-
-      execute(retries + 1, command: command, devices: devices)
+      execute(retries + 1, command: command)
     end
 
     def handle_results(tests_exit_status)
