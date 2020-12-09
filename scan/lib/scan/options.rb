@@ -481,7 +481,7 @@ module Scan
                                     env_name: 'SCAN_NUMBER_OF_RETRIES',
                                     description: "The number of times a test can fail before scan should stop retrying",
                                     type: Integer,
-                                    default_value: 1),
+                                    default_value: 0),
 
       ]
     end
