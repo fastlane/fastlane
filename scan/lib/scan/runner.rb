@@ -78,7 +78,7 @@ module Scan
                                                   exit_status = $?.exitstatus
                                                   if retries < Scan.config[:number_of_retries]
                                                     # If there are retries remaining, run the tests again
-                                                    retry_tests(retries, command)
+                                                    return retry_tests(retries, command)
                                                   else
                                                     ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
                                                   end
