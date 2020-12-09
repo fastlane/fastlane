@@ -78,7 +78,9 @@ module Scan
                                                   exit_status = $?.exitstatus
                                                   if retries < Scan.config[:number_of_retries]
                                                     # If there are retries remaining, run the tests again
-                                                    return retry_tests(retries, command)
+                                                    Scan.config[:only_testing] = retryable_tests(error_output)
+                                                    UI.important("Retrying tests: #{Scan.config[:only_testing]}")
+                                                    return retry_tests(retries, @test_command_generator.generate)
                                                   else
                                                     ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
                                                   end
@@ -91,6 +93,28 @@ module Scan
                                               end)
 
       exit_status
+    end
+
+    def retryable_tests(input)
+      input = Helper.strip_ansi_colors(input)
+      
+      retryable_tests = []
+  
+      suites = input.match(/Test Suite ([\w\s]+)\.xctest started/).captures
+      for suite in suites
+        executed_tests = input.split("Test Suite #{suite}\.xctest started\n")[1]
+        test_class = executed_tests.split("\n")[0]
+
+        prefix = "#{suite}/#{test_class}/"
+        failing_tests = executed_tests.split("\n\n")[0].split("\n")
+          .select { |line| line.start_with? /\s*✗/ }
+          .map { |line| line.match(/\s*✗\s*(\w+)/).captures[0]  }
+          .map { |test_case| prefix + test_case }
+
+        retryable_tests += failing_tests
+      end
+  
+      retryable_tests
     end
 
     def retry_tests(retries, command)
