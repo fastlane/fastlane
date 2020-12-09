@@ -97,23 +97,23 @@ module Scan
 
     def retryable_tests(input)
       input = Helper.strip_ansi_colors(input)
-      
+
       retryable_tests = []
-  
+
       suites = input.match(/Test Suite ([\w\s]+)\.xctest started/).captures
-      for suite in suites
+      suites.each do |suite|
         executed_tests = input.split("Test Suite #{suite}\.xctest started\n")[1]
         test_class = executed_tests.split("\n")[0]
 
         prefix = "#{suite}/#{test_class}/"
         failing_tests = executed_tests.split("\n\n")[0].split("\n")
-          .select { |line| line.start_with? /\s*✗/ }
-          .map { |line| line.match(/\s*✗\s*(\w+)/).captures[0]  }
-          .map { |test_case| prefix + test_case }
+                                      .select { |line| line.start_with?(/\s*✗/) }
+                                      .map { |line| line.match(/\s*✗\s*(\w+)/).captures[0] }
+                                      .map { |test_case| prefix + test_case }
 
         retryable_tests += failing_tests
       end
-  
+
       retryable_tests
     end
 
