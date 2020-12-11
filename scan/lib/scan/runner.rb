@@ -100,21 +100,22 @@ module Scan
 
       retryable_tests = []
 
-      suites = input.match(/Test Suite ([\w\s]+)\.xctest started/).captures
+      failing_tests = input.split("Failing tests:\n")[1]
+      suites = failing_tests.split(/\n {8}(?=\w)/)
+        .map { |string| string.split("\n\n")[0] }
+
       suites.each do |suite|
-        executed_tests = input.split("Test Suite #{suite}\.xctest started\n")[1]
-        test_class = executed_tests.split("\n")[0]
-
-        prefix = "#{suite}/#{test_class}/"
-        failing_tests = executed_tests.split("\n\n")[0].split("\n")
-                                      .select { |line| line.start_with?(/\s*✗/) }
-                                      .map { |line| line.match(/\s*✗\s*(\w+)/).captures[0] }
-                                      .map { |test_case| prefix + test_case }
-
-        retryable_tests += failing_tests
+        suite_name = suite.match(/\s*([\w\s]+):/).captures[0]
+    
+        test_cases = suite.split(":\n")[1].split("\n").each
+            .select { |line| line.start_with?(/\s+/) }
+            .map { |line| line.strip.gsub(".", "/").gsub("()", "") }
+            .map { |line| suite_name + "/" + line }
+    
+        retryable_tests += test_cases
       end
 
-      retryable_tests
+      retryable_tests.uniq
     end
 
     def retry_tests(retries, command)
