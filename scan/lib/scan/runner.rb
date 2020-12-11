@@ -101,8 +101,9 @@ module Scan
       retryable_tests = []
 
       failing_tests = input.split("Failing tests:\n")[1]
-      suites = failing_tests.split(/\n {8}(?=\w)/)
-                            .map { |string| string.split("\n\n")[0] }
+                           .split("\n\n")[0]
+
+      suites = failing_tests.split(/(?=\n\s+[\w\s]+:\n)/)
 
       suites.each do |suite|
         suite_name = suite.match(/\s*([\w\s]+):/).captures[0]
