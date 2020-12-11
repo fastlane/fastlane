@@ -102,16 +102,16 @@ module Scan
 
       failing_tests = input.split("Failing tests:\n")[1]
       suites = failing_tests.split(/\n {8}(?=\w)/)
-        .map { |string| string.split("\n\n")[0] }
+                            .map { |string| string.split("\n\n")[0] }
 
       suites.each do |suite|
         suite_name = suite.match(/\s*([\w\s]+):/).captures[0]
-    
+
         test_cases = suite.split(":\n")[1].split("\n").each
-            .select { |line| line.start_with?(/\s+/) }
-            .map { |line| line.strip.gsub(".", "/").gsub("()", "") }
-            .map { |line| suite_name + "/" + line }
-    
+                          .select { |line| line.start_with?(/\s+/) }
+                          .map { |line| line.strip.gsub(".", "/").gsub("()", "") }
+                          .map { |line| suite_name + "/" + line }
+
         retryable_tests += test_cases
       end
 
