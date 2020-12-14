@@ -38,7 +38,7 @@ describe Fastlane do
       it "allows you to not include the current lane in the tag and message" do
         result = Fastlane::FastFile.new.parse("lane :test do
           add_git_tag ({
-            includes_lane_in_tag: false,
+            includes_lane: false,
           })
         end").runner.execute(:test)
 

@@ -10,7 +10,7 @@ module Fastlane
           tag = options[:tag]
         elsif options[:build_number]
           tag_components = [options[:grouping]]
-          tag_components << lane_name if options[:includes_lane_in_tag]
+          tag_components << lane_name if options[:includes_lane]
           tag_components << "#{options[:prefix]}#{options[:build_number]}#{options[:postfix]}"
           tag = tag_components.join('/')
         else
@@ -37,7 +37,7 @@ module Fastlane
       def self.details
         list = <<-LIST.markdown_list
           `grouping` is just to keep your tags organised under one 'folder', defaults to 'builds'
-          `lane` is the name of the current fastlane lane, if chosen to be included via 'includes_lane_in_tag' option, which defaults to 'true'
+          `lane` is the name of the current fastlane lane, if chosen to be included via 'includes_lane' option, which defaults to 'true'
           `prefix` is anything you want to stick in front of the version number, e.g. 'v'
           `postfix` is anything you want to stick at the end of the version number, e.g. '-RC1'
           `build_number` is the build number, which defaults to the value emitted by the `increment_build_number` action
@@ -60,9 +60,9 @@ module Fastlane
                                        env_name: "FL_GIT_TAG_GROUPING",
                                        description: "Is used to keep your tags organised under one 'folder'",
                                        default_value: 'builds'),
-          FastlaneCore::ConfigItem.new(key: :includes_lane_in_tag,
-                                       env_name: "FL_GIT_TAG_INCLUDES_LANE_IN_TAG",
-                                       description: "Whether the current lane should be included in the tag composition, e.g. '<grouping>/<lane>/<prefix><build_number><postfix>'",
+          FastlaneCore::ConfigItem.new(key: :includes_lane,
+                                       env_name: "FL_GIT_TAG_INCLUDES_LANE",
+                                       description: "Whether the current lane should be included in the tag and message composition, e.g. '<grouping>/<lane>/<prefix><build_number><postfix>'",
                                        is_string: false,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :prefix,
@@ -110,7 +110,7 @@ module Fastlane
           'add_git_tag # simple tag with default values',
           'add_git_tag(
             grouping: "fastlane-builds",
-            includes_lane_in_tag: true,
+            includes_lane: true,
             prefix: "v",
             postfix: "-RC1",
             build_number: 123
