@@ -11,7 +11,7 @@ module Fastlane
         cmd << "--disable-sandbox" if params[:disable_sandbox]
         cmd << "--verbose" if params[:verbose]
         cmd << params[:command] if package_commands.include?(params[:command])
-        cmd << "--enable-code-coverage" if params[:enable_code_coverage] && params[:command] == 'generate-xcodeproj'
+        cmd << "--enable-code-coverage" if params[:enable_code_coverage] && (params[:command] == 'generate-xcodeproj' || params[:command] == 'test')
         if params[:xcconfig]
           cmd << "--xcconfig-overrides #{params[:xcconfig]}"
         end
@@ -47,7 +47,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :enable_code_coverage,
                                        env_name: "FL_SPM_ENABLE_CODE_COVERAGE",
-                                       description: "Enables code coverage for the generated Xcode project when using the generate-xcodeproj command",
+                                       description: "Enables code coverage for the test command and the generated Xcode project when using the generate-xcodeproj command",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :build_path,
