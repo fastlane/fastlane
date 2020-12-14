@@ -35,6 +35,18 @@ describe Fastlane do
         expect(result).to eq("git tag -am #{message.shellescape} #{tag.shellescape}")
       end
 
+      it "allows you to not include the current lane in the tag and message" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          add_git_tag ({
+            includes_lane_in_tag: false,
+          })
+        end").runner.execute(:test)
+
+        message = "builds/#{build_number} (fastlane)"
+        tag = "builds/#{build_number}"
+        expect(result).to eq("git tag -am #{message.shellescape} #{tag.shellescape}")
+      end
+
       it "allows you to specify a prefix" do
         prefix = '16309-'
 
