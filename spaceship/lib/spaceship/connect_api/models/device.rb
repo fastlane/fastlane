@@ -54,8 +54,26 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
+      # @param client [ConnectAPI] ConnectAPI client.
+      # @param platform [String] The platform of the device.
+      # @param include_disabled [Bool] Whether to include disable devices. false by default.
+      # @return (Device) Find a device based on the UDID of the device. nil if no device was found.
+      def self.find_by_udid(device_udid, client: nil, platform: nil, include_disabled: false)
+        self.all(client: client).find do |device|
+          device.udid.casecmp(device_udid) == 0 && (include_disabled ? true : device.enabled?)
+        end
+      end
+
       def self.create(client: nil, name: nil, platform: nil, udid: nil)
         client ||= Spaceship::ConnectAPI
+        
+        # Find the device by UDID and return it in case it already exists
+        existing = self.find_by_udid(udid, client: client, platform: platform)
+        if existing
+          UI.verbose("UDID '#{udid}' already exists - Skipping its creation...")
+          return existing
+        end
+
         resp = client.post_device(name: name, platform: platform, udid: udid)
         return resp.to_models.first
       end
