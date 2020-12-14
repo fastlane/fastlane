@@ -2,14 +2,14 @@ require 'fastimage'
 
 module Deliver
   class AppScreenshotValidator
-    # A simple structure that holds error information as well as format error message consistently
-    # Set `true` to `to_skip` when just needing to skip uploading rather than causing a crash.
+    # A simple structure that holds error information as well as formatted error messages consistently
+    # Set `to_skip` to `true` when just needing to skip uploading rather than causing a crash.
     class ValidationError
       # Constants that can be given to `type` param
       INVALID_SCREEN_SIZE = 'Invalid screen size'.freeze
       UNACCEPTABLE_DEVICE = 'Not an accepted App Store Connect device'.freeze
       INVALID_FILE_EXTENSION = 'Invalid file extension'.freeze
-      FILE_EXTENSION_MISMATCH = 'File extension mistmaches its image format'.freeze
+      FILE_EXTENSION_MISMATCH = 'File extension mismatches its image format'.freeze
 
       attr_reader :type, :path, :debug_info, :to_skip
 
@@ -32,8 +32,8 @@ module Deliver
     # Access each array by symbol returned from FastImage.type
     ALLOWED_SCREENSHOT_FILE_EXTENSION = { png: ['png', 'PNG'], jpeg: ['jpg', 'JPG', 'jpeg', 'JPEG'] }.freeze
 
-    # Validate a screenshot and inform an error message via `errors` parameters. `errors` is mutated
-    # to append the messages and each message should contain the corresponding path to let users know which file gets the error.
+    # Validate a screenshot and inform an error message via `errors` parameter. `errors` is mutated
+    # to append the messages and each message should contain the corresponding path to let users know which file is throwing the error.
     #
     # @param screenshot [AppScreenshot]
     # @param errors [Array<Deliver::AppScreenshotValidator::ValidationError>] Pass an array object to add validation errors when detecting errors
@@ -83,11 +83,11 @@ module Deliver
       end
 
       format = FastImage.type(screenshot.path)
-      is_extension_macthed = ALLOWED_SCREENSHOT_FILE_EXTENSION[format] &&
+      is_extension_matched = ALLOWED_SCREENSHOT_FILE_EXTENSION[format] &&
                              ALLOWED_SCREENSHOT_FILE_EXTENSION[format].include?(extension)
 
       # This error only appears when file extension is valid
-      if is_valid_extension && !is_extension_macthed
+      if is_valid_extension && !is_extension_matched
         errors_found << ValidationError.new(type: ValidationError::FILE_EXTENSION_MISMATCH,
                                             path: screenshot.path,
                                             debug_info: "Actual format is #{format}")

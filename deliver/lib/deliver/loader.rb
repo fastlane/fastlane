@@ -111,9 +111,9 @@ module Deliver
       end
 
       unless errors_to_crash.empty?
-        UI.important("🚫 Invalid screenshots are detected! Here's the reasons.")
+        UI.important("🚫 Invalid screenshots were detected! Here are the reasons:")
         errors_to_crash.each { |error| UI.error(error) }
-        UI.user_error!("Canceled uploading screenshot. Please check above error messages and correct screenshots.")
+        UI.user_error!("Canceled uploading screenshots. Please check the error messages above and fix the screenshots.")
       end
 
       valid_screenshots

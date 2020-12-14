@@ -82,7 +82,7 @@ module Deliver
     # @param path (String) path to the screenshot file
     # @param language (String) Language of this screenshot (e.g. English)
     # @param screen_size (Deliver::AppScreenshot::ScreenSize) the screen size, which
-    #  will automatically be calculated when you don't set it. (Deperecated)
+    #  will automatically be calculated when you don't set it. (Deprecated)
     def initialize(path, language, screen_size = nil)
       UI.deprecated('screen_size param for Deliver::AppScreenshot.new is deperecated.') if screen_size
       self.path = path
@@ -158,7 +158,7 @@ module Deliver
 
     # Validates the given screenshots (size and format)
     def is_valid?
-      UI.deprecated('Deliver::AppScreenshot#is_valid? is depereated in favor of Deliver::AppScreenshotValidator')
+      UI.deprecated('Deliver::AppScreenshot#is_valid? is deprecated in favor of Deliver::AppScreenshotValidator')
       return false unless ["png", "PNG", "jpg", "JPG", "jpeg", "JPEG"].include?(self.path.split(".").last)
 
       return self.screen_size == self.class.calculate_screen_size(self.path)
