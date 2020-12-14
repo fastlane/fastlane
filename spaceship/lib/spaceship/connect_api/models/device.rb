@@ -66,7 +66,7 @@ module Spaceship
 
       def self.create(client: nil, name: nil, platform: nil, udid: nil)
         client ||= Spaceship::ConnectAPI
-        
+
         # Find the device by UDID and return it in case it already exists
         existing = self.find_by_udid(udid, client: client, platform: platform)
         if existing
