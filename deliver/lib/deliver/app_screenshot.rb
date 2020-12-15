@@ -84,7 +84,7 @@ module Deliver
     # @param screen_size (Deliver::AppScreenshot::ScreenSize) the screen size, which
     #  will automatically be calculated when you don't set it. (Deprecated)
     def initialize(path, language, screen_size = nil)
-      UI.deprecated('`screen_size` for Deliver::AppScreenshot.new is deperecated in favor of the default behavior to calculate size automatically. Passed value is no longer validated.') if screen_size
+      UI.deprecated('`screen_size` for Deliver::AppScreenshot.new is deprecated in favor of the default behavior to calculate size automatically. Passed value is no longer validated.') if screen_size
       self.path = path
       self.language = language
       self.screen_size = screen_size || self.class.calculate_screen_size(path)
