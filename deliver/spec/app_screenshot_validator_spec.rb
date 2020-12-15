@@ -60,4 +60,13 @@ describe Deliver::AppScreenshotValidator do
       expect(error.to_skip).to be(true)
     end
   end
+
+  describe '.validate_file_extension_and_format' do
+    it 'should provide ideal filename to match content format' do
+      errors_found = []
+      described_class.validate(app_screenshot_with(ScreenSize::IOS_65, :png, 'image.jpeg'), errors_found)
+      error = errors_found.find { |e| e.type == Error::FILE_EXTENSION_MISMATCH }
+      expect(error.debug_info).to match(/image\.png/)
+    end
+  end
 end

@@ -32,11 +32,14 @@ module Deliver
     # Access each array by symbol returned from FastImage.type
     ALLOWED_SCREENSHOT_FILE_EXTENSION = { png: ['png', 'PNG'], jpeg: ['jpg', 'JPG', 'jpeg', 'JPEG'] }.freeze
 
+    APP_SCREENSHOT_SPEC_URL = 'https://help.apple.com/app-store-connect/#/devd274dd925'.freeze
+
     # Validate a screenshot and inform an error message via `errors` parameter. `errors` is mutated
     # to append the messages and each message should contain the corresponding path to let users know which file is throwing the error.
     #
     # @param screenshot [AppScreenshot]
-    # @param errors [Array<Deliver::AppScreenshotValidator::ValidationError>] Pass an array object to add validation errors when detecting errors
+    # @param errors [Array<Deliver::AppScreenshotValidator::ValidationError>] Pass an array object to add validation errors when detecting errors.
+    #   This will be mutated to add more error objects as validation detects errors.
     # @return [Boolean] true if given screenshot is valid
     def self.validate(screenshot, errors)
       # Given screenshot will be diagnosed and errors found are accumulated
@@ -55,7 +58,7 @@ module Deliver
       if screenshot.screen_size.nil?
         errors_found << ValidationError.new(type: ValidationError::INVALID_SCREEN_SIZE,
                                             path: screenshot.path,
-                                            debug_info: "Actual size is #{get_formatted_size(screenshot)}")
+                                            debug_info: "Actual size is #{get_formatted_size(screenshot)}. See the specifications to fix #{APP_SCREENSHOT_SPEC_URL}")
       end
     end
 
@@ -66,7 +69,7 @@ module Deliver
       if !screenshot.screen_size.nil? && screenshot.device_type.nil?
         errors_found << ValidationError.new(type: ValidationError::UNACCEPTABLE_DEVICE,
                                             path: screenshot.path,
-                                            debug_info: "Screen size #{screenshot.screen_size} is not accepted",
+                                            debug_info: "Screen size #{screenshot.screen_size} is not accepted. See the specifications to fix #{APP_SCREENSHOT_SPEC_URL}",
                                             to_skip: true)
       end
     end
@@ -88,9 +91,11 @@ module Deliver
 
       # This error only appears when file extension is valid
       if is_valid_extension && !is_extension_matched
+        expected_extension = ALLOWED_SCREENSHOT_FILE_EXTENSION[format].first
+        expected_filename = File.basename(screenshot.path, File.extname(screenshot.path)) + ".#{expected_extension}"
         errors_found << ValidationError.new(type: ValidationError::FILE_EXTENSION_MISMATCH,
                                             path: screenshot.path,
-                                            debug_info: "Actual format is #{format}")
+                                            debug_info: %(Actual format is "#{format}". Rename the filename to "#{expected_filename}".))
       end
     end
 
