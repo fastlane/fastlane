@@ -315,7 +315,7 @@ describe Fastlane do
           expect(result).to eq("swift package generate-xcodeproj --enable-code-coverage")
         end
 
-        it "sets --enable-code-coverage to false" do
+        it "sets --enable-code-coverage to false for generate-xcodeproj" do
           result = Fastlane::FastFile.new.parse("lane :test do
             spm(
               command: 'generate-xcodeproj',
