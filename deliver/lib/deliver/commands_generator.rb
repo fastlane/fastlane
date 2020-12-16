@@ -177,7 +177,7 @@ module Deliver
             end
           end
 
-          Deliver::Setup.new.generate_metadata_files(app, v, path)
+          Deliver::Setup.new.generate_metadata_files(app, v, path, options)
         end
       end
 

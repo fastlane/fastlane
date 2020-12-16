@@ -84,7 +84,7 @@ describe Deliver do
             "review_information/notes" => "This is a note"
           }
 
-          setup.generate_metadata_files(app, version, tempdir)
+          setup.generate_metadata_files(app, version, tempdir, { use_live_version: true })
           base_dir = File.join(tempdir)
           map.each do |filename, value|
             path = File.join(base_dir, "#{filename}.txt")
