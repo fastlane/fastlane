@@ -47,7 +47,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :enable_code_coverage,
                                        env_name: "FL_SPM_ENABLE_CODE_COVERAGE",
-                                       description: "Enables code coverage for the test command and the generated Xcode project when using the generate-xcodeproj command",
+                                       description: "Enables code coverage for the generated Xcode project when using the 'generate-xcodeproj' and the 'test' command",
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :build_path,
