@@ -3,6 +3,7 @@ require 'spaceship/tunes/tunes'
 
 require_relative 'module'
 require_relative 'app_screenshot'
+require_relative 'app_screenshot_validator'
 require_relative 'upload_metadata'
 require_relative 'languages'
 
@@ -80,7 +81,7 @@ module Deliver
       end
     end
 
-    # Returns the list of valid app screenshot
+    # Returns the list of valid app screenshot. When detecting invalid screenshots, this will cause an error.
     #
     # @param root [String] A directory path
     # @param ignore_validation [String] Set false not to raise the error when finding invalid folder name
@@ -100,36 +101,22 @@ module Deliver
       end
 
       errors = []
-      valid_screenshots = screenshots.select { |screenshot| validate_screenshot(screenshot, errors) }
+      valid_screenshots = screenshots.select { |screenshot| Deliver::AppScreenshotValidator.validate(screenshot, errors) }
 
-      unless errors.empty?
-        UI.important("Unaccepted device screenshots are detected! 🚫 Screenshot file will be skipped. 🏃")
-        errors.each { |error| UI.important(error) }
+      errors_to_skip, errors_to_crash = errors.partition(&:to_skip)
+
+      unless errors_to_skip.empty?
+        UI.important("🏃 Screenshots to be skipped are detected!")
+        errors_to_skip.each { |error| UI.message(error) }
+      end
+
+      unless errors_to_crash.empty?
+        UI.important("🚫 Invalid screenshots were detected! Here are the reasons:")
+        errors_to_crash.each { |error| UI.error(error) }
+        UI.user_error!("Canceled uploading screenshots. Please check the error messages above and fix the screenshots.")
       end
 
       valid_screenshots
-    end
-
-    # Validate a screenshot and inform an error message via `errors` parameters. `errors` is mutated
-    # to append the messages and each message should contain the corresponding path to let users know which file gets the error.
-    #
-    # @param screenshot [AppScreenshot]
-    # @param errors [Array<String>] Pass an array object to add error messages when finding an error
-    # @return [Boolean] true if given screenshot is valid
-    def self.validate_screenshot(screenshot, errors)
-      # Given screenshot will be diagnosed and errors found are accumulated
-      errors_found = []
-
-      # Checking if the device type exists in spaceship
-      # Ex: iPhone 6.1 inch isn't supported in App Store Connect but need
-      # to have it in there for frameit support
-      if screenshot.device_type.nil?
-        errors_found << "🏃 Skipping screenshot file: #{screenshot.path} - Not an accepted App Store Connect device..."
-      end
-
-      # Merge errors found into given errors array
-      errors_found.each { |error| errors.push(error) }
-      errors_found.empty?
     end
 
     # Returns the list of language folders
