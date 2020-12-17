@@ -1,6 +1,3 @@
-require 'fastlane_core/languages'
-require 'spaceship/tunes/tunes'
-
 require_relative 'module'
 require_relative 'app_screenshot'
 require_relative 'app_screenshot_validator'
