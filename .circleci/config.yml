@@ -87,6 +87,8 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
+            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow
+            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask fetch --unshallow
             brew update
             brew untap caskroom/versions || true
             brew install shellcheck
