@@ -146,7 +146,7 @@ describe Sigh do
       it "list certificates found when there're multiple certificates and not in development" do
         options = { skip_certificate_verification: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
-        sigh_stub_spaceship_connect()
+        sigh_stub_spaceship_connect
 
         certificates_to_use = fake_runner.certificates_to_use
         expect(certificates_to_use.size).to eq(1)
