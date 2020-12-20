@@ -142,6 +142,17 @@ describe Sigh do
       end
     end
 
+    describe "#certificates_to_use" do
+      it "list certificates found when there're multiple certificates and not in development" do
+        options = { skip_certificate_verification: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+        sigh_stub_spaceship_connect()
+
+        certificates_to_use = fake_runner.certificates_to_use
+        expect(certificates_to_use.size).to eq(1)
+      end
+    end
+
     describe "#profile_type_pretty_type" do
       profile_types = {
         Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE => "AppStore",
