@@ -510,6 +510,34 @@ describe FastlaneCore do
       end
     end
 
+    describe "xcodebuild use_system_scm" do
+      it 'generates an xcodebuild -showBuildSettings command that includes scmProvider if provided in options', requires_xcode: true do
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          use_system_scm: true
+        })
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -scmProvider system"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
+
+      it 'generates an xcodebuild -showBuildSettings command that does not include scmProvider when not provided in options', requires_xcode: true do
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+        })
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
+
+      it 'generates an xcodebuild -showBuildSettings command that does not include scmProvider when the option provided is false', requires_xcode: true do
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          use_system_scm: false
+        })
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
+    end
+
     describe 'xcodebuild command for SwiftPM', requires_xcode: true do
       it 'generates an xcodebuild -resolvePackageDependencies command with Xcode >= 11' do
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)

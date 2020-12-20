@@ -322,6 +322,7 @@ module FastlaneCore
       proj << "-configuration #{options[:configuration].shellescape}" if options[:configuration]
       proj << "-derivedDataPath #{options[:derived_data_path].shellescape}" if options[:derived_data_path]
       proj << "-xcconfig #{options[:xcconfig].shellescape}" if options[:xcconfig]
+      proj << "-scmProvider system" if options[:use_system_scm]
 
       if FastlaneCore::Helper.xcode_at_least?('11.0') && options[:cloned_source_packages_path]
         proj << "-clonedSourcePackagesDirPath #{options[:cloned_source_packages_path].shellescape}"
