@@ -231,7 +231,17 @@ module Match
       def git_push(commands: [], commit_message: nil)
         commit_message ||= generate_commit_message
         commands << "git commit -m #{commit_message.shellescape}"
-        commands << "git push origin #{self.branch.shellescape}"
+        command = "git push origin #{self.branch.shellescape}"
+        unless self.git_private_key.nil?
+          if File.file?(self.git_private_key)
+            ssh_add = File.expand_path(self.git_private_key).shellescape.to_s
+          else
+            UI.message("Private key file does not exist, will continue by using it as a raw key.")
+            ssh_add = "- <<< \"#{self.git_private_key}\""
+          end
+          command = "ssh-agent bash -c 'ssh-add #{ssh_add}; #{command}'"
+        end
+        commands << command
 
         UI.message("Pushing changes to remote git repo...")
         Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
