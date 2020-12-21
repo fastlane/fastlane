@@ -41,7 +41,6 @@ module Fastlane
         export_profile: "-exportProvisioningProfile",
         export_signing_identity: "-exportSigningIdentity",
         export_with_original_signing_identity: "-exportWithOriginalSigningIdentity",
-        frameworks: "-framework",
         hide_shell_script_environment: "-hideShellScriptEnvironment",
         jobs: "-jobs",
         output: "-output",
@@ -108,10 +107,11 @@ module Fastlane
 
         if params
           # Operation bools
-          archiving    = params.key? :archive
-          exporting    = params.key? :export_archive
-          testing      = params.key? :test
-          xcpretty_utf = params[:xcpretty_utf]
+          archiving            = params.key? :archive
+          creating_xcframework = params.key? :create_xcframework
+          exporting            = params.key? :export_archive
+          testing              = params.key? :test
+          xcpretty_utf         = params[:xcpretty_utf]
 
           if params.key? :raw_buildlog
             raw_buildlog = params[:raw_buildlog]
@@ -342,6 +342,8 @@ module Fastlane
             end.join(' ')
           elsif k == :destination
             [*v].collect { |dst| "-destination \"#{dst}\"" }.join(' ')
+          elsif k == :frameworks
+            [*v].map { |framework| "-framework \"#{framework}\"" }.join(' ')
           elsif k == :keychain && v.to_s.length > 0
             # If keychain is specified, append as OTHER_CODE_SIGN_FLAGS
             "OTHER_CODE_SIGN_FLAGS=\"--keychain #{v}\""
@@ -643,8 +645,7 @@ module Fastlane
 
     class XccreatexcframeworkAction < Action
       def self.run(params)
-        params_hash = params || {}
-        params_hash[:create_xcframework] = true
+        params_hash = { create_xcframework: true }.merge(params)
 
         XcodebuildAction.run(params_hash)
       end
