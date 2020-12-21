@@ -285,7 +285,7 @@ describe Fastlane do
           xcodebuild(
             create_xcframework: true,
             frameworks: ['FrameworkA.framework', 'FrameworkB.framework'],
-            otuput: './build-dir/UniversalFramework.xcframework',
+            output: './build-dir/UniversalFramework.xcframework',
             allow_internal_distribution: true
           )
         end").runner.execute(:test)
