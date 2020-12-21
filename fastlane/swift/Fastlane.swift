@@ -700,7 +700,6 @@ public func apteligent(dsym: String? = nil,
    - endpoint: Artifactory endpoint
    - username: Artifactory username
    - password: Artifactory password
-   - apiKey: Artifactory API key
    - properties: Artifact properties hash
    - sslPemFile: Location of pem file to use for ssl verification
    - sslVerify: Verify SSL
@@ -709,15 +708,14 @@ public func apteligent(dsym: String? = nil,
    - proxyAddress: Proxy address
    - proxyPort: Proxy port
    - readTimeout: Read timeout
-*/
+ */
 public func artifactory(file: String,
                         repo: String,
                         repoPath: String,
                         endpoint: String,
-                        username: String? = nil,
-                        password: String? = nil,
-                        apiKey: String? = nil,
-                        properties: [String : Any] = [:],
+                        username: String,
+                        password: String,
+                        properties: [String: Any] = [:],
                         sslPemFile: String? = nil,
                         sslVerify: Bool = true,
                         proxyUsername: String? = nil,
@@ -732,7 +730,6 @@ public func artifactory(file: String,
                                                                                                RubyCommand.Argument(name: "endpoint", value: endpoint),
                                                                                                RubyCommand.Argument(name: "username", value: username),
                                                                                                RubyCommand.Argument(name: "password", value: password),
-                                                                                               RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                                RubyCommand.Argument(name: "properties", value: properties),
                                                                                                RubyCommand.Argument(name: "ssl_pem_file", value: sslPemFile),
                                                                                                RubyCommand.Argument(name: "ssl_verify", value: sslVerify),

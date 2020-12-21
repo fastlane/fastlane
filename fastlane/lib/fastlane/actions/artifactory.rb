@@ -10,40 +10,34 @@ module Fastlane
         Actions.verify_gem!('artifactory')
 
         require 'artifactory'
+
+        UI.user_error!("Cannot connect to Artifactory - 'username' was provided but it's missing 'password'") if params[:username] && !params[:password]
+        UI.user_error!("Cannot connect to Artifactory - 'password' was provided but it's missing 'username'") if !params[:username] && params[:password]
+        UI.user_error!("Cannot connect to Artifactory - either 'api_key', or 'username' and 'password' must be provided") if !params[:api_key] && !params[:username]
         file_path = File.absolute_path(params[:file])
+        
+        if File.exist?(file_path)
+          client = connect_to_artifactory(params)
+          artifact = Artifactory::Resource::Artifact.new
+          artifact.client = client
+          artifact.local_path = file_path
+          artifact.checksums = {
+              "sha1" => Digest::SHA1.file(file_path),
+              "md5" => Digest::MD5.file(file_path)
+          }
+          UI.message("Uploading file: #{artifact.local_path} ...")
+          upload = artifact.upload(params[:repo], params[:repo_path], params[:properties])
 
-        if (params[:username] && params[:password]) || params[:api_key]
-          if File.exist?(file_path)
-            client = connect_to_artifactory(params)
-            artifact = Artifactory::Resource::Artifact.new
-            artifact.client = client
-            artifact.local_path = file_path
-            artifact.checksums = {
-                "sha1" => Digest::SHA1.file(file_path),
-                "md5" => Digest::MD5.file(file_path)
-            }
-            UI.message("Uploading file: #{artifact.local_path} ...")
-            upload = artifact.upload(params[:repo], params[:repo_path], params[:properties])
+          Actions.lane_context[SharedValues::ARTIFACTORY_DOWNLOAD_URL] = upload.uri
+          Actions.lane_context[SharedValues::ARTIFACTORY_DOWNLOAD_SIZE] = upload.size
 
-            Actions.lane_context[SharedValues::ARTIFACTORY_DOWNLOAD_URL] = upload.uri
-            Actions.lane_context[SharedValues::ARTIFACTORY_DOWNLOAD_SIZE] = upload.size
-
-            UI.message("Uploaded Artifact:")
-            UI.message("Repo: #{upload.repo}")
-            UI.message("URI: #{upload.uri}")
-            UI.message("Size: #{upload.size}")
-            UI.message("SHA1: #{upload.sha1}")
-          else
-            UI.message("File not found: '#{file_path}'")
-          end
+          UI.message("Uploaded Artifact:")
+          UI.message("Repo: #{upload.repo}")
+          UI.message("URI: #{upload.uri}")
+          UI.message("Size: #{upload.size}")
+          UI.message("SHA1: #{upload.sha1}")
         else
-          if params[:username] && !params[:password]
-            UI.user_error!("Connect to artifactory using 'username' require setting a 'password'")
-          elsif !params[:username] && params[:password]
-            UI.user_error!("Connect to artifactory using 'password' require setting a 'password'")
-          else
-            UI.user_error!("You can either connect to artifactory using 'username' and 'password' or 'api_key'")
-          end
+          UI.message("File not found: '#{file_path}'")
         end
       end
 
@@ -126,7 +120,7 @@ module Fastlane
                                        optional: true,
                                        conflicting_options: [:api_key],
                                        conflict_block: proc do |value|
-                                         UI.user_error!("You can either use a 'username' 'password' combination or 'api_key', not both")
+                                         UI.user_error!("You can't use option '#{value.key}' along with 'username'")
                                        end),
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_ARTIFACTORY_PASSWORD",
@@ -135,17 +129,17 @@ module Fastlane
                                        optional: true,
                                        conflicting_options: [:api_key],
                                        conflict_block: proc do |value|
-                                         UI.user_error!("You can either use a 'username' 'password' combination or 'api_key', not both")
+                                         UI.user_error!("You can't use option '#{value.key}' along with 'password'")
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_key,
-                                      env_name: "FL_ARTIFACTORY_API_KEY",
-                                      description: "Artifactory API key",
-                                      sensitive: true,
-                                      optional: true,
-                                      conflicting_options: [:username, :password],
-                                      conflict_block: proc do |value|
-                                        UI.user_error!("You can either use a 'username' 'password' combination or 'api_key', not both")
-                                      end),
+                                       env_name: "FL_ARTIFACTORY_API_KEY",
+                                       description: "Artifactory API key",
+                                       sensitive: true,
+                                       optional: true,
+                                       conflicting_options: [:username, :password],
+                                       conflict_block: proc do |value|
+                                         UI.user_error!("You can't use option '#{value.key}' along with 'api_key'")
+                                       end),
           FastlaneCore::ConfigItem.new(key: :properties,
                                        env_name: "FL_ARTIFACTORY_PROPERTIES",
                                        description: "Artifact properties hash",
