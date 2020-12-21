@@ -13,7 +13,7 @@ describe Fastlane::Action do
       end
 
       it "file name follows our convention and matches the class name" do
-        exceptions = %w(plugin_scores xcarchive xcbuild xcclean xcexport xctest)
+        exceptions = %w(plugin_scores xcarchive xcbuild xcclean xcexport xctest xccreatexcframework)
 
         action_path = File.join(Dir.pwd, "fastlane/lib/fastlane/actions/#{name}.rb")
         unless exceptions.include?(name)
