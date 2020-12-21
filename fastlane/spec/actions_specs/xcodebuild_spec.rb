@@ -19,9 +19,11 @@ describe Fastlane do
             installsrc: true,
             test: true,
             arch: 'architecture',
+            allow_internal_distribution: true,
             alltargets: true,
             archive_path: './build/MyApp.xcarchive',
             configuration: 'Debug',
+            create_xcframework: true,
             derivedDataPath: '/derived/data/path',
             destination: 'name=iPhone 5s,OS=8.1',
             destination_timeout: 240,
@@ -37,10 +39,12 @@ describe Fastlane do
             export_profile: 'MyApp Distribution',
             export_signing_identity: 'Distribution: MyCompany, LLC',
             export_with_original_signing_identity: true,
+            framework: ['FrameworkA.framework', 'FrameworkB.framework'],
             hide_shell_script_environment: true,
             jobs: 5,
             parallelize_targets: true,
             keychain: '/path/to/My.keychain',
+            output: 'UniversalFramework.xcframework',
             project: 'MyApp.xcodeproj',
             result_bundle_path: '/result/bundle/path',
             scheme: 'MyApp',
@@ -59,11 +63,15 @@ describe Fastlane do
 
         expect(result).to eq(
           "set -o pipefail && xcodebuild analyze archive build clean install installsrc test -arch \"architecture\" " \
-          "-alltargets -archivePath \"./build/MyApp.xcarchive\" -configuration \"Debug\" -derivedDataPath \"/derived/data/path\" " \
+          "-allow-internal-distribution " \
+          "-alltargets -archivePath \"./build/MyApp.xcarchive\" -configuration \"Debug\" " \
+          "-create-xcframework -derivedDataPath \"/derived/data/path\" " \
           "-destination \"name=iPhone 5s,OS=8.1\" -destination-timeout \"240\" -dry-run -exportArchive -exportFormat \"ipa\" " \
           "-exportInstallerIdentity -exportOptionsPlist \"/path/to/plist\" -exportPath \"./build/MyApp\" -exportProvisioningProfile " \
           "\"MyApp Distribution\" -exportSigningIdentity \"Distribution: MyCompany, LLC\" -exportWithOriginalSigningIdentity " \
-          "-hideShellScriptEnvironment -jobs \"5\" -parallelizeTargets OTHER_CODE_SIGN_FLAGS=\"--keychain /path/to/My.keychain\" -project " \
+          "-framework \"FrameworkA.framework\" -framework \"FrameworkB.framework\" " \
+          "-hideShellScriptEnvironment -jobs \"5\" -output \"UniversalFramework.xcframework\" " \
+          "-parallelizeTargets OTHER_CODE_SIGN_FLAGS=\"--keychain /path/to/My.keychain\" -project " \
           "\"MyApp.xcodeproj\" -resultBundlePath \"/result/bundle/path\" -scheme \"MyApp\" -sdk \"iphonesimulator\" -skipUnavailableActions -target " \
           "\"MyAppTarget\" -toolchain \"toolchain name\" -workspace \"MyApp.xcworkspace\" -xcconfig \"my.xcconfig\" -newArgument YES -enableAddressSanitizer " \
           "\"YES\" -enableThreadSanitizer \"NO\" -enableCodeCoverage \"YES\" | tee 'mypath/xcodebuild.log' | xcpretty --color --test"
@@ -407,6 +415,18 @@ describe Fastlane do
 
         expect(result).to eq(
           "set -o pipefail && xcodebuild clean | tee '#{build_log_path}' | xcpretty --color --simple"
+        )
+      end
+    end
+
+    describe "xccreatexcframework" do
+      it "is equivalent to 'xcodebuild -create-xcframework'" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xccreatexcframework
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && xcodebuild -create-xcframework | tee '#{build_log_path}' | xcpretty --color --simple"
         )
       end
     end

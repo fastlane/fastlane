@@ -21,9 +21,11 @@ module Fastlane
         test: "test",
 
         # parameters
+        allow_internal_distribution: "-allow-internal-distribution",
         alltargets: "-alltargets",
         arch: "-arch",
         archive_path: "-archivePath",
+        create_xcframework: "-create-xcframework",
         configuration: "-configuration",
         derivedDataPath: "-derivedDataPath",
         destination_timeout: "-destination-timeout",
@@ -39,8 +41,10 @@ module Fastlane
         export_profile: "-exportProvisioningProfile",
         export_signing_identity: "-exportSigningIdentity",
         export_with_original_signing_identity: "-exportWithOriginalSigningIdentity",
+        framework: "-framework",
         hide_shell_script_environment: "-hideShellScriptEnvironment",
         jobs: "-jobs",
+        output: "-output",
         parallelize_targets: "-parallelizeTargets",
         project: "-project",
         result_bundle_path: "-resultBundlePath",
@@ -634,6 +638,48 @@ module Fastlane
 
       def self.author
         "dtrenz"
+      end
+    end
+
+    class XccreatexcframeworkAction < Action
+      def self.run(params)
+        params_hash = params || {}
+        params_hash[:create_xcframework] = true
+
+        XcodebuildAction.run(params_hash)
+      end
+
+      def self.example_code
+        [
+          'xccreatexcframework(
+            framework: ["FrameworkA.framework", "FrameworkB.framework"],
+            output: "UniversalFramework.xcframework"
+          )'
+        ]
+      end
+
+      def self.category
+        :building
+      end
+
+      def self.description
+        "Packages multiple build configurations of a given library or framework into a single xcframework"
+      end
+
+      def self.available_options
+        [
+          ['framework', 'List of frameworks to add to resulting xcframework'],
+          ['output', 'The path to write the xcframework to'],
+          ['allow_internal_distribution', 'Specifies that the created xcframework contains information not suitable for public distribution']
+        ]
+      end
+
+      def self.is_supported?(platform)
+        [:ios, :mac].include? platform
+      end
+
+      def self.author
+        "jgongo"
       end
     end
   end
