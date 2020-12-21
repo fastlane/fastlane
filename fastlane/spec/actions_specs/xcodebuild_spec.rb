@@ -39,7 +39,7 @@ describe Fastlane do
             export_profile: 'MyApp Distribution',
             export_signing_identity: 'Distribution: MyCompany, LLC',
             export_with_original_signing_identity: true,
-            framework: ['FrameworkA.framework', 'FrameworkB.framework'],
+            frameworks: ['FrameworkA.framework', 'FrameworkB.framework'],
             hide_shell_script_environment: true,
             jobs: 5,
             parallelize_targets: true,

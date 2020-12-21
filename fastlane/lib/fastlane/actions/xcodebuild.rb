@@ -41,7 +41,7 @@ module Fastlane
         export_profile: "-exportProvisioningProfile",
         export_signing_identity: "-exportSigningIdentity",
         export_with_original_signing_identity: "-exportWithOriginalSigningIdentity",
-        framework: "-framework",
+        frameworks: "-framework",
         hide_shell_script_environment: "-hideShellScriptEnvironment",
         jobs: "-jobs",
         output: "-output",
@@ -668,7 +668,7 @@ module Fastlane
 
       def self.available_options
         [
-          ['framework', 'List of frameworks to add to resulting xcframework'],
+          ['frameworks', 'List of frameworks to add to resulting xcframework'],
           ['output', 'The path to write the xcframework to'],
           ['allow_internal_distribution', 'Specifies that the created xcframework contains information not suitable for public distribution']
         ]
