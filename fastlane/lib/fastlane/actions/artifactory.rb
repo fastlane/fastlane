@@ -15,7 +15,7 @@ module Fastlane
         UI.user_error!("Cannot connect to Artifactory - 'password' was provided but it's missing 'username'") if !params[:username] && params[:password]
         UI.user_error!("Cannot connect to Artifactory - either 'api_key', or 'username' and 'password' must be provided") if !params[:api_key] && !params[:username]
         file_path = File.absolute_path(params[:file])
-        
+
         if File.exist?(file_path)
           client = connect_to_artifactory(params)
           artifact = Artifactory::Resource::Artifact.new
