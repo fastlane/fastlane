@@ -281,6 +281,28 @@ describe Fastlane do
         )
       end
 
+      it "can create xcframework" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xcodebuild(
+            create_xcframework: true,
+            frameworks: ['FrameworkA.framework', 'FrameworkB.framework'],
+            otuput: './build-dir/UniversalFramework.xcframework',
+            allow_internal_distribution: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-create-xcframework " \
+          + "-framework \"FrameworkA.framework\" " \
+          + "-framework \"FrameworkB.framework\" " \
+          + "-output \"./build-dir/UniversalFramework.xcframework\" " \
+          + "-allow-internal-distribution " \
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+        )
+      end
+
       it "can export" do
         ENV.delete("XCODE_SCHEME")
         ENV.delete("XCODE_WORKSPACE")
@@ -427,6 +449,56 @@ describe Fastlane do
 
         expect(result).to eq(
           "set -o pipefail && xcodebuild -create-xcframework | tee '#{build_log_path}' | xcpretty --color --simple"
+        )
+      end
+
+      it "can create an xcframework with a single framework" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xccreatexcframework(
+            frameworks: 'FrameworkA.framework',
+            output: 'UniversalFramework.xcframework'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          "xcodebuild -create-xcframework -framework \"FrameworkA.framework\" " \
+          "-output \"UniversalFramework.xcframework\" " \
+          "| tee '#{build_log_path}' | xcpretty --color --simple"
+        )
+      end
+
+      it "can create an xcframework with an array of frameworks" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xccreatexcframework(
+            frameworks: ['FrameworkA.framework', 'FrameworkB.framework'],
+            output: 'UniversalFramework.xcframework'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          "xcodebuild -create-xcframework -framework \"FrameworkA.framework\" " \
+          "-framework \"FrameworkB.framework\" " \
+          "-output \"UniversalFramework.xcframework\" " \
+          "| tee '#{build_log_path}' | xcpretty --color --simple"
+        )
+      end
+
+      it "can create an xcframework with a comma separated list of frameworks" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xccreatexcframework(
+            frameworks: 'FrameworkA.framework,FrameworkB.framework',
+            output: 'UniversalFramework.xcframework'
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          "xcodebuild -create-xcframework -framework \"FrameworkA.framework\" " \
+          "-framework \"FrameworkB.framework\" " \
+          "-output \"UniversalFramework.xcframework\" " \
+          "| tee '#{build_log_path}' | xcpretty --color --simple"
         )
       end
     end
