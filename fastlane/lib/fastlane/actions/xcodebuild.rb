@@ -343,7 +343,8 @@ module Fastlane
           elsif k == :destination
             [*v].collect { |dst| "-destination \"#{dst}\"" }.join(' ')
           elsif k == :frameworks
-            [*v].map { |framework| "-framework \"#{framework}\"" }.join(' ')
+            frameworks = v.kind_of?(Array)? v : v.to_s.split(',')
+            frameworks.map { |framework| "-framework \"#{framework}\"" }.join(' ')
           elsif k == :keychain && v.to_s.length > 0
             # If keychain is specified, append as OTHER_CODE_SIGN_FLAGS
             "OTHER_CODE_SIGN_FLAGS=\"--keychain #{v}\""
