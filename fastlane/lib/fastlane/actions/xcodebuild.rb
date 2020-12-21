@@ -670,7 +670,7 @@ module Fastlane
       end
 
       def self.description
-        "Packages multiple build configurations of a given library or framework into a single xcframework"
+        "Packages multiple frameworks into a single xcframework"
       end
 
       def self.available_options
