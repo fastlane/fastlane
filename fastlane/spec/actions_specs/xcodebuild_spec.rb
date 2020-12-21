@@ -23,7 +23,6 @@ describe Fastlane do
             alltargets: true,
             archive_path: './build/MyApp.xcarchive',
             configuration: 'Debug',
-            create_xcframework: true,
             derivedDataPath: '/derived/data/path',
             destination: 'name=iPhone 5s,OS=8.1',
             destination_timeout: 240,
@@ -65,13 +64,13 @@ describe Fastlane do
           "set -o pipefail && xcodebuild analyze archive build clean install installsrc test -arch \"architecture\" " \
           "-allow-internal-distribution " \
           "-alltargets -archivePath \"./build/MyApp.xcarchive\" -configuration \"Debug\" " \
-          "-create-xcframework -derivedDataPath \"/derived/data/path\" " \
+          "-derivedDataPath \"/derived/data/path\" " \
           "-destination \"name=iPhone 5s,OS=8.1\" -destination-timeout \"240\" -dry-run -exportArchive -exportFormat \"ipa\" " \
           "-exportInstallerIdentity -exportOptionsPlist \"/path/to/plist\" -exportPath \"./build/MyApp\" -exportProvisioningProfile " \
           "\"MyApp Distribution\" -exportSigningIdentity \"Distribution: MyCompany, LLC\" -exportWithOriginalSigningIdentity " \
           "-framework \"FrameworkA.framework\" -framework \"FrameworkB.framework\" " \
-          "-hideShellScriptEnvironment -jobs \"5\" -output \"UniversalFramework.xcframework\" " \
-          "-parallelizeTargets OTHER_CODE_SIGN_FLAGS=\"--keychain /path/to/My.keychain\" -project " \
+          "-hideShellScriptEnvironment -jobs \"5\" -parallelizeTargets OTHER_CODE_SIGN_FLAGS=\"--keychain /path/to/My.keychain\" " \
+          "-output \"UniversalFramework.xcframework\" -project " \
           "\"MyApp.xcodeproj\" -resultBundlePath \"/result/bundle/path\" -scheme \"MyApp\" -sdk \"iphonesimulator\" -skipUnavailableActions -target " \
           "\"MyAppTarget\" -toolchain \"toolchain name\" -workspace \"MyApp.xcworkspace\" -xcconfig \"my.xcconfig\" -newArgument YES -enableAddressSanitizer " \
           "\"YES\" -enableThreadSanitizer \"NO\" -enableCodeCoverage \"YES\" | tee 'mypath/xcodebuild.log' | xcpretty --color --test"
