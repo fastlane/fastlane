@@ -163,6 +163,11 @@ module Fastlane
             params[:enableCodeCoverage] = params[:enable_code_coverage] ? 'YES' : 'NO'
           end
 
+          if creating_xcframework
+            allowed_params = %i(create_xcframework frameworks output allow_internal_distribution)
+            params.select! { |k, _| allowed_params.include?(k) }
+          end
+
           # Maps parameter hash to CLI args
           params = export_options_to_plist(params)
           if hash_args = hash_to_args(params)
