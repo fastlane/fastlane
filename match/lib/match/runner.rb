@@ -160,11 +160,12 @@ module Match
     def fetch_certificate(params: nil, working_directory: nil, specific_cert_type: nil)
       cert_type = Match.cert_type_sym(specific_cert_type || params[:type])
 
-      certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.p12")]
+      dir = File.join(prefixed_working_directory, "certs", cert_type.to_s)
+      certs = Dir[File.join(dir, "*.cer")]
+      keys = Dir[File.join(dir, "*.p12")]
 
       if certs.count == 0 || keys.count == 0
-        UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
+        UI.important("Couldn't find a valid code signing identity for '#{cert_type}' in directory '#{dir}'... creating one for you now")
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
         cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory, specific_cert_type: specific_cert_type)
         private_key_path = cert_path.gsub(".cer", ".p12")

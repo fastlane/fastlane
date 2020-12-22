@@ -108,7 +108,7 @@ module Match
           download_path = File.join(self.working_directory, file_path)
 
           FileUtils.mkdir_p(File.expand_path("..", download_path))
-          UI.verbose("Downloading file from S3 '#{file_path}' on bucket #{self.s3_bucket}")
+          UI.verbose("Downloading file from S3 '#{file_path}' on bucket '#{self.s3_bucket}' and saving it to '#{download_path}'")
 
           object.download_file(download_path)
         end
