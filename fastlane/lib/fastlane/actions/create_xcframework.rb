@@ -6,13 +6,11 @@ module Fastlane
 
     class CreateXcframeworkAction < Action
       def self.run(params)
-        UI.user_error!("Please provide either :frameworks or :libraries to be packaged into the xcframework") unless params[:frameworks] or params[:libraries]
+        UI.user_error!("Please provide either :frameworks or :libraries to be packaged into the xcframework") unless params[:frameworks] || params[:libraries]
 
         create_command = ['xcodebuild', '-create-xcframework']
-        create_command << params[:frameworks].map { |framework| ['-framework', "\"#{framework}\""]  }.flatten if params[:frameworks]
-        create_command << params[:libraries].map { |library, headers|
-          ['-library', "\"#{library}\""] + (headers.empty? ? [] : ['-headers', "\"#{headers}\""])
-        } if params[:libraries]
+        create_command << params[:frameworks].map { |framework| ['-framework', "\"#{framework}\""] }.flatten if params[:frameworks]
+        create_command << params[:libraries].map { |library, headers| ['-library', "\"#{library}\""] + (headers.empty? ? [] : ['-headers', "\"#{headers}\""]) } if params[:libraries]
         create_command << ['-output', "\"#{params[:output]}\""]
         create_command << ['-allow-internal-distribution'] if params[:allow_internal_distribution]
 
@@ -56,11 +54,11 @@ module Fastlane
                                        optional: true,
                                        conflicting_options: [:libraries],
                                        verify_block: proc do |value|
-                                         value.each { |framework|
+                                         value.each do |framework|
                                            UI.user_error!("#{framework} doesn't end with '.framework'. Is this really a framework?") unless framework.end_with?('.framework')
                                            UI.user_error!("Couldn't find framework at #{framework}") unless File.exist?(framework)
                                            UI.user_error!("#{framework} doesn't seem to be a framework") unless File.directory?(framework)
-                                         }
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :libraries,
                                        env_name: "FL_CREATE_XCFRAMEWORK_LIBRARIES",
@@ -69,10 +67,10 @@ module Fastlane
                                        optional: true,
                                        conflicting_options: [:frameworks],
                                        verify_block: proc do |value|
-                                         value.each { |library, headers|
+                                         value.each do |library, headers|
                                            UI.user_error!("Couldn't find library at #{library}") unless File.exist?(library)
-                                           UI.user_error!("#{headers} doesn't exist or is not a directory") unless headers.empty? or File.directory?(headers)
-                                         }
+                                           UI.user_error!("#{headers} doesn't exist or is not a directory") unless headers.empty? || File.directory?(headers)
+                                         end
                                        end),
           FastlaneCore::ConfigItem.new(key: :output,
                                        env_name: "FL_CREATE_XCFRAMEWORK_OUTPUT",

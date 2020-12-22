@@ -118,7 +118,6 @@ describe Fastlane do
         end
       end
 
-
       context "when packaging libraries" do
         context "which exist" do
           before(:each) do
