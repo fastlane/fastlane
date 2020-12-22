@@ -95,6 +95,17 @@ module Fastlane
       def self.return_value
       end
 
+      def self.example_code
+        [
+          "create_xcframework(frameworks: ['FrameworkA.framework', 'FrameworkB.framework'], output: 'UniversalFramework.xcframework')",
+          "create_xcframework(libraries: { 'LibraryA.so' => '', 'LibraryB.so' => 'LibraryBHeaders'}, output: 'UniversalFramework.xcframework')"
+        ]
+      end
+
+      def self.category
+        :building
+      end
+
       def self.authors
         ["jgongo"]
       end
