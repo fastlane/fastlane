@@ -659,7 +659,7 @@ module Fastlane
       def self.example_code
         [
           'xccreatexcframework(
-            framework: ["FrameworkA.framework", "FrameworkB.framework"],
+            frameworks: ["FrameworkA.framework", "FrameworkB.framework"],
             output: "UniversalFramework.xcframework"
           )'
         ]
