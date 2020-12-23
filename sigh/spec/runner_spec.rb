@@ -209,14 +209,14 @@ describe Sigh do
         it "fetches profiles with duplicate name and appends timestamp" do
           sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: "com.krausefx.app", all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["com.krausefx.app AppStore"] })
 
-          expect(Time).to receive(:now).and_return("1234")
+          allow(Time).to receive(:now).and_return(Time.at(1_608_653_743))
 
           options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true, skip_fetch_profiles: false }
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
           profile = fake_runner.create_profile!
 
-          expect(profile.name).to eq("com.krausefx.app AppStore 1234")
+          expect(profile.name).to eq("com.krausefx.app AppStore 1608653743")
           expect(profile.bundle_id.identifier).to eq("com.krausefx.app")
         end
       end
