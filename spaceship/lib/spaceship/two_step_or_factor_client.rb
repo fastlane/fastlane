@@ -4,6 +4,7 @@ require_relative 'tunes/tunes_client'
 module Spaceship
   class Client
     def handle_two_step_or_factor(response)
+      raise "2FA can only be performed in interactive mode" unless interactive
       # extract `x-apple-id-session-id` and `scnt` from response, to be used by `update_request_headers`
       @x_apple_id_session_id = response["x-apple-id-session-id"]
       @scnt = response["scnt"]
@@ -353,6 +354,21 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
       req.headers["X-Apple-Widget-Key"] = self.itc_service_key
       req.headers["Accept"] = "application/json"
       req.headers["scnt"] = @scnt
+    end
+
+    def interactive
+      interactive = true
+      interactive = false if $stdout.isatty == false
+      interactive = false if is_ci?
+      return interactive
+    end
+
+    def is_ci
+      # Check for Jenkins, Travis CI, ... environment variables
+      ['CIRCLECI', 'JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO'].each do |current|
+        return true if ENV.key?(current)
+      end
+      return false
     end
   end
 end
