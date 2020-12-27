@@ -87,14 +87,19 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            if $(git rev-parse --is-shallow-repository); then
-              # If it's still a shallow repository, unshallow it. It won't be a shallow repository anymore after caching the unshallowed repo.
-              git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow
-            fi
-            if $(git rev-parse --is-shallow-repository); then
-              # If it's still a shallow repository, unshallow it. It won't be a shallow repository anymore after caching the unshallowed repo.
-              git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask fetch --unshallow
-            fi
+            HOMEBREW_REPOS_TO_UNSHALLOW_IF_NEEDED=(
+              "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core"
+              "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask"
+            )
+            for REPO in "${HOMEBREW_REPOS_TO_UNSHALLOW_IF_NEEDED[@]}"; do
+               if $(git -C "$REPO" rev-parse --is-shallow-repository); then
+                 echo "The repository '$REPO' is shallow and needs to be unshallowed."
+                 echo "This is likely gonna take several minutes, and it's only needed to be done once, until we cache the unshallowed repo."
+                 git -C "$REPO" fetch --unshallow
+               else
+                 echo "The repository '$REPO' is a complete repository (not shallow), so we don't need to unshallow it anymore. :)"
+               fi
+            done
             brew update
             brew untap caskroom/versions || true
             brew install shellcheck
