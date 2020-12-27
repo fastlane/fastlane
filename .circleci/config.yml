@@ -87,8 +87,14 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow
-            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask fetch --unshallow
+            if $(git rev-parse --is-shallow-repository); then
+              # If it's still a shallow repository, unshallow it. It won't be a shallow repository anymore after caching the unshallowed repo.
+              git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow
+            fi
+            if $(git rev-parse --is-shallow-repository); then
+              # If it's still a shallow repository, unshallow it. It won't be a shallow repository anymore after caching the unshallowed repo.
+              git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask fetch --unshallow
+            fi
             brew update
             brew untap caskroom/versions || true
             brew install shellcheck
