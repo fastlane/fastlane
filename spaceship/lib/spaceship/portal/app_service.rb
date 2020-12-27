@@ -46,7 +46,7 @@ module Spaceship
       AssociatedDomains = AppService.new_service("SKC3T5S89Y")
       ClassKit = AppService.new_service("PKTJAN2017")
       AutoFillCredential = AppService.new_service("CPEQ28MX4E")
-      DataProtection = AppService.new_service("dataProtection", values: { off: "", complete: "complete", unless_open: "unlessopen", until_first_auth: "untilfirstauth" })
+      DataProtection = AppService.new_service("dataProtection", values: { off: "", complete: "COMPLETE_PROTECTION", unless_open: "PROTECTED_UNLESS_OPEN", until_first_auth: "PROTECTED_UNTIL_FIRST_USER_AUTH" })
       GameCenter = AppService.new_service("gameCenter")
       HealthKit = AppService.new_service("HK421J6T7P")
       HomeKit = AppService.new_service("homeKit")

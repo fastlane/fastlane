@@ -9,7 +9,7 @@ describe Produce do
 
       instance = Produce::DeveloperCenter.new
       features = instance.enable_services
-      expect(features["dataProtection"].value).to eq("complete")
+      expect(features["dataProtection"].value).to eq("COMPLETE_PROTECTION")
     end
 
     it "accepts symbol'd hash" do
@@ -21,7 +21,7 @@ describe Produce do
 
       instance = Produce::DeveloperCenter.new
       features = instance.enable_services
-      expect(features["dataProtection"].value).to eq("complete")
+      expect(features["dataProtection"].value).to eq("COMPLETE_PROTECTION")
     end
   end
 end
