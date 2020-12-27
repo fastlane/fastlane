@@ -31,12 +31,12 @@ aliases:
     restore_cache:
       name: cache | restore homebrew
       keys:
-        - v3-homebrew-{{ epoch }}
-        - v3-homebrew
+        - v4-homebrew-{{ epoch }}
+        - v4-homebrew
   - &cache_save_homebrew
     save_cache:
       name: cache | store homebrew
-      key: v3-homebrew-{{ epoch }}
+      key: v4-homebrew-{{ epoch }}
       paths:
         - "/usr/local/Homebrew"
 
@@ -87,9 +87,6 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow
-            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask fetch --unshallow
-            brew update
             brew untap caskroom/versions || true
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
