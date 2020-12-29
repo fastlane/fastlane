@@ -87,7 +87,6 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            brew untap caskroom/versions || true
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
       - *cache_save_homebrew
@@ -172,7 +171,6 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            brew untap caskroom/versions
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
       - *cache_save_homebrew
