@@ -1,3 +1,5 @@
+require 'spaceship'
+
 require_relative 'module'
 require_relative 'queue_worker'
 
