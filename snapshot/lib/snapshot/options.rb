@@ -123,7 +123,7 @@ module Snapshot
                                      type: Boolean),
         FastlaneCore::ConfigItem.new(key: :override_status_bar,
                                      env_name: 'SNAPSHOT_OVERRIDE_STATUS_BAR',
-                                     description: "Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception",
+                                     description: "Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception",
                                      default_value: false,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :localize_simulator,
