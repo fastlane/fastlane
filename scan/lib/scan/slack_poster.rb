@@ -51,6 +51,7 @@ module Scan
         username: username,
         icon_url: icon_url,
         payload: {},
+        default_payloads: Scan.config[:slack_default_payloads],
         attachment_properties: {
           fields: fields
         }

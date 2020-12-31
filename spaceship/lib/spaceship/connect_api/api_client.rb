@@ -196,7 +196,7 @@ module Spaceship
 
         store_csrf_tokens(response)
 
-        return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, client: self)
+        return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, headers: response.headers, client: self)
       end
 
       def handle_401(response)
