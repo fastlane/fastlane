@@ -153,6 +153,14 @@ describe Deliver::Loader do
       allow(FastImage).to receive(:size) do |path|
         path.match(/{([0-9]+)x([0-9]+)}/).captures.map(&:to_i)
       end
+
+      allow(FastImage).to receive(:type) do |path|
+        # work out valid format symbol
+        found = Deliver::AppScreenshotValidator::ALLOWED_SCREENSHOT_FILE_EXTENSION.find do |_, extensions|
+          extensions.include?(File.extname(path).delete('.'))
+        end
+        found.first if found
+      end
     end
 
     it "should not find any screenshots when the directory is empty" do
@@ -222,7 +230,7 @@ describe Deliver::Loader do
       add_screenshot("/Screenshots/iMessage/en-GB/AppleTV-01First{3840x2160}.jpg")
       expect do
         collect_screenshots_from_dir("/Screenshots/")
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Unsupported screen size [3840, 2160] for path '/Screenshots/iMessage/en-GB/AppleTV-01First{3840x2160}.jpg'")
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /Canceled uploading screenshot/)
     end
   end
 end
