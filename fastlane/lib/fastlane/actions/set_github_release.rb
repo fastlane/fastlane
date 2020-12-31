@@ -67,7 +67,7 @@ module Fastlane
           assets = params[:upload_assets]
           if assets && assets.count > 0
             # upload assets
-            self.upload_assets(assets, json['upload_url'], api_token)
+            self.upload_assets(assets, json['upload_url'], api_token, api_bearer)
 
             # fetch the release again, so that it contains the uploaded assets
             GithubApiAction.run(
