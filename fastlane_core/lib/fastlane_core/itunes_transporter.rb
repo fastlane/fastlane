@@ -160,11 +160,10 @@ module FastlaneCore
       end
 
       deliver_additional_params = env_deliver_additional_params.to_s.strip
-      if !deliver_additional_params.include?("-t ")
-        UI.user_error!("Invalid transport parameter")
-      else
-        return deliver_additional_params
+      if deliver_additional_params.include?("-t ")
+        UI.important("Apple recommends you don’t specify the -t transport and instead allow Transporter to use automatic transport discovery to determine the best transport mode for your packages. For more information, please read Apple's Transporter User Guide 2.1: https://help.apple.com/itc/transporteruserguide/#/apdATD1E1288-D1E1A1303-D1E1288A1126")
       end
+      return deliver_additional_params
     end
   end
 

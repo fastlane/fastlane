@@ -218,7 +218,7 @@ fastlane pilot upload --verbose
 
 ## Firewall Issues
 
-_pilot_ uses the iTunes Transporter to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocol from the command line using
+_pilot_ uses the iTunes [Transporter](https://help.apple.com/itc/transporteruserguide/#/apdATD1E1288-D1E1A1303-D1E1288A1126) to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocol from the command line using
 
 ```no-highlight
 DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" pilot ...
@@ -230,6 +230,10 @@ If you are using _pilot_ via the [fastlane action](https://docs.fastlane.tools/a
 ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV"
 pilot...
 ```
+
+Note, however, that Apple recommends you don’t specify the `-t transport` and instead allow Transporter to use automatic transport discovery to determine the best transport mode for your packages. For this reason, if the `t` option is passed, we will raise a warning.
+
+Also note that `-t` is not the only additional parameter that can be used. The string specified in the `DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS` environment variable will be forwarded to Transporter. For all the available options, check [Apple's Transporter User Guide](https://help.apple.com/itc/transporteruserguide/#/apdATD1E1288-D1E1A1303-D1E1288A1126).
 
 ## Credentials Issues
 
