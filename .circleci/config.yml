@@ -27,19 +27,6 @@ aliases:
       paths:
         - ".bundle"
 
-  - &cache_restore_homebrew
-    restore_cache:
-      name: cache | restore homebrew
-      keys:
-        - v3-homebrew-{{ epoch }}
-        - v3-homebrew
-  - &cache_save_homebrew
-    save_cache:
-      name: cache | store homebrew
-      key: v3-homebrew-{{ epoch }}
-      paths:
-        - "/usr/local/Homebrew"
-
   - &cache_restore_rubocop
     restore_cache:
       name: cache | restore rubocop
@@ -77,21 +64,21 @@ jobs:
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
-      - *cache_restore_homebrew
       - *set_ruby
       - run:
           name: debug | ruby version
           command: |
             ruby -v
       - run:
+          name: debug | brew version
+          command: |
+            brew -v
+      - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            brew update
-            brew untap caskroom/versions || true
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-      - *cache_save_homebrew
       - *cache_save_bundler
       - run:
           name: Check PR Metadata
@@ -167,16 +154,13 @@ jobs:
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
-      - *cache_restore_homebrew
       - *set_ruby
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            brew untap caskroom/versions
             brew install shellcheck
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-      - *cache_save_homebrew
       - *cache_save_bundler
       - run: bundle exec fastlane generate_swift_api
 
