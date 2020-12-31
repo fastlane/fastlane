@@ -112,12 +112,14 @@ module Fastlane
 
           json << {
             "category" => category.id,
-            "purposes" => selected_purposes.map(&:id),
+            "purposes" => selected_purposes.map(&:id).sort.uniq,
             "data_protections" => [
               protection_id, tracking_id
-            ].compact
+            ].compact.sort.uniq
           }
         end
+
+        json.sort_by! { |c| c["category"] }
 
         # Recursively call this method if no categories were selected for data collection
         if json.empty?
