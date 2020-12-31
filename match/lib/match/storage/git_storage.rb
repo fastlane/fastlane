@@ -89,15 +89,7 @@ module Match
           command += " -b #{self.branch.shellescape} --single-branch"
         end
 
-        unless self.git_private_key.nil?
-          if File.file?(self.git_private_key)
-            ssh_add = File.expand_path(self.git_private_key).shellescape.to_s
-          else
-            UI.message("Private key file does not exist, will continue by using it as a raw key.")
-            ssh_add = "- <<< \"#{self.git_private_key}\""
-          end
-          command = "ssh-agent bash -c 'ssh-add #{ssh_add}; #{command}'"
-        end
+        command = command_from_private_key(command) unless self.git_private_key.nil?
 
         UI.message("Cloning remote git repo...")
         if self.branch && !self.clone_branch_directly
@@ -170,6 +162,16 @@ module Match
         Dir[File.join(working_directory, "**", file_name, "*.#{file_ext}")]
       end
 
+      def command_from_private_key(command)
+        if File.file?(self.git_private_key)
+          ssh_add = File.expand_path(self.git_private_key).shellescape.to_s
+        else
+          UI.message("Private key file does not exist, will continue by using it as a raw key.")
+          ssh_add = "- <<< \"#{self.git_private_key}\""
+        end
+        return "ssh-agent bash -c 'ssh-add #{ssh_add}; #{command}'"
+      end
+
       private
 
       # Create and checkout an specific branch in the git repo
@@ -231,7 +233,9 @@ module Match
       def git_push(commands: [], commit_message: nil)
         commit_message ||= generate_commit_message
         commands << "git commit -m #{commit_message.shellescape}"
-        commands << "git push origin #{self.branch.shellescape}"
+        git_push_command = "git push origin #{self.branch.shellescape}"
+        git_push_command = command_from_private_key(git_push_command) unless self.git_private_key.nil?
+        commands << git_push_command
 
         UI.message("Pushing changes to remote git repo...")
         Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
