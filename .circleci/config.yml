@@ -78,6 +78,7 @@ jobs:
           command: |
             mkdir -p ~/test-reports
             brew install shellcheck
+            gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
       - *cache_save_bundler
       - run:
@@ -131,6 +132,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
+            gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
       - *cache_save_bundler
       - run:
@@ -166,6 +168,7 @@ jobs:
           command: |
             mkdir -p ~/test-reports
             brew install shellcheck
+            gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
       - *cache_save_bundler
       - run: bundle exec fastlane generate_swift_api
@@ -183,7 +186,7 @@ jobs:
           name: Setup Build
           command: |
             gem update --system
-            gem install bundler
+            gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
 
       - *cache_save_bundler
@@ -202,6 +205,7 @@ jobs:
       - run:
           name: Setup Build
           command: |
+            gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
 
       - *cache_save_bundler
