@@ -7,6 +7,7 @@
 [![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](https://rubygems.org/gems/fastlane)
+[![Homebrew](https://img.shields.io/badge/dynamic/json.svg?url=https://formulae.brew.sh/api/formula/fastlane.json&query=$.versions.stable&label=homebrew)](https://formulae.brew.sh/formula/fastlane)
 [![Build Status](https://img.shields.io/circleci/project/github/fastlane/fastlane/master.svg)](https://circleci.com/gh/fastlane/fastlane)
 [![PRs welcome!](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
 
@@ -187,12 +188,12 @@ Check out [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to help
 Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 ## Metrics
- 
-_fastlane_ tracks a few key metrics to understand how developers are using the tool and to help us know what areas need improvement. No personal/sensitive information is ever collected. Metrics that are collected include: 
- 
+
+_fastlane_ tracks a few key metrics to understand how developers are using the tool and to help us know what areas need improvement. No personal/sensitive information is ever collected. Metrics that are collected include:
+
 * The number of _fastlane_ runs
 * A salted hash of the app identifier or package name, which helps us anonymously identify unique usage of _fastlane_
- 
+
 You can easily opt-out of metrics collection by adding `opt_out_usage` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. [Check out the metrics code on GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane_core/lib/fastlane_core/analytics)
 
 ## License
