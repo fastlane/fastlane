@@ -85,7 +85,8 @@ jobs:
             mkdir -p ~/test-reports
             brew install shellcheck
             gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundlee
+
       - *cache_save_bundler
       - run:
           name: Check PR Metadata
@@ -178,7 +179,6 @@ jobs:
             gem update --system
             gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
             bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-
       - *cache_save_bundler
 
       - run: bundle exec fastlane validate_docs

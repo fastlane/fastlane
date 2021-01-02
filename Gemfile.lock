@@ -333,7 +333,7 @@ GEM
     yard (0.9.26)
 
 PLATFORMS
-  x86_64-darwin-19
+  ruby
 
 DEPENDENCIES
   climate_control (~> 0.2.0)
