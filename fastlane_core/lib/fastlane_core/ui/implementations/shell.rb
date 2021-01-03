@@ -69,6 +69,7 @@ module FastlaneCore
     end
 
     def command_output(message)
+      message = message.encode('UTF-8', 'ASCII', invalid: :replace)
       actual = (message.split("\r").last || "") # as clearing the line will remove the `>` and the time stamp
       actual.split("\n").each do |msg|
         if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_OUTPUT_FORMAT")
