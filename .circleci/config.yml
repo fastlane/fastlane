@@ -49,6 +49,14 @@ aliases:
         echo "ruby-${_RUBY_VERSION}" > ~/.ruby-version
         echo 'chruby ruby-${_RUBY_VERSION}' >> ~/.bash_profile
 
+  - &bundle_install
+    run:
+      name: bundle install
+      command: |
+        gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
+        bundle config set --local path .bundle
+        bundle check || bundle install --jobs=4 --retry=3
+
 jobs:
   tests_macos: &tests_macos_base
     description: 'Execute tests on macOS with given Xcode and Ruby version'
@@ -84,9 +92,7 @@ jobs:
           command: |
             mkdir -p ~/test-reports
             brew install shellcheck
-            gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundlee
-
+      - *bundle_install
       - *cache_save_bundler
       - run:
           name: Check PR Metadata
@@ -124,8 +130,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - *bundle_install
       - *cache_save_bundler
       - run:
           name: Check PR Metadata
@@ -156,8 +161,7 @@ jobs:
           command: |
             mkdir -p ~/test-reports
             brew install shellcheck
-            gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - *bundle_install
       - *cache_save_bundler
       - run: bundle exec fastlane generate_swift_api
 
@@ -177,8 +181,7 @@ jobs:
           name: Setup Build
           command: |
             gem update --system
-            gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - *bundle_install
       - *cache_save_bundler
 
       - run: bundle exec fastlane validate_docs
@@ -194,13 +197,7 @@ jobs:
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
-
-      - run:
-          name: Setup Build
-          command: |
-            gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-
+      - *bundle_install
       - *cache_save_bundler
 
       - run: bundle exec fastlane lint_source
