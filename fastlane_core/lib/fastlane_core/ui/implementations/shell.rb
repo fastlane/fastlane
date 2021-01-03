@@ -69,8 +69,7 @@ module FastlaneCore
     end
 
     def command_output(message)
-      message = message.encode('UTF-8', 'ASCII', invalid: :replace)
-      actual = (message.split("\r").last || "") # as clearing the line will remove the `>` and the time stamp
+      actual = (make_utf_8(message).split("\r").last || "") # as clearing the line will remove the `>` and the time stamp
       actual.split("\n").each do |msg|
         if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_OUTPUT_FORMAT")
           log.info(msg)
@@ -150,6 +149,19 @@ module FastlaneCore
     end
 
     private
+
+    def make_utf_8(message)
+      orig_encoding = message.encoding
+
+      # Try some common encodings and return the first with valid codings
+      ['UTF-8', 'UTF-16', 'ISO-8859-1'].each do |dest_encoding|
+        message.force_encoding(dest_encoding)
+        return message.encode('UTF-8', dest_encoding) if message.valid_encoding?
+      end
+
+      message.force_encoding(orig_encoding)
+      return message
+    end
 
     def verify_interactive!(message)
       return if interactive?
