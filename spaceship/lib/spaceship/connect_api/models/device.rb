@@ -69,9 +69,7 @@ module Spaceship
 
         # Find the device by UDID and return it in case it already exists
         existing = self.find_by_udid(udid, client: client, platform: platform)
-        if existing
-          return existing
-        end
+        return existing if existing
 
         resp = client.post_device(name: name, platform: platform, udid: udid)
         return resp.to_models.first
