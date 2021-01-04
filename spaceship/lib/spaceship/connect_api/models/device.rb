@@ -70,7 +70,6 @@ module Spaceship
         # Find the device by UDID and return it in case it already exists
         existing = self.find_by_udid(udid, client: client, platform: platform)
         if existing
-          UI.verbose("UDID '#{udid}' already exists - Skipping its creation...")
           return existing
         end
 
