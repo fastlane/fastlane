@@ -72,14 +72,23 @@ describe Spaceship::Client do
 
     context 'when running non-interactive' do
       it 'raises an error' do
-        expect(subject).to receive(:interactive).and_return(false)
+        ENV["FASTLANE_IS_INTERACTIVE"] = "false"
         expect { subject.handle_two_step_or_factor("response") }.to raise_error("2FA can only be performed in interactive mode")
       end
     end
 
     context 'when running interactive' do
       it 'does not raise an error' do
-        expect(subject).to receive(:interactive).and_return(true)
+        ENV["FASTLANE_IS_INTERACTIVE"] = "true"
+        expect(subject).to receive(:handle_two_factor)
+        stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
+        subject.handle_two_step_or_factor("response")
+      end
+    end
+
+    context 'when interactive mode is not set' do
+      it 'does not raise an error' do
+        ENV["FASTLANE_IS_INTERACTIVE"] = nil
         expect(subject).to receive(:handle_two_factor)
         stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
         subject.handle_two_step_or_factor("response")
