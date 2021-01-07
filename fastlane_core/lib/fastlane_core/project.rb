@@ -323,8 +323,13 @@ module FastlaneCore
       proj << "-derivedDataPath #{options[:derived_data_path].shellescape}" if options[:derived_data_path]
       proj << "-xcconfig #{options[:xcconfig].shellescape}" if options[:xcconfig]
 
-      if FastlaneCore::Helper.xcode_at_least?('11.0') && options[:cloned_source_packages_path]
+      xcode_at_least_11 = FastlaneCore::Helper.xcode_at_least?('11.0')
+      if xcode_at_least_11 && options[:cloned_source_packages_path]
         proj << "-clonedSourcePackagesDirPath #{options[:cloned_source_packages_path].shellescape}"
+      end
+
+      if xcode_at_least_11 && options[:disable_automatic_package_resolution] == true
+        proj << "-disableAutomaticPackageResolution"
       end
 
       return proj
@@ -350,9 +355,13 @@ module FastlaneCore
     end
 
     def build_xcodebuild_resolvepackagedependencies_command
-      command = "xcodebuild -resolvePackageDependencies #{xcodebuild_parameters.join(' ')}"
-      command += " 2> /dev/null" if xcodebuild_suppress_stderr
-      command
+      if options[:skip_resolve_package_dependencies] == true
+        return nil
+      else
+        command = "xcodebuild -resolvePackageDependencies #{xcodebuild_parameters.join(' ')}"
+        command += " 2> /dev/null" if xcodebuild_suppress_stderr
+        command
+      end
     end
 
     # Get the build settings for our project
@@ -369,10 +378,15 @@ module FastlaneCore
 
         # SwiftPM support
         if FastlaneCore::Helper.xcode_at_least?('11.0')
-          UI.important("Resolving Swift Package Manager dependencies...")
-          FastlaneCore::CommandExecutor.execute(command: build_xcodebuild_resolvepackagedependencies_command,
-                                                print_all: true,
-                                                print_command: !self.xcodebuild_list_silent)
+          command = build_xcodebuild_resolvepackagedependencies_command
+          if command
+            UI.important("Resolving Swift Package Manager dependencies...")
+            FastlaneCore::CommandExecutor.execute(command: command,
+              print_all: true,
+              print_command: !self.xcodebuild_list_silent)
+          else
+            UI.important("Skipped Swift Package Manager dependencies resolution.")
+          end
         end
 
         command = build_xcodebuild_showbuildsettings_command
