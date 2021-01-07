@@ -11,9 +11,9 @@ module Fastlane
         skip_git_hooks = params[:skip_git_hooks] ? '--no-verify' : ''
 
         if params[:allow_nothing_to_commit]
-          nothing_staged = Actions.sh("git --no-pager diff --name-only --staged").empty?
-          UI.success("Nothing staged to commit ✅.") if nothing_staged
-          return if nothing_staged
+          repo_clean = Actions.sh("git status #{paths} --porcelain").empty?
+          UI.success("Nothing to commit, working tree clean ✅.") if repo_clean
+          return if repo_clean
         end
 
         command = "git commit -m #{params[:message].shellescape} #{paths} #{skip_git_hooks}".strip
