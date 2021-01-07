@@ -187,7 +187,9 @@ module Fastlane
 
       def self.generate_slack_attachments(options)
         color = (options[:success] ? 'good' : 'danger')
-        should_add_payload = ->(payload_name) { options[:default_payloads].map(&:to_sym).include?(payload_name.to_sym) }
+        default_payloads = self.available_options.find { |a| a.key == :default_payloads }
+        default_payloads_value = options[:default_payloads] || default_payloads.default_value
+        should_add_payload = ->(payload_name) { default_payloads_value.map(&:to_sym).include?(payload_name.to_sym) }
 
         slack_attachment = {
           fallback: options[:message],
