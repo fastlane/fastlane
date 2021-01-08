@@ -18,7 +18,7 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
         require 'fastlane/actions/slack'
-        arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+        options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           message: message,
           success: false,
@@ -30,7 +30,7 @@ describe Fastlane do
           default_payloads: [:lane, :test_result, :git_branch, :git_author, :last_git_commit_hash]
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
+        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
 
         expect(notifier.config.defaults[:username]).to eq('fastlane')
         expect(notifier.config.defaults[:channel]).to eq(channel)
@@ -59,7 +59,7 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
         require 'fastlane/actions/slack'
-        arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+        options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           message: message,
           pretext: pretext,
@@ -67,7 +67,7 @@ describe Fastlane do
           channel: channel
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
+        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
 
         expect(notifier.config.defaults[:username]).to eq('fastlane')
         expect(notifier.config.defaults[:channel]).to eq(channel)
@@ -85,7 +85,7 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
         require 'fastlane/actions/slack'
-        arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+        options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           message: message,
           success: false,
@@ -101,7 +101,7 @@ describe Fastlane do
           }
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
+        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
 
         fields = attachments[:fields]
 
@@ -123,7 +123,7 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
         require 'fastlane/actions/slack'
-        arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+        options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           message: message,
           success: false,
@@ -131,7 +131,7 @@ describe Fastlane do
           default_payloads: "lane,test_result"
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
+        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
 
         fields = attachments[:fields]
 
@@ -148,7 +148,7 @@ describe Fastlane do
         message = "Custom Message"
 
         require 'fastlane/actions/slack'
-        arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+        options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           message: message,
           success: false,
@@ -156,7 +156,7 @@ describe Fastlane do
           default_payloads: [:git_branch, :last_git_commit_hash]
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
+        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
 
         fields = attachments[:fields]
 
@@ -174,7 +174,8 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
         require 'fastlane/actions/slack'
-        arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+
+        options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           message: message,
           success: false,
@@ -190,6 +191,7 @@ describe Fastlane do
         expect(attachments[:color]).to eq('danger')
         expect(attachments[:text]).to eq(message)
         expect(attachments[:pretext]).to eq(nil)
+        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
 
         fields = attachments[:fields]
         expect(fields[0][:title]).to eq('Lane')
@@ -215,14 +217,14 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
         require 'fastlane/actions/slack'
-        arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+        options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           message: input_message,
           success: false,
           channel: channel
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
+        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
 
         expect(notifier.config.defaults[:username]).to eq('fastlane')
         expect(notifier.config.defaults[:channel]).to eq(channel)
@@ -243,14 +245,14 @@ describe Fastlane do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
         require 'fastlane/actions/slack'
-        arguments = Fastlane::ConfigurationHelper.parse(Fastlane::Actions::SlackAction, {
+        options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           pretext: input_pretext,
           success: false,
           channel: channel
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(arguments)
+        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
 
         expect(notifier.config.defaults[:username]).to eq('fastlane')
         expect(notifier.config.defaults[:channel]).to eq(channel)
