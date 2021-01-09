@@ -154,13 +154,11 @@ module Pilot
 
       return if config[:skip_submission]
       if options[:reject_build_waiting_for_review]
-        waiting_for_review_build = build.app.get_builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
-        unless waiting_for_review_build.nil?
-          UI.important("Another build is already in review. Going to remove that build and submit the new one.")
-          UI.important("Deleting beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
-          waiting_for_review_build.beta_app_review_submission.delete!
-          UI.success("Deleted beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
-        end
+        reject_build_waiting_for_review(build)
+      end
+
+      if options[:expire_previous_builds]
+        expire_previous_builds(build)
       end
 
       if !build.ready_for_internal_testing? && options[:skip_waiting_for_build_processing]
@@ -194,7 +192,7 @@ module Pilot
         [
           build.app_version,
           build.version,
-          (build.beta_build_metrics || []).map(&:install_count).reduce(:+)
+          (build.beta_build_metrics || []).map(&:install_count).compact.reduce(:+)
         ]
       end
 
@@ -275,16 +273,31 @@ module Pilot
       changelog
     end
 
+    def self.emoji_regex
+      # EmojiRegex::RGIEmoji is now preferred over EmojiRegex::Regex which is deprecated as of 3.2.0
+      # https://github.com/ticky/ruby-emoji-regex/releases/tag/v3.2.0
+      return defined?(EmojiRegex::RGIEmoji) ? EmojiRegex::RGIEmoji : EmojiRegex::Regex
+    end
+
     def self.strip_emoji(changelog)
-      if changelog && changelog =~ EmojiRegex::Regex
-        changelog.gsub!(EmojiRegex::Regex, "")
+      if changelog && changelog =~ emoji_regex
+        changelog.gsub!(emoji_regex, "")
         UI.important("Emoji symbols have been removed from the changelog, since they're not allowed by Apple.")
+      end
+      changelog
+    end
+
+    def self.strip_less_than_sign(changelog)
+      if changelog && changelog.include?("<")
+        changelog.delete!("<")
+        UI.important("Less than signs (<) have been removed from the changelog, since they're not allowed by Apple.")
       end
       changelog
     end
 
     def self.sanitize_changelog(changelog)
       changelog = strip_emoji(changelog)
+      changelog = strip_less_than_sign(changelog)
       truncate_changelog(changelog)
     end
 
@@ -318,22 +331,51 @@ module Pilot
       !options[:localized_build_info].nil?
     end
 
+    def reject_build_waiting_for_review(build)
+      waiting_for_review_build = build.app.get_builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
+      unless waiting_for_review_build.nil?
+        UI.important("Another build is already in review. Going to remove that build and submit the new one.")
+        UI.important("Deleting beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+        waiting_for_review_build.beta_app_review_submission.delete!
+        UI.success("Deleted beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+      end
+    end
+
+    def expire_previous_builds(build)
+      builds_to_expire = build.app.get_builds.reject do |asc_build|
+        asc_build.id == build.id
+      end
+
+      builds_to_expire.each(&:expire!)
+    end
+
+    # If App Store Connect API token, use token.
     # If itc_provider was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
+      # Use JWT auth
+      unless api_token.nil?
+        api_token.refresh! if api_token.expired?
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)
+      end
+
+      # Otherwise use username and password
+      tunes_client = Spaceship::ConnectAPI.client ? Spaceship::ConnectAPI.client.tunes_client : nil
+
       generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
-      return generic_transporter if options[:itc_provider] || Spaceship::Tunes.client.nil?
-      return generic_transporter unless Spaceship::Tunes.client.teams.count > 1
+      return generic_transporter if options[:itc_provider] || tunes_client.nil?
+      return generic_transporter unless tunes_client.teams.count > 1
 
       begin
-        team = Spaceship::Tunes.client.teams.find { |t| t['contentProvider']['contentProviderId'].to_s == Spaceship::Tunes.client.team_id }
+        team = tunes_client.teams.find { |t| t['contentProvider']['contentProviderId'].to_s == tunes_client.team_id }
         name = team['contentProvider']['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
         return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
       rescue => ex
-        UI.verbose("Couldn't infer a provider short name for team with id #{Spaceship::Tunes.client.team_id} automatically: #{ex}. Proceeding without provider short name.")
+        STDERR.puts(ex.to_s)
+        UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")
         return generic_transporter
       end
     end

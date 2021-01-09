@@ -26,27 +26,37 @@ module Fastlane
       end
 
       def self.get_build_number(params)
-        UI.message("Login to App Store Connect (#{params[:username]})")
-        Spaceship::Tunes.login(params[:username])
-        Spaceship::Tunes.select_team(team_id: params[:team_id], team_name: params[:team_name])
-        UI.message("Login successful")
+        # Prompts select team if multiple teams and none specified
+        token = self.api_token(params)
+        if token
+          UI.message("Using App Store Connect API token...")
+          Spaceship::ConnectAPI.token = token
+        else
+          UI.message("Login to App Store Connect (#{params[:username]})")
+          Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true, tunes_team_id: params[:team_id], team_name: params[:team_name])
+          UI.message("Login successful")
+        end
 
-        app = Spaceship::Tunes::Application.find(params[:app_identifier], mac: params[:platform] == "osx")
+        platform = Spaceship::ConnectAPI::Platform.map(params[:platform])
+
+        app = Spaceship::ConnectAPI::App.find(params[:app_identifier])
         UI.user_error!("Could not find an app on App Store Connect with app_identifier: #{params[:app_identifier]}") unless app
         if params[:live]
           UI.message("Fetching the latest build number for live-version")
-          UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on iTC") unless app.live_version
-          build_nr = app.live_version.current_build_number
+          live_version = app.get_live_app_store_version(platform: platform)
 
-          UI.message("Latest upload for live-version #{app.live_version.version} is build: #{build_nr}")
+          UI.user_error!("Could not find a live-version of #{params[:app_identifier]} on App Store Connect") unless live_version
+          build_nr = live_version.build.version
 
-          return OpenStruct.new({ build_nr: build_nr, build_v: app.live_version.version })
+          UI.message("Latest upload for live-version #{live_version.version_string} is build: #{build_nr}")
+
+          return OpenStruct.new({ build_nr: build_nr, build_v: live_version.version_string })
         else
           version_number = params[:version]
           platform = params[:platform]
 
           # Create filter for get_builds with optional version number
-          filter = { app: app.apple_id }
+          filter = { app: app.id }
           if version_number
             filter["preReleaseVersion.version"] = version_number
             version_number_message = "version #{version_number}"
@@ -88,6 +98,13 @@ module Fastlane
         versions.map(&:to_s).sort_by { |v| Gem::Version.new(v) }
       end
 
+      def self.api_token(params)
+        params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+        api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
+        return api_token
+      end
+
       #####################################################
       # @!group Documentation
       #####################################################
@@ -100,6 +117,21 @@ module Fastlane
         user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
         [
+          FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                       env_name: "APPSTORE_BUILD_NUMBER_API_KEY_PATH",
+                                       description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                       optional: true,
+                                       conflicting_options: [:api_key],
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :api_key,
+                                       env_name: "APPSTORE_BUILD_NUMBER_API_KEY",
+                                       description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                       type: Hash,
+                                       optional: true,
+                                       sensitive: true,
+                                       conflicting_options: [:api_key_path]),
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
                                        env_name: "INITIAL_BUILD_NUMBER",
                                        description: "sets the build number to given value if no build is in current train",
@@ -189,6 +221,14 @@ module Fastlane
             live: false,
             app_identifier: "app.identifier",
             version: "1.2.9"
+          )',
+          'api_key = app_store_connect_api_key(
+            key_id: "MyKeyID12345",
+            issuer_id: "00000000-0000-0000-0000-000000000000",
+            key_filepath: "./AuthKey.p8"
+          )
+          build_num = app_store_build_number(
+            api_key: api_key
           )'
         ]
       end

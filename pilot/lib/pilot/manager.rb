@@ -17,12 +17,22 @@ module Pilot
     end
 
     def login
-      config[:username] ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+      if api_token
+        UI.message("Creating authorization token for App Store Connect API")
+        Spaceship::ConnectAPI.token = api_token
+      else
+        config[:username] ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
-      UI.message("Login to App Store Connect (#{config[:username]})")
-      Spaceship::Tunes.login(config[:username])
-      Spaceship::Tunes.select_team(team_id: config[:team_id], team_name: config[:team_name])
-      UI.message("Login successful")
+        UI.message("Login to App Store Connect (#{config[:username]})")
+        Spaceship::ConnectAPI.login(config[:username], use_portal: false, use_tunes: true, tunes_team_id: config[:team_id], team_name: config[:team_name])
+        UI.message("Login successful")
+      end
+    end
+
+    def api_token
+      @api_token ||= Spaceship::ConnectAPI::Token.create(config[:api_key]) if config[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(config[:api_key_path]) if config[:api_key_path]
+      return @api_token
     end
 
     # The app object we're currently using

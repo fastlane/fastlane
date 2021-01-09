@@ -108,7 +108,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :use_app_entitlements,
                                        env_name: "FL_USE_APP_ENTITLEMENTS",
-                                       description: "Extract app bundle codesigning entitlements and combine with entitlements from new provisionin profile",
+                                       description: "Extract app bundle codesigning entitlements and combine with entitlements from new provisioning profile",
                                        conflicting_options: [:entitlements],
                                        is_string: false,
                                        optional: true),

@@ -30,6 +30,7 @@ module Match
 
       def encrypt_files
         files = []
+        password = fetch_password!
         iterate(self.working_directory) do |current|
           files << current
           encrypt_specific_file(path: current, password: password)
@@ -41,6 +42,7 @@ module Match
 
       def decrypt_files
         files = []
+        password = fetch_password!
         iterate(self.working_directory) do |current|
           files << current
           begin
@@ -50,7 +52,7 @@ module Match
             UI.error("Couldn't decrypt the repo, please make sure you enter the right password!")
             UI.user_error!("Invalid password passed via 'MATCH_PASSWORD'") if ENV["MATCH_PASSWORD"]
             clear_password
-            self.decrypt_files # call itself
+            self.decrypt_files # Call itself
             return
           end
           UI.success("🔓  Decrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
@@ -83,7 +85,7 @@ module Match
       end
 
       # Access the MATCH_PASSWORD, either from ENV variable, Keychain or user input
-      def password
+      def fetch_password!
         password = ENV["MATCH_PASSWORD"]
         unless password
           item = Security::InternetPassword.find(server: server_name(self.keychain_name))
@@ -99,7 +101,7 @@ module Match
             UI.important("Enter the passphrase that should be used to encrypt/decrypt your certificates")
             UI.important("This passphrase is specific per repository and will be stored in your local keychain")
             UI.important("Make sure to remember the password, as you'll need it when you run match on a different machine")
-            password = ChangePassword.ask_password(confirm: true)
+            password = FastlaneCore::Helper.ask_password(message: "Passphrase for Match storage: ", confirm: true)
             store_password(password)
           end
         end

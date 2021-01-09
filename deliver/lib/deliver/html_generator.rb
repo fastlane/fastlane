@@ -1,3 +1,5 @@
+require 'spaceship'
+
 require_relative 'module'
 
 module Deliver
@@ -35,8 +37,8 @@ module Deliver
     # Returns a path relative to FastlaneFolder.path
     # This is needed as the Preview.html file is located inside FastlaneFolder.path
     def render_relative_path(export_path, path)
-      export_path = Pathname.new(export_path)
-      path = Pathname.new(path).relative_path_from(export_path)
+      export_path = Pathname.new(File.expand_path(export_path))
+      path = Pathname.new(File.expand_path(path)).relative_path_from(export_path)
       return path.to_path
     end
 
@@ -51,7 +53,12 @@ module Deliver
       @app_name ||= options[:app].name
 
       @languages = options[:description].keys if options[:description]
-      @languages ||= options[:app].latest_version.description.languages
+      @languages ||= begin
+        platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+        version = options[:app].get_edit_app_store_version(platform: platform)
+
+        version.get_app_store_version_localizations.collect(&:locale)
+      end
 
       html_path = File.join(Deliver::ROOT, "lib/assets/summary.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system

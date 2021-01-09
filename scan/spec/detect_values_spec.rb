@@ -15,6 +15,30 @@ describe Scan do
       end
     end
 
+    describe "#detect_destination" do
+      it "ios", requires_xcodebuild: true do
+        options = { project: "./scan/examples/standard/app.xcodeproj" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        expect(Scan.config[:destination].first).to match(/platform=iOS/)
+      end
+
+      context "catalyst" do
+        it "ios", requires_xcodebuild: true do
+          options = { project: "./scan/examples/standard/app.xcodeproj" }
+          expect_any_instance_of(FastlaneCore::Project).to receive(:supports_mac_catalyst?).and_return(true)
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.config[:destination].first).to match(/platform=iOS/)
+        end
+
+        it "mac", requires_xcodebuild: true do
+          options = { project: "./scan/examples/standard/app.xcodeproj", catalyst_platform: "macos" }
+          expect_any_instance_of(FastlaneCore::Project).to receive(:supports_mac_catalyst?).and_return(true)
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.config[:destination].first).to match(/platform=macOS,variant=Mac Catalyst/)
+        end
+      end
+    end
+
     describe "validation" do
       it "advises of problems with multiple output_types and a custom_report_file_name", requires_xcodebuild: true do
         options = {
@@ -63,6 +87,33 @@ describe Scan do
         }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
         expect(Scan.config[:skip_testing]).to eq(["Bundle/SuiteA", "Bundle/SuiteB"])
+      end
+
+      it "coerces only_test_configurations to be an array", requires_xcodebuild: true do
+        options = {
+          project: "./scan/examples/standard/app.xcodeproj",
+          only_test_configurations: "ConfigurationA"
+        }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        expect(Scan.config[:only_test_configurations]).to eq(["ConfigurationA"])
+      end
+
+      it "coerces skip_test_configurations to be an array", requires_xcodebuild: true do
+        options = {
+          project: "./scan/examples/standard/app.xcodeproj",
+          skip_test_configurations: "ConfigurationA,ConfigurationB"
+        }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        expect(Scan.config[:skip_test_configurations]).to eq(["ConfigurationA", "ConfigurationB"])
+      end
+
+      it "leaves skip_test_configurations as an array", requires_xcodebuild: true do
+        options = {
+          project: "./scan/examples/standard/app.xcodeproj",
+          skip_test_configurations: ["ConfigurationA", "ConfigurationB"]
+        }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        expect(Scan.config[:skip_test_configurations]).to eq(["ConfigurationA", "ConfigurationB"])
       end
     end
   end

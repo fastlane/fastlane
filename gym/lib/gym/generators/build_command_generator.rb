@@ -38,8 +38,8 @@ module Gym
         options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
         options << "-destination '#{config[:destination]}'" if config[:destination]
         options << "-archivePath #{archive_path.shellescape}" unless config[:skip_archive]
-        options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
+        options << "-scmProvider system" if config[:use_system_scm]
         options << config[:xcargs] if config[:xcargs]
         options << "OTHER_SWIFT_FLAGS=\"-Xfrontend -debug-time-function-bodies\"" if config[:analyze_build_time]
 

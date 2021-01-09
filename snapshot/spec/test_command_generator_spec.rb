@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 describe Snapshot do
   describe Snapshot::TestCommandGenerator do
     let(:os_version) { "9.3" }
@@ -105,11 +107,11 @@ describe Snapshot do
 
         expect(FastlaneCore::CommandExecutor).
           to receive(:execute).
-          with(command: "xcrun simctl spawn --standalone 33333 log collect --output /tmp/scan_results/de-DE/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null", print_all: false, print_command: true)
+          with(command: %r{xcrun simctl spawn 33333 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/de-DE/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null}, print_all: false, print_command: true)
 
         expect(FastlaneCore::CommandExecutor).
           to receive(:execute).
-          with(command: "xcrun simctl spawn --standalone 98765 log collect --output /tmp/scan_results/en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null", print_all: false, print_command: true)
+          with(command: %r{xcrun simctl spawn 98765 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null}, print_all: false, print_command: true)
 
         Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPhone 6 (10.1)"], "de-DE", nil, 0)
         Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPhone 6s (10.1)"], "en-US", nil, 0)
@@ -175,12 +177,14 @@ describe Snapshot do
               "xcodebuild",
               "-scheme ExampleUITests",
               "-project ./snapshot/example/Example.xcodeproj",
-              "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+              "-derivedDataPath /tmp/path/to/snapshot_derived",
               "-destination 'platform=iOS Simulator,name=#{name},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
               :build,
               :test,
-              "| tee /path/to/logs | xcpretty "
+              "| tee /path/to/logs",
+              "| xcpretty "
             ]
           )
         end
@@ -202,13 +206,15 @@ describe Snapshot do
               "xcodebuild",
               "-scheme ExampleUITests",
               "-project ./snapshot/example/Example.xcodeproj",
-              "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+              "-derivedDataPath /tmp/path/to/snapshot_derived",
               "-only-testing:TestBundle/TestSuite/Screenshots",
               "-destination 'platform=iOS Simulator,name=#{name},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
               :build,
               :test,
-              "| tee /path/to/logs | xcpretty "
+              "| tee /path/to/logs",
+              "| xcpretty "
             ]
           )
         end
@@ -230,32 +236,38 @@ describe Snapshot do
               "xcodebuild",
               "-scheme ExampleUITests",
               "-project ./snapshot/example/Example.xcodeproj",
-              "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+              "-derivedDataPath /tmp/path/to/snapshot_derived",
               "-destination 'platform=tvOS Simulator,name=#{name},OS=#{os}'",
               "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
               :build,
               :test,
-              "| tee /path/to/logs | xcpretty "
+              "| tee /path/to/logs",
+              "| xcpretty "
             ]
           )
         end
       end
 
       context 'fixed derivedDataPath' do
+        let(:temp) { Dir.mktmpdir }
+
         before do
-          configure(options.merge(derived_data_path: 'fake/derived/path'))
+          configure(options.merge(derived_data_path: temp))
         end
 
         it 'uses the fixed derivedDataPath if given', requires_xcode: true do
           expect(Dir).not_to(receive(:mktmpdir))
           command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
-          expect(command.join('')).to include("-derivedDataPath 'fake/derived/path'")
+          expect(command.join('')).to include("-derivedDataPath #{temp}")
         end
       end
 
       context 'test-without-building' do
+        let(:temp) { Dir.mktmpdir }
+
         before do
-          configure(options.merge(derived_data_path: 'fake/derived/path', test_without_building: true))
+          configure(options.merge(derived_data_path: temp, test_without_building: true))
         end
 
         it 'uses the "test-without-building" command and not the default "build test"', requires_xcode: true do
@@ -271,6 +283,74 @@ describe Snapshot do
 
           command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
           expect(command.join('')).to include("-testPlan 'simple'") if FastlaneCore::Helper.xcode_at_least?(11)
+        end
+      end
+
+      context "only-testing" do
+        it "only tests the test bundle/suite/cases specified in only_testing when the input is an array", requires_xcode: true do
+          configure(options.merge(only_testing: %w(TestBundleA/TestSuiteB TestBundleC)))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-only-testing:TestBundleA/TestSuiteB")
+          expect(command.join('')).to include("-only-testing:TestBundleC")
+        end
+
+        it "only tests the test bundle/suite/cases specified in only_testing when the input is a string", requires_xcode: true do
+          configure(options.merge(only_testing: 'TestBundleA/TestSuiteB'))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-only-testing:TestBundleA/TestSuiteB")
+          expect(command.join('')).not_to(include("-only-testing:TestBundleC"))
+        end
+      end
+
+      context "skip-testing" do
+        it "does not test the test bundle/suite/cases specified in skip_testing when the input is an array", requires_xcode: true do
+          configure(options.merge(skip_testing: %w(TestBundleA/TestSuiteB TestBundleC)))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-skip-testing:TestBundleA/TestSuiteB")
+          expect(command.join('')).to include("-skip-testing:TestBundleC")
+        end
+
+        it "does not test the test bundle/suite/cases specified in skip_testing when the input is a string", requires_xcode: true do
+          configure(options.merge(skip_testing: 'TestBundleA/TestSuiteB'))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("-skip-testing:TestBundleA/TestSuiteB")
+          expect(command.join('')).not_to(include("-skip-testing:TestBundleC"))
+        end
+      end
+
+      context "disable_xcpretty" do
+        it "does not include xcpretty in the pipe command when true", requires_xcode: true do
+          configure(options.merge(disable_xcpretty: true))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to_not(include("| xcpretty "))
+        end
+
+        it "includes xcpretty in the pipe command when false", requires_xcode: true do
+          configure(options.merge(disable_xcpretty: false))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("| xcpretty ")
+        end
+      end
+
+      context "suppress_xcode_output" do
+        it "includes /dev/null in the pipe command when true", requires_xcode: true do
+          configure(options.merge(suppress_xcode_output: true))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to include("> /dev/null")
+        end
+
+        it "does not include /dev/null in the pipe command when false", requires_xcode: true do
+          configure(options.merge(suppress_xcode_output: false))
+
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          expect(command.join('')).to_not(include("> /dev/null"))
         end
       end
     end
@@ -293,12 +373,14 @@ describe Snapshot do
             "xcodebuild",
             "-scheme ExampleMacOS",
             "-project ./snapshot/example/Example.xcodeproj",
-            "-derivedDataPath '/tmp/path/to/snapshot_derived'",
+            "-derivedDataPath /tmp/path/to/snapshot_derived",
             "-destination 'platform=macOS'",
             "FASTLANE_SNAPSHOT=YES",
+            "FASTLANE_LANGUAGE=en",
             :build,
             :test,
-            "| tee /path/to/logs | xcpretty "
+            "| tee /path/to/logs",
+            "| xcpretty "
           ]
         )
       end

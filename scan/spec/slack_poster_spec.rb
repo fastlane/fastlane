@@ -87,7 +87,8 @@ describe Scan::SlackPoster do
           channel: nil,
           slack_url: 'https://slack/hook/url',
           username: 'fastlane',
-          icon_url: 'https://s3-eu-west-1.amazonaws.com/fastlane.tools/fastlane.png',
+          icon_url: 'https://fastlane.tools/assets/img/fastlane_icon.png',
+          default_payloads: nil,
           attachment_properties: {
             fields: [
               {

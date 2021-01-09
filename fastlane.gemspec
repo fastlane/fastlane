@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Jérôme Lacoste",
-                        "Iulian Onofrei",
-                        "Luka Mirosevic",
-                        "Matthew Ellis",
-                        "Helmut Januschka",
-                        "Manu Wallner",
-                        "Olivier Halligon",
-                        "Aaron Brager",
-                        "Jan Piotrowski",
+  spec.authors       = ["Maksym Grebenets",
                         "Kohki Miki",
-                        "Maksym Grebenets",
-                        "Felix Krause",
-                        "Josh Holtz",
-                        "Max Ott",
-                        "Danielle Tomlinson",
-                        "Daniel Jankowski",
-                        "Jimmy Dee",
-                        "Fumiya Nakamura",
-                        "Andrew McBurney",
-                        "Stefan Natchev",
+                        "Jan Piotrowski",
+                        "Helmut Januschka",
                         "Joshua Liebowitz",
-                        "Jorge Revuelta H"]
+                        "Aaron Brager",
+                        "Andrew McBurney",
+                        "Danielle Tomlinson",
+                        "Jorge Revuelta H",
+                        "Manu Wallner",
+                        "Josh Holtz",
+                        "Iulian Onofrei",
+                        "Stefan Natchev",
+                        "Olivier Halligon",
+                        "Max Ott",
+                        "Daniel Jankowski",
+                        "Luka Mirosevic",
+                        "Jérôme Lacoste",
+                        "Fumiya Nakamura",
+                        "Felix Krause",
+                        "Jimmy Dee",
+                        "Matthew Ellis"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -47,7 +47,7 @@ Gem::Specification.new do |spec|
     "docs_url" => "https://docs.fastlane.tools"
   }
 
-  spec.required_ruby_version = '>= 2.0.0'
+  spec.required_ruby_version = '>= 2.4'
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
@@ -67,70 +67,56 @@ Gem::Specification.new do |spec|
   spec.add_dependency('multipart-post', '~> 2.0.0') # Needed for uploading builds to appetize
   spec.add_dependency('word_wrap', '~> 1.0.0') # to add line breaks for tables with long strings
 
-  spec.add_dependency('public_suffix', '~> 2.0.0') # https://github.com/fastlane/fastlane/issues/10162
-
   # TTY dependencies
   spec.add_dependency('tty-screen', '>= 0.6.3', '< 1.0.0') # detect the terminal width
   spec.add_dependency('tty-spinner', '>= 0.8.0', '< 1.0.0') # loading indicators
 
-  spec.add_dependency('babosa', '>= 1.0.2', "< 2.0.0")
+  spec.add_dependency('babosa', '>= 1.0.3', "< 2.0.0") # library for creating human-friendly identifiers, aka "slugs"
   spec.add_dependency('colored') # colored terminal output
   spec.add_dependency('commander-fastlane', '>= 4.4.6', '< 5.0.0') # CLI parser
   spec.add_dependency('excon', '>= 0.71.0', '< 1.0.0') # Great HTTP Client
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
-  spec.add_dependency('faraday', '~> 0.17') # Used for deploygate, hockey and testfairy actions
-  spec.add_dependency('faraday_middleware', '~> 0.13.1') # same as faraday
+  spec.add_dependency('faraday', '~> 1.0') # The faraday gem is used for deploygate, hockey and testfairy actions.
+  spec.add_dependency('faraday_middleware', '~> 1.0') # Same as faraday
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
   spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
-  spec.add_dependency('multi_xml', '~> 0.5')
-  spec.add_dependency('rubyzip', '>= 1.3.0', '< 2.0.0') # fix swift/ipa in gym
+  spec.add_dependency('rubyzip', '>= 2.0.0', '< 3.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
   spec.add_dependency('bundler', '>= 1.12.0', '< 3.0.0') # Used for fastlane plugins
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
-  spec.add_dependency('jwt', '~> 2.1.0') # Used for generating authentication tokens for AppStore connect api
-
-  # need to lock 0.11 and under when using less than Ruby 2.4 to prevent install issues when using 'gem install'
-  # 'gem install' does not respect Ruby versions and would try installing 0.12 on Ruby 2.3 or less
-  # https://github.com/fastlane/fastlane/pull/15483
-  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.4')
-    spec.add_dependency('signet', '<= 0.11')
-    spec.add_dependency('google-cloud-env', '1.2.1')
-    spec.add_dependency('google-cloud-core', '1.3.2')
-    STDERR.puts("WARNING: Locking to a potentially insecure version of 'signet', 'google-cloud-env', and 'google-cloud-core' because you are using a version of Ruby which is marked as End-Of-Life. Please upgrade your Ruby installation to 2.4 or later")
-  end
+  spec.add_dependency('jwt', '>= 2.1.0', '< 3') # Used for generating authentication tokens for App Store Connect API
 
   # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
   # If you upgrade this gem, make sure to upgrade the users of it as well.
-  spec.add_dependency('google-api-client', '>= 0.29.2', '< 0.37.0') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-api-client', '>= 0.37.0', '< 0.39.0') # Google API Client to access Play Publishing API
   spec.add_dependency('google-cloud-storage', '>= 1.15.0', '< 2.0.0') # Access Google Cloud Storage for match
 
-  spec.add_dependency('emoji_regex', '>= 0.1', '< 2.0') # Used to scan for Emoji in the changelog
+  spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
 
   spec.add_dependency('aws-sdk-s3', '~> 1.0') # Used for S3 storage in fastlane match
 
   # Development only
-  spec.add_development_dependency('rake', '< 12')
-  spec.add_development_dependency('rspec', '~> 3.5.0')
-  spec.add_development_dependency('rspec_junit_formatter', '~> 0.2.3')
+  spec.add_development_dependency('rake')
+  spec.add_development_dependency('rspec', '~> 3.9.0')
+  spec.add_development_dependency('rspec_junit_formatter', '~> 0.4.1')
   spec.add_development_dependency('pry')
   spec.add_development_dependency('pry-byebug')
   spec.add_development_dependency('pry-rescue')
   spec.add_development_dependency('pry-stack_explorer')
   spec.add_development_dependency('yard', '~> 0.9.11')
-  spec.add_development_dependency('webmock', '~> 2.3.2')
-  spec.add_development_dependency('hashdiff', '< 0.4.0') # Locked under 0.4.0 until webmock bumped up to 3.6.0 or greater - HashDiff was changed to Hashdiff
+  spec.add_development_dependency('webmock', '~> 3.8')
   spec.add_development_dependency('coveralls', '~> 0.8.13')
   spec.add_development_dependency('rubocop', Fastlane::RUBOCOP_REQUIREMENT)
   spec.add_development_dependency('rubocop-require_tools', '>= 0.1.2')
   spec.add_development_dependency('rb-readline') # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency('rest-client', '>= 1.8.0')
-  spec.add_development_dependency('fakefs', '~> 0.8.1')
-  spec.add_development_dependency('sinatra', '~> 1.4.8')
+  spec.add_development_dependency('fakefs', '~> 1.2.1')
+  spec.add_development_dependency('sinatra', '~> 2.0.8') # Used for mock servers
   spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
   spec.add_development_dependency('climate_control', '~> 0.2.0')
 end

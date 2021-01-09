@@ -4,9 +4,10 @@ require 'credentials_manager'
 describe FastlaneCore do
   let(:password) { "!> p@$s_-+=w'o%rd\"&#*<" }
   let(:email) { 'fabric.devtools@gmail.com' }
+  let(:jwt) { '409jjl43j90ghjqoineio49024' }
 
   describe FastlaneCore::ItunesTransporter do
-    def shell_upload_command(provider_short_name = nil)
+    def shell_upload_command(provider_short_name: nil, transporter: nil, jwt: nil)
       escaped_password = password.shellescape
       unless FastlaneCore::Helper.windows?
         escaped_password = escaped_password.gsub("\\'") do
@@ -17,17 +18,18 @@ describe FastlaneCore do
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         "-m upload",
-        "-u #{email.shellescape}",
-        "-p #{escaped_password}",
+        ("-u #{email.shellescape}" if jwt.nil?),
+        ("-p #{escaped_password}" if jwt.nil?),
+        ("-jwt #{jwt}" unless jwt.nil?),
         "-f \"/tmp/my.app.id.itmsp\"",
-        "-t DAV,Signiant",
+        (transporter.to_s if transporter),
         "-k 100000",
         ("-WONoPause true" if FastlaneCore::Helper.windows?),
         ("-itc_provider #{provider_short_name}" if provider_short_name)
       ].compact.join(' ')
     end
 
-    def shell_download_command(provider_short_name = nil)
+    def shell_download_command(provider_short_name = nil, jwt: nil)
       escaped_password = password.shellescape
       unless FastlaneCore::Helper.windows?
         escaped_password = escaped_password.gsub("\\'") do
@@ -38,24 +40,26 @@ describe FastlaneCore do
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         '-m lookupMetadata',
-        "-u #{email.shellescape}",
-        "-p #{escaped_password}",
+        ("-u #{email.shellescape}" if jwt.nil?),
+        ("-p #{escaped_password}" if jwt.nil?),
+        ("-jwt #{jwt}" unless jwt.nil?),
         "-apple_id my.app.id",
         "-destination '/tmp'",
         ("-itc_provider #{provider_short_name}" if provider_short_name)
       ].compact.join(' ')
     end
 
-    def shell_provider_id_command
+    def shell_provider_id_command(jwt: nil)
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         "-m provider",
-        '-u "fabric.devtools@gmail.com"',
-        "-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'"
+        ('-u "fabric.devtools@gmail.com"' if jwt.nil?),
+        ("-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'" if jwt.nil?),
+        ("-jwt #{jwt}" unless jwt.nil?)
       ].compact.join(' ')
     end
 
-    def java_upload_command(provider_short_name = nil)
+    def java_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, classpath: true)
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
@@ -65,20 +69,22 @@ describe FastlaneCore do
         '-Xms1024m',
         '-Djava.awt.headless=true',
         '-Dsun.net.http.retryPost=false',
-        "-classpath #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
-        'com.apple.transporter.Application',
+        ("-classpath #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}" if classpath),
+        ('com.apple.transporter.Application' if classpath),
+        ("-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}" unless classpath),
         "-m upload",
-        "-u #{email.shellescape}",
-        "-p #{password.shellescape}",
+        ("-u #{email.shellescape}" if jwt.nil?),
+        ("-p #{password.shellescape}" if jwt.nil?),
+        ("-jwt #{jwt}" unless jwt.nil?),
         "-f /tmp/my.app.id.itmsp",
-        "-t DAV,Signiant",
+        (transporter.to_s if transporter),
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
         '2>&1'
       ].compact.join(' ')
     end
 
-    def java_download_command(provider_short_name = nil)
+    def java_download_command(provider_short_name = nil, jwt: nil, classpath: true)
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
@@ -88,11 +94,13 @@ describe FastlaneCore do
         '-Xms1024m',
         '-Djava.awt.headless=true',
         '-Dsun.net.http.retryPost=false',
-        "-classpath #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
-        'com.apple.transporter.Application',
+        ("-classpath #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}" if classpath),
+        ('com.apple.transporter.Application' if classpath),
+        ("-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}" unless classpath),
         '-m lookupMetadata',
-        "-u #{email.shellescape}",
-        "-p #{password.shellescape}",
+        ("-u #{email.shellescape}" if jwt.nil?),
+        ("-p #{password.shellescape}" if jwt.nil?),
+        ("-jwt #{jwt}" unless jwt.nil?),
         '-apple_id my.app.id',
         '-destination /tmp',
         ("-itc_provider #{provider_short_name}" if provider_short_name),
@@ -100,7 +108,7 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
-    def java_provider_id_command
+    def java_provider_id_command(jwt: nil)
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
@@ -113,13 +121,14 @@ describe FastlaneCore do
         "-classpath #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
         'com.apple.transporter.Application',
         '-m provider',
-        '-u fabric.devtools@gmail.com',
-        "-p \\!\\>\\ p@\\$s_-\\+\\=w\\'o\\%rd\\\"\\&\\#\\*\\<",
+        ('-u fabric.devtools@gmail.com' if jwt.nil?),
+        ("-p \\!\\>\\ p@\\$s_-\\+\\=w\\'o\\%rd\\\"\\&\\#\\*\\<" if jwt.nil?),
+        ("-jwt #{jwt}" unless jwt.nil?),
         '2>&1'
       ].compact.join(' ')
     end
 
-    def java_upload_command_9(provider_short_name = nil)
+    def java_upload_command_9(provider_short_name: nil, transporter: nil, jwt: nil)
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
@@ -131,17 +140,18 @@ describe FastlaneCore do
         '-Dsun.net.http.retryPost=false',
         "-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
         "-m upload",
-        "-u #{email.shellescape}",
-        "-p #{password.shellescape}",
+        ("-u #{email.shellescape}" if jwt.nil?),
+        ("-p #{password.shellescape}" if jwt.nil?),
+        ("-jwt #{jwt}" unless jwt.nil?),
         "-f /tmp/my.app.id.itmsp",
-        "-t DAV,Signiant",
+        (transporter.to_s if transporter),
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
         '2>&1'
       ].compact.join(' ')
     end
 
-    def java_download_command_9(provider_short_name = nil)
+    def java_download_command_9(provider_short_name = nil, jwt: nil)
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
@@ -153,8 +163,40 @@ describe FastlaneCore do
         '-Dsun.net.http.retryPost=false',
         "-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
         '-m lookupMetadata',
-        "-u #{email.shellescape}",
-        "-p #{password.shellescape}",
+        ("-u #{email.shellescape}" if jwt.nil?),
+        ("-p #{password.shellescape}" if jwt.nil?),
+        ("-jwt #{jwt}" unless jwt.nil?),
+        '-apple_id my.app.id',
+        '-destination /tmp',
+        ("-itc_provider #{provider_short_name}" if provider_short_name),
+        '2>&1'
+      ].compact.join(' ')
+    end
+
+    def xcrun_upload_command(provider_short_name: nil, transporter: nil, jwt: nil)
+      [
+        ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.nil?),
+        "xcrun iTMSTransporter",
+        "-m upload",
+        ("-u #{email.shellescape}" if jwt.nil?),
+        ("-p @env:ITMS_TRANSPORTER_PASSWORD" if jwt.nil?),
+        ("-jwt #{jwt}" unless jwt.nil?),
+        "-f /tmp/my.app.id.itmsp",
+        (transporter.to_s if transporter),
+        "-k 100000",
+        ("-itc_provider #{provider_short_name}" if provider_short_name),
+        '2>&1'
+      ].compact.join(' ')
+    end
+
+    def xcrun_download_command(provider_short_name = nil, jwt: nil)
+      [
+        ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.nil?),
+        "xcrun iTMSTransporter",
+        '-m lookupMetadata',
+        ("-u #{email.shellescape}" if jwt.nil?),
+        ("-p @env:ITMS_TRANSPORTER_PASSWORD" if jwt.nil?),
+        ("-jwt #{jwt}" unless jwt.nil?),
         '-apple_id my.app.id',
         '-destination /tmp',
         ("-itc_provider #{provider_short_name}" if provider_short_name),
@@ -171,70 +213,175 @@ describe FastlaneCore do
       end
 
       describe "by default" do
-        describe "upload command generation" do
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new(email, password)
-            expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command)
+        describe "with username and password" do
+          describe "upload command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command)
+            end
+          end
+
+          describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set" do
+            before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV,Signiant" }
+
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command(transporter: "-t DAV,Signiant"))
+            end
+
+            after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+          end
+
+          describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set to empty string" do
+            before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command)
+            end
+
+            after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+          end
+
+          describe "download command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password)
+              expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command)
+            end
+          end
+
+          describe "provider ID command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<")
+              expect(transporter.provider_ids).to eq(java_provider_id_command)
+            end
           end
         end
 
-        describe "download command generation" do
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new(email, password)
-            expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command)
+        describe "with JWt" do
+          describe "upload command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command(jwt: jwt))
+            end
           end
-        end
 
-        describe "provider ID command generation" do
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<")
-            expect(transporter.provider_ids).to eq(java_provider_id_command)
+          describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set" do
+            before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV,Signiant" }
+
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command(transporter: "-t DAV,Signiant", jwt: jwt))
+            end
+
+            after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+          end
+
+          describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set to empty string" do
+            before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command(jwt: jwt))
+            end
+
+            after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+          end
+
+          describe "download command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command(jwt: jwt))
+            end
+          end
+
+          describe "provider ID command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.provider_ids).to eq(java_provider_id_command(jwt: jwt))
+            end
           end
         end
       end
 
       describe "use_shell_script is false with a itc_provider short name set" do
-        describe "upload command generation" do
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd1234')
-            expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command('abcd1234'))
+        describe "with username and password" do
+          describe "upload command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd1234')
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command(provider_short_name: 'abcd1234'))
+            end
+          end
+
+          describe "download command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd1234')
+              expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command('abcd1234'))
+            end
+          end
+
+          describe "provider ID command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<")
+              expect(transporter.provider_ids).to eq(java_provider_id_command)
+            end
           end
         end
 
-        describe "download command generation" do
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd1234')
-            expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command('abcd1234'))
+        describe "with JWT (ignores provider id)" do
+          describe "upload command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, 'abcd1234', jwt)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command(jwt: jwt))
+            end
           end
-        end
 
-        describe "provider ID command generation" do
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<")
-            expect(transporter.provider_ids).to eq(java_provider_id_command)
+          describe "download command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, 'abcd1234', jwt)
+              expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command(jwt: jwt))
+            end
           end
         end
       end
 
       describe "use_shell_script is true with a itc_provider short name set" do
-        describe "upload command generation" do
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new(email, password, true, 'abcd1234')
-            expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command('abcd1234'))
+        describe "with username and password" do
+          describe "upload command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, true, 'abcd1234')
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command(provider_short_name: 'abcd1234'))
+            end
+          end
+
+          describe "download command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, true, 'abcd1234')
+              expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command('abcd1234'))
+            end
+          end
+
+          describe "provider ID command generation" do
+            it 'generates a call to the shell script' do
+              transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true, 'abcd1234')
+              expect(transporter.provider_ids).to eq(shell_provider_id_command)
+            end
           end
         end
 
-        describe "download command generation" do
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new(email, password, true, 'abcd1234')
-            expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command('abcd1234'))
+        describe "with JWT (ignores provider id)" do
+          describe "upload command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, true, 'abcd1234', jwt)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command(jwt: jwt))
+            end
           end
-        end
 
-        describe "provider ID command generation" do
-          it 'generates a call to the shell script' do
-            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", true, 'abcd1234')
-            expect(transporter.provider_ids).to eq(shell_provider_id_command)
+          describe "download command generation" do
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, true, 'abcd1234', jwt)
+              expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command(jwt: jwt))
+            end
           end
         end
       end
@@ -323,24 +470,93 @@ describe FastlaneCore do
         allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
       end
 
-      describe "upload command generation" do
-        it 'generates a call to the shell script' do
-          transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
-          expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
+      describe "with username and password" do
+        describe "upload command generation" do
+          it 'generates a call to the shell script' do
+            transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
+          end
+        end
+
+        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV,Signiant" }
+
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(email, password)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command(transporter: "-t DAV,Signiant"))
+          end
+
+          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+        end
+
+        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set to empty string" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(email, password)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
+          end
+
+          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+        end
+
+        describe "download command generation" do
+          it 'generates a call to the shell script' do
+            transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+            expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
+          end
+        end
+
+        describe "provider ID command generation" do
+          it 'generates a call to the shell script' do
+            transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
+            expect(transporter.provider_ids).to eq(shell_provider_id_command)
+          end
         end
       end
 
-      describe "download command generation" do
-        it 'generates a call to the shell script' do
-          transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
-          expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command)
+      describe "with JWT" do
+        describe "upload command generation" do
+          it 'generates a call to the shell script' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command(jwt: jwt))
+          end
         end
-      end
 
-      describe "provider ID command generation" do
-        it 'generates a call to the shell script' do
-          transporter = FastlaneCore::ItunesTransporter.new('fabric.devtools@gmail.com', "!> p@$s_-+=w'o%rd\"&#*<", false)
-          expect(transporter.provider_ids).to eq(shell_provider_id_command)
+        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV,Signiant" }
+
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command(transporter: "-t DAV,Signiant", jwt: jwt))
+          end
+
+          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+        end
+
+        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set to empty string" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command(jwt: jwt))
+          end
+
+          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+        end
+
+        describe "download command generation" do
+          it 'generates a call to the shell script' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command(jwt: jwt))
+          end
+        end
+
+        describe "provider ID command generation" do
+          it 'generates a call to the shell script' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.provider_ids).to eq(shell_provider_id_command(jwt: jwt))
+          end
         end
       end
     end
@@ -353,17 +569,195 @@ describe FastlaneCore do
         allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
       end
 
-      describe "upload command generation" do
-        it 'generates a call to java directly' do
-          transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
-          expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command_9)
+      describe "with username and password" do
+        describe "upload command generation" do
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command_9)
+          end
+        end
+
+        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV,Signiant" }
+
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(email, password)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command_9(transporter: "-t DAV,Signiant"))
+          end
+
+          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+        end
+
+        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set with empty string" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(email, password)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command_9)
+          end
+
+          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+        end
+
+        describe "download command generation" do
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+            expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command_9)
+          end
         end
       end
 
-      describe "download command generation" do
-        it 'generates a call to java directly' do
-          transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
-          expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command_9)
+      describe "with JWT" do
+        describe "upload command generation" do
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command_9(jwt: jwt))
+          end
+        end
+
+        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV,Signiant" }
+
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command_9(transporter: "-t DAV,Signiant", jwt: jwt))
+          end
+
+          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+        end
+
+        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set with empty string" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command_9(jwt: jwt))
+          end
+
+          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+        end
+
+        describe "download command generation" do
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command_9(jwt: jwt))
+          end
+        end
+      end
+    end
+
+    describe "with Xcode 11.x installed" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11.1')
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+      end
+
+      describe "with username and password" do
+        describe "with default itms_path" do
+          before(:each) do
+            allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
+            stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+          end
+
+          describe "upload command generation" do
+            it 'generates a call to xcrun iTMSTransporter' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command)
+            end
+          end
+
+          describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set" do
+            before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV,Signiant" }
+
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command(transporter: "-t DAV,Signiant"))
+            end
+
+            after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+          end
+
+          describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set with empty string" do
+            before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command)
+            end
+
+            after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+          end
+
+          describe "download command generation" do
+            it 'generates a call to xcrun iTMSTransporter' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+              expect(transporter.download('my.app.id', '/tmp')).to eq(xcrun_download_command)
+            end
+          end
+        end
+
+        describe "with user defined itms_path" do
+          before(:each) do
+            stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/tmp' })
+          end
+
+          describe "upload command generation" do
+            it 'generates a call to xcrun iTMSTransporter' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(java_upload_command(classpath: false))
+            end
+          end
+
+          describe "download command generation" do
+            it 'generates a call to xcrun iTMSTransporter' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+              expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command(classpath: false))
+            end
+          end
+        end
+      end
+
+      describe "with JWT" do
+        before(:each) do
+          allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+        end
+
+        describe "upload command generation" do
+          it 'generates a call to xcrun iTMSTransporter' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command(jwt: jwt))
+          end
+        end
+
+        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV,Signiant" }
+
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command(transporter: "-t DAV,Signiant", jwt: jwt))
+          end
+
+          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+        end
+
+        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set with empty string" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+          it 'generates a call to java directly' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command(jwt: jwt))
+          end
+
+          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+        end
+
+        describe "download command generation" do
+          it 'generates a call to xcrun iTMSTransporter' do
+            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+            expect(transporter.download('my.app.id', '/tmp')).to eq(xcrun_download_command(jwt: jwt))
+          end
         end
       end
     end
@@ -407,6 +801,8 @@ describe FastlaneCore do
           command = shell_upload_command if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_version.start_with?('6.')
           # If we are on Mac with Xcode >= 9, switch to newer java command
           command = java_upload_command_9 if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_at_least?(9)
+          # If we are on Mac with Xcode >= 11, switch to xcrun command
+          command = xcrun_upload_command if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_at_least?(11)
           expect(transporter.upload('my.app.id', '/tmp')).to eq(command)
         end
       end
@@ -421,6 +817,8 @@ describe FastlaneCore do
           command = shell_download_command if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_version.start_with?('6.')
           # If we are on Mac with Xcode >= 9, switch to newer java command
           command = java_download_command_9 if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_at_least?(9)
+          # If we are on Mac with Xcode >= 11, switch to newer xcrun command
+          command = xcrun_download_command if FastlaneCore::Helper.is_mac? && FastlaneCore::Helper.xcode_at_least?(11)
           expect(transporter.download('my.app.id', '/tmp')).to eq(command)
         end
       end

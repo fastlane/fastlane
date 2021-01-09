@@ -2,7 +2,6 @@ require 'fastlane_core/configuration/config_item'
 require 'credentials_manager/appfile_config'
 
 require_relative 'module'
-require_relative 'upload_assets'
 
 module Deliver
   # rubocop:disable Metrics/ClassLength
@@ -13,6 +12,22 @@ module Deliver
       user ||= ENV["DELIVER_USER"]
 
       [
+        FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                     env_name: "DELIVER_API_KEY_PATH",
+                                     description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                     optional: true,
+                                     conflicting_options: [:api_key],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_name: "DELIVER_API_KEY",
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                     type: Hash,
+                                     optional: true,
+                                     sensitive: true,
+                                     conflicting_options: [:api_key_path]),
+
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "DELIVER_USERNAME",
@@ -130,7 +145,7 @@ module Deliver
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_app_version_update,
                                      env_name: "DELIVER_SKIP_APP_VERSION_UPDATE",
-                                     description: "Don't update app version for submission",
+                                     description: "Don’t create or update the app version that is being prepared for submission",
                                      is_string: false,
                                      default_value: false),
 
@@ -138,7 +153,7 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :force,
                                      short_option: "-f",
                                      env_name: "DELIVER_FORCE",
-                                     description: "Skip the HTML report file verification",
+                                     description: "Skip verification of HTML preview file",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :overwrite_screenshots,
@@ -161,16 +176,22 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :automatic_release,
                                      env_name: "DELIVER_AUTOMATIC_RELEASE",
                                      description: "Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)",
-                                     is_string: false,
-                                     default_value: false),
+                                     type: Boolean,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :auto_release_date,
                                      env_name: "DELIVER_AUTO_RELEASE_DATE",
                                      description: "Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)",
-                                     is_string: false,
+                                     type: Integer,
                                      optional: true,
                                      conflicting_options: [:automatic_release],
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'auto_release_date' and '#{value.key}' options together.")
+                                     end,
+                                     verify_block: proc do |value|
+                                       now_in_ms = Time.now.to_i * 1000
+                                       if value < now_in_ms
+                                         UI.user_error!("'#{value}' needs to be in the future and in milliseonds (current time is '#{now_in_ms}')")
+                                       end
                                      end),
         FastlaneCore::ConfigItem.new(key: :phased_release,
                                      env_name: "DELIVER_PHASED_RELEASE",
@@ -206,6 +227,7 @@ module Deliver
                                      short_option: "-b",
                                      description: "Extra information for the submission (e.g. compliance specifications, IDFA settings)",
                                      is_string: false,
+                                     type: Hash,
                                      optional: true),
 
         # affiliation
@@ -283,29 +305,24 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :individual_metadata_items,
                                      env_name: "DELIVER_INDIVUDAL_METADATA_ITEMS",
                                      description: "An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow",
+                                     deprecated: "Removed after the migration to the new App Store Connect API in June 2020",
                                      is_string: false,
                                      type: Array,
-                                     default_value: []),
+                                     optional: true),
 
         # Non Localised
         FastlaneCore::ConfigItem.new(key: :app_icon,
                                      env_name: "DELIVER_APP_ICON_PATH",
                                      description: "Metadata: The path to the app icon",
+                                     deprecated: "Removed after the migration to the new App Store Connect API in June 2020",
                                      optional: true,
-                                     short_option: "-l",
-                                     verify_block: proc do |value|
-                                       UI.user_error!("Could not find png file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                       UI.user_error!("'#{value}' doesn't seem to be one of the supported files. supported: #{Deliver::UploadAssets::SUPPORTED_ICON_EXTENSIONS.join(',')}") unless Deliver::UploadAssets::SUPPORTED_ICON_EXTENSIONS.include?(File.extname(value).downcase)
-                                     end),
+                                     short_option: "-l"),
         FastlaneCore::ConfigItem.new(key: :apple_watch_app_icon,
                                      env_name: "DELIVER_APPLE_WATCH_APP_ICON_PATH",
                                      description: "Metadata: The path to the Apple Watch app icon",
+                                     deprecated: "Removed after the migration to the new App Store Connect API in June 2020",
                                      optional: true,
-                                     short_option: "-q",
-                                     verify_block: proc do |value|
-                                       UI.user_error!("Could not find png file at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                       UI.user_error!("'#{value}' doesn't seem to be one of the supported files. supported: #{Deliver::UploadAssets::SUPPORTED_ICON_EXTENSIONS.join(',')}") unless Deliver::UploadAssets::SUPPORTED_ICON_EXTENSIONS.include?(File.extname(value).downcase)
-                                     end),
+                                     short_option: "-q"),
         FastlaneCore::ConfigItem.new(key: :copyright,
                                      env_name: "DELIVER_COPYRIGHT",
                                      description: "Metadata: The copyright notice",

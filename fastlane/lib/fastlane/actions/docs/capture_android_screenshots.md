@@ -52,7 +52,25 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 
 ##### Configuring your <a href="#ui-tests">UI Tests</a> for Screenshots
 
-1. Add `@ClassRule public static final LocaleTestRule localeTestRule = new LocaleTestRule();` to your tests class to handle automatic switching of locales
+1. Add `LocaleTestRule` to your tests class to handle automatic switching of locales.  
+   If you're using Java use:
+   ```java
+   @ClassRule
+   public static final LocaleTestRule localeTestRule = new LocaleTestRule();
+   ```
+   If you're using Kotlin use:
+   ```kotlin
+   @Rule @JvmField
+   val localeTestRule = LocaleTestRule()
+   ```
+   Important is the `@JvmField` annotation. It won't work like that:
+   ```kotlin
+   companion object {
+       @get:ClassRule
+       val localeTestRule = LocaleTestRule()
+   }
+   ```
+
 2. To capture screenshots, add the following to your tests `Screengrab.screenshot("name_of_screenshot_here");` on the appropriate screens
 
 # Generating Screenshots with Screengrab
@@ -137,6 +155,7 @@ fastlane action screengrab
 Check out [Testing UI for a Single App](http://developer.android.com/training/testing/ui-testing/espresso-testing.html) for an introduction to using Espresso for UI testing.
 
 ##### Example UI Test Class (Using JUnit4)
+Java:
 ```java
 @RunWith(JUnit4.class)
 public class JUnit4StyleTests {
@@ -157,7 +176,29 @@ public class JUnit4StyleTests {
 }
 
 ```
-There is an [example project](https://github.com/fastlane/fastlane/tree/master/screengrab/example/src/androidTest/java/tools/fastlane/localetester) showing how to use use JUnit 3 or 4 and Espresso with the screengrab Java library to capture screenshots during a UI test run.
+Kotlin:
+```kotlin
+@RunWith(JUnit4.class)
+class JUnit4StyleTests {
+    @get:Rule
+    var activityRule = ActivityTestRule(MainActivity::class.java)
+
+    @Rule @JvmField
+    val localeTestRule = LocaleTestRule()
+
+    @Test
+    fun testTakeScreenshot() {
+        Screengrab.screenshot("before_button_click")
+
+        onView(withId(R.id.fab)).perform(click())
+
+        Screengrab.screenshot("after_button_click")
+    }
+}
+
+```
+
+There is an [example project](https://github.com/fastlane/fastlane/tree/master/screengrab/example/src/androidTest/java/tools/fastlane/localetester) showing how to use JUnit 3 or 4 and Espresso with the screengrab Java library to capture screenshots during a UI test run.
 
 Using JUnit 4 is preferable because of its ability to perform actions before and after the entire test class is run. This means you will change the device's locale far fewer times when compared with JUnit 3 running those commands before and after each test method.
 
@@ -210,7 +251,7 @@ new CleanStatusBar()
 <details>
 <summary>Launch Arguments</summary>
 
-You can provide additional arguments to your testcases on launch. These strings will be available in your tests through `InstrumentationRegistry.getArguments()`.
+You can provide additional arguments to your test cases on launch. These strings will be available in your tests through `InstrumentationRegistry.getArguments()`.
 
 ```ruby
 screengrab(
@@ -290,4 +331,3 @@ Sit back and enjoy your new screenshots!
 Note: while this could also be done by creating a new build variant (i.e. debug, release and creating a new one called screengrab), [Android only allows one build type to be tested](http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Testing) which defaults to debug. That's why we use product flavors.
 
 </details>
-

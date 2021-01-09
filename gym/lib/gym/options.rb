@@ -155,7 +155,7 @@ module Gym
                                      end),
         FastlaneCore::ConfigItem.new(key: :installer_cert_name,
                                      env_name: "GYM_INSTALLER_CERT_NAME",
-                                     description: "Full name of 3rd Party Mac Developer Installer or Deveoper ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`",
+                                     description: "Full name of 3rd Party Mac Developer Installer or Developer ID Installer certificate. Example: `3rd Party Mac Developer Installer: Your Company (ABC1234XWYZ)`",
                                      type: String,
                                      optional: true),
         # Very optional
@@ -279,7 +279,13 @@ module Gym
                                      env_name: "GYM_CLONED_SOURCE_PACKAGES_PATH",
                                      description: "Sets a custom path for Swift Package Manager dependencies",
                                      type: String,
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :use_system_scm,
+                                     env_name: "GYM_USE_SYSTEM_SCM",
+                                     description: "Lets xcodebuild use system's scm configuration",
+                                     optional: true,
+                                     type: Boolean,
+                                     default_value: false)
       ]
     end
   end

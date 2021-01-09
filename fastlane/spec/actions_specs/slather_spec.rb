@@ -22,7 +22,9 @@ describe Fastlane do
             simple_output: true,
             gutter_json: true,
             cobertura_xml: true,
+            sonarqube_xml: true,
             llvm_cov: true,
+            json: true,
             html: true,
             show: true,
             verbose: true,
@@ -50,7 +52,9 @@ describe Fastlane do
                     --simple-output
                     --gutter-json
                     --cobertura-xml
+                    --sonarqube-xml
                     --llvm-cov
+                    --json
                     --html
                     --show
                     --build-directory foo
@@ -90,7 +94,9 @@ describe Fastlane do
             simple_output: true,
             gutter_json: true,
             cobertura_xml: true,
+            sonarqube_xml: true,
             llvm_cov: true,
+            json: true,
             html: true,
             show: true,
             source_directory: 'baz',
@@ -113,7 +119,9 @@ describe Fastlane do
                     --simple-output
                     --gutter-json
                     --cobertura-xml
+                    --sonarqube-xml
                     --llvm-cov
+                    --json
                     --html
                     --show
                     --build-directory foo
@@ -231,6 +239,64 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(expected)
+      end
+
+      it "works with binary_basename as string" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            binary_basename: 'bar',
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("slather coverage --binary-basename bar foo.xcodeproj")
+      end
+
+      it "works with binary_basename as array" do
+        binary_basename = ['other', 'stuff']
+        expected = "slather coverage
+                    --binary-basename #{binary_basename[0]}
+                    --binary-basename #{binary_basename[1]}
+                    foo.xcodeproj".gsub(/\s+/, ' ')
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            binary_basename: #{binary_basename},
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq(expected)
+      end
+
+      it "works with binary_basename as environment string" do
+        ENV['FL_SLATHER_BINARY_BASENAME'] = 'bar'
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("slather coverage --binary-basename bar foo.xcodeproj")
+        ENV.delete('FL_SLATHER_BINARY_BASENAME')
+      end
+
+      it "works with binary_basename as environment array" do
+        ENV['FL_SLATHER_BINARY_BASENAME'] = 'other,stuff'
+        binary_basenames = ENV['FL_SLATHER_BINARY_BASENAME'].split(',')
+        expected = "slather coverage
+                    --binary-basename #{binary_basenames[0]}
+                    --binary-basename #{binary_basenames[1]}
+                    foo.xcodeproj".gsub(/\s+/, ' ')
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq(expected)
+        ENV.delete('FL_SLATHER_BINARY_BASENAME')
       end
 
       it "works with multiple ignore patterns" do

@@ -49,7 +49,7 @@ module Supply
                                      end),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
-                                     description: "The percentage of the user fraction when uploading to the rollout track",
+                                     description: "The percentage of the user fraction when uploading to the rollout track (setting to 1 will complete the rollout)",
                                      optional: true,
                                      verify_block: proc do |value|
                                        min = 0.0
@@ -281,6 +281,15 @@ module Supply
                                          UI.user_error!("Version code '#{version_code}' is not an integer") if version_code == 0
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :in_app_update_priority,
+                                     env_name: "SUPPLY_IN_APP_UPDATE_PRIORITY",
+                                     optional: true,
+                                     type: Integer,
+                                     description: "In-app update priority for all the newly added apks in the release. Can take values between [0,5]",
+                                     verify_block: proc do |in_app_update_priority|
+                                       in_app_update_priority = in_app_update_priority.to_i
+                                       UI.user_error!("Invalid in_app_update_priority value '#{in_app_update_priority}'. Values must be between [0,5]") unless (0..5).member?(in_app_update_priority)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :obb_main_references_version,
                                      env_name: "SUPPLY_OBB_MAIN_REFERENCES_VERSION",
                                      description: "References version of 'main' expansion file",
@@ -300,7 +309,14 @@ module Supply
                                      env_name: "SUPPLY_OBB_PATCH_FILE SIZE",
                                      description: "Size of 'patch' expansion file in bytes",
                                      optional: true,
-                                     type: Numeric)
+                                     type: Numeric),
+        FastlaneCore::ConfigItem.new(key: :ack_bundle_installation_warning,
+                                     env_name: "ACK_BUNDLE_INSTALLATION_WARNING",
+                                     description: "Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 150MB",
+                                     optional: true,
+                                     type: Boolean,
+                                     default_value: false)
+
       ]
     end
     # rubocop:enable Metrics/PerceivedComplexity

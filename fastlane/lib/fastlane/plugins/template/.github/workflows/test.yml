@@ -1,0 +1,29 @@
+name: Test
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v1
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile') }}
+        restore-keys: |
+          ${{ runner.os }}-gem-
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.4
+    - name: Install dependencies
+      run: bundle check || bundle install --jobs=4 --retry=3 --path vendor/bundle
+    - name: Run tests
+      run: bundle exec rake
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: test-results

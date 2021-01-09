@@ -111,7 +111,7 @@ module Supply
       releases = track.releases
 
       releases = releases.select { |r| r.status == status } if status
-      releases = releases.select { |r| r.version_codes.map(&:to_s).include?(version_code.to_s) } if version_code
+      releases = releases.select { |r| (r.version_codes || []).map(&:to_s).include?(version_code.to_s) } if version_code
 
       if releases.size > 1
         UI.user_error!("More than one release found in this track. Please specify with the :version_code option to select a release.")
@@ -192,9 +192,10 @@ module Supply
       release = releases.first
       track_to = client.tracks(Supply.config[:track_promote_to]).first
 
-      if Supply.config[:rollout]
+      rollout = (Supply.config[:rollout] || 0).to_f
+      if rollout > 0 && rollout < 1
         release.status = Supply::ReleaseStatus::IN_PROGRESS
-        release.user_fraction = Supply.config[:rollout]
+        release.user_fraction = rollout
       else
         release.status = Supply::ReleaseStatus::COMPLETED
         release.user_fraction = nil
@@ -389,6 +390,10 @@ module Supply
           track_release.status = Supply::ReleaseStatus::IN_PROGRESS
           track_release.user_fraction = rollout
         end
+      end
+
+      if Supply.config[:in_app_update_priority]
+        track_release.in_app_update_priority = Supply.config[:in_app_update_priority].to_i
       end
 
       tracks = client.tracks(Supply.config[:track])

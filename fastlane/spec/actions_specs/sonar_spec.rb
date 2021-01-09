@@ -35,6 +35,7 @@ describe Fastlane do
             project_name: 'project-name',
             project_version: '1.0.0',
             sources_path: '/Sources',
+            exclusions: '/Sources/Excluded',
             project_language: 'ruby',
             source_encoding: 'utf-8',
             sonar_login: 'sonar-login',
@@ -53,6 +54,7 @@ describe Fastlane do
                     -Dsonar.projectName=\"project-name\"
                     -Dsonar.projectVersion=\"1.0.0\"
                     -Dsonar.sources=\"/Sources\"
+                    -Dsonar.exclusions=\"/Sources/Excluded\"
                     -Dsonar.language=\"ruby\"
                     -Dsonar.sourceEncoding=\"utf-8\"
                     -Dsonar.login=\"sonar-login\"

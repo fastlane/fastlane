@@ -47,7 +47,9 @@ module FastlaneCore
       def bundle_id(path, keychain_path = nil)
         profile = parse(path, keychain_path)
         app_id_prefix = profile["ApplicationIdentifierPrefix"].first
-        bundle_id = profile["Entitlements"]["application-identifier"].gsub("#{app_id_prefix}.", "")
+        entitlements = profile["Entitlements"]
+        app_identifier = entitlements["application-identifier"] || entitlements["com.apple.application-identifier"]
+        bundle_id = app_identifier.gsub("#{app_id_prefix}.", "")
         bundle_id
       rescue
         UI.error("Unable to extract the Bundle Id from the provided provisioning profile '#{path}'.")
@@ -113,7 +115,7 @@ module FastlaneCore
           else
             # `security` only works on Mac, fallback to `openssl`
             # via https://stackoverflow.com/a/14379814/252627
-            decoded = `openssl smime -inform der -verify -noverify -in #{path} 2> #{err}`
+            decoded = `openssl smime -inform der -verify -noverify -in #{path.shellescape} 2> #{err}`
           end
           UI.error("Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(err)}") if $?.exitstatus != 0
           decoded

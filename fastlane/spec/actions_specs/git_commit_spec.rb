@@ -63,7 +63,7 @@ describe Fastlane do
 
       it "does not generate the git command when configured to allow nothing to commit and there are no changes to commit" do
         allow(Fastlane::Actions).to receive(:sh)
-          .with("git status --porcelain")
+          .with("git --no-pager diff --name-only --staged")
           .and_return("")
         result = Fastlane::FastFile.new.parse("lane :test do
           git_commit(path: './fastlane/README.md', message: 'message', allow_nothing_to_commit: true)

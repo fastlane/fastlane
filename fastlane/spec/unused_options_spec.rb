@@ -40,6 +40,7 @@ describe Fastlane do
           swiftlint
           plugin_scores
           google_play_track_version_codes
+          google_play_track_release_names
           modify_services
           build_app
           build_android_app

@@ -88,6 +88,20 @@ describe Gym do
                            ])
     end
 
+    it "uses system scm", requires_xcodebuild: true do
+      options = { project: "./gym/examples/standard/Example.xcodeproj", use_system_scm: true }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+      result = Gym::BuildCommandGenerator.generate
+      expect(result).to include("-scmProvider system")
+    end
+
+    it "defaults to Xcode scm when option is not provided", requires_xcodebuild: true do
+      options = { project: "./gym/examples/standard/Example.xcodeproj" }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+      result = Gym::BuildCommandGenerator.generate
+      expect(result).to_not(include("-scmProvider system"))
+    end
+
     it "uses the correct build command when `skip_archive` is used", requires_xcodebuild: true do
       log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
@@ -168,11 +182,12 @@ describe Gym do
     end
 
     describe "Derived Data Example" do
-      before do
+      before(:each) do
         options = { project: "./gym/examples/standard/Example.xcodeproj", derived_data_path: "/tmp/my/derived_data", scheme: 'Example' }
-        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+        config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+        @project = FastlaneCore::Project.new(config)
+        allow(Gym).to receive(:project).and_return(@project)
       end
-
       it "uses the correct build command with the example project", requires_xcodebuild: true do
         log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
@@ -182,9 +197,9 @@ describe Gym do
                                "xcodebuild",
                                "-scheme Example",
                                "-project ./gym/examples/standard/Example.xcodeproj",
+                               "-derivedDataPath /tmp/my/derived_data",
                                "-destination 'generic/platform=iOS'",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
-                               "-derivedDataPath '/tmp/my/derived_data'",
                                :archive,
                                "| tee #{log_path.shellescape}",
                                "| xcpretty"

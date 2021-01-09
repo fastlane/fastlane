@@ -23,6 +23,8 @@ module Match
       attr_reader :username
       attr_reader :team_id
       attr_reader :team_name
+      attr_reader :api_key_path
+      attr_reader :api_key
 
       # Managed values
       attr_accessor :gc_storage
@@ -44,7 +46,9 @@ module Match
           readonly: params[:readonly],
           username: params[:username],
           team_id: params[:team_id],
-          team_name: params[:team_name]
+          team_name: params[:team_name],
+          api_key_path: params[:api_key_path],
+          api_key: params[:api_key]
         )
       end
 
@@ -56,7 +60,9 @@ module Match
                      readonly: nil,
                      username: nil,
                      team_id: nil,
-                     team_name: nil)
+                     team_name: nil,
+                     api_key_path: nil,
+                     api_key: nil)
         @type = type if type
         @platform = platform if platform
         @google_cloud_project_id = google_cloud_project_id if google_cloud_project_id
@@ -66,6 +72,9 @@ module Match
         @username = username
         @team_id = team_id
         @team_name = team_name
+
+        @api_key_path = api_key_path
+        @api_key = api_key
 
         @google_cloud_keys_file = ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id)
 
@@ -106,9 +115,17 @@ module Match
           # see `prefixed_working_directory` comments for more details
           return self.team_id
         else
-          spaceship = SpaceshipEnsure.new(self.username, self.team_id, self.team_name)
+          UI.user_error!("The `team_id` option is required. fastlane cannot automatically determine portal team id via the App Store Connect API (yet)") if self.team_id.to_s.empty?
+
+          spaceship = SpaceshipEnsure.new(self.username, self.team_id, self.team_name, self.api_token)
           return spaceship.team_id
         end
+      end
+
+      def api_token
+        api_token ||= Spaceship::ConnectAPI::Token.create(self.api_key) if self.api_key
+        api_token ||= Spaceship::ConnectAPI::Token.from_json_file(self.api_key_path) if self.api_key_path
+        return api_token
       end
 
       def prefixed_working_directory
@@ -180,6 +197,10 @@ module Match
         false
       end
 
+      def list_files(file_name: "", file_ext: "")
+        Dir[File.join(working_directory, self.team_id, "**", file_name, "*.#{file_ext}")]
+      end
+
       def generate_matchfile_content
         return "google_cloud_bucket_name(\"#{self.bucket_name}\")"
       end
@@ -209,7 +230,7 @@ module Match
 
         return DEFAULT_KEYS_FILE_NAME if File.exist?(DEFAULT_KEYS_FILE_NAME)
 
-        fastlane_folder_gc_keys_path = File.join(FastlaneCore::FastlaneFolder.path, DEFAULT_KEYS_FILE_NAME)
+        fastlane_folder_gc_keys_path = File.join(FastlaneCore::FastlaneFolder.path || Dir.pwd, DEFAULT_KEYS_FILE_NAME)
         return fastlane_folder_gc_keys_path if File.exist?(fastlane_folder_gc_keys_path)
 
         if google_cloud_project_id.to_s.length > 0

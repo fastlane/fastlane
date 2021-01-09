@@ -52,7 +52,8 @@ describe Match::Generator do
         ignore_profiles_with_different_name: true,
         team_id: 'team_id',
         platform: :ios,
-        template_name: 'template_name'
+        template_name: 'template_name',
+        fail_on_name_taken: false
       })
 
       # This is the important part. We need to see the right configuration come through

@@ -54,6 +54,25 @@ module Sigh
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
                                      default_value_dynamic: true),
+
+        # App Store Connect API
+        FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                     env_name: "SIGH_API_KEY_PATH",
+                                     description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                     optional: true,
+                                     conflicting_options: [:api_key],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_name: "SIGH_API_KEY",
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                     type: Hash,
+                                     optional: true,
+                                     sensitive: true,
+                                     conflicting_options: [:api_key_path]),
+
+        # Apple ID
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "SIGH_USERNAME",
@@ -82,6 +101,8 @@ module Sigh
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
+
+        # Other options
         FastlaneCore::ConfigItem.new(key: :provisioning_name,
                                      short_option: "-n",
                                      env_name: "SIGH_PROVISIONING_PROFILE_NAME",
@@ -131,12 +152,12 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :platform,
                                      short_option: '-p',
                                      env_name: "SIGH_PLATFORM",
-                                     description: "Set the provisioning profile's platform (i.e. ios, tvos)",
+                                     description: "Set the provisioning profile's platform (i.e. ios, tvos, macos, catalyst)",
                                      is_string: false,
                                      default_value: "ios",
                                      verify_block: proc do |value|
                                        value = value.to_s
-                                       pt = %w(macos tvos ios)
+                                       pt = %w(macos tvos ios catalyst)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :readonly,
@@ -153,7 +174,13 @@ module Sigh
                                      env_name: "SIGH_PROVISIONING_PROFILE_TEMPLATE_NAME",
                                      description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
                                      optional: true,
-                                     default_value: nil)
+                                     default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :fail_on_name_taken,
+                                     env_name: "SIGH_FAIL_ON_NAME_TAKEN",
+                                     description: "Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first",
+                                     optional: true,
+                                     is_string: false,
+                                     default_value: false)
       ]
     end
   end

@@ -43,12 +43,20 @@ module Fastlane
           command << "--skip-tests"
         end
 
+        if params[:use_json]
+          command << "--use-json"
+        end
+
         if params[:verbose]
           command << "--verbose"
         end
 
         if params[:use_modular_headers]
           command << "--use-modular-headers"
+        end
+
+        if params[:synchronous]
+          command << "--synchronous"
         end
 
         result = Actions.sh(command.join(' '))
@@ -117,6 +125,11 @@ module Fastlane
                                        optional: true,
                                        type: Boolean,
                                        env_name: "FL_POD_PUSH_SKIP_TESTS"),
+          FastlaneCore::ConfigItem.new(key: :use_json,
+                                       description: "Convert the podspec to JSON before pushing it to the repo",
+                                       optional: true,
+                                       type: Boolean,
+                                       env_name: "FL_POD_PUSH_USE_JSON"),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        description: "Show more debugging information",
                                        optional: true,
@@ -127,7 +140,12 @@ module Fastlane
                                        description: "Use modular headers option during validation",
                                        optional: true,
                                        type: Boolean,
-                                       env_name: "FL_POD_PUSH_USE_MODULAR_HEADERS")
+                                       env_name: "FL_POD_PUSH_USE_MODULAR_HEADERS"),
+          FastlaneCore::ConfigItem.new(key: :synchronous,
+                                       description: "If validation depends on other recently pushed pods, synchronize",
+                                       optional: true,
+                                       type: Boolean,
+                                       env_name: "FL_POD_PUSH_SYNCHRONOUS")
         ]
       end
 

@@ -31,6 +31,14 @@ describe Match do
         expect(s3_client).to receive(:upload_file).with('foobar', 'ABCDEFG/certs/development/ABCDEFG.p12', 'body', 'private')
         subject.upload_files(files_to_upload: files_to_upload)
       end
+
+      it 'uploads files with s3_object_prefix if set' do
+        allow(subject).to receive(:s3_object_prefix).and_return('123456/')
+
+        expect(s3_client).to receive(:upload_file).with('foobar', '123456/ABCDEFG/certs/development/ABCDEFG.cer', 'body', 'private')
+        expect(s3_client).to receive(:upload_file).with('foobar', '123456/ABCDEFG/certs/development/ABCDEFG.p12', 'body', 'private')
+        subject.upload_files(files_to_upload: files_to_upload)
+      end
     end
 
     describe '#delete_files' do
@@ -48,6 +56,15 @@ describe Match do
 
         subject.delete_files(files_to_delete: files_to_upload)
       end
+
+      it 'deletes files with s3_object_prefix if set' do
+        allow(subject).to receive(:s3_object_prefix).and_return('123456/')
+
+        expect(s3_client).to receive(:delete_file).with('foobar', '123456/ABCDEFG/certs/development/ABCDEFG.cer')
+        expect(s3_client).to receive(:delete_file).with('foobar', '123456/ABCDEFG/certs/development/ABCDEFG.p12')
+
+        subject.delete_files(files_to_delete: files_to_upload)
+      end
     end
 
     describe '#download' do
@@ -62,6 +79,16 @@ describe Match do
       before { class_double('FileUtils', mkdir_p: true).as_stubbed_const }
 
       it 'downloads to correct working directory' do
+        files_to_download.each do |file_object|
+          expect(file_object).to receive(:download_file).with("#{working_directory}/#{file_object.key}")
+        end
+
+        subject.download
+      end
+
+      it 'downloads files and strips the s3_object_prefix for working_directory path' do
+        allow(subject).to receive(:s3_object_prefix).and_return('123456/')
+
         files_to_download.each do |file_object|
           expect(file_object).to receive(:download_file).with("#{working_directory}/#{file_object.key}")
         end

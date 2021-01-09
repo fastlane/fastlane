@@ -16,7 +16,7 @@ module Match
 
       ensure_ui_interactive
 
-      to = ChangePassword.ask_password(message: "New passphrase for Git Repo: ", confirm: true)
+      to = FastlaneCore::Helper.ask_password(message: "New passphrase for Git Repo: ", confirm: true)
 
       # Choose the right storage and encryption implementations
       storage = Storage.for_mode(params[:storage_mode], {
@@ -42,23 +42,6 @@ module Match
       message = "[fastlane] Changed passphrase"
       files_to_commit = encryption.encrypt_files
       storage.save_changes!(files_to_commit: files_to_commit, custom_message: message)
-    end
-
-    # This method is called from both here, and from `openssl.rb`
-    def self.ask_password(message: "Passphrase for Match storage: ", confirm: nil)
-      ensure_ui_interactive
-      loop do
-        password = UI.password(message)
-        if confirm
-          password2 = UI.password("Type passphrase again: ")
-          if password == password2
-            return password
-          end
-        else
-          return password
-        end
-        UI.error("Passphrases differ. Try again")
-      end
     end
 
     def self.ensure_ui_interactive
