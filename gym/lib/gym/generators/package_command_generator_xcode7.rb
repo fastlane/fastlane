@@ -82,7 +82,7 @@ module Gym
       end
 
       def pkg_path
-        path = Gym.cache[:pkg_path]
+        path = Gym.cache[:binary_path]
         return path if path
 
         path = Dir[File.join(temporary_output_path, "*.pkg")].last
@@ -90,24 +90,24 @@ module Gym
         # We need to process generic PKG or APP
         if path
           # Try to find PKG file in the output directory, used when app thinning was not set
-          Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
-          FileUtils.mv(path, Gym.cache[:pkg_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:pkg_path]).downcase).zero?
+          Gym.cache[:binary_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
+          FileUtils.mv(path, Gym.cache[:binary_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:binary_path]).downcase).zero?
         elsif Dir.exist?(apps_path)
           # Try to find "generic" PKG file inside "Apps" folder, used when app thinning was set
           files = Dir[File.join(apps_path, "*.pkg")]
           # Generic PKG file doesn't have suffix so its name is the shortest
           path = files.min_by(&:length)
-          Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
-          FileUtils.cp(path, Gym.cache[:pkg_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:pkg_path]).downcase).zero?
+          Gym.cache[:binary_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
+          FileUtils.cp(path, Gym.cache[:binary_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:binary_path]).downcase).zero?
         elsif appPath
           # Try to find .app file in the output directory. This is used when macOS is set and .app is being generated.
-          Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.app")
-          FileUtils.mv(appPath, Gym.cache[:pkg_path]) unless File.expand_path(appPath).casecmp(File.expand_path(Gym.cache[:pkg_path]).downcase).zero?
+          Gym.cache[:binary_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.app")
+          FileUtils.mv(appPath, Gym.cache[:binary_path]) unless File.expand_path(appPath).casecmp(File.expand_path(Gym.cache[:binary_path]).downcase).zero?
         else
           ErrorHandler.handle_empty_archive unless path
         end
 
-        Gym.cache[:pkg_path]
+        Gym.cache[:binary_path]
       end
 
       # The path the the dsym file for this app. Might be nil
