@@ -63,7 +63,7 @@ module Spaceship
         "appStoreVersionSubmission" => "app_store_version_submission",
         "build" => "build",
         "appStoreVersionPhasedRelease" => "app_store_version_phased_release",
-        "appStoreReviewDetail" => "app_store_review_detail"
+        "appStoreReviewDetail" => "app_store_review_detail",
         "appStoreVersionLocalizations" => "app_store_version_localizations"
       })
 
