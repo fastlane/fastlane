@@ -411,6 +411,11 @@ module Scan
                                      description: "Only post on Slack if the tests fail",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :slack_default_payloads,
+                                     env_name: "SCAN_SLACK_DEFAULT_PAYLOADS",
+                                     description: "Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack",
+                                     optional: true,
+                                     type: Array),
 
         # misc
         FastlaneCore::ConfigItem.new(key: :destination,
