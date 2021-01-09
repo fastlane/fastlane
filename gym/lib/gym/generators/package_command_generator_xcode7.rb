@@ -81,7 +81,7 @@ module Gym
         Gym.cache[:ipa_path]
       end
 
-      def pkg_path
+      def binary_path
         path = Gym.cache[:binary_path]
         return path if path
 
