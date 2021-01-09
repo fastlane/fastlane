@@ -94,6 +94,26 @@ describe Fastlane do
         expect(result).to eq("git push origin master:master --tags --set-upstream")
       end
 
+      it "runs git push with 1 element in push-options" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            push_to_git_remote(
+              push_options: ['something-to-tell-remote-git-server']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("git push origin master:master --tags --push-option=something-to-tell-remote-git-server")
+      end
+
+      it "runs git push with 2 elements in push-options" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            push_to_git_remote(
+              push_options: ['something-to-tell-remote-git-server', 'something-else']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("git push origin master:master --tags --push-option=something-to-tell-remote-git-server --push-option=something-else")
+      end
+
       context "runs git push without local_branch" do
         it "should raise an error if get current branch failed" do
           allow(Fastlane::Actions).to receive(:git_branch).and_return(nil)
