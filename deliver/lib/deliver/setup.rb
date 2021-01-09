@@ -64,6 +64,7 @@ module Deliver
       # App info localizations
       if options[:use_live_version]
         app_info = app.fetch_live_app_info
+        UI.user_error!("The option `use_live_version` was set to `true`, however no live app was found on App Store Connect.") unless app_info
       else
         app_info = app.fetch_edit_app_info || app.fetch_live_app_info
       end
