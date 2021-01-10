@@ -984,8 +984,6 @@ public func buildAndroidApp(task: String? = nil,
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
-   - skipResolvePackageDependencies: Skips manual resolution of Swift Package Manager dependencies
-   - disableAutomaticPackageResolution: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
 
  - returns: The absolute path to the generated ipa file
@@ -1036,8 +1034,6 @@ public func buildApp(workspace: String? = nil,
                      xcprettyUtf: Bool? = nil,
                      skipProfileDetection: Bool = false,
                      clonedSourcePackagesPath: String? = nil,
-                     skipResolvePackageDependencies: Bool = false,
-                     disableAutomaticPackageResolution: Bool = false,
                      useSystemScm: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "build_app", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -1084,8 +1080,6 @@ public func buildApp(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf),
                                                                                              RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection),
                                                                                              RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
-                                                                                             RubyCommand.Argument(name: "skip_resolve_package_dependencies", value: skipResolvePackageDependencies),
-                                                                                             RubyCommand.Argument(name: "disable_automatic_package_resolution", value: disableAutomaticPackageResolution),
                                                                                              RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
@@ -1135,8 +1129,6 @@ public func buildApp(workspace: String? = nil,
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
-   - skipResolvePackageDependencies: Skips manual resolution of Swift Package Manager dependencies
-   - disableAutomaticPackageResolution: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
 
  - returns: The absolute path to the generated ipa file
@@ -1184,8 +1176,6 @@ public func buildIosApp(workspace: String? = nil,
                         xcprettyUtf: Bool? = nil,
                         skipProfileDetection: Bool = false,
                         clonedSourcePackagesPath: String? = nil,
-                        skipResolvePackageDependencies: Bool = false,
-                        disableAutomaticPackageResolution: Bool = false,
                         useSystemScm: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "build_ios_app", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -1229,8 +1219,6 @@ public func buildIosApp(workspace: String? = nil,
                                                                                                  RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf),
                                                                                                  RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection),
                                                                                                  RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
-                                                                                                 RubyCommand.Argument(name: "skip_resolve_package_dependencies", value: skipResolvePackageDependencies),
-                                                                                                 RubyCommand.Argument(name: "disable_automatic_package_resolution", value: disableAutomaticPackageResolution),
                                                                                                  RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
@@ -1281,8 +1269,6 @@ public func buildIosApp(workspace: String? = nil,
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
-   - skipResolvePackageDependencies: Skips manual resolution of Swift Package Manager dependencies
-   - disableAutomaticPackageResolution: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
 
  - returns: The absolute path to the generated ipa file
@@ -1331,8 +1317,6 @@ public func buildMacApp(workspace: String? = nil,
                         xcprettyUtf: Bool? = nil,
                         skipProfileDetection: Bool = false,
                         clonedSourcePackagesPath: String? = nil,
-                        skipResolvePackageDependencies: Bool = false,
-                        disableAutomaticPackageResolution: Bool = false,
                         useSystemScm: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "build_mac_app", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -1377,8 +1361,6 @@ public func buildMacApp(workspace: String? = nil,
                                                                                                  RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf),
                                                                                                  RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection),
                                                                                                  RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
-                                                                                                 RubyCommand.Argument(name: "skip_resolve_package_dependencies", value: skipResolvePackageDependencies),
-                                                                                                 RubyCommand.Argument(name: "disable_automatic_package_resolution", value: disableAutomaticPackageResolution),
                                                                                                  RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
@@ -1564,8 +1546,6 @@ public func captureAndroidScreenshots(androidHome: String? = nil,
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
-   - skipResolvePackageDependencies: Skips manual resolution of Swift Package Manager dependencies
-   - disableAutomaticPackageResolution: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
@@ -1611,8 +1591,6 @@ public func captureIosScreenshots(workspace: String? = nil,
                                   concurrentSimulators: Bool = true,
                                   disableSlideToType: Bool = false,
                                   clonedSourcePackagesPath: String? = nil,
-                                  skipResolvePackageDependencies: Bool = false,
-                                  disableAutomaticPackageResolution: Bool = false,
                                   testplan: String? = nil,
                                   onlyTesting: Any? = nil,
                                   skipTesting: Any? = nil,
@@ -1658,8 +1636,6 @@ public func captureIosScreenshots(workspace: String? = nil,
                                                                                                            RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators),
                                                                                                            RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
                                                                                                            RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
-                                                                                                           RubyCommand.Argument(name: "skip_resolve_package_dependencies", value: skipResolvePackageDependencies),
-                                                                                                           RubyCommand.Argument(name: "disable_automatic_package_resolution", value: disableAutomaticPackageResolution),
                                                                                                            RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                                            RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                                            RubyCommand.Argument(name: "skip_testing", value: skipTesting),
@@ -1711,8 +1687,6 @@ public func captureIosScreenshots(workspace: String? = nil,
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
-   - skipResolvePackageDependencies: Skips manual resolution of Swift Package Manager dependencies
-   - disableAutomaticPackageResolution: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
@@ -1758,8 +1732,6 @@ public func captureScreenshots(workspace: String? = nil,
                                concurrentSimulators: Bool = true,
                                disableSlideToType: Bool = false,
                                clonedSourcePackagesPath: String? = nil,
-                               skipResolvePackageDependencies: Bool = false,
-                               disableAutomaticPackageResolution: Bool = false,
                                testplan: String? = nil,
                                onlyTesting: Any? = nil,
                                skipTesting: Any? = nil,
@@ -1805,8 +1777,6 @@ public func captureScreenshots(workspace: String? = nil,
                                                                                                        RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators),
                                                                                                        RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
                                                                                                        RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
-                                                                                                       RubyCommand.Argument(name: "skip_resolve_package_dependencies", value: skipResolvePackageDependencies),
-                                                                                                       RubyCommand.Argument(name: "disable_automatic_package_resolution", value: disableAutomaticPackageResolution),
                                                                                                        RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                                        RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                                        RubyCommand.Argument(name: "skip_testing", value: skipTesting),
@@ -4066,8 +4036,6 @@ public func gradle(task: String? = nil,
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
-   - skipResolvePackageDependencies: Skips manual resolution of Swift Package Manager dependencies
-   - disableAutomaticPackageResolution: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
 
  - returns: The absolute path to the generated ipa file
@@ -4118,8 +4086,6 @@ public func gym(workspace: Any? = gymfile.workspace,
                 xcprettyUtf: Bool? = gymfile.xcprettyUtf,
                 skipProfileDetection: Bool = gymfile.skipProfileDetection,
                 clonedSourcePackagesPath: Any? = gymfile.clonedSourcePackagesPath,
-                skipResolvePackageDependencies: Bool = gymfile.skipResolvePackageDependencies,
-                disableAutomaticPackageResolution: Bool = gymfile.disableAutomaticPackageResolution,
                 useSystemScm: Bool = gymfile.useSystemScm)
 {
     let command = RubyCommand(commandID: "", methodName: "gym", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -4166,8 +4132,6 @@ public func gym(workspace: Any? = gymfile.workspace,
                                                                                        RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf),
                                                                                        RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection),
                                                                                        RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
-                                                                                       RubyCommand.Argument(name: "skip_resolve_package_dependencies", value: skipResolvePackageDependencies),
-                                                                                       RubyCommand.Argument(name: "disable_automatic_package_resolution", value: disableAutomaticPackageResolution),
                                                                                        RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
@@ -6177,8 +6141,6 @@ public func rubyVersion() {
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
-   - skipResolvePackageDependencies: Skips manual resolution of Swift Package Manager dependencies
-   - disableAutomaticPackageResolution: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
@@ -6248,8 +6210,6 @@ public func runTests(workspace: String? = nil,
                      customReportFileName: String? = nil,
                      xcodebuildCommand: String = "env NSUnbufferedIO=YES xcodebuild",
                      clonedSourcePackagesPath: String? = nil,
-                     skipResolvePackageDependencies: Bool = false,
-                     disableAutomaticPackageResolution: Bool = false,
                      useSystemScm: Bool = false,
                      failBuild: Bool = true)
 {
@@ -6317,8 +6277,6 @@ public func runTests(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
                                                                                              RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand),
                                                                                              RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
-                                                                                             RubyCommand.Argument(name: "skip_resolve_package_dependencies", value: skipResolvePackageDependencies),
-                                                                                             RubyCommand.Argument(name: "disable_automatic_package_resolution", value: disableAutomaticPackageResolution),
                                                                                              RubyCommand.Argument(name: "use_system_scm", value: useSystemScm),
                                                                                              RubyCommand.Argument(name: "fail_build", value: failBuild)])
     _ = runner.executeCommand(command)
@@ -6468,8 +6426,6 @@ public func say(text: Any,
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
-   - skipResolvePackageDependencies: Skips manual resolution of Swift Package Manager dependencies
-   - disableAutomaticPackageResolution: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
@@ -6539,8 +6495,6 @@ public func scan(workspace: Any? = scanfile.workspace,
                  customReportFileName: Any? = scanfile.customReportFileName,
                  xcodebuildCommand: Any = scanfile.xcodebuildCommand,
                  clonedSourcePackagesPath: Any? = scanfile.clonedSourcePackagesPath,
-                 skipResolvePackageDependencies: Bool = scanfile.skipResolvePackageDependencies,
-                 disableAutomaticPackageResolution: Bool = scanfile.disableAutomaticPackageResolution,
                  useSystemScm: Bool = scanfile.useSystemScm,
                  failBuild: Bool = scanfile.failBuild)
 {
@@ -6608,8 +6562,6 @@ public func scan(workspace: Any? = scanfile.workspace,
                                                                                         RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
                                                                                         RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand),
                                                                                         RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
-                                                                                        RubyCommand.Argument(name: "skip_resolve_package_dependencies", value: skipResolvePackageDependencies),
-                                                                                        RubyCommand.Argument(name: "disable_automatic_package_resolution", value: disableAutomaticPackageResolution),
                                                                                         RubyCommand.Argument(name: "use_system_scm", value: useSystemScm),
                                                                                         RubyCommand.Argument(name: "fail_build", value: failBuild)])
     _ = runner.executeCommand(command)
@@ -7330,8 +7282,6 @@ public func slather(buildDirectory: String? = nil,
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
-   - skipResolvePackageDependencies: Skips manual resolution of Swift Package Manager dependencies
-   - disableAutomaticPackageResolution: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
@@ -7377,8 +7327,6 @@ public func snapshot(workspace: Any? = snapshotfile.workspace,
                      concurrentSimulators: Bool = snapshotfile.concurrentSimulators,
                      disableSlideToType: Bool = snapshotfile.disableSlideToType,
                      clonedSourcePackagesPath: Any? = snapshotfile.clonedSourcePackagesPath,
-                     skipResolvePackageDependencies: Bool = snapshotfile.skipResolvePackageDependencies,
-                     disableAutomaticPackageResolution: Bool = snapshotfile.disableAutomaticPackageResolution,
                      testplan: Any? = snapshotfile.testplan,
                      onlyTesting: Any? = snapshotfile.onlyTesting,
                      skipTesting: Any? = snapshotfile.skipTesting,
@@ -7424,8 +7372,6 @@ public func snapshot(workspace: Any? = snapshotfile.workspace,
                                                                                             RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators),
                                                                                             RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
                                                                                             RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
-                                                                                            RubyCommand.Argument(name: "skip_resolve_package_dependencies", value: skipResolvePackageDependencies),
-                                                                                            RubyCommand.Argument(name: "disable_automatic_package_resolution", value: disableAutomaticPackageResolution),
                                                                                             RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                             RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                             RubyCommand.Argument(name: "skip_testing", value: skipTesting),
