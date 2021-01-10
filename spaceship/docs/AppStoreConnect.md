@@ -60,9 +60,8 @@ Spaceship::ConnectAPI::App.all.collect do |app|
 end
 
 # Create a new app
-// Not working yet
 app = Spaceship::ConnectAPI::App.create(name: "App Name",
-                                        primary_language: "English",
+                                        primary_locale: "English",
                                         version_string: "1.0", # initial version
                                         sku: "123",
                                         bundle_id: "com.krausefx.app",
