@@ -144,6 +144,12 @@ module Spaceship
         end.first
       end
 
+      def fetch_latest_app_info(client: nil, includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_app_infos(app_id: id, includes: includes)
+        return resp.to_models.first
+      end
+
       #
       # Available Territories
       #
