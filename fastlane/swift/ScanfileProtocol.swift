@@ -176,6 +176,9 @@ public protocol ScanfileProtocol: class {
     /// Only post on Slack if the tests fail
     var slackOnlyOnFailure: Bool { get }
 
+    /// Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack
+    var slackDefaultPayloads: [String]? { get }
+
     /// Use only if you're a pro, use the other options instead
     var destination: String? { get }
 
@@ -257,6 +260,7 @@ public extension ScanfileProtocol {
     var slackIconUrl: String { return "https://fastlane.tools/assets/img/fastlane_icon.png" }
     var skipSlack: Bool { return false }
     var slackOnlyOnFailure: Bool { return false }
+    var slackDefaultPayloads: [String]? { return nil }
     var destination: String? { return nil }
     var catalystPlatform: String? { return nil }
     var customReportFileName: String? { return nil }
@@ -268,4 +272,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.60]
+// FastlaneRunnerAPIVersion [0.9.62]

@@ -185,7 +185,7 @@ module Precheck
 
     def latest_app_version
       platform = Spaceship::ConnectAPI::Platform.map(Precheck.config[:platform])
-      @latest_version ||= app.get_edit_app_store_version(platform: platform)
+      @latest_version ||= Precheck.config[:use_live] ? app.get_live_app_store_version(platform: platform) : app.get_latest_app_store_version(platform: platform)
     end
 
     # Makes sure the current App ID exists. If not, it will show an appropriate error message

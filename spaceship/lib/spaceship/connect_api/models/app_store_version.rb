@@ -21,6 +21,8 @@ module Spaceship
       attr_accessor :created_date
 
       attr_accessor :app_store_version_submission
+      attr_accessor :app_store_version_phased_release
+      attr_accessor :app_store_review_detail
 
       module AppStoreState
         READY_FOR_SALE = "READY_FOR_SALE"
@@ -58,7 +60,9 @@ module Spaceship
         "createdDate" =>  "created_date",
 
         "appStoreVersionSubmission" => "app_store_version_submission",
-        "build" => "build"
+        "build" => "build",
+        "appStoreVersionPhasedRelease" => "app_store_version_phased_release",
+        "appStoreReviewDetail" => "app_store_review_detail"
       })
 
       ESSENTIAL_INCLUDES = [

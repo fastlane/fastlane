@@ -54,6 +54,7 @@ public func addExtraPlatforms(platforms: [String] = []) {
  - parameters:
    - tag: Define your own tag text. This will replace all other parameters
    - grouping: Is used to keep your tags organised under one 'folder'
+   - includesLane: Whether the current lane should be included in the tag and message composition, e.g. '<grouping>/<lane>/<prefix><build_number><postfix>'
    - prefix: Anything you want to put in front of the version number (e.g. 'v')
    - postfix: Anything you want to put at the end of the version number (e.g. '-RC1')
    - buildNumber: The build number. Defaults to the result of increment_build_number if you're using it
@@ -62,10 +63,10 @@ public func addExtraPlatforms(platforms: [String] = []) {
    - force: Force adding the tag
    - sign: Make a GPG-signed tag, using the default e-mail address's key
 
- This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number>`, where:|
+ This will automatically tag your build with the following format: `<grouping>/<lane>/<prefix><build_number><postfix>`, where:|
  |
  >- `grouping` is just to keep your tags organised under one 'folder', defaults to 'builds'|
- - `lane` is the name of the current fastlane lane|
+ - `lane` is the name of the current fastlane lane, if chosen to be included via 'includes_lane' option, which defaults to 'true'|
  - `prefix` is anything you want to stick in front of the version number, e.g. 'v'|
  - `postfix` is anything you want to stick at the end of the version number, e.g. '-RC1'|
  - `build_number` is the build number, which defaults to the value emitted by the `increment_build_number` action|
@@ -74,6 +75,7 @@ public func addExtraPlatforms(platforms: [String] = []) {
  */
 public func addGitTag(tag: String? = nil,
                       grouping: String = "builds",
+                      includesLane: Bool = true,
                       prefix: String = "",
                       postfix: String = "",
                       buildNumber: Any? = nil,
@@ -84,6 +86,7 @@ public func addGitTag(tag: String? = nil,
 {
     let command = RubyCommand(commandID: "", methodName: "add_git_tag", className: nil, args: [RubyCommand.Argument(name: "tag", value: tag),
                                                                                                RubyCommand.Argument(name: "grouping", value: grouping),
+                                                                                               RubyCommand.Argument(name: "includes_lane", value: includesLane),
                                                                                                RubyCommand.Argument(name: "prefix", value: prefix),
                                                                                                RubyCommand.Argument(name: "postfix", value: postfix),
                                                                                                RubyCommand.Argument(name: "build_number", value: buildNumber),
@@ -1520,7 +1523,7 @@ public func captureAndroidScreenshots(androidHome: String? = nil,
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
    - headless: Enabling this option will prevent displaying the simulator window
-   - overrideStatusBar: Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
+   - overrideStatusBar: Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
@@ -1661,7 +1664,7 @@ public func captureIosScreenshots(workspace: String? = nil,
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
    - headless: Enabling this option will prevent displaying the simulator window
-   - overrideStatusBar: Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
+   - overrideStatusBar: Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
@@ -1993,6 +1996,7 @@ public func chatwork(apiToken: String,
    - platform: The platform to use (optional)
    - defaultRuleLevel: The default rule level unless otherwise configured
    - includeInAppPurchases: Should check in-app purchases?
+   - useLive: Should force check live app?
    - negativeAppleSentiment: mentioning  in a way that could be considered negative
    - placeholderText: using placeholder text (e.g.:"lorem ipsum", "text here", etc...)
    - otherPlatforms: mentioning other platforms, like Android or Blackberry
@@ -2017,6 +2021,7 @@ public func checkAppStoreMetadata(apiKeyPath: String? = nil,
                                   platform: String = "ios",
                                   defaultRuleLevel: Any = "error",
                                   includeInAppPurchases: Bool = true,
+                                  useLive: Bool = false,
                                   negativeAppleSentiment: Any? = nil,
                                   placeholderText: Any? = nil,
                                   otherPlatforms: Any? = nil,
@@ -2037,6 +2042,7 @@ public func checkAppStoreMetadata(apiKeyPath: String? = nil,
                                                                                                             RubyCommand.Argument(name: "platform", value: platform),
                                                                                                             RubyCommand.Argument(name: "default_rule_level", value: defaultRuleLevel),
                                                                                                             RubyCommand.Argument(name: "include_in_app_purchases", value: includeInAppPurchases),
+                                                                                                            RubyCommand.Argument(name: "use_live", value: useLive),
                                                                                                             RubyCommand.Argument(name: "negative_apple_sentiment", value: negativeAppleSentiment),
                                                                                                             RubyCommand.Argument(name: "placeholder_text", value: placeholderText),
                                                                                                             RubyCommand.Argument(name: "other_platforms", value: otherPlatforms),
@@ -2861,6 +2867,32 @@ public func dotgpgEnvironment(dotgpgFile: String) {
  */
 public func download(url: String) {
     let command = RubyCommand(commandID: "", methodName: "download", className: nil, args: [RubyCommand.Argument(name: "url", value: url)])
+    _ = runner.executeCommand(command)
+}
+
+/**
+ Download App Privacy Details from an app in App Store Connect
+
+ - parameters:
+   - username: Your Apple ID Username for App Store Connect
+   - appIdentifier: The bundle identifier of your app
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+   - outputJsonPath: Path to the app usage data JSON file generated by interactive questions
+
+ Download App Privacy Details from an app in App Store Connect. For more detail information, view https://docs.fastlane.tools/uploading-app-privacy-details
+ */
+public func downloadAppPrivacyDetailsFromAppStore(username: String,
+                                                  appIdentifier: String,
+                                                  teamId: Any? = nil,
+                                                  teamName: String? = nil,
+                                                  outputJsonPath: String = "./fastlane/app_privacy_details.json")
+{
+    let command = RubyCommand(commandID: "", methodName: "download_app_privacy_details_from_app_store", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
+                                                                                                                               RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
+                                                                                                                               RubyCommand.Argument(name: "team_id", value: teamId),
+                                                                                                                               RubyCommand.Argument(name: "team_name", value: teamName),
+                                                                                                                               RubyCommand.Argument(name: "output_json_path", value: outputJsonPath)])
     _ = runner.executeCommand(command)
 }
 
@@ -3791,6 +3823,7 @@ public func gitTagExists(tag: String,
  - parameters:
    - serverUrl: The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')
    - apiToken: Personal API Token for GitHub - generate one at https://github.com/settings/tokens
+   - apiBearer: Use a Bearer authorization token. Usually generated by Github Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
    - httpMethod: The HTTP method. e.g. GET / POST
    - body: The request body in JSON or hash format
    - rawBody: The request body taken verbatim instead of as JSON, useful for file uploads
@@ -3807,7 +3840,8 @@ public func gitTagExists(tag: String,
  Documentation: [https://developer.github.com/v3](https://developer.github.com/v3).
  */
 public func githubApi(serverUrl: String = "https://api.github.com",
-                      apiToken: String,
+                      apiToken: String? = nil,
+                      apiBearer: String? = nil,
                       httpMethod: String = "GET",
                       body: [String: Any] = [:],
                       rawBody: String? = nil,
@@ -3819,6 +3853,7 @@ public func githubApi(serverUrl: String = "https://api.github.com",
 {
     let command = RubyCommand(commandID: "", methodName: "github_api", className: nil, args: [RubyCommand.Argument(name: "server_url", value: serverUrl),
                                                                                               RubyCommand.Argument(name: "api_token", value: apiToken),
+                                                                                              RubyCommand.Argument(name: "api_bearer", value: apiBearer),
                                                                                               RubyCommand.Argument(name: "http_method", value: httpMethod),
                                                                                               RubyCommand.Argument(name: "body", value: body),
                                                                                               RubyCommand.Argument(name: "raw_body", value: rawBody),
@@ -5159,6 +5194,7 @@ public func oclint(oclintPath: String = "oclint",
    - apnsP12: APNS P12 File (in .p12 format)
    - apnsP12Password: APNS P12 password
    - apnsEnv: APNS environment
+   - organizationId: OneSignal Organization ID
 
  You can use this action to automatically create or update a OneSignal application. You can also upload a `.p12` with password, a GCM key, or both.
  */
@@ -5169,7 +5205,8 @@ public func onesignal(appId: String? = nil,
                       androidGcmSenderId: String? = nil,
                       apnsP12: String? = nil,
                       apnsP12Password: String? = nil,
-                      apnsEnv: String = "production")
+                      apnsEnv: String = "production",
+                      organizationId: String? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "onesignal", className: nil, args: [RubyCommand.Argument(name: "app_id", value: appId),
                                                                                              RubyCommand.Argument(name: "auth_token", value: authToken),
@@ -5178,7 +5215,8 @@ public func onesignal(appId: String? = nil,
                                                                                              RubyCommand.Argument(name: "android_gcm_sender_id", value: androidGcmSenderId),
                                                                                              RubyCommand.Argument(name: "apns_p12", value: apnsP12),
                                                                                              RubyCommand.Argument(name: "apns_p12_password", value: apnsP12Password),
-                                                                                             RubyCommand.Argument(name: "apns_env", value: apnsEnv)])
+                                                                                             RubyCommand.Argument(name: "apns_env", value: apnsEnv),
+                                                                                             RubyCommand.Argument(name: "organization_id", value: organizationId)])
     _ = runner.executeCommand(command)
 }
 
@@ -5489,6 +5527,7 @@ public func podLibLint(useBundleExec: Bool = true,
    - swiftVersion: The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file
    - skipImportValidation: Lint skips validating that the pod can be imported
    - skipTests: Lint skips building and running tests during validation
+   - useJson: Convert the podspec to JSON before pushing it to the repo
    - verbose: Show more debugging information
    - useModularHeaders: Use modular headers option during validation
    - synchronous: If validation depends on other recently pushed pods, synchronize
@@ -5502,6 +5541,7 @@ public func podPush(useBundleExec: Bool = false,
                     swiftVersion: String? = nil,
                     skipImportValidation: Bool? = nil,
                     skipTests: Bool? = nil,
+                    useJson: Bool? = nil,
                     verbose: Bool = false,
                     useModularHeaders: Bool? = nil,
                     synchronous: Bool? = nil)
@@ -5515,6 +5555,7 @@ public func podPush(useBundleExec: Bool = false,
                                                                                             RubyCommand.Argument(name: "swift_version", value: swiftVersion),
                                                                                             RubyCommand.Argument(name: "skip_import_validation", value: skipImportValidation),
                                                                                             RubyCommand.Argument(name: "skip_tests", value: skipTests),
+                                                                                            RubyCommand.Argument(name: "use_json", value: useJson),
                                                                                             RubyCommand.Argument(name: "verbose", value: verbose),
                                                                                             RubyCommand.Argument(name: "use_modular_headers", value: useModularHeaders),
                                                                                             RubyCommand.Argument(name: "synchronous", value: synchronous)])
@@ -5568,6 +5609,7 @@ public func podioItem(clientId: String,
    - platform: The platform to use (optional)
    - defaultRuleLevel: The default rule level unless otherwise configured
    - includeInAppPurchases: Should check in-app purchases?
+   - useLive: Should force check live app?
    - freeStuffInIap: using text indicating that your IAP is free
 
  - returns: true if precheck passes, else, false
@@ -5583,6 +5625,7 @@ public func precheck(apiKeyPath: Any? = precheckfile.apiKeyPath,
                      platform: Any = precheckfile.platform,
                      defaultRuleLevel: Any = precheckfile.defaultRuleLevel,
                      includeInAppPurchases: Bool = precheckfile.includeInAppPurchases,
+                     useLive: Bool = precheckfile.useLive,
                      freeStuffInIap: Any? = precheckfile.freeStuffInIap)
 {
     let command = RubyCommand(commandID: "", methodName: "precheck", className: nil, args: [RubyCommand.Argument(name: "api_key_path", value: apiKeyPath),
@@ -5594,6 +5637,7 @@ public func precheck(apiKeyPath: Any? = precheckfile.apiKeyPath,
                                                                                             RubyCommand.Argument(name: "platform", value: platform),
                                                                                             RubyCommand.Argument(name: "default_rule_level", value: defaultRuleLevel),
                                                                                             RubyCommand.Argument(name: "include_in_app_purchases", value: includeInAppPurchases),
+                                                                                            RubyCommand.Argument(name: "use_live", value: useLive),
                                                                                             RubyCommand.Argument(name: "free_stuff_in_iap", value: freeStuffInIap)])
     _ = runner.executeCommand(command)
 }
@@ -5738,6 +5782,7 @@ public func pushGitTags(force: Bool = false,
    - remote: The remote to push to
    - noVerify: Whether or not to use --no-verify
    - setUpstream: Whether or not to use --set-upstream
+   - pushOptions: Array of strings to be passed using the '--push-option' option
 
  Lets you push your local commits to a remote git repo. Useful if you make local changes such as adding a version bump commit (using `commit_version_bump`) or a git tag (using 'add_git_tag') on a CI server, and you want to push those changes back to your canonical/main repo.
  If this is a new branch, use the `set_upstream` option to set the remote branch as upstream.
@@ -5749,7 +5794,8 @@ public func pushToGitRemote(localBranch: String? = nil,
                             tags: Bool = true,
                             remote: String = "origin",
                             noVerify: Bool = false,
-                            setUpstream: Bool = false)
+                            setUpstream: Bool = false,
+                            pushOptions: [String] = [])
 {
     let command = RubyCommand(commandID: "", methodName: "push_to_git_remote", className: nil, args: [RubyCommand.Argument(name: "local_branch", value: localBranch),
                                                                                                       RubyCommand.Argument(name: "remote_branch", value: remoteBranch),
@@ -5758,7 +5804,8 @@ public func pushToGitRemote(localBranch: String? = nil,
                                                                                                       RubyCommand.Argument(name: "tags", value: tags),
                                                                                                       RubyCommand.Argument(name: "remote", value: remote),
                                                                                                       RubyCommand.Argument(name: "no_verify", value: noVerify),
-                                                                                                      RubyCommand.Argument(name: "set_upstream", value: setUpstream)])
+                                                                                                      RubyCommand.Argument(name: "set_upstream", value: setUpstream),
+                                                                                                      RubyCommand.Argument(name: "push_options", value: pushOptions)])
     _ = runner.executeCommand(command)
 }
 
@@ -6088,6 +6135,7 @@ public func rubyVersion() {
    - slackIconUrl: Overrides the webhook's image property if slack_use_webhook_configured_username_and_icon is false
    - skipSlack: Don't publish to slack, even when an URL is given
    - slackOnlyOnFailure: Only post on Slack if the tests fail
+   - slackDefaultPayloads: Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack
    - destination: Use only if you're a pro, use the other options instead
    - catalystPlatform: Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
@@ -6156,6 +6204,7 @@ public func runTests(workspace: String? = nil,
                      slackIconUrl: String = "https://fastlane.tools/assets/img/fastlane_icon.png",
                      skipSlack: Bool = false,
                      slackOnlyOnFailure: Bool = false,
+                     slackDefaultPayloads: [String]? = nil,
                      destination: Any? = nil,
                      catalystPlatform: String? = nil,
                      customReportFileName: String? = nil,
@@ -6222,6 +6271,7 @@ public func runTests(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "slack_icon_url", value: slackIconUrl),
                                                                                              RubyCommand.Argument(name: "skip_slack", value: skipSlack),
                                                                                              RubyCommand.Argument(name: "slack_only_on_failure", value: slackOnlyOnFailure),
+                                                                                             RubyCommand.Argument(name: "slack_default_payloads", value: slackDefaultPayloads),
                                                                                              RubyCommand.Argument(name: "destination", value: destination),
                                                                                              RubyCommand.Argument(name: "catalyst_platform", value: catalystPlatform),
                                                                                              RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
@@ -6370,6 +6420,7 @@ public func say(text: Any,
    - slackIconUrl: Overrides the webhook's image property if slack_use_webhook_configured_username_and_icon is false
    - skipSlack: Don't publish to slack, even when an URL is given
    - slackOnlyOnFailure: Only post on Slack if the tests fail
+   - slackDefaultPayloads: Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack
    - destination: Use only if you're a pro, use the other options instead
    - catalystPlatform: Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
@@ -6438,6 +6489,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                  slackIconUrl: Any = scanfile.slackIconUrl,
                  skipSlack: Bool = scanfile.skipSlack,
                  slackOnlyOnFailure: Bool = scanfile.slackOnlyOnFailure,
+                 slackDefaultPayloads: [String]? = scanfile.slackDefaultPayloads,
                  destination: Any? = scanfile.destination,
                  catalystPlatform: Any? = scanfile.catalystPlatform,
                  customReportFileName: Any? = scanfile.customReportFileName,
@@ -6504,6 +6556,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                                                                                         RubyCommand.Argument(name: "slack_icon_url", value: slackIconUrl),
                                                                                         RubyCommand.Argument(name: "skip_slack", value: skipSlack),
                                                                                         RubyCommand.Argument(name: "slack_only_on_failure", value: slackOnlyOnFailure),
+                                                                                        RubyCommand.Argument(name: "slack_default_payloads", value: slackDefaultPayloads),
                                                                                         RubyCommand.Argument(name: "destination", value: destination),
                                                                                         RubyCommand.Argument(name: "catalyst_platform", value: catalystPlatform),
                                                                                         RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
@@ -6682,6 +6735,7 @@ public func setChangelog(apiKeyPath: String? = nil,
     - repositoryName: The path to your repo, e.g. 'fastlane/fastlane'
     - serverUrl: The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')
     - apiToken: Personal API Token for GitHub - generate one at https://github.com/settings/tokens
+    - apiBearer: Use a Bearer authorization token. Usually generated by Github Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
     - tagName: Pass in the tag name
     - name: Name of this release
     - commitish: Specifies the commitish value that determines where the Git tag is created from. Can be any branch or commit SHA. Unused if the Git tag already exists. Default: the repository's default branch (usually master)
@@ -6699,7 +6753,8 @@ public func setChangelog(apiKeyPath: String? = nil,
  */
 @discardableResult public func setGithubRelease(repositoryName: String,
                                                 serverUrl: String = "https://api.github.com",
-                                                apiToken: String,
+                                                apiToken: String? = nil,
+                                                apiBearer: String? = nil,
                                                 tagName: String,
                                                 name: String? = nil,
                                                 commitish: String? = nil,
@@ -6711,6 +6766,7 @@ public func setChangelog(apiKeyPath: String? = nil,
     let command = RubyCommand(commandID: "", methodName: "set_github_release", className: nil, args: [RubyCommand.Argument(name: "repository_name", value: repositoryName),
                                                                                                       RubyCommand.Argument(name: "server_url", value: serverUrl),
                                                                                                       RubyCommand.Argument(name: "api_token", value: apiToken),
+                                                                                                      RubyCommand.Argument(name: "api_bearer", value: apiBearer),
                                                                                                       RubyCommand.Argument(name: "tag_name", value: tagName),
                                                                                                       RubyCommand.Argument(name: "name", value: name),
                                                                                                       RubyCommand.Argument(name: "commitish", value: commitish),
@@ -7001,7 +7057,7 @@ public func skipDocs() {
    - username: Overrides the webhook's username property if use_webhook_configured_username_and_icon is false
    - iconUrl: Overrides the webhook's image property if use_webhook_configured_username_and_icon is false
    - payload: Add additional information to this post. payload must be a hash containing any key with any value
-   - defaultPayloads: Remove some of the default payloads. More information about the available payloads on GitHub
+   - defaultPayloads: Specifies default payloads to include. Pass an empty array to suppress all the default payloads
    - attachmentProperties: Merge additional properties in the slack attachment, see https://api.slack.com/docs/attachments
    - success: Was this build successful? (true/false)
    - failOnError: Should an error sending the slack notification cause a failure? (true/false)
@@ -7017,7 +7073,7 @@ public func slack(message: String? = nil,
                   username: String = "fastlane",
                   iconUrl: String = "https://fastlane.tools/assets/img/fastlane_icon.png",
                   payload: [String: Any] = [:],
-                  defaultPayloads: [String]? = nil,
+                  defaultPayloads: [String] = ["lane", "test_result", "git_branch", "git_author", "last_git_commit", "last_git_commit_hash"],
                   attachmentProperties: [String: Any] = [:],
                   success: Bool = true,
                   failOnError: Bool = true,
@@ -7203,7 +7259,7 @@ public func slather(buildDirectory: String? = nil,
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
    - headless: Enabling this option will prevent displaying the simulator window
-   - overrideStatusBar: Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
+   - overrideStatusBar: Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
@@ -7463,7 +7519,7 @@ public func splunkmint(dsym: String? = nil,
 
  - parameters:
    - command: The swift command (one of: build, test, clean, reset, update, resolve, generate-xcodeproj, init)
-   - enableCodeCoverage: Enables code coverage for the generated Xcode project when using the generate-xcodeproj command
+   - enableCodeCoverage: Enables code coverage for the generated Xcode project when using the 'generate-xcodeproj' and the 'test' command
    - buildPath: Specify build/cache directory [default: ./.build]
    - packagePath: Change working directory before any other operation
    - xcconfig: Use xcconfig file to override swift package generate-xcodeproj defaults
@@ -8424,6 +8480,44 @@ public func updateUrlSchemes(path: String,
     let command = RubyCommand(commandID: "", methodName: "update_url_schemes", className: nil, args: [RubyCommand.Argument(name: "path", value: path),
                                                                                                       RubyCommand.Argument(name: "url_schemes", value: urlSchemes),
                                                                                                       RubyCommand.Argument(name: "update_url_schemes", value: updateUrlSchemes)])
+    _ = runner.executeCommand(command)
+}
+
+/**
+ Upload App Privacy Details for an app in App Store Connect
+
+ - parameters:
+   - username: Your Apple ID Username for App Store Connect
+   - appIdentifier: The bundle identifier of your app
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+   - jsonPath: Path to the app usage data JSON
+   - outputJsonPath: Path to the app usage data JSON file generated by interactive questions
+   - skipJsonFileSaving: Whether to skip the saving of the JSON file
+   - skipUpload: Whether to skip the upload and only create the JSON file with interactive questions
+   - skipPublish: Whether to skip the publishing
+
+ Upload App Privacy Details for an app in App Store Connect. For more detail information, view https://docs.fastlane.tools/uploading-app-privacy-details
+ */
+public func uploadAppPrivacyDetailsToAppStore(username: String,
+                                              appIdentifier: String,
+                                              teamId: Any? = nil,
+                                              teamName: String? = nil,
+                                              jsonPath: String? = nil,
+                                              outputJsonPath: String = "./fastlane/app_privacy_details.json",
+                                              skipJsonFileSaving: Bool = false,
+                                              skipUpload: Bool = false,
+                                              skipPublish: Bool = false)
+{
+    let command = RubyCommand(commandID: "", methodName: "upload_app_privacy_details_to_app_store", className: nil, args: [RubyCommand.Argument(name: "username", value: username),
+                                                                                                                           RubyCommand.Argument(name: "app_identifier", value: appIdentifier),
+                                                                                                                           RubyCommand.Argument(name: "team_id", value: teamId),
+                                                                                                                           RubyCommand.Argument(name: "team_name", value: teamName),
+                                                                                                                           RubyCommand.Argument(name: "json_path", value: jsonPath),
+                                                                                                                           RubyCommand.Argument(name: "output_json_path", value: outputJsonPath),
+                                                                                                                           RubyCommand.Argument(name: "skip_json_file_saving", value: skipJsonFileSaving),
+                                                                                                                           RubyCommand.Argument(name: "skip_upload", value: skipUpload),
+                                                                                                                           RubyCommand.Argument(name: "skip_publish", value: skipPublish)])
     _ = runner.executeCommand(command)
 }
 
@@ -9429,4 +9523,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.105]
+// FastlaneRunnerAPIVersion [0.9.107]

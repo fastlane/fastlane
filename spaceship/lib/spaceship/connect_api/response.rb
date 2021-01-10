@@ -6,11 +6,13 @@ module Spaceship
       include Enumerable
       attr_reader :body
       attr_reader :status
+      attr_reader :headers
       attr_reader :client
 
-      def initialize(body: nil, status: nil, client: nil)
+      def initialize(body: nil, status: nil, headers: nil, client: nil)
         @body = body
         @status = status
+        @headers = headers
         @client = client
       end
 

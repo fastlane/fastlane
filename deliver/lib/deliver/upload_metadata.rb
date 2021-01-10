@@ -1,3 +1,5 @@
+require 'spaceship'
+
 require_relative 'module'
 require_relative 'queue_worker'
 
@@ -375,7 +377,7 @@ module Deliver
       # Check folder list (an empty folder signifies a language is required)
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        enabled_languages << lang_folder.language unless enabled_languages.include?(lang_folder.language)
+        enabled_languages << lang_folder.basename unless enabled_languages.include?(lang_folder.basename)
       end
 
       return unless enabled_languages.include?("default")
@@ -414,7 +416,7 @@ module Deliver
       # Check folder list (an empty folder signifies a language is required)
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        enabled_languages << lang_folder.language unless enabled_languages.include?(lang_folder.language)
+        enabled_languages << lang_folder.basename unless enabled_languages.include?(lang_folder.basename)
       end
 
       # Mapping to strings because :default symbol can be passed in
@@ -531,7 +533,7 @@ module Deliver
 
           UI.message("Loading '#{path}'...")
           options[key] ||= {}
-          options[key][lang_folder.language] ||= File.read(path)
+          options[key][lang_folder.basename] ||= File.read(path)
         end
       end
 

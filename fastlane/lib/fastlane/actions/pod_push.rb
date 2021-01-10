@@ -43,6 +43,10 @@ module Fastlane
           command << "--skip-tests"
         end
 
+        if params[:use_json]
+          command << "--use-json"
+        end
+
         if params[:verbose]
           command << "--verbose"
         end
@@ -121,6 +125,11 @@ module Fastlane
                                        optional: true,
                                        type: Boolean,
                                        env_name: "FL_POD_PUSH_SKIP_TESTS"),
+          FastlaneCore::ConfigItem.new(key: :use_json,
+                                       description: "Convert the podspec to JSON before pushing it to the repo",
+                                       optional: true,
+                                       type: Boolean,
+                                       env_name: "FL_POD_PUSH_USE_JSON"),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        description: "Show more debugging information",
                                        optional: true,
