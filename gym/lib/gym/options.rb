@@ -105,11 +105,11 @@ module Gym
         FastlaneCore::ConfigItem.new(key: :export_method,
                                      short_option: "-j",
                                      env_name: "GYM_EXPORT_METHOD",
-                                     description: "Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id",
+                                     description: "Method used to export the archive. Valid values are: app-store, validation, ad-hoc, package, enterprise, development, developer-id and mac-application",
                                      type: String,
                                      optional: true,
                                      verify_block: proc do |value|
-                                       av = %w(app-store ad-hoc package enterprise development developer-id)
+                                       av = %w(app-store validation ad-hoc package enterprise development developer-id mac-application)
                                        UI.user_error!("Unsupported export_method '#{value}', must be: #{av}") unless av.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :export_options,
