@@ -29,6 +29,9 @@ public protocol PrecheckfileProtocol: class {
     /// Should check in-app purchases?
     var includeInAppPurchases: Bool { get }
 
+    /// Should force check live app?
+    var useLive: Bool { get }
+
     /// using text indicating that your IAP is free
     var freeStuffInIap: String? { get }
 }
@@ -43,9 +46,10 @@ public extension PrecheckfileProtocol {
     var platform: String { return "ios" }
     var defaultRuleLevel: String { return "error" }
     var includeInAppPurchases: Bool { return true }
+    var useLive: Bool { return false }
     var freeStuffInIap: String? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.49]
+// FastlaneRunnerAPIVersion [0.9.50]
