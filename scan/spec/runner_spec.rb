@@ -77,6 +77,18 @@ describe Scan do
           @scan.handle_results(0)
           expect(Scan.cache[:temp_junit_report]).to(eq('/var/folders/non_existent_file.junit'))
         end
+
+        it "fails if tests_exit_status is not 0", requires_xcodebuild: true do
+          expect do
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+              output_directory: '/tmp/scan_results',
+              project: './scan/examples/standard/app.xcodeproj',
+              disable_xcpretty: true
+            })
+
+            @scan.handle_results(1)
+          end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Test execution failed. Exit status: 1")
+        end
       end
     end
 
