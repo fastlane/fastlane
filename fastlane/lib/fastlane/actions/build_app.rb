@@ -8,6 +8,7 @@ module Fastlane
     end
 
     class BuildAppAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(values)
         require 'gym'
 
