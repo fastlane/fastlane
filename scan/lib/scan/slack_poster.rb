@@ -44,7 +44,7 @@ module Scan
         }
       end
 
-      arguments = {
+      options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
         message: "#{Scan.config[:app_name] || Scan.project.app_name} Tests:\n#{Scan.config[:slack_message]}",
         channel: channel,
         slack_url: Scan.config[:slack_url].to_s,
@@ -56,11 +56,8 @@ module Scan
         attachment_properties: {
           fields: fields
         }
-      }
-      options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, arguments)
-      result = Fastlane::Actions::SlackAction.run(options)
-      return arguments if Helper.test? # Used to help validate the arguments passed to SlackAction
-      return result
+      })
+      Fastlane::Actions::SlackAction.run(options)
     end
   end
 end

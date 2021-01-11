@@ -80,8 +80,8 @@ describe Scan::SlackPoster do
       end
     end
 
-    def expect_slack_poster_arguments_match
-      expect(Scan::SlackPoster.new.run({ tests: 0, failures: 0 })).to match(hash_including({
+    def expected_slack_poster_arguments
+      hash = {
         message: a_string_matching(' Tests:'),
         channel: nil,
         slack_url: 'https://slack/hook/url',
@@ -102,7 +102,7 @@ describe Scan::SlackPoster do
             }
           ]
         }
-      }))
+      }
     end
 
     describe "with slack_url option set to a URL value" do
@@ -116,7 +116,12 @@ describe Scan::SlackPoster do
             slack_url: 'https://slack/hook/url'
           })
 
-          expect_slack_poster_arguments_match
+          expect(FastlaneCore::Configuration).to(
+            receive(:create)
+            .with(any_args, hash_including(expected_slack_poster_arguments))
+            .and_call_original
+          )
+          Scan::SlackPoster.new.run({ tests: 0, failures: 0 })
         end
       end
     end
@@ -130,7 +135,12 @@ describe Scan::SlackPoster do
             project: './scan/examples/standard/app.xcodeproj'
           })
 
-          expect_slack_poster_arguments_match
+          expect(FastlaneCore::Configuration).to(
+            receive(:create)
+            .with(any_args, hash_including(expected_slack_poster_arguments))
+            .and_call_original
+          )
+          Scan::SlackPoster.new.run({ tests: 0, failures: 0 })
         end
       end
     end
