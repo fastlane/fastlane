@@ -51,7 +51,7 @@ describe FastlaneCore do
 
     def shell_provider_id_command(jwt: nil)
       # Ruby doesn't escape "+" with Shellwords.escape from 2.7 https://bugs.ruby-lang.org/issues/14429
-      escaped_password = if RUBY_VERSION > "2.7.0"
+      escaped_password = if RUBY_VERSION >= "2.7.0"
                            "'\\!\\>\\ p@\\$s_-+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'"
                          else
                            "'\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'"
