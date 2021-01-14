@@ -112,7 +112,6 @@ describe Gym do
       expect(result).to include("-scmProvider system").once
     end
 
-
     it "defaults to Xcode scm when option is not provided", requires_xcodebuild: true do
       options = { project: "./gym/examples/standard/Example.xcodeproj" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
