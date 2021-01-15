@@ -83,7 +83,12 @@ module Scan
     end
 
     def handle_results(tests_exit_status)
-      return if Scan.config[:disable_xcpretty]
+      if Scan.config[:disable_xcpretty]
+        unless tests_exit_status == 0
+          UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+        end
+        return
+      end
 
       result = TestResultParser.new.parse_result(test_results)
       SlackPoster.new.run(result)
