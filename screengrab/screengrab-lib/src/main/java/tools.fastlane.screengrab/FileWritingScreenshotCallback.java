@@ -1,10 +1,12 @@
 package tools.fastlane.screengrab;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
-import androidx.test.platform.app.InstrumentationRegistry;
 import android.util.Log;
+
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -12,8 +14,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Locale;
-
-import tools.fastlane.screengrab.file.Chmod;
 
 /**
  * Default {@link ScreenshotCallback} implementation that stores the captured Bitmap on the file
@@ -44,7 +44,6 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
             try {
                 fos = new BufferedOutputStream(new FileOutputStream(screenshotFile));
                 screenshot.compress(Bitmap.CompressFormat.PNG, FULL_QUALITY, fos);
-                Chmod.chmodPlusR(screenshotFile);
             } finally {
                 screenshot.recycle();
                 if (fos != null) {
@@ -65,21 +64,22 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
         return new File(screenshotDirectory, screenshotFileName);
     }
 
+    @SuppressLint("WorldReadableFiles")
     private static File getFilesDirectory(Context context, Locale locale) throws IOException {
-        File directory = null;
-
-        if (Build.VERSION.SDK_INT >= 21) {
-            File internalDir = new File(context.getFilesDir(), getDirectoryName(context, locale));
-            directory = initializeDirectory(internalDir);
+        File base;
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+            base = context.getDir(SCREENGRAB_DIR_NAME, Context.MODE_PRIVATE);
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            //noinspection deprecation
+            base = context.getDir(SCREENGRAB_DIR_NAME, Context.MODE_WORLD_READABLE);
+        } else {
+            base = context.getExternalFilesDir(SCREENGRAB_DIR_NAME);
+        }
+        if (base == null) {
+            throw new IOException("Unable to get a world-readable directory");
         }
 
-        // We can only try this fall-back before Android N, since N makes Context.MODE_WORLD_READABLE
-        // result in a SecurityException
-        if (directory == null && Build.VERSION.SDK_INT < 24) {
-            File internalDir = new File(context.getDir(SCREENGRAB_DIR_NAME, Context.MODE_WORLD_READABLE), localeToDirName(locale));
-            directory = initializeDirectory(internalDir);
-        }
-
+        File directory = initializeDirectory(new File(base, localeToDirName(locale)));
         if (directory == null) {
             throw new IOException("Unable to get a screenshot storage directory");
         }
@@ -102,15 +102,11 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
         return null;
     }
 
-    private static String getDirectoryName(Context context, Locale locale) {
-        return context.getPackageName() + "/" + SCREENGRAB_DIR_NAME + "/" + localeToDirName(locale);
-    }
-
     private static String localeToDirName(Locale locale) {
         StringBuilder sb = new StringBuilder(locale.getLanguage());
         String localeCountry = locale.getCountry();
 
-        if (localeCountry != null && localeCountry.length() != 0) {
+        if (localeCountry.length() != 0) {
             sb.append("-").append(localeCountry);
         }
 
@@ -119,13 +115,12 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
 
     private static void createPathTo(File dir) throws IOException {
         File parent = dir.getParentFile();
-        if (!parent.exists()) {
+        if (parent != null && !parent.exists()) {
             createPathTo(parent);
         }
         if (!dir.exists() && !dir.mkdirs()) {
             throw new IOException("Unable to create output dir: " + dir.getAbsolutePath());
         }
-        Chmod.chmodPlusRWX(dir);
     }
 
     private static boolean shouldAppendTimestamp() {

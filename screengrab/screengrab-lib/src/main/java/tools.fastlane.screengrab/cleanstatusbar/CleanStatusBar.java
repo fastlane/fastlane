@@ -1,14 +1,22 @@
 package tools.fastlane.screengrab.cleanstatusbar;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.test.InstrumentationRegistry;
+import androidx.test.core.app.ApplicationProvider;
 
+import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+
+@SuppressWarnings({"unused", "RedundantSuppression"})
 public class CleanStatusBar {
     private static final String TAG = "Screengrab";
 
@@ -51,10 +59,10 @@ public class CleanStatusBar {
     /**
      * Disables the clean status bar
      */
-    public static void disable()
-    {
+    public static void disable() {
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
-        sendCommand(InstrumentationRegistry.getTargetContext(), "exit");
+
+        sendCommand(ApplicationProvider.getApplicationContext(), "exit");
     }
 
     /**
@@ -311,7 +319,12 @@ public class CleanStatusBar {
             return;
         }
 
-        Context context = InstrumentationRegistry.getTargetContext();
+        Context context = ApplicationProvider.getApplicationContext();
+
+        // "warm up" demo mode -- no clue why this is needed
+        // without this, the status bar unreproducibly breaks
+        sendCommand(context, "enter");
+        sendCommand(context, "enter");
 
         sendCommand(context, "battery", "level", Integer.toString(batteryLevel),
                 "plugged", batteryPlugged ? "true" : "false",
@@ -323,8 +336,8 @@ public class CleanStatusBar {
         sendCommand(context, "network", "airplane", airplaneModeVisibility.getValue());
         // Some network commands conflict...
         if(airplaneModeVisibility == IconVisibility.HIDE) {
-            sendCommand(context,"network", "sims", Integer.toString(numberOfSims));
-            sendCommand(context,"network", "carriernetworkchange", carrierNetworkChangeVisibility.getValue());
+            sendCommand(context, "network", "sims", Integer.toString(numberOfSims));
+            sendCommand(context, "network", "carriernetworkchange", carrierNetworkChangeVisibility.getValue());
             if(carrierNetworkChangeVisibility == IconVisibility.HIDE) {
                 sendCommand(context, "network", "mobile", mobileNetworkVisibility.getValue(),
                         "level", mobileNetworkLevel == null ? "null" : Integer.toString(mobileNetworkLevel),
@@ -353,13 +366,43 @@ public class CleanStatusBar {
 
     private static void sendCommand(@NonNull Context context, @NonNull String... commands)
     {
+        Log.v(TAG, Arrays.toString(commands));
         if ((commands.length - 1) % 2 != 0)
             throw new IllegalArgumentException();
         Intent intent = new Intent("com.android.systemui.demo")
+                .setPackage("com.android.systemui")
                 .putExtra("command", commands[0]);
         for (int i = 1; i < commands.length; i += 2) {
             intent.putExtra(commands[i], commands[i + 1]);
         }
-        context.sendBroadcast(intent);
+
+
+        HandlerThread thread = new HandlerThread("DemoModeCallback");
+        thread.start();
+        Handler scheduler = new Handler(thread.getLooper());
+
+        FutureTask<Void> callback = new FutureTask<>(new Runnable() {
+            @Override
+            public void run() {
+                // no-op
+            }
+        }, null);
+
+        context.sendOrderedBroadcast(intent,
+                null,
+                new DemoModeCallbackBroadcastReceiver(callback),
+                scheduler,
+                Activity.RESULT_OK,
+                null,
+                null);
+        try {
+            callback.get();
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            thread.quitSafely();
+        }
     }
 }

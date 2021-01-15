@@ -1,6 +1,7 @@
 package tools.fastlane.localetester;
 
-import androidx.test.rule.ActivityTestRule;
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -9,6 +10,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.concurrent.CountDownLatch;
 
 import tools.fastlane.screengrab.Screengrab;
 import tools.fastlane.screengrab.UiAutomatorScreenshotStrategy;
@@ -30,14 +33,14 @@ public class JUnit4StyleTests {
     public static final LocaleTestRule localeTestRule = new LocaleTestRule();
 
     @Rule
-    public ActivityTestRule<MainActivity> activityRule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityScenarioRule<MainActivity> activityRule = new ActivityScenarioRule<>(MainActivity.class);
 
     @BeforeClass
     public static void beforeAll() {
         Screengrab.setDefaultScreenshotStrategy(new UiAutomatorScreenshotStrategy());
 
         new CleanStatusBar()
-                .setMobileNetworkDataType(MobileDataType.THREEG)
+                .setMobileNetworkDataType(MobileDataType.ONEX)
                 .setBluetoothState(BluetoothState.DISCONNECTED)
                 .enable();
     }
@@ -60,7 +63,7 @@ public class JUnit4StyleTests {
 
     @Test
     public void testTakeMoreScreenshots() {
-        onView(withId(R.id.nav_button)).perform(click());
+        onView(withId(R.id.nav_button)).perform(click()); // TODO: does not always finish displaying
 
         Screengrab.screenshot("anotherActivity");
 

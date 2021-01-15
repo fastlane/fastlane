@@ -6,12 +6,6 @@ require_relative 'module'
 
 module Screengrab
   class Runner
-    NEEDED_PERMISSIONS = [
-      'android.permission.READ_EXTERNAL_STORAGE',
-      'android.permission.WRITE_EXTERNAL_STORAGE',
-      'android.permission.CHANGE_CONFIGURATION'
-    ].freeze
-
     attr_accessor :number_of_retries
 
     def initialize(executor = FastlaneCore::CommandExecutor,
@@ -59,8 +53,8 @@ module Screengrab
       device_serial = select_device
 
       device_screenshots_paths = [
-        determine_external_screenshots_path(device_serial, @config[:locales]),
-        determine_internal_screenshots_paths(@config[:app_package_name], @config[:locales])
+        determine_external_screenshots_path(device_serial, @config[:app_package_name], @config[:locales]),
+        determine_internal_screenshots_paths(device_serial, @config[:app_package_name], @config[:locales])
       ].flatten
 
       # Root is needed to access device paths at /data
@@ -73,8 +67,6 @@ module Screengrab
 
       app_apk_path ||= select_app_apk(discovered_apk_paths)
       tests_apk_path ||= select_tests_apk(discovered_apk_paths)
-
-      validate_apk(app_apk_path)
 
       number_of_screenshots = run_tests(device_type_dir_name, device_screenshots_paths, device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, @config[:launch_arguments])
 
@@ -133,29 +125,37 @@ module Screengrab
       Dir.glob(File.join(output_directory, '**', device_type, '*.png'), File::FNM_CASEFOLD)
     end
 
-    def determine_external_screenshots_path(device_serial, locales)
+    def get_device_environment_variable(device_serial, variable_name)
       # macOS evaluates $foo in `echo $foo` before executing the command,
       # Windows doesn't - hence the double backslash vs. single backslash
-      command = Helper.windows? ? "shell echo \$EXTERNAL_STORAGE " : "shell echo \\$EXTERNAL_STORAGE"
-      device_ext_storage = run_adb_command("-s #{device_serial} #{command}",
-                                           print_all: true,
-                                           print_command: true)
-      device_ext_storage = device_ext_storage.strip
+      command = Helper.windows? ? "shell echo \$#{variable_name}" : "shell echo \\$#{variable_name}"
+      value = run_adb_command("-s #{device_serial} #{command}",
+                              print_all: true,
+                              print_command: true)
+      return value.strip
+    end
+
+    def determine_external_screenshots_path(device_serial, app_package_name, locales)
+      device_ext_storage = get_device_environment_variable(device_serial, "EXTERNAL_STORAGE")
       return locales.map do |locale|
-        File.join(device_ext_storage, @config[:app_package_name], 'screengrab', locale, "images", "screenshots")
+        [
+          "#{device_ext_storage}/#{app_package_name}/screengrab/#{locale}/images/screenshots",
+          "#{device_ext_storage}/Android/data/#{app_package_name}/files/screengrab/#{locale}/images/screenshots"
+        ]
       end.flatten
     end
 
-    def determine_internal_screenshots_paths(app_package_name, locales)
+    def determine_internal_screenshots_paths(device_serial, app_package_name, locales)
+      device_data = get_device_environment_variable(device_serial, "ANDROID_DATA")
       return locales.map do |locale|
         [
-          "/data/user/0/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots",
+          "#{device_data}/user/0/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots",
 
           # https://github.com/fastlane/fastlane/issues/15653#issuecomment-578541663
-          "/data/data/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots",
+          "#{device_data}/data/#{app_package_name}/files/#{app_package_name}/screengrab/#{locale}/images/screenshots",
 
-          "/data/data/#{app_package_name}/app_screengrab/#{locale}/images/screenshots",
-          "/data/data/#{app_package_name}/screengrab/#{locale}/images/screenshots"
+          "#{device_data}/data/#{app_package_name}/app_screengrab/#{locale}/images/screenshots",
+          "#{device_data}/data/#{app_package_name}/screengrab/#{locale}/images/screenshots"
         ]
       end.flatten
     end
@@ -169,24 +169,6 @@ module Screengrab
                           print_all: true,
                           print_command: true)
         end
-      end
-    end
-
-    def validate_apk(app_apk_path)
-      unless @android_env.aapt_path
-        UI.important("The `aapt` command could not be found on your system, so your app APK could not be validated")
-        return
-      end
-
-      UI.message('Validating app APK')
-      apk_permissions = @executor.execute(command: "#{@android_env.aapt_path} dump permissions #{app_apk_path}",
-                                          print_all: true,
-                                          print_command: true)
-
-      missing_permissions = NEEDED_PERMISSIONS.reject { |needed| apk_permissions.include?(needed) }
-
-      if missing_permissions.any?
-        UI.user_error!("The needed permission(s) #{missing_permissions.join(', ')} could not be found in your app APK")
       end
     end
 
@@ -226,24 +208,35 @@ module Screengrab
       UI.message('Granting the permission necessary to change locales on the device')
       run_adb_command("-s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.CHANGE_CONFIGURATION",
                       print_all: true,
-                      print_command: true)
+                      print_command: true,
+                      raise_errors: false)
 
-      if device_api_version(device_serial) >= 23
-        UI.message('Granting the permissions necessary to access device external storage')
-        run_adb_command("-s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.WRITE_EXTERNAL_STORAGE",
-                        print_all: true,
-                        print_command: true)
-        run_adb_command("-s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.READ_EXTERNAL_STORAGE",
-                        print_all: true,
-                        print_command: true)
-      end
+      UI.message('Granting the permissions necessary to access device external storage')
+      run_adb_command("-s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.WRITE_EXTERNAL_STORAGE",
+                      print_all: true,
+                      print_command: true,
+                      raise_errors: false)
+      run_adb_command("-s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.READ_EXTERNAL_STORAGE",
+                      print_all: true,
+                      print_command: true,
+                      raise_errors: false)
+    end
+
+    def kill_app(device_serial, package_name)
+      run_adb_command("-s #{device_serial} shell am force-stop #{package_name}.test",
+                      print_all: true,
+                      print_command: true)
+      run_adb_command("-s #{device_serial} shell am force-stop #{package_name}",
+                      print_all: true,
+                      print_command: true)
     end
 
     def run_tests(device_type_dir_name, device_screenshots_paths, device_serial, app_apk_path, tests_apk_path, test_classes_to_use, test_packages_to_use, launch_arguments)
+      sdk_version = device_api_version(device_serial)
       unless @config[:reinstall_app]
         install_apks(device_serial, app_apk_path, tests_apk_path)
         grant_permissions(device_serial)
-        enable_clean_status_bar(device_serial, app_apk_path)
+        enable_clean_status_bar(device_serial, sdk_version)
       end
 
       number_of_screenshots = 0
@@ -253,20 +246,24 @@ module Screengrab
           uninstall_apks(device_serial, @config[:app_package_name], @config[:tests_package_name])
           install_apks(device_serial, app_apk_path, tests_apk_path)
           grant_permissions(device_serial)
-          enable_clean_status_bar(device_serial, app_apk_path)
+        else
+          kill_app(device_serial, @config[:app_package_name])
         end
-        number_of_screenshots += run_tests_for_locale(device_type_dir_name, device_screenshots_paths, locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
+        number_of_screenshots += run_tests_for_locale(device_type_dir_name, device_screenshots_paths, locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments, sdk_version)
       end
 
       number_of_screenshots
     end
 
-    def run_tests_for_locale(device_type_dir_name, device_screenshots_paths, locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments)
+    def run_tests_for_locale(device_type_dir_name, device_screenshots_paths, locale, device_serial, test_classes_to_use, test_packages_to_use, launch_arguments, sdk_version)
       UI.message("Running tests for locale: #{locale}")
 
       instrument_command = ["-s #{device_serial} shell am instrument --no-window-animation -w",
                             "-e testLocale #{locale.tr('-', '_')}",
                             "-e endingLocale #{@config[:ending_locale].tr('-', '_')}"]
+      if sdk_version >= 28
+        instrument_command << "--no-hidden-api-checks"
+      end
       instrument_command << "-e appendTimestamp #{@config[:use_timestamp_suffix]}"
       instrument_command << "-e class #{test_classes_to_use.join(',')}" if test_classes_to_use
       instrument_command << "-e package #{test_packages_to_use.join(',')}" if test_packages_to_use
@@ -300,6 +297,7 @@ module Screengrab
       Dir.mktmpdir do |tempdir|
         device_screenshots_paths.each do |device_path|
           if_device_path_exists(@config[:app_package_name], device_serial, device_path) do |path|
+            UI.message(path)
             next unless path.include?(locale)
             out = run_adb_command("-s #{device_serial} pull #{path} #{tempdir}",
                                   print_all: false,
@@ -418,29 +416,14 @@ module Screengrab
                       print_all: true, print_command: true).to_i
     end
 
-    def enable_clean_status_bar(device_serial, app_apk_path)
-      return unless device_api_version(device_serial) >= 23
-
-      unless @android_env.aapt_path
-        UI.error("The `aapt` command could not be found, so status bar could not be cleaned. Make sure android_home is configured for screengrab or ANDROID_HOME is set in the environment")
-        return
-      end
-
-      # Check if the app wants to use the clean status bar feature
-      badging_dump = @executor.execute(command: "#{@android_env.aapt_path} dump badging #{app_apk_path}",
-                                       print_all: true, print_command: true)
-      return unless badging_dump.include?('uses-feature: name=\'tools.fastlane.screengrab.cleanstatusbar\'')
+    def enable_clean_status_bar(device_serial, sdk_version)
+      return unless sdk_version >= 23
 
       UI.message('Enabling clean status bar')
 
-      # Make sure the app requests the DUMP permission
-      unless badging_dump.include?('uses-permission: name=\'android.permission.DUMP\'')
-        UI.user_error!("The clean status bar feature requires the android.permission.DUMP permission but it could not be found in your app APK")
-      end
-
       # Grant the DUMP permission
       run_adb_command("-s #{device_serial} shell pm grant #{@config[:app_package_name]} android.permission.DUMP",
-                      print_all: true, print_command: true)
+                      print_all: true, print_command: true, raise_errors: false)
 
       # Enable the SystemUI demo mode
       run_adb_command("-s #{device_serial} shell settings put global sysui_demo_allowed 1",

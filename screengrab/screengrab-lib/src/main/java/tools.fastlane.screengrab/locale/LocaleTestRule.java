@@ -9,15 +9,18 @@ import java.util.Locale;
 public class LocaleTestRule implements TestRule {
 
     private final Locale testLocale;
-    private final Locale endingLocale;
 
     public LocaleTestRule() {
-        this(LocaleUtil.getTestLocale(), LocaleUtil.getEndingLocale());
+        this(LocaleUtil.getTestLocale());
     }
 
-    public LocaleTestRule(Locale testLocale, Locale endingLocale) {
+    @SuppressWarnings({"unused", "RedundantSuppression"})
+    public LocaleTestRule(Locale testLocale, @Deprecated Locale endingLocale) {
+        this(testLocale);
+    }
+
+    public LocaleTestRule(Locale testLocale) {
         this.testLocale = testLocale;
-        this.endingLocale = endingLocale;
     }
 
     @Override
@@ -25,14 +28,15 @@ public class LocaleTestRule implements TestRule {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
+                LocaleListCompat original = null;
                 try {
                     if (testLocale != null) {
-                        LocaleUtil.changeDeviceLocaleTo(testLocale);
+                        original = LocaleUtil.changeDeviceLocaleTo(new LocaleListCompat(testLocale));
                     }
                     base.evaluate();
                 } finally {
-                    if (endingLocale != null) {
-                        LocaleUtil.changeDeviceLocaleTo(endingLocale);
+                    if (original != null) {
+                        LocaleUtil.changeDeviceLocaleTo(original);
                     }
                 }
             }

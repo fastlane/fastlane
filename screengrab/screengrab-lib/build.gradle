@@ -1,47 +1,66 @@
-String lookupProperty(Project project, String gradlePropName, String envVarName) {
+plugins {
+    id "com.jfrog.bintray" version "1.8.4"
+    id "com.android.library"
+    id "maven-publish"
+}
+
+static String lookupProperty(Project project, String gradlePropName, String envVarName) {
     return project.hasProperty(gradlePropName) ? project.property(gradlePropName) : System.getenv()[envVarName]
 }
 
 Object[] versionInfo = screengrabVersion(rootProject.file('version.properties'))
 String versionNameString = versionInfo[0] as String
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.novoda:bintray-release:0.9.1'
-    }
-}
-
-apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
-
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         minSdkVersion 18
     }
 }
 
-publish {
-    userOrg = 'fastlane'
-    repoName = 'fastlane'
-    groupId = 'tools.fastlane'
-    artifactId = 'screengrab'
-    publishVersion = versionNameString
-    desc = 'Fastlane Screengrab API'
-    website = 'https://docs.fastlane.tools/actions/screengrab/'
-    bintrayUser = lookupProperty(project, 'bintrayUser', 'BINTRAY_USER')
-    bintrayKey = lookupProperty(project, 'bintrayKey', 'BINTRAY_KEY')
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                from components.release
+                groupId = "tools.fastlane"
+                artifactId = "screengrab"
+                version = versionNameString
+            }
+        }
+    }
 }
 
+bintray {
+    user = lookupProperty(project, 'bintrayUser', 'BINTRAY_USER')
+    key = lookupProperty(project, 'bintrayKey', 'BINTRAY_KEY')
+    publish = true
+    dryRun = false
+    override = false
+
+    publications = ['release']
+
+    pkg {
+        repo = "fastlane"
+        userOrg = "fastlane"
+        name = "screengrab"
+        desc = 'Fastlane Screengrab API'
+        websiteUrl = 'https://docs.fastlane.tools/actions/screengrab/'
+        publicDownloadNumbers = true
+        version {
+            name = versionNameString
+            released = new Date()
+        }
+    }
+}
 dependencies {
-    api "androidx.annotation:annotation:1.1.0"
-    api 'androidx.test:runner:1.2.0'
-    api 'androidx.test:rules:1.2.0'
-    api 'androidx.test.espresso:espresso-core:3.2.0'
-    api 'androidx.test.uiautomator:uiautomator:2.2.0'
-    api 'com.jraska:falcon:2.1.1'
+    implementation "androidx.annotation:annotation:1.1.0"
+    implementation 'androidx.test:core:1.3.0'
+    implementation 'androidx.test:runner:1.3.0'
+    implementation 'androidx.test:rules:1.3.0'
+    implementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+    implementation 'com.jraska:falcon:2.1.1'
 }
