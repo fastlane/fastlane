@@ -493,6 +493,18 @@ describe FastlaneCore do
       end
     end
 
+    describe "xcodebuild disable_package_automatic_updates" do
+      it 'generates xcodebuild -showBuildSettings command with disabled automatic package resolution' do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          disable_package_automatic_updates: true
+        })
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -disableAutomaticPackageResolution"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
+    end
+
     describe 'xcodebuild_xcconfig option', requires_xcode: true do
       it 'generates an xcodebuild -showBuildSettings command without xcconfig by default' do
         project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
@@ -554,6 +566,15 @@ describe FastlaneCore do
         })
         command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -clonedSourcePackagesDirPath ./path/to/resolve"
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+      end
+
+      it 'generates nil if skip_package_dependencies_resolution is true' do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          skip_package_dependencies_resolution: true
+        })
+        expect(project.build_xcodebuild_resolvepackagedependencies_command).to be_nil
       end
 
       it 'build_settings() should not add SPM path if Xcode < 11' do
