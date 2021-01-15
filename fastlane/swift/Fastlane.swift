@@ -2496,7 +2496,6 @@ public func createKeychain(name: String? = nil,
  - returns: The pull request URL when successful
  */
 public func createPullRequest(apiToken: String,
-                              api_bearer: String,
                               repo: String,
                               title: String,
                               body: String? = nil,
@@ -2511,7 +2510,6 @@ public func createPullRequest(apiToken: String,
                               teamReviewers: [String]? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "create_pull_request", className: nil, args: [RubyCommand.Argument(name: "api_token", value: apiToken),
-                                                                                                       RubyCommand.Argument(name: "api_bearer", value: api_bearer),
                                                                                                        RubyCommand.Argument(name: "repo", value: repo),
                                                                                                        RubyCommand.Argument(name: "title", value: title),
                                                                                                        RubyCommand.Argument(name: "body", value: body),
