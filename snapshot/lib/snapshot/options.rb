@@ -283,7 +283,12 @@ module Snapshot
                                      env_name: "SNAPSHOT_SUPPRESS_XCODE_OUTPUT",
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      type: Boolean,
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :use_system_scm,
+                                     env_name: "SNAPSHOT_USE_SYSTEM_SCM",
+                                     description: "Lets xcodebuild use system's scm configuration",
+                                     type: Boolean,
+                                     default_value: false)
       ]
     end
   end
