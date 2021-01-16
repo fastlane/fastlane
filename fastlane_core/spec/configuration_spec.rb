@@ -38,14 +38,16 @@ describe FastlaneCore do
       describe "config conflicts" do
         it "raises an error if a key was used twice" do
           expect do
-            FastlaneCore::Configuration.create([FastlaneCore::ConfigItem.new(
-              key: :cert_name,
-              env_name: "asdf"
-            ),
-            FastlaneCore::ConfigItem.new(
-              key: :cert_name,
-              env_name: "asdf"
-            )], {})
+            FastlaneCore::Configuration.create([
+                                                 FastlaneCore::ConfigItem.new(
+                                                   key: :cert_name,
+                                                   env_name: "asdf"
+                                                 ),
+                                                 FastlaneCore::ConfigItem.new(
+                                                   key: :cert_name,
+                                                   env_name: "asdf"
+                                                 )
+                                               ], {})
           end.to raise_error("Multiple entries for configuration key 'cert_name' found!")
         end
 
