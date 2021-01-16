@@ -64,7 +64,7 @@ describe FastlaneCore do
           end.to raise_error("Multiple entries for short_option '-f' found!")
         end
 
-        it "raises an error for unresolved conflict between options" do
+        it "raises an error for unresolved conflict between options with truthy values" do
           conflicting_options = [
             FastlaneCore::ConfigItem.new(key: :foo,
                                          conflicting_options: [:bar, :oof]),
@@ -80,6 +80,29 @@ describe FastlaneCore do
           expect do
             FastlaneCore::Configuration.create(conflicting_options, values)
           end.to raise_error("Unresolved conflict between options: 'foo' and 'bar'")
+        end
+
+        it "doesn't raise for conflicting options that have falsey values" do
+          conflicting_options = [
+            FastlaneCore::ConfigItem.new(key: :foo,
+                                         conflicting_options: [:bar, :oof, :meh]),
+            FastlaneCore::ConfigItem.new(key: :bar,
+                                         optional: true),
+            FastlaneCore::ConfigItem.new(key: :oof,
+                                         is_string: false),
+            FastlaneCore::ConfigItem.new(key: :meh,
+                                         optional: true)
+          ]
+
+          values = {
+              foo: "",
+              bar: nil,
+              oof: false
+          }
+
+          expect do
+            FastlaneCore::Configuration.create(conflicting_options, values)
+          end.not_to raise_error
         end
 
         it "calls custom conflict handler when conflict happens between two options" do

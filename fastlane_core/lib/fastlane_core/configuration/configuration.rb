@@ -120,8 +120,8 @@ module FastlaneCore
           index = @available_options.find_index { |item| item.key == conflicting_option_key }
           conflicting_option = @available_options[index]
 
-          # ignore conflicts because value of conflict option is nil
-          next if @values[conflicting_option.key].nil?
+          # ignore conflicts because value of conflict option is falsey (nil, false, etc)
+          next unless @values[conflicting_option.key]
 
           if current.conflict_block
             begin
