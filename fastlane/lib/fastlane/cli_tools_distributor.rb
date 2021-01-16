@@ -123,9 +123,9 @@ module Fastlane
       end
 
       # Since loading dotenv should respect additional environments passed using
-      # --env, we must extrat the arguments out of ARGV and process them before
+      # --env, we must extract the arguments out of ARGV and process them before
       # calling into commander. This is required since the ENV must be configured
-      # before running any other commands in order to correclty respect variables
+      # before running any other commands in order to correctly respect variables
       # like FASTLANE_HIDE_CHANGELOG and FASTLANE_DISABLE_COLORS
       def load_dot_env
         env_cl_param = lambda do

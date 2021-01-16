@@ -82,29 +82,41 @@ module Match
       output_dir_certs = File.join(storage.prefixed_working_directory, "certs", cert_type.to_s)
       output_dir_profiles = File.join(storage.prefixed_working_directory, "profiles", prov_type.to_s)
 
-      # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
-      token = api_token(params)
-      if token
-        UI.message("Creating authorization token for App Store Connect API")
-        Spaceship::ConnectAPI.token = token
+      should_skip_certificate_matching = params[:skip_certificate_matching]
+      # In case there is no access to Apple Developer portal but we have the certificates, keys and profiles
+      if should_skip_certificate_matching
+        cert_name = File.basename(cert_path, ".*")
+        p12_name = File.basename(p12_path, ".*")
+
+        # Make dir if doesn't exist
+        FileUtils.mkdir_p(output_dir_certs)
+        dest_cert_path = File.join(output_dir_certs, "#{cert_name}.cer")
+        dest_p12_path = File.join(output_dir_certs, "#{p12_name}.p12")
       else
-        UI.message("Login to App Store Connect (#{params[:username]})")
-        Spaceship::ConnectAPI.login(params[:username], use_portal: true, use_tunes: false, portal_team_id: params[:team_id], team_name: params[:team_name])
+        # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
+        token = api_token(params)
+        if token
+          UI.message("Creating authorization token for App Store Connect API")
+          Spaceship::ConnectAPI.token = token
+        else
+          UI.message("Login to App Store Connect (#{params[:username]})")
+          Spaceship::ConnectAPI.login(params[:username], use_portal: true, use_tunes: false, portal_team_id: params[:team_id], team_name: params[:team_name])
+        end
+        certs = Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: certificate_type })
+
+        # Base64 encode contents to find match from API to find a cert ID
+        cert_contents_base_64 = Base64.strict_encode64(File.binread(cert_path))
+        matching_cert = certs.find do |cert|
+          cert.certificate_content == cert_contents_base_64
+        end
+
+        UI.user_error!("This certificate cannot be imported - the certificate contents did not match with any available on the Developer Portal") if matching_cert.nil?
+
+        # Make dir if doesn't exist
+        FileUtils.mkdir_p(output_dir_certs)
+        dest_cert_path = File.join(output_dir_certs, "#{matching_cert.id}.cer")
+        dest_p12_path = File.join(output_dir_certs, "#{matching_cert.id}.p12")
       end
-      certs = Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: certificate_type })
-
-      # Base64 encode contents to find match from API to find a cert ID
-      cert_contents_base_64 = Base64.strict_encode64(File.binread(cert_path))
-      matching_cert = certs.find do |cert|
-        cert.certificate_content == cert_contents_base_64
-      end
-
-      UI.user_error!("This certificate cannot be imported - the certificate contents did not match with any available on the Developer Portal") if matching_cert.nil?
-
-      # Make dir if doesn't exist
-      FileUtils.mkdir_p(output_dir_certs)
-      dest_cert_path = File.join(output_dir_certs, "#{matching_cert.id}.cer")
-      dest_p12_path = File.join(output_dir_certs, "#{matching_cert.id}.p12")
 
       files_to_commit = [dest_cert_path, dest_p12_path]
 

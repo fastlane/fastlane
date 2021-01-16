@@ -76,6 +76,7 @@ describe Scan do
   describe Scan::TestCommandGenerator do
     before(:each) do
       @test_command_generator = Scan::TestCommandGenerator.new
+      @project.options.values.delete(:use_system_scm)
     end
 
     it "raises an exception when project path wasn't found" do
@@ -157,6 +158,36 @@ describe Scan do
 
       result = @test_command_generator.generate
       expect(result.last).to include("| xcpretty -f 'custom-formatter.rb'")
+    end
+
+    it "uses system scm", requires_xcodebuild: true do
+      options = { project: "./scan/examples/standard/app.xcodeproj", use_system_scm: true }
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      result = @test_command_generator.generate
+      expect(result).to include("-scmProvider system").once
+    end
+
+    it "uses system scm via project options", requires_xcodebuild: true do
+      options = { project: "./scan/examples/standard/app.xcodeproj" }
+      @project.options[:use_system_scm] = true
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      result = @test_command_generator.generate
+      expect(result).to include("-scmProvider system").once
+    end
+
+    it "uses system scm options exactly once", requires_xcodebuild: true do
+      options = { project: "./scan/examples/standard/app.xcodeproj", use_system_scm: true }
+      @project.options[:use_system_scm] = true
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      result = @test_command_generator.generate
+      expect(result).to include("-scmProvider system").once
+    end
+
+    it "defaults to Xcode scm when option is not provided", requires_xcodebuild: true do
+      options = { project: "./scan/examples/standard/app.xcodeproj" }
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      result = @test_command_generator.generate
+      expect(result).to_not(include("-scmProvider system"))
     end
 
     describe "Standard Example" do
@@ -283,11 +314,11 @@ describe Scan do
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: "xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
+            with(command: %r{xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null}, print_all: false, print_command: true)
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
+            with(command: %r{xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null}, print_all: false, print_command: true)
 
           mock_test_result_parser = Object.new
           allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)

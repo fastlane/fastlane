@@ -152,6 +152,7 @@ module Spaceship
 
       def with_asc_retry(tries = 5, &_block)
         tries = 1 if Object.const_defined?("SpecHelper")
+
         response = yield
 
         status = response.status if response
@@ -162,6 +163,10 @@ module Spaceship
         end
 
         return response
+      rescue UnauthorizedAccessError => error
+        # Catch unathorized access and re-raising
+        # There is no need to try again
+        raise error
       rescue => error
         tries -= 1
         puts(error) if Spaceship::Globals.verbose?
@@ -191,7 +196,11 @@ module Spaceship
 
         store_csrf_tokens(response)
 
-        return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, client: self)
+        return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, headers: response.headers, client: self)
+      end
+
+      def handle_401(response)
+        raise UnauthorizedAccessError, handle_errors(response) if response && (response.body || {})['errors']
       end
 
       def handle_errors(response)

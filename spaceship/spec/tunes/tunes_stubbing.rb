@@ -55,6 +55,11 @@ class TunesStubbing
           to_return(status: 200, body: "", headers: {})
       end
 
+      # 2FA: Submit security code from trusted phone with voice for verification
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode").
+        with(body: "{\"securityCode\":{\"code\":\"123\"},\"phoneNumber\":{\"id\":1},\"mode\":\"voice\"}").
+        to_return(status: 200, body: "", headers: {})
+
       # 2FA: Submit security code from trusted device for verification
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode").
         with(body: "{\"securityCode\":{\"code\":\"123\"}}").
@@ -313,7 +318,7 @@ class TunesStubbing
     end
 
     def itc_stub_pricing_tiers
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/pricing/matrix").
+      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/pricing/matrix").
         to_return(status: 200, body: itc_read_fixture_file("pricing_tiers.json"),
                   headers: { "Content-Type" => "application/json" })
     end

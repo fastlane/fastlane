@@ -8,7 +8,7 @@ let package = Package(
         .library(name: "Fastlane", targets: ["Fastlane"])
     ],
     dependencies: [
-        .package(url: "https://github.com/kareman/SwiftShell", .upToNextMajor(from: "5.0.1"))
+        .package(url: "https://github.com/kareman/SwiftShell", .upToNextMajor(from: "5.1.0"))
     ],
     targets: [
         .target(

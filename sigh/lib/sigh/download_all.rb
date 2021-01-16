@@ -9,10 +9,16 @@ module Sigh
   class DownloadAll
     # Download all valid provisioning profiles
     def download_all(download_xcode_profiles: false)
-      UI.message("Starting login with user '#{Sigh.config[:username]}'")
-      Spaceship.login(Sigh.config[:username], nil)
-      Spaceship.select_team
-      UI.message("Successfully logged in")
+      if (token = api_token)
+        UI.message("Creating authorization token for App Store Connect API")
+        Spaceship::ConnectAPI.token = token
+      else
+        # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
+        # Prompts select team if multiple teams and none specified
+        UI.message("Starting login with user '#{Sigh.config[:username]}'")
+        Spaceship::ConnectAPI.login(Sigh.config[:username], nil, use_portal: true, use_tunes: false)
+        UI.message("Successfully logged in")
+      end
 
       if download_xcode_profiles
         UI.deprecated("The App Store Connect API does not support querying for Xcode managed profiles: --download_code_profiles is deprecated")
@@ -51,6 +57,12 @@ module Sigh
       # but works on both web session and official API
       profiles = Spaceship::ConnectAPI::Profile.all(filter: { profileType: profile_types.join(",") }, includes: "bundleId")
       download_profiles(profiles)
+    end
+
+    def api_token
+      api_token ||= Spaceship::ConnectAPI::Token.create(Sigh.config[:api_key]) if Sigh.config[:api_key]
+      api_token ||= Spaceship::ConnectAPI::Token.from_json_file(Sigh.config[:api_key_path]) if Sigh.config[:api_key_path]
+      return api_token
     end
 
     # @param profiles [Array] Array of all the provisioning profiles we want to download

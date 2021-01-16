@@ -279,7 +279,23 @@ module Gym
                                      env_name: "GYM_CLONED_SOURCE_PACKAGES_PATH",
                                      description: "Sets a custom path for Swift Package Manager dependencies",
                                      type: String,
-                                     optional: true)
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_package_dependencies_resolution,
+                                     env_name: "GYM_SKIP_PACKAGE_DEPENDENCIES_RESOLUTION",
+                                     description: "Skips resolution of Swift Package Manager dependencies",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,
+                                     env_name: "GYM_DISABLE_PACKAGE_AUTOMATIC_UPDATES",
+                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :use_system_scm,
+                                     env_name: "GYM_USE_SYSTEM_SCM",
+                                     description: "Lets xcodebuild use system's scm configuration",
+                                     optional: true,
+                                     type: Boolean,
+                                     default_value: false)
       ]
     end
   end

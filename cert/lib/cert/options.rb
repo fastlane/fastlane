@@ -109,7 +109,7 @@ module Cert
                                      short_option: "-p",
                                      env_name: "CERT_KEYCHAIN_PASSWORD",
                                      sensitive: true,
-                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
+                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_set_partition_list,
                                      short_option: "-P",
@@ -119,11 +119,11 @@ module Cert
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :platform,
                                      env_name: "CERT_PLATFORM",
-                                     description: "Set the provisioning profile's platform (ios, macos)",
+                                     description: "Set the provisioning profile's platform (ios, macos, tvos)",
                                      default_value: "ios",
                                      verify_block: proc do |value|
                                        value = value.to_s
-                                       pt = %w(macos ios)
+                                       pt = %w(macos ios tvos)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end)
       ]

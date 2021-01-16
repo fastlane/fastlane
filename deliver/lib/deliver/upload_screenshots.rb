@@ -13,8 +13,6 @@ module Deliver
     DeleteScreenshotJob = Struct.new(:app_screenshot, :localization, :app_screenshot_set)
     UploadScreenshotJob = Struct.new(:app_screenshot_set, :path)
 
-    NUMBER_OF_THREADS = Helper.test? ? 1 : [ENV.fetch("DELIVER_NUMBER_OF_THREADS", 10).to_i, 10].min
-
     def upload(options, screenshots)
       return if options[:skip_screenshots]
       return if options[:edit_live]
@@ -69,7 +67,7 @@ module Deliver
     def delete_screenshots(localizations, screenshots_per_language, tries: 5)
       tries -= 1
 
-      worker = QueueWorker.new(NUMBER_OF_THREADS) do |job|
+      worker = QueueWorker.new do |job|
         start_time = Time.now
         target = "#{job.localization.locale} #{job.app_screenshot_set.screenshot_display_type} #{job.app_screenshot.id}"
         begin
@@ -115,7 +113,7 @@ module Deliver
       tries -= 1
 
       # Upload screenshots
-      worker = QueueWorker.new(NUMBER_OF_THREADS) do |job|
+      worker = QueueWorker.new do |job|
         begin
           UI.verbose("Uploading '#{job.path}'...")
           start_time = Time.now
@@ -236,7 +234,7 @@ module Deliver
       iterator = AppScreenshotIterator.new(localizations)
 
       # Re-order screenshots within app_screenshot_set
-      worker = QueueWorker.new(NUMBER_OF_THREADS) do |app_screenshot_set|
+      worker = QueueWorker.new do |app_screenshot_set|
         original_ids = app_screenshot_set.app_screenshots.map(&:id)
         sorted_ids = app_screenshot_set.app_screenshots.sort_by(&:file_name).map(&:id)
         if original_ids != sorted_ids
@@ -253,70 +251,7 @@ module Deliver
 
     def collect_screenshots(options)
       return [] if options[:skip_screenshots]
-      return collect_screenshots_for_languages(options[:screenshots_path], options[:ignore_language_directory_validation])
-    end
-
-    def collect_screenshots_for_languages(path, ignore_validation)
-      screenshots = []
-      extensions = '{png,jpg,jpeg}'
-
-      available_languages = UploadScreenshots.available_languages.each_with_object({}) do |lang, lang_hash|
-        lang_hash[lang.downcase] = lang
-      end
-
-      Loader.language_folders(path, ignore_validation).each do |lng_folder|
-        language = File.basename(lng_folder)
-
-        # Check to see if we need to traverse multiple platforms or just a single platform
-        if language == Loader::APPLE_TV_DIR_NAME || language == Loader::IMESSAGE_DIR_NAME
-          screenshots.concat(collect_screenshots_for_languages(File.join(path, language), ignore_validation))
-          next
-        end
-
-        files = Dir.glob(File.join(lng_folder, "*.#{extensions}"), File::FNM_CASEFOLD).sort
-        next if files.count == 0
-
-        framed_screenshots_found = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}"), File::FNM_CASEFOLD).count > 0
-
-        UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃") if framed_screenshots_found
-
-        language_dir_name = File.basename(lng_folder)
-
-        if available_languages[language_dir_name.downcase].nil?
-          UI.user_error!("#{language_dir_name} is not an available language. Please verify that your language codes are available in iTunesConnect. See https://developer.apple.com/library/content/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/AppStoreTerritories.html for more information.")
-        end
-
-        language = available_languages[language_dir_name.downcase]
-
-        files.each do |file_path|
-          is_framed = file_path.downcase.include?("_framed.")
-          is_watch = file_path.downcase.include?("watch")
-
-          if framed_screenshots_found && !is_framed && !is_watch
-            UI.important("🏃 Skipping screenshot file: #{file_path}")
-            next
-          end
-
-          screenshots << AppScreenshot.new(file_path, language)
-        end
-      end
-
-      # Checking if the device type exists in spaceship
-      # Ex: iPhone 6.1 inch isn't supported in App Store Connect but need
-      # to have it in there for frameit support
-      unaccepted_device_shown = false
-      screenshots.select! do |screenshot|
-        exists = !screenshot.device_type.nil?
-        unless exists
-          UI.important("Unaccepted device screenshots are detected! 🚫 Screenshot file will be skipped. 🏃") unless unaccepted_device_shown
-          unaccepted_device_shown = true
-
-          UI.important("🏃 Skipping screenshot file: #{screenshot.path} - Not an accepted App Store Connect device...")
-        end
-        exists
-      end
-
-      return screenshots
+      return Loader.load_app_screenshots(options[:screenshots_path], options[:ignore_language_directory_validation])
     end
 
     # helper method so Spaceship::Tunes.client.available_languages is easier to test

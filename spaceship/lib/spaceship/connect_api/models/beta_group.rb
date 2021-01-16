@@ -33,8 +33,18 @@ module Spaceship
       #
 
       # beta_testers - [{email: "", firstName: "", lastName: ""}]
-      def post_bulk_beta_tester_assignments(beta_testers: nil)
-        return Spaceship::ConnectAPI.post_bulk_beta_tester_assignments(beta_group_id: id, beta_testers: beta_testers)
+      def post_bulk_beta_tester_assignments(client: nil, beta_testers: nil)
+        client ||= Spaceship::ConnectAPI
+        return client.post_bulk_beta_tester_assignments(beta_group_id: id, beta_testers: beta_testers)
+      end
+
+      def delete!
+        return Spaceship::ConnectAPI.delete_beta_group(group_id: id)
+      end
+
+      def fetch_builds
+        resps = Spaceship::ConnectAPI.get_builds_for_beta_group(group_id: id).all_pages
+        return resps.flat_map(&:to_models)
       end
     end
   end

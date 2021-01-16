@@ -106,7 +106,7 @@ app.launch()
 
 ```objective-c
 XCUIApplication *app = [[XCUIApplication alloc] init];
-[Snapshot setupSnapshot:app];
+[Snapshot setupSnapshot:app waitForAnimations:NO];
 [app launch];
 ```
 
@@ -281,6 +281,10 @@ launch_arguments([
   "-secretFeatureEnabled NO"
 ])
 ```
+
+## Xcode Environment Variables
+
+_snapshot_ includes `FASTLANE_SNAPSHOT=YES` and `FASTLANE_LANGUAGE=<language>` as arguments when executing `xcodebuild`. This means you may use these environment variables in a custom build phase run script to do any additional configuration.
 
 # How does it work?
 

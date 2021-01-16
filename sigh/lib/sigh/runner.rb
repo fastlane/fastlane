@@ -139,7 +139,7 @@ module Sigh
           # Skip certificates that failed to download
           next unless current_cert[:downloaded]
           file = Tempfile.new('cert')
-          file.write(current_cert[:downloaded])
+          file.write(current_cert[:downloaded].force_encoding('UTF-8'))
           file.close
           if FastlaneCore::CertChecker.installed?(file.path)
             installed = true
@@ -303,7 +303,7 @@ module Sigh
         end
 
         if Sigh.config[:cert_owner_name]
-          next unless c.owner_name.strip == Sigh.config[:cert_owner_name].strip
+          next unless c.display_name.strip == Sigh.config[:cert_owner_name].strip
         end
 
         true
@@ -315,7 +315,7 @@ module Sigh
           certificates = certificates.find_all do |c|
             file = Tempfile.new('cert')
             raw_data = Base64.decode64(c.certificate_content)
-            file.write(raw_data)
+            file.write(raw_data.force_encoding("UTF-8"))
             file.close
 
             FastlaneCore::CertChecker.installed?(file.path)
@@ -327,7 +327,7 @@ module Sigh
         UI.important("Found more than one code signing identity. Choosing the first one. Check out `fastlane sigh --help` to see all available options.")
         UI.important("Available Code Signing Identities for current filters:")
         certificates.each do |c|
-          str = ["\t- Name:", c.owner_name, "- ID:", c.id + " - Expires", c.expires.strftime("%d/%m/%Y")].join(" ")
+          str = ["\t- Name:", c.display_name, "- ID:", c.id + " - Expires", Time.parse(c.expiration_date).strftime("%Y-%m-%d")].join(" ")
           UI.message(str.green)
         end
       end

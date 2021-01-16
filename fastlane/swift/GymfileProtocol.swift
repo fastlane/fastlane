@@ -133,6 +133,9 @@ public protocol GymfileProtocol: class {
 
     /// Sets a custom path for Swift Package Manager dependencies
     var clonedSourcePackagesPath: String? { get }
+
+    /// Lets xcodebuild use system's scm configuration
+    var useSystemScm: Bool { get }
 }
 
 public extension GymfileProtocol {
@@ -180,8 +183,9 @@ public extension GymfileProtocol {
     var xcprettyUtf: Bool? { return nil }
     var skipProfileDetection: Bool { return false }
     var clonedSourcePackagesPath: String? { return nil }
+    var useSystemScm: Bool { return false }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.48]
+// FastlaneRunnerAPIVersion [0.9.57]

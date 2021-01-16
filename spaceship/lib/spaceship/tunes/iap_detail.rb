@@ -242,7 +242,7 @@ module Spaceship
       # @return ([Spaceship::Tunes::PricingInfo]) An array of pricing infos from the same tier
       def world_wide_pricing_info
         client
-          .pricing_tiers
+          .pricing_tiers(application.apple_id)
           .find { |p| p.tier_stem == pricing_intervals.first[:tier].to_s }
           .pricing_info
       end

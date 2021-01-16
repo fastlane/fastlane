@@ -65,7 +65,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "MATCH_APP_IDENTIFIER",
-                                     description: "The bundle identifier(s) of your app (comma-separated)",
+                                     description: "The bundle identifier(s) of your app (comma-separated string or array of strings)",
                                      type: Array, # we actually allow String and Array here
                                      skip_type_validation: true,
                                      code_gen_sensitive: true,
@@ -227,7 +227,7 @@ module Match
                                      short_option: "-p",
                                      env_name: "MATCH_KEYCHAIN_PASSWORD",
                                      sensitive: true,
-                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
+                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password",
                                      optional: true),
 
         # settings
@@ -280,6 +280,12 @@ module Match
         FastlaneCore::ConfigItem.new(key: :fail_on_name_taken,
                                      env_name: "MATCH_FAIL_ON_NAME_TAKEN",
                                      description: "Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first",
+                                     optional: true,
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_certificate_matching,
+                                     env_name: "MATCH_SKIP_CERTIFICATE_MATCHING",
+                                     description: "Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action",
                                      optional: true,
                                      type: Boolean,
                                      default_value: false),
