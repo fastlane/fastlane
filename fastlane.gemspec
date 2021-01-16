@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Jimmy Dee",
-                        "Aaron Brager",
-                        "Jorge Revuelta H",
-                        "Josh Holtz",
-                        "Jan Piotrowski",
-                        "Stefan Natchev",
-                        "Iulian Onofrei",
-                        "Jérôme Lacoste",
-                        "Helmut Januschka",
-                        "Luka Mirosevic",
-                        "Matthew Ellis",
-                        "Maksym Grebenets",
-                        "Andrew McBurney",
-                        "Manu Wallner",
-                        "Joshua Liebowitz",
-                        "Felix Krause",
+  spec.authors       = ["Maksym Grebenets",
                         "Kohki Miki",
-                        "Olivier Halligon",
-                        "Daniel Jankowski",
-                        "Max Ott",
+                        "Jan Piotrowski",
+                        "Helmut Januschka",
+                        "Joshua Liebowitz",
+                        "Aaron Brager",
+                        "Andrew McBurney",
                         "Danielle Tomlinson",
-                        "Fumiya Nakamura"]
+                        "Jorge Revuelta H",
+                        "Manu Wallner",
+                        "Josh Holtz",
+                        "Iulian Onofrei",
+                        "Stefan Natchev",
+                        "Olivier Halligon",
+                        "Max Ott",
+                        "Daniel Jankowski",
+                        "Luka Mirosevic",
+                        "Jérôme Lacoste",
+                        "Fumiya Nakamura",
+                        "Felix Krause",
+                        "Jimmy Dee",
+                        "Matthew Ellis"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -102,7 +102,7 @@ Gem::Specification.new do |spec|
 
   # Development only
   spec.add_development_dependency('rake')
-  spec.add_development_dependency('rspec', '~> 3.9.0')
+  spec.add_development_dependency('rspec', '~> 3.10.0')
   spec.add_development_dependency('rspec_junit_formatter', '~> 0.4.1')
   spec.add_development_dependency('pry')
   spec.add_development_dependency('pry-byebug')

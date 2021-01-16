@@ -130,7 +130,7 @@ module Precheck
       items = []
 
       # App info localizations
-      app_info = app.fetch_edit_app_info
+      app_info = Precheck.config[:use_live] ? app.fetch_live_app_info : app.fetch_latest_app_info
       app_info_localizations = app_info.get_app_info_localizations
       app_info_localizations.each do |localization|
         items << collect_text_items_from_language_item(locale: localization.locale,

@@ -23,7 +23,7 @@ describe Precheck do
       allow(fake_happy_app).to receive(:name).and_return("My Fake App")
       allow(fake_happy_app).to receive(:in_app_purchases).and_return(fake_in_app_purchases)
 
-      allow(fake_happy_app).to receive(:fetch_edit_app_info).and_return(fake_happy_app_info)
+      allow(fake_happy_app).to receive(:fetch_latest_app_info).and_return(fake_happy_app_info)
       allow(fake_happy_app_info).to receive(:get_app_info_localizations).and_return([fake_info_localization])
 
       allow(fake_happy_app_version).to receive(:copyright).and_return("Copyright taquitos, #{DateTime.now.year}")

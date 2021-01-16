@@ -785,26 +785,6 @@ describe FastlaneCore do
       after(:each) { ENV.delete("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT") }
     end
 
-    describe "with `DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS` set to wrong value" do
-      it 'failed to generate command for upload with lack of space' do
-        ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-tDAV,Signiant"
-        transporter = FastlaneCore::ItunesTransporter.new(email, password)
-        expect do
-          transporter.upload('my.app.id', '/tmp')
-        end.to raise_error(FastlaneCore::Interface::FastlaneError)
-      end
-
-      it 'failed to generate command for upload with incorrect value' do
-        ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-x DAV,Signiant"
-        transporter = FastlaneCore::ItunesTransporter.new(email, password)
-        expect do
-          transporter.upload('my.app.id', '/tmp')
-        end.to raise_error(FastlaneCore::Interface::FastlaneError)
-      end
-
-      after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
-    end
-
     describe "with no special configuration" do
       before(:each) do
         allow(File).to receive(:exist?).and_return(true) unless FastlaneCore::Helper.mac?
