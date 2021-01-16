@@ -29,8 +29,8 @@ describe FastlaneCore do
         expect do
           FastlaneCore::Configuration.create([FastlaneCore::ConfigItem.new(
             key: :cert_name,
-       env_name: "asdf",
-    description: "Set the profile name."
+            env_name: "asdf",
+            description: "Set the profile name."
           )], {})
         end.to raise_error("Do not let descriptions end with a '.', since it's used for user inputs as well for key :cert_name")
       end
@@ -40,12 +40,12 @@ describe FastlaneCore do
           expect do
             FastlaneCore::Configuration.create([FastlaneCore::ConfigItem.new(
               key: :cert_name,
-         env_name: "asdf"
+              env_name: "asdf"
             ),
-                                                FastlaneCore::ConfigItem.new(
-                                                  key: :cert_name,
-                                             env_name: "asdf"
-                                                )], {})
+            FastlaneCore::ConfigItem.new(
+              key: :cert_name,
+              env_name: "asdf"
+            )], {})
           end.to raise_error("Multiple entries for configuration key 'cert_name' found!")
         end
 
