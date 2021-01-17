@@ -104,7 +104,7 @@ Gem::Specification.new do |spec|
 
   # Development only
   spec.add_development_dependency('rake')
-  spec.add_development_dependency('rspec', '~> 3.10.0')
+  spec.add_development_dependency('rspec', '~> 3.10')
   spec.add_development_dependency('rspec_junit_formatter', '~> 0.4.1')
   spec.add_development_dependency('pry')
   spec.add_development_dependency('pry-byebug')
