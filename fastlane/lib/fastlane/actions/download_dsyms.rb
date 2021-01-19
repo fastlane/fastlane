@@ -14,9 +14,14 @@ module Fastlane
 
         # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
-        UI.message("Login to App Store Connect (#{params[:username]})")
-        Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true)
-        UI.message("Login successful")
+        if (token = api_token(params))
+          UI.message("Using App Store Connect API token...")
+          Spaceship::ConnectAPI.token = token
+        else
+          UI.message("Login to App Store Connect (#{params[:username]})")
+          Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true, tunes_team_id: params[:team_id], team_name: params[:team_name])
+          UI.message("Login successful")
+        end
 
         # Get App
         app = Spaceship::ConnectAPI::App.find(params[:app_identifier])
@@ -119,6 +124,13 @@ module Fastlane
           UI.verbose("Build_version: #{asc_build_number} matches #{build_number}, grabbing dsym_url") if build_number
           get_details_and_download_dsym(app: app, train: asc_app_version, build_number: asc_build_number, uploaded_date: uploaded_date, platform: itc_platform, wait_for_dsym_processing: wait_for_dsym_processing, wait_timeout: wait_timeout, output_directory: output_directory)
         end
+      end
+
+      def self.api_token(params)
+        params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+        api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
+        return api_token
       end
 
       def self.get_details_and_download_dsym(app: nil, train: nil, build_number: nil, uploaded_date: nil, platform: nil, wait_for_dsym_processing: nil, wait_timeout: nil, output_directory: nil)
