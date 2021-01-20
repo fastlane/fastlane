@@ -4,6 +4,7 @@ require_relative 'tunes/tunes_client'
 module Spaceship
   class Client
     def handle_two_step_or_factor(response)
+      raise "2FA can only be performed in interactive mode" if ENV["FASTLANE_IS_INTERACTIVE"] == "false"
       # extract `x-apple-id-session-id` and `scnt` from response, to be used by `update_request_headers`
       @x_apple_id_session_id = response["x-apple-id-session-id"]
       @scnt = response["scnt"]

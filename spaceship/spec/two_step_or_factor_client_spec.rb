@@ -70,6 +70,31 @@ describe Spaceship::Client do
     let(:no_trusted_devices_voice_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_voice_no_trusted_devices.json'), encoding: 'utf-8')) }
     let(:no_trusted_devices_two_numbers_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_no_trusted_devices_two_numbers.json'), encoding: 'utf-8')) }
 
+    context 'when running non-interactive' do
+      it 'raises an error' do
+        ENV["FASTLANE_IS_INTERACTIVE"] = "false"
+        expect { subject.handle_two_step_or_factor("response") }.to raise_error("2FA can only be performed in interactive mode")
+      end
+    end
+
+    context 'when running interactive' do
+      it 'does not raise an error' do
+        ENV["FASTLANE_IS_INTERACTIVE"] = "true"
+        expect(subject).to receive(:handle_two_factor)
+        stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
+        subject.handle_two_step_or_factor("response")
+      end
+    end
+
+    context 'when interactive mode is not set' do
+      it 'does not raise an error' do
+        ENV["FASTLANE_IS_INTERACTIVE"] = nil
+        expect(subject).to receive(:handle_two_factor)
+        stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
+        subject.handle_two_step_or_factor("response")
+      end
+    end
+
     context 'when SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER is not set' do
       context 'with trusted devices' do
         let(:response) do
