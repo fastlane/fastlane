@@ -38,6 +38,15 @@ module Spaceship
         return client.post_bulk_beta_tester_assignments(beta_group_id: id, beta_testers: beta_testers)
       end
 
+      def update(client: nil, attributes: nil)
+        return if attributes.empty?
+
+        client ||= Spaceship::ConnectAPI
+
+        attributes = reverse_attr_mapping(attributes)
+        return client.patch_group(group_id: id, attributes: attributes).first
+      end
+
       def delete!
         return Spaceship::ConnectAPI.delete_beta_group(group_id: id)
       end

@@ -394,6 +394,29 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
           client.add_beta_groups_to_build(build_id: build_id, beta_group_ids: beta_group_ids)
         end
       end
+
+      context 'patch_beta_groups' do
+        let(:path) { "betaGroups" }
+        let(:beta_group_id) { "123" }
+        let(:attributes) { { public_link_enabled: false } }
+        let(:body) do
+          {
+            data: {
+                attributes: attributes,
+                id: beta_group_id,
+                type: "betaGroups"
+              }
+          }
+        end
+
+        it 'succeeds' do
+          url = "#{path}/#{beta_group_id}"
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:patch).and_yield(req_mock)
+          client.patch_group(group_id: beta_group_id, attributes: attributes)
+        end
+      end
     end
 
     describe "betaTesters" do
