@@ -27,7 +27,7 @@ module Fastlane
         end
 
         begin
-          Spaceship::ConnectAPI::Device.create(name: name, platform: platform, udid: udid)
+          Spaceship::ConnectAPI::Device.find_or_create(udid, name: name, platform: platform)
         rescue => ex
           UI.error(ex.to_s)
           UI.crash!("Failed to register new device (name: #{name}, platform: #{platform}, UDID: #{udid})")
