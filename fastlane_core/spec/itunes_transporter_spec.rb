@@ -50,11 +50,17 @@ describe FastlaneCore do
     end
 
     def shell_provider_id_command(jwt: nil)
+      # Ruby doesn't escape "+" with Shellwords.escape from 2.7 https://bugs.ruby-lang.org/issues/14429
+      escaped_password = if RUBY_VERSION >= "2.7.0"
+                           "'\\!\\>\\ p@\\$s_-+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'"
+                         else
+                           "'\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'"
+                         end
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         "-m provider",
         ('-u "fabric.devtools@gmail.com"' if jwt.nil?),
-        ("-p '\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'" if jwt.nil?),
+        ("-p #{escaped_password}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?)
       ].compact.join(' ')
     end
@@ -122,8 +128,8 @@ describe FastlaneCore do
         'com.apple.transporter.Application',
         '-m provider',
         ('-u fabric.devtools@gmail.com' if jwt.nil?),
-        ("-p \\!\\>\\ p@\\$s_-\\+\\=w\\'o\\%rd\\\"\\&\\#\\*\\<" if jwt.nil?),
-        ("-jwt #{jwt}" unless jwt.nil?),
+        ("-p #{password.shellescape}" if jwt.nil?),
+        ("-jwt #{jwt}" if jwt),
         '2>&1'
       ].compact.join(' ')
     end
