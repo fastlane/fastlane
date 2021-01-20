@@ -271,8 +271,7 @@ module Gym
 
     # Copies the .app from the archive into the output directory
     def copy_mac_app
-      exe_name = Gym.project.build_settings(key: "EXECUTABLE_NAME")
-      app_path = File.join(BuildCommandGenerator.archive_path, "Products/Applications/#{exe_name}.app")
+      app_path = Dir[File.join(BuildCommandGenerator.archive_path, "Products/Applications/*.app")].last
 
       UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless File.exist?(app_path)
 
