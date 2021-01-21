@@ -54,6 +54,13 @@ describe Fastlane do
       end
 
       it "generates the correct git command when configured to allow nothing to commit and there are changes to commit" do
+        expect(Fastlane::Actions).to receive(:sh)
+          .with("git status ./fastlane/README.md --porcelain")
+          .and_return("M  ./fastlane/README.md")
+        expect(Fastlane::Actions).to receive(:sh)
+          .with("git commit -m message ./fastlane/README.md")
+          .and_call_original
+
         result = Fastlane::FastFile.new.parse("lane :test do
           git_commit(path: './fastlane/README.md', message: 'message', allow_nothing_to_commit: true)
         end").runner.execute(:test)
@@ -62,8 +69,8 @@ describe Fastlane do
       end
 
       it "does not generate the git command when configured to allow nothing to commit and there are no changes to commit" do
-        allow(Fastlane::Actions).to receive(:sh)
-          .with("git --no-pager diff --name-only --staged")
+        expect(Fastlane::Actions).to receive(:sh)
+          .with("git status ./fastlane/README.md --porcelain")
           .and_return("")
         result = Fastlane::FastFile.new.parse("lane :test do
           git_commit(path: './fastlane/README.md', message: 'message', allow_nothing_to_commit: true)
