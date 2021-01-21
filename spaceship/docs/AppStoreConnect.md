@@ -60,6 +60,7 @@ Spaceship::ConnectAPI::App.all.collect do |app|
 end
 
 # Create a new app
+# Currently only works with Apple ID login (not API Key)
 app = Spaceship::ConnectAPI::App.create(name: "App Name",
                                         version_string: "1.0", # initial version
                                         sku: "123",
