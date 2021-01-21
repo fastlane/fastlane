@@ -139,13 +139,13 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :reporter,
                                        env_name: "FL_SWIFTLINT_REPORTER",
-                                       description: "Choose output reporter. Available: xcode, json, csv, checkstyle, junit, html, \
-                                                     emoji, sonarqube, markdown, github-actions-logging",
+                                       description: "Choose output reporter. Available: xcode, json, csv, checkstyle, codeclimate, \
+                                                     junit, html, emoji, sonarqube, markdown, github-actions-logging",
                                        is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         available = ['xcode', 'json', 'csv', 'checkstyle', 'junit', 'html', 'emoji', 'sonarqube', 'markdown', 'github-actions-logging']
-                                         UI.user_error!("Available values are '#{available.join("', '")}'") unless available.include?(value)
+                                         available = ['xcode', 'json', 'csv', 'checkstyle', 'codeclimate', 'junit', 'html', 'emoji', 'sonarqube', 'markdown', 'github-actions-logging']
+                                         UI.warning("Known 'reporter' values are '#{available.join("', '")}'. If you're receiving errors from swiftlint related to the reporter, make sure the reporter identifier you're using is correct and it's supported by your version of swiftlint.") unless available.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :quiet,
                                        env_name: "FL_SWIFTLINT_QUIET",
