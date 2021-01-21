@@ -359,7 +359,7 @@ DEPENDENCIES
   coveralls (~> 0.8.13)
   danger (~> 8.0)
   danger-junit (~> 1.0)
-  fakefs (~> 1.2.1)
+  fakefs (~> 1.2)
   fastlane!
   fastlane-plugin-clubmate
   fastlane-plugin-ruby
@@ -371,7 +371,7 @@ DEPENDENCIES
   rake
   rb-readline
   rest-client (>= 1.8.0)
-  rspec (~> 3.10.0)
+  rspec (~> 3.10)
   rspec_junit_formatter (~> 0.4.1)
   rubocop (= 0.49.1)
   rubocop-require_tools (>= 0.1.2)
