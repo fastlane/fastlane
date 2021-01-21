@@ -85,7 +85,7 @@ module Fastlane
 
       def self.api_token(params)
         params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
-        api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+        api_token ||= Spaceship::ConnectAPI::Token.create(**params[:api_key]) if params[:api_key]
         api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
         return api_token
       end
