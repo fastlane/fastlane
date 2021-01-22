@@ -37,7 +37,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,
-                                       description: "The file you want to commit",
+                                       description: "The file(s) you want to commit, use . to match all paths",
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :message,
                                        description: "The commit message that should be used"),
