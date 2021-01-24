@@ -16,6 +16,8 @@ end
 task(:test_all) do
   formatter = "--format progress"
   formatter += " -r rspec_junit_formatter --format RspecJunitFormatter -o #{ENV['CIRCLE_TEST_REPORTS']}/rspec/fastlane-junit-results.xml" if ENV["CIRCLE_TEST_REPORTS"]
+  # To move Ruby 3.0 or next major version migration going forward, we want to keep monitoring deprecation warnings
+  formatter += " 2> #{File.join(ENV["CIRCLE_TEST_REPORTS"], 'warnings.txt')}" if ENV["CIRCLE_TEST_REPORTS"]
   sh("rspec --pattern ./**/*_spec.rb #{formatter}")
 end
 
