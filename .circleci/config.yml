@@ -71,6 +71,7 @@ jobs:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'en_US.UTF-8'
       LANG: 'en_US.UTF-8'
+      RUBYOPT: -W:deprecated
       _RUBY_VERSION: << parameters.ruby_version >>
     shell: '/bin/bash --login -eo pipefail'
     steps:
@@ -105,6 +106,9 @@ jobs:
       - store_artifacts:
           path: ~/test-reports/rspec
           destination: test-reports
+      - store_artifacts:
+          path: ~/test-reports/ruby_warnings.txt
+          destination: ruby_warnings.txt
       - run:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
@@ -143,6 +147,9 @@ jobs:
       - store_artifacts:
           path: ~/test-reports/rspec
           destination: test-reports
+      - store_artifacts:
+          path: ~/test-reports/ruby_warnings.txt
+          destination: ruby_warnings.txt
       - run:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
