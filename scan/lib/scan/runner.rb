@@ -150,6 +150,28 @@ module Scan
       UI.message("Successfully zipped build products: #{output_path}")
     end
 
+    def additional_xctestrun
+      return unless Scan.config[:should_zip_build_products]
+      return unless Scan.config[:should_additional_xctestrun]
+
+      # Gets :derived_data_path/Build/Products directory for zipping zip
+      derived_data_path = Scan.config[:derived_data_path]
+      path = File.join(derived_data_path, "Build/Products")
+
+      # Gets absolute path of output directory
+      output_directory = File.absolute_path(Scan.config[:output_directory])
+      output_path = File.join(output_directory, "settings.xctestrun")
+
+      # Caching path for action to put into lane_context
+      Scan.cache[:additional_xctestrun] = output_path
+
+      # Copy .xctestrun file and moves it to output directory
+      UI.message("Copying .xctestrun file")
+      xctestrun_file = Dir.glob("#{path}/*.xctestrun").first
+      Fileutils.cp(xctestrun_file, output_path)
+      UI.message("Successfully copied xctestrun file: #{output_path}")
+    end
+
     def test_results
       temp_junit_report = Scan.cache[:temp_junit_report]
       return File.read(temp_junit_report) if temp_junit_report && File.file?(temp_junit_report)
