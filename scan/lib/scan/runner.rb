@@ -168,7 +168,7 @@ module Scan
       # Copy .xctestrun file and moves it to output directory
       UI.message("Copying .xctestrun file")
       xctestrun_file = Dir.glob("#{path}/*.xctestrun").first
-      Fileutils.cp(xctestrun_file, output_path)
+      FileUtils.cp(xctestrun_file, output_path)
       UI.message("Successfully copied xctestrun file: #{output_path}")
     end
 
