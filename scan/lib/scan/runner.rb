@@ -152,7 +152,6 @@ module Scan
     end
 
     def additional_xctestrun
-      return unless Scan.config[:should_zip_build_products]
       return unless Scan.config[:additional_xctestrun]
 
       # Gets :derived_data_path/Build/Products directory for zipping zip
