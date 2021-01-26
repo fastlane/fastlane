@@ -271,7 +271,7 @@ module Scan
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :additional_xctestrun,
                                      env_name: "SCAN_SHOULD_ADDITIONAL_XCTESTRUN",
-                                     description: "Should provide additional copy of .xctestrun file and place in output path?",
+                                     description: "Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?",
                                      optional: true,
                                      is_string: false,
                                      default_value: false),
