@@ -105,6 +105,7 @@ module Scan
 
       copy_simulator_logs
       zip_build_products
+      additional_xctestrun
 
       if result[:failures] > 0
         open_report
@@ -147,7 +148,7 @@ module Scan
 
     def additional_xctestrun
       return unless Scan.config[:should_zip_build_products]
-      return unless Scan.config[:should_additional_xctestrun]
+      return unless Scan.config[:additional_xctestrun]
 
       # Gets :derived_data_path/Build/Products directory for zipping zip
       derived_data_path = Scan.config[:derived_data_path]
