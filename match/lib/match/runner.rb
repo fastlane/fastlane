@@ -355,7 +355,7 @@ module Match
         devices = Spaceship::ConnectAPI::Device.all
         unless device_classes.empty?
           devices = devices.select do |device|
-            device_classes.include?(device.device_class)
+            device_classes.include?(device.device_class) && device.enabled?
           end
         end
 

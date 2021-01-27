@@ -8,6 +8,7 @@ module Spaceship
       attr_accessor :name
       attr_accessor :subtitle
       attr_accessor :privacy_policy_url
+      attr_accessor :privacy_choices_url
       attr_accessor :privacy_policy_text
 
       attr_mapping({
@@ -15,6 +16,7 @@ module Spaceship
         "name" => "name",
         "subtitle" => "subtitle",
         "privacyPolicyUrl" => "privacy_policy_url",
+        "privacyChoicesUrl" => "privacy_choices_url",
         "privacyPolicyText" => "privacy_policy_text"
       })
 
@@ -26,13 +28,15 @@ module Spaceship
       # API
       #
 
-      def update(attributes: nil)
+      def update(client: nil, attributes: nil)
+        client ||= Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
-        Spaceship::ConnectAPI.patch_app_info_localization(app_info_localization_id: id, attributes: attributes)
+        client.patch_app_info_localization(app_info_localization_id: id, attributes: attributes)
       end
 
-      def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI.delete_app_info_localization(app_info_localization_id: id)
+      def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_app_info_localization(app_info_localization_id: id)
       end
     end
   end

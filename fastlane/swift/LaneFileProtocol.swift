@@ -22,8 +22,8 @@ public protocol LaneFileProtocol: class {
 
 public extension LaneFileProtocol {
     var fastlaneVersion: String { return "" } // Defaults to "" because that means any is fine
-    func beforeAll(with lane: String) {} // No-op by default
-    func afterAll(with lane: String) {} // No-op by default
+    func beforeAll(with _: String) {} // No-op by default
+    func afterAll(with _: String) {} // No-op by default
     func onError(currentLane _: String, errorInfo _: String) {} // No-op by default
     func recordLaneDescriptions() {} // No-op by default
 }

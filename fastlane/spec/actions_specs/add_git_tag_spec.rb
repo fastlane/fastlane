@@ -35,6 +35,18 @@ describe Fastlane do
         expect(result).to eq("git tag -am #{message.shellescape} #{tag.shellescape}")
       end
 
+      it "allows you to not include the current lane in the tag and message" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          add_git_tag ({
+            includes_lane: false,
+          })
+        end").runner.execute(:test)
+
+        message = "builds/#{build_number} (fastlane)"
+        tag = "builds/#{build_number}"
+        expect(result).to eq("git tag -am #{message.shellescape} #{tag.shellescape}")
+      end
+
       it "allows you to specify a prefix" do
         prefix = '16309-'
 
@@ -74,6 +86,16 @@ describe Fastlane do
 
         message = "#{tag} (fastlane)"
         expect(result).to eq("git tag -am #{message.shellescape} #{tag.shellescape}")
+      end
+
+      it "raises error if no tag or build_number are provided" do
+        Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER] = nil
+
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            add_git_tag ({})
+          end").runner.execute(:test)
+        end.to raise_error(/No value found for 'tag' or 'build_number'. At least one of them must be provided. Note that if you do specify a tag, all other arguments are ignored./)
       end
 
       it "specified tag overrides generate tag" do

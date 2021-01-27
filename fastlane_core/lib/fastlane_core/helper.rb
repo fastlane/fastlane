@@ -14,7 +14,7 @@ module FastlaneCore
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @enabled ||= !FastlaneCore::FastlaneFolder.path.nil?
+      !FastlaneCore::FastlaneFolder.path.nil?
     end
 
     # Checks if fastlane is enabled for this project and returns the folder where the configuration lives
@@ -74,7 +74,7 @@ module FastlaneCore
       return true if self.is_circle_ci?
 
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO'].each do |current|
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO', 'BUDDY'].each do |current|
         return true if ENV.key?(current)
       end
       return false
@@ -107,7 +107,7 @@ module FastlaneCore
 
     # Do we want to disable the colored output?
     def self.colors_disabled?
-      FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS")
+      FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS") || ENV.key?("NO_COLOR")
     end
 
     # Does the user use the Mac stock terminal
@@ -203,9 +203,17 @@ module FastlaneCore
       return File.join(self.itms_path, 'iTMSTransporter')
     end
 
+    def self.user_defined_itms_path?
+      return FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
+    end
+
+    def self.user_defined_itms_path
+      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if self.user_defined_itms_path?
+    end
+
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
-      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
+      return self.user_defined_itms_path if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
 
       if self.mac?
         # First check for manually install iTMSTransporter

@@ -60,11 +60,11 @@ Spaceship::ConnectAPI::App.all.collect do |app|
 end
 
 # Create a new app
-// Not working yet
+# Currently only works with Apple ID login (not API Key)
 app = Spaceship::ConnectAPI::App.create(name: "App Name",
-                                        primary_language: "English",
                                         version_string: "1.0", # initial version
                                         sku: "123",
+                                        primary_locale: "English",
                                         bundle_id: "com.krausefx.app",
                                         platforms: ["IOS"])
 ```

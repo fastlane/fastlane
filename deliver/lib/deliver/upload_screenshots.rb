@@ -251,70 +251,7 @@ module Deliver
 
     def collect_screenshots(options)
       return [] if options[:skip_screenshots]
-      return collect_screenshots_for_languages(options[:screenshots_path], options[:ignore_language_directory_validation])
-    end
-
-    def collect_screenshots_for_languages(path, ignore_validation)
-      screenshots = []
-      extensions = '{png,jpg,jpeg}'
-
-      available_languages = UploadScreenshots.available_languages.each_with_object({}) do |lang, lang_hash|
-        lang_hash[lang.downcase] = lang
-      end
-
-      Loader.language_folders(path, ignore_validation).each do |lng_folder|
-        language = File.basename(lng_folder)
-
-        # Check to see if we need to traverse multiple platforms or just a single platform
-        if language == Loader::APPLE_TV_DIR_NAME || language == Loader::IMESSAGE_DIR_NAME
-          screenshots.concat(collect_screenshots_for_languages(File.join(path, language), ignore_validation))
-          next
-        end
-
-        files = Dir.glob(File.join(lng_folder, "*.#{extensions}"), File::FNM_CASEFOLD).sort
-        next if files.count == 0
-
-        framed_screenshots_found = Dir.glob(File.join(lng_folder, "*_framed.#{extensions}"), File::FNM_CASEFOLD).count > 0
-
-        UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃") if framed_screenshots_found
-
-        language_dir_name = File.basename(lng_folder)
-
-        if available_languages[language_dir_name.downcase].nil?
-          UI.user_error!("#{language_dir_name} is not an available language. Please verify that your language codes are available in iTunesConnect. See https://developer.apple.com/library/content/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/AppStoreTerritories.html for more information.")
-        end
-
-        language = available_languages[language_dir_name.downcase]
-
-        files.each do |file_path|
-          is_framed = file_path.downcase.include?("_framed.")
-          is_watch = file_path.downcase.include?("watch")
-
-          if framed_screenshots_found && !is_framed && !is_watch
-            UI.important("🏃 Skipping screenshot file: #{file_path}")
-            next
-          end
-
-          screenshots << AppScreenshot.new(file_path, language)
-        end
-      end
-
-      # Checking if the device type exists in spaceship
-      # Ex: iPhone 6.1 inch isn't supported in App Store Connect but need
-      # to have it in there for frameit support
-      unaccepted_device_shown = false
-      screenshots.select! do |screenshot|
-        exists = !screenshot.device_type.nil?
-        unless exists
-          UI.important("Unaccepted device screenshots are detected! 🚫 Screenshot file will be skipped. 🏃") unless unaccepted_device_shown
-          unaccepted_device_shown = true
-
-          UI.important("🏃 Skipping screenshot file: #{screenshot.path} - Not an accepted App Store Connect device...")
-        end
-        exists
-      end
-
-      return screenshots
+      return Loader.load_app_screenshots(options[:screenshots_path], options[:ignore_language_directory_validation])
     end
 
     # helper method so Spaceship::Tunes.client.available_languages is easier to test

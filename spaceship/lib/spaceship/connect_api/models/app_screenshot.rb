@@ -79,7 +79,8 @@ module Spaceship
       #
       #
 
-      def self.create(app_screenshot_set_id: nil, path: nil, wait_for_processing: true)
+      def self.create(client: nil, app_screenshot_set_id: nil, path: nil, wait_for_processing: true)
+        client ||= Spaceship::ConnectAPI
         require 'faraday'
 
         filename = File.basename(path)
@@ -93,7 +94,7 @@ module Spaceship
 
         # Create placeholder to upload screenshot
         begin
-          screenshot = Spaceship::ConnectAPI.post_app_screenshot(
+          screenshot = client.post_app_screenshot(
             app_screenshot_set_id: app_screenshot_set_id,
             attributes: post_attributes
           ).first
@@ -117,7 +118,7 @@ module Spaceship
             sleep(30)
 
             screenshots = Spaceship::ConnectAPI::AppScreenshotSet
-                          .get(app_screenshot_set_id: app_screenshot_set_id)
+                          .get(client: client, app_screenshot_set_id: app_screenshot_set_id)
                           .app_screenshots
 
             screenshot = screenshots.find do |s|
@@ -152,7 +153,7 @@ module Spaceship
         rescue => error
           puts("Failed to patch app screenshot. Update may have gone through so verifying") if Spaceship::Globals.verbose?
 
-          screenshot = Spaceship::ConnectAPI.get_app_screenshot(app_screenshot_id: screenshot.id).first
+          screenshot = client.get_app_screenshot(app_screenshot_id: screenshot.id).first
           raise error unless screenshot.complete?
         end
 
@@ -172,15 +173,16 @@ module Spaceship
             puts("Waiting #{sleep_time} seconds before checking status of processing...") if Spaceship::Globals.verbose?
             sleep(sleep_time)
 
-            screenshot = Spaceship::ConnectAPI.get_app_screenshot(app_screenshot_id: screenshot.id).first
+            screenshot = client.get_app_screenshot(app_screenshot_id: screenshot.id).first
           end
         end
 
         return screenshot
       end
 
-      def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI.delete_app_screenshot(app_screenshot_id: id)
+      def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_app_screenshot(app_screenshot_id: id)
       end
     end
   end

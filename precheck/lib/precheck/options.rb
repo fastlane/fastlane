@@ -97,7 +97,12 @@ module Precheck
                                      description: "Should check in-app purchases?",
                                      is_string: false,
                                      optional: true,
-                                     default_value: true)
+                                     default_value: true),
+        FastlaneCore::ConfigItem.new(key: :use_live,
+                                     env_name: "PRECHECK_USE_LIVE",
+                                     description: "Should force check live app?",
+                                     is_string: false,
+                                     default_value: false)
       ] + rules
     end
   end

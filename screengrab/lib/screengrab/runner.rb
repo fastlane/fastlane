@@ -24,6 +24,8 @@ module Screengrab
     end
 
     def run
+      # Standardize the locales
+      @config[:locales].map! { |locale| locale.gsub("_", "-") }
       FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [], title: "Summary for screengrab #{Fastlane::VERSION}")
 
       app_apk_path = @config.fetch(:app_apk_path, ask: false)

@@ -411,6 +411,11 @@ module Scan
                                      description: "Only post on Slack if the tests fail",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :slack_default_payloads,
+                                     env_name: "SCAN_SLACK_DEFAULT_PAYLOADS",
+                                     description: "Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack",
+                                     optional: true,
+                                     type: Array),
 
         # misc
         FastlaneCore::ConfigItem.new(key: :destination,
@@ -419,6 +424,15 @@ module Scan
                                      description: "Use only if you're a pro, use the other options instead",
                                      is_string: false,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :catalyst_platform,
+                                     env_name: "SCAN_CATALYST_PLATFORM",
+                                     description: "Platform to build when using a Catalyst enabled app. Valid values are: ios, macos",
+                                     type: String,
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       av = %w(ios macos)
+                                       UI.user_error!("Unsupported export_method '#{value}', must be: #{av}") unless av.include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :custom_report_file_name,
                                      env_name: "SCAN_CUSTOM_REPORT_FILE_NAME",
                                      description: "Sets custom full report file name when generating a single report",
@@ -436,7 +450,23 @@ module Scan
                                     env_name: "SCAN_CLONED_SOURCE_PACKAGES_PATH",
                                     description: "Sets a custom path for Swift Package Manager dependencies",
                                     type: String,
-                                    optional: true)
+                                    optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_package_dependencies_resolution,
+                                     env_name: "SCAN_SKIP_PACKAGE_DEPENDENCIES_RESOLUTION",
+                                     description: "Skips resolution of Swift Package Manager dependencies",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,
+                                     env_name: "SCAN_DISABLE_PACKAGE_AUTOMATIC_UPDATES",
+                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :use_system_scm,
+                                     env_name: "SCAN_USE_SYSTEM_SCM",
+                                     description: "Lets xcodebuild use system's scm configuration",
+                                     optional: true,
+                                     type: Boolean,
+                                     default_value: false)
 
       ]
     end

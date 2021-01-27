@@ -77,7 +77,7 @@ module Fastlane
       end
 
       def self.try_create_device(name: nil, platform: nil, udid: nil)
-        Spaceship::ConnectAPI::Device.create(name: name, platform: platform, udid: udid)
+        Spaceship::ConnectAPI::Device.find_or_create(udid, name: name, platform: platform)
       rescue => ex
         UI.error(ex.to_s)
         UI.crash!("Failed to register new device (name: #{name}, UDID: #{udid})")
@@ -155,6 +155,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
+                                       optional: true,
                                        default_value: user,
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :platform,

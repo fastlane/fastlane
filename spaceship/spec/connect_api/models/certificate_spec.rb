@@ -31,7 +31,7 @@ describe Spaceship::ConnectAPI::Certificate do
       model = Spaceship::ConnectAPI::Models.parse(certificates_response).first
     end
 
-    context 'with past exiration_date' do
+    context 'with past expiration_date' do
       before { certificate.expiration_date = "1999-02-01T20:50:34.000+0000" }
 
       it 'should be invalid' do
@@ -39,7 +39,7 @@ describe Spaceship::ConnectAPI::Certificate do
       end
     end
 
-    context 'with a future exiration_date' do
+    context 'with a future expiration_date' do
       before { certificate.expiration_date = "9999-02-01T20:50:34.000+0000" }
 
       it 'should be valid' do

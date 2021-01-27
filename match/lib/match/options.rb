@@ -65,7 +65,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "MATCH_APP_IDENTIFIER",
-                                     description: "The bundle identifier(s) of your app (comma-separated)",
+                                     description: "The bundle identifier(s) of your app (comma-separated string or array of strings)",
                                      type: Array, # we actually allow String and Array here
                                      skip_type_validation: true,
                                      code_gen_sensitive: true,
@@ -227,7 +227,7 @@ module Match
                                      short_option: "-p",
                                      env_name: "MATCH_KEYCHAIN_PASSWORD",
                                      sensitive: true,
-                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
+                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password",
                                      optional: true),
 
         # settings

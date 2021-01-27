@@ -37,7 +37,7 @@ class Runner {
         socketClient.send(rubyCommand: command)
 
         let secondsToWait = DispatchTimeInterval.seconds(SocketClient.defaultCommandTimeoutSeconds)
-        // swiftlint:disable next
+        // swiftformat:disable:next redundantSelf
         let timeoutResult = Self.waitWithPolling(self.executeNext[command.id], toEventually: { $0 == true }, timeout: SocketClient.defaultCommandTimeoutSeconds)
         executeNext.removeValue(forKey: command.id)
         let failureMessage = "command didn't execute in: \(SocketClient.defaultCommandTimeoutSeconds) seconds"

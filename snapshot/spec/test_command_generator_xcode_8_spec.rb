@@ -134,6 +134,7 @@ describe Snapshot do
               "-derivedDataPath /tmp/path/to/snapshot_derived",
               "-destination 'platform=iOS Simulator,id=#{id},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
               :build,
               :test,
               "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone\\ 6-en.log")}",
@@ -158,6 +159,7 @@ describe Snapshot do
               "-only-testing:TestBundle/TestSuite/Screenshots",
               "-destination 'platform=iOS Simulator,id=#{id},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
               :build,
               :test,
               "| tee #{File.expand_path('~/Library/Logs/snapshot/Example-ExampleUITests-iPhone\\ 6-en.log')}",
@@ -181,6 +183,7 @@ describe Snapshot do
               "-derivedDataPath /tmp/path/to/snapshot_derived",
               "-destination 'platform=tvOS Simulator,id=#{id},OS=#{os}'",
               "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
               :build,
               :test,
               "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-Apple\\ TV\\ 1080p-en.log")}",
@@ -191,14 +194,16 @@ describe Snapshot do
       end
 
       context 'fixed derivedDataPath' do
+        let(:temp) { Dir.mktmpdir }
+
         before do
-          configure(options.merge(derived_data_path: 'fake/derived/path'))
+          configure(options.merge(derived_data_path: temp))
         end
 
         it 'uses the fixed derivedDataPath if given', requires_xcode: true do
           expect(Dir).not_to(receive(:mktmpdir))
           command = Snapshot::TestCommandGeneratorXcode8.generate(device_type: "iPhone 6", language: "en", locale: nil)
-          expect(command.join('')).to include("-derivedDataPath fake/derived/path")
+          expect(command.join('')).to include("-derivedDataPath #{temp}")
         end
       end
 
@@ -251,6 +256,7 @@ describe Snapshot do
             "-derivedDataPath /tmp/path/to/snapshot_derived",
             "-destination 'platform=macOS'",
             "FASTLANE_SNAPSHOT=YES",
+            "FASTLANE_LANGUAGE=en",
             :build,
             :test,
             "| tee #{File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/ExampleMacOS-ExampleMacOS-Mac-en.log")}",

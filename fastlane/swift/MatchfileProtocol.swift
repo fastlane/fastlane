@@ -1,8 +1,8 @@
 // MatchfileProtocol.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 public protocol MatchfileProtocol: class {
-    /// Define the profile type, can be appstore, adhoc, development, enterprise, developer_id
+    /// Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution
     var type: String { get }
 
     /// Create additional cert types needed for macOS installers (valid values: mac_installer_distribution, developer_id_installer)
@@ -17,7 +17,7 @@ public protocol MatchfileProtocol: class {
     /// Skip syncing provisioning profiles
     var skipProvisioningProfiles: Bool { get }
 
-    /// The bundle identifier(s) of your app (comma-separated)
+    /// The bundle identifier(s) of your app (comma-separated string or array of strings)
     var appIdentifier: [String] { get }
 
     /// Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
@@ -92,7 +92,7 @@ public protocol MatchfileProtocol: class {
     /// Keychain the items should be imported to
     var keychainName: String { get }
 
-    /// This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
+    /// This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
     var keychainPassword: String? { get }
 
     /// Renew the provisioning profiles every time you run match
@@ -184,4 +184,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.44]
+// FastlaneRunnerAPIVersion [0.9.52]
