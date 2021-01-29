@@ -21,7 +21,8 @@ module Fastlane
         other_action.appetize(path: zipped_bundle,
                               api_token: params[:api_token],
                               public_key: params[:public_key],
-                              note: params[:note])
+                              note: params[:note],
+                              timeout: params[:timeout])
 
         public_key = Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]
         UI.success("Generated Public Key: #{Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]}")

@@ -31,6 +31,10 @@ module Fastlane
 
         params[:note] = options[:note] if options[:note].to_s.length > 0
 
+        if options[:timeout]
+          params[:timeout] = options[:timeout]
+        end
+
         uri = URI.parse(appetize_url(options))
         req = create_request(uri, params)
         req.basic_auth(options[:api_token], nil)
@@ -147,7 +151,15 @@ module Fastlane
                                        env_name: "APPETIZE_NOTE",
                                        description: "Notes you wish to add to the uploaded app",
                                        is_string: true,
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :timeout,
+                                       env_name: "APPETIZE_TIMEOUT",
+                                       description: "The number of seconds to wait until automatically ending the session due to user inactivity. Must be 30, 60, 90, 120, 180, 300, 600, 1800, 3600 or 7200. Default is 120",
+                                       is_string: false,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                          UI.user_error!("The value provided doesn't match any of the supported options.") unless [30, 60, 90, 120, 180, 300, 600, 1800, 3600, 7200].include?(value)
+                                       end),
         ]
       end
 
