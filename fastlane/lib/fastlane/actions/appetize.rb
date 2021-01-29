@@ -155,11 +155,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :timeout,
                                        env_name: "APPETIZE_TIMEOUT",
                                        description: "The number of seconds to wait until automatically ending the session due to user inactivity. Must be 30, 60, 90, 120, 180, 300, 600, 1800, 3600 or 7200. Default is 120",
-                                       is_string: false,
+                                       type: Integer,
                                        optional: true,
                                        verify_block: proc do |value|
-                                          UI.user_error!("The value provided doesn't match any of the supported options.") unless [30, 60, 90, 120, 180, 300, 600, 1800, 3600, 7200].include?(value)
-                                       end),
+                                         UI.user_error!("The value provided doesn't match any of the supported options.") unless [30, 60, 90, 120, 180, 300, 600, 1800, 3600, 7200].include?(value)
+                                       end)
         ]
       end
 
