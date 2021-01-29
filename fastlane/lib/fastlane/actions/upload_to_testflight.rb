@@ -22,7 +22,7 @@ module Fastlane
         return values if Helper.test?
 
         if distribute_only
-          Pilot::BuildManager.new.wait_for_build_processing_to_be_complete(values) unless values[:skip_waiting_for_build_processing]
+          Pilot::BuildManager.new.wait_for_build_processing_to_be_complete(false) unless values[:skip_waiting_for_build_processing]
           Pilot::BuildManager.new.distribute(values) # we already have the finished config
         else
           Pilot::BuildManager.new.upload(values) # we already have the finished config
