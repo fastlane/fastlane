@@ -69,7 +69,7 @@ module FastlaneCore
     end
 
     def command_output(message)
-      actual = (make_utf_8(message).split("\r").last || "") # as clearing the line will remove the `>` and the time stamp
+      actual = (encode_as_utf_8_if_possible(message).split("\r").last || "") # as clearing the line will remove the `>` and the time stamp
       actual.split("\n").each do |msg|
         if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_OUTPUT_FORMAT")
           log.info(msg)
@@ -150,7 +150,7 @@ module FastlaneCore
 
     private
 
-    def make_utf_8(message)
+    def encode_as_utf_8_if_possible(message)
       orig_encoding = message.encoding
 
       # Try some common encodings and return the first with valid codings
