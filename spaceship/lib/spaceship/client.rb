@@ -57,6 +57,7 @@ module Spaceship
     InternalServerError = Spaceship::InternalServerError
     BadGatewayError = Spaceship::BadGatewayError
     AccessForbiddenError = Spaceship::AccessForbiddenError
+    TooManyRequestsError = Spaceship::TooManyRequestsError
 
     def self.hostname
       raise "You must implement self.hostname"
@@ -196,7 +197,7 @@ module Spaceship
       self.new(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id)
     end
 
-    def initialize(cookie: nil, current_team_id: nil, timeout: nil)
+    def initialize(cookie: nil, current_team_id: nil, csrf_tokens: nil, timeout: nil)
       options = {
        request: {
           timeout:       (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i,
@@ -204,6 +205,7 @@ module Spaceship
         }
       }
       @current_team_id = current_team_id
+      @csrf_tokens = csrf_tokens
       @cookie = cookie || HTTP::CookieJar.new
 
       @client = Faraday.new(self.class.hostname, options) do |c|
@@ -644,6 +646,17 @@ module Spaceship
         retry
       end
       raise ex # re-raise the exception
+    rescue TooManyRequestsError => ex
+      tries -= 1
+      unless tries.zero?
+        msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after #{ex.retry_after} seconds (remaining: #{tries})..."
+        puts(msg) if Spaceship::Globals.verbose?
+        logger.warn(msg)
+
+        sleep(ex.retry_after) unless Object.const_defined?("SpecHelper")
+        retry
+      end
+      raise ex # re-raise the exception
     rescue \
         Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
         InternalServerError => ex
@@ -857,9 +870,7 @@ module Spaceship
 
         resp_hash = response.to_hash
         if resp_hash[:status] == 401
-          msg = "Auth lost"
-          logger.warn(msg)
-          raise UnauthorizedAccessError.new, "Unauthorized Access"
+          handle_401(response)
         end
 
         if response.body.to_s.include?("<title>302 Found</title>")
@@ -874,10 +885,18 @@ module Spaceship
           msg = "Access forbidden"
           logger.warn(msg)
           raise AccessForbiddenError.new, msg
+        elsif resp_hash[:status] == 429
+          raise TooManyRequestsError, resp_hash
         end
 
         return response
       end
+    end
+
+    def handle_401(response)
+      msg = "Auth lost"
+      logger.warn(msg)
+      raise UnauthorizedAccessError.new, "Unauthorized Access"
     end
 
     def send_request_auto_paginate(method, url_or_path, params, headers, &block)

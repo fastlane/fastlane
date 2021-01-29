@@ -43,6 +43,25 @@ module Spaceship
     end
   end
 
+  # Raised when 429 is received from App Store Connect
+  class TooManyRequestsError < BasicPreferredInfoError
+    attr_reader :retry_after
+    attr_reader :rate_limit_user
+
+    def initialize(resp_hash)
+      headers = resp_hash[:response_headers] || {}
+      @retry_after = (headers['retry-after'] || 60).to_i
+      @rate_limit_user = headers['x-daiquiri-rate-limit-user']
+      message = 'Apple 429 detected'
+      message += " - #{rate_limit_user}" if rate_limit_user
+      super(message)
+    end
+
+    def show_github_issues
+      false
+    end
+  end
+
   class UnexpectedResponse < StandardError
     attr_reader :error_info
 

@@ -95,6 +95,7 @@ Require/MissingRequireStatement:
     - '**/spec/**/*.rb'
     - '**/spec_helper.rb'
     - 'spaceship/lib/spaceship/babosa_fix.rb'
+    - 'fastlane_core/lib/fastlane_core/ui/disable_colors.rb'
     - '**/Fastfile'
     - '**/*.gemspec'
     - 'rakelib/**/*'
@@ -243,7 +244,7 @@ Layout/SpaceAroundOperators:
     - '**/spec/actions_specs/xcodebuild_spec.rb'
 
 AllCops:
-  TargetRubyVersion: 2.0
+  TargetRubyVersion: 2.4
   Include:
     - '*/lib/assets/*Template'
     - '*/lib/assets/*TemplateAndroid'
@@ -319,6 +320,7 @@ Style/MethodCallWithArgsParentheses:
     - 'platform'
     # rspec tests code below
     - 'to'
+    - 'not_to'
     - 'describe'
     - 'it'
     - 'be'

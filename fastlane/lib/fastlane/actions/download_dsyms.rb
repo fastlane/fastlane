@@ -208,6 +208,7 @@ module Fastlane
         else
           http = Net::HTTP.new(uri.host, uri.port)
         end
+        http.read_timeout = 300
         http.use_ssl = (uri.scheme == "https")
         res = http.get(uri.request_uri)
         res.body
@@ -284,7 +285,6 @@ module Fastlane
                                        short_option: "-p",
                                        env_name: "DOWNLOAD_DSYMS_PLATFORM",
                                        description: "The app platform for dSYMs you wish to download (ios, appletvos)",
-                                       optional: true,
                                        default_value: :ios),
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",

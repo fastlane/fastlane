@@ -20,7 +20,7 @@ class MainProcess {
     @objc func connectToFastlaneAndRunLane() {
         runner.startSocketThread(port: argumentProcessor.port)
 
-        let completedRun = Fastfile.runLane(from: nil, named: argumentProcessor.currentLane, parameters: argumentProcessor.laneParameters())
+        let completedRun = Fastfile.runLane(from: nil, named: argumentProcessor.currentLane, with: argumentProcessor.laneParameters())
         if completedRun {
             runner.disconnectFromFastlaneProcess()
         }

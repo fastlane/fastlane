@@ -21,6 +21,7 @@ describe Fastlane do
           key_id: key_id,
           issuer_id: issuer_id,
           key: File.binread(fake_api_key_p8_path),
+          is_key_content_base64: false,
           duration: nil,
           in_house: nil
         }
@@ -29,28 +30,55 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY]).to eq(hash)
       end
 
-      it "with key_content" do
-        key_content = File.binread(fake_api_key_p8_path).gsub("\r", '')
+      describe "with key_content" do
+        let(:key_content) { File.binread(fake_api_key_p8_path).gsub("\r", '') }
 
-        result = Fastlane::FastFile.new.parse("lane :test do
-          app_store_connect_api_key(
-            key_id: '#{key_id}',
-            issuer_id: '#{issuer_id}',
-            key_content: '#{key_content}',
+        it "with plain text" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            app_store_connect_api_key(
+              key_id: '#{key_id}',
+              issuer_id: '#{issuer_id}',
+              key_content: '#{key_content}',
+              duration: 200,
+              in_house: true
+            )
+          end").runner.execute(:test)
+
+          hash = {
+            key_id: key_id,
+            issuer_id: issuer_id,
+            key: key_content,
+            is_key_content_base64: false,
             duration: 200,
             in_house: true
-          )
-        end").runner.execute(:test)
+          }
 
-        hash = {
-          key_id: key_id,
-          issuer_id: issuer_id,
-          key: key_content,
-          duration: 200,
-          in_house: true
-        }
+          expect(result).to eq(hash)
+        end
 
-        expect(result).to eq(hash)
+        it "with base64 encoded" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            app_store_connect_api_key(
+              key_id: '#{key_id}',
+              issuer_id: '#{issuer_id}',
+              key_content: '#{key_content}',
+              is_key_content_base64: true,
+              duration: 200,
+              in_house: true
+            )
+          end").runner.execute(:test)
+
+          hash = {
+            key_id: key_id,
+            issuer_id: issuer_id,
+            key: key_content,
+            is_key_content_base64: true,
+            duration: 200,
+            in_house: true
+          }
+
+          expect(result).to eq(hash)
+        end
       end
 
       it "raise error when no key_filepath or key_content" do

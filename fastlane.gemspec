@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Jorge Revuelta H",
-                        "Helmut Januschka",
-                        "Felix Krause",
-                        "Kohki Miki",
-                        "Joshua Liebowitz",
-                        "Manu Wallner",
-                        "Max Ott",
-                        "Jérôme Lacoste",
-                        "Jimmy Dee",
-                        "Luka Mirosevic",
-                        "Matthew Ellis",
-                        "Maksym Grebenets",
-                        "Josh Holtz",
-                        "Jan Piotrowski",
-                        "Stefan Natchev",
-                        "Daniel Jankowski",
+  spec.authors       = ["Andrew McBurney",
                         "Olivier Halligon",
+                        "Felix Krause",
+                        "Daniel Jankowski",
                         "Danielle Tomlinson",
-                        "Fumiya Nakamura",
+                        "Jimmy Dee",
+                        "Max Ott",
+                        "Stefan Natchev",
+                        "Maksym Grebenets",
+                        "Jérôme Lacoste",
+                        "Jan Piotrowski",
+                        "Jorge Revuelta H",
+                        "Kohki Miki",
                         "Aaron Brager",
-                        "Andrew McBurney",
-                        "Iulian Onofrei"]
+                        "Luka Mirosevic",
+                        "Josh Holtz",
+                        "Iulian Onofrei",
+                        "Helmut Januschka",
+                        "Joshua Liebowitz",
+                        "Fumiya Nakamura",
+                        "Matthew Ellis",
+                        "Manu Wallner"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -71,6 +71,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('tty-screen', '>= 0.6.3', '< 1.0.0') # detect the terminal width
   spec.add_dependency('tty-spinner', '>= 0.8.0', '< 1.0.0') # loading indicators
 
+  spec.add_dependency('artifactory', '~> 3.0') # Used to export to an artifactory server
   spec.add_dependency('babosa', '>= 1.0.3', "< 2.0.0") # library for creating human-friendly identifiers, aka "slugs"
   spec.add_dependency('colored') # colored terminal output
   spec.add_dependency('commander-fastlane', '>= 4.4.6', '< 5.0.0') # CLI parser
@@ -102,7 +103,7 @@ Gem::Specification.new do |spec|
 
   # Development only
   spec.add_development_dependency('rake')
-  spec.add_development_dependency('rspec', '~> 3.9.0')
+  spec.add_development_dependency('rspec', '~> 3.10.0')
   spec.add_development_dependency('rspec_junit_formatter', '~> 0.4.1')
   spec.add_development_dependency('pry')
   spec.add_development_dependency('pry-byebug')

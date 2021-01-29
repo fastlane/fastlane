@@ -11,6 +11,10 @@ class MockSession
   def team_id
     'abc'
   end
+
+  def csrf_tokens
+    nil
+  end
 end
 
 class MockTransporter

@@ -214,6 +214,30 @@ module Spaceship
           test_flight_request_client.post("betaGroups", body)
         end
 
+        def patch_group(group_id: nil, attributes: {})
+          body = {
+            data: {
+              attributes: attributes,
+              id: group_id,
+              type: "betaGroups"
+            }
+          }
+
+          test_flight_request_client.patch("betaGroups/#{group_id}", body)
+        end
+
+        def delete_beta_group(group_id: nil)
+          raise "group_id is nil" if group_id.nil?
+
+          test_flight_request_client.delete("betaGroups/#{group_id}")
+        end
+
+        def get_builds_for_beta_group(group_id: nil)
+          raise "group_id is nil" if group_id.nil?
+
+          test_flight_request_client.get("betaGroups/#{group_id}/builds")
+        end
+
         #
         # betaTesters
         #
@@ -275,6 +299,19 @@ module Spaceship
           }
 
           test_flight_request_client.delete("betaTesters/#{beta_tester_id}/relationships/betaGroups", nil, body)
+        end
+
+        def delete_beta_testers_from_app(beta_tester_ids: [], app_id: nil)
+          body = {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.delete("apps/#{app_id}/relationships/betaTesters", nil, body)
         end
 
         #

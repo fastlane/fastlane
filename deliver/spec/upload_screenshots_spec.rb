@@ -2,96 +2,6 @@ require 'deliver/upload_screenshots'
 require 'fakefs/spec_helpers'
 
 describe Deliver::UploadScreenshots do
-  describe "#collect_screenshots_for_languages (screenshot collection)" do
-    include(FakeFS::SpecHelpers)
-
-    def add_screenshot(file)
-      FileUtils.mkdir_p(File.dirname(file))
-      File.open(file, 'w') { |f| f << 'touch' }
-    end
-
-    def collect_screenshots_from_dir(dir)
-      Deliver::UploadScreenshots.new.collect_screenshots_for_languages(dir, false)
-    end
-
-    before do
-      FakeFS::FileSystem.clone(File.join(Spaceship::ROOT, "lib", "assets", "displayFamilies.json"))
-      allow(FastImage).to receive(:size) do |path|
-        path.match(/{([0-9]+)x([0-9]+)}/).captures.map(&:to_i)
-      end
-    end
-
-    it "should not find any screenshots when the directory is empty" do
-      screenshots = collect_screenshots_from_dir("/Screenshots")
-      expect(screenshots.count).to eq(0)
-    end
-
-    it "should find screenshot when present in the directory" do
-      add_screenshot("/Screenshots/en-GB/iPhone8-01First{750x1334}.jpg")
-      screenshots = collect_screenshots_from_dir("/Screenshots/")
-      expect(screenshots.count).to eq(1)
-      expect(screenshots.first.screen_size).to eq(Deliver::AppScreenshot::ScreenSize::IOS_47)
-    end
-
-    it "should not collect iPhone XR screenshots" do
-      add_screenshot("/Screenshots/en-GB/iPhoneXR-01First{828x1792}.jpg")
-      screenshots = collect_screenshots_from_dir("/Screenshots/")
-      expect(screenshots.count).to eq(0)
-    end
-
-    it "should find different languages" do
-      add_screenshot("/Screenshots/en-GB/iPhone8-01First{750x1334}.jpg")
-      add_screenshot("/Screenshots/fr-FR/iPhone8-01First{750x1334}.jpg")
-      screenshots = collect_screenshots_from_dir("/Screenshots")
-      expect(screenshots.count).to eq(2)
-      expect(screenshots.group_by(&:language).keys).to include("en-GB", "fr-FR")
-    end
-
-    it "should not collect regular screenshots if framed varieties exist" do
-      add_screenshot("/Screenshots/en-GB/iPhone8-01First{750x1334}.jpg")
-      add_screenshot("/Screenshots/en-GB/iPhone8-01First{750x1334}_framed.jpg")
-      screenshots = collect_screenshots_from_dir("/Screenshots/")
-      expect(screenshots.count).to eq(1)
-      expect(screenshots.first.path).to eq("/Screenshots/en-GB/iPhone8-01First{750x1334}_framed.jpg")
-    end
-
-    it "should collect Apple Watch screenshots" do
-      add_screenshot("/Screenshots/en-GB/AppleWatch-01First{368x448}.jpg")
-      screenshots = collect_screenshots_from_dir("/Screenshots/")
-      expect(screenshots.count).to eq(1)
-    end
-
-    it "should continue to collect Apple Watch screenshots even when framed iPhone screenshots exist" do
-      add_screenshot("/Screenshots/en-GB/AppleWatch-01First{368x448}.jpg")
-      add_screenshot("/Screenshots/en-GB/iPhone8-01First{750x1334}.jpg")
-      add_screenshot("/Screenshots/en-GB/iPhone8-01First{750x1334}_framed.jpg")
-      screenshots = collect_screenshots_from_dir("/Screenshots/")
-      expect(screenshots.count).to eq(2)
-      expect(screenshots.group_by(&:device_type).keys).to include("APP_WATCH_SERIES_4", "APP_IPHONE_47")
-    end
-
-    it "should support special appleTV directory" do
-      add_screenshot("/Screenshots/appleTV/en-GB/01First{3840x2160}.jpg")
-      screenshots = collect_screenshots_from_dir("/Screenshots/")
-      expect(screenshots.count).to eq(1)
-      expect(screenshots.first.device_type).to eq("APP_APPLE_TV")
-    end
-
-    it "should detect iMessage screenshots based on the directory they are contained within" do
-      add_screenshot("/Screenshots/iMessage/en-GB/iPhone8-01First{750x1334}.jpg")
-      screenshots = collect_screenshots_from_dir("/Screenshots/")
-      expect(screenshots.count).to eq(1)
-      expect(screenshots.first.is_messages?).to be_truthy
-    end
-
-    it "should raise an error if unsupported screenshot sizes are in iMessage directory" do
-      add_screenshot("/Screenshots/iMessage/en-GB/AppleTV-01First{3840x2160}.jpg")
-      expect do
-        collect_screenshots_from_dir("/Screenshots/")
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Unsupported screen size [3840, 2160] for path '/Screenshots/iMessage/en-GB/AppleTV-01First{3840x2160}.jpg'")
-    end
-  end
-
   describe '#delete_screenshots' do
     context 'when localization has a screenshot' do
       it 'should delete screenshots that AppScreenshotIterator gives' do
@@ -267,6 +177,35 @@ describe Deliver::UploadScreenshots do
                                       language: 'en-US',
                                       device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
         screenshots_per_language = { 'en-US' => [*Array.new(10, uploaded_local_screenshot), new_local_screenshot] }
+        allow(described_class).to receive(:calculate_checksum).with(uploaded_local_screenshot.path).and_return('checksum')
+        allow(described_class).to receive(:calculate_checksum).with(new_local_screenshot.path).and_return('another_checksum')
+
+        expect(app_screenshot_set).to_not(receive(:upload_screenshot))
+        subject.upload_screenshots([localization], screenshots_per_language)
+      end
+    end
+
+    context 'when localization has 10 screenshots uploaded already and try inserting another new screenshot to the top of the list' do
+      it 'should skip new screenshot' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot',
+                                source_file_checksum: 'checksum')
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: Array.new(10, app_screenshot))
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        uploaded_local_screenshot = double('Deliver::AppScreenshot',
+                                           path: 'screenshot.jpg',
+                                           language: 'en-US',
+                                           device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        new_local_screenshot = double('Deliver::AppScreenshot',
+                                      path: '0_screenshot.jpg',
+                                      language: 'en-US',
+                                      device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+
+        # The new screenshot appears prior to others in the iterator
+        screenshots_per_language = { 'en-US' => [new_local_screenshot, *Array.new(10, uploaded_local_screenshot)] }
         allow(described_class).to receive(:calculate_checksum).with(uploaded_local_screenshot.path).and_return('checksum')
         allow(described_class).to receive(:calculate_checksum).with(new_local_screenshot.path).and_return('another_checksum')
 

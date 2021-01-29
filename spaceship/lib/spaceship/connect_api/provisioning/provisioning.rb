@@ -36,13 +36,56 @@ module Spaceship
           provisioning_request_client.get("certificates", params)
         end
 
+        def get_certificate(certificate_id: nil, includes: nil)
+          params = provisioning_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
+          provisioning_request_client.get("certificates/#{certificate_id}", params)
+        end
+
+        def post_certificate(attributes: {})
+          body = {
+            data: {
+              attributes: attributes,
+              type: "certificates"
+            }
+          }
+
+          provisioning_request_client.post("certificates", body)
+        end
+
+        def delete_certificate(certificate_id: nil)
+          raise "Certificate id is nil" if certificate_id.nil?
+
+          provisioning_request_client.delete("certificates/#{certificate_id}")
+        end
+
         #
         # devices
         #
 
-        def get_devices(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_devices(profile_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = provisioning_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          provisioning_request_client.get("devices", params)
+          if profile_id.nil?
+            provisioning_request_client.get("devices", params)
+          else
+            provisioning_request_client.get("profiles/#{profile_id}/devices", params)
+          end
+        end
+
+        def post_device(name: nil, platform: nil, udid: nil)
+          attributes = {
+            name: name,
+            platform: platform,
+            udid: udid
+          }
+
+          body = {
+            data: {
+              attributes: attributes,
+              type: "devices"
+            }
+          }
+
+          provisioning_request_client.post("devices", body)
         end
 
         #

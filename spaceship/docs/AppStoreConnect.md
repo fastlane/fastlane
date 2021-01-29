@@ -60,11 +60,11 @@ Spaceship::ConnectAPI::App.all.collect do |app|
 end
 
 # Create a new app
-// Not working yet
+# Currently only works with Apple ID login (not API Key)
 app = Spaceship::ConnectAPI::App.create(name: "App Name",
-                                        primary_language: "English",
                                         version_string: "1.0", # initial version
                                         sku: "123",
+                                        primary_locale: "English",
                                         bundle_id: "com.krausefx.app",
                                         platforms: ["IOS"])
 ```
@@ -88,21 +88,21 @@ app.update_price_tier!("3")
 
 <img src="/spaceship/assets/docs/AppVersions.png" width="500">
 
-You can have up to 2 app versions at the same time. One is usually the version already available in the App Store (`live_version`) and one being the one you can edit (`edit_version`).
+You can have up to 2 app versions at the same time. One is usually the version already available in the App Store (`get_live_app_store_version`) and one being the one you can edit (`get_edit_app_store_version`).
 
 While you usually can modify some values in the production version (e.g. app description), most options are already locked.
 
 With _spaceship_ you can access the versions like this
 
 ```ruby
-app.live_version # the version that's currently available in the App Store
-app.edit_version # the version that's in `Prepare for Submission` mode
+app.get_live_app_store_version # the version that's currently available in the App Store
+app.get_edit_app_store_version # the version that's in `Prepare for Submission` mode
 ```
 
 You can then go ahead and modify app metadata on the version objects:
 
 ```ruby
-v = app.edit_version
+v = app.get_edit_app_store_version
 
 # Access information
 v.app_status        # => "Waiting for Review"
@@ -211,7 +211,7 @@ attr_reader :screenshots
 ### Select a build for review
 
 ```ruby
-version = app.edit_version
+version = app.get_edit_app_store_version
 
 builds = version.candidate_builds
 version.select_build(builds.first)

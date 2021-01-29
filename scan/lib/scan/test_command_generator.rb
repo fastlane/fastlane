@@ -38,6 +38,9 @@ module Scan
       if config[:derived_data_path] && !options.include?("-derivedDataPath #{config[:derived_data_path].shellescape}")
         options << "-derivedDataPath #{config[:derived_data_path].shellescape}"
       end
+      if config[:use_system_scm] && !options.include?("-scmProvider system")
+        options << "-scmProvider system"
+      end
       options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
       if FastlaneCore::Helper.xcode_at_least?(10)
         options << "-parallel-testing-worker-count #{config[:concurrent_workers]}" if config[:concurrent_workers]

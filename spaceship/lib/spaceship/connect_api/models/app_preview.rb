@@ -45,8 +45,9 @@ module Spaceship
       # API
       #
 
-      def self.get(app_preview_id: nil)
-        Spaceship::ConnectAPI.get_app_preview(app_preview_id: app_preview_id).first
+      def self.get(client: nil, app_preview_id: nil)
+        client ||= Spaceship::ConnectAPI
+        client.get_app_preview(app_preview_id: app_preview_id).first
       end
 
       # Creates an AppPreview in an AppPreviewSet
@@ -54,7 +55,8 @@ module Spaceship
       # @param app_preview_set_id The AppPreviewSet id
       # @param path The path of the file
       # @param frame_time_code The time code for the preview still frame (ex: "00:00:07:01")
-      def self.create(app_preview_set_id: nil, path: nil, wait_for_processing: true, frame_time_code: nil)
+      def self.create(client: nil, app_preview_set_id: nil, path: nil, wait_for_processing: true, frame_time_code: nil)
+        client ||= Spaceship::ConnectAPI
         require 'faraday'
 
         filename = File.basename(path)
@@ -67,7 +69,7 @@ module Spaceship
         }
 
         # Create placeholder
-        preview = Spaceship::ConnectAPI.post_app_preview(
+        preview = client.post_app_preview(
           app_preview_set_id: app_preview_set_id,
           attributes: post_attributes
         ).first
@@ -83,14 +85,14 @@ module Spaceship
         }
 
         begin
-          preview = Spaceship::ConnectAPI.patch_app_preview(
+          preview = client.patch_app_preview(
             app_preview_id: preview.id,
             attributes: patch_attributes
           ).first
         rescue => error
           puts("Failed to patch app preview. Update may have gone through so verifying") if Spaceship::Globals.verbose?
 
-          preview = Spaceship::ConnectAPI::AppPreview.get(app_preview_id: preview.id)
+          preview = Spaceship::ConnectAPI::AppPreview.get(client: client, app_preview_id: preview.id)
           raise error unless preview.complete?
         end
 
@@ -111,20 +113,22 @@ module Spaceship
             puts("Waiting #{sleep_time} seconds before checking status of processing...") if Spaceship::Globals.verbose?
             sleep(sleep_time)
 
-            preview = Spaceship::ConnectAPI::AppPreview.get(app_preview_id: preview.id)
+            preview = Spaceship::ConnectAPI::AppPreview.get(client: client, app_preview_id: preview.id)
           end
         end
 
         preview
       end
 
-      def update(attributes: nil)
+      def update(client: nil, attributes: nil)
+        client ||= Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
-        Spaceship::ConnectAPI.patch_app_preview(app_preview_id: id, attributes: attributes).first
+        client.patch_app_preview(app_preview_id: id, attributes: attributes).first
       end
 
-      def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI.delete_app_preview(app_preview_id: id)
+      def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_app_preview(app_preview_id: id)
       end
     end
   end

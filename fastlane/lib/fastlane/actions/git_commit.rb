@@ -11,7 +11,11 @@ module Fastlane
         skip_git_hooks = params[:skip_git_hooks] ? '--no-verify' : ''
 
         if params[:allow_nothing_to_commit]
-          repo_clean = Actions.sh("git status --porcelain").empty?
+          # Here we check if the path passed in parameter contains any modification
+          # and we skip the `git commit` command if there is none.
+          # That means you can have other files modified that are not in the path parameter
+          # and still make use of allow_nothing_to_commit.
+          repo_clean = Actions.sh("git status #{paths} --porcelain").empty?
           UI.success("Nothing to commit, working tree clean ✅.") if repo_clean
           return if repo_clean
         end
@@ -42,7 +46,7 @@ module Fastlane
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :allow_nothing_to_commit,
-                                       description: "Set to true to allow commit without any git changes",
+                                       description: "Set to true to allow commit without any git changes in the files you want to commit",
                                        type: Boolean,
                                        optional: true)
         ]

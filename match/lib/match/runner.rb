@@ -55,7 +55,9 @@ module Match
         readonly: params[:readonly],
         username: params[:readonly] ? nil : params[:username], # only pass username if not readonly
         team_id: params[:team_id],
-        team_name: params[:team_name]
+        team_name: params[:team_name],
+        api_key_path: params[:api_key_path],
+        api_key: params[:api_key]
       })
       storage.download
 
@@ -67,7 +69,7 @@ module Match
       encryption.decrypt_files if encryption
 
       unless params[:readonly]
-        self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
+        self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name], api_token(params))
         if params[:type] == "enterprise" && !Spaceship.client.in_house?
           UI.user_error!("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
         end
@@ -100,7 +102,7 @@ module Match
       end
 
       cert_ids << cert_id
-      spaceship.certificates_exists(username: params[:username], certificate_ids: cert_ids, platform: params[:platform]) if spaceship
+      spaceship.certificates_exists(username: params[:username], certificate_ids: cert_ids) if spaceship
 
       # Provisioning Profiles
       unless params[:skip_provisioning_profiles]
@@ -135,6 +137,12 @@ module Match
       storage.clear_changes if storage
     end
     # rubocop:enable Metrics/PerceivedComplexity
+
+    def api_token(params)
+      @api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
+      return @api_token
+    end
 
     # Used when creating a new certificate or profile
     def prefixed_working_directory
@@ -316,22 +324,42 @@ module Match
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
-      portal_profile = Spaceship.provisioning_profile.all.detect { |i| i.uuid == uuid }
+
+      all_profiles = Spaceship::ConnectAPI::Profile.all(includes: "devices")
+      portal_profile = all_profiles.detect { |i| i.uuid == uuid }
 
       if portal_profile
-        profile_device_count = portal_profile.devices.count
+        profile_device_count = portal_profile.fetch_all_devices.count
 
-        portal_device_count =
+        device_classes =
           case platform
           when :ios
-            Spaceship.device.all_ios_profile_devices.count
+            [
+              Spaceship::ConnectAPI::Device::DeviceClass::IPAD,
+              Spaceship::ConnectAPI::Device::DeviceClass::IPHONE,
+              Spaceship::ConnectAPI::Device::DeviceClass::IPOD,
+              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH
+            ]
           when :tvos
-            Spaceship.device.all_apple_tvs.count
+            [
+              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV
+            ]
           when :mac, :catalyst
-            Spaceship.device.all_macs.count
+            [
+              Spaceship::ConnectAPI::Device::DeviceClass::MAC
+            ]
           else
-            Spaceship.device.all.count
+            []
           end
+
+        devices = Spaceship::ConnectAPI::Device.all
+        unless device_classes.empty?
+          devices = devices.select do |device|
+            device_classes.include?(device.device_class) && device.enabled?
+          end
+        end
+
+        portal_device_count = devices.size
 
         return portal_device_count != profile_device_count
       end

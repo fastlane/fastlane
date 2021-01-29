@@ -1,8 +1,8 @@
 // MatchfileProtocol.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 public protocol MatchfileProtocol: class {
-    /// Define the profile type, can be appstore, adhoc, development, enterprise, developer_id
+    /// Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution
     var type: String { get }
 
     /// Create additional cert types needed for macOS installers (valid values: mac_installer_distribution, developer_id_installer)
@@ -17,11 +17,17 @@ public protocol MatchfileProtocol: class {
     /// Skip syncing provisioning profiles
     var skipProvisioningProfiles: Bool { get }
 
-    /// The bundle identifier(s) of your app (comma-separated)
+    /// The bundle identifier(s) of your app (comma-separated string or array of strings)
     var appIdentifier: [String] { get }
 
+    /// Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+    var apiKeyPath: String? { get }
+
+    /// Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
+    var apiKey: [String: Any]? { get }
+
     /// Your Apple ID Username
-    var username: String { get }
+    var username: String? { get }
 
     /// The ID of your Developer Portal team if you're in multiple teams
     var teamId: String? { get }
@@ -53,7 +59,7 @@ public protocol MatchfileProtocol: class {
     /// Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
     var gitBasicAuthorization: String? { get }
 
-    /// Use a bearer authorization header to access the git repo (e.g.: access to an Azure Devops repository), usually a string in Base64
+    /// Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64
     var gitBearerAuthorization: String? { get }
 
     /// Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof
@@ -86,7 +92,7 @@ public protocol MatchfileProtocol: class {
     /// Keychain the items should be imported to
     var keychainName: String { get }
 
-    /// This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password
+    /// This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
     var keychainPassword: String? { get }
 
     /// Renew the provisioning profiles every time you run match
@@ -116,8 +122,14 @@ public protocol MatchfileProtocol: class {
     /// Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
     var failOnNameTaken: Bool { get }
 
+    /// Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action
+    var skipCertificateMatching: Bool { get }
+
     /// Path in which to export certificates, key and profile
     var outputPath: String? { get }
+
+    /// Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
+    var skipSetPartitionList: Bool { get }
 
     /// Print out extra information and all commands
     var verbose: Bool { get }
@@ -130,7 +142,9 @@ public extension MatchfileProtocol {
     var generateAppleCerts: Bool { return true }
     var skipProvisioningProfiles: Bool { return false }
     var appIdentifier: [String] { return [] }
-    var username: String { return "" }
+    var apiKeyPath: String? { return nil }
+    var apiKey: [String: Any]? { return nil }
+    var username: String? { return nil }
     var teamId: String? { return nil }
     var teamName: String? { return nil }
     var storageMode: String { return "git" }
@@ -162,10 +176,12 @@ public extension MatchfileProtocol {
     var templateName: String? { return nil }
     var profileName: String? { return nil }
     var failOnNameTaken: Bool { return false }
+    var skipCertificateMatching: Bool { return false }
     var outputPath: String? { return nil }
+    var skipSetPartitionList: Bool { return false }
     var verbose: Bool { return false }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.40]
+// FastlaneRunnerAPIVersion [0.9.52]

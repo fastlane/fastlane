@@ -322,9 +322,15 @@ module FastlaneCore
       proj << "-configuration #{options[:configuration].shellescape}" if options[:configuration]
       proj << "-derivedDataPath #{options[:derived_data_path].shellescape}" if options[:derived_data_path]
       proj << "-xcconfig #{options[:xcconfig].shellescape}" if options[:xcconfig]
+      proj << "-scmProvider system" if options[:use_system_scm]
 
-      if FastlaneCore::Helper.xcode_at_least?('11.0') && options[:cloned_source_packages_path]
+      xcode_at_least_11 = FastlaneCore::Helper.xcode_at_least?('11.0')
+      if xcode_at_least_11 && options[:cloned_source_packages_path]
         proj << "-clonedSourcePackagesDirPath #{options[:cloned_source_packages_path].shellescape}"
+      end
+
+      if xcode_at_least_11 && options[:disable_package_automatic_updates]
+        proj << "-disableAutomaticPackageResolution"
       end
 
       return proj
@@ -350,6 +356,7 @@ module FastlaneCore
     end
 
     def build_xcodebuild_resolvepackagedependencies_command
+      return nil if options[:skip_package_dependencies_resolution]
       command = "xcodebuild -resolvePackageDependencies #{xcodebuild_parameters.join(' ')}"
       command += " 2> /dev/null" if xcodebuild_suppress_stderr
       command
@@ -369,10 +376,16 @@ module FastlaneCore
 
         # SwiftPM support
         if FastlaneCore::Helper.xcode_at_least?('11.0')
-          UI.important("Resolving Swift Package Manager dependencies...")
-          FastlaneCore::CommandExecutor.execute(command: build_xcodebuild_resolvepackagedependencies_command,
-                                                print_all: true,
-                                                print_command: !self.xcodebuild_list_silent)
+          if (command = build_xcodebuild_resolvepackagedependencies_command)
+            UI.important("Resolving Swift Package Manager dependencies...")
+            FastlaneCore::CommandExecutor.execute(
+              command: command,
+              print_all: true,
+              print_command: !self.xcodebuild_list_silent
+            )
+          else
+            UI.important("Skipped Swift Package Manager dependencies resolution.")
+          end
         end
 
         command = build_xcodebuild_showbuildsettings_command

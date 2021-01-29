@@ -8,6 +8,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
   before do
     allow(mock_tunes_client).to receive(:team_id).and_return("123")
     allow(mock_tunes_client).to receive(:select_team)
+    allow(mock_tunes_client).to receive(:csrf_tokens)
     allow(Spaceship::TunesClient).to receive(:login).and_return(mock_tunes_client)
     Spaceship::ConnectAPI.login(username, password, use_portal: false, use_tunes: true)
   end
@@ -393,6 +394,29 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
           client.add_beta_groups_to_build(build_id: build_id, beta_group_ids: beta_group_ids)
         end
       end
+
+      context 'patch_beta_groups' do
+        let(:path) { "betaGroups" }
+        let(:beta_group_id) { "123" }
+        let(:attributes) { { public_link_enabled: false } }
+        let(:body) do
+          {
+            data: {
+                attributes: attributes,
+                id: beta_group_id,
+                type: "betaGroups"
+              }
+          }
+        end
+
+        it 'succeeds' do
+          url = "#{path}/#{beta_group_id}"
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:patch).and_yield(req_mock)
+          client.patch_group(group_id: beta_group_id, attributes: attributes)
+        end
+      end
     end
 
     describe "betaTesters" do
@@ -497,6 +521,29 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
           expect(client).to receive(:request).with(:delete).and_yield(req_mock)
           client.delete_beta_tester_from_beta_groups(beta_tester_id: beta_tester_id, beta_group_ids: beta_group_ids)
+        end
+      end
+
+      context "delete_beta_testers_from_app" do
+        let(:app_id) { "123" }
+        let(:beta_tester_ids) { ["1234", "5678"] }
+        let(:path) { "apps/#{app_id}/relationships/betaTesters" }
+        let(:body) do
+          {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+        end
+
+        it "succeeds" do
+          url = path
+          req_mock = test_request_body(url, body)
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock)
+          client.delete_beta_testers_from_app(beta_tester_ids: beta_tester_ids, app_id: app_id)
         end
       end
     end

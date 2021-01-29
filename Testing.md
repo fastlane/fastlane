@@ -93,7 +93,7 @@ bundle update
 in your project’s root directory. After doing so, you can verify you’re using the local version by running
 
 ```
-bundle show fastlane
+bundle info fastlane
 ```
 
 which should print out the path to your local development environment.

@@ -42,9 +42,14 @@ module Match
       # while on Git we recommend using the git branch instead. As there is
       # no concept of branches in Google Cloud Storage (omg thanks), we use
       # the team id properly
-      spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name])
+      spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name], api_token(params))
       team_id = spaceship.team_id
-      UI.message("Detected team ID '#{team_id}' to use for Google Cloud Storage...")
+
+      if team_id.to_s.empty?
+        UI.user_error!("The `team_id` option is required. fastlane cannot automatically determine portal team id via the App Store Connect API (yet)")
+      else
+        UI.message("Detected team ID '#{team_id}' to use for Google Cloud Storage...")
+      end
 
       files_to_commit = []
       Dir.chdir(git_storage.working_directory) do
@@ -83,6 +88,12 @@ module Match
       UI.success("You can also remove the `git_url`, as well as any other git related configurations from your Fastfile and Matchfile")
       UI.message("")
       UI.input("Please make sure to read the above and confirm with enter")
+    end
+
+    def api_token(params)
+      @api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
+      return @api_token
     end
 
     def ensure_parameters_are_valid(params)

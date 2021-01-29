@@ -67,7 +67,33 @@ describe Spaceship::Client do
   describe 'handle_two_factor' do
     let(:trusted_devices_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'client_appleauth_auth_2fa_response.json'), encoding: 'utf-8')) }
     let(:no_trusted_devices_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_no_trusted_devices.json'), encoding: 'utf-8')) }
+    let(:no_trusted_devices_voice_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_voice_no_trusted_devices.json'), encoding: 'utf-8')) }
     let(:no_trusted_devices_two_numbers_response) { JSON.parse(File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_no_trusted_devices_two_numbers.json'), encoding: 'utf-8')) }
+
+    context 'when running non-interactive' do
+      it 'raises an error' do
+        ENV["FASTLANE_IS_INTERACTIVE"] = "false"
+        expect { subject.handle_two_step_or_factor("response") }.to raise_error("2FA can only be performed in interactive mode")
+      end
+    end
+
+    context 'when running interactive' do
+      it 'does not raise an error' do
+        ENV["FASTLANE_IS_INTERACTIVE"] = "true"
+        expect(subject).to receive(:handle_two_factor)
+        stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
+        subject.handle_two_step_or_factor("response")
+      end
+    end
+
+    context 'when interactive mode is not set' do
+      it 'does not raise an error' do
+        ENV["FASTLANE_IS_INTERACTIVE"] = nil
+        expect(subject).to receive(:handle_two_factor)
+        stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
+        subject.handle_two_step_or_factor("response")
+      end
+    end
 
     context 'when SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER is not set' do
       context 'with trusted devices' do
@@ -112,6 +138,18 @@ describe Spaceship::Client do
             expect(WebMock).to have_not_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone')
             expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode')
             expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: 1 }, mode: "sms" })
+          end
+
+          it "does not request sms code, and sends the correct request with voice" do
+            response = OpenStruct.new
+            response.body = no_trusted_devices_voice_response
+
+            bool = subject.handle_two_factor(response)
+            expect(bool).to eq(true)
+
+            expect(WebMock).to have_not_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone')
+            expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode')
+            expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: 1 }, mode: "voice" })
           end
         end
 
@@ -224,9 +262,7 @@ describe Spaceship::Client do
 
           # making sure we use env var for phone number selection
           it 'does not prompt user to choose number' do
-            # rubocop:disable Style/MethodCallWithArgsParentheses
             expect(subject).not_to receive(:choose_phone_number)
-            # rubocop:enable Style/MethodCallWithArgsParentheses
 
             bool = subject.handle_two_factor(response)
             expect(bool).to eq(true)
