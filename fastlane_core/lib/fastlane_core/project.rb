@@ -75,6 +75,9 @@ module FastlaneCore
     # Gets rid of annoying plugin info warnings.
     attr_accessor :xcodebuild_suppress_stderr
 
+    # @param options [FastlaneCore::Configuration|Hash] a set of configuration to run xcodebuild to work out build settings
+    # @param xcodebuild_list_silent [Boolean] a flag to silent xcodebuild command's output
+    # @param xcodebuild_suppress_stderr [Boolean] a flag to supress output to stderr from xcodebuild
     def initialize(options, xcodebuild_list_silent: false, xcodebuild_suppress_stderr: false)
       @options = options
       @path = File.expand_path(self.options[:workspace] || self.options[:project])
