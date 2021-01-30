@@ -95,6 +95,11 @@ module FastlaneCore
       @options.kind_of?(FastlaneCore::Configuration) ? @options.values : @options
     end
 
+    def options=(new_value)
+      UI.deprecated('Update `options` is not worth doing since it can change behavior of this object entirely. Consider re-creating FastlaneCore::Project.')
+      @options = new_value
+    end
+
     def workspace?
       self.is_workspace
     end
