@@ -77,10 +77,10 @@ module FastlaneCore
 
     def initialize(options, xcodebuild_list_silent: false, xcodebuild_suppress_stderr: false)
       @options = options
-      self.path = File.expand_path(options[:workspace] || options[:project])
-      self.is_workspace = (options[:workspace].to_s.length > 0)
-      self.xcodebuild_list_silent = xcodebuild_list_silent
-      self.xcodebuild_suppress_stderr = xcodebuild_suppress_stderr
+      @path = File.expand_path(options[:workspace] || options[:project])
+      @is_workspace = (options[:workspace].to_s.length > 0)
+      @xcodebuild_list_silent = xcodebuild_list_silent
+      @xcodebuild_suppress_stderr = xcodebuild_suppress_stderr
 
       if !path || !File.directory?(path)
         UI.user_error!("Could not find project at path '#{path}'")
