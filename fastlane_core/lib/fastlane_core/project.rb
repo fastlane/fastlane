@@ -77,8 +77,8 @@ module FastlaneCore
 
     def initialize(options, xcodebuild_list_silent: false, xcodebuild_suppress_stderr: false)
       @options = options
-      @path = File.expand_path(options[:workspace] || options[:project])
-      @is_workspace = (options[:workspace].to_s.length > 0)
+      @path = File.expand_path(self.options[:workspace] || self.options[:project])
+      @is_workspace = (self.options[:workspace].to_s.length > 0)
       @xcodebuild_list_silent = xcodebuild_list_silent
       @xcodebuild_suppress_stderr = xcodebuild_suppress_stderr
 
