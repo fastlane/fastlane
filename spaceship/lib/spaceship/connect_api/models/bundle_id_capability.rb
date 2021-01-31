@@ -41,6 +41,21 @@ module Spaceship
         MARZIPAN = "MARZIPAN" # Catalyst
       end
 
+      module Settings
+        ICLOUD_VERSION = "ICLOUD_VERSION"
+        DATA_PROTECTION_PERMISSION_LEVEL = "DATA_PROTECTION_PERMISSION_LEVEL"
+        APPLE_ID_AUTH_APP_CONSENT = "APPLE_ID_AUTH_APP_CONSENT"
+      end
+
+      module Options
+        XCODE_5 = "XCODE_5"
+        XCODE_6 = "XCODE_6"
+        COMPLETE_PROTECTION = "COMPLETE_PROTECTION"
+        PROTECTED_UNLESS_OPEN = "PROTECTED_UNLESS_OPEN"
+        PROTECTED_UNTIL_FIRST_USER_AUTH = "PROTECTED_UNTIL_FIRST_USER_AUTH"
+        PRIMARY_APP_CONSENT = "PRIMARY_APP_CONSENT"
+      end
+
       def self.type
         return "bundleIdCapabilities"
       end
@@ -59,14 +74,26 @@ module Spaceship
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def self.all(client: nil, bundle_id_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        raise "bundle_id_id is required " if bundle_id_id.nil?
+
         client ||= Spaceship::ConnectAPI
-        return client.get_users(filter: filter, includes: includes)
+        resp = client.get_bundle_id_capabilities(bundle_id_id: bundle_id_id, filter: filter, includes: includes).all_pages
+        return resp.flat_map(&:to_models)
       end
 
-      def self.find(client: nil, email: nil, includes: nil)
+      def self.create(client: nil, bundle_id_id: nil, capability_type: nil, settings: [])
+        raise "bundle_id_id is required " if bundle_id_id.nil?
+        raise "capability_type is required " if capability_type.nil?
+
         client ||= Spaceship::ConnectAPI
-        return all(client: client, filter: { email: email }, includes: includes)
+        resp = client.post_bundle_id_capability(bundle_id_id: bundle_id_id, capability_type: capability_type, settings: settings)
+        return resp.to_models.first
+      end
+
+      def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_bundle_id_capability(bundle_id_capability_id: id)
       end
     end
   end
