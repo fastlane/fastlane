@@ -20,6 +20,7 @@ module Fastlane
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
         cmd << '--clean-install' if params[:clean_install] && pod_version(params).to_f >= 1.7
+        cmd << '--allow-root' if params[:allow_root] && pod_version(params).to_f >= 1.10
         cmd << '--repo-update' if params[:repo_update]
         cmd << '--silent' if params[:silent]
         cmd << '--verbose' if params[:verbose]
@@ -120,6 +121,13 @@ module Fastlane
                                        is_string: false,
                                        default_value: false,
                                        type: Boolean),
+           FastlaneCore::ConfigItem.new(key: :allow_root,
+                                        env_name: "FL_COCOAPODS_ALLOW_ROOT",
+                                        description: 'Allows CocoaPods to run as root',
+                                        optional: true,
+                                        is_string: false,
+                                        default_value: false,
+                                        type: Boolean),
 
           # Deprecated
           FastlaneCore::ConfigItem.new(key: :clean,
