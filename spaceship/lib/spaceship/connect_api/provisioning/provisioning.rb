@@ -27,6 +27,23 @@ module Spaceship
           provisioning_request_client.get("bundleIds/#{bundle_id_id}", params)
         end
 
+        def post_bundle_id(name: nil, platform: nil, identifier: nil, seed_id: nil)
+          attributes = {
+            name: name,
+            platform: platform,
+            identifier: identifier,
+            seedId: seed_id
+          }
+
+          body = {
+            data: {
+              attributes: attributes,
+              type: "bundleIds"
+            }
+          }
+
+          provisioning_request_client.post("bundleIds", body)
+        end
         #
         # certificates
         #
