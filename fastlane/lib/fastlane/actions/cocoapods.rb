@@ -1,6 +1,7 @@
 module Fastlane
   module Actions
     class CocoapodsAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         Actions.verify_gem!('cocoapods')
         cmd = []
@@ -121,13 +122,13 @@ module Fastlane
                                        is_string: false,
                                        default_value: false,
                                        type: Boolean),
-           FastlaneCore::ConfigItem.new(key: :allow_root,
-                                        env_name: "FL_COCOAPODS_ALLOW_ROOT",
-                                        description: 'Allows CocoaPods to run as root',
-                                        optional: true,
-                                        is_string: false,
-                                        default_value: false,
-                                        type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :allow_root,
+                                       env_name: "FL_COCOAPODS_ALLOW_ROOT",
+                                       description: 'Allows CocoaPods to run as root',
+                                       optional: true,
+                                       is_string: false,
+                                       default_value: false,
+                                       type: Boolean),
 
           # Deprecated
           FastlaneCore::ConfigItem.new(key: :clean,
