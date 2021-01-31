@@ -33,7 +33,7 @@ module Fastlane
         cmd << "--cache-builds" if params[:cache_builds]
         cmd << "--new-resolver" if params[:new_resolver]
         cmd << "--log-path #{params[:log_path]}" if params[:log_path]
-        cmd << "--archive #{params[:archive]}" if params[:archive]
+        cmd << "--archive" if params[:archive]
 
         Actions.sh(cmd.join(' '))
       end
