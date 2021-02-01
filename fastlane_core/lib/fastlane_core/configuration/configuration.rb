@@ -243,6 +243,12 @@ module FastlaneCore
       while value.nil?
         UI.important("To not be asked about this value, you can specify it using '#{option.key}'") if ENV["FASTLANE_ONBOARDING_IN_PROCESS"].to_s.length == 0
         value = option.sensitive ? UI.password("#{option.description}: ") : UI.input("#{option.description}: ")
+
+        # ConfigItem allows to specify a type for the item but UI.password and
+        # UI.input return String values. Try to convert the String input to
+        # the option's type before passing it along.
+        value = option.auto_convert_value(value)
+
         # Also store this value to use it from now on
         begin
           set(key, value)
