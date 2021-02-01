@@ -247,7 +247,7 @@ module FastlaneCore
         begin
           set(key, value)
         rescue => ex
-          puts(ex)
+          UI.error(ex)
           value = nil
         end
       end
