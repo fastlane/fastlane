@@ -693,28 +693,60 @@ describe FastlaneCore do
             expect(@config[:cert_name]).to eq("production_default")
           end
 
-          it "auto converts the value after asking the user for one" do
-            allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
-            allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
-            allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+          describe "auto converting the value after asking the user for one" do
+            before(:each) do
+              allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+              allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
+              allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+            end
 
-            # Taken from match/options.rb
-            config_item = FastlaneCore::ConfigItem.new(key: :app_identifiers,
-                                     short_option: "-a",
-                                     env_name: "MATCH_APP_IDENTIFIER",
-                                     description: "The bundle identifier(s) of your app (comma-separated)",
-                                     is_string: false,
-                                     type: Array, # we actually allow String and Array here
-                                     skip_type_validation: true,
-                                     code_gen_sensitive: true,
-                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
-                                     default_value_dynamic: true)
-            config = FastlaneCore::Configuration.create([config_item], {})
+            it "doesn't show an error and converts the value if the input matches the item type" do
+              config_item = FastlaneCore::ConfigItem.new(key: :item,
+                                                         short_option: "-i",
+                                                         env_name: "ITEM_ENV_VAR",
+                                                         description: "a description",
+                                                         is_string: false,
+                                                         type: Integer,
+                                                         # false is the default, but let's be explicit
+                                                         skip_type_validation: false)
+              config = FastlaneCore::Configuration.create([config_item], {})
 
-            config.set(:app_identifiers, nil)
-            expect(FastlaneCore::UI).to receive(:input).and_return("app.identifier")
-            expect(config[:app_identifiers].class).to eq(Array)
-            expect(config[:app_identifiers]).to eq(["app.identifier"])
+              config.set(:item, nil)
+              expect(FastlaneCore::UI).to receive(:input).once.and_return("123")
+              expect(FastlaneCore::UI).not_to(receive(:error))
+              expect(config[:item].class).to eq(Integer)
+              expect(config[:item]).to eq(123)
+            end
+
+            # It would be good to have a test for the scenario where the user
+            # inserts a value that doesn't match the expected type to verify
+            # we show an error. Unfortunately, because after showing the error
+            # we ask for the value again, we'd be stuck into an infinite loop
+            # in the tests.
+            #
+            # Note that using `.to receive(:input).once` like above is not an
+            # option because that would fail the test in this case.
+
+            it "doesn't show an error when skipping type validation" do
+              # Taken from match/options.rb
+              config_item = FastlaneCore::ConfigItem.new(key: :app_identifiers,
+                                                         short_option: "-a",
+                                                         env_name: "MATCH_APP_IDENTIFIER",
+                                                         description: "The bundle identifier(s) of your app (comma-separated)",
+                                                         is_string: false,
+                                                         type: Array, # we actually allow String and Array here
+                                                         skip_type_validation: true,
+                                                         code_gen_sensitive: true,
+                                                         default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+                                                         default_value_dynamic: true)
+              config = FastlaneCore::Configuration.create([config_item], {})
+
+              config.set(:app_identifiers, nil)
+              expect(FastlaneCore::UI).to receive(:input).once.and_return("app.identifier")
+              expect(FastlaneCore::UI).not_to(receive(:error))
+              expect(config[:app_identifiers].class).to eq(Array)
+              expect(config[:app_identifiers]).to eq(["app.identifier"])
+            end
           end
         end
 
