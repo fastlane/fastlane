@@ -154,7 +154,7 @@ module Scan
     def additional_xctestrun
       return unless Scan.config[:additional_xctestrun]
 
-      # Gets :derived_data_path/Build/Products directory for zipping zip
+      # Gets :derived_data_path/Build/Products directory for coping .xctestrun file
       derived_data_path = Scan.config[:derived_data_path]
       path = File.join(derived_data_path, "Build/Products")
 
