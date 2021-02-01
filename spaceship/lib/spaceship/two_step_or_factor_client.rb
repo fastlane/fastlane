@@ -102,6 +102,10 @@ module Spaceship
     end
 
     def handle_two_factor(response, depth = 0)
+      puts "response tooManyCodesSent  : #{response.body.fetch("securityCode", {})["tooManyCodesSent"]} #{response.body.fetch("securityCode", {})["tooManyCodesSent"] == false} #{response.body.fetch("securityCode", {})["tooManyCodesSent"] == "false"}"
+      if response.body.fetch("securityCode", {})["tooManyCodesSent"]
+        raise Tunes::Error.new, "Too many verification codes have been sent. Enter the last code you received, use one of your devices, or try again later."
+      end
       if depth == 0
         puts("Two-factor Authentication (6 digits code) is enabled for account '#{self.user}'")
         puts("More information about Two-factor Authentication: https://support.apple.com/en-us/HT204915")

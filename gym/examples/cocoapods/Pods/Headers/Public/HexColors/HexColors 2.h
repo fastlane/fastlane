@@ -1,0 +1,1 @@
+../../../HexColors/Classes/HexColors.h
