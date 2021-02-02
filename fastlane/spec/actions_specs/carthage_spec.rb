@@ -349,6 +349,26 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap --cache-builds")
       end
 
+      it "does not add a use_xcframeworks flag to command if use_xcframeworks is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_xcframeworks: false
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap")
+      end
+
+      it "add a use_xcframeworks flag to command if use_xcframeworks is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_xcframeworks: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --use-xcframeworks")
+      end
+
       it "does not set the project directory if none is provided" do
         result = Fastlane::FastFile.new.parse("lane :test do
           carthage
@@ -663,6 +683,53 @@ describe Fastlane do
               end").runner.execute(:test)
               expect(result).to eq("carthage archive")
             end
+          end
+        end
+      end
+
+      context "when specify use_xcframeworks" do
+        context "when command is archive" do
+          let(:command) { 'archive' }
+
+          it "raises an exception" do
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                  carthage(command: '#{command}', use_xcframeworks: true)
+                end").runner.execute(:test)
+            end.to raise_error("Use XCFrameworks option is available only for 'build', 'bootstrap', and 'update' command.")
+          end
+        end
+
+        context "when command is update" do
+          let(:command) { 'update' }
+
+          it "adds the use_xcframeworks option" do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', use_xcframeworks: true)
+              end").runner.execute(:test)
+            expect(result).to eq("carthage update --use-xcframeworks")
+          end
+        end
+
+        context "when command is build" do
+          let(:command) { 'build' }
+
+          it "adds the use_xcframeworks option" do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', use_xcframeworks: true)
+              end").runner.execute(:test)
+            expect(result).to eq("carthage build --use-xcframeworks")
+          end
+        end
+
+        context "when command is bootstrap" do
+          let(:command) { 'bootstrap' }
+
+          it "adds the use_xcframeworks option" do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', use_xcframeworks: true)
+              end").runner.execute(:test)
+            expect(result).to eq("carthage bootstrap --use-xcframeworks")
           end
         end
       end

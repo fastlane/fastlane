@@ -33,6 +33,7 @@ module Fastlane
         cmd << "--cache-builds" if params[:cache_builds]
         cmd << "--new-resolver" if params[:new_resolver]
         cmd << "--log-path #{params[:log_path]}" if params[:log_path]
+        cmd << "--use-xcframeworks" if params[:use_xcframeworks]
 
         Actions.sh(cmd.join(' '))
       end
@@ -49,6 +50,10 @@ module Fastlane
 
         if params[:log_path] && !%w(build bootstrap update).include?(command_name)
           UI.user_error!("Log path option is available only for 'build', 'bootstrap', and 'update' command.")
+        end
+
+        if params[:use_xcframeworks] && !%w(build bootstrap update).include?(command_name)
+          UI.user_error!("Use XCFrameworks option is available only for 'build', 'bootstrap', and 'update' command.")
         end
       end
 
@@ -183,6 +188,11 @@ module Fastlane
                                        env_name: "FL_CARTHAGE_LOG_PATH",
                                        description: "Path to the xcode build output",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :use_xcframeworks,
+                                       env_name: "FL_CARTHAGE_USE_XCFRAMEWORKS",
+                                       description: "Create xcframework bundles instead of one framework per platform (requires Xcode 12+)",
+                                       is_string: false,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :executable,
                                        env_name: "FL_CARTHAGE_EXECUTABLE",
                                        description: "Path to the `carthage` executable on your machine",
