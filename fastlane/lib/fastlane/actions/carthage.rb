@@ -192,6 +192,7 @@ module Fastlane
                                        env_name: "FL_CARTHAGE_ARCHIVE",
                                        description: "Archive built frameworks from the current project",
                                        is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :executable,
                                        env_name: "FL_CARTHAGE_EXECUTABLE",
