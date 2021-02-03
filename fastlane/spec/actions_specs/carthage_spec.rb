@@ -349,6 +349,28 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap --cache-builds")
       end
 
+      it "does not add a xcode_warnings flag to command if xcode_warnings is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'outdated',
+              xcode_warnings: false
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage outdated")
+      end
+
+      it "add a xcode_warnings flag to command if xcode_warnings is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'outdated',
+              xcode_warnings: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage outdated --xcode-warnings")
+      end
+
       it "does not set the project directory if none is provided" do
         result = Fastlane::FastFile.new.parse("lane :test do
           carthage
@@ -659,9 +681,34 @@ describe Fastlane do
               # Stub the environment variable specifying the derived data path
               stub_const('ENV', { 'FL_CARTHAGE_DERIVED_DATA' => './derived_data' })
               result = Fastlane::FastFile.new.parse("lane :test do
-                carthage(command: '#{command}')
-              end").runner.execute(:test)
+                  carthage(command: '#{command}')
+                end").runner.execute(:test)
               expect(result).to eq("carthage archive")
+            end
+          end
+        end
+      end
+
+      context "when specify xcode_warnings" do
+        context "when command is outdated" do
+          let(:command) { 'outdated' }
+
+          it "adds the xcode_warnings option" do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', xcode_warnings: true)
+              end").runner.execute(:test)
+            expect(result).to eq("carthage outdated --xcode-warnings")
+          end
+        end
+
+        context "when xcode_warnings option is present with invalid command" do
+          it "raises an exception" do
+            ['build', 'archive', 'update', 'bootstrap'].each do |command|
+              expect do
+                Fastlane::FastFile.new.parse("lane :test do
+                    carthage(command: '#{command}', archive: true)
+                  end").runner.execute(:test)
+              end.to raise_error("Archive option is available only for 'build' command.")
             end
           end
         end

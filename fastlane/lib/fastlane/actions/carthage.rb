@@ -33,6 +33,7 @@ module Fastlane
         cmd << "--cache-builds" if params[:cache_builds]
         cmd << "--new-resolver" if params[:new_resolver]
         cmd << "--log-path #{params[:log_path]}" if params[:log_path]
+        cmd << "--xcode-warnings" if params[:xcode_warnings]
 
         Actions.sh(cmd.join(' '))
       end
@@ -49,6 +50,10 @@ module Fastlane
 
         if params[:log_path] && !%w(build bootstrap update).include?(command_name)
           UI.user_error!("Log path option is available only for 'build', 'bootstrap', and 'update' command.")
+        end
+
+        if command_name != "outdated" && params[:xcode_warnings]
+          UI.user_error!("Xcode warnings option is available only for 'outdated' command.")
         end
       end
 
@@ -183,6 +188,12 @@ module Fastlane
                                        env_name: "FL_CARTHAGE_LOG_PATH",
                                        description: "Path to the xcode build output",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :xcode_warnings,
+                                       env_name: "FL_CARTHAGE_XCODE_WARNINGS",
+                                       description: "Output Xcode compatible warning messages",
+                                       is_string: false,
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :executable,
                                        env_name: "FL_CARTHAGE_EXECUTABLE",
                                        description: "Path to the `carthage` executable on your machine",
