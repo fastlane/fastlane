@@ -690,30 +690,6 @@ describe Fastlane do
       end
 
       context "when specify archive" do
-        context "when command is archive" do
-          let(:command) { 'archive' }
-
-          it "raises an exception" do
-            expect do
-              Fastlane::FastFile.new.parse("lane :test do
-                  carthage(command: '#{command}', archive: true)
-                end").runner.execute(:test)
-            end.to raise_error("Archive option is available only for 'build' command.")
-          end
-        end
-
-        context "when command is update" do
-          let(:command) { 'update' }
-
-          it "raises an exception" do
-            expect do
-              Fastlane::FastFile.new.parse("lane :test do
-                  carthage(command: '#{command}', archive: true)
-                end").runner.execute(:test)
-            end.to raise_error("Archive option is available only for 'build' command.")
-          end
-        end
-
         context "when command is build" do
           let(:command) { 'build' }
 
@@ -725,15 +701,15 @@ describe Fastlane do
           end
         end
 
-        context "when command is bootstrap" do
-          let(:command) { 'bootstrap' }
-
+        context "when archive option is present with invalid command" do
           it "raises an exception" do
-            expect do
-              Fastlane::FastFile.new.parse("lane :test do
-                  carthage(command: '#{command}', archive: true)
-                end").runner.execute(:test)
-            end.to raise_error("Archive option is available only for 'build' command.")
+            ['archive', 'update', 'bootstrap'].each do |command|
+              expect do
+                Fastlane::FastFile.new.parse("lane :test do
+                    carthage(command: '#{command}', archive: true)
+                  end").runner.execute(:test)
+              end.to raise_error("Archive option is available only for 'build' command.")
+            end
           end
         end
       end
