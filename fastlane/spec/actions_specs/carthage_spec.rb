@@ -708,7 +708,7 @@ describe Fastlane do
                 Fastlane::FastFile.new.parse("lane :test do
                     carthage(command: '#{command}', archive: true)
                   end").runner.execute(:test)
-              end.to raise_error("Archive option is available only for 'build' command.")
+              end.to raise_error("Xcode warnings option is available only for 'outdated' command.")
             end
           end
         end
