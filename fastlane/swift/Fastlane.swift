@@ -6199,7 +6199,6 @@ public func rubyVersion() {
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
-   - additionalXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
@@ -6271,7 +6270,6 @@ public func runTests(workspace: String? = nil,
                      xcprettyArgs: String? = nil,
                      derivedDataPath: String? = nil,
                      shouldZipBuildProducts: Bool = false,
-                     additionalXctestrun: Bool = false,
                      resultBundle: Bool = false,
                      useClangReportName: Bool = false,
                      concurrentWorkers: Int? = nil,
@@ -6341,7 +6339,6 @@ public func runTests(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                              RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
                                                                                              RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
-                                                                                             RubyCommand.Argument(name: "additional_xctestrun", value: additionalXctestrun),
                                                                                              RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                              RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
                                                                                              RubyCommand.Argument(name: "concurrent_workers", value: concurrentWorkers),
@@ -6493,7 +6490,6 @@ public func say(text: Any,
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
-   - additionalXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
@@ -6565,7 +6561,6 @@ public func scan(workspace: Any? = scanfile.workspace,
                  xcprettyArgs: Any? = scanfile.xcprettyArgs,
                  derivedDataPath: Any? = scanfile.derivedDataPath,
                  shouldZipBuildProducts: Bool = scanfile.shouldZipBuildProducts,
-                 additionalXctestrun: Bool = scanfile.additionalXctestrun,
                  resultBundle: Bool = scanfile.resultBundle,
                  useClangReportName: Bool = scanfile.useClangReportName,
                  concurrentWorkers: Int? = scanfile.concurrentWorkers,
@@ -6635,7 +6630,6 @@ public func scan(workspace: Any? = scanfile.workspace,
                                                                                         RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                         RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
                                                                                         RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
-                                                                                        RubyCommand.Argument(name: "additional_xctestrun", value: additionalXctestrun),
                                                                                         RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                         RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
                                                                                         RubyCommand.Argument(name: "concurrent_workers", value: concurrentWorkers),

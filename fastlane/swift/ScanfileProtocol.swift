@@ -110,9 +110,6 @@ public protocol ScanfileProtocol: class {
     /// Should zip the derived data build products and place in output path?
     var shouldZipBuildProducts: Bool { get }
 
-    ///Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
-    var additionalXctestrun: Bool { get }
-
     /// Should an Xcode result bundle be generated in the output directory
     var resultBundle: Bool { get }
 
