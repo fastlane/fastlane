@@ -686,7 +686,7 @@ describe Fastlane do
           end
         end
 
-        context "when valid command is used for --use-xcframeworks option" do
+        context "when --use-xcframeworks option is present with valid command" do
           it "adds the use_xcframeworks option" do
             ['update', 'build', 'bootstrap'].each do |command|
               result = Fastlane::FastFile.new.parse("lane :test do
