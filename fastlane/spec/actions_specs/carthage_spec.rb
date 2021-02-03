@@ -685,51 +685,15 @@ describe Fastlane do
             end
           end
         end
-      end
 
-      context "when specify use_xcframeworks" do
-        context "when command is archive" do
-          let(:command) { 'archive' }
-
-          it "raises an exception" do
-            expect do
-              Fastlane::FastFile.new.parse("lane :test do
-                  carthage(command: '#{command}', use_xcframeworks: true)
-                end").runner.execute(:test)
-            end.to raise_error("Use XCFrameworks option is available only for 'build', 'bootstrap', and 'update' command.")
-          end
-        end
-
-        context "when command is update" do
-          let(:command) { 'update' }
-
+        context "when valid command is used for --use-xcframeworks option" do
           it "adds the use_xcframeworks option" do
-            result = Fastlane::FastFile.new.parse("lane :test do
+            ['update', 'build', 'bootstrap'].each do |command|
+              result = Fastlane::FastFile.new.parse("lane :test do
                 carthage(command: '#{command}', use_xcframeworks: true)
               end").runner.execute(:test)
-            expect(result).to eq("carthage update --use-xcframeworks")
-          end
-        end
-
-        context "when command is build" do
-          let(:command) { 'build' }
-
-          it "adds the use_xcframeworks option" do
-            result = Fastlane::FastFile.new.parse("lane :test do
-                carthage(command: '#{command}', use_xcframeworks: true)
-              end").runner.execute(:test)
-            expect(result).to eq("carthage build --use-xcframeworks")
-          end
-        end
-
-        context "when command is bootstrap" do
-          let(:command) { 'bootstrap' }
-
-          it "adds the use_xcframeworks option" do
-            result = Fastlane::FastFile.new.parse("lane :test do
-                carthage(command: '#{command}', use_xcframeworks: true)
-              end").runner.execute(:test)
-            expect(result).to eq("carthage bootstrap --use-xcframeworks")
+              expect(result).to eq("carthage #{command} --use-xcframeworks")
+            end
           end
         end
       end

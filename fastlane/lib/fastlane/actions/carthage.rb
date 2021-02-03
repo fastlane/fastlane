@@ -191,6 +191,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :use_xcframeworks,
                                        env_name: "FL_CARTHAGE_USE_XCFRAMEWORKS",
                                        description: "Create xcframework bundles instead of one framework per platform (requires Xcode 12+)",
+                                       type: Boolean,
                                        is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :executable,
