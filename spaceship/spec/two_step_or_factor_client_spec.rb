@@ -77,6 +77,17 @@ describe Spaceship::Client do
       end
     end
 
+    context 'when running non-interactive and force 2FA to continue' do
+      it 'raises an error' do
+        ENV["FASTLANE_IS_INTERACTIVE"] = "false"
+        ENV["SPACESHIP_ALLOW_NON_INTERACTIVE_2FA"] = "true"
+        expect(subject).to receive(:handle_two_factor)
+        stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
+        subject.handle_two_step_or_factor("response")
+        ENV.delete('SPACESHIP_ALLOW_NON_INTERACTIVE_2FA')
+      end
+    end
+
     context 'when running interactive' do
       it 'does not raise an error' do
         ENV["FASTLANE_IS_INTERACTIVE"] = "true"
