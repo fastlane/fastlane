@@ -18,7 +18,7 @@ module Spaceship
       uri    = URI.parse(widget_key_location)
       params = CGI.parse(uri.query)
 
-      widget_key = (params['widgetKey'] || []).first
+      widget_key = params.dig('widgetKey', 0)
       if widget_key.nil?
         STDERR.puts("Couldn't find widgetKey to continue with requests")
         return false
@@ -49,7 +49,7 @@ module Spaceship
       request(:get) do |req|
         req.url("https://appleid.apple.com/account/security/upgrade/setuplater")
 
-        req.headers['scnt'] = response.headers['scnt']
+        req.headers['scnt'] = response_repair_options.headers['scnt']
         req.headers['X-Apple-Id-Session-Id'] = response.headers['X-Apple-Id-Session-Id']
         req.headers['X-Apple-Session-Token'] = response_repair_options.headers['x-apple-session-token']
         req.headers['X-Apple-Skip-Repair-Attributes'] = '[]'
