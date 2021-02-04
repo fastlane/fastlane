@@ -30,7 +30,8 @@ describe Spaceship::TunesClient do
 
       expect do
         Spaceship::Tunes.login(username, password)
-      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement.")
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement. " \
+                             "Your account might also be asked to upgrade to 2FA. Set SPACESHIP_SKIP_2FA_UPGRADE=1 for fastlane to automaticaly bypass 2FA upgrade if possible.")
     end
 
     it 'has authType of hsa' do
@@ -41,7 +42,8 @@ describe Spaceship::TunesClient do
 
       expect do
         Spaceship::Tunes.login(username, password)
-      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement.")
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement. " \
+                             "Your account might also be asked to upgrade to 2FA. Set SPACESHIP_SKIP_2FA_UPGRADE=1 for fastlane to automaticaly bypass 2FA upgrade if possible.")
     end
 
     it 'has authType of non-sa' do
@@ -52,7 +54,8 @@ describe Spaceship::TunesClient do
 
       expect do
         Spaceship::Tunes.login(username, password)
-      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement.")
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement. " \
+                             "Your account might also be asked to upgrade to 2FA. Set SPACESHIP_SKIP_2FA_UPGRADE=1 for fastlane to automaticaly bypass 2FA upgrade if possible.")
     end
 
     it 'has authType of hsa2' do
@@ -63,7 +66,8 @@ describe Spaceship::TunesClient do
 
       expect do
         Spaceship::Tunes.login(username, password)
-      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement.")
+      end.to raise_exception(Spaceship::AppleIDAndPrivacyAcknowledgementNeeded, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement. " \
+                             "Your account might also be asked to upgrade to 2FA. Set SPACESHIP_SKIP_2FA_UPGRADE=1 for fastlane to automaticaly bypass 2FA upgrade if possible.")
     end
   end
 
