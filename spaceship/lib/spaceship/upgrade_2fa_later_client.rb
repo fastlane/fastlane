@@ -5,7 +5,6 @@ module Spaceship
   class Client
     def try_upgrade_2fa_later(response)
       if ENV['SPACESHIP_SKIP_2FA_UPGRADE'].nil?
-        puts("Skipping automatic bypass of 2FA upgrade")
         return false
       end
 
@@ -79,6 +78,7 @@ module Spaceship
       if response_repair_complete.status == 204
         return true
       else
+        STDERR.puts("Failed with status code of #{response_repair_complete.status}")
         return false
       end
     rescue => error
