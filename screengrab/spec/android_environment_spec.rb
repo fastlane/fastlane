@@ -68,7 +68,7 @@ describe Screengrab do
 
     describe "with an empty ANDROID_HOME and a complete PATH" do
       it "finds commands on the PATH" do
-        FastlaneSpec::Env.with_env_values('PATH' => 'screengrab/spec/fixtures/empty_home_complete_path_windows/path') do
+        FastlaneSpec::Env.with_env_values('PATH' => 'screengrab/spec/fixtures/empty_home_complete_path_windows/path', 'PATHEXT' => ".EXE") do
           android_env = Screengrab::AndroidEnvironment.new('screengrab/spec/fixtures/empty_home_complete_path_windows/android_home', nil)
 
           expect(android_env.android_home).to eq('screengrab/spec/fixtures/empty_home_complete_path_windows/android_home')
@@ -83,7 +83,7 @@ describe Screengrab do
 
     describe "with a complete ANDROID_HOME and a complete PATH and no build tools version specified" do
       it "finds adb.exe in platform-tools and aapt in the highest version build tools dir" do
-        FastlaneSpec::Env.with_env_values('PATH' => 'screengrab/spec/fixtures/complete_home_complete_path_windows/path') do
+        FastlaneSpec::Env.with_env_values('PATH' => 'screengrab/spec/fixtures/complete_home_complete_path_windows/path', 'PATHEXT' => ".EXE") do
           android_env = Screengrab::AndroidEnvironment.new('screengrab/spec/fixtures/complete_home_complete_path_windows/android_home', nil)
 
           expect(android_env.android_home).to eq('screengrab/spec/fixtures/complete_home_complete_path_windows/android_home')
@@ -95,7 +95,5 @@ describe Screengrab do
         end
       end
     end
-
   end
-
 end

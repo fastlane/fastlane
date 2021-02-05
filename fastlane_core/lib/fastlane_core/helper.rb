@@ -368,8 +368,34 @@ module FastlaneCore
 
     # checks if a given path is an executable file
     def self.executable?(cmd_path)
-      # no executable files on Windows, so existing is enough there
-      cmd_path && !File.directory?(cmd_path) && (File.executable?(cmd_path) || (self.windows? && File.exist?(cmd_path)) || (self.windows? && File.exist?(cmd_path + '.exe')))
+      if !cmd_path || File.directory?(cmd_path)
+        return false
+      end
+
+      if self.windows?
+        return File.exist?(get_executable_path(cmd_path))
+      else
+        return File.executable?(cmd_path)
+      end
+    end
+
+    # returns the path of the executable with the correct extension on Windows
+    def self.get_executable_path(cmd_path)
+      if self.windows?
+        # PATHEXT contains the list of file extensions that Windows considers executable, semicolon separated.
+        # e.g. ".COM;.EXE;.BAT;.CMD"
+        exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : []
+        exts << '' # Always have an empty string (= no file extension)
+
+        # no executable files on Windows, so existing is enough there
+        # also check if command + ext is present
+        exts.each do |ext|
+          executable_path = "#{cmd_path}#{ext.downcase}"
+          return executable_path if File.exist?(executable_path)
+        end
+      end
+
+      return cmd_path
     end
 
     # checks if given file is a valid json file
