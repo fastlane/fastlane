@@ -174,7 +174,7 @@ describe Scan do
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
           output_directory: '/tmp/scan_results',
           project: './scan/examples/standard/app.xcodeproj',
-          additional_xctestrun: false
+          additional_xctestrun: true
         })
 
         path = File.join(Scan.config[:derived_data_path], "Build/Products")
