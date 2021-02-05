@@ -74,18 +74,13 @@ module Spaceship
       # API
       #
 
-      def self.all(client: nil, bundle_id_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-        raise "bundle_id_id is required " if bundle_id_id.nil?
-
+      def self.all(client: nil, bundle_id_id:, limit: nil)
         client ||= Spaceship::ConnectAPI
-        resp = client.get_bundle_id_capabilities(bundle_id_id: bundle_id_id, filter: filter, includes: includes).all_pages
+        resp = client.get_bundle_id_capabilities(bundle_id_id: bundle_id_id, limit: limit).all_pages
         return resp.flat_map(&:to_models)
       end
 
-      def self.create(client: nil, bundle_id_id: nil, capability_type: nil, settings: [])
-        raise "bundle_id_id is required " if bundle_id_id.nil?
-        raise "capability_type is required " if capability_type.nil?
-
+      def self.create(client: nil, bundle_id_id:, capability_type:, settings: [])
         client ||= Spaceship::ConnectAPI
         resp = client.post_bundle_id_capability(bundle_id_id: bundle_id_id, capability_type: capability_type, settings: settings)
         return resp.to_models.first

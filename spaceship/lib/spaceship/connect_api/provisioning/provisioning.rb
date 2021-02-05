@@ -27,7 +27,7 @@ module Spaceship
           provisioning_request_client.get("bundleIds/#{bundle_id_id}", params)
         end
 
-        def post_bundle_id(name: nil, platform: nil, identifier: nil, seed_id: nil)
+        def post_bundle_id(name:, platform:, identifier:, seed_id:)
           attributes = {
             name: name,
             platform: platform,
@@ -49,12 +49,12 @@ module Spaceship
         # bundleIdCapability
         #
 
-        def get_bundle_id_capabilities(bundle_id_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-          params = provisioning_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        def get_bundle_id_capabilities(bundle_id_id:, limit:)
+          params = provisioning_request_client.build_params(filter: nil, includes: nil, limit: limit, sort: nil)
           provisioning_request_client.get("bundleIds/#{bundle_id_id}/bundleIdCapabilities", params)
         end
 
-        def post_bundle_id_capability(bundle_id_id: nil, capability_type: nil, settings: [])
+        def post_bundle_id_capability(bundle_id_id:, capability_type:, settings: [])
           body = {
             data: {
               attributes: {
@@ -76,9 +76,7 @@ module Spaceship
           provisioning_request_client.post("bundleIdCapabilities", body)
         end
 
-        def delete_bundle_id_capability(bundle_id_capability_id: nil)
-          raise "Capability id is nil" if bundle_id_capability_id.nil?
-
+        def delete_bundle_id_capability(bundle_id_capability_id:)
           provisioning_request_client.delete("bundleIdCapabilities/#{bundle_id_capability_id}")
         end
 
