@@ -168,5 +168,25 @@ describe Scan do
         scan.zip_build_products
       end
     end
+
+    describe "additional_xctestrun" do
+      it "copies .xctestrun file when :additional_xctestrun is true", requires_xcodebuild: true do
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+          output_directory: '/tmp/scan_results',
+          project: './scan/examples/standard/app.xcodeproj',
+          additional_xctestrun: false
+        })
+
+        path = File.join(Scan.config[:derived_data_path], "Build/Products")
+        output_path = File.absolute_path('/tmp/scan_results/settings.xctestrun')
+ 
+        expect(File.file?(output_path)) .to be true
+
+        info_plist_file = Dir.glob("scan/examples/standard/appUITests/*.plist").first
+        FileUtils.cp(info_plist_file, output_path)
+
+        expect(FileUtils.identical?(info_plist_file, output_path)) .to be true
+      end
+    end
   end
 end
