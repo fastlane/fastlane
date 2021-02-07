@@ -179,7 +179,7 @@ describe Scan do
 
         path = File.join(Scan.config[:derived_data_path], "Build/Products")
         output_path = File.absolute_path('/tmp/scan_results/settings.xctestrun')
-        FileUtils.touch(output_path)
+        File.new(output_path)
 
         info_plist_file = Dir.glob("scan/examples/standard/appUITests/*.plist").first
         FileUtils.cp(info_plist_file, output_path)
