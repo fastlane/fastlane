@@ -96,7 +96,7 @@ module Pilot
       else
         platform = config[:app_platform]
         app_version = config[:app_version]
-        build = config[:build_number]
+        app_build = config[:build_number]
       end
 
       latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(
