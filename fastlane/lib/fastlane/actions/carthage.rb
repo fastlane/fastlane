@@ -34,6 +34,7 @@ module Fastlane
         cmd << "--new-resolver" if params[:new_resolver]
         cmd << "--log-path #{params[:log_path]}" if params[:log_path]
         cmd << "--use-xcframeworks" if params[:use_xcframeworks]
+        cmd << "--archive" if params[:archive]
 
         Actions.sh(cmd.join(' '))
       end
@@ -54,6 +55,10 @@ module Fastlane
 
         if params[:use_xcframeworks] && !%w(build bootstrap update).include?(command_name)
           UI.user_error!("Use XCFrameworks option is available only for 'build', 'bootstrap', and 'update' command.")
+        end
+
+        if command_name != "build" && params[:archive]
+          UI.user_error!("Archive option is available only for 'build' command.")
         end
       end
 
@@ -193,6 +198,12 @@ module Fastlane
                                        description: "Create xcframework bundles instead of one framework per platform (requires Xcode 12+)",
                                        type: Boolean,
                                        is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :archive,
+                                       env_name: "FL_CARTHAGE_ARCHIVE",
+                                       description: "Archive built frameworks from the current project",
+                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :executable,
                                        env_name: "FL_CARTHAGE_EXECUTABLE",
