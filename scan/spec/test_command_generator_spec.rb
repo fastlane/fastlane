@@ -76,7 +76,7 @@ describe Scan do
   describe Scan::TestCommandGenerator do
     before(:each) do
       @test_command_generator = Scan::TestCommandGenerator.new
-      @project.options.values.delete(:use_system_scm)
+      @project.options.delete(:use_system_scm)
     end
 
     it "raises an exception when project path wasn't found" do
