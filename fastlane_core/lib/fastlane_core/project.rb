@@ -275,7 +275,7 @@ module FastlaneCore
     end
 
     def supports_mac_catalyst?
-      build_settings(key: "SUPPORTS_MACCATALYST") == "YES"
+      build_settings(key: "SUPPORTS_MACCATALYST") == "YES" || build_settings(key: "SUPPORTS_UIKITFORMAC") == "YES"
     end
 
     def command_line_tool?
