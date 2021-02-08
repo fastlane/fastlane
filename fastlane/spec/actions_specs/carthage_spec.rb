@@ -349,6 +349,26 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap --cache-builds")
       end
 
+      it "does not add a use_xcframeworks flag to command if use_xcframeworks is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_xcframeworks: false
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap")
+      end
+
+      it "add a use_xcframeworks flag to command if use_xcframeworks is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_xcframeworks: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --use-xcframeworks")
+      end
+
       it "does not add a archive flag to command if archive is set to false" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
@@ -684,6 +704,17 @@ describe Fastlane do
                 carthage(command: '#{command}')
               end").runner.execute(:test)
               expect(result).to eq("carthage archive")
+            end
+          end
+        end
+
+        context "when --use-xcframeworks option is present with valid command" do
+          it "adds the use_xcframeworks option" do
+            ['update', 'build', 'bootstrap'].each do |command|
+              result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', use_xcframeworks: true)
+              end").runner.execute(:test)
+              expect(result).to eq("carthage #{command} --use-xcframeworks")
             end
           end
         end
