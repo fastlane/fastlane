@@ -22,8 +22,11 @@ module Fastlane
         return values if Helper.test?
 
         if distribute_only
-          Pilot::BuildManager.new.wait_for_build_processing_to_be_complete(false) unless values[:skip_waiting_for_build_processing]
-          Pilot::BuildManager.new.distribute(values) # we already have the finished config
+          build_manager = Pilot::BuildManager.new
+          should_login_in_start = values[:apple_id].nil?
+          build_manager.start(values, should_login: should_login_in_start)
+          build_manager.wait_for_build_processing_to_be_complete(false) unless values[:skip_waiting_for_build_processing]
+          build_manager.distribute(values) # we already have the finished config
         else
           Pilot::BuildManager.new.upload(values) # we already have the finished config
         end
