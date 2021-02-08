@@ -33,6 +33,7 @@ module Fastlane
         cmd << "--cache-builds" if params[:cache_builds]
         cmd << "--new-resolver" if params[:new_resolver]
         cmd << "--log-path #{params[:log_path]}" if params[:log_path]
+        cmd << "--archive" if params[:archive]
 
         Actions.sh(cmd.join(' '))
       end
@@ -49,6 +50,10 @@ module Fastlane
 
         if params[:log_path] && !%w(build bootstrap update).include?(command_name)
           UI.user_error!("Log path option is available only for 'build', 'bootstrap', and 'update' command.")
+        end
+
+        if command_name != "build" && params[:archive]
+          UI.user_error!("Archive option is available only for 'build' command.")
         end
       end
 
@@ -183,6 +188,12 @@ module Fastlane
                                        env_name: "FL_CARTHAGE_LOG_PATH",
                                        description: "Path to the xcode build output",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :archive,
+                                       env_name: "FL_CARTHAGE_ARCHIVE",
+                                       description: "Archive built frameworks from the current project",
+                                       is_string: false,
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :executable,
                                        env_name: "FL_CARTHAGE_EXECUTABLE",
                                        description: "Path to the `carthage` executable on your machine",
