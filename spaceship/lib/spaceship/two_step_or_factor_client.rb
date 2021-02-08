@@ -25,7 +25,7 @@ module Spaceship
     end
 
     def handle_two_step(response)
-      if response.body.fetch("securityCode", {})["tooManyCodesLock"].to_s.length > 0
+      if response.body.fetch("securityCode", {})["tooManyCodesSent"]
         raise Tunes::Error.new, "Too many verification codes have been sent. Enter the last code you received, use one of your devices, or try again later."
       end
 
@@ -102,7 +102,6 @@ module Spaceship
     end
 
     def handle_two_factor(response, depth = 0)
-      puts "response tooManyCodesSent  : #{response.body.fetch("securityCode", {})["tooManyCodesSent"]} #{response.body.fetch("securityCode", {})["tooManyCodesSent"] == false} #{response.body.fetch("securityCode", {})["tooManyCodesSent"] == "false"}"
       if response.body.fetch("securityCode", {})["tooManyCodesSent"]
         raise Tunes::Error.new, "Too many verification codes have been sent. Enter the last code you received, use one of your devices, or try again later."
       end
