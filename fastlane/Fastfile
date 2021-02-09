@@ -104,7 +104,7 @@ desc "Increment the version number of this gem, after generating new Swift API"
 lane :bump do |options|
   verify_env_variables
   ensure_git_branch(branch: "master")
-  #ensure_git_status_clean
+  ensure_git_status_clean
 
   github_api_token = ENV["FL_GITHUB_RELEASE_API_TOKEN"]
   UI.user_error!("Please provide a GitHub API token using `FL_GITHUB_RELEASE_API_TOKEN`") if github_api_token.to_s.length == 0
@@ -132,7 +132,7 @@ lane :bump do |options|
   generate_fastlane_swift_runner_manifest
 
   # Add all changed files to the version bump commit
-  sh("git add ../fastlane/swift/*")
+  paths_for_commit += sh("cd .. && git status --porcelain fastlane/swift | sed s/^...//").each_line.to_a.map(&:strip)
   paths_for_commit << "Gemfile.lock"
 
   # Add version file path to change set
