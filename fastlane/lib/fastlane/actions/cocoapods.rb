@@ -20,8 +20,8 @@ module Fastlane
 
         cmd << '--no-clean' unless params[:clean]
         cmd << '--no-integrate' unless params[:integrate]
-        cmd << '--clean-install' if params[:clean_install] && pod_version(params).to_f >= 1.7
-        cmd << '--allow-root' if params[:allow_root] && pod_version(params).to_f >= 1.10
+        cmd << '--clean-install' if params[:clean_install] && pod_version_at_least("1.7", params)
+        cmd << '--allow-root' if params[:allow_root] && pod_version_at_least("1.10", params)
         cmd << '--repo-update' if params[:repo_update]
         cmd << '--silent' if params[:silent]
         cmd << '--verbose' if params[:verbose]
@@ -46,6 +46,11 @@ module Fastlane
 
       def self.pod_version(params)
         use_bundle_exec?(params) ? `bundle exec pod --version` : `pod --version`
+      end
+
+      def self.pod_version_at_least(at_least_version, params)
+        version = pod_version(params)
+        return Gem::Version.new(version) >= Gem::Version.new(at_least_version)
       end
 
       def self.call_error_callback(params, result)
