@@ -718,14 +718,24 @@ describe FastlaneCore do
               expect(config[:item]).to eq(123)
             end
 
-            # It would be good to have a test for the scenario where the user
-            # inserts a value that doesn't match the expected type to verify
-            # we show an error. Unfortunately, because after showing the error
-            # we ask for the value again, we'd be stuck into an infinite loop
-            # in the tests.
-            #
-            # Note that using `.to receive(:input).once` like above is not an
-            # option because that would fail the test in this case.
+            it "shows an error after user inputs value that doesn't match type (the first time) and works the second time" do
+              config_item = FastlaneCore::ConfigItem.new(key: :item,
+                                                         short_option: "-i",
+                                                         env_name: "ITEM_ENV_VAR",
+                                                         description: "a description",
+                                                         is_string: false,
+                                                         type: Integer,
+                                                         # false is the default, but let's be explicit
+                                                         skip_type_validation: false)
+              config = FastlaneCore::Configuration.create([config_item], {})
+
+              config.set(:item, nil)
+              expect(FastlaneCore::UI).to receive(:input).once.and_return("123abc")
+              expect(FastlaneCore::UI).to receive(:input).once.and_return("123")
+              expect(FastlaneCore::UI).to(receive(:error)).once
+              expect(config[:item].class).to eq(Integer)
+              expect(config[:item]).to eq(123)
+            end
 
             it "doesn't show an error when skipping type validation" do
               # Taken from match/options.rb
