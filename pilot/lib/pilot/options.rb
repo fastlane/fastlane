@@ -88,7 +88,7 @@ module Pilot
                                      type: Boolean,
                                      env_name: "DEMO_ACCOUNT_REQUIRED",
                                      description: "Do you need a demo account when Apple does review?",
-                                     default_value: false),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :beta_app_review_info,
                                      type: Hash,
                                      env_name: "PILOT_BETA_APP_REVIEW_INFO",
