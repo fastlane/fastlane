@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane (2.172.0)
+    fastlane (2.174.0)
       CFPropertyList (>= 2.3, < 4.0.0)
       addressable (>= 2.3, < 3.0.0)
       artifactory (~> 3.0)
