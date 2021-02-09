@@ -49,8 +49,8 @@ module Spaceship
         # bundleIdCapability
         #
 
-        def get_bundle_id_capabilities(bundle_id_id:, limit:)
-          params = provisioning_request_client.build_params(filter: nil, includes: nil, limit: limit, sort: nil)
+        def get_bundle_id_capabilities(bundle_id_id:, includes: nil, limit: nil, sort: nil)
+          params = provisioning_request_client.build_params(filter: nil, includes: includes, limit: limit, sort: sort)
           provisioning_request_client.get("bundleIds/#{bundle_id_id}/bundleIdCapabilities", params)
         end
 
