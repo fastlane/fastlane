@@ -520,6 +520,8 @@ describe Deliver::UploadMetadata do
 
     context "with localized version values for release notes" do
       it "default value set for unspecified languages" do
+        expect(uploader).to receive(:detect_existing_app_store_languages).and_return([])
+
         options[:languages] = ['en-AU', 'en-CA', 'en-GB']
         options[:release_notes] = {
           'default' => 'something',

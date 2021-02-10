@@ -364,6 +364,7 @@ module Deliver
 
       # Build a complete list of the required languages
       enabled_languages = detect_languages(options)
+      enabled_languages += detect_existing_app_store_languages(options)
 
       # Get all languages used in existing settings
       (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
@@ -398,6 +399,18 @@ module Deliver
         end
         current.delete("default")
       end
+    end
+
+    def detect_existing_app_store_languages(options)
+      app = options[:app]
+
+      enabled_languages = detect_languages(options)
+
+      app_store_version_localizations = verify_available_version_languages!(options, app, enabled_languages) unless options[:edit_live]
+      app_info_localizations = verify_available_info_languages!(options, app, enabled_languages) unless options[:edit_live]
+
+      locales = app_store_version_localizations.map(&:locale) + app_info_localizations.map(&:locale)
+      return locales.compact.uniq
     end
 
     def detect_languages(options)
