@@ -149,7 +149,7 @@ module FastlaneCore
 
       @key = key
       @env_name = env_name
-      @env_names = env_names
+      @env_names = [env_name].compact + (env_names || [])
       @description = description
       @short_option = short_option
       @default_value = default_value
@@ -242,9 +242,7 @@ module FastlaneCore
     end
 
     def fetch_env_value
-      all_env_names = [env_name].compact + (env_names || [])
-
-      all_env_names.each do |name|
+      env_names.each do |name|
         next if ENV[name].nil?
         # verify! before using (see https://github.com/fastlane/fastlane/issues/14449)
         return ENV[name].dup if verify!(auto_convert_value(ENV[name]))
