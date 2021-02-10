@@ -56,6 +56,14 @@ module Spaceship
       def ready_for_beta_submission?
         return external_build_state == ExternalState::READY_FOR_BETA_SUBMISSION
       end
+
+      def waiting_for_beta_review?
+        return [ExternalState::WAITING_FOR_BETA_REVIEW, ExternalState::IN_BETA_TESTING].include?(external_build_state)
+      end
+
+      def beta_approved?
+        return external_build_state == ExternalState::BETA_APPROVED
+      end
     end
   end
 end

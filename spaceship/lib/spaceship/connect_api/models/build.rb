@@ -87,6 +87,21 @@ module Spaceship
         return build_beta_detail.ready_for_beta_submission?
       end
 
+      def waiting_for_beta_review?
+        raise "No build_beta_detail included" unless build_beta_detail
+        return build_beta_detail.waiting_for_beta_review?
+      end
+
+      def beta_approved?
+        raise "No build_beta_detail included" unless build_beta_detail
+        return build_beta_detail.beta_approved?
+      end
+
+      def external_build_state
+        raise "No build_beta_detail included" unless build_beta_detail
+        return build_beta_detail.external_build_state
+      end
+
       # This is here temporarily until the removal of Spaceship::TestFlight
       def to_testflight_build
         h = {
