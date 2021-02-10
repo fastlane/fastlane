@@ -209,7 +209,6 @@ module FastlaneCore
 
     # Returns the value for a certain key. fastlane_core tries to fetch the value from different sources
     # if 'ask' is true and the value is not present, the user will be prompted to provide a value
-    # rubocop:disable Metrics/PerceivedComplexity
     def fetch(key, ask: true)
       UI.crash!("Key '#{key}' must be a symbol. Example :app_id.") unless key.kind_of?(Symbol)
 
@@ -218,9 +217,8 @@ module FastlaneCore
       # Same order as https://docs.fastlane.tools/advanced/#priorities-of-parameters-and-options
       value = if @values.key?(key) && !@values[key].nil?
                 @values[key]
-              elsif option.env_name && !ENV[option.env_name].nil?
-                # verify! before using (see https://github.com/fastlane/fastlane/issues/14449)
-                ENV[option.env_name].dup if option.verify!(option.auto_convert_value(ENV[option.env_name]))
+              elsif (env_value = option.fetch_env_value)
+                env_value
               elsif self.config_file_options.key?(key)
                 self.config_file_options[key]
               else
