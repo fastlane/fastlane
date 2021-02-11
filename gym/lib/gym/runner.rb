@@ -274,7 +274,7 @@ module Gym
       exe_name = Gym.project.build_settings(key: "EXECUTABLE_NAME")
       app_path = File.join(BuildCommandGenerator.archive_path, "Products/Applications/#{exe_name}.app")
 
-      if false == File.exist?(app_path)
+      if File.exist?(app_path) == false
         # Apparently the `EXECUTABLE_NAME` is not correct. This can happen when building a workspace which has a project
         # earlier in the build order that has a different `EXECUTABLE_NAME` than the app. Try to find the last `.app` as
         # a fallback for this situation.
