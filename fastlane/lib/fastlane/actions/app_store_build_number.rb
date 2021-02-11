@@ -27,10 +27,11 @@ module Fastlane
 
       def self.get_build_number(params)
         # Prompts select team if multiple teams and none specified
-        token = self.api_token(params)
-        if token
-          UI.message("Using App Store Connect API token...")
-          Spaceship::ConnectAPI.token = token
+        if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
+          UI.message("Creating authorization token for App Store Connect API")
+          Spaceship::ConnectAPI.token = api_token
+        elsif !Spaceship::ConnectAPI.token.nil?
+          UI.message("Using existing authorization token for App Store Connect API")
         else
           UI.message("Login to App Store Connect (#{params[:username]})")
           Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true, tunes_team_id: params[:team_id], team_name: params[:team_name])
@@ -96,13 +97,6 @@ module Fastlane
 
       def self.order_versions(versions)
         versions.map(&:to_s).sort_by { |v| Gem::Version.new(v) }
-      end
-
-      def self.api_token(params)
-        params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
-        api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
-        api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
-        return api_token
       end
 
       #####################################################

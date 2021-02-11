@@ -17,9 +17,11 @@ module Sigh
                                          hide_keys: [:output_path],
                                              title: "Summary for sigh #{Fastlane::VERSION}")
 
-      if api_token
+      if (api_token = Spaceship::ConnectAPI::Token.from(hash: Sigh.config[:api_key], filepath: Sigh.config[:api_key_path]))
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
+      elsif !Spaceship::ConnectAPI.token.nil?
+        UI.message("Using existing authorization token for App Store Connect API")
       else
         # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
@@ -57,12 +59,6 @@ module Sigh
       end
 
       return download_profile(profile)
-    end
-
-    def api_token
-      @api_token ||= Spaceship::ConnectAPI::Token.create(Sigh.config[:api_key]) if Sigh.config[:api_key]
-      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(Sigh.config[:api_key_path]) if Sigh.config[:api_key_path]
-      return @api_token
     end
 
     # The kind of provisioning profile we're interested in

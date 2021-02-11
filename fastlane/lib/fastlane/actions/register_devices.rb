@@ -39,9 +39,11 @@ module Fastlane
         end
 
         require 'spaceship'
-        if (token = api_token(params))
-          UI.message("Using App Store Connect API token...")
-          Spaceship::ConnectAPI.token = token
+        if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
+          UI.message("Creating authorization token for App Store Connect API")
+          Spaceship::ConnectAPI.token = api_token
+        elsif !Spaceship::ConnectAPI.token.nil?
+          UI.message("Using existing authorization token for App Store Connect API")
         else
           UI.message("Login to App Store Connect (#{params[:username]})")
           credentials = CredentialsManager::AccountManager.new(user: params[:username])
@@ -81,13 +83,6 @@ module Fastlane
       rescue => ex
         UI.error(ex.to_s)
         UI.crash!("Failed to register new device (name: #{name}, UDID: #{udid})")
-      end
-
-      def self.api_token(params)
-        params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
-        api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
-        api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
-        return api_token
       end
 
       #####################################################

@@ -25,6 +25,12 @@ module Spaceship
       # key is for App Store or Enterprise so this is the temporary workaround
       attr_accessor :in_house
 
+      def self.from(hash: nil, filepath: nil)
+        api_token ||= self.create(hash) if hash
+        api_token ||= self.from_json_file(filepath) if filepath
+        return api_token
+      end
+
       def self.from_json_file(filepath)
         json = JSON.parse(File.read(filepath), { symbolize_names: true })
 

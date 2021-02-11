@@ -18,6 +18,14 @@ module Precheck
                                          hide_keys: [:output_path],
                                              title: "Summary for precheck #{Fastlane::VERSION}")
 
+      api_token = if (token = Spaceship::ConnectAPI::Token.from(hash: Precheck.config[:api_key], filepath: Precheck.config[:api_key_path]))
+                    UI.message("Creating authorization token for App Store Connect API")
+                    token
+                  elsif (token = Spaceship::ConnectAPI.token)
+                    UI.message("Using existing authorization token for App Store Connect API")
+                    token
+                  end
+
       if api_token
 
         # As of 2020-09-15, App Store Connect API does not have support for IAPs yet
@@ -29,7 +37,6 @@ module Precheck
           UI.user_error!("Precheck cannot check In-app purchases with the App Store Connect API Key (yet). Exclude In-app purchases from precheck or use Apple ID login")
         end
 
-        UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
       elsif Spaceship::Tunes.client.nil?
         # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
@@ -69,12 +76,6 @@ module Precheck
       end
 
       return true
-    end
-
-    def api_token
-      @api_token ||= Spaceship::ConnectAPI::Token.create(Precheck.config[:api_key]) if Precheck.config[:api_key]
-      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(Precheck.config[:api_key_path]) if Precheck.config[:api_key_path]
-      return @api_token
     end
 
     def print_items_not_checked(processor_result: nil)

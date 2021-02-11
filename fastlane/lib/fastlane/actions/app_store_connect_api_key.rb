@@ -35,6 +35,10 @@ module Fastlane
           in_house: in_house
         }
 
+        # Creates Spaceship API Key session
+        # User does not need to pass the token into any actions because of this
+        Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(key)
+
         Actions.lane_context.set_sensitive(SharedValues::APP_STORE_CONNECT_API_KEY, key)
 
         return key
