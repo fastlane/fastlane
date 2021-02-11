@@ -75,6 +75,7 @@ module Fastlane
                                        env_name: "APP_STORE_CONNECT_API_KEY_DURATION",
                                        description: "The token session duration",
                                        optional: true,
+                                       default_value: Spaceship::ConnectAPI::Token::MAX_TOKEN_DURATION,
                                        type: Integer),
           FastlaneCore::ConfigItem.new(key: :in_house,
                                        env_name: "APP_STORE_CONNECT_API_KEY_IN_HOUSE",
