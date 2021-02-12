@@ -47,6 +47,13 @@ module Fastlane
         FileUtils.rm_rf(compressed_package_path) if compressed_package_path
 
         notarization_upload_plist = Plist.parse_xml(notarization_upload_response)
+
+        if notarization_upload_plist.has_key?('product-errors') && notarization_upload_plist['product-errors'].any?
+          UI.important("🚫 Could not upload package to notarization service! Here are the reasons:")
+          notarization_upload_plist['product-errors'].each { |product_error| UI.error "#{product_error['message']} (#{product_error['code']})" }
+          UI.user_error!("Package upload to notarization service cancelled. Please check the error messages above.")
+        end
+
         notarization_request_id = notarization_upload_plist['notarization-upload']['RequestUUID']
 
         UI.success("Successfully uploaded package to notarization service with request identifier #{notarization_request_id}")
