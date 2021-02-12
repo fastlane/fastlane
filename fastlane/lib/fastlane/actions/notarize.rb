@@ -7,6 +7,7 @@ module Fastlane
         try_early_stapling = params[:try_early_stapling]
         print_log = params[:print_log]
         verbose = params[:verbose]
+        api_key_path = params[:api_key_path]
 
         # Compress and read bundle identifier only for .app bundle.
         compressed_package_path = nil
@@ -28,15 +29,37 @@ module Fastlane
 
         UI.user_error!('Could not read bundle identifier, provide as a parameter') unless bundle_id
 
-        apple_id_account = CredentialsManager::AccountManager.new(user: params[:username])
-
-        # Add password as a temporary environment variable for altool.
-        # Use app specific password if specified.
-        ENV['FL_NOTARIZE_PASSWORD'] = ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'] || apple_id_account.password
-
         UI.message('Uploading package to notarization service, might take a while')
 
-        notarization_upload_command = "xcrun altool --notarize-app -t osx -f \"#{compressed_package_path || package_path}\" --primary-bundle-id #{bundle_id} -u #{apple_id_account.user} -p @env:FL_NOTARIZE_PASSWORD --output-format xml"
+        notarization_upload_command = "xcrun altool --notarize-app -t osx -f \"#{compressed_package_path || package_path}\" --primary-bundle-id #{bundle_id} --output-format xml"
+
+        # If specified, prefer AppStore Connect API key to authenticate upload
+        if api_key_path
+          # From xcrun altool for --apiKey:
+          # This option will search the following directories in sequence for a private key file with the name of 'AuthKey_<api_key>.p8':  './private_keys', '~/private_keys', '~/.private_keys', and '~/.appstoreconnect/private_keys'.
+          api_key = JSON.parse(File.read(api_key_path))
+          api_key_folder_path = 'private_keys'
+          api_key_file_path = File.join(api_key_folder_path, "AuthKey_#{api_key['key_id']}.p8")
+          directory_exists = File.directory?(api_key_folder_path)
+          file_exists = File.exist?(api_key_file_path)
+          begin
+            FileUtils.mkdir_p(api_key_folder_path) unless directory_exists
+            File.open(api_key_file_path, 'w') {|f| f.write api_key['key'] } unless file_exists
+            notarization_upload_command << " --apiKey #{api_key['key_id']} --apiIssuer #{api_key['issuer_id']}"
+          ensure
+            # FileUtils.rm(api_key_file_path) unless file_exists
+            # FileUtils.rm_r(api_key_folder_path) unless directory_exists
+          end
+        else
+          apple_id_account = CredentialsManager::AccountManager.new(user: params[:username])
+
+          # Add password as a temporary environment variable for altool.
+          # Use app specific password if specified.
+          ENV['FL_NOTARIZE_PASSWORD'] = ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'] || apple_id_account.password
+
+          notarization_upload_command << " -u #{apple_id_account.user} -p @env:FL_NOTARIZE_PASSWORD"
+        end
+
         notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider]
 
         notarization_upload_response = Actions.sh(
@@ -184,7 +207,15 @@ module Fastlane
                                        description: 'Whether to log requests',
                                        optional: true,
                                        default_value: false,
-                                       type: Boolean)
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                       env_name: 'FL_NOTARIZE_API_KEY_PATH',
+                                       description: 'Path to AppStore Connect API key',
+                                       optional: true,
+                                       is_string: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("API Key not found at '#{value}'") unless File.exist?(value)
+                                       end)
         ]
       end
 
