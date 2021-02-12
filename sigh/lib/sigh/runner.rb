@@ -278,7 +278,7 @@ module Sigh
                          [Spaceship::ConnectAPI::Device::DeviceClass::MAC]
                        end
 
-      if api_token
+      if Spaceship::ConnectAPI.token
         return Spaceship::ConnectAPI::Device.all.select do |device|
           device_classes.include?(device.device_class)
         end

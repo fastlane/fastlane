@@ -7,7 +7,6 @@ module Fastlane
       def self.run(config)
         require 'precheck'
         Precheck.config = config
-        Precheck.config[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
         return Precheck::Runner.new.run
       end
 

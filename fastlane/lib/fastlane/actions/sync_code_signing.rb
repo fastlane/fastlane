@@ -10,7 +10,6 @@ module Fastlane
         require 'match'
 
         params.load_configuration_file("Matchfile")
-        params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
         Match::Runner.new.run(params)
 
         define_profile_type(params)

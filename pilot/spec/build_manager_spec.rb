@@ -452,8 +452,8 @@ describe "Build Manager" do
     end
 
     it "with API token" do
-      options = { api_key_path: fake_api_key_json_path }
-      fake_manager.instance_variable_set(:@config, options)
+      options = {}
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
 
       transporter = fake_manager.send(:transporter_for_selected_team, options)
       expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)

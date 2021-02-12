@@ -9,6 +9,9 @@ describe Fastlane do
       let(:issuer_id) { "32423-234234-234324-234" }
 
       it "with key_filepath" do
+        expect(Spaceship::ConnectAPI::Token).to receive(:create)
+        expect(Spaceship::ConnectAPI).to receive(:token=)
+
         result = Fastlane::FastFile.new.parse("lane :test do
           app_store_connect_api_key(
             key_id: '#{key_id}',
@@ -27,13 +30,15 @@ describe Fastlane do
         }
 
         expect(result).to eq(hash)
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY]).to eq(hash)
       end
 
       describe "with key_content" do
         let(:key_content) { File.binread(fake_api_key_p8_path).gsub("\r", '') }
 
         it "with plain text" do
+          expect(Spaceship::ConnectAPI::Token).to receive(:create)
+          expect(Spaceship::ConnectAPI).to receive(:token=)
+
           result = Fastlane::FastFile.new.parse("lane :test do
             app_store_connect_api_key(
               key_id: '#{key_id}',
@@ -57,6 +62,9 @@ describe Fastlane do
         end
 
         it "with base64 encoded" do
+          expect(Spaceship::ConnectAPI::Token).to receive(:create)
+          expect(Spaceship::ConnectAPI).to receive(:token=)
+
           result = Fastlane::FastFile.new.parse("lane :test do
             app_store_connect_api_key(
               key_id: '#{key_id}',
