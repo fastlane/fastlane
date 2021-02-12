@@ -70,6 +70,7 @@ module Fastlane
                                        short_option: "-u",
                                        env_name: "ITUNESCONNECT_USER",
                                        description: "Your Apple ID Username",
+                                       optional: true,
                                        default_value: user,
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :version,

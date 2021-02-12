@@ -58,6 +58,7 @@ module Cert
                                      short_option: "-u",
                                      env_name: "CERT_USERNAME",
                                      description: "Your Apple ID Username",
+                                     optional: true,
                                      default_value: user,
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :team_id,
