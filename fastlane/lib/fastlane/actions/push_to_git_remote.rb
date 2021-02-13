@@ -33,7 +33,7 @@ module Fastlane
         command << '--set-upstream' if params[:set_upstream]
 
         # optionally add the --push_options components
-        params[:push_options].each { |push_option| command << "--push-option=#{push_option}" }
+        params[:push_options].each { |push_option| command << "--push-option=#{push_option}" } if params[:push_options]
 
         # execute our command
         Actions.sh('pwd')

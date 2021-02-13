@@ -387,7 +387,7 @@ class TunesStubbing
         with(body: itc_read_fixture_file("iap_create_recurring.json")).
         to_return(status: 200, body: itc_read_fixture_file("iap_detail_recurring.json"),
                   headers: { "Content-Type" => "application/json" })
-      # create recurring iap witout pricing
+      # create recurring iap without pricing
       stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps").
         with(body: itc_read_fixture_file("iap_create_recurring_without_pricing.json")).
         to_return(status: 200, body: itc_read_fixture_file("iap_detail_recurring.json"),

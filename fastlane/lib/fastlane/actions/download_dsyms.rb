@@ -59,11 +59,6 @@ module Fastlane
           build_number = live_version.build.version
         end
 
-        # Remove leading zeros from version string (eg. 1.02 -> 1.2)
-        if version
-          version = version.split(".").map(&:to_i).join(".")
-        end
-
         # Make sure output_directory has a slash on the end
         if output_directory && !output_directory.end_with?('/')
           output_directory += '/'
@@ -163,7 +158,8 @@ module Fastlane
 
       def self.get_latest_build!(app_id: nil, version: nil, platform: nil)
         filter = { app: app_id }
-        filter["preReleaseVersion.version"] = version
+        # The version filter seems to ignore zero prefixes in versions (e.g. 21.01)
+        filter["preReleaseVersion.version"] = version.split(".").map(&:to_i).join(".")
         filter["preReleaseVersion.platform"] = platform
         latest_build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion").first
 

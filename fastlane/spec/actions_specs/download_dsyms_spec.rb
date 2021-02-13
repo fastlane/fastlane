@@ -99,7 +99,7 @@ describe Fastlane do
         it 'downloads all dsyms of all builds in train 1.07.0' do
           expect(build_resp).to receive(:to_models).and_return([build1])
 
-          [[build1, '1.7.0', '3', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
+          [[build1, '1.07.0', '3', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
