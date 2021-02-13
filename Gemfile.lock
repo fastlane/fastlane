@@ -25,6 +25,7 @@ PATH
       jwt (>= 2.1.0, < 3)
       mini_magick (>= 4.9.4, < 5.0.0)
       multipart-post (~> 2.0.0)
+      naturally (~> 2.2)
       plist (>= 3.1.0, < 4.0.0)
       rubyzip (>= 2.0.0, < 3.0.0)
       security (= 0.1.3)
@@ -381,4 +382,4 @@ DEPENDENCIES
   yard (~> 0.9.11)
 
 BUNDLED WITH
-   2.2.8
+   2.2.9
