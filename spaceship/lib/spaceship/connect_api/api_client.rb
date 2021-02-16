@@ -247,8 +247,23 @@ module Spaceship
         # ]
         # }
 
+        # Detail is missing in this response making debugging super hard
+        # {"errors" =>
+        #   [
+        #     {
+        #       "id"=>"80ea6cff-0043-4543-9cd1-3e26b0fce383",
+        #       "status"=>"409",
+        #       "code"=>"ENTITY_ERROR.RELATIONSHIP.INVALID",
+        #       "title"=>"The provided entity includes a relationship with an invalid value",
+        #       "source"=>{
+        #         "pointer"=>"/data/relationships/primarySubcategoryOne"
+        #       }
+        #     }
+        #   ]
+        # }
+
         return response.body['errors'].map do |error|
-          messages = [[error['title'], error['detail']].compact.join(" - ")]
+          messages = [[error['title'], error['detail'], error.dig("source", "pointer")].compact.join(" - ")]
 
           meta = error["meta"] || {}
           associated_errors = meta["associatedErrors"] || {}

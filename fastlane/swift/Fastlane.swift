@@ -158,7 +158,7 @@ public func appStoreConnectApiKey(keyId: String,
                                   keyFilepath: String? = nil,
                                   keyContent: String? = nil,
                                   isKeyContentBase64: Bool = false,
-                                  duration: Int? = nil,
+                                  duration: Int = 1200,
                                   inHouse: Bool? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "app_store_connect_api_key", className: nil, args: [RubyCommand.Argument(name: "key_id", value: keyId),
@@ -219,6 +219,7 @@ public func appaloosa(binary: String,
    - path: Path to zipped build on the local filesystem. Either this or `url` must be specified
    - publicKey: If not provided, a new app will be created. If provided, the existing build will be overwritten
    - note: Notes you wish to add to the uploaded app
+   - timeout: The number of seconds to wait until automatically ending the session due to user inactivity. Must be 30, 60, 90, 120, 180, 300, 600, 1800, 3600 or 7200. Default is 120
 
  If you provide a `public_key`, this will overwrite an existing application. If you want to have this build as a new app version, you shouldn't provide this value.
 
@@ -230,7 +231,8 @@ public func appetize(apiHost: String = "api.appetize.io",
                      platform: String = "ios",
                      path: String? = nil,
                      publicKey: String? = nil,
-                     note: String? = nil)
+                     note: String? = nil,
+                     timeout: Int? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "appetize", className: nil, args: [RubyCommand.Argument(name: "api_host", value: apiHost),
                                                                                             RubyCommand.Argument(name: "api_token", value: apiToken),
@@ -238,7 +240,8 @@ public func appetize(apiHost: String = "api.appetize.io",
                                                                                             RubyCommand.Argument(name: "platform", value: platform),
                                                                                             RubyCommand.Argument(name: "path", value: path),
                                                                                             RubyCommand.Argument(name: "public_key", value: publicKey),
-                                                                                            RubyCommand.Argument(name: "note", value: note)])
+                                                                                            RubyCommand.Argument(name: "note", value: note),
+                                                                                            RubyCommand.Argument(name: "timeout", value: timeout)])
     _ = runner.executeCommand(command)
 }
 
@@ -874,6 +877,7 @@ public func badge(dark: Any? = nil,
    - apiToken: Appetize.io API Token
    - publicKey: If not provided, a new app will be created. If provided, the existing build will be overwritten
    - note: Notes you wish to add to the uploaded app
+   - timeout: The number of seconds to wait until automatically ending the session due to user inactivity. Must be 30, 60, 90, 120, 180, 300, 600, 1800, 3600 or 7200. Default is 120
 
  This should be called from danger.
  More information in the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md).
@@ -882,13 +886,15 @@ public func buildAndUploadToAppetize(xcodebuild: [String: Any] = [:],
                                      scheme: String? = nil,
                                      apiToken: String,
                                      publicKey: String? = nil,
-                                     note: String? = nil)
+                                     note: String? = nil,
+                                     timeout: Int? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "build_and_upload_to_appetize", className: nil, args: [RubyCommand.Argument(name: "xcodebuild", value: xcodebuild),
                                                                                                                 RubyCommand.Argument(name: "scheme", value: scheme),
                                                                                                                 RubyCommand.Argument(name: "api_token", value: apiToken),
                                                                                                                 RubyCommand.Argument(name: "public_key", value: publicKey),
-                                                                                                                RubyCommand.Argument(name: "note", value: note)])
+                                                                                                                RubyCommand.Argument(name: "note", value: note),
+                                                                                                                RubyCommand.Argument(name: "timeout", value: timeout)])
     _ = runner.executeCommand(command)
 }
 
@@ -1850,6 +1856,8 @@ public func captureScreenshots(workspace: String? = nil,
    - projectDirectory: Define the directory containing the Carthage project
    - newResolver: Use new resolver when resolving dependency graph
    - logPath: Path to the xcode build output
+   - useXcframeworks: Create xcframework bundles instead of one framework per platform (requires Xcode 12+)
+   - archive: Archive built frameworks from the current project
    - executable: Path to the `carthage` executable on your machine
  */
 public func carthage(command: String = "bootstrap",
@@ -1872,6 +1880,8 @@ public func carthage(command: String = "bootstrap",
                      projectDirectory: String? = nil,
                      newResolver: Bool? = nil,
                      logPath: String? = nil,
+                     useXcframeworks: Bool = false,
+                     archive: Bool = false,
                      executable: String = "carthage")
 {
     let command = RubyCommand(commandID: "", methodName: "carthage", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
@@ -1894,6 +1904,8 @@ public func carthage(command: String = "bootstrap",
                                                                                             RubyCommand.Argument(name: "project_directory", value: projectDirectory),
                                                                                             RubyCommand.Argument(name: "new_resolver", value: newResolver),
                                                                                             RubyCommand.Argument(name: "log_path", value: logPath),
+                                                                                            RubyCommand.Argument(name: "use_xcframeworks", value: useXcframeworks),
+                                                                                            RubyCommand.Argument(name: "archive", value: archive),
                                                                                             RubyCommand.Argument(name: "executable", value: executable)])
     _ = runner.executeCommand(command)
 }
@@ -2192,6 +2204,7 @@ public func clubmate() {
    - errorCallback: A callback invoked with the command output if there is a non-zero exit status
    - tryRepoUpdateOnError: Retry with --repo-update if action was finished with error
    - deployment: Disallow any changes to the Podfile or the Podfile.lock during installation
+   - allowRoot: Allows CocoaPods to run as root
    - clean: **DEPRECATED!** (Option renamed as clean_install) Remove SCM directories
    - integrate: **DEPRECATED!** (Option removed from cocoapods) Integrate the Pods libraries into the Xcode project(s)
 
@@ -2207,6 +2220,7 @@ public func cocoapods(repoUpdate: Bool = false,
                       errorCallback: ((String) -> Void)? = nil,
                       tryRepoUpdateOnError: Bool = false,
                       deployment: Bool = false,
+                      allowRoot: Bool = false,
                       clean: Bool = true,
                       integrate: Bool = true)
 {
@@ -2220,6 +2234,7 @@ public func cocoapods(repoUpdate: Bool = false,
                                                                                              RubyCommand.Argument(name: "error_callback", value: errorCallback, type: .stringClosure),
                                                                                              RubyCommand.Argument(name: "try_repo_update_on_error", value: tryRepoUpdateOnError),
                                                                                              RubyCommand.Argument(name: "deployment", value: deployment),
+                                                                                             RubyCommand.Argument(name: "allow_root", value: allowRoot),
                                                                                              RubyCommand.Argument(name: "clean", value: clean),
                                                                                              RubyCommand.Argument(name: "integrate", value: integrate)])
     _ = runner.executeCommand(command)
@@ -9630,4 +9645,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.108]
+// FastlaneRunnerAPIVersion [0.9.110]
