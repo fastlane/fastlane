@@ -130,19 +130,26 @@ module Deliver
     def upload_metadata
       upload_metadata = UploadMetadata.new
       upload_screenshots = UploadScreenshots.new
+      prepare_languages = Deliver::PrepareLanguages.new
 
       # First, collect all the things for the HTML Report
       screenshots = upload_screenshots.collect_screenshots(options)
       upload_metadata.load_from_filesystem(options)
 
-      # Assign "default" values to all languages
-      upload_metadata.assign_defaults(options)
+      unless options[:skip_metadata]
+        # Prepare languages by enabling meta languags
+        # on App Store Connect (if needed)
+        prepare_languages.prepare!(options)
+
+        # Assign "default" values to all languages
+        upload_metadata.assign_defaults(options, prepare_languages)
+      end
 
       # Validate
       validate_html(screenshots)
 
       # Commit
-      upload_metadata.upload(options)
+      upload_metadata.upload(options, prepare_languages)
       upload_screenshots.upload(options, screenshots)
       UploadPriceTier.new.upload(options)
     end
