@@ -21,7 +21,7 @@ describe Fastlane do
         expect do
           # We have to clean ENV to be sure that Bundler environement is not defined.
           stub_const('ENV', {})
-          expect(FastlaneCore::Changelog).to receive(:show_changes).with("fastlane", Fastlane::VERSION, update_gem_command: "sudo gem install fastlane")
+          expect(FastlaneCore::Changelog).to receive(:show_changes).with("fastlane", Fastlane::VERSION, update_gem_command: "gem install fastlane")
 
           Fastlane::FastFile.new.parse("lane :test do
             min_fastlane_version '9999'
