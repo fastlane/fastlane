@@ -372,11 +372,7 @@ module FastlaneCore
         return false
       end
 
-      if self.windows?
-        return File.exist?(get_executable_path(cmd_path))
-      else
-        return File.executable?(cmd_path)
-      end
+      return File.exist?(get_executable_path(cmd_path))
     end
 
     # returns the path of the executable with the correct extension on Windows
