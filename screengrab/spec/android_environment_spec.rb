@@ -61,7 +61,7 @@ describe Screengrab do
     end
   end
 
-  describe "pon windows" do
+  describe "on windows" do
     before(:each) do
       allow(FastlaneCore::Helper).to receive(:windows?).and_return(true)
     end
