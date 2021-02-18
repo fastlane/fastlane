@@ -169,23 +169,34 @@ describe Scan do
       end
     end
 
-    describe "additional_xctestrun" do
+    describe "output_xctestrun" do
       it "copies .xctestrun file when :additional_xctestrun is true", requires_xcodebuild: true do
-        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-          output_directory: '/tmp/scan_results',
-          project: './scan/examples/standard/app.xcodeproj',
-          additional_xctestrun: true
-        })
+        Dir.mktmpdir("scan_results") do |tmp_dir|
+          # Configuration
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            derived_data_path: File.join(tmp_dir, 'derived_data'),
+            output_directory: File.join(tmp_dir, 'output'),
+            project: './scan/examples/standard/app.xcodeproj',
+            output_xctestrun: true
+          })
 
-        path = File.join(Scan.config[:derived_data_path], "Build/Products")
-        output_path = File.absolute_path('/tmp/scan_results/settings.xctestrun')
-        File.new(output_path)
+          # Make output directory
+          FileUtils.mkdir_p(Scan.config[:output_directory])
 
-        info_plist_file = Dir.glob("scan/examples/standard/appUITests/*.plist").first
-        FileUtils.cp(info_plist_file, output_path)
+          # Make derived data directory
+          path = File.join(Scan.config[:derived_data_path], "Build/Products")
+          FileUtils.mkdir_p(path)
 
-        expect(File.file?(output_path)) .to eq(true)
-        expect(FileUtils.identical?(info_plist_file, output_path)) .to be true
+          # Create .xctestrun file that will be copied
+          xctestrun_path = File.join(path, 'something-project-something.xctestrun')
+          FileUtils.touch(xctestrun_path)
+
+          scan = Scan::Runner.new
+          scan.copy_xctestrun
+
+          output_path = File.join(Scan.config[:output_directory], 'settings.xctestrun')
+          expect(File.file?(output_path)).to eq(true)
+        end
       end
     end
   end

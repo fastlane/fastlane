@@ -110,7 +110,7 @@ module Scan
 
       copy_simulator_logs
       zip_build_products
-      additional_xctestrun
+      copy_xctestrun
 
       if result[:failures] > 0
         open_report
@@ -151,25 +151,30 @@ module Scan
       UI.message("Successfully zipped build products: #{output_path}")
     end
 
-    def additional_xctestrun
-      return unless Scan.config[:additional_xctestrun]
+    def copy_xctestrun
+      return unless Scan.config[:output_xctestrun]
 
       # Gets :derived_data_path/Build/Products directory for coping .xctestrun file
       derived_data_path = Scan.config[:derived_data_path]
-      path = File.join(derived_data_path, "Build/Products")
+      path = File.join(derived_data_path, "Build", "Products")
 
       # Gets absolute path of output directory
       output_directory = File.absolute_path(Scan.config[:output_directory])
       output_path = File.join(output_directory, "settings.xctestrun")
 
       # Caching path for action to put into lane_context
-      Scan.cache[:additional_xctestrun] = output_path
+      Scan.cache[:output_xctestrun] = output_path
 
       # Copy .xctestrun file and moves it to output directory
       UI.message("Copying .xctestrun file")
       xctestrun_file = Dir.glob("#{path}/*.xctestrun").first
-      FileUtils.cp(xctestrun_file, output_path)
-      UI.message("Successfully copied xctestrun file: #{output_path}")
+
+      if xctestrun_file
+        FileUtils.cp(xctestrun_file, output_path)
+        UI.message("Successfully copied xctestrun file: #{output_path}")
+      else
+        UI.user_error!("Could not find .xctextrun file to copy")
+      end
     end
 
     def test_results
