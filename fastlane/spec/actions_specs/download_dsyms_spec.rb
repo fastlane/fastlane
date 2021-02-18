@@ -135,9 +135,6 @@ describe Fastlane do
 
       context 'when version is latest' do
         it 'downloads only dsyms of latest build in latest train' do
-          expect(app).to receive(:get_edit_app_store_version).and_return(version)
-          expect(version).to receive(:version_string).and_return('2.0.0')
-
           expect(Spaceship::ConnectAPI).to receive(:get_builds).and_return([build2, build1])
 
           expect(build_resp).to receive(:to_models).and_return([build1, build2])
