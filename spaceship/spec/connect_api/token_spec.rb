@@ -5,12 +5,21 @@ describe Spaceship::ConnectAPI::Token do
   let(:issuer_id) { '693fbb20-54a0-4d94-88ce-8a6caf875439' }
 
   let(:fake_api_key_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key.json" }
+  let(:fake_api_key_extra_fields_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key_extra_fields.json" }
   let(:fake_api_key_base64_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key_base64.json" }
   let(:fake_api_key_in_house_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key_in_house.json" }
 
   context '#from_json_file' do
     it 'successfully creates token' do
       token = Spaceship::ConnectAPI::Token.from_json_file(fake_api_key_json_path)
+
+      expect(token.key_id).to eq("D485S484")
+      expect(token.issuer_id).to eq("061966a2-5f3c-4185-af13-70e66d2263f5")
+      expect(token.in_house).to be_nil
+    end
+
+    it 'successfully creates token with extra fields' do
+      token = Spaceship::ConnectAPI::Token.from_json_file(fake_api_key_extra_fields_json_path)
 
       expect(token.key_id).to eq("D485S484")
       expect(token.issuer_id).to eq("061966a2-5f3c-4185-af13-70e66d2263f5")
