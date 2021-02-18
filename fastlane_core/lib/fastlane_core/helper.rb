@@ -425,20 +425,20 @@ module FastlaneCore
       UI.current.log
     end
 
-    def self.ask_password(message: "Passphrase: ", confirm: nil)
+    def self.ask_password(message: "Passphrase: ", confirm: nil, confirmation_message: "Type passphrase again: ")
       raise "This code should only run in interactive mode" unless UI.interactive?
 
       loop do
         password = UI.password(message)
         if confirm
-          password2 = UI.password("Type passphrase again: ")
+          password2 = UI.password(confirmation_message)
           if password == password2
             return password
           end
         else
           return password
         end
-        UI.error("Passphrases differ. Try again")
+        UI.error("Your entries do not match. Please try again")
       end
     end
   end
