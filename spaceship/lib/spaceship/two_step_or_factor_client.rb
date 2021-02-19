@@ -135,7 +135,7 @@ module Spaceship
 
         phone_number = env_2fa_sms_default_phone_number
         phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
-        push_mode = push_mode_from_masked_number(response.body["trustedPhoneNumbers"], phone_number)
+        push_mode = push_mode_from_number(response.body["trustedPhoneNumbers"], phone_number)
         # don't request sms if no trusted devices and env default is the only trusted number,
         # code was automatically sent
         should_request_code = !sms_automatically_sent(response)
@@ -235,7 +235,6 @@ module Spaceship
 
     def phone_id_from_number(phone_numbers, phone_number)
       phone_numbers.each do |phone|
-
 
         return phone['id'] if match_phone_to_masked_phone(phone_number, phone['numberWithDialCode'])
         # +491621234585 matches /^\+49([0-9]{8})85$/

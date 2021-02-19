@@ -235,6 +235,21 @@ describe Spaceship::Client do
         end.to raise_error(Spaceship::Tunes::Error)
       end
 
+      context 'and pushMode is voice' do
+        let(:phone_number) { '+49 123 4567880' }
+        let(:phone_id) { 3 }
+
+        it 'requests voice code' do
+          bool = subject.handle_two_factor(response)
+          expect(bool).to eq(true)
+  
+          # expected requests
+          expect(WebMock).to have_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone').with(body: { phoneNumber: { id: phone_id }, mode: "voice" }).once
+          expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: phone_id }, mode: "voice" })
+          expect(WebMock).to have_requested(:get, 'https://idmsa.apple.com/appleauth/auth/2sv/trust')
+        end
+      end
+
       context 'with trusted devices' do
         # make sure sms overrides device verification when env var is set
         it 'requests sms code, and submits code correctly' do
