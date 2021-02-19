@@ -249,6 +249,15 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
 )
     end
 
+    def push_mode_from_number(phone_numbers, phone_number)
+      phone_numbers.each do |phone|
+        return phone['pushMode'] if match_phone_to_masked_phone(phone_number, phone['numberWithDialCode'])
+      end
+
+      # If no pushMode was supplied, assume sms
+      return "sms"
+    end
+
     def match_phone_to_masked_phone(phone_number, masked_number)
       characters_to_remove_from_phone_numbers = ' \-()"'
 
