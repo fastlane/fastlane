@@ -234,33 +234,10 @@ module Spaceship
     end
 
     def phone_id_from_number(phone_numbers, phone_number)
-      characters_to_remove_from_phone_numbers = ' \-()"'
-
-      # start with e.g. +49 162 1234585 or +1-123-456-7866
-      phone_number = phone_number.tr(characters_to_remove_from_phone_numbers, '')
-      # cleaned: +491621234585 or +11234567866
-
       phone_numbers.each do |phone|
-        # rubocop:disable Style/AsciiComments
-        # start with: +49 •••• •••••85 or +1 (•••) •••-••66
-        number_with_dialcode_masked = phone['numberWithDialCode'].tr(characters_to_remove_from_phone_numbers, '')
-        # cleaned: +49•••••••••85 or +1••••••••66
-        # rubocop:enable Style/AsciiComments
 
-        maskings_count = number_with_dialcode_masked.count('•') # => 9 or 8
-        pattern = /^([0-9+]{2,4})([•]{#{maskings_count}})([0-9]{2})$/
-        # following regex: range from maskings_count-2 because sometimes the masked number has 1 or 2 dots more than the actual number
-        # e.g. https://github.com/fastlane/fastlane/issues/14969
-        replacement = "\\1([0-9]{#{maskings_count - 2},#{maskings_count}})\\3"
-        number_with_dialcode_regex_part = number_with_dialcode_masked.gsub(pattern, replacement)
-        # => +49([0-9]{8,9})85 or +1([0-9]{7,8})66
 
-        backslash = '\\'
-        number_with_dialcode_regex_part = backslash + number_with_dialcode_regex_part
-        number_with_dialcode_regex = /^#{number_with_dialcode_regex_part}$/
-        # => /^\+49([0-9]{8})85$/ or /^\+1([0-9]{7,8})66$/
-
-        return phone['id'] if phone_number =~ number_with_dialcode_regex
+        return phone['id'] if match_phone_to_masked_phone(phone_number, phone['numberWithDialCode'])
         # +491621234585 matches /^\+49([0-9]{8})85$/
       end
 
@@ -270,6 +247,35 @@ Could not find a matching phone number to #{phone_number} in #{phone_numbers}.
 Make sure your environment variable is set to the correct phone number.
 If it is, please open an issue at https://github.com/fastlane/fastlane/issues/new and include this output so we can fix our matcher. Thanks.
 )
+    end
+
+    def match_phone_to_masked_phone(phone_number, masked_number)
+      characters_to_remove_from_phone_numbers = ' \-()"'
+
+      # start with e.g. +49 162 1234585 or +1-123-456-7866
+      phone_number = phone_number.tr(characters_to_remove_from_phone_numbers, '')
+      # cleaned: +491621234585 or +11234567866
+
+      # rubocop:disable Style/AsciiComments
+      # start with: +49 •••• •••••85 or +1 (•••) •••-••66
+      number_with_dialcode_masked = masked_number.tr(characters_to_remove_from_phone_numbers, '')
+      # cleaned: +49•••••••••85 or +1••••••••66
+      # rubocop:enable Style/AsciiComments
+
+      maskings_count = number_with_dialcode_masked.count('•') # => 9 or 8
+      pattern = /^([0-9+]{2,4})([•]{#{maskings_count}})([0-9]{2})$/
+      # following regex: range from maskings_count-2 because sometimes the masked number has 1 or 2 dots more than the actual number
+      # e.g. https://github.com/fastlane/fastlane/issues/14969
+      replacement = "\\1([0-9]{#{maskings_count - 2},#{maskings_count}})\\3"
+      number_with_dialcode_regex_part = number_with_dialcode_masked.gsub(pattern, replacement)
+      # => +49([0-9]{8,9})85 or +1([0-9]{7,8})66
+
+      backslash = '\\'
+      number_with_dialcode_regex_part = backslash + number_with_dialcode_regex_part
+      number_with_dialcode_regex = /^#{number_with_dialcode_regex_part}$/
+      # => /^\+49([0-9]{8})85$/ or /^\+1([0-9]{7,8})66$/
+
+      return phone_number =~ number_with_dialcode_regex
     end
 
     def phone_id_from_masked_number(phone_numbers, masked_number)
