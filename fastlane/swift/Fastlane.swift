@@ -8,7 +8,7 @@ import Foundation
  - parameters:
    - serial: Android serial of the device to use for this command
    - command: All commands you want to pass to the adb command, e.g. `kill-server`
-   - adbPath: The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT environment variable is set)
+   - adbPath: The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT, ANDROID_HOME or ANDROID_SDK environment variable is set)
 
  - returns: The output of the adb command
 
@@ -3845,7 +3845,7 @@ public func gitAdd(path: Any? = nil,
  Directly commit the given file with the given message
 
  - parameters:
-   - path: The file you want to commit
+   - path: The file(s) or directory(ies) you want to commit. You can pass an array of multiple file-paths or fileglobs "*.txt" to commit all matching files. The files already staged but not specified and untracked files won't be committed
    - message: The commit message that should be used
    - skipGitHooks: Set to true to pass --no-verify to git
    - allowNothingToCommit: Set to true to allow commit without any git changes in the files you want to commit
@@ -8338,7 +8338,7 @@ public func updateAppIdentifier(xcodeproj: String,
    - useAutomaticSigning: Defines if project should use automatic signing
    - teamId: Team ID, is used when upgrading project
    - targets: Specify targets you want to toggle the signing mech. (default to all targets)
-   - buildConfigurations: Specify build_configurations you want to toggle the signing mech. (default to all targets)
+   - buildConfigurations: Specify build_configurations you want to toggle the signing mech. (default to all configurations)
    - codeSignIdentity: Code signing identity type (iPhone Developer, iPhone Distribution)
    - profileName: Provisioning profile name to use for code signing
    - profileUuid: Provisioning profile UUID to use for code signing
@@ -9645,4 +9645,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.110]
+// FastlaneRunnerAPIVersion [0.9.111]
