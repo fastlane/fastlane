@@ -91,6 +91,8 @@ Shopping list:
       end
 
       it "finds commands with known extensions which are on the PATH" do
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(true)
+
         Tempfile.open(['foobarbaz', '.exe']) do |f|
           File.chmod(0777, f)
 
@@ -104,6 +106,8 @@ Shopping list:
       end
 
       it "does not find commands with unknown extensions which are on the PATH" do
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(true)
+
         Tempfile.open(['foobarbaz', '.exe']) do |f|
           File.chmod(0777, f)
 
