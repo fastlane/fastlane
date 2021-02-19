@@ -235,9 +235,7 @@ module Spaceship
 
     def phone_id_from_number(phone_numbers, phone_number)
       phone_numbers.each do |phone|
-
         return phone['id'] if match_phone_to_masked_phone(phone_number, phone['numberWithDialCode'])
-        # +491621234585 matches /^\+49([0-9]{8})85$/
       end
 
       # Handle case of phone_number not existing in phone_numbers because ENV var is wrong or matcher is broken
@@ -284,6 +282,7 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
       # => /^\+49([0-9]{8})85$/ or /^\+1([0-9]{7,8})66$/
 
       return phone_number =~ number_with_dialcode_regex
+      # +491621234585 matches /^\+49([0-9]{8})85$/
     end
 
     def phone_id_from_masked_number(phone_numbers, masked_number)

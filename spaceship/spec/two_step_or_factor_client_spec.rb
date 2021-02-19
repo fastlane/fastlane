@@ -242,7 +242,7 @@ describe Spaceship::Client do
         it 'requests voice code' do
           bool = subject.handle_two_factor(response)
           expect(bool).to eq(true)
-  
+
           # expected requests
           expect(WebMock).to have_requested(:put, 'https://idmsa.apple.com/appleauth/auth/verify/phone').with(body: { phoneNumber: { id: phone_id }, mode: "voice" }).once
           expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode').with(body: { securityCode: { code: "123" }, phoneNumber: { id: phone_id }, mode: "voice" })
