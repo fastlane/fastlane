@@ -170,7 +170,7 @@ describe Scan do
     end
 
     describe "output_xctestrun" do
-      it "copies .xctestrun file when :additional_xctestrun is true", requires_xcodebuild: true do
+      it "copies .xctestrun file when :output_xctestrun is true", requires_xcodebuild: true do
         Dir.mktmpdir("scan_results") do |tmp_dir|
           # Configuration
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
