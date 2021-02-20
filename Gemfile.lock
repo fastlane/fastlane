@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane (2.172.0)
+    fastlane (2.175.0)
       CFPropertyList (>= 2.3, < 4.0.0)
       addressable (>= 2.3, < 3.0.0)
       artifactory (~> 3.0)
@@ -25,6 +25,7 @@ PATH
       jwt (>= 2.1.0, < 3)
       mini_magick (>= 4.9.4, < 5.0.0)
       multipart-post (~> 2.0.0)
+      naturally (~> 2.2)
       plist (>= 3.1.0, < 4.0.0)
       rubyzip (>= 2.0.0, < 3.0.0)
       security (= 0.1.3)
@@ -49,7 +50,7 @@ GEM
     ast (2.4.1)
     atomos (0.1.3)
     aws-eventstream (1.1.0)
-    aws-partitions (1.422.0)
+    aws-partitions (1.427.0)
     aws-sdk-core (3.112.0)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)
@@ -58,7 +59,7 @@ GEM
     aws-sdk-kms (1.42.0)
       aws-sdk-core (~> 3, >= 3.112.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-s3 (1.88.0)
+    aws-sdk-s3 (1.88.1)
       aws-sdk-core (~> 3, >= 3.112.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.1)
@@ -157,7 +158,7 @@ GEM
       webrick
     google-apis-iamcredentials_v1 (0.1.0)
       google-apis-core (~> 0.1)
-    google-apis-storage_v1 (0.1.0)
+    google-apis-storage_v1 (0.2.0)
       google-apis-core (~> 0.1)
     google-cloud-core (1.5.0)
       google-cloud-env (~> 1.0)
@@ -173,7 +174,7 @@ GEM
       google-cloud-core (~> 1.2)
       googleauth (~> 0.9)
       mini_mime (~> 1.0)
-    googleauth (0.15.0)
+    googleauth (0.15.1)
       faraday (>= 0.17.3, < 2.0)
       jwt (>= 1.4, < 3.0)
       memoist (~> 0.16)
@@ -381,4 +382,4 @@ DEPENDENCIES
   yard (~> 0.9.11)
 
 BUNDLED WITH
-   2.2.8
+   2.2.9

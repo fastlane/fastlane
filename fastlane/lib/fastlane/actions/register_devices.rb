@@ -118,7 +118,7 @@ module Fastlane
                                          UI.user_error!("Could not find file '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_key_path,
-                                       env_name: "FL_REGISTER_DEVICES_API_KEY_PATH",
+                                       env_names: ["FL_REGISTER_DEVICES_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
                                        description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                        optional: true,
                                        conflicting_options: [:api_key],
@@ -126,7 +126,7 @@ module Fastlane
                                          UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_key,
-                                       env_name: "FL_REGISTER_DEVICES_API_KEY",
+                                       env_names: ["FL_REGISTER_DEVICES_API_KEY", "APP_STORE_CONNECT_API_KEY"],
                                        description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                        type: Hash,
                                        optional: true,

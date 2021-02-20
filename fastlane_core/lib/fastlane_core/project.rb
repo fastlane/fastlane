@@ -1,5 +1,6 @@
 require_relative 'helper'
 require 'xcodeproj'
+require_relative './configuration/configuration'
 require 'fastlane_core/command_executor'
 
 module FastlaneCore
@@ -67,9 +68,6 @@ module FastlaneCore
     # Is this project a workspace?
     attr_accessor :is_workspace
 
-    # The config object containing the scheme, configuration, etc.
-    attr_accessor :options
-
     # Should the output of xcodebuild commands be silenced?
     attr_accessor :xcodebuild_list_silent
 
@@ -77,16 +75,32 @@ module FastlaneCore
     # Gets rid of annoying plugin info warnings.
     attr_accessor :xcodebuild_suppress_stderr
 
+    # @param options [FastlaneCore::Configuration|Hash] a set of configuration to run xcodebuild to work out build settings
+    # @param xcodebuild_list_silent [Boolean] a flag to silent xcodebuild command's output
+    # @param xcodebuild_suppress_stderr [Boolean] a flag to supress output to stderr from xcodebuild
     def initialize(options, xcodebuild_list_silent: false, xcodebuild_suppress_stderr: false)
-      self.options = options
-      self.path = File.expand_path(options[:workspace] || options[:project])
-      self.is_workspace = (options[:workspace].to_s.length > 0)
-      self.xcodebuild_list_silent = xcodebuild_list_silent
-      self.xcodebuild_suppress_stderr = xcodebuild_suppress_stderr
+      @options = options
+      @path = File.expand_path(self.options[:workspace] || self.options[:project])
+      @is_workspace = (self.options[:workspace].to_s.length > 0)
+      @xcodebuild_list_silent = xcodebuild_list_silent
+      @xcodebuild_suppress_stderr = xcodebuild_suppress_stderr
 
       if !path || !File.directory?(path)
         UI.user_error!("Could not find project at path '#{path}'")
       end
+    end
+
+    # @return [Hash] a hash object containing project, workspace, scheme, any configuration related to xcodebuild, or etc...
+    def options
+      # To keep compatibility with actions using this class from outside of `fastlane` gem; i.e. `xcov`,
+      # converts `options` to a plain Hash. Otherwise, it might crash when a new option's key is added
+      # due to `FastlaneCore::Configuration` to validate valid keys defined.
+      @options.kind_of?(FastlaneCore::Configuration) ? @options.values : @options
+    end
+
+    def options=(new_value)
+      UI.deprecated('Update `options` is not worth doing since it can change behavior of this object entirely. Consider re-creating FastlaneCore::Project.')
+      @options = new_value
     end
 
     def workspace?

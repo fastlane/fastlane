@@ -579,10 +579,10 @@ module Spaceship
       }
 
       r = request(:post) do |req|
-        req.url("https://analytics.itunes.apple.com/analytics/api/v1/data/time-series")
+        req.url("https://appstoreconnect.apple.com/analytics/api/v1/data/time-series")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
-        req.headers['X-Requested-By'] = 'analytics.itunes.apple.com'
+        req.headers['X-Requested-By'] = 'appstoreconnect.apple.com'
       end
 
       data = parse_response(r)

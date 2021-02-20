@@ -39,13 +39,8 @@ module Fastlane
         # Set version if it is latest
         if version == 'latest'
           # Try to grab the edit version first, else fallback to live version
-          UI.message("Looking for latest version...")
-          latest_version = app.get_edit_app_store_version(platform: platform) || app.get_live_app_store_version(platform: platform)
-
-          UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.nil?
-
-          latest_build = get_latest_build!(app_id: app.id, version: latest_version.version_string, platform: platform)
-
+          UI.message("Looking for latest build...")
+          latest_build = get_latest_build!(app_id: app.id, platform: platform)
           version = latest_build.app_version
           build_number = latest_build.version
         elsif version == 'live'
@@ -57,11 +52,6 @@ module Fastlane
           # No need to search for candidates, because released App Store version should only have one build
           version = live_version.version_string
           build_number = live_version.build.version
-        end
-
-        # Remove leading zeros from version string (eg. 1.02 -> 1.2)
-        if version
-          version = version.split(".").map(&:to_i).join(".")
         end
 
         # Make sure output_directory has a slash on the end
@@ -161,14 +151,14 @@ module Fastlane
       end
       # rubocop:enable Metrics/PerceivedComplexity
 
-      def self.get_latest_build!(app_id: nil, version: nil, platform: nil)
+      def self.get_latest_build!(app_id: nil, platform: nil)
         filter = { app: app_id }
-        filter["preReleaseVersion.version"] = version
         filter["preReleaseVersion.platform"] = platform
         latest_build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion").first
 
         if latest_build.nil?
-          UI.user_error!("Could not find latest build for version #{version}")
+          UI.user_error!("Could not find any build for platform #{platform}") if platform
+          UI.user_error!("Could not find any build")
         end
 
         return latest_build
