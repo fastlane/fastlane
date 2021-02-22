@@ -450,7 +450,7 @@ module Deliver
                                      description: "Should precheck check in-app purchases?",
                                      is_string: false,
                                      optional: true,
-                                     default_value: false),
+                                     default_value: true),
 
         # internal
         FastlaneCore::ConfigItem.new(key: :app,
