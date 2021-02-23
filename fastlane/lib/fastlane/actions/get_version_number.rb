@@ -48,7 +48,7 @@ module Fastlane
           project_path = Dir.glob("#{xcodeproj_path_or_dir}/*.xcodeproj").first
         end
 
-        if project_path
+        if project_path && File.exist?(project_path)
           return Xcodeproj::Project.open(project_path)
         else
           UI.user_error!("Unable to find Xcode project in folder: #{folder}")
