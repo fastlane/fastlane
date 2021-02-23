@@ -13,7 +13,7 @@ alphabetically, in a human-friendly way. See https://github.com/fastlane/fastlan
 Since iPad Pro (3rd Gen) 12.9" and iPad Pro (2nd Gen) 12.9" have the same image
 resolution, screenshots of the iPad Pro (3rd gen) 12.9" must contain either the
 string `iPad Pro (12.9-inch) (3rd generation)`, `IPAD_PRO_3GEN_129`, or `ipadPro129`
-(Apple's internal naming of the display family for the 3rd generation iPad Pro)
+(App Store Connect's internal naming of the display family for the 3rd generation iPad Pro)
 in its filename to be assigned the correct display family and to be uploaded to
 the correct screenshot slot in your app's metadata.
 
