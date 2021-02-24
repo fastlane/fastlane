@@ -69,7 +69,7 @@ jobs:
         type: string
       ruby_opt:
         type: string
-        default: -W
+        default: ''
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'en_US.UTF-8'
@@ -101,8 +101,10 @@ jobs:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
       - *cache_restore_rubocop
-      - run: |
-          RUBYOPT=<< parameters.ruby_opt >> bundle exec fastlane execute_tests
+      - run:
+          name: bundle exec fastlane execute_tests
+          command: |
+            RUBYOPT=<< parameters.ruby_opt >> bundle exec fastlane execute_tests
       - *cache_save_rubocop
       - run:
           name: Check compatibility with Ruby 3.0
