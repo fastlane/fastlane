@@ -16,9 +16,18 @@ end
 task(:test_all) do
   formatter = "--format progress"
   formatter += " -r rspec_junit_formatter --format RspecJunitFormatter -o #{ENV['CIRCLE_TEST_REPORTS']}/rspec/fastlane-junit-results.xml" if ENV["CIRCLE_TEST_REPORTS"]
+  command = "rspec --pattern ./**/*_spec.rb #{formatter}"
+
   # To move Ruby 3.0 or next major version migration going forward, we want to keep monitoring deprecation warnings
-  formatter += " 2>&1 | tee >(grep 'warning:' > #{File.join(ENV['CIRCLE_TEST_REPORTS'], 'ruby_warnings.txt')})" if ENV["CIRCLE_TEST_REPORTS"]
-  sh("/bin/bash -c \"rspec --pattern ./**/*_spec.rb #{formatter}\"")
+  if Gem.win_platform?
+    # Windows would not work with /bin/bash so skip collecting warnings
+    sh(command)
+  else
+    # Mix stderr into stdout to let handle `tee` it and then collect warnings by filtering stdout out
+    command += " 2>&1 | tee >(grep 'warning:' > #{File.join(ENV['CIRCLE_TEST_REPORTS'], 'ruby_warnings.txt')})" if ENV["CIRCLE_TEST_REPORTS"]
+    # tee >(...) occurs syntax error with `sh` helper which uses /bin/sh by default.
+    sh("/bin/bash -c \"#{command}\"")
+  end
 end
 
 # Overwrite the default rake task
