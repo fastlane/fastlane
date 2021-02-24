@@ -425,6 +425,40 @@ describe "Build Manager" do
     end
   end
 
+  describe "#update_beta_app_meta" do
+    let(:fake_build_manager) { Pilot::BuildManager.new }
+    let(:fake_build) { double("fake build") }
+
+    it "does not attempt to set demo account required" do
+      options = {}
+
+      expect(fake_build_manager).to receive(:update_build_beta_details)
+      fake_build_manager.update_beta_app_meta(options, fake_build)
+    end
+
+    it "sets demo account required to false" do
+      options = { demo_account_required: false }
+
+      expect(fake_build_manager).to receive(:update_review_detail)
+      expect(fake_build_manager).to receive(:update_build_beta_details)
+
+      fake_build_manager.update_beta_app_meta(options, fake_build)
+
+      expect(options[:beta_app_review_info][:demo_account_required]).to be(false)
+    end
+
+    it "sets demo account required to true" do
+      options = { demo_account_required: true }
+
+      expect(fake_build_manager).to receive(:update_review_detail)
+      expect(fake_build_manager).to receive(:update_build_beta_details)
+
+      fake_build_manager.update_beta_app_meta(options, fake_build)
+
+      expect(options[:beta_app_review_info][:demo_account_required]).to be(true)
+    end
+  end
+
   describe "#upload" do
     describe "uses Manager.login (which does spaceship login)" do
       let(:fake_build_manager) { Pilot::BuildManager.new }
