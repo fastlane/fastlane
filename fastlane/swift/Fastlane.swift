@@ -4680,10 +4680,15 @@ public func ipa(workspace: String? = nil,
 /**
  Generate docs using Jazzy
 
- - parameter config: Path to jazzy config file
+ - parameters:
+   - config: Path to jazzy config file
+   - moduleVersion: Version string to use as part of the the default docs title and inside the docset
  */
-public func jazzy(config: String? = nil) {
-    let command = RubyCommand(commandID: "", methodName: "jazzy", className: nil, args: [RubyCommand.Argument(name: "config", value: config)])
+public func jazzy(config: String? = nil,
+                  moduleVersion: String? = nil)
+{
+    let command = RubyCommand(commandID: "", methodName: "jazzy", className: nil, args: [RubyCommand.Argument(name: "config", value: config),
+                                                                                         RubyCommand.Argument(name: "module_version", value: moduleVersion)])
     _ = runner.executeCommand(command)
 }
 
@@ -5457,7 +5462,7 @@ public func pilot(apiKeyPath: String? = nil,
                   appPlatform: String = "ios",
                   appleId: String? = nil,
                   ipa: String? = nil,
-                  demoAccountRequired: Bool = false,
+                  demoAccountRequired: Bool? = nil,
                   betaAppReviewInfo: [String: Any]? = nil,
                   localizedAppInfo: [String: Any]? = nil,
                   betaAppDescription: String? = nil,
@@ -6214,6 +6219,7 @@ public func rubyVersion() {
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
+   - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
@@ -6285,6 +6291,7 @@ public func runTests(workspace: String? = nil,
                      xcprettyArgs: String? = nil,
                      derivedDataPath: String? = nil,
                      shouldZipBuildProducts: Bool = false,
+                     outputXctestrun: Bool = false,
                      resultBundle: Bool = false,
                      useClangReportName: Bool = false,
                      concurrentWorkers: Int? = nil,
@@ -6354,6 +6361,7 @@ public func runTests(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                              RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
                                                                                              RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
+                                                                                             RubyCommand.Argument(name: "output_xctestrun", value: outputXctestrun),
                                                                                              RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                              RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
                                                                                              RubyCommand.Argument(name: "concurrent_workers", value: concurrentWorkers),
@@ -6505,6 +6513,7 @@ public func say(text: Any,
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
+   - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
@@ -6576,6 +6585,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                  xcprettyArgs: Any? = scanfile.xcprettyArgs,
                  derivedDataPath: Any? = scanfile.derivedDataPath,
                  shouldZipBuildProducts: Bool = scanfile.shouldZipBuildProducts,
+                 outputXctestrun: Bool = scanfile.outputXctestrun,
                  resultBundle: Bool = scanfile.resultBundle,
                  useClangReportName: Bool = scanfile.useClangReportName,
                  concurrentWorkers: Int? = scanfile.concurrentWorkers,
@@ -6645,6 +6655,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                                                                                         RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                         RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
                                                                                         RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
+                                                                                        RubyCommand.Argument(name: "output_xctestrun", value: outputXctestrun),
                                                                                         RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                         RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
                                                                                         RubyCommand.Argument(name: "concurrent_workers", value: concurrentWorkers),
@@ -8134,7 +8145,7 @@ public func testflight(apiKeyPath: String? = nil,
                        appPlatform: String = "ios",
                        appleId: String? = nil,
                        ipa: String? = nil,
-                       demoAccountRequired: Bool = false,
+                       demoAccountRequired: Bool? = nil,
                        betaAppReviewInfo: [String: Any]? = nil,
                        localizedAppInfo: [String: Any]? = nil,
                        betaAppDescription: String? = nil,
@@ -9127,7 +9138,7 @@ public func uploadToTestflight(apiKeyPath: String? = nil,
                                appPlatform: String = "ios",
                                appleId: String? = nil,
                                ipa: String? = nil,
-                               demoAccountRequired: Bool = false,
+                               demoAccountRequired: Bool? = nil,
                                betaAppReviewInfo: [String: Any]? = nil,
                                localizedAppInfo: [String: Any]? = nil,
                                betaAppDescription: String? = nil,
@@ -9645,4 +9656,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.111]
+// FastlaneRunnerAPIVersion [0.9.112]
