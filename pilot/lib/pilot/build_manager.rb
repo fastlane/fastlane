@@ -89,12 +89,11 @@ module Pilot
     end
 
     def wait_for_build_processing_to_be_complete(return_when_build_appears = false)
+      platform = fetch_app_platform
       if config[:ipa]
-        platform = fetch_app_platform
         app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
         app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
       else
-        platform = config[:app_platform]
         app_version = config[:app_version]
         app_build = config[:build_number]
       end
