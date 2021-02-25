@@ -207,6 +207,13 @@ module FastlaneCore
       return FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
     end
 
+    def self.path_name_itmsp
+      if !@name_itms
+        @name_itms = ENV["FASTLANE_ITUNES_TRANSPORTER_PATH_ITMSP"] || "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".gsub("x") do rand(16).to_s(16) end
+      end
+      return @name_itms
+    end
+
     def self.user_defined_itms_path
       return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if self.user_defined_itms_path?
     end
