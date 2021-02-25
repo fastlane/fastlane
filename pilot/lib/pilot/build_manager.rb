@@ -407,6 +407,7 @@ module Pilot
 
         unless beta_groups.empty?
           uploaded_build.add_beta_groups(beta_groups: beta_groups)
+          uploaded_build.post_beta_app_review_submission()
         end
       end
 
