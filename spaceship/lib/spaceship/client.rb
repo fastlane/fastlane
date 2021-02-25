@@ -134,7 +134,7 @@ module Spaceship
       if teams.count > 1
         puts("The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now.")
       end
-      @current_team_id ||= teams[0]['contentProvider']['contentProviderId']
+      @current_team_id ||= user_details_data['sessionToken']['contentProviderId']
     end
 
     # Set a new team ID which will be used from now on
@@ -170,6 +170,9 @@ module Spaceship
       end
 
       handle_itc_response(response.body)
+
+      # clear user_details_data cache, as session switch will have changed sessionToken attribute
+      @_cached_user_details = nil
 
       @current_team_id = team_id
     end
