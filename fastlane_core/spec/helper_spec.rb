@@ -148,7 +148,7 @@ describe FastlaneCore do
       end
 
       it "#path_name_itmsp", requires_xcode: true do
-        value = Helper.path_name_itmsp
+        value = FastlaneCore::Helper.path_name_itmsp
         expect(FastlaneCore::Helper.path_name_itmsp).to match(value)
       end
 
