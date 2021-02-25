@@ -208,8 +208,8 @@ module FastlaneCore
     end
 
     def self.path_name_itmsp
-      if !@name_itms
-        @name_itms = ENV["FASTLANE_ITUNES_TRANSPORTER_PATH_ITMSP"] || "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".gsub("x") do rand(16).to_s(16) end
+      unless @name_itms
+        @name_itms = ENV["FASTLANE_ITUNES_TRANSPORTER_PATH_ITMSP"] || "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".gsub("x") { rand(16).to_s(16) }
       end
       return @name_itms
     end
