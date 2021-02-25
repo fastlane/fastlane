@@ -253,9 +253,11 @@ module Pilot
         end
       end
 
-      update_build_beta_details(build, {
-        auto_notify_enabled: options[:notify_external_testers]
-      })
+      if options[:notify_external_testers]
+        update_build_beta_details(build, {
+          auto_notify_enabled: options[:notify_external_testers]
+        })
+      end
     end
 
     def self.truncate_changelog(changelog)
