@@ -58,9 +58,8 @@ module Fastlane
           ENV['FL_NOTARIZE_PASSWORD'] = ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'] || apple_id_account.password
 
           notarization_upload_command << " -u #{apple_id_account.user} -p @env:FL_NOTARIZE_PASSWORD"
+          notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider]
         end
-
-        notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider]
 
         notarization_upload_response = Actions.sh(
           notarization_upload_command,
