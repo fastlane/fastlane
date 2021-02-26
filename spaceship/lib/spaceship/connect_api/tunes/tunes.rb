@@ -381,6 +381,11 @@ module Spaceship
           tunes_request_client.post("appPreviewSets", body)
         end
 
+        def delete_app_preview_set(app_preview_set_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("appPreviewSets/#{app_preview_set_id}", params)
+        end
+
         def patch_app_preview_set_previews(app_preview_set_id: nil, app_preview_ids: nil)
           app_preview_ids ||= []
 
@@ -513,6 +518,11 @@ module Spaceship
           }
 
           tunes_request_client.patch("appScreenshotSets/#{app_screenshot_set_id}/relationships/appScreenshots", body)
+        end
+
+        def delete_app_screenshot_set(app_screenshot_set_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("appScreenshotSets/#{app_screenshot_set_id}", params)
         end
 
         #

@@ -123,6 +123,11 @@ module Spaceship
         return client.get_app_screenshot_set(app_screenshot_set_id: app_screenshot_set_id, filter: nil, includes: includes, limit: nil, sort: nil).first
       end
 
+      def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        return client.delete_app_screenshot_set(app_screenshot_set_id: id)
+      end
+
       def upload_screenshot(client: nil, path: nil, wait_for_processing: true, position: nil)
         client ||= Spaceship::ConnectAPI
         screenshot = Spaceship::ConnectAPI::AppScreenshot.create(client: client, app_screenshot_set_id: id, path: path, wait_for_processing: wait_for_processing)
