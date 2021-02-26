@@ -99,7 +99,7 @@ module FastlaneCore
           UI.important("Enter the password for #{keychain_path}")
           UI.important("This passphrase will be stored in your local keychain with the name #{server} and used in future runs")
           UI.important("This prompt can be avoided by specifying the 'keychain_password' option or 'MATCH_KEYCHAIN_PASSWORD' environment variable")
-          keychain_password = FastlaneCore::Helper.ask_password(message: "Password for #{keychain_name} keychain: ", confirm: true)
+          keychain_password = FastlaneCore::Helper.ask_password(message: "Password for #{keychain_name} keychain: ", confirm: true, confirmation_message: "Type password for #{keychain_name} keychain again: ")
           Security::InternetPassword.add(server, "", keychain_password)
         else
           UI.important("Keychain password for #{keychain_path} was not specified and not found in your keychain. Specify the 'keychain_password' option to prevent the UI permission popup when code signing")

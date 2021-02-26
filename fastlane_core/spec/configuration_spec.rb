@@ -794,7 +794,7 @@ describe FastlaneCore do
             ENV.delete("abc")
           end
 
-          it "prioritizes ENV values after CLI" do
+          it "prioritizes env_name after CLI" do
             ENV["abc"] = "val env"
             config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", default_value: "val default")
             config = FastlaneCore::Configuration.create([config_item], {})
@@ -804,8 +804,38 @@ describe FastlaneCore do
             ENV.delete("abc")
           end
 
-          it "prioritizes config file values after ENV" do
+          it "prioritizes env_names after CLI" do
+            ENV["abc"] = "val env"
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_names: ["abc"], default_value: "val default")
+            config = FastlaneCore::Configuration.create([config_item], {})
+            config.config_file_options = { item: "val config" }
+
+            expect(config[:item]).to eq("val env")
+            ENV.delete("abc")
+          end
+
+          it "prioritizes env_names after env_name" do
+            ENV["abc"] = "val env"
+            ENV["def"] = "val env wrong"
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", "env_names": ["def"], default_value: "val default")
+            config = FastlaneCore::Configuration.create([config_item], {})
+            config.config_file_options = { item: "val config" }
+
+            expect(config[:item]).to eq("val env")
+            ENV.delete("abc")
+            ENV.delete("def")
+          end
+
+          it "prioritizes config file values after env_name" do
             config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", default_value: "val default")
+            config = FastlaneCore::Configuration.create([config_item], {})
+            config.config_file_options = { item: "val config" }
+
+            expect(config[:item]).to eq("val config")
+          end
+
+          it "prioritizes config file values after env_names" do
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_names: ["abc"], default_value: "val default")
             config = FastlaneCore::Configuration.create([config_item], {})
             config.config_file_options = { item: "val config" }
 
