@@ -38,7 +38,7 @@ module Fastlane
           # From xcrun altool for --apiKey:
           # This option will search the following directories in sequence for a private key file with the name of 'AuthKey_<api_key>.p8':  './private_keys', '~/private_keys', '~/.private_keys', and '~/.appstoreconnect/private_keys'.
           api_key = JSON.parse(File.read(api_key_path))
-          api_key_folder_path = 'private_keys'
+          api_key_folder_path = '~/.appstoreconnect/private_keys'
           api_key_file_path = File.join(api_key_folder_path, "AuthKey_#{api_key['key_id']}.p8")
           directory_exists = File.directory?(api_key_folder_path)
           file_exists = File.exist?(api_key_file_path)
