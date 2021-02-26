@@ -67,7 +67,7 @@ module FastlaneCore
         long_switch = "--#{option.key} #{value_appendix}"
 
         description = option.description
-        description += " (#{option.env_name})" unless option.env_name.to_s.empty?
+        description += " (#{option.env_names.join(', ')})" unless option.env_names.empty?
 
         # We compact this array here to remove the short_switch variable if it is nil.
         # Passing a nil value to global_option has been shown to create problems with

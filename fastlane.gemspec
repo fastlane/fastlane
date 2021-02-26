@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Aaron Brager",
-                        "Matthew Ellis",
-                        "Jan Piotrowski",
-                        "Maksym Grebenets",
-                        "Fumiya Nakamura",
-                        "Jorge Revuelta H",
-                        "Jérôme Lacoste",
-                        "Max Ott",
-                        "Manu Wallner",
-                        "Luka Mirosevic",
-                        "Daniel Jankowski",
-                        "Helmut Januschka",
-                        "Josh Holtz",
-                        "Joshua Liebowitz",
+  spec.authors       = ["Jan Piotrowski",
                         "Stefan Natchev",
-                        "Jimmy Dee",
-                        "Iulian Onofrei",
-                        "Andrew McBurney",
+                        "Aaron Brager",
+                        "Manu Wallner",
+                        "Jérôme Lacoste",
                         "Olivier Halligon",
-                        "Kohki Miki",
+                        "Helmut Januschka",
+                        "Jorge Revuelta H",
+                        "Danielle Tomlinson",
+                        "Jimmy Dee",
                         "Felix Krause",
-                        "Danielle Tomlinson"]
+                        "Andrew McBurney",
+                        "Fumiya Nakamura",
+                        "Daniel Jankowski",
+                        "Maksym Grebenets",
+                        "Iulian Onofrei",
+                        "Josh Holtz",
+                        "Max Ott",
+                        "Luka Mirosevic",
+                        "Joshua Liebowitz",
+                        "Kohki Miki",
+                        "Matthew Ellis"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -84,6 +84,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
   spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
+  spec.add_dependency('naturally', '~> 2.2') # Used to sort strings with numbers in a human-friendly way
   spec.add_dependency('rubyzip', '>= 2.0.0', '< 3.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')

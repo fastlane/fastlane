@@ -83,7 +83,7 @@ module Deliver
 
       if options[:api_key] || options[:api_key_path]
         if options[:precheck_include_in_app_purchases]
-          UI.user_error!("Precheck cannot check In-app purchases with the App Store Connect API Key (yet). Exclude In-app purchases from precheck or use Apple ID login")
+          UI.user_error!("Precheck cannot check In-app purchases with the App Store Connect API Key (yet). Exclude In-app purchases from precheck, disable the precheck step in your build step, or use Apple ID login")
         end
 
         precheck_options[:api_key] = options[:api_key]
