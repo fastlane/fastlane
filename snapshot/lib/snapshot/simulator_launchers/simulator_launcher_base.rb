@@ -69,7 +69,8 @@ module Snapshot
           unless launcher_config.dark_mode.nil?
             interface_style(type, launcher_config.dark_mode)
           end
-        elsif launcher_config.reinstall_app
+        end
+        if launcher_config.reinstall_app && !launcher_config.erase_simulator
           # no need to reinstall if device has been erased
           uninstall_app(type)
         end
