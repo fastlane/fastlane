@@ -188,6 +188,8 @@ module Spaceship
           raise UnexpectedResponse, response.body
         end
 
+        handle_4xx_errors(response)
+
         raise UnexpectedResponse, response.body['error'] if response.body['error']
 
         raise UnexpectedResponse, handle_errors(response) if response.body['errors']
@@ -199,8 +201,17 @@ module Spaceship
         return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, headers: response.headers, client: self)
       end
 
-      def handle_401(response)
-        raise UnauthorizedAccessError, handle_errors(response) if response && (response.body || {})['errors']
+      def handle_4xx_errors(response)
+        case response.status.to_i
+        when 401
+          raise UnauthorizedAccessError, handle_errors(response) if response && (response.body || {})['errors']
+        when 403
+          if response.body['errors'].first['code'].eql?("FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED")
+            raise ProgramLicenseAgreementUpdated, handle_errors(response) if response && (response.body || {})['errors']
+          else
+            raise AccessForbiddenError, handle_errors(response) if response && (response.body || {})['errors']
+          end
+        end
       end
 
       def handle_errors(response)
