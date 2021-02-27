@@ -876,6 +876,7 @@ module Spaceship
     # Actually sends the request to the remote server
     # Automatically retries the request up to 3 times if something goes wrong
     def send_request(method, url_or_path, params, headers, &block)
+      require_relative 'portal/portal_client'
       with_retry do
         response = @client.send(method, url_or_path, params, headers, &block)
         log_response(method, url_or_path, response, headers, &block)
@@ -893,7 +894,7 @@ module Spaceship
           raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
         end
 
-        if resp_hash[:status] == 403
+        if resp_hash[:status] == 403 && self.kind_of?(Spaceship::PortalClient)
           msg = "Access forbidden"
           logger.warn(msg)
           raise AccessForbiddenError.new, msg
