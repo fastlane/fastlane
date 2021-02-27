@@ -13,8 +13,8 @@ module Spaceship
       rescue Gem::LoadError
         puts("Could not find gem 'pry'".red)
         puts("")
-        puts("If you installed spaceship using `sudo gem install spaceship` run")
-        puts("  sudo gem install pry".yellow)
+        puts("If you installed spaceship using `gem install spaceship` run")
+        puts("  gem install pry".yellow)
         puts("to install the missing gem")
         puts("")
         puts("If you use a Gemfile add this to your Gemfile:")

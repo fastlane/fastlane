@@ -4,8 +4,10 @@
       "swiftformat": {
         "version": "0.47.11",
         "bottle": {
+          "rebuild": 0,
           "cellar": ":any_skip_relocation",
           "prefix": "/usr/local",
+          "root_url": "https://homebrew.bintray.com/bottles",
           "files": {
             "arm64_big_sur": {
               "url": "https://homebrew.bintray.com/bottles/swiftformat-0.47.11.arm64_big_sur.bottle.tar.gz",
@@ -31,9 +33,9 @@
   "system": {
     "macos": {
       "catalina": {
-        "HOMEBREW_VERSION": "3.0.0-57-g59dd425",
+        "HOMEBREW_VERSION": "3.0.2",
         "HOMEBREW_PREFIX": "/usr/local",
-        "Homebrew/homebrew-core": "637196b33ecd885dc057c16fc5cb652a4561f632",
+        "Homebrew/homebrew-core": "372d8a99773af6b309354856d1295825ab43d7e0",
         "CLT": "11.0.33.12",
         "Xcode": "12.2",
         "macOS": "10.15.7"

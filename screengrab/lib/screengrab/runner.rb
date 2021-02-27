@@ -392,13 +392,12 @@ module Screengrab
     end
 
     def run_adb_command(command, print_all: false, print_command: false, raise_errors: true)
-      adb_path = @android_env.adb_path.chomp("adb")
       adb_host = @config[:adb_host]
       host = adb_host.nil? ? '' : "-H #{adb_host} "
       output = ''
       begin
         errout = nil
-        cmdout = @executor.execute(command: adb_path + "adb " + host + command,
+        cmdout = @executor.execute(command: @android_env.adb_path + " " + host + command,
                                   print_all: print_all,
                                   print_command: print_command,
                                   error: raise_errors ? nil : proc { |out, status| errout = out }) || ''

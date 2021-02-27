@@ -8,7 +8,7 @@ import Foundation
  - parameters:
    - serial: Android serial of the device to use for this command
    - command: All commands you want to pass to the adb command, e.g. `kill-server`
-   - adbPath: The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT environment variable is set)
+   - adbPath: The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT, ANDROID_HOME or ANDROID_SDK environment variable is set)
 
  - returns: The output of the adb command
 
@@ -3845,7 +3845,7 @@ public func gitAdd(path: Any? = nil,
  Directly commit the given file with the given message
 
  - parameters:
-   - path: The file you want to commit
+   - path: The file(s) or directory(ies) you want to commit. You can pass an array of multiple file-paths or fileglobs "*.txt" to commit all matching files. The files already staged but not specified and untracked files won't be committed
    - message: The commit message that should be used
    - skipGitHooks: Set to true to pass --no-verify to git
    - allowNothingToCommit: Set to true to allow commit without any git changes in the files you want to commit
@@ -4680,10 +4680,15 @@ public func ipa(workspace: String? = nil,
 /**
  Generate docs using Jazzy
 
- - parameter config: Path to jazzy config file
+ - parameters:
+   - config: Path to jazzy config file
+   - moduleVersion: Version string to use as part of the the default docs title and inside the docset
  */
-public func jazzy(config: String? = nil) {
-    let command = RubyCommand(commandID: "", methodName: "jazzy", className: nil, args: [RubyCommand.Argument(name: "config", value: config)])
+public func jazzy(config: String? = nil,
+                  moduleVersion: String? = nil)
+{
+    let command = RubyCommand(commandID: "", methodName: "jazzy", className: nil, args: [RubyCommand.Argument(name: "config", value: config),
+                                                                                         RubyCommand.Argument(name: "module_version", value: moduleVersion)])
     _ = runner.executeCommand(command)
 }
 
@@ -5457,7 +5462,7 @@ public func pilot(apiKeyPath: String? = nil,
                   appPlatform: String = "ios",
                   appleId: String? = nil,
                   ipa: String? = nil,
-                  demoAccountRequired: Bool = false,
+                  demoAccountRequired: Bool? = nil,
                   betaAppReviewInfo: [String: Any]? = nil,
                   localizedAppInfo: [String: Any]? = nil,
                   betaAppDescription: String? = nil,
@@ -6214,6 +6219,7 @@ public func rubyVersion() {
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
+   - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
@@ -6285,6 +6291,7 @@ public func runTests(workspace: String? = nil,
                      xcprettyArgs: String? = nil,
                      derivedDataPath: String? = nil,
                      shouldZipBuildProducts: Bool = false,
+                     outputXctestrun: Bool = false,
                      resultBundle: Bool = false,
                      useClangReportName: Bool = false,
                      concurrentWorkers: Int? = nil,
@@ -6354,6 +6361,7 @@ public func runTests(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                              RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
                                                                                              RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
+                                                                                             RubyCommand.Argument(name: "output_xctestrun", value: outputXctestrun),
                                                                                              RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                              RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
                                                                                              RubyCommand.Argument(name: "concurrent_workers", value: concurrentWorkers),
@@ -6505,6 +6513,7 @@ public func say(text: Any,
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
+   - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
@@ -6576,6 +6585,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                  xcprettyArgs: Any? = scanfile.xcprettyArgs,
                  derivedDataPath: Any? = scanfile.derivedDataPath,
                  shouldZipBuildProducts: Bool = scanfile.shouldZipBuildProducts,
+                 outputXctestrun: Bool = scanfile.outputXctestrun,
                  resultBundle: Bool = scanfile.resultBundle,
                  useClangReportName: Bool = scanfile.useClangReportName,
                  concurrentWorkers: Int? = scanfile.concurrentWorkers,
@@ -6645,6 +6655,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                                                                                         RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                         RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
                                                                                         RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
+                                                                                        RubyCommand.Argument(name: "output_xctestrun", value: outputXctestrun),
                                                                                         RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                         RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
                                                                                         RubyCommand.Argument(name: "concurrent_workers", value: concurrentWorkers),
@@ -8134,7 +8145,7 @@ public func testflight(apiKeyPath: String? = nil,
                        appPlatform: String = "ios",
                        appleId: String? = nil,
                        ipa: String? = nil,
-                       demoAccountRequired: Bool = false,
+                       demoAccountRequired: Bool? = nil,
                        betaAppReviewInfo: [String: Any]? = nil,
                        localizedAppInfo: [String: Any]? = nil,
                        betaAppDescription: String? = nil,
@@ -8338,7 +8349,7 @@ public func updateAppIdentifier(xcodeproj: String,
    - useAutomaticSigning: Defines if project should use automatic signing
    - teamId: Team ID, is used when upgrading project
    - targets: Specify targets you want to toggle the signing mech. (default to all targets)
-   - buildConfigurations: Specify build_configurations you want to toggle the signing mech. (default to all targets)
+   - buildConfigurations: Specify build_configurations you want to toggle the signing mech. (default to all configurations)
    - codeSignIdentity: Code signing identity type (iPhone Developer, iPhone Distribution)
    - profileName: Provisioning profile name to use for code signing
    - profileUuid: Provisioning profile UUID to use for code signing
@@ -9127,7 +9138,7 @@ public func uploadToTestflight(apiKeyPath: String? = nil,
                                appPlatform: String = "ios",
                                appleId: String? = nil,
                                ipa: String? = nil,
-                               demoAccountRequired: Bool = false,
+                               demoAccountRequired: Bool? = nil,
                                betaAppReviewInfo: [String: Any]? = nil,
                                localizedAppInfo: [String: Any]? = nil,
                                betaAppDescription: String? = nil,
@@ -9645,4 +9656,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.110]
+// FastlaneRunnerAPIVersion [0.9.112]

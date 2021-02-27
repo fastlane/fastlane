@@ -415,5 +415,21 @@ describe Deliver::UploadScreenshots do
         described_class.new.sort_screenshots([localization])
       end
     end
+
+    context 'when localization has screenshots uploaded in wrong order with trailing numbers up to 10' do
+      it 'should reoder screenshots' do
+        app_screenshot1 = make_app_screenshot(id: '1', file_name: '6.5_1.jpg')
+        app_screenshot2 = make_app_screenshot(id: '2', file_name: '6.5_2.jpg')
+        app_screenshot10 = make_app_screenshot(id: '10', file_name: '6.5_10.jpg')
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [app_screenshot10, app_screenshot2, app_screenshot1])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        expect(app_screenshot_set).to receive(:reorder_screenshots).with(app_screenshot_ids: ['1', '2', '10'])
+        described_class.new.sort_screenshots([localization])
+      end
+    end
   end
 end
