@@ -30,11 +30,6 @@ end
 
 def before_each_spaceship
   @cache_paths.each { |path| try_delete(path) }
-  ENV["DELIVER_USER"] = "spaceship@krausefx.com"
-  ENV["DELIVER_PASSWORD"] = "so_secret"
-  ENV['SPACESHIP_AVOID_XCODE_API'] = 'true'
-
-  ENV.delete("FASTLANE_USER")
 
   TunesStubbing.itc_stub_login
   PortalStubbing.adp_stub_login
@@ -96,7 +91,28 @@ def before_each_spaceship
 end
 
 def after_each_spaceship
+  Spaceship::ConnectAPI.client = nil
+  Spaceship::Tunes.client = nil
+  Spaceship::Portal.client = nil
+  Spaceship::Base.subclasses.each do |subclass|
+    subclass.client = nil if subclass.respond_to?(:client=)
+  end
+  Spaceship::Base.subclasses.flat_map(&:subclasses).compact.each do |subclass|
+    subclass.client = nil if subclass.respond_to?(:client=)
+  end
+
   @cache_paths.each { |path| try_delete(path) }
+end
+
+def around_each_spaceship(current_test)
+  FastlaneSpec::Env.with_env_values(
+    DELIVER_USER: 'spaceship@krausefx.com',
+    DELIVER_PASSWORD: 'so_secret',
+    SPACESHIP_AVOID_XCODE_API: 'true',
+    FASTLANE_USER: nil
+  ) do
+    current_test.run
+  end
 end
 
 RSpec.configure do |config|
