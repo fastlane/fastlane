@@ -90,16 +90,19 @@ def before_each_spaceship
   ConnectAPIStubbing::Users.stub_users
 end
 
+def clear_client_instance_cache_recurisvely(klass)
+  klass.subclasses.compact.each do |subclass|
+    subclass.client = nil
+    clear_client_instance_cache_recurisvely(subclass) if subclass.subclasses
+  end
+end
+
 def after_each_spaceship
+  # Clear client caches that may cause dependencies among unit test cases each other
   Spaceship::ConnectAPI.client = nil
   Spaceship::Tunes.client = nil
   Spaceship::Portal.client = nil
-  Spaceship::Base.subclasses.each do |subclass|
-    subclass.client = nil if subclass.respond_to?(:client=)
-  end
-  Spaceship::Base.subclasses.flat_map(&:subclasses).compact.each do |subclass|
-    subclass.client = nil if subclass.respond_to?(:client=)
-  end
+  clear_client_instance_cache_recurisvely(Spaceship::Base)
 
   @cache_paths.each { |path| try_delete(path) }
 end
