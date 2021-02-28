@@ -72,11 +72,16 @@ RSpec.configure do |config|
     # execute `around_each_*` method from spec_helper for each tool
     tool_name = current_test.id.match(%r{\.\/(\w+)\/})[1]
     method_name = "around_each_#{tool_name}".to_sym
+
+    around_hook_defined = true
     begin
       my_main.send(method_name, current_test)
     rescue NoMethodError
-      # no method implemented
-      current_test.run
+      around_hook_defined = false
+    ensure
+      # Run current_test here if it's not run by the around hook
+      # If this is called in rescue clause, the backtrace messes up
+      current_test.run unless around_hook_defined
     end
   end
 
