@@ -582,7 +582,7 @@ module Spaceship
         req.url("https://appstoreconnect.apple.com/analytics/api/v1/data/time-series")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
-        req.headers['X-Requested-By'] = 'dev.apple.com'
+        req.headers['X-Requested-By'] = 'appstoreconnect.apple.com'
       end
 
       data = parse_response(r)
@@ -601,7 +601,7 @@ module Spaceship
         req.url("https://appstoreconnect.apple.com/analytics/api/v1/data/time-series")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
-        req.headers['X-Requested-By'] = 'dev.apple.com'
+        req.headers['X-Requested-By'] = 'appstoreconnect.apple.com'
       end
 
       data = parse_response(r)
@@ -635,7 +635,7 @@ module Spaceship
         req.url("https://appstoreconnect.apple.com/analytics/api/v1/data/app-list")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
-        req.headers['X-Requested-By'] = 'dev.apple.com'
+        req.headers['X-Requested-By'] = 'appstoreconnect.apple.com'
       end
 
       data = parse_response(r)["results"]
