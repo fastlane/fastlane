@@ -767,6 +767,11 @@ module Spaceship
           tunes_request_client.get("appStoreVersions/#{app_store_version_id}/appStoreVersionLocalizations", params)
         end
 
+        def get_app_store_version_localization(app_store_version_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.get("appStoreVersionLocalizations/#{app_store_version_localization_id}", params)
+        end
+
         def post_app_store_version_localization(app_store_version_id: nil, attributes: {})
           body = {
             data: {
