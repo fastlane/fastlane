@@ -1,6 +1,6 @@
+require 'fastlane_core'
 require 'spaceship/tunes/tunes'
 require 'digest/md5'
-require 'fastlane_core/queue_worker'
 
 require_relative 'app_screenshot'
 require_relative 'module'

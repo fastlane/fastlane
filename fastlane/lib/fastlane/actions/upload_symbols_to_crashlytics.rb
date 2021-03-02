@@ -1,5 +1,3 @@
-require 'thread'
-
 module Fastlane
   module Actions
     class UploadSymbolsToCrashlyticsAction < Action
@@ -35,10 +33,11 @@ module Fastlane
           UI.message("Using #{max_worker_threads} threads for Crashlytics dSYM upload 🏎")
         end
 
-        dsym_paths.each do |current_path|
-          handle_dsym(params, current_path, max_worker_threads)
+        worker = FastlaneCore::QueueWorker.new(max_worker_threads) do |dsym_path|
+          handle_dsym(params, dsym_path, max_worker_threads)
         end
-
+        worker.batch_enqueue(dsym_paths)
+        worker.start
         UI.success("Successfully uploaded dSYM files to Crashlytics 💯")
       end
 

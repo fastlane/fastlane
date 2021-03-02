@@ -1,5 +1,5 @@
+require 'fastlane_core'
 require 'spaceship'
-require 'fastlane_core/queue_worker'
 
 require_relative 'module'
 
