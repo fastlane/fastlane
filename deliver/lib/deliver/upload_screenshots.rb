@@ -1,10 +1,10 @@
 require 'spaceship/tunes/tunes'
 require 'digest/md5'
+require 'fastlane_core/queue_worker'
 
 require_relative 'app_screenshot'
 require_relative 'module'
 require_relative 'loader'
-require_relative 'queue_worker'
 require_relative 'app_screenshot_iterator'
 
 module Deliver
@@ -67,7 +67,7 @@ module Deliver
     def delete_screenshots(localizations, screenshots_per_language, tries: 5)
       tries -= 1
 
-      worker = QueueWorker.new do |job|
+      worker = FastlaneCore::QueueWorker.new do |job|
         start_time = Time.now
         target = "#{job.localization.locale} #{job.app_screenshot_set.screenshot_display_type} #{job.app_screenshot.id}"
         begin
@@ -113,7 +113,7 @@ module Deliver
       tries -= 1
 
       # Upload screenshots
-      worker = QueueWorker.new do |job|
+      worker = FastlaneCore::QueueWorker.new do |job|
         begin
           UI.verbose("Uploading '#{job.path}'...")
           start_time = Time.now
@@ -235,7 +235,7 @@ module Deliver
       iterator = AppScreenshotIterator.new(localizations)
 
       # Re-order screenshots within app_screenshot_set
-      worker = QueueWorker.new do |app_screenshot_set|
+      worker = FastlaneCore::QueueWorker.new do |app_screenshot_set|
         original_ids = app_screenshot_set.app_screenshots.map(&:id)
         sorted_ids = Naturally.sort(app_screenshot_set.app_screenshots, by: :file_name).map(&:id)
         if original_ids != sorted_ids
