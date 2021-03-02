@@ -10,7 +10,7 @@ require_relative 'app_screenshot_iterator'
 module Deliver
   # upload screenshots to App Store Connect
   class UploadScreenshots
-    DeleteScreenshotJob = Struct.new(:app_screenshot, :localization, :app_screenshot_set)
+    DeleteScreenshotSetJob = Struct.new(:app_screenshot_set, :localization)
     UploadScreenshotJob = Struct.new(:app_screenshot_set, :path)
 
     def upload(options, screenshots)
@@ -69,10 +69,10 @@ module Deliver
 
       worker = FastlaneCore::QueueWorker.new do |job|
         start_time = Time.now
-        target = "#{job.localization.locale} #{job.app_screenshot_set.screenshot_display_type} #{job.app_screenshot.id}"
+        target = "#{job.localization.locale} #{job.app_screenshot_set.screenshot_display_type}"
         begin
           UI.verbose("Deleting '#{target}'")
-          job.app_screenshot.delete!
+          job.app_screenshot_set.delete!
           UI.message("Deleted '#{target}' -  (#{Time.now - start_time} secs)")
         rescue => error
           UI.error("Failed to delete screenshot #{target} - (#{Time.now - start_time} secs)")
@@ -81,12 +81,12 @@ module Deliver
       end
 
       iterator = AppScreenshotIterator.new(localizations)
-      iterator.each_app_screenshot do |localization, app_screenshot_set, app_screenshot|
+      iterator.each_app_screenshot_set do |localization, app_screenshot_set|
         # Only delete screenshots if trying to upload
         next unless screenshots_per_language.keys.include?(localization.locale)
 
-        UI.verbose("Queued delete sceeenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{app_screenshot.id}")
-        worker.enqueue(DeleteScreenshotJob.new(app_screenshot, localization, app_screenshot_set))
+        UI.verbose("Queued delete sceeenshot set job for #{localization.locale} #{app_screenshot_set.screenshot_display_type}")
+        worker.enqueue(DeleteScreenshotSetJob.new(app_screenshot_set, localization))
       end
 
       worker.start
