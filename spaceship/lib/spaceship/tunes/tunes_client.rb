@@ -567,10 +567,10 @@ module Spaceship
     # @!group AppAnalytics
     #####################################################
 
-    def time_series_analytics(app_ids, measures, start_time, end_time, frequency, view_by)
+    def time_series_analytics(app_ids, dimensions, measures, start_time, end_time, frequency, view_by)
       data = {
         adamId: app_ids,
-        dimensionFilters: [],
+        dimensionFilters: dimensions,
         endTime: end_time,
         frequency: frequency,
         group: group_for_view_by(view_by, measures),
@@ -586,6 +586,59 @@ module Spaceship
       end
 
       data = parse_response(r)
+    end
+
+    def dimension_values_analytics(app_ids, dimensions, frequency, start_time, end_time)
+      data = {
+        adamId: app_ids,
+        dimensions: dimensions,
+        frequency: frequency,
+        endTime: end_time,
+        startTime: start_time
+      }
+
+      r = request(:post) do |req|
+        req.url("https://appstoreconnect.apple.com/analytics/api/v1/data/time-series")
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-By'] = 'appstoreconnect.apple.com'
+      end
+
+      data = parse_response(r)
+    end
+
+    def analytics_app_info
+      r = request(:get, "https://appstoreconnect.apple.com/analytics/api/v1/app-info/all")
+      data = parse_response(r)["results"]
+    end
+
+    def analytics_user_info
+      r = request(:get, "https://appstoreconnect.apple.com/analytics/api/v1/settings/user-info")
+      data = parse_response(r)
+    end
+
+    def analytics_all_measures
+      r = request(:get, "https://appstoreconnect.apple.com/analytics/api/v1/settings/all")
+      data = parse_response(r)
+    end
+
+    def analytics_app_list(app_ids, measures, frequency, start_time, end_time)
+      data = {
+        adamId: app_ids,
+        endTime: end_time,
+        frequency: frequency,
+        measures: measures,
+        startTime: start_time
+      }
+
+      r = request(:post) do |req|
+        req.url("https://appstoreconnect.apple.com/analytics/api/v1/data/app-list")
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-By'] = 'appstoreconnect.apple.com'
+      end
+
+      data = parse_response(r)["results"]
     end
 
     #####################################################
@@ -1604,7 +1657,7 @@ module Spaceship
           metric: measures.first,
           dimension: view_by,
           rank: "DESCENDING",
-          limit: 3
+          limit: 200
         }
       end
     end
