@@ -73,14 +73,14 @@ module Screengrab
     def find_adb(platform_tools_path)
       return FastlaneCore::CommandExecutor.which('adb') unless platform_tools_path
 
-      adb_path = File.join(platform_tools_path, 'adb')
+      adb_path = Helper.get_executable_path(File.join(platform_tools_path, 'adb'))
       return executable_command?(adb_path) ? adb_path : nil
     end
 
     def find_aapt(build_tools_path)
       return FastlaneCore::CommandExecutor.which('aapt') unless build_tools_path
 
-      aapt_path = File.join(build_tools_path, 'aapt')
+      aapt_path = Helper.get_executable_path(File.join(build_tools_path, 'aapt'))
       return executable_command?(aapt_path) ? aapt_path : nil
     end
 

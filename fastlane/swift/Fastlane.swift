@@ -8,7 +8,7 @@ import Foundation
  - parameters:
    - serial: Android serial of the device to use for this command
    - command: All commands you want to pass to the adb command, e.g. `kill-server`
-   - adbPath: The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT environment variable is set)
+   - adbPath: The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT, ANDROID_HOME or ANDROID_SDK environment variable is set)
 
  - returns: The output of the adb command
 
@@ -158,7 +158,7 @@ public func appStoreConnectApiKey(keyId: String,
                                   keyFilepath: String? = nil,
                                   keyContent: String? = nil,
                                   isKeyContentBase64: Bool = false,
-                                  duration: Int? = nil,
+                                  duration: Int = 1200,
                                   inHouse: Bool? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "app_store_connect_api_key", className: nil, args: [RubyCommand.Argument(name: "key_id", value: keyId),
@@ -219,6 +219,7 @@ public func appaloosa(binary: String,
    - path: Path to zipped build on the local filesystem. Either this or `url` must be specified
    - publicKey: If not provided, a new app will be created. If provided, the existing build will be overwritten
    - note: Notes you wish to add to the uploaded app
+   - timeout: The number of seconds to wait until automatically ending the session due to user inactivity. Must be 30, 60, 90, 120, 180, 300, 600, 1800, 3600 or 7200. Default is 120
 
  If you provide a `public_key`, this will overwrite an existing application. If you want to have this build as a new app version, you shouldn't provide this value.
 
@@ -230,7 +231,8 @@ public func appetize(apiHost: String = "api.appetize.io",
                      platform: String = "ios",
                      path: String? = nil,
                      publicKey: String? = nil,
-                     note: String? = nil)
+                     note: String? = nil,
+                     timeout: Int? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "appetize", className: nil, args: [RubyCommand.Argument(name: "api_host", value: apiHost),
                                                                                             RubyCommand.Argument(name: "api_token", value: apiToken),
@@ -238,7 +240,8 @@ public func appetize(apiHost: String = "api.appetize.io",
                                                                                             RubyCommand.Argument(name: "platform", value: platform),
                                                                                             RubyCommand.Argument(name: "path", value: path),
                                                                                             RubyCommand.Argument(name: "public_key", value: publicKey),
-                                                                                            RubyCommand.Argument(name: "note", value: note)])
+                                                                                            RubyCommand.Argument(name: "note", value: note),
+                                                                                            RubyCommand.Argument(name: "timeout", value: timeout)])
     _ = runner.executeCommand(command)
 }
 
@@ -874,6 +877,7 @@ public func badge(dark: Any? = nil,
    - apiToken: Appetize.io API Token
    - publicKey: If not provided, a new app will be created. If provided, the existing build will be overwritten
    - note: Notes you wish to add to the uploaded app
+   - timeout: The number of seconds to wait until automatically ending the session due to user inactivity. Must be 30, 60, 90, 120, 180, 300, 600, 1800, 3600 or 7200. Default is 120
 
  This should be called from danger.
  More information in the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md).
@@ -882,13 +886,15 @@ public func buildAndUploadToAppetize(xcodebuild: [String: Any] = [:],
                                      scheme: String? = nil,
                                      apiToken: String,
                                      publicKey: String? = nil,
-                                     note: String? = nil)
+                                     note: String? = nil,
+                                     timeout: Int? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "build_and_upload_to_appetize", className: nil, args: [RubyCommand.Argument(name: "xcodebuild", value: xcodebuild),
                                                                                                                 RubyCommand.Argument(name: "scheme", value: scheme),
                                                                                                                 RubyCommand.Argument(name: "api_token", value: apiToken),
                                                                                                                 RubyCommand.Argument(name: "public_key", value: publicKey),
-                                                                                                                RubyCommand.Argument(name: "note", value: note)])
+                                                                                                                RubyCommand.Argument(name: "note", value: note),
+                                                                                                                RubyCommand.Argument(name: "timeout", value: timeout)])
     _ = runner.executeCommand(command)
 }
 
@@ -1850,6 +1856,8 @@ public func captureScreenshots(workspace: String? = nil,
    - projectDirectory: Define the directory containing the Carthage project
    - newResolver: Use new resolver when resolving dependency graph
    - logPath: Path to the xcode build output
+   - useXcframeworks: Create xcframework bundles instead of one framework per platform (requires Xcode 12+)
+   - archive: Archive built frameworks from the current project
    - executable: Path to the `carthage` executable on your machine
  */
 public func carthage(command: String = "bootstrap",
@@ -1872,6 +1880,8 @@ public func carthage(command: String = "bootstrap",
                      projectDirectory: String? = nil,
                      newResolver: Bool? = nil,
                      logPath: String? = nil,
+                     useXcframeworks: Bool = false,
+                     archive: Bool = false,
                      executable: String = "carthage")
 {
     let command = RubyCommand(commandID: "", methodName: "carthage", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
@@ -1894,6 +1904,8 @@ public func carthage(command: String = "bootstrap",
                                                                                             RubyCommand.Argument(name: "project_directory", value: projectDirectory),
                                                                                             RubyCommand.Argument(name: "new_resolver", value: newResolver),
                                                                                             RubyCommand.Argument(name: "log_path", value: logPath),
+                                                                                            RubyCommand.Argument(name: "use_xcframeworks", value: useXcframeworks),
+                                                                                            RubyCommand.Argument(name: "archive", value: archive),
                                                                                             RubyCommand.Argument(name: "executable", value: executable)])
     _ = runner.executeCommand(command)
 }
@@ -2192,6 +2204,7 @@ public func clubmate() {
    - errorCallback: A callback invoked with the command output if there is a non-zero exit status
    - tryRepoUpdateOnError: Retry with --repo-update if action was finished with error
    - deployment: Disallow any changes to the Podfile or the Podfile.lock during installation
+   - allowRoot: Allows CocoaPods to run as root
    - clean: **DEPRECATED!** (Option renamed as clean_install) Remove SCM directories
    - integrate: **DEPRECATED!** (Option removed from cocoapods) Integrate the Pods libraries into the Xcode project(s)
 
@@ -2207,6 +2220,7 @@ public func cocoapods(repoUpdate: Bool = false,
                       errorCallback: ((String) -> Void)? = nil,
                       tryRepoUpdateOnError: Bool = false,
                       deployment: Bool = false,
+                      allowRoot: Bool = false,
                       clean: Bool = true,
                       integrate: Bool = true)
 {
@@ -2220,6 +2234,7 @@ public func cocoapods(repoUpdate: Bool = false,
                                                                                              RubyCommand.Argument(name: "error_callback", value: errorCallback, type: .stringClosure),
                                                                                              RubyCommand.Argument(name: "try_repo_update_on_error", value: tryRepoUpdateOnError),
                                                                                              RubyCommand.Argument(name: "deployment", value: deployment),
+                                                                                             RubyCommand.Argument(name: "allow_root", value: allowRoot),
                                                                                              RubyCommand.Argument(name: "clean", value: clean),
                                                                                              RubyCommand.Argument(name: "integrate", value: integrate)])
     _ = runner.executeCommand(command)
@@ -3830,7 +3845,7 @@ public func gitAdd(path: Any? = nil,
  Directly commit the given file with the given message
 
  - parameters:
-   - path: The file you want to commit
+   - path: The file(s) or directory(ies) you want to commit. You can pass an array of multiple file-paths or fileglobs "*.txt" to commit all matching files. The files already staged but not specified and untracked files won't be committed
    - message: The commit message that should be used
    - skipGitHooks: Set to true to pass --no-verify to git
    - allowNothingToCommit: Set to true to allow commit without any git changes in the files you want to commit
@@ -4665,10 +4680,15 @@ public func ipa(workspace: String? = nil,
 /**
  Generate docs using Jazzy
 
- - parameter config: Path to jazzy config file
+ - parameters:
+   - config: Path to jazzy config file
+   - moduleVersion: Version string to use as part of the the default docs title and inside the docset
  */
-public func jazzy(config: String? = nil) {
-    let command = RubyCommand(commandID: "", methodName: "jazzy", className: nil, args: [RubyCommand.Argument(name: "config", value: config)])
+public func jazzy(config: String? = nil,
+                  moduleVersion: String? = nil)
+{
+    let command = RubyCommand(commandID: "", methodName: "jazzy", className: nil, args: [RubyCommand.Argument(name: "config", value: config),
+                                                                                         RubyCommand.Argument(name: "module_version", value: moduleVersion)])
     _ = runner.executeCommand(command)
 }
 
@@ -5442,7 +5462,7 @@ public func pilot(apiKeyPath: String? = nil,
                   appPlatform: String = "ios",
                   appleId: String? = nil,
                   ipa: String? = nil,
-                  demoAccountRequired: Bool = false,
+                  demoAccountRequired: Bool? = nil,
                   betaAppReviewInfo: [String: Any]? = nil,
                   localizedAppInfo: [String: Any]? = nil,
                   betaAppDescription: String? = nil,
@@ -6199,6 +6219,7 @@ public func rubyVersion() {
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
+   - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
@@ -6270,6 +6291,7 @@ public func runTests(workspace: String? = nil,
                      xcprettyArgs: String? = nil,
                      derivedDataPath: String? = nil,
                      shouldZipBuildProducts: Bool = false,
+                     outputXctestrun: Bool = false,
                      resultBundle: Bool = false,
                      useClangReportName: Bool = false,
                      concurrentWorkers: Int? = nil,
@@ -6339,6 +6361,7 @@ public func runTests(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                              RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
                                                                                              RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
+                                                                                             RubyCommand.Argument(name: "output_xctestrun", value: outputXctestrun),
                                                                                              RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                              RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
                                                                                              RubyCommand.Argument(name: "concurrent_workers", value: concurrentWorkers),
@@ -6490,6 +6513,7 @@ public func say(text: Any,
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
+   - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
@@ -6561,6 +6585,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                  xcprettyArgs: Any? = scanfile.xcprettyArgs,
                  derivedDataPath: Any? = scanfile.derivedDataPath,
                  shouldZipBuildProducts: Bool = scanfile.shouldZipBuildProducts,
+                 outputXctestrun: Bool = scanfile.outputXctestrun,
                  resultBundle: Bool = scanfile.resultBundle,
                  useClangReportName: Bool = scanfile.useClangReportName,
                  concurrentWorkers: Int? = scanfile.concurrentWorkers,
@@ -6630,6 +6655,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                                                                                         RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                         RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
                                                                                         RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
+                                                                                        RubyCommand.Argument(name: "output_xctestrun", value: outputXctestrun),
                                                                                         RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                         RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
                                                                                         RubyCommand.Argument(name: "concurrent_workers", value: concurrentWorkers),
@@ -8119,7 +8145,7 @@ public func testflight(apiKeyPath: String? = nil,
                        appPlatform: String = "ios",
                        appleId: String? = nil,
                        ipa: String? = nil,
-                       demoAccountRequired: Bool = false,
+                       demoAccountRequired: Bool? = nil,
                        betaAppReviewInfo: [String: Any]? = nil,
                        localizedAppInfo: [String: Any]? = nil,
                        betaAppDescription: String? = nil,
@@ -8323,7 +8349,7 @@ public func updateAppIdentifier(xcodeproj: String,
    - useAutomaticSigning: Defines if project should use automatic signing
    - teamId: Team ID, is used when upgrading project
    - targets: Specify targets you want to toggle the signing mech. (default to all targets)
-   - buildConfigurations: Specify build_configurations you want to toggle the signing mech. (default to all targets)
+   - buildConfigurations: Specify build_configurations you want to toggle the signing mech. (default to all configurations)
    - codeSignIdentity: Code signing identity type (iPhone Developer, iPhone Distribution)
    - profileName: Provisioning profile name to use for code signing
    - profileUuid: Provisioning profile UUID to use for code signing
@@ -9112,7 +9138,7 @@ public func uploadToTestflight(apiKeyPath: String? = nil,
                                appPlatform: String = "ios",
                                appleId: String? = nil,
                                ipa: String? = nil,
-                               demoAccountRequired: Bool = false,
+                               demoAccountRequired: Bool? = nil,
                                betaAppReviewInfo: [String: Any]? = nil,
                                localizedAppInfo: [String: Any]? = nil,
                                betaAppDescription: String? = nil,
@@ -9630,4 +9656,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.109]
+// FastlaneRunnerAPIVersion [0.9.112]

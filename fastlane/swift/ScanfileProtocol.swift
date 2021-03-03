@@ -110,6 +110,9 @@ public protocol ScanfileProtocol: class {
     /// Should zip the derived data build products and place in output path?
     var shouldZipBuildProducts: Bool { get }
 
+    /// Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
+    var outputXctestrun: Bool { get }
+
     /// Should an Xcode result bundle be generated in the output directory
     var resultBundle: Bool { get }
 
@@ -244,6 +247,7 @@ public extension ScanfileProtocol {
     var xcprettyArgs: String? { return nil }
     var derivedDataPath: String? { return nil }
     var shouldZipBuildProducts: Bool { return false }
+    var outputXctestrun: Bool { return false }
     var resultBundle: Bool { return false }
     var useClangReportName: Bool { return false }
     var concurrentWorkers: Int? { return nil }
@@ -280,4 +284,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.64]
+// FastlaneRunnerAPIVersion [0.9.67]

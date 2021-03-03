@@ -168,5 +168,36 @@ describe Scan do
         scan.zip_build_products
       end
     end
+
+    describe "output_xctestrun" do
+      it "copies .xctestrun file when :output_xctestrun is true", requires_xcodebuild: true do
+        Dir.mktmpdir("scan_results") do |tmp_dir|
+          # Configuration
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            derived_data_path: File.join(tmp_dir, 'derived_data'),
+            output_directory: File.join(tmp_dir, 'output'),
+            project: './scan/examples/standard/app.xcodeproj',
+            output_xctestrun: true
+          })
+
+          # Make output directory
+          FileUtils.mkdir_p(Scan.config[:output_directory])
+
+          # Make derived data directory
+          path = File.join(Scan.config[:derived_data_path], "Build/Products")
+          FileUtils.mkdir_p(path)
+
+          # Create .xctestrun file that will be copied
+          xctestrun_path = File.join(path, 'something-project-something.xctestrun')
+          FileUtils.touch(xctestrun_path)
+
+          scan = Scan::Runner.new
+          scan.copy_xctestrun
+
+          output_path = File.join(Scan.config[:output_directory], 'settings.xctestrun')
+          expect(File.file?(output_path)).to eq(true)
+        end
+      end
+    end
   end
 end
