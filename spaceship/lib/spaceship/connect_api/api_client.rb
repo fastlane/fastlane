@@ -150,6 +150,12 @@ module Spaceship
 
       protected
 
+      class TimeoutError < StandardError
+        def initialize(msg)
+          super
+        end
+      end
+
       def with_asc_retry(tries = 5, &_block)
         tries = 1 if Object.const_defined?("SpecHelper")
 
@@ -159,7 +165,7 @@ module Spaceship
 
         if [500, 504].include?(status)
           msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
-          raise msg
+          raise TimeoutError, msg
         end
 
         return response
@@ -167,7 +173,7 @@ module Spaceship
         # Catch unathorized access and re-raising
         # There is no need to try again
         raise error
-      rescue => error
+      rescue TimeoutError => error
         tries -= 1
         puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
@@ -188,11 +194,11 @@ module Spaceship
           raise UnexpectedResponse, response.body
         end
 
-        handle_4xx_errors(response)
+        handle_error(response)
 
         raise UnexpectedResponse, response.body['error'] if response.body['error']
 
-        raise UnexpectedResponse, handle_errors(response) if response.body['errors']
+        raise UnexpectedResponse, format_errors(response) if response.body['errors']
 
         raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
 
@@ -201,20 +207,22 @@ module Spaceship
         return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, headers: response.headers, client: self)
       end
 
-      def handle_4xx_errors(response)
+      def handle_error(response)
         case response.status.to_i
         when 401
-          raise UnauthorizedAccessError, handle_errors(response) if response && (response.body || {})['errors']
+          raise UnauthorizedAccessError, format_errors(response) if response && (response.body || {})['errors']
         when 403
-          if response.body['errors'].first['code'].eql?("FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED")
-            raise ProgramLicenseAgreementUpdated, handle_errors(response) if response && (response.body || {})['errors']
+          error = (response.body['errors'] || []).first || {}
+          error_code = error['code']
+          if error_code == "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
+            raise ProgramLicenseAgreementUpdated, format_errors(response) if response && (response.body || {})['errors']
           else
-            raise AccessForbiddenError, handle_errors(response) if response && (response.body || {})['errors']
+            raise AccessForbiddenError, format_errors(response) if response && (response.body || {})['errors']
           end
         end
       end
 
-      def handle_errors(response)
+      def format_errors(response)
         # Example error format
         # {
         # "errors":[
