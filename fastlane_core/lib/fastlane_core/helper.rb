@@ -2,6 +2,7 @@ require 'logger'
 require 'colored'
 require 'tty-spinner'
 require 'pathname'
+require 'securerandom'
 
 require_relative 'fastlane_folder'
 require_relative 'ui/ui'
