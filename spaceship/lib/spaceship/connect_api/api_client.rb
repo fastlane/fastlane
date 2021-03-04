@@ -150,7 +150,7 @@ module Spaceship
 
       protected
 
-      class TimeoutError < StandardError
+      class TimeoutRetryError < StandardError
         def initialize(msg)
           super
         end
@@ -165,7 +165,7 @@ module Spaceship
 
         if [500, 504].include?(status)
           msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
-          raise TimeoutError, msg
+          raise TimeoutRetryError, msg
         end
 
         return response
@@ -173,7 +173,7 @@ module Spaceship
         # Catch unathorized access and re-raising
         # There is no need to try again
         raise error
-      rescue TimeoutError => error
+      rescue TimeoutRetryError => error
         tries -= 1
         puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
@@ -194,8 +194,6 @@ module Spaceship
           raise UnexpectedResponse, response.body
         end
 
-        handle_error(response)
-
         raise UnexpectedResponse, response.body['error'] if response.body['error']
 
         raise UnexpectedResponse, format_errors(response) if response.body['errors']
@@ -207,6 +205,7 @@ module Spaceship
         return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, headers: response.headers, client: self)
       end
 
+      # Overridden from Spaceship::Client
       def handle_error(response)
         case response.status.to_i
         when 401
