@@ -4,8 +4,7 @@ require 'fakefs/spec_helpers'
 describe Deliver::UploadScreenshots do
   describe '#delete_screenshots' do
     context 'when localization has a screenshot' do
-      it 'should delete screenshots that AppScreenshotIterator gives' do
-        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', id: 'some-id')
+      it 'should delete screenshots by screenshot_sets that AppScreenshotIterator gives' do
         # return empty by `app_screenshots` as `each_app_screenshot_set` mocked needs it empty
         app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
                                     screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
@@ -15,10 +14,13 @@ describe Deliver::UploadScreenshots do
                               get_app_screenshot_sets: [app_screenshot_set])
         screenshots_per_language = { 'en-US' => [] }
 
-        allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot).and_yield(localization, app_screenshot_set, app_screenshot)
-        allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set).and_return([[localization, app_screenshot_set]])
+        # emurate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
+        allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set) do |&args|
+          next([[localization, app_screenshot_set]]) unless args
+          args.call(localization, app_screenshot_set)
+        end
 
-        expect(app_screenshot).to receive(:delete!).once
+        expect(app_screenshot_set).to receive(:delete!)
         described_class.new.delete_screenshots([localization], screenshots_per_language)
       end
     end
@@ -33,13 +35,17 @@ describe Deliver::UploadScreenshots do
                               get_app_screenshot_sets: [app_screenshot_set])
         screenshots_per_language = { 'en-US' => [] }
 
-        allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot).and_yield(localization, app_screenshot_set, app_screenshot)
-        # Return an screenshot once to fail validation and then return empty next time to pass it
+        # emurate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
+        allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set) do |&args|
+          next([[localization, app_screenshot_set]]) unless args
+          args.call(localization, app_screenshot_set)
+        end
+
+        # Return a screenshot once to fail validation and then return empty next time to pass it
         allow(app_screenshot_set).to receive(:app_screenshots).exactly(2).times.and_return([app_screenshot], [])
-        allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set).and_return([[localization, app_screenshot_set]])
 
         # Try `delete!` twice by retry
-        expect(app_screenshot).to receive(:delete!).twice
+        expect(app_screenshot_set).to receive(:delete!).twice
         described_class.new.delete_screenshots([localization], screenshots_per_language)
       end
     end
