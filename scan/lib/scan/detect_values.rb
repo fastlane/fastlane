@@ -154,7 +154,6 @@ module Scan
               version = pieces[1].tr('()', '')
               potential_emptiness_error = lambda do |sims|
                 if sims.empty?
-                  fail_if_device_not_found(device_string) if Scan.config[:ensure_devices_found]
                   UI.error("No simulators found that are equal to the version " \
                   "of specifier (#{version}) and greater than or equal to the version " \
                   "of deployment target (#{deployment_target_version})")
