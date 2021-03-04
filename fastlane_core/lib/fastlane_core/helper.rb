@@ -209,7 +209,7 @@ module FastlaneCore
 
     def self.path_name_itmsp
       unless @name_itms
-        @name_itms = ENV["FASTLANE_ITUNES_TRANSPORTER_PATH_ITMSP"] || "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".gsub("x") { rand(16).to_s(16) }
+        @name_itms ||= ENV["FASTLANE_ITUNES_TRANSPORTER_PATH_ITMSP"] || SecureRandom.uuid
       end
       return @name_itms
     end
