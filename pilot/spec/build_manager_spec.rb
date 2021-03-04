@@ -258,7 +258,7 @@ describe "Build Manager" do
       end
 
       it "updates non-localized demo_account_required, notify_external_testers, beta_app_feedback_email, and beta_app_description and distributes" do
-        expect(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail).exactly(6).times
+        expect(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail).exactly(8).times
 
         options = distribute_options_non_localized
 
@@ -329,7 +329,7 @@ describe "Build Manager" do
         expect(Spaceship::ConnectAPI).to receive(:patch_builds).with({
           build_id: ready_to_submit_mock_build.id, attributes: { usesNonExemptEncryption: false }
         })
-        expect(fake_build_manager).to receive(:wait_for_build_processing_to_be_complete).and_return(ready_to_submit_mock_build)
+        expect(Spaceship::ConnectAPI::Build).to receive(:get).and_return(ready_to_submit_mock_build)
 
         # Expect beta groups fetched from app. This tests:
         # 1. app.get_beta_groups is called

@@ -428,7 +428,14 @@ module Pilot
 
         UI.important("Export compliance has been set to '#{uses_non_exempt_encryption}'. Need to wait for build to finishing processing again...")
         UI.important("Set 'ITSAppUsesNonExemptEncryption' in the 'Info.plist' to skip this step and speed up the submission")
-        return wait_for_build_processing_to_be_complete
+
+        loop do
+          build = Spaceship::ConnectAPI::Build.get(build_id: uploaded_build.id)
+          return build unless build.missing_export_compliance?
+
+          UI.message("Waiting for build #{uploaded_build.id} to process export compliance")
+          sleep(5)
+        end
       else
         return uploaded_build
       end
