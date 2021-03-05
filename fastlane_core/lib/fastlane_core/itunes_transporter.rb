@@ -477,9 +477,7 @@ module FastlaneCore
     #   when transferring
     def upload(app_id = nil, dir = nil, package_path: nil)
       raise "app_id and dir are required or package_path is required" if (app_id.nil? || dir.nil?) && package_path.nil?
-
-      actual_dir = package_path
-      actual_dir ||= File.join(dir, "#{app_id}.itmsp")
+      actual_dir = package_path || File.join(dir, "#{app_id}.itmsp")
 
       UI.message("Going to upload updated app to App Store Connect")
       UI.success("This might take a few minutes. Please don't interrupt the script.")
