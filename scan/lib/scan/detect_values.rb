@@ -165,6 +165,7 @@ module Scan
             if array.empty?
               UI.test_failure!("No '#{device_string}' found") if Scan.config[:ensure_devices_found]
               UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty?
+            end
           end
         end
 
