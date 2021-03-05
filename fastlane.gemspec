@@ -97,7 +97,6 @@ Gem::Specification.new do |spec|
   # If you upgrade this gem, make sure to upgrade the users of it as well.
   spec.add_dependency('google-api-client', '>= 0.37.0', '< 0.39.0') # Google API Client to access Play Publishing API
   spec.add_dependency('google-cloud-storage', '>= 1.15.0', '< 2.0.0') # Access Google Cloud Storage for match
-  spec.add_dependency('signet', '>= 0.14.0') # Signet 0.14.0 is needed for Ruby 2.4
 
   # need to lock under 0.15 using less than Ruby 2.5 to prevent install issues when using 'gem install'
   # 'gem install' does not respect Ruby versions and would try installing 0.15 on Ruby 2.4 or less
