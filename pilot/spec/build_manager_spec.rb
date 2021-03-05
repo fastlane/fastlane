@@ -121,6 +121,12 @@ describe "Build Manager" do
         external_build_state: Spaceship::ConnectAPI::BuildBetaDetail::ExternalState::PROCESSING
       })
     end
+    let(:build_beta_detail_missing_export_compliance) do
+      Spaceship::ConnectAPI::BuildBetaDetail.new("321", {
+        internal_build_state: Spaceship::ConnectAPI::BuildBetaDetail::InternalState::MISSING_EXPORT_COMPLIANCE,
+        external_build_state: Spaceship::ConnectAPI::BuildBetaDetail::ExternalState::MISSING_EXPORT_COMPLIANCE
+      })
+    end
     let(:build_beta_detail) do
       Spaceship::ConnectAPI::BuildBetaDetail.new("321", {
         internal_build_state: Spaceship::ConnectAPI::BuildBetaDetail::InternalState::READY_FOR_BETA_TESTING,
@@ -258,7 +264,7 @@ describe "Build Manager" do
       end
 
       it "updates non-localized demo_account_required, notify_external_testers, beta_app_feedback_email, and beta_app_description and distributes" do
-        expect(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail).exactly(8).times
+        expect(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail_missing_export_compliance).exactly(7).times
 
         options = distribute_options_non_localized
 
@@ -325,11 +331,13 @@ describe "Build Manager" do
         })
 
         # A build will go back into a processing state after a patch
-        # Expect wait_for_build_processing_to_be_complete to be called after patching
+        # Expect wait_for_export compliance processing_to_be_complete to be called after patching
         expect(Spaceship::ConnectAPI).to receive(:patch_builds).with({
           build_id: ready_to_submit_mock_build.id, attributes: { usesNonExemptEncryption: false }
         })
-        expect(Spaceship::ConnectAPI::Build).to receive(:get).and_return(ready_to_submit_mock_build)
+        expect(Spaceship::ConnectAPI::Build).to receive(:get).and_return(ready_to_submit_mock_build).exactly(2).times
+        expect(FastlaneCore::UI).to receive(:message).with("Waiting for build 123 to process export compliance")
+        expect(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail).exactly(3).times
 
         # Expect beta groups fetched from app. This tests:
         # 1. app.get_beta_groups is called
