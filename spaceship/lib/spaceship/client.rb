@@ -134,7 +134,7 @@ module Spaceship
       if teams.count > 1
         puts("The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now.")
       end
-      @current_team_id ||= teams[0]['contentProvider']['contentProviderId']
+      @current_team_id ||= user_details_data['sessionToken']['contentProviderId']
     end
 
     # Set a new team ID which will be used from now on
@@ -170,6 +170,9 @@ module Spaceship
       end
 
       handle_itc_response(response.body)
+
+      # clear user_details_data cache, as session switch will have changed sessionToken attribute
+      @_cached_user_details = nil
 
       @current_team_id = team_id
     end
@@ -880,10 +883,7 @@ module Spaceship
         response = @client.send(method, url_or_path, params, headers, &block)
         log_response(method, url_or_path, response, headers, &block)
 
-        resp_hash = response.to_hash
-        if resp_hash[:status] == 401
-          handle_401(response)
-        end
+        handle_error(response)
 
         if response.body.to_s.include?("<title>302 Found</title>")
           raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
@@ -893,22 +893,23 @@ module Spaceship
           raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
         end
 
-        if resp_hash[:status] == 403
-          msg = "Access forbidden"
-          logger.warn(msg)
-          raise AccessForbiddenError.new, msg
-        elsif resp_hash[:status] == 429
-          raise TooManyRequestsError, resp_hash
-        end
-
         return response
       end
     end
 
-    def handle_401(response)
-      msg = "Auth lost"
-      logger.warn(msg)
-      raise UnauthorizedAccessError.new, "Unauthorized Access"
+    def handle_error(response)
+      case response.status
+      when 401
+        msg = "Auth lost"
+        logger.warn(msg)
+        raise UnauthorizedAccessError.new, "Unauthorized Access"
+      when 403
+        msg = "Access forbidden"
+        logger.warn(msg)
+        raise AccessForbiddenError.new, msg
+      when 429
+        raise TooManyRequestsError, response.to_hash
+      end
     end
 
     def send_request_auto_paginate(method, url_or_path, params, headers, &block)

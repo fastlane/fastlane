@@ -28,6 +28,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
       expect(req_mock).to receive(:params=).with(params)
       expect(req_mock).to receive(:options).and_return(options_mock)
       expect(options_mock).to receive(:params_encoder=).with(Faraday::NestedParamsEncoder)
+      allow(req_mock).to receive(:status)
 
       return req_mock
     end
@@ -39,6 +40,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
       expect(req_mock).to receive(:body=).with(JSON.generate(body))
       expect(req_mock).to receive(:headers).and_return(header_mock)
       expect(header_mock).to receive(:[]=).with("Content-Type", "application/json")
+      allow(req_mock).to receive(:status)
 
       return req_mock
     end
@@ -67,7 +69,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
           url = path
           req_mock = test_request_body(url, body)
 
-          expect(client).to receive(:request).with(:post).and_yield(req_mock)
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
           client.post_app_store_version_release_request(app_store_version_id: app_store_version_id)
         end
       end
