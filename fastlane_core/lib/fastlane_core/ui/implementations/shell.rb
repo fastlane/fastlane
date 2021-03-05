@@ -151,16 +151,18 @@ module FastlaneCore
     private
 
     def encode_as_utf_8_if_possible(message)
-      orig_encoding = message.encoding
+      return message if message.valid_encoding?
 
-      # Try some common encodings and return the first with valid codings
-      ['UTF-8', 'UTF-16', 'ISO-8859-1'].each do |dest_encoding|
-        message.force_encoding(dest_encoding)
-        return message.encode('UTF-8', dest_encoding) if message.valid_encoding?
+      # Try following common encodings and return the first with valid codings
+      #
+      # * UTF-16 - output by genstrings
+      test_string = message.dup
+      [Encoding::UTF_16].each do |dest_encoding|
+        return message.encode(Encoding::UTF_8, dest_encoding) if test_string.force_encoding(dest_encoding).valid_encoding?
       end
 
-      message.force_encoding(orig_encoding)
-      return message
+      # return the original message if no valid encoding is found
+      message
     end
 
     def verify_interactive!(message)
