@@ -587,6 +587,20 @@ describe FastlaneCore do
         command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
         expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
       end
+
+      it 'generates even if given options do not support skip_package_dependencies_resolution' do
+        config = FastlaneCore::Configuration.create(
+          [
+            FastlaneCore::ConfigItem.new(key: :workspace, optional: true),
+            FastlaneCore::ConfigItem.new(key: :project, optional: true)
+          ], {
+            project: './fastlane_core/spec/fixtures/projects/Example.xcodeproj'
+          }
+        )
+        project = FastlaneCore::Project.new(config)
+        expect(project.build_xcodebuild_resolvepackagedependencies_command).to_not(be_nil)
+        expect { project.build_xcodebuild_resolvepackagedependencies_command }.to_not(raise_error)
+      end
     end
 
     describe "#project_paths" do
