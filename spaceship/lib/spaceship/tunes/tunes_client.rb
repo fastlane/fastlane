@@ -567,7 +567,7 @@ module Spaceship
     # @!group AppAnalytics
     #####################################################
 
-    def time_series_analytics(app_ids, dimensions, measures, start_time, end_time, frequency, view_by)
+    def time_series_analytics(app_ids, measures, start_time, end_time, frequency, view_by, dimensions = [])
       data = {
         adamId: app_ids,
         dimensionFilters: dimensions,
