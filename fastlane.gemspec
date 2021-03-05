@@ -58,14 +58,13 @@ Gem::Specification.new do |spec|
 
   # need to lock under 0.15 using less than Ruby 2.5 to prevent install issues when using 'gem install'
   # 'gem install' does not respect Ruby versions and would try installing 0.15 on Ruby 2.4 or less
-  # signet - https://github.com/googleapis/signet/commit/bd6fe87948f8fc7702720dae651e82f4fd348b5d#diff-cd03b1ea000c03b6c5c89bccd9d04486b36976aef245f00ea92aaef2bd98ebb7
-  spec.add_dependency('signet', '<= 0.14.1')
-  spec.add_dependency('googleauth', '<= 0.15.1')
-#  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.5')
-#    spec.add_dependency('signet', '<= 0.14.1')
-#    spec.add_dependency('googleauth', '<= 0.9')
-#    STDERR.puts("WARNING: Locking to a potentially insecure version of 'signet' and 'googleauth' because you are using a version of Ruby which is marked as End-Of-Life. Please upgrade your Ruby installation to 2.5 or later")
-#  end
+  # signet - https://github.com/googleapis/signet/commit/bd6fe87948f8fc7702720dae651e82f4fd348b5d
+  # googleauth - https://github.com/googleapis/google-auth-library-ruby/commit/6644806ab47cea6d08e1901c2ed808e53a579bc3
+  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.5')
+    spec.add_dependency('signet', '<= 0.14.1')
+    spec.add_dependency('googleauth', '<= 0.15.1')
+    STDERR.puts("WARNING: Locking to a potentially insecure version of 'signet' and 'googleauth' because you are using a version of Ruby which is marked as End-Of-Life. Please upgrade your Ruby installation to 2.5 or later")
+  end
 
   spec.add_dependency('slack-notifier', '>= 2.0.0', '< 3.0.0') # Slack notifications
   spec.add_dependency('xcodeproj', '>= 1.13.0', '< 2.0.0') # Modify Xcode projects
