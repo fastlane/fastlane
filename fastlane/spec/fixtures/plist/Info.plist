@@ -40,7 +40,7 @@
 	<key>CFBundleVersion</key>
 	<string>0.9.14</string>
 	<key>LSApplicationCategoryType</key>
-	<string/>
+	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
