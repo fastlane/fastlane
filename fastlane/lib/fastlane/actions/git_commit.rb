@@ -11,9 +11,13 @@ module Fastlane
         skip_git_hooks = params[:skip_git_hooks] ? '--no-verify' : ''
 
         if params[:allow_nothing_to_commit]
-          nothing_staged = Actions.sh("git --no-pager diff --name-only --staged").empty?
-          UI.success("Nothing staged to commit ✅.") if nothing_staged
-          return if nothing_staged
+          # Here we check if the path passed in parameter contains any modification
+          # and we skip the `git commit` command if there is none.
+          # That means you can have other files modified that are not in the path parameter
+          # and still make use of allow_nothing_to_commit.
+          repo_clean = Actions.sh("git status #{paths} --porcelain").empty?
+          UI.success("Nothing to commit, working tree clean ✅.") if repo_clean
+          return if repo_clean
         end
 
         command = "git commit -m #{params[:message].shellescape} #{paths} #{skip_git_hooks}".strip
@@ -33,7 +37,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,
-                                       description: "The file you want to commit",
+                                       description: "The file(s) or directory(ies) you want to commit. You can pass an array of multiple file-paths or fileglobs \"*.txt\" to commit all matching files. The files already staged but not specified and untracked files won't be committed",
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :message,
                                        description: "The commit message that should be used"),
@@ -42,7 +46,7 @@ module Fastlane
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :allow_nothing_to_commit,
-                                       description: "Set to true to allow commit without any git changes",
+                                       description: "Set to true to allow commit without any git changes in the files you want to commit",
                                        type: Boolean,
                                        optional: true)
         ]

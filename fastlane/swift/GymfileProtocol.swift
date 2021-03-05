@@ -1,5 +1,5 @@
 // GymfileProtocol.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 public protocol GymfileProtocol: class {
     /// Path to the workspace file
@@ -41,7 +41,7 @@ public protocol GymfileProtocol: class {
     /// Should the ipa file include bitcode?
     var includeBitcode: Bool? { get }
 
-    /// Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id
+    /// Method used to export the archive. Valid values are: app-store, validation, ad-hoc, package, enterprise, development, developer-id and mac-application
     var exportMethod: String? { get }
 
     /// Path to an export options plist or a hash with export options. Use 'xcodebuild -help' to print the full set of available options
@@ -134,6 +134,12 @@ public protocol GymfileProtocol: class {
     /// Sets a custom path for Swift Package Manager dependencies
     var clonedSourcePackagesPath: String? { get }
 
+    /// Skips resolution of Swift Package Manager dependencies
+    var skipPackageDependenciesResolution: Bool { get }
+
+    /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+    var disablePackageAutomaticUpdates: Bool { get }
+
     /// Lets xcodebuild use system's scm configuration
     var useSystemScm: Bool { get }
 }
@@ -183,9 +189,11 @@ public extension GymfileProtocol {
     var xcprettyUtf: Bool? { return nil }
     var skipProfileDetection: Bool { return false }
     var clonedSourcePackagesPath: String? { return nil }
+    var skipPackageDependenciesResolution: Bool { return false }
+    var disablePackageAutomaticUpdates: Bool { return false }
     var useSystemScm: Bool { return false }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.57]
+// FastlaneRunnerAPIVersion [0.9.62]

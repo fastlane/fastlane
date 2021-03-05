@@ -75,10 +75,11 @@ module Fastlane
                                        env_name: "APP_STORE_CONNECT_API_KEY_DURATION",
                                        description: "The token session duration",
                                        optional: true,
+                                       default_value: Spaceship::ConnectAPI::Token::MAX_TOKEN_DURATION,
                                        type: Integer),
           FastlaneCore::ConfigItem.new(key: :in_house,
                                        env_name: "APP_STORE_CONNECT_API_KEY_IN_HOUSE",
-                                       description: "Is App Store or Enterprise (in house) team? App Store Connect API cannot not determine this on its own (yet)",
+                                       description: "Is App Store or Enterprise (in house) team? App Store Connect API cannot determine this on its own (yet)",
                                        optional: true,
                                        type: Boolean)
         ]

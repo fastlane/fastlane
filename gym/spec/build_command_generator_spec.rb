@@ -6,6 +6,7 @@ describe Gym do
   end
 
   before(:each) do
+    @project.options.delete(:use_system_scm)
     allow(Gym).to receive(:project).and_return(@project)
   end
 
@@ -92,7 +93,23 @@ describe Gym do
       options = { project: "./gym/examples/standard/Example.xcodeproj", use_system_scm: true }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       result = Gym::BuildCommandGenerator.generate
-      expect(result).to include("-scmProvider system")
+      expect(result).to include("-scmProvider system").once
+    end
+
+    it "uses system scm via project options", requires_xcodebuild: true do
+      options = { project: "./gym/examples/standard/Example.xcodeproj" }
+      @project.options[:use_system_scm] = true
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+      result = Gym::BuildCommandGenerator.generate
+      expect(result).to include("-scmProvider system").once
+    end
+
+    it "uses system scm options exactly once", requires_xcodebuild: true do
+      options = { project: "./gym/examples/standard/Example.xcodeproj", use_system_scm: true }
+      @project.options[:use_system_scm] = true
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+      result = Gym::BuildCommandGenerator.generate
+      expect(result).to include("-scmProvider system").once
     end
 
     it "defaults to Xcode scm when option is not provided", requires_xcodebuild: true do

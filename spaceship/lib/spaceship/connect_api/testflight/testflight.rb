@@ -214,6 +214,18 @@ module Spaceship
           test_flight_request_client.post("betaGroups", body)
         end
 
+        def patch_group(group_id: nil, attributes: {})
+          body = {
+            data: {
+              attributes: attributes,
+              id: group_id,
+              type: "betaGroups"
+            }
+          }
+
+          test_flight_request_client.patch("betaGroups/#{group_id}", body)
+        end
+
         def delete_beta_group(group_id: nil)
           raise "group_id is nil" if group_id.nil?
 

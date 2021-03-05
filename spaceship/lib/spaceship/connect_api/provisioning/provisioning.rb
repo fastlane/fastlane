@@ -27,6 +27,59 @@ module Spaceship
           provisioning_request_client.get("bundleIds/#{bundle_id_id}", params)
         end
 
+        def post_bundle_id(name:, platform:, identifier:, seed_id:)
+          attributes = {
+            name: name,
+            platform: platform,
+            identifier: identifier,
+            seedId: seed_id
+          }
+
+          body = {
+            data: {
+              attributes: attributes,
+              type: "bundleIds"
+            }
+          }
+
+          provisioning_request_client.post("bundleIds", body)
+        end
+
+        #
+        # bundleIdCapability
+        #
+
+        def get_bundle_id_capabilities(bundle_id_id:, includes: nil, limit: nil, sort: nil)
+          params = provisioning_request_client.build_params(filter: nil, includes: includes, limit: limit, sort: sort)
+          provisioning_request_client.get("bundleIds/#{bundle_id_id}/bundleIdCapabilities", params)
+        end
+
+        def post_bundle_id_capability(bundle_id_id:, capability_type:, settings: [])
+          body = {
+            data: {
+              attributes: {
+                capabilityType: capability_type,
+                settings: settings
+              },
+              type: "bundleIdCapabilities",
+              relationships: {
+                bundleId: {
+                  data: {
+                    type: "bundleIds",
+                    id: bundle_id_id
+                  }
+                }
+              }
+            }
+          }
+
+          provisioning_request_client.post("bundleIdCapabilities", body)
+        end
+
+        def delete_bundle_id_capability(bundle_id_capability_id:)
+          provisioning_request_client.delete("bundleIdCapabilities/#{bundle_id_capability_id}")
+        end
+
         #
         # certificates
         #

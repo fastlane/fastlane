@@ -83,7 +83,12 @@ module Scan
     end
 
     def handle_results(tests_exit_status)
-      return if Scan.config[:disable_xcpretty]
+      if Scan.config[:disable_xcpretty]
+        unless tests_exit_status == 0
+          UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+        end
+        return
+      end
 
       result = TestResultParser.new.parse_result(test_results)
       SlackPoster.new.run(result)
@@ -105,6 +110,7 @@ module Scan
 
       copy_simulator_logs
       zip_build_products
+      copy_xctestrun
 
       if result[:failures] > 0
         open_report
@@ -143,6 +149,32 @@ module Scan
       UI.message("Zipping build products")
       FastlaneCore::Helper.zip_directory(path, output_path, contents_only: true, overwrite: true, print: false)
       UI.message("Successfully zipped build products: #{output_path}")
+    end
+
+    def copy_xctestrun
+      return unless Scan.config[:output_xctestrun]
+
+      # Gets :derived_data_path/Build/Products directory for coping .xctestrun file
+      derived_data_path = Scan.config[:derived_data_path]
+      path = File.join(derived_data_path, "Build", "Products")
+
+      # Gets absolute path of output directory
+      output_directory = File.absolute_path(Scan.config[:output_directory])
+      output_path = File.join(output_directory, "settings.xctestrun")
+
+      # Caching path for action to put into lane_context
+      Scan.cache[:output_xctestrun] = output_path
+
+      # Copy .xctestrun file and moves it to output directory
+      UI.message("Copying .xctestrun file")
+      xctestrun_file = Dir.glob("#{path}/*.xctestrun").first
+
+      if xctestrun_file
+        FileUtils.cp(xctestrun_file, output_path)
+        UI.message("Successfully copied xctestrun file: #{output_path}")
+      else
+        UI.user_error!("Could not find .xctextrun file to copy")
+      end
     end
 
     def test_results

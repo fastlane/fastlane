@@ -15,27 +15,27 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Maksym Grebenets",
-                        "Kohki Miki",
-                        "Jan Piotrowski",
-                        "Helmut Januschka",
-                        "Joshua Liebowitz",
-                        "Aaron Brager",
-                        "Andrew McBurney",
-                        "Danielle Tomlinson",
-                        "Jorge Revuelta H",
-                        "Manu Wallner",
-                        "Josh Holtz",
-                        "Iulian Onofrei",
+  spec.authors       = ["Jan Piotrowski",
                         "Stefan Natchev",
-                        "Olivier Halligon",
-                        "Max Ott",
-                        "Daniel Jankowski",
-                        "Luka Mirosevic",
+                        "Aaron Brager",
+                        "Manu Wallner",
                         "Jérôme Lacoste",
-                        "Fumiya Nakamura",
-                        "Felix Krause",
+                        "Olivier Halligon",
+                        "Helmut Januschka",
+                        "Jorge Revuelta H",
+                        "Danielle Tomlinson",
                         "Jimmy Dee",
+                        "Felix Krause",
+                        "Andrew McBurney",
+                        "Fumiya Nakamura",
+                        "Daniel Jankowski",
+                        "Maksym Grebenets",
+                        "Iulian Onofrei",
+                        "Josh Holtz",
+                        "Max Ott",
+                        "Luka Mirosevic",
+                        "Joshua Liebowitz",
+                        "Kohki Miki",
                         "Matthew Ellis"]
 
   spec.email         = ["fastlane@krausefx.com"]
@@ -71,6 +71,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('tty-screen', '>= 0.6.3', '< 1.0.0') # detect the terminal width
   spec.add_dependency('tty-spinner', '>= 0.8.0', '< 1.0.0') # loading indicators
 
+  spec.add_dependency('artifactory', '~> 3.0') # Used to export to an artifactory server
   spec.add_dependency('babosa', '>= 1.0.3', "< 2.0.0") # library for creating human-friendly identifiers, aka "slugs"
   spec.add_dependency('colored') # colored terminal output
   spec.add_dependency('commander-fastlane', '>= 4.4.6', '< 5.0.0') # CLI parser
@@ -83,6 +84,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
   spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
+  spec.add_dependency('naturally', '~> 2.2') # Used to sort strings with numbers in a human-friendly way
   spec.add_dependency('rubyzip', '>= 2.0.0', '< 3.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
@@ -102,7 +104,7 @@ Gem::Specification.new do |spec|
 
   # Development only
   spec.add_development_dependency('rake')
-  spec.add_development_dependency('rspec', '~> 3.9.0')
+  spec.add_development_dependency('rspec', '~> 3.10.0')
   spec.add_development_dependency('rspec_junit_formatter', '~> 0.4.1')
   spec.add_development_dependency('pry')
   spec.add_development_dependency('pry-byebug')

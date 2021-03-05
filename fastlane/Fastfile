@@ -126,13 +126,14 @@ lane :bump do |options|
   new_version = version_bump_podspec(path: version_file_path, bump_type: bump_type, require_variable_prefix: false)
 
   # Everything looks good, let's generate the Swift API
-  generated_files = generate_swift_api(fastlane_version: new_version)
+  generate_swift_api(fastlane_version: new_version)
 
   # Alright, now let's update our FastlaneSwiftRunner manifest
-  generated_files << generate_fastlane_swift_runner_manifest
+  generate_fastlane_swift_runner_manifest
 
   # Add all changed files to the version bump commit
-  paths_for_commit += generated_files
+  paths_for_commit += sh("cd .. && git status --porcelain fastlane/swift | sed s/^...//").each_line.to_a.map(&:strip)
+  paths_for_commit << "Gemfile.lock"
 
   # Add version file path to change set
   paths_for_commit << version_file_path
@@ -313,7 +314,21 @@ lane :release do
   send_mac_app_ci_reminder
 
   update_docs(version: version)
+
+  release_brew
+  release_github
+
   slack_train
+end
+
+lane :release_brew do
+  version = local_version
+  sh("cd .. && brew bump-formula-pr fastlane --url=https://github.com/fastlane/fastlane/archive/#{version}.tar.gz")
+end
+
+lane :release_github do
+  version = local_version
+  sh("cd .. &&gem push --key github --host https://rubygems.pkg.github.com/fastlane pkg/fastlane-#{version}.gem")
 end
 
 desc "Notifies Fabric Slack to run CI Job for Mac App"

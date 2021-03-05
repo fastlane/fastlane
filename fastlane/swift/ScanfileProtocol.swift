@@ -1,5 +1,5 @@
 // ScanfileProtocol.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 public protocol ScanfileProtocol: class {
     /// Path to the workspace file
@@ -110,6 +110,9 @@ public protocol ScanfileProtocol: class {
     /// Should zip the derived data build products and place in output path?
     var shouldZipBuildProducts: Bool { get }
 
+    /// Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
+    var outputXctestrun: Bool { get }
+
     /// Should an Xcode result bundle be generated in the output directory
     var resultBundle: Bool { get }
 
@@ -194,6 +197,12 @@ public protocol ScanfileProtocol: class {
     /// Sets a custom path for Swift Package Manager dependencies
     var clonedSourcePackagesPath: String? { get }
 
+    /// Skips resolution of Swift Package Manager dependencies
+    var skipPackageDependenciesResolution: Bool { get }
+
+    /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+    var disablePackageAutomaticUpdates: Bool { get }
+
     /// Lets xcodebuild use system's scm configuration
     var useSystemScm: Bool { get }
 
@@ -238,6 +247,7 @@ public extension ScanfileProtocol {
     var xcprettyArgs: String? { return nil }
     var derivedDataPath: String? { return nil }
     var shouldZipBuildProducts: Bool { return false }
+    var outputXctestrun: Bool { return false }
     var resultBundle: Bool { return false }
     var useClangReportName: Bool { return false }
     var concurrentWorkers: Int? { return nil }
@@ -266,10 +276,12 @@ public extension ScanfileProtocol {
     var customReportFileName: String? { return nil }
     var xcodebuildCommand: String { return "env NSUnbufferedIO=YES xcodebuild" }
     var clonedSourcePackagesPath: String? { return nil }
+    var skipPackageDependenciesResolution: Bool { return false }
+    var disablePackageAutomaticUpdates: Bool { return false }
     var useSystemScm: Bool { return false }
     var failBuild: Bool { return true }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.62]
+// FastlaneRunnerAPIVersion [0.9.67]

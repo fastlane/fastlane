@@ -1,5 +1,5 @@
 // Fastlane.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 import Foundation
 /**
@@ -8,7 +8,7 @@ import Foundation
  - parameters:
    - serial: Android serial of the device to use for this command
    - command: All commands you want to pass to the adb command, e.g. `kill-server`
-   - adbPath: The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT environment variable is set)
+   - adbPath: The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT, ANDROID_HOME or ANDROID_SDK environment variable is set)
 
  - returns: The output of the adb command
 
@@ -158,7 +158,7 @@ public func appStoreConnectApiKey(keyId: String,
                                   keyFilepath: String? = nil,
                                   keyContent: String? = nil,
                                   isKeyContentBase64: Bool = false,
-                                  duration: Int? = nil,
+                                  duration: Int = 1200,
                                   inHouse: Bool? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "app_store_connect_api_key", className: nil, args: [RubyCommand.Argument(name: "key_id", value: keyId),
@@ -219,6 +219,7 @@ public func appaloosa(binary: String,
    - path: Path to zipped build on the local filesystem. Either this or `url` must be specified
    - publicKey: If not provided, a new app will be created. If provided, the existing build will be overwritten
    - note: Notes you wish to add to the uploaded app
+   - timeout: The number of seconds to wait until automatically ending the session due to user inactivity. Must be 30, 60, 90, 120, 180, 300, 600, 1800, 3600 or 7200. Default is 120
 
  If you provide a `public_key`, this will overwrite an existing application. If you want to have this build as a new app version, you shouldn't provide this value.
 
@@ -230,7 +231,8 @@ public func appetize(apiHost: String = "api.appetize.io",
                      platform: String = "ios",
                      path: String? = nil,
                      publicKey: String? = nil,
-                     note: String? = nil)
+                     note: String? = nil,
+                     timeout: Int? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "appetize", className: nil, args: [RubyCommand.Argument(name: "api_host", value: apiHost),
                                                                                             RubyCommand.Argument(name: "api_token", value: apiToken),
@@ -238,7 +240,8 @@ public func appetize(apiHost: String = "api.appetize.io",
                                                                                             RubyCommand.Argument(name: "platform", value: platform),
                                                                                             RubyCommand.Argument(name: "path", value: path),
                                                                                             RubyCommand.Argument(name: "public_key", value: publicKey),
-                                                                                            RubyCommand.Argument(name: "note", value: note)])
+                                                                                            RubyCommand.Argument(name: "note", value: note),
+                                                                                            RubyCommand.Argument(name: "timeout", value: timeout)])
     _ = runner.executeCommand(command)
 }
 
@@ -700,6 +703,7 @@ public func apteligent(dsym: String? = nil,
    - endpoint: Artifactory endpoint
    - username: Artifactory username
    - password: Artifactory password
+   - apiKey: Artifactory API key
    - properties: Artifact properties hash
    - sslPemFile: Location of pem file to use for ssl verification
    - sslVerify: Verify SSL
@@ -708,13 +712,16 @@ public func apteligent(dsym: String? = nil,
    - proxyAddress: Proxy address
    - proxyPort: Proxy port
    - readTimeout: Read timeout
+
+ Connect to the artifactory server using either a username/password or an api_key
  */
 public func artifactory(file: String,
                         repo: String,
                         repoPath: String,
                         endpoint: String,
-                        username: String,
-                        password: String,
+                        username: String? = nil,
+                        password: String? = nil,
+                        apiKey: String? = nil,
                         properties: [String: Any] = [:],
                         sslPemFile: String? = nil,
                         sslVerify: Bool = true,
@@ -730,6 +737,7 @@ public func artifactory(file: String,
                                                                                                RubyCommand.Argument(name: "endpoint", value: endpoint),
                                                                                                RubyCommand.Argument(name: "username", value: username),
                                                                                                RubyCommand.Argument(name: "password", value: password),
+                                                                                               RubyCommand.Argument(name: "api_key", value: apiKey),
                                                                                                RubyCommand.Argument(name: "properties", value: properties),
                                                                                                RubyCommand.Argument(name: "ssl_pem_file", value: sslPemFile),
                                                                                                RubyCommand.Argument(name: "ssl_verify", value: sslVerify),
@@ -869,6 +877,7 @@ public func badge(dark: Any? = nil,
    - apiToken: Appetize.io API Token
    - publicKey: If not provided, a new app will be created. If provided, the existing build will be overwritten
    - note: Notes you wish to add to the uploaded app
+   - timeout: The number of seconds to wait until automatically ending the session due to user inactivity. Must be 30, 60, 90, 120, 180, 300, 600, 1800, 3600 or 7200. Default is 120
 
  This should be called from danger.
  More information in the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md).
@@ -877,13 +886,15 @@ public func buildAndUploadToAppetize(xcodebuild: [String: Any] = [:],
                                      scheme: String? = nil,
                                      apiToken: String,
                                      publicKey: String? = nil,
-                                     note: String? = nil)
+                                     note: String? = nil,
+                                     timeout: Int? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "build_and_upload_to_appetize", className: nil, args: [RubyCommand.Argument(name: "xcodebuild", value: xcodebuild),
                                                                                                                 RubyCommand.Argument(name: "scheme", value: scheme),
                                                                                                                 RubyCommand.Argument(name: "api_token", value: apiToken),
                                                                                                                 RubyCommand.Argument(name: "public_key", value: publicKey),
-                                                                                                                RubyCommand.Argument(name: "note", value: note)])
+                                                                                                                RubyCommand.Argument(name: "note", value: note),
+                                                                                                                RubyCommand.Argument(name: "timeout", value: timeout)])
     _ = runner.executeCommand(command)
 }
 
@@ -953,7 +964,7 @@ public func buildAndroidApp(task: String? = nil,
    - skipPackagePkg: Should we skip packaging the pkg?
    - includeSymbols: Should the ipa file include symbols?
    - includeBitcode: Should the ipa file include bitcode?
-   - exportMethod: Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id
+   - exportMethod: Method used to export the archive. Valid values are: app-store, validation, ad-hoc, package, enterprise, development, developer-id and mac-application
    - exportOptions: Path to an export options plist or a hash with export options. Use 'xcodebuild -help' to print the full set of available options
    - exportXcargs: Pass additional arguments to xcodebuild for the package phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
    - skipBuildArchive: Export ipa from previously built xcarchive. Uses archive_path as source
@@ -984,6 +995,8 @@ public func buildAndroidApp(task: String? = nil,
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
 
  - returns: The absolute path to the generated ipa file
@@ -1034,6 +1047,8 @@ public func buildApp(workspace: String? = nil,
                      xcprettyUtf: Bool? = nil,
                      skipProfileDetection: Bool = false,
                      clonedSourcePackagesPath: String? = nil,
+                     skipPackageDependenciesResolution: Bool = false,
+                     disablePackageAutomaticUpdates: Bool = false,
                      useSystemScm: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "build_app", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -1080,6 +1095,8 @@ public func buildApp(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf),
                                                                                              RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection),
                                                                                              RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                             RubyCommand.Argument(name: "skip_package_dependencies_resolution", value: skipPackageDependenciesResolution),
+                                                                                             RubyCommand.Argument(name: "disable_package_automatic_updates", value: disablePackageAutomaticUpdates),
                                                                                              RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
@@ -1100,7 +1117,7 @@ public func buildApp(workspace: String? = nil,
    - skipPackageIpa: Should we skip packaging the ipa?
    - includeSymbols: Should the ipa file include symbols?
    - includeBitcode: Should the ipa file include bitcode?
-   - exportMethod: Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id
+   - exportMethod: Method used to export the archive. Valid values are: app-store, validation, ad-hoc, package, enterprise, development, developer-id and mac-application
    - exportOptions: Path to an export options plist or a hash with export options. Use 'xcodebuild -help' to print the full set of available options
    - exportXcargs: Pass additional arguments to xcodebuild for the package phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
    - skipBuildArchive: Export ipa from previously built xcarchive. Uses archive_path as source
@@ -1129,6 +1146,8 @@ public func buildApp(workspace: String? = nil,
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
 
  - returns: The absolute path to the generated ipa file
@@ -1176,6 +1195,8 @@ public func buildIosApp(workspace: String? = nil,
                         xcprettyUtf: Bool? = nil,
                         skipProfileDetection: Bool = false,
                         clonedSourcePackagesPath: String? = nil,
+                        skipPackageDependenciesResolution: Bool = false,
+                        disablePackageAutomaticUpdates: Bool = false,
                         useSystemScm: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "build_ios_app", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -1219,6 +1240,8 @@ public func buildIosApp(workspace: String? = nil,
                                                                                                  RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf),
                                                                                                  RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection),
                                                                                                  RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                                 RubyCommand.Argument(name: "skip_package_dependencies_resolution", value: skipPackageDependenciesResolution),
+                                                                                                 RubyCommand.Argument(name: "disable_package_automatic_updates", value: disablePackageAutomaticUpdates),
                                                                                                  RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
@@ -1239,7 +1262,7 @@ public func buildIosApp(workspace: String? = nil,
    - skipPackagePkg: Should we skip packaging the pkg?
    - includeSymbols: Should the ipa file include symbols?
    - includeBitcode: Should the ipa file include bitcode?
-   - exportMethod: Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id
+   - exportMethod: Method used to export the archive. Valid values are: app-store, validation, ad-hoc, package, enterprise, development, developer-id and mac-application
    - exportOptions: Path to an export options plist or a hash with export options. Use 'xcodebuild -help' to print the full set of available options
    - exportXcargs: Pass additional arguments to xcodebuild for the package phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
    - skipBuildArchive: Export ipa from previously built xcarchive. Uses archive_path as source
@@ -1269,6 +1292,8 @@ public func buildIosApp(workspace: String? = nil,
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
 
  - returns: The absolute path to the generated ipa file
@@ -1317,6 +1342,8 @@ public func buildMacApp(workspace: String? = nil,
                         xcprettyUtf: Bool? = nil,
                         skipProfileDetection: Bool = false,
                         clonedSourcePackagesPath: String? = nil,
+                        skipPackageDependenciesResolution: Bool = false,
+                        disablePackageAutomaticUpdates: Bool = false,
                         useSystemScm: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "build_mac_app", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -1361,6 +1388,8 @@ public func buildMacApp(workspace: String? = nil,
                                                                                                  RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf),
                                                                                                  RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection),
                                                                                                  RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                                 RubyCommand.Argument(name: "skip_package_dependencies_resolution", value: skipPackageDependenciesResolution),
+                                                                                                 RubyCommand.Argument(name: "disable_package_automatic_updates", value: disablePackageAutomaticUpdates),
                                                                                                  RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
@@ -1546,11 +1575,14 @@ public func captureAndroidScreenshots(androidHome: String? = nil,
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
    - disableXcpretty: Disable xcpretty formatting of build
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
+   - useSystemScm: Lets xcodebuild use system's scm configuration
  */
 public func captureIosScreenshots(workspace: String? = nil,
                                   project: String? = nil,
@@ -1591,11 +1623,14 @@ public func captureIosScreenshots(workspace: String? = nil,
                                   concurrentSimulators: Bool = true,
                                   disableSlideToType: Bool = false,
                                   clonedSourcePackagesPath: String? = nil,
+                                  skipPackageDependenciesResolution: Bool = false,
+                                  disablePackageAutomaticUpdates: Bool = false,
                                   testplan: String? = nil,
                                   onlyTesting: Any? = nil,
                                   skipTesting: Any? = nil,
                                   disableXcpretty: Bool? = nil,
-                                  suppressXcodeOutput: Bool? = nil)
+                                  suppressXcodeOutput: Bool? = nil,
+                                  useSystemScm: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "capture_ios_screenshots", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                                            RubyCommand.Argument(name: "project", value: project),
@@ -1636,11 +1671,14 @@ public func captureIosScreenshots(workspace: String? = nil,
                                                                                                            RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators),
                                                                                                            RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
                                                                                                            RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                                           RubyCommand.Argument(name: "skip_package_dependencies_resolution", value: skipPackageDependenciesResolution),
+                                                                                                           RubyCommand.Argument(name: "disable_package_automatic_updates", value: disablePackageAutomaticUpdates),
                                                                                                            RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                                            RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                                            RubyCommand.Argument(name: "skip_testing", value: skipTesting),
                                                                                                            RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty),
-                                                                                                           RubyCommand.Argument(name: "suppress_xcode_output", value: suppressXcodeOutput)])
+                                                                                                           RubyCommand.Argument(name: "suppress_xcode_output", value: suppressXcodeOutput),
+                                                                                                           RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
 
@@ -1687,11 +1725,14 @@ public func captureIosScreenshots(workspace: String? = nil,
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
    - disableXcpretty: Disable xcpretty formatting of build
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
+   - useSystemScm: Lets xcodebuild use system's scm configuration
  */
 public func captureScreenshots(workspace: String? = nil,
                                project: String? = nil,
@@ -1732,11 +1773,14 @@ public func captureScreenshots(workspace: String? = nil,
                                concurrentSimulators: Bool = true,
                                disableSlideToType: Bool = false,
                                clonedSourcePackagesPath: String? = nil,
+                               skipPackageDependenciesResolution: Bool = false,
+                               disablePackageAutomaticUpdates: Bool = false,
                                testplan: String? = nil,
                                onlyTesting: Any? = nil,
                                skipTesting: Any? = nil,
                                disableXcpretty: Bool? = nil,
-                               suppressXcodeOutput: Bool? = nil)
+                               suppressXcodeOutput: Bool? = nil,
+                               useSystemScm: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "capture_screenshots", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                                        RubyCommand.Argument(name: "project", value: project),
@@ -1777,11 +1821,14 @@ public func captureScreenshots(workspace: String? = nil,
                                                                                                        RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators),
                                                                                                        RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
                                                                                                        RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                                       RubyCommand.Argument(name: "skip_package_dependencies_resolution", value: skipPackageDependenciesResolution),
+                                                                                                       RubyCommand.Argument(name: "disable_package_automatic_updates", value: disablePackageAutomaticUpdates),
                                                                                                        RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                                        RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                                        RubyCommand.Argument(name: "skip_testing", value: skipTesting),
                                                                                                        RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty),
-                                                                                                       RubyCommand.Argument(name: "suppress_xcode_output", value: suppressXcodeOutput)])
+                                                                                                       RubyCommand.Argument(name: "suppress_xcode_output", value: suppressXcodeOutput),
+                                                                                                       RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
 
@@ -1809,6 +1856,8 @@ public func captureScreenshots(workspace: String? = nil,
    - projectDirectory: Define the directory containing the Carthage project
    - newResolver: Use new resolver when resolving dependency graph
    - logPath: Path to the xcode build output
+   - useXcframeworks: Create xcframework bundles instead of one framework per platform (requires Xcode 12+)
+   - archive: Archive built frameworks from the current project
    - executable: Path to the `carthage` executable on your machine
  */
 public func carthage(command: String = "bootstrap",
@@ -1831,6 +1880,8 @@ public func carthage(command: String = "bootstrap",
                      projectDirectory: String? = nil,
                      newResolver: Bool? = nil,
                      logPath: String? = nil,
+                     useXcframeworks: Bool = false,
+                     archive: Bool = false,
                      executable: String = "carthage")
 {
     let command = RubyCommand(commandID: "", methodName: "carthage", className: nil, args: [RubyCommand.Argument(name: "command", value: command),
@@ -1853,6 +1904,8 @@ public func carthage(command: String = "bootstrap",
                                                                                             RubyCommand.Argument(name: "project_directory", value: projectDirectory),
                                                                                             RubyCommand.Argument(name: "new_resolver", value: newResolver),
                                                                                             RubyCommand.Argument(name: "log_path", value: logPath),
+                                                                                            RubyCommand.Argument(name: "use_xcframeworks", value: useXcframeworks),
+                                                                                            RubyCommand.Argument(name: "archive", value: archive),
                                                                                             RubyCommand.Argument(name: "executable", value: executable)])
     _ = runner.executeCommand(command)
 }
@@ -2151,6 +2204,7 @@ public func clubmate() {
    - errorCallback: A callback invoked with the command output if there is a non-zero exit status
    - tryRepoUpdateOnError: Retry with --repo-update if action was finished with error
    - deployment: Disallow any changes to the Podfile or the Podfile.lock during installation
+   - allowRoot: Allows CocoaPods to run as root
    - clean: **DEPRECATED!** (Option renamed as clean_install) Remove SCM directories
    - integrate: **DEPRECATED!** (Option removed from cocoapods) Integrate the Pods libraries into the Xcode project(s)
 
@@ -2166,6 +2220,7 @@ public func cocoapods(repoUpdate: Bool = false,
                       errorCallback: ((String) -> Void)? = nil,
                       tryRepoUpdateOnError: Bool = false,
                       deployment: Bool = false,
+                      allowRoot: Bool = false,
                       clean: Bool = true,
                       integrate: Bool = true)
 {
@@ -2179,6 +2234,7 @@ public func cocoapods(repoUpdate: Bool = false,
                                                                                              RubyCommand.Argument(name: "error_callback", value: errorCallback, type: .stringClosure),
                                                                                              RubyCommand.Argument(name: "try_repo_update_on_error", value: tryRepoUpdateOnError),
                                                                                              RubyCommand.Argument(name: "deployment", value: deployment),
+                                                                                             RubyCommand.Argument(name: "allow_root", value: allowRoot),
                                                                                              RubyCommand.Argument(name: "clean", value: clean),
                                                                                              RubyCommand.Argument(name: "integrate", value: integrate)])
     _ = runner.executeCommand(command)
@@ -2480,6 +2536,7 @@ public func createKeychain(name: String? = nil,
 
  - parameters:
    - apiToken: Personal API Token for GitHub - generate one at https://github.com/settings/tokens
+   - apiBearer: Use a Bearer authorization token. Usually generated by Github Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
    - repo: The name of the repository you want to submit the pull request to
    - title: The title of the pull request
    - body: The contents of the pull request
@@ -2495,7 +2552,8 @@ public func createKeychain(name: String? = nil,
 
  - returns: The pull request URL when successful
  */
-public func createPullRequest(apiToken: String,
+public func createPullRequest(apiToken: String? = nil,
+                              apiBearer: String? = nil,
                               repo: String,
                               title: String,
                               body: String? = nil,
@@ -2510,6 +2568,7 @@ public func createPullRequest(apiToken: String,
                               teamReviewers: [String]? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "create_pull_request", className: nil, args: [RubyCommand.Argument(name: "api_token", value: apiToken),
+                                                                                                       RubyCommand.Argument(name: "api_bearer", value: apiBearer),
                                                                                                        RubyCommand.Argument(name: "repo", value: repo),
                                                                                                        RubyCommand.Argument(name: "title", value: title),
                                                                                                        RubyCommand.Argument(name: "body", value: body),
@@ -2522,6 +2581,42 @@ public func createPullRequest(apiToken: String,
                                                                                                        RubyCommand.Argument(name: "assignees", value: assignees),
                                                                                                        RubyCommand.Argument(name: "reviewers", value: reviewers),
                                                                                                        RubyCommand.Argument(name: "team_reviewers", value: teamReviewers)])
+    _ = runner.executeCommand(command)
+}
+
+/**
+ Package multiple build configs of a library/framework into a single xcframework
+
+ - parameters:
+   - frameworks: Frameworks to add to the target xcframework
+   - libraries: Libraries to add to the target xcframework, with their corresponding headers
+   - output: The path to write the xcframework to
+   - allowInternalDistribution: Specifies that the created xcframework contains information not suitable for public distribution
+
+ Utility for packaging multiple build configurations of a given library
+ or framework into a single xcframework.
+
+ If you want to package several frameworks just provide an array containing
+ the list of frameworks to be packaged using the :frameworks parameter.
+
+ If you want to package several libraries with their corresponding headers
+ provide a hash containing the library as the key and the directory containing
+ its headers as the value (or an empty string if there are no headers associated
+ with the provided library).
+
+ Finally specify the location of the xcframework to be generated using the :output
+ parameter.
+
+ */
+public func createXcframework(frameworks: [String]? = nil,
+                              libraries: [String: Any]? = nil,
+                              output: String,
+                              allowInternalDistribution: Bool = false)
+{
+    let command = RubyCommand(commandID: "", methodName: "create_xcframework", className: nil, args: [RubyCommand.Argument(name: "frameworks", value: frameworks),
+                                                                                                      RubyCommand.Argument(name: "libraries", value: libraries),
+                                                                                                      RubyCommand.Argument(name: "output", value: output),
+                                                                                                      RubyCommand.Argument(name: "allow_internal_distribution", value: allowInternalDistribution)])
     _ = runner.executeCommand(command)
 }
 
@@ -3750,10 +3845,10 @@ public func gitAdd(path: Any? = nil,
  Directly commit the given file with the given message
 
  - parameters:
-   - path: The file you want to commit
+   - path: The file(s) or directory(ies) you want to commit. You can pass an array of multiple file-paths or fileglobs "*.txt" to commit all matching files. The files already staged but not specified and untracked files won't be committed
    - message: The commit message that should be used
    - skipGitHooks: Set to true to pass --no-verify to git
-   - allowNothingToCommit: Set to true to allow commit without any git changes
+   - allowNothingToCommit: Set to true to allow commit without any git changes in the files you want to commit
  */
 public func gitCommit(path: Any,
                       message: String,
@@ -4005,7 +4100,7 @@ public func gradle(task: String? = nil,
    - skipPackagePkg: Should we skip packaging the pkg?
    - includeSymbols: Should the ipa file include symbols?
    - includeBitcode: Should the ipa file include bitcode?
-   - exportMethod: Method used to export the archive. Valid values are: app-store, ad-hoc, package, enterprise, development, developer-id
+   - exportMethod: Method used to export the archive. Valid values are: app-store, validation, ad-hoc, package, enterprise, development, developer-id and mac-application
    - exportOptions: Path to an export options plist or a hash with export options. Use 'xcodebuild -help' to print the full set of available options
    - exportXcargs: Pass additional arguments to xcodebuild for the package phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
    - skipBuildArchive: Export ipa from previously built xcarchive. Uses archive_path as source
@@ -4036,6 +4131,8 @@ public func gradle(task: String? = nil,
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
 
  - returns: The absolute path to the generated ipa file
@@ -4086,6 +4183,8 @@ public func gym(workspace: Any? = gymfile.workspace,
                 xcprettyUtf: Bool? = gymfile.xcprettyUtf,
                 skipProfileDetection: Bool = gymfile.skipProfileDetection,
                 clonedSourcePackagesPath: Any? = gymfile.clonedSourcePackagesPath,
+                skipPackageDependenciesResolution: Bool = gymfile.skipPackageDependenciesResolution,
+                disablePackageAutomaticUpdates: Bool = gymfile.disablePackageAutomaticUpdates,
                 useSystemScm: Bool = gymfile.useSystemScm)
 {
     let command = RubyCommand(commandID: "", methodName: "gym", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -4132,6 +4231,8 @@ public func gym(workspace: Any? = gymfile.workspace,
                                                                                        RubyCommand.Argument(name: "xcpretty_utf", value: xcprettyUtf),
                                                                                        RubyCommand.Argument(name: "skip_profile_detection", value: skipProfileDetection),
                                                                                        RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                       RubyCommand.Argument(name: "skip_package_dependencies_resolution", value: skipPackageDependenciesResolution),
+                                                                                       RubyCommand.Argument(name: "disable_package_automatic_updates", value: disablePackageAutomaticUpdates),
                                                                                        RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
@@ -4579,10 +4680,15 @@ public func ipa(workspace: String? = nil,
 /**
  Generate docs using Jazzy
 
- - parameter config: Path to jazzy config file
+ - parameters:
+   - config: Path to jazzy config file
+   - moduleVersion: Version string to use as part of the the default docs title and inside the docset
  */
-public func jazzy(config: String? = nil) {
-    let command = RubyCommand(commandID: "", methodName: "jazzy", className: nil, args: [RubyCommand.Argument(name: "config", value: config)])
+public func jazzy(config: String? = nil,
+                  moduleVersion: String? = nil)
+{
+    let command = RubyCommand(commandID: "", methodName: "jazzy", className: nil, args: [RubyCommand.Argument(name: "config", value: config),
+                                                                                         RubyCommand.Argument(name: "module_version", value: moduleVersion)])
     _ = runner.executeCommand(command)
 }
 
@@ -5356,7 +5462,7 @@ public func pilot(apiKeyPath: String? = nil,
                   appPlatform: String = "ios",
                   appleId: String? = nil,
                   ipa: String? = nil,
-                  demoAccountRequired: Bool = false,
+                  demoAccountRequired: Bool? = nil,
                   betaAppReviewInfo: [String: Any]? = nil,
                   localizedAppInfo: [String: Any]? = nil,
                   betaAppDescription: String? = nil,
@@ -5904,7 +6010,7 @@ public func registerDevices(devices: [String: Any]? = nil,
                             apiKey: [String: Any]? = nil,
                             teamId: String? = nil,
                             teamName: String? = nil,
-                            username: String,
+                            username: String? = nil,
                             platform: String = "ios")
 {
     let command = RubyCommand(commandID: "", methodName: "register_devices", className: nil, args: [RubyCommand.Argument(name: "devices", value: devices),
@@ -6113,6 +6219,7 @@ public func rubyVersion() {
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
+   - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
@@ -6141,6 +6248,8 @@ public func rubyVersion() {
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
@@ -6182,6 +6291,7 @@ public func runTests(workspace: String? = nil,
                      xcprettyArgs: String? = nil,
                      derivedDataPath: String? = nil,
                      shouldZipBuildProducts: Bool = false,
+                     outputXctestrun: Bool = false,
                      resultBundle: Bool = false,
                      useClangReportName: Bool = false,
                      concurrentWorkers: Int? = nil,
@@ -6210,6 +6320,8 @@ public func runTests(workspace: String? = nil,
                      customReportFileName: String? = nil,
                      xcodebuildCommand: String = "env NSUnbufferedIO=YES xcodebuild",
                      clonedSourcePackagesPath: String? = nil,
+                     skipPackageDependenciesResolution: Bool = false,
+                     disablePackageAutomaticUpdates: Bool = false,
                      useSystemScm: Bool = false,
                      failBuild: Bool = true)
 {
@@ -6249,6 +6361,7 @@ public func runTests(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                              RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
                                                                                              RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
+                                                                                             RubyCommand.Argument(name: "output_xctestrun", value: outputXctestrun),
                                                                                              RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                              RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
                                                                                              RubyCommand.Argument(name: "concurrent_workers", value: concurrentWorkers),
@@ -6277,6 +6390,8 @@ public func runTests(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
                                                                                              RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand),
                                                                                              RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                             RubyCommand.Argument(name: "skip_package_dependencies_resolution", value: skipPackageDependenciesResolution),
+                                                                                             RubyCommand.Argument(name: "disable_package_automatic_updates", value: disablePackageAutomaticUpdates),
                                                                                              RubyCommand.Argument(name: "use_system_scm", value: useSystemScm),
                                                                                              RubyCommand.Argument(name: "fail_build", value: failBuild)])
     _ = runner.executeCommand(command)
@@ -6398,6 +6513,7 @@ public func say(text: Any,
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
+   - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
@@ -6426,6 +6542,8 @@ public func say(text: Any,
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
@@ -6467,6 +6585,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                  xcprettyArgs: Any? = scanfile.xcprettyArgs,
                  derivedDataPath: Any? = scanfile.derivedDataPath,
                  shouldZipBuildProducts: Bool = scanfile.shouldZipBuildProducts,
+                 outputXctestrun: Bool = scanfile.outputXctestrun,
                  resultBundle: Bool = scanfile.resultBundle,
                  useClangReportName: Bool = scanfile.useClangReportName,
                  concurrentWorkers: Int? = scanfile.concurrentWorkers,
@@ -6495,6 +6614,8 @@ public func scan(workspace: Any? = scanfile.workspace,
                  customReportFileName: Any? = scanfile.customReportFileName,
                  xcodebuildCommand: Any = scanfile.xcodebuildCommand,
                  clonedSourcePackagesPath: Any? = scanfile.clonedSourcePackagesPath,
+                 skipPackageDependenciesResolution: Bool = scanfile.skipPackageDependenciesResolution,
+                 disablePackageAutomaticUpdates: Bool = scanfile.disablePackageAutomaticUpdates,
                  useSystemScm: Bool = scanfile.useSystemScm,
                  failBuild: Bool = scanfile.failBuild)
 {
@@ -6534,6 +6655,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                                                                                         RubyCommand.Argument(name: "xcpretty_args", value: xcprettyArgs),
                                                                                         RubyCommand.Argument(name: "derived_data_path", value: derivedDataPath),
                                                                                         RubyCommand.Argument(name: "should_zip_build_products", value: shouldZipBuildProducts),
+                                                                                        RubyCommand.Argument(name: "output_xctestrun", value: outputXctestrun),
                                                                                         RubyCommand.Argument(name: "result_bundle", value: resultBundle),
                                                                                         RubyCommand.Argument(name: "use_clang_report_name", value: useClangReportName),
                                                                                         RubyCommand.Argument(name: "concurrent_workers", value: concurrentWorkers),
@@ -6562,6 +6684,8 @@ public func scan(workspace: Any? = scanfile.workspace,
                                                                                         RubyCommand.Argument(name: "custom_report_file_name", value: customReportFileName),
                                                                                         RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand),
                                                                                         RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                        RubyCommand.Argument(name: "skip_package_dependencies_resolution", value: skipPackageDependenciesResolution),
+                                                                                        RubyCommand.Argument(name: "disable_package_automatic_updates", value: disablePackageAutomaticUpdates),
                                                                                         RubyCommand.Argument(name: "use_system_scm", value: useSystemScm),
                                                                                         RubyCommand.Argument(name: "fail_build", value: failBuild)])
     _ = runner.executeCommand(command)
@@ -7282,11 +7406,14 @@ public func slather(buildDirectory: String? = nil,
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
    - disableXcpretty: Disable xcpretty formatting of build
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
+   - useSystemScm: Lets xcodebuild use system's scm configuration
  */
 public func snapshot(workspace: Any? = snapshotfile.workspace,
                      project: Any? = snapshotfile.project,
@@ -7327,11 +7454,14 @@ public func snapshot(workspace: Any? = snapshotfile.workspace,
                      concurrentSimulators: Bool = snapshotfile.concurrentSimulators,
                      disableSlideToType: Bool = snapshotfile.disableSlideToType,
                      clonedSourcePackagesPath: Any? = snapshotfile.clonedSourcePackagesPath,
+                     skipPackageDependenciesResolution: Bool = snapshotfile.skipPackageDependenciesResolution,
+                     disablePackageAutomaticUpdates: Bool = snapshotfile.disablePackageAutomaticUpdates,
                      testplan: Any? = snapshotfile.testplan,
                      onlyTesting: Any? = snapshotfile.onlyTesting,
                      skipTesting: Any? = snapshotfile.skipTesting,
                      disableXcpretty: Bool? = snapshotfile.disableXcpretty,
-                     suppressXcodeOutput: Bool? = snapshotfile.suppressXcodeOutput)
+                     suppressXcodeOutput: Bool? = snapshotfile.suppressXcodeOutput,
+                     useSystemScm: Bool = snapshotfile.useSystemScm)
 {
     let command = RubyCommand(commandID: "", methodName: "snapshot", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
                                                                                             RubyCommand.Argument(name: "project", value: project),
@@ -7372,11 +7502,14 @@ public func snapshot(workspace: Any? = snapshotfile.workspace,
                                                                                             RubyCommand.Argument(name: "concurrent_simulators", value: concurrentSimulators),
                                                                                             RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
                                                                                             RubyCommand.Argument(name: "cloned_source_packages_path", value: clonedSourcePackagesPath),
+                                                                                            RubyCommand.Argument(name: "skip_package_dependencies_resolution", value: skipPackageDependenciesResolution),
+                                                                                            RubyCommand.Argument(name: "disable_package_automatic_updates", value: disablePackageAutomaticUpdates),
                                                                                             RubyCommand.Argument(name: "testplan", value: testplan),
                                                                                             RubyCommand.Argument(name: "only_testing", value: onlyTesting),
                                                                                             RubyCommand.Argument(name: "skip_testing", value: skipTesting),
                                                                                             RubyCommand.Argument(name: "disable_xcpretty", value: disableXcpretty),
-                                                                                            RubyCommand.Argument(name: "suppress_xcode_output", value: suppressXcodeOutput)])
+                                                                                            RubyCommand.Argument(name: "suppress_xcode_output", value: suppressXcodeOutput),
+                                                                                            RubyCommand.Argument(name: "use_system_scm", value: useSystemScm)])
     _ = runner.executeCommand(command)
 }
 
@@ -7713,7 +7846,7 @@ public func supply(packageName: String,
    - files: List of files to process
    - ignoreExitStatus: Ignore the exit status of the SwiftLint command, so that serious violations                                                     don't fail the build (true/false)
    - raiseIfSwiftlintError: Raises an error if swiftlint fails, so you can fail CI/CD jobs if necessary                                                     (true/false)
-   - reporter: Choose output reporter. Available: xcode, json, csv, checkstyle, junit, html,                                                      emoji, sonarqube, markdown, github-actions-logging
+   - reporter: Choose output reporter. Available: xcode, json, csv, checkstyle, codeclimate,                                                      junit, html, emoji, sonarqube, markdown, github-actions-logging
    - quiet: Don't print status logs like 'Linting <file>' & 'Done linting'
    - executable: Path to the `swiftlint` executable on your machine
    - format: Format code when mode is :autocorrect
@@ -8012,7 +8145,7 @@ public func testflight(apiKeyPath: String? = nil,
                        appPlatform: String = "ios",
                        appleId: String? = nil,
                        ipa: String? = nil,
-                       demoAccountRequired: Bool = false,
+                       demoAccountRequired: Bool? = nil,
                        betaAppReviewInfo: [String: Any]? = nil,
                        localizedAppInfo: [String: Any]? = nil,
                        betaAppDescription: String? = nil,
@@ -8216,7 +8349,7 @@ public func updateAppIdentifier(xcodeproj: String,
    - useAutomaticSigning: Defines if project should use automatic signing
    - teamId: Team ID, is used when upgrading project
    - targets: Specify targets you want to toggle the signing mech. (default to all targets)
-   - buildConfigurations: Specify build_configurations you want to toggle the signing mech. (default to all targets)
+   - buildConfigurations: Specify build_configurations you want to toggle the signing mech. (default to all configurations)
    - codeSignIdentity: Code signing identity type (iPhone Developer, iPhone Distribution)
    - profileName: Provisioning profile name to use for code signing
    - profileUuid: Provisioning profile UUID to use for code signing
@@ -9005,7 +9138,7 @@ public func uploadToTestflight(apiKeyPath: String? = nil,
                                appPlatform: String = "ios",
                                appleId: String? = nil,
                                ipa: String? = nil,
-                               demoAccountRequired: Bool = false,
+                               demoAccountRequired: Bool? = nil,
                                betaAppReviewInfo: [String: Any]? = nil,
                                localizedAppInfo: [String: Any]? = nil,
                                betaAppDescription: String? = nil,
@@ -9523,4 +9656,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.107]
+// FastlaneRunnerAPIVersion [0.9.112]

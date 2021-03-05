@@ -76,6 +76,7 @@ describe Scan do
   describe Scan::TestCommandGenerator do
     before(:each) do
       @test_command_generator = Scan::TestCommandGenerator.new
+      @project.options.delete(:use_system_scm)
     end
 
     it "raises an exception when project path wasn't found" do
@@ -163,7 +164,23 @@ describe Scan do
       options = { project: "./scan/examples/standard/app.xcodeproj", use_system_scm: true }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       result = @test_command_generator.generate
-      expect(result).to include("-scmProvider system")
+      expect(result).to include("-scmProvider system").once
+    end
+
+    it "uses system scm via project options", requires_xcodebuild: true do
+      options = { project: "./scan/examples/standard/app.xcodeproj" }
+      @project.options[:use_system_scm] = true
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      result = @test_command_generator.generate
+      expect(result).to include("-scmProvider system").once
+    end
+
+    it "uses system scm options exactly once", requires_xcodebuild: true do
+      options = { project: "./scan/examples/standard/app.xcodeproj", use_system_scm: true }
+      @project.options[:use_system_scm] = true
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      result = @test_command_generator.generate
+      expect(result).to include("-scmProvider system").once
     end
 
     it "defaults to Xcode scm when option is not provided", requires_xcodebuild: true do

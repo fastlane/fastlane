@@ -23,6 +23,7 @@ module Spaceship
       attr_accessor :app_store_version_submission
       attr_accessor :app_store_version_phased_release
       attr_accessor :app_store_review_detail
+      attr_accessor :app_store_version_localizations
 
       module AppStoreState
         READY_FOR_SALE = "READY_FOR_SALE"
@@ -62,7 +63,8 @@ module Spaceship
         "appStoreVersionSubmission" => "app_store_version_submission",
         "build" => "build",
         "appStoreVersionPhasedRelease" => "app_store_version_phased_release",
-        "appStoreReviewDetail" => "app_store_review_detail"
+        "appStoreReviewDetail" => "app_store_review_detail",
+        "appStoreVersionLocalizations" => "app_store_version_localizations"
       })
 
       ESSENTIAL_INCLUDES = [
