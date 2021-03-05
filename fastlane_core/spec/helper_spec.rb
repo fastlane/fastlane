@@ -147,11 +147,6 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.transporter_path).to match(%r{/Applications/Xcode.*.app/Contents/Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter|/Applications/Xcode.*.app/Contents/SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms/bin/iTMSTransporter})
       end
 
-      it "#path_name_itmsp", requires_xcode: true do
-        value = FastlaneCore::Helper.path_name_itmsp
-        expect(FastlaneCore::Helper.path_name_itmsp).to match(value)
-      end
-
       it "#xcode_version", requires_xcode: true do
         expect(FastlaneCore::Helper.xcode_version).to match(/^\d[\.\d]+$/)
       end

@@ -208,13 +208,6 @@ module FastlaneCore
       return FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
     end
 
-    def self.path_name_itmsp
-      unless @name_itms
-        @name_itms ||= ENV["FASTLANE_ITUNES_TRANSPORTER_PATH_ITMSP"] || SecureRandom.uuid
-      end
-      return @name_itms
-    end
-
     def self.user_defined_itms_path
       return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if self.user_defined_itms_path?
     end

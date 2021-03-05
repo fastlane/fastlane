@@ -58,7 +58,7 @@ describe Deliver::Runner do
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
           .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'ios')
           .and_return('path')
-        expect(transporter).to receive(:upload).with('YI8C2AS', 'path').and_return(true)
+        expect(transporter).to receive(:upload).with(package_path: 'path').and_return(true)
         runner.upload_binary
       end
     end
@@ -72,7 +72,7 @@ describe Deliver::Runner do
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
           .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'appletvos')
           .and_return('path')
-        expect(transporter).to receive(:upload).with('YI8C2AS', 'path').and_return(true)
+        expect(transporter).to receive(:upload).with(package_path: 'path').and_return(true)
         runner.upload_binary
       end
     end
@@ -88,7 +88,7 @@ describe Deliver::Runner do
         expect_any_instance_of(FastlaneCore::PkgUploadPackageBuilder).to receive(:generate)
           .with(app_id: 'YI8C2AS', pkg_path: 'ACME.pkg', package_path: '/tmp', platform: 'osx')
           .and_return('path')
-        expect(transporter).to receive(:upload).with('YI8C2AS', 'path').and_return(true)
+        expect(transporter).to receive(:upload).with(package_path: 'path').and_return(true)
         runner.upload_binary
       end
     end

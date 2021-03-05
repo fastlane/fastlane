@@ -499,7 +499,7 @@ describe "Build Manager" do
 
         # other stuff required to let `upload` work:
 
-        expect(fake_build_manager).to receive(:fetch_app_id).and_return(123).exactly(3).times
+        expect(fake_build_manager).to receive(:fetch_app_id).and_return(123).exactly(2).times
         expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version)
         expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build)
 
