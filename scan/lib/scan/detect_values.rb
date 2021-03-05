@@ -162,8 +162,9 @@ module Scan
               filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)
             end
           ).tap do |array|
-            fail_if_device_not_found(device_string) if Scan.config[:ensure_devices_found] && array.empty?
-            UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty?
+            if array.empty?
+              UI.test_failure!("No '#{device_string}' found") if Scan.config[:ensure_devices_found]
+              UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty?
           end
         end
 
@@ -222,10 +223,6 @@ module Scan
     # get deployment target version
     def self.get_deployment_target_version(deployment_target_key)
       Scan.config[:deployment_target_version] || Scan.project.build_settings(key: deployment_target_key) || '0'
-    end
-
-    def self.fail_if_device_not_found(device_string)
-      UI.test_failure!("No '#{device_string}' found")
     end
   end
 end
