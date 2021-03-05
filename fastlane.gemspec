@@ -56,6 +56,15 @@ Gem::Specification.new do |spec|
   # spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = Dir["*/lib"]
 
+  # need to lock under 0.15 using less than Ruby 2.5 to prevent install issues when using 'gem install'
+  # 'gem install' does not respect Ruby versions and would try installing 0.15 on Ruby 2.4 or less
+  # signet - https://github.com/googleapis/signet/commit/bd6fe87948f8fc7702720dae651e82f4fd348b5d#diff-cd03b1ea000c03b6c5c89bccd9d04486b36976aef245f00ea92aaef2bd98ebb7
+  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.5')
+    spec.add_dependency('signet', '< 0.15')
+    spec.add_dependency('googleauth', '< 0.10')
+    STDERR.puts("WARNING: Locking to a potentially insecure version of 'signet' and 'googleauth' because you are using a version of Ruby which is marked as End-Of-Life. Please upgrade your Ruby installation to 2.5 or later")
+  end
+
   spec.add_dependency('slack-notifier', '>= 2.0.0', '< 3.0.0') # Slack notifications
   spec.add_dependency('xcodeproj', '>= 1.13.0', '< 2.0.0') # Modify Xcode projects
   spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output
@@ -97,14 +106,6 @@ Gem::Specification.new do |spec|
   # If you upgrade this gem, make sure to upgrade the users of it as well.
   spec.add_dependency('google-api-client', '>= 0.37.0', '< 0.39.0') # Google API Client to access Play Publishing API
   spec.add_dependency('google-cloud-storage', '>= 1.15.0', '< 2.0.0') # Access Google Cloud Storage for match
-
-  # need to lock under 0.15 using less than Ruby 2.5 to prevent install issues when using 'gem install'
-  # 'gem install' does not respect Ruby versions and would try installing 0.15 on Ruby 2.4 or less
-  # signet - https://github.com/googleapis/signet/commit/bd6fe87948f8fc7702720dae651e82f4fd348b5d#diff-cd03b1ea000c03b6c5c89bccd9d04486b36976aef245f00ea92aaef2bd98ebb7
-  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.5')
-    spec.add_dependency('signet', '< 0.15')
-    STDERR.puts("WARNING: Locking to a potentially insecure version of 'signet'  because you are using a version of Ruby which is marked as End-Of-Life. Please upgrade your Ruby installation to 2.5 or later")
-  end
 
   spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
 
