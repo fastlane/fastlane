@@ -254,10 +254,10 @@ workflows:
           ruby_version: '2.5'
       - validate_documentation:
           name: 'Validate Documentation'
-          ruby_version: 'circleci/ruby:2.4'
+          ruby_version: 'circleci/ruby:2.5'
       - lint_source_code:
           name: 'Lint source code'
           ruby_version: 'circleci/ruby:2.5'
       - modules_load_up_tests:
           name: 'Modules load up tests'
-          ruby_version: '2.5'
+          ruby_version: 'circleci/ruby:2.5'
