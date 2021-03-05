@@ -60,6 +60,7 @@ Gem::Specification.new do |spec|
   # 'gem install' does not respect Ruby versions and would try installing 0.15 on Ruby 2.4 or less
   # signet - https://github.com/googleapis/signet/commit/bd6fe87948f8fc7702720dae651e82f4fd348b5d#diff-cd03b1ea000c03b6c5c89bccd9d04486b36976aef245f00ea92aaef2bd98ebb7
   spec.add_dependency('signet', '<= 0.14.1')
+  spec.add_dependency('googleauth', '<= 0.15.1')
 #  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.5')
 #    spec.add_dependency('signet', '<= 0.14.1')
 #    spec.add_dependency('googleauth', '<= 0.9')
