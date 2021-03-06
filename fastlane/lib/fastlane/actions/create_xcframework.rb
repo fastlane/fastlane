@@ -18,7 +18,7 @@ module Fastlane
           UI.message("Deleting existing: #{params[:output]}")
           FileUtils.remove_dir(params[:output])
         end
-       
+
         Actions.lane_context[SharedValues::XCFRAMEWORK_PATH] = params[:output]
 
         sh(create_command)
