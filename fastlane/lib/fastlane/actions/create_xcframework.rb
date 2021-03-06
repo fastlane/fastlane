@@ -22,7 +22,6 @@ module Fastlane
         Actions.lane_context[SharedValues::XCFRAMEWORK_PATH] = params[:output]
 
         sh(create_command)
-        UI.message("Successfully created: #{params[:output]}")
       end
 
       #####################################################
