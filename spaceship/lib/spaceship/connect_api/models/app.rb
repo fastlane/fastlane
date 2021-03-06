@@ -203,7 +203,7 @@ module Spaceship
       # @return (Bool) Was something changed?
       def ensure_version!(version_string, platform: nil, client: nil)
         client ||= Spaceship::ConnectAPI
-        app_store_version = get_edit_app_store_version(platform: platform)
+        app_store_version = get_edit_app_store_version(client: client, platform: platform)
 
         if app_store_version
           if version_string != app_store_version.version_string

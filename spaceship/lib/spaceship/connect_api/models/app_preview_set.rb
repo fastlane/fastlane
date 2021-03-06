@@ -69,6 +69,11 @@ module Spaceship
         return client.get_app_preview_set(app_preview_set_id: app_preview_set_id, filter: nil, includes: includes, limit: nil, sort: nil).first
       end
 
+      def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        return client.delete_app_preview_set(app_preview_set_id: id)
+      end
+
       def upload_preview(client: nil, path: nil, wait_for_processing: true, position: nil, frame_time_code: nil)
         client ||= Spaceship::ConnectAPI
         # Upload preview

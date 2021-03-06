@@ -55,6 +55,15 @@ class TunesStubbing
           to_return(status: 200, body: "", headers: {})
       end
 
+      # 2FA: Request and Submit code via voice
+      stub_request(:put, "https://idmsa.apple.com/appleauth/auth/verify/phone").
+        with(body: "{\"phoneNumber\":{\"id\":3},\"mode\":\"voice\"}").
+        to_return(status: 200, body: "", headers: {})
+
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode").
+        with(body: "{\"securityCode\":{\"code\":\"123\"},\"phoneNumber\":{\"id\":3},\"mode\":\"voice\"}").
+        to_return(status: 200, body: "", headers: {})
+
       # 2FA: Submit security code from trusted phone with voice for verification
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode").
         with(body: "{\"securityCode\":{\"code\":\"123\"},\"phoneNumber\":{\"id\":1},\"mode\":\"voice\"}").
