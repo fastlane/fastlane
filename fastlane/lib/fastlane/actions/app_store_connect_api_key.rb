@@ -76,7 +76,10 @@ module Fastlane
                                        description: "The token session duration",
                                        optional: true,
                                        default_value: Spaceship::ConnectAPI::Token::MAX_TOKEN_DURATION,
-                                       type: Integer),
+                                       type: Integer,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The duration can't be more than 1200 (20 minutes) and the value entered was '#{value}'") unless value <= 1200
+                                       end),
           FastlaneCore::ConfigItem.new(key: :in_house,
                                        env_name: "APP_STORE_CONNECT_API_KEY_IN_HOUSE",
                                        description: "Is App Store or Enterprise (in house) team? App Store Connect API cannot determine this on its own (yet)",
