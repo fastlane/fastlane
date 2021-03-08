@@ -456,7 +456,7 @@ module FastlaneCore
 
       return result if Helper.test?
 
-      itmsp_path = File.join(dir, "#{app_id}-#{Helper.path_name_itmsp}.itmsp")
+      itmsp_path = File.join(dir, "#{app_id}.itmsp")
       successful = result && File.directory?(itmsp_path)
 
       if successful
