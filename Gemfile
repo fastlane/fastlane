@@ -7,6 +7,7 @@ gem "danger-junit", "~> 1.0"
 
 # Locking this in until Ruby 2.4 is no longer officially supported by fastlane
 gem "signet", "< 0.15.0"
+gem "googleauth", "< 0.16.0"
 
 gemspec(path: ".")
 
