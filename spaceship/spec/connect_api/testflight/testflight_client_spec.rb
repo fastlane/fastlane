@@ -272,7 +272,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
           params = { filter: { build: build_id } }
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
-          client.get_beta_build_localizations(params)
+          client.get_beta_build_localizations(**params)
         end
       end
 
