@@ -156,9 +156,9 @@ GEM
       rexml
       signet (~> 0.14)
       webrick
-    google-apis-iamcredentials_v1 (0.2.0)
+    google-apis-iamcredentials_v1 (0.1.0)
       google-apis-core (~> 0.1)
-    google-apis-storage_v1 (0.3.0)
+    google-apis-storage_v1 (0.2.0)
       google-apis-core (~> 0.1)
     google-cloud-core (1.5.0)
       google-cloud-env (~> 1.0)
@@ -231,7 +231,7 @@ GEM
     pry-rescue (1.5.2)
       interception (>= 0.5)
       pry (>= 0.12.0)
-    pry-stack_explorer (0.4.13)
+    pry-stack_explorer (0.4.12)
       binding_of_caller (~> 0.7)
       pry (~> 0.13)
     public_suffix (4.0.6)
@@ -365,6 +365,8 @@ DEPENDENCIES
   fastlane-plugin-ruby
   fastlane-plugin-slack_train (>= 0.2.0)
   google-apis-core (< 0.3.0)
+  google-apis-iamcredentials_v1 (< 0.2.0)
+  google-apis-storage_v1 (< 0.3.0)
   googleauth (< 0.16.0)
   ox (= 2.13.2)
   pry
