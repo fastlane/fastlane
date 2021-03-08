@@ -274,6 +274,19 @@ module Spaceship
 
           test_flight_request_client.post("bulkBetaTesterAssignments", body)
         end
+        
+        def add_beta_tester_to_group(beta_group_id: nil, testerIds: nil)
+               testerIds || []
+             body = {
+               data: testerIds.map do |id|
+                 {
+                   type: "betaTesters",
+                   id: id
+                 }
+               end
+             }
+            test_flight_request_client.post("betaGroups/#{beta_group_id}/relationships/betaTesters", body)
+        end
 
         def delete_beta_tester_from_apps(beta_tester_id: nil, app_ids: [])
           body = {
