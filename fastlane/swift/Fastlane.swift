@@ -149,7 +149,7 @@ public func appStoreBuildNumber(apiKeyPath: String? = nil,
    - keyContent: The content of the key p8 file
    - isKeyContentBase64: Whether :key_content is Base64 encoded or not
    - duration: The token session duration
-   - inHouse: Is App Store or Enterprise (in house) team? App Store Connect API cannot not determine this on its own (yet)
+   - inHouse: Is App Store or Enterprise (in house) team? App Store Connect API cannot determine this on its own (yet)
 
  Load the App Store Connect API token to use in other fastlane tools and actions
  */
@@ -183,6 +183,7 @@ public func appStoreConnectApiKey(keyId: String,
    - locale: Select the folder locale for your screenshots
    - device: Select the device format for your screenshots
    - description: Your app description
+   - changelog: Your app changelog
 
  Appaloosa is a private mobile application store. This action offers a quick deployment on the platform.
  You can create an account, push to your existing account, or manage your user groups.
@@ -195,7 +196,8 @@ public func appaloosa(binary: String,
                       screenshots: String,
                       locale: String = "en-US",
                       device: String? = nil,
-                      description: String? = nil)
+                      description: String? = nil,
+                      changelog: String? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "appaloosa", className: nil, args: [RubyCommand.Argument(name: "binary", value: binary),
                                                                                              RubyCommand.Argument(name: "api_token", value: apiToken),
@@ -204,7 +206,8 @@ public func appaloosa(binary: String,
                                                                                              RubyCommand.Argument(name: "screenshots", value: screenshots),
                                                                                              RubyCommand.Argument(name: "locale", value: locale),
                                                                                              RubyCommand.Argument(name: "device", value: device),
-                                                                                             RubyCommand.Argument(name: "description", value: description)])
+                                                                                             RubyCommand.Argument(name: "description", value: description),
+                                                                                             RubyCommand.Argument(name: "changelog", value: changelog)])
     _ = runner.executeCommand(command)
 }
 
@@ -6189,6 +6192,7 @@ public func rubyVersion() {
    - device: The name of the simulator type you want to run tests on (e.g. 'iPhone 6')
    - devices: Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])
    - skipDetectDevices: Should skip auto detecting of devices if none were specified
+   - ensureDevicesFound: Should fail if devices not found
    - forceQuitSimulator: Enabling this option will automatically killall Simulator processes before the run
    - resetSimulator: Enabling this option will automatically erase the simulator before running the application
    - disableSlideToType: Enabling this option will disable the simulator from showing the 'Slide to type' prompt
@@ -6261,6 +6265,7 @@ public func runTests(workspace: String? = nil,
                      device: String? = nil,
                      devices: [String]? = nil,
                      skipDetectDevices: Bool = false,
+                     ensureDevicesFound: Bool = false,
                      forceQuitSimulator: Bool = false,
                      resetSimulator: Bool = false,
                      disableSlideToType: Bool = true,
@@ -6331,6 +6336,7 @@ public func runTests(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "device", value: device),
                                                                                              RubyCommand.Argument(name: "devices", value: devices),
                                                                                              RubyCommand.Argument(name: "skip_detect_devices", value: skipDetectDevices),
+                                                                                             RubyCommand.Argument(name: "ensure_devices_found", value: ensureDevicesFound),
                                                                                              RubyCommand.Argument(name: "force_quit_simulator", value: forceQuitSimulator),
                                                                                              RubyCommand.Argument(name: "reset_simulator", value: resetSimulator),
                                                                                              RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
@@ -6483,6 +6489,7 @@ public func say(text: Any,
    - device: The name of the simulator type you want to run tests on (e.g. 'iPhone 6')
    - devices: Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])
    - skipDetectDevices: Should skip auto detecting of devices if none were specified
+   - ensureDevicesFound: Should fail if devices not found
    - forceQuitSimulator: Enabling this option will automatically killall Simulator processes before the run
    - resetSimulator: Enabling this option will automatically erase the simulator before running the application
    - disableSlideToType: Enabling this option will disable the simulator from showing the 'Slide to type' prompt
@@ -6555,6 +6562,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                  device: Any? = scanfile.device,
                  devices: [String]? = scanfile.devices,
                  skipDetectDevices: Bool = scanfile.skipDetectDevices,
+                 ensureDevicesFound: Bool = scanfile.ensureDevicesFound,
                  forceQuitSimulator: Bool = scanfile.forceQuitSimulator,
                  resetSimulator: Bool = scanfile.resetSimulator,
                  disableSlideToType: Bool = scanfile.disableSlideToType,
@@ -6625,6 +6633,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                                                                                         RubyCommand.Argument(name: "device", value: device),
                                                                                         RubyCommand.Argument(name: "devices", value: devices),
                                                                                         RubyCommand.Argument(name: "skip_detect_devices", value: skipDetectDevices),
+                                                                                        RubyCommand.Argument(name: "ensure_devices_found", value: ensureDevicesFound),
                                                                                         RubyCommand.Argument(name: "force_quit_simulator", value: forceQuitSimulator),
                                                                                         RubyCommand.Argument(name: "reset_simulator", value: resetSimulator),
                                                                                         RubyCommand.Argument(name: "disable_slide_to_type", value: disableSlideToType),
@@ -9510,7 +9519,7 @@ public func xcov(workspace: String? = nil,
                  coverallsServiceJobId: String? = nil,
                  coverallsRepoToken: String? = nil,
                  xcconfig: String? = nil,
-                 ideFoundationPath: String = "/Applications/Xcode-12.2.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-12.4.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: Bool = false)
 {
     let command = RubyCommand(commandID: "", methodName: "xcov", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -9656,4 +9665,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.112]
+// FastlaneRunnerAPIVersion [0.9.113]
