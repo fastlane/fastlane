@@ -163,7 +163,7 @@ module Scan
             end
           ).tap do |array|
             if array.empty?
-              UI.test_failure!("No '#{device_string}' found") if Scan.config[:ensure_devices_found]
+              UI.test_failure!("No device found with name '#{device_string}'") if Scan.config[:ensure_devices_found]
               UI.error("Ignoring '#{device_string}', couldn’t find matching simulator")
             end
           end
