@@ -36,7 +36,6 @@ module Fastlane
         params[:push_options].each { |push_option| command << "--push-option=#{push_option}" } if params[:push_options]
 
         # execute our command
-        Actions.sh('pwd')
         return command.join(' ') if Helper.test?
 
         Actions.sh(command.join(' '))
