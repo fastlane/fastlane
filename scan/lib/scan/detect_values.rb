@@ -162,7 +162,10 @@ module Scan
               filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)
             end
           ).tap do |array|
-            UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty?
+            if array.empty?
+              UI.test_failure!("No device found with name '#{device_string}'") if Scan.config[:ensure_devices_found]
+              UI.error("Ignoring '#{device_string}', couldn’t find matching simulator")
+            end
           end
         end
 
