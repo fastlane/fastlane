@@ -118,6 +118,30 @@ describe Fastlane do
         end
       end
 
+      context "when rewriting existing xcframework" do
+        before(:each) do
+          allow(File).to receive(:exist?).with('FrameworkA.framework').and_return(true)
+          allow(File).to receive(:exist?).with('FrameworkB.framework').and_return(true)
+          allow(File).to receive(:directory?).with('FrameworkA.framework').and_return(true)
+          allow(File).to receive(:directory?).with('FrameworkB.framework').and_return(true)
+          allow(File).to receive(:directory?).with('UniversalFramework.xcframework').and_return(true)
+        end
+
+        it "should fail due to the deleted xcframework" do
+          Fastlane::FastFile.new.parse("lane :test do
+            create_xcframework(
+              frameworks: ['FrameworkA.framework', 'FrameworkB.framework'],
+              output: 'UniversalFramework.xcframework'
+            )
+          end").runner.execute(:test)
+
+          rescue => e
+            expect(e.to_s).to eq("No such file or directory @ apply2files - UniversalFramework.xcframework")
+          else
+            fail("Error should have been raised")
+        end
+      end
+
       context "when packaging libraries" do
         context "which exist" do
           before(:each) do
