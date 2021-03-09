@@ -88,11 +88,11 @@ module Fastlane
                 UI.error("Error polling for notarization info: #{msg}")
               }
             )
-          end
 
-          unless error
-            notarization_info_plist = Plist.parse_xml(notarization_info_response)
-            notarization_info = notarization_info_plist['notarization-info']
+            unless error
+              notarization_info_plist = Plist.parse_xml(notarization_info_response)
+              notarization_info = notarization_info_plist['notarization-info']
+            end
           end
         end
 
