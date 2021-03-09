@@ -42,7 +42,7 @@ describe Match do
         MATCH_PASSWORD: 'test',
         # Remove values ad-hoc until other test cases refactored
         FASTLANE_TEAM_ID: nil,
-        FASTLANE_TEAM_NAME: nil,
+        FASTLANE_TEAM_NAME: nil
       ) { example.run }
     end
 
