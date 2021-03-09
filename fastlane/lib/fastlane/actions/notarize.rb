@@ -35,7 +35,7 @@ module Fastlane
 
         notarization_info = {}
         with_notarize_authenticator(api_key_path) do |notarize_authenticator|
-          notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider] and api_key_path.nil?
+          notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider] && api_key_path.nil?
 
           notarization_upload_response = Actions.sh(
             notarize_authenticator.call(notarization_upload_command),
@@ -46,9 +46,9 @@ module Fastlane
 
           notarization_upload_plist = Plist.parse_xml(notarization_upload_response)
 
-          if notarization_upload_plist.has_key?('product-errors') && notarization_upload_plist['product-errors'].any?
+          if notarization_upload_plist.key?('product-errors') && notarization_upload_plist['product-errors'].any?
             UI.important("🚫 Could not upload package to notarization service! Here are the reasons:")
-            notarization_upload_plist['product-errors'].each { |product_error| UI.error "#{product_error['message']} (#{product_error['code']})" }
+            notarization_upload_plist['product-errors'].each { |product_error| UI.error("#{product_error['message']} (#{product_error['code']})") }
             UI.user_error!("Package upload to notarization service cancelled. Please check the error messages above.")
           end
 
@@ -139,9 +139,9 @@ module Fastlane
           file_exists = File.exist?(api_key_file_path)
           begin
             FileUtils.mkdir_p(api_key_folder_path) unless directory_exists
-            File.open(api_key_file_path, 'w') {|f| f.write api_key['key'] } unless file_exists
+            File.open(api_key_file_path, 'w') { |f| f.write(api_key['key']) } unless file_exists
 
-            yield Proc.new { |command| "#{command} --apiKey #{api_key['key_id']} --apiIssuer #{api_key['issuer_id']}" }
+            yield(proc { |command| "#{command} --apiKey #{api_key['key_id']} --apiIssuer #{api_key['issuer_id']}" })
           ensure
             FileUtils.rm(api_key_file_path) unless file_exists
             FileUtils.rm_r(api_key_folder_path) unless directory_exists
@@ -153,7 +153,7 @@ module Fastlane
           # Use app specific password if specified.
           ENV['FL_NOTARIZE_PASSWORD'] = ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'] || apple_id_account.password
 
-          yield Proc.new { |command| "#{command} -u #{apple_id_account.user} -p @env:FL_NOTARIZE_PASSWORD" }
+          yield(proc { |command| "#{command} -u #{apple_id_account.user} -p @env:FL_NOTARIZE_PASSWORD" })
         end
       end
 
