@@ -33,6 +33,7 @@ module Fastlane
 
         notarization_upload_command = "xcrun altool --notarize-app -t osx -f \"#{compressed_package_path || package_path}\" --primary-bundle-id #{bundle_id} --output-format xml"
 
+        notarization_info = {}
         with_notarize_authenticator(api_key_path) do |notarize_authenticator|
           notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider] and api_key_path.nil?
 
@@ -55,7 +56,6 @@ module Fastlane
 
           UI.success("Successfully uploaded package to notarization service with request identifier #{notarization_request_id}")
 
-          notarization_info = {}
           while notarization_info.empty? || (notarization_info['Status'] == 'in progress')
             if notarization_info.empty?
               UI.message('Waiting to query request status')
