@@ -492,7 +492,7 @@ module FastlaneCore
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
-        return upload(app_id, dir)
+        return upload(app_id, dir, package_path)
       end
 
       if result
