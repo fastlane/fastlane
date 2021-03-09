@@ -31,7 +31,7 @@ module Pilot
                                                                       platform: platform)
 
       transporter = transporter_for_selected_team(options)
-      result = transporter.upload(fetch_app_id, package_path)
+      result = transporter.upload(package_path: package_path)
 
       unless result
         UI.user_error!("Error uploading ipa file, for more information see above")

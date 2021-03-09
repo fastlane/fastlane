@@ -178,7 +178,7 @@ module Deliver
       end
 
       transporter = transporter_for_selected_team
-      result = transporter.upload(options[:app].id, package_path)
+      result = transporter.upload(package_path: package_path)
       UI.user_error!("Could not upload binary to App Store Connect. Check out the error above", show_github_issues: true) unless result
     end
 
