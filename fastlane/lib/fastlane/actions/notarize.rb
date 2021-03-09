@@ -1,6 +1,7 @@
 module Fastlane
   module Actions
     class NotarizeAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         package_path = params[:package]
         bundle_id = params[:bundle_id]
@@ -95,6 +96,7 @@ module Fastlane
             end
           end
         end
+        # rubocop:enable Metrics/PerceivedComplexity
 
         log_url = notarization_info['LogFileURL']
         ENV['FL_NOTARIZE_LOG_FILE_URL'] = log_url
