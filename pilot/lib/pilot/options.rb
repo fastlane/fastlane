@@ -183,7 +183,7 @@ module Pilot
                                     is_string: false,
                                     env_name: "PILOT_NOTIFY_EXTERNAL_TESTERS",
                                     description: "Should notify external testers?",
-                                    default_value: true),
+                                    optional: true),
         FastlaneCore::ConfigItem.new(key: :app_version,
                                      env_name: "PILOT_APP_VERSION",
                                      description: "The version number of the application build to distribute. If the version number is not specified, then the most recent build uploaded to TestFlight will be distributed. If specified, the most recent build for the version number will be distributed",
