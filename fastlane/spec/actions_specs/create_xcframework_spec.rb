@@ -136,7 +136,7 @@ describe Fastlane do
               )
             end").runner.execute(:test)
           rescue => e
-            expect(e.to_s).to eq("No such file or directory @ apply2files - UniversalFramework.xcframework")
+            expect(e.to_s).to eq("No such file or directory @ apply2files - UniversalFramework.xcframework").or(eq("No such file or directory @ unlink_internal - UniversalFramework.xcframework"))
           else
             fail("Error should have been raised")
           end
