@@ -361,7 +361,8 @@ describe "Build Manager" do
           beta_group_ids: [beta_groups[0].id]
         }).and_return(Spaceship::ConnectAPI::Response.new)
         expect(ready_to_submit_mock_build).to receive(:add_beta_groups).with(beta_groups: [beta_groups[0]]).and_wrap_original do |m, *args|
-          m.call(*args)
+          options = args.first
+          m.call(**options)
         end
 
         # Expect success messages
