@@ -20,6 +20,7 @@ module Fastlane
         cmd << "--output #{params[:output]}" if params[:output]
         cmd << "--use-ssh" if params[:use_ssh]
         cmd << "--use-submodules" if params[:use_submodules]
+        cmd << "--use-netrc" if params[:use_netrc]
         cmd << "--no-use-binaries" if params[:use_binaries] == false
         cmd << "--no-checkout" if params[:no_checkout] == true
         cmd << "--no-build" if params[:no_build] == true
@@ -32,6 +33,8 @@ module Fastlane
         cmd << "--cache-builds" if params[:cache_builds]
         cmd << "--new-resolver" if params[:new_resolver]
         cmd << "--log-path #{params[:log_path]}" if params[:log_path]
+        cmd << "--use-xcframeworks" if params[:use_xcframeworks]
+        cmd << "--archive" if params[:archive]
 
         Actions.sh(cmd.join(' '))
       end
@@ -48,6 +51,14 @@ module Fastlane
 
         if params[:log_path] && !%w(build bootstrap update).include?(command_name)
           UI.user_error!("Log path option is available only for 'build', 'bootstrap', and 'update' command.")
+        end
+
+        if params[:use_xcframeworks] && !%w(build bootstrap update).include?(command_name)
+          UI.user_error!("Use XCFrameworks option is available only for 'build', 'bootstrap', and 'update' command.")
+        end
+
+        if command_name != "build" && params[:archive]
+          UI.user_error!("Archive option is available only for 'build' command.")
         end
       end
 
@@ -86,6 +97,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :use_submodules,
                                        env_name: "FL_CARTHAGE_USE_SUBMODULES",
                                        description: "Add dependencies as Git submodules",
+                                       is_string: false,
+                                       type: Boolean,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :use_netrc,
+                                       env_name: "FL_CARTHAGE_USE_NETRC",
+                                       description: "Use .netrc for downloading frameworks",
                                        is_string: false,
                                        type: Boolean,
                                        optional: true),
@@ -176,6 +193,18 @@ module Fastlane
                                        env_name: "FL_CARTHAGE_LOG_PATH",
                                        description: "Path to the xcode build output",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :use_xcframeworks,
+                                       env_name: "FL_CARTHAGE_USE_XCFRAMEWORKS",
+                                       description: "Create xcframework bundles instead of one framework per platform (requires Xcode 12+)",
+                                       type: Boolean,
+                                       is_string: false,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :archive,
+                                       env_name: "FL_CARTHAGE_ARCHIVE",
+                                       description: "Archive built frameworks from the current project",
+                                       is_string: false,
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :executable,
                                        env_name: "FL_CARTHAGE_EXECUTABLE",
                                        description: "Path to the `carthage` executable on your machine",

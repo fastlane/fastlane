@@ -5,6 +5,14 @@ module Snapshot
     require 'erb'
     require 'fastimage'
 
+    def html_path
+      if Snapshot.config[:html_template]
+        Snapshot.config[:html_template]
+      else
+        File.join(Snapshot::ROOT, "lib", "snapshot/page.html.erb")
+      end
+    end
+
     def generate
       UI.message("Generating HTML Report")
 
@@ -36,7 +44,6 @@ module Snapshot
         end
       end
 
-      html_path = File.join(Snapshot::ROOT, "lib", "snapshot/page.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
       export_path = "#{screens_path}/screenshots.html"

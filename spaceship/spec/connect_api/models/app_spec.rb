@@ -1,5 +1,15 @@
 describe Spaceship::ConnectAPI::App do
-  before { Spaceship::Tunes.login }
+  let(:mock_tunes_client) { double('tunes_client') }
+  let(:username) { 'spaceship@krausefx.com' }
+  let(:password) { 'so_secret' }
+
+  before do
+    allow(mock_tunes_client).to receive(:team_id).and_return("123")
+    allow(mock_tunes_client).to receive(:select_team)
+    allow(mock_tunes_client).to receive(:csrf_tokens)
+    allow(Spaceship::TunesClient).to receive(:login).and_return(mock_tunes_client)
+    Spaceship::ConnectAPI.login(username, password, use_portal: false, use_tunes: true)
+  end
 
   describe '#Spaceship::ConnectAPI' do
     it '#get_apps' do

@@ -72,13 +72,23 @@ module Fastlane
 
           UI.message('Querying request status')
 
+          # As of July 2020, the request UUID might not be available for polling yet which returns an error code
+          # This is now handled with the error_callback (which prevents an error from being raised)
+          # Catching this error allows for polling to continue until the notarization is complete
+          error = false
           notarization_info_response = Actions.sh(
             "xcrun altool --notarization-info #{notarization_request_id} -u #{apple_id_account.user} -p @env:FL_NOTARIZE_PASSWORD --output-format xml",
-            log: verbose
+            log: verbose,
+            error_callback: lambda { |msg|
+              error = true
+              UI.error("Error polling for notarization info: #{msg}")
+            }
           )
 
-          notarization_info_plist = Plist.parse_xml(notarization_info_response)
-          notarization_info = notarization_info_plist['notarization-info']
+          unless error
+            notarization_info_plist = Plist.parse_xml(notarization_info_response)
+            notarization_info = notarization_info_plist['notarization-info']
+          end
         end
 
         log_url = notarization_info['LogFileURL']

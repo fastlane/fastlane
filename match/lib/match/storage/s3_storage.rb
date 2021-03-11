@@ -14,16 +14,20 @@ module Match
       attr_reader :s3_bucket
       attr_reader :s3_region
       attr_reader :s3_client
+      attr_reader :s3_object_prefix
       attr_reader :readonly
       attr_reader :username
       attr_reader :team_id
       attr_reader :team_name
+      attr_reader :api_key_path
+      attr_reader :api_key
 
       def self.configure(params)
         s3_region = params[:s3_region]
         s3_access_key = params[:s3_access_key]
         s3_secret_access_key = params[:s3_secret_access_key]
         s3_bucket = params[:s3_bucket]
+        s3_object_prefix = params[:s3_object_prefix]
 
         if params[:git_url].to_s.length > 0
           UI.important("Looks like you still define a `git_url` somewhere, even though")
@@ -37,10 +41,13 @@ module Match
           s3_access_key: s3_access_key,
           s3_secret_access_key: s3_secret_access_key,
           s3_bucket: s3_bucket,
+          s3_object_prefix: s3_object_prefix,
           readonly: params[:readonly],
           username: params[:username],
           team_id: params[:team_id],
-          team_name: params[:team_name]
+          team_name: params[:team_name],
+          api_key_path: params[:api_key_path],
+          api_key: params[:api_key]
         )
       end
 
@@ -48,17 +55,23 @@ module Match
                      s3_access_key: nil,
                      s3_secret_access_key: nil,
                      s3_bucket: nil,
+                     s3_object_prefix: nil,
                      readonly: nil,
                      username: nil,
                      team_id: nil,
-                     team_name: nil)
+                     team_name: nil,
+                     api_key_path: nil,
+                     api_key: nil)
         @s3_bucket = s3_bucket
         @s3_region = s3_region
         @s3_client = Fastlane::Helper::S3ClientHelper.new(access_key: s3_access_key, secret_access_key: s3_secret_access_key, region: s3_region)
+        @s3_object_prefix = s3_object_prefix.to_s
         @readonly = readonly
         @username = username
         @team_id = team_id
         @team_name = team_name
+        @api_key_path = api_key_path
+        @api_key = api_key
       end
 
       # To make debugging easier, we have a custom exception here
@@ -88,8 +101,10 @@ module Match
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
 
-        s3_client.find_bucket!(s3_bucket).objects.each do |object|
-          file_path = object.key # :team_id/path/to/file
+        s3_client.find_bucket!(s3_bucket).objects(prefix: s3_object_prefix).each do |object|
+          file_path = strip_s3_object_prefix(object.key) # :s3_object_prefix:team_id/path/to/file
+
+          # strip s3_prefix from file_path
           download_path = File.join(self.working_directory, file_path)
 
           FileUtils.mkdir_p(File.expand_path("..", download_path))
@@ -113,12 +128,11 @@ module Match
 
         files_to_upload.each do |file_name|
           # Go from
-          #   "/var/folders/px/bz2kts9n69g8crgv4jpjh6b40000gn/T/d20181026-96528-1av4gge/profiles/development/Development_me.mobileprovision"
+          #   "/var/folders/px/bz2kts9n69g8crgv4jpjh6b40000gn/T/d20181026-96528-1av4gge/:team_id/profiles/development/Development_me.mobileprovision"
           # to
-          #   "profiles/development/Development_me.mobileprovision"
+          #   ":s3_object_prefix:team_id/profiles/development/Development_me.mobileprovision"
           #
-
-          target_path = sanitize_file_name(file_name)
+          target_path = s3_object_path(file_name)
           UI.verbose("Uploading '#{target_path}' to S3 Storage...")
 
           body = File.read(file_name)
@@ -130,13 +144,18 @@ module Match
 
       def delete_files(files_to_delete: [], custom_message: nil)
         files_to_delete.each do |file_name|
-          target_path = sanitize_file_name(file_name)
+          target_path = s3_object_path(file_name)
+          UI.verbose("Deleting '#{target_path}' from S3 Storage...")
           s3_client.delete_file(s3_bucket, target_path)
         end
       end
 
       def skip_docs
         false
+      end
+
+      def list_files(file_name: "", file_ext: "")
+        Dir[File.join(working_directory, self.team_id, "**", file_name, "*.#{file_ext}")]
       end
 
       # Implement this for the `fastlane match init` command
@@ -148,6 +167,17 @@ module Match
 
       private
 
+      def s3_object_path(file_name)
+        santized = sanitize_file_name(file_name)
+        return santized if santized.start_with?(s3_object_prefix)
+
+        s3_object_prefix + santized
+      end
+
+      def strip_s3_object_prefix(object_path)
+        object_path.gsub(/^#{s3_object_prefix}/, "")
+      end
+
       def sanitize_file_name(file_name)
         file_name.gsub(self.working_directory + "/", "")
       end
@@ -158,9 +188,17 @@ module Match
           # see `prefixed_working_directory` comments for more details
           return self.team_id
         else
-          spaceship = SpaceshipEnsure.new(self.username, self.team_id, self.team_name)
+          UI.user_error!("The `team_id` option is required. fastlane cannot automatically determine portal team id via the App Store Connect API (yet)") if self.team_id.to_s.empty?
+
+          spaceship = SpaceshipEnsure.new(self.username, self.team_id, self.team_name, api_token)
           return spaceship.team_id
         end
+      end
+
+      def api_token
+        api_token ||= Spaceship::ConnectAPI::Token.create(**self.api_key) if self.api_key
+        api_token ||= Spaceship::ConnectAPI::Token.from_json_file(self.api_key_path) if self.api_key_path
+        return api_token
       end
     end
   end

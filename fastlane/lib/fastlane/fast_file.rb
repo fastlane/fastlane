@@ -201,13 +201,17 @@ module Fastlane
       # First accepts hash (or named keywords) like other actions
       # Otherwise uses sh method that doesn't have an interface like an action
       if args.count == 1 && args.first.kind_of?(Hash)
-        hash = args.first
-        command = hash.delete(:command)
+        options = args.first
+        command = options.delete(:command)
 
         raise ArgumentError, "sh requires :command keyword in argument" if command.nil?
-
-        new_args = [*command, hash]
-        FastFile.sh(*new_args, &b)
+        log = options[:log].nil? ? true : options[:log]
+        FastFile.sh(*command, step_name: options[:step_name], log: log, error_callback: options[:error_callback], &b)
+      elsif args.count != 1 && args.last.kind_of?(Hash)
+        new_args = args.dup
+        options = new_args.pop
+        log = options[:log].nil? ? true : options[:log]
+        FastFile.sh(*new_args, step_name: options[:step_name], log: log, error_callback: options[:error_callback], &b)
       else
         FastFile.sh(*args, &b)
       end
@@ -259,11 +263,20 @@ module Fastlane
       return return_value
     end
 
+    def find_tag(folder: nil, version: nil, remote: false)
+      req = Gem::Requirement.new(version)
+      all_tags = get_tags(folder: folder, remote: remote)
+
+      return all_tags.select { |t| req =~ FastlaneCore::TagVersion.new(t) }.last
+    end
+
     # @param url [String] The git URL to clone the repository from
     # @param branch [String] The branch to checkout in the repository
     # @param path [String] The path to the Fastfile
     # @param version [String, Array] Version requirement for repo tags
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil, dependencies: [])
+    # @param dependencies [Array] An optional array of additional Fastfiles in the repository
+    # @param cache_path [String] An optional path to a directory where the repository should be cloned into
+    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil, dependencies: [], cache_path: nil) # rubocop:disable Metrics/PerceivedComplexity
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
@@ -271,41 +284,75 @@ module Fastlane
 
         action_launched('import_from_git')
 
+        is_eligible_for_caching = !version.nil? && !cache_path.nil?
+
+        UI.message("Eligible for caching") if is_eligible_for_caching
+
         # Checkout the repo
         repo_name = url.split("/").last
         checkout_param = branch
 
-        Dir.mktmpdir("fl_clone") do |tmp_path|
-          clone_folder = File.join(tmp_path, repo_name)
+        import_block = proc do |target_path|
+          clone_folder = File.join(target_path, repo_name)
 
           branch_option = "--branch #{branch}" if branch != 'HEAD'
 
           checkout_dependencies = dependencies.map(&:shellescape).join(" ")
 
-          checkout_path = "#{path.shellescape} #{checkout_dependencies}"
+          # If the current call is eligible for caching, we check out all the
+          # files and directories. If not, we only check out the specified
+          # `path` and `dependencies`.
+          checkout_path = is_eligible_for_caching ? "" : "#{path.shellescape} #{checkout_dependencies}"
 
-          UI.message("Cloning remote git repo...")
-          Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-            Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} --depth 1 -n #{branch_option}")
+          if Dir[clone_folder].empty?
+            UI.message("Cloning remote git repo...")
+            Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+              # When using cached clones, we need the entire repository history
+              # so we can switch between tags or branches instantly, or else,
+              # it would defeat the caching's purpose.
+              depth = is_eligible_for_caching ? "" : "--depth 1"
+
+              Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} #{depth} --no-checkout #{branch_option}")
+            end
           end
 
           unless version.nil?
-            req = Gem::Requirement.new(version)
-            all_tags = fetch_remote_tags(folder: clone_folder)
-            checkout_param = all_tags.select { |t| req =~ FastlaneCore::TagVersion.new(t) }.last
+            if is_eligible_for_caching
+              checkout_param = find_tag(folder: clone_folder, version: version, remote: false)
+
+              if checkout_param.nil?
+                # Update the repo and try again before failing
+                UI.message("Updating git repo...")
+                Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+                  Actions.sh("cd #{clone_folder.shellescape} && git checkout #{branch} && git reset --hard && git pull --all")
+                end
+
+                checkout_param = find_tag(folder: clone_folder, version: version, remote: false)
+              else
+                UI.message("Found tag #{checkout_param}. No git repo update needed.")
+              end
+            else
+              checkout_param = find_tag(folder: clone_folder, version: version, remote: true)
+            end
+
             UI.user_error!("No tag found matching #{version.inspect}") if checkout_param.nil?
           end
 
           Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{checkout_path}")
 
-          # We also want to check out all the local actions of this fastlane setup
-          containing = path.split(File::SEPARATOR)[0..-2]
-          containing = "." if containing.count == 0
-          actions_folder = File.join(containing, "actions")
-          begin
-            Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{actions_folder.shellescape}")
-          rescue
-            # We don't care about a failure here, as local actions are optional
+          # Knowing that we check out all the files and directories when the
+          # current call is eligible for caching, we don't need to also
+          # explicitly check out the "actions" directory.
+          unless is_eligible_for_caching
+            # We also want to check out all the local actions of this fastlane setup
+            containing = path.split(File::SEPARATOR)[0..-2]
+            containing = "." if containing.count == 0
+            actions_folder = File.join(containing, "actions")
+            begin
+              Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{actions_folder.shellescape}")
+            rescue
+              # We don't care about a failure here, as local actions are optional
+            end
           end
 
           return_value = nil
@@ -320,6 +367,12 @@ module Fastlane
 
           return return_value
         end
+
+        if is_eligible_for_caching
+          import_block.call(File.expand_path(cache_path))
+        else
+          Dir.mktmpdir("fl_clone", &import_block)
+        end
       end
     end
 
@@ -327,10 +380,12 @@ module Fastlane
     # @!group Versioning helpers
     #####################################################
 
-    def fetch_remote_tags(folder: nil)
-      UI.message("Fetching remote git tags...")
-      Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-        Actions.sh("cd #{folder.shellescape} && git fetch --all --tags -q")
+    def get_tags(folder: nil, remote: false)
+      if remote
+        UI.message("Fetching remote git tags...")
+        Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+          Actions.sh("cd #{folder.shellescape} && git fetch --all --tags -q")
+        end
       end
 
       # Fetch all possible tags

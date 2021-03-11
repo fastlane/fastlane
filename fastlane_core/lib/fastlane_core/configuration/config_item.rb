@@ -12,6 +12,9 @@ module FastlaneCore
     # [String] the name of the environment variable, which is only used if no other values were found
     attr_accessor :env_name
 
+    # [Array] the names of the environment variables, which is only used if no other values were found
+    attr_accessor :env_names
+
     # [String] A description shown to the user
     attr_accessor :description
 
@@ -71,6 +74,7 @@ module FastlaneCore
     # Creates a new option
     # @param key (Symbol) the key which is used as command parameters or key in the fastlane tools
     # @param env_name (String) the name of the environment variable, which is only used if no other values were found
+    # @param env_names (Array) the names of the environment variables, which is only used if no other values were found
     # @param description (String) A description shown to the user
     # @param short_option (String) A string of length 1 which is used for the command parameters (e.g. -f)
     # @param default_value the value which is used if there was no given values and no environment values
@@ -88,8 +92,10 @@ module FastlaneCore
     # @param sensitive (Boolean) Set if the variable is sensitive, such as a password or API token, to prevent echoing when prompted for the parameter
     # @param display_in_shell (Boolean) Set if the variable can be used from shell
     # rubocop:disable Metrics/ParameterLists
+    # rubocop:disable Metrics/PerceivedComplexity
     def initialize(key: nil,
                    env_name: nil,
+                   env_names: nil,
                    description: nil,
                    short_option: nil,
                    default_value: nil,
@@ -108,6 +114,11 @@ module FastlaneCore
                    display_in_shell: true)
       UI.user_error!("key must be a symbol") unless key.kind_of?(Symbol)
       UI.user_error!("env_name must be a String") unless (env_name || '').kind_of?(String)
+
+      UI.user_error!("env_names must be an Array") unless (env_names || []).kind_of?(Array)
+      (env_names || []).each do |name|
+        UI.user_error!("env_names must only contain String") unless (name || '').kind_of?(String)
+      end
 
       if short_option
         UI.user_error!("short_option for key :#{key} must of type String") unless short_option.kind_of?(String)
@@ -138,6 +149,7 @@ module FastlaneCore
 
       @key = key
       @env_name = env_name
+      @env_names = [env_name].compact + (env_names || [])
       @description = description
       @short_option = short_option
       @default_value = default_value
@@ -160,6 +172,7 @@ module FastlaneCore
 
       update_code_gen_default_value_if_able!
     end
+    # rubocop:enable Metrics/PerceivedComplexity
     # rubocop:enable Metrics/ParameterLists
 
     # if code_gen_default_value is nil, use the default value if it isn't a `code_gen_sensitive` value
@@ -228,6 +241,16 @@ module FastlaneCore
       true
     end
 
+    def fetch_env_value
+      env_names.each do |name|
+        next if ENV[name].nil?
+        # verify! before using (see https://github.com/fastlane/fastlane/issues/14449)
+        return ENV[name].dup if verify!(auto_convert_value(ENV[name]))
+      end
+
+      return nil
+    end
+
     # rubocop:disable Metrics/PerceivedComplexity
     # Returns an updated value type (if necessary)
     def auto_convert_value(value)
@@ -264,9 +287,7 @@ module FastlaneCore
 
     # Determines the defined data type of this ConfigItem
     def data_type
-      if @data_type.kind_of?(Symbol)
-        nil
-      elsif @data_type
+      if @data_type
         @data_type
       else
         (@is_string ? String : nil)

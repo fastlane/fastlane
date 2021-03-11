@@ -81,7 +81,7 @@ _scan_ uses the latest APIs and tools to make running tests plain simple and off
 👱 | Automatically switches to the [travis formatter](https://github.com/kattrali/xcpretty-travis-formatter) when running on Travis
 📖 | Helps you resolve common test errors like simulator not responding
 
-_scan_ uses a plain `xcodebuild` command, therefore keeping 100% compatible with `xcodebuild`. To generate the nice output, _scan_ uses [xcpretty](https://github.com/supermarin/xcpretty). You can alway access the raw output in `~/Library/Logs/scan`.
+_scan_ uses a plain `xcodebuild` command, therefore keeping 100% compatible with `xcodebuild`. To generate the nice output, _scan_ uses [xcpretty](https://github.com/supermarin/xcpretty). You can always access the raw output in `~/Library/Logs/scan`.
 
 ![img/actions/scanScreenshot.png](/img/actions/scanScreenshot.png)
 ![img/actions/slack.png](/img/actions/slack.png)
@@ -100,7 +100,7 @@ That's all you need to run your tests. If you want more control, here are some a
 fastlane scan --workspace "Example.xcworkspace" --scheme "AppName" --device "iPhone 6" --clean
 ```
 
-If you need to use a different xcode install, use `xcode-select` or define `DEVELOPER_DIR`:
+If you need to use a different Xcode install, use `xcode-select` or define `DEVELOPER_DIR`:
 
 ```no-highlight
 DEVELOPER_DIR="/Applications/Xcode6.2.app" scan

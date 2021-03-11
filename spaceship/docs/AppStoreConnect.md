@@ -12,51 +12,63 @@
   * [Testers](#testers)
   * [App ratings & reviews](#app-ratings--reviews)
   * [App Analytics](#app-analytics)
+  * [Bundle Id](#bundle-id-auth-key)
+  * [Bundle Id Capability](#bundle-id-capability-auth-key)
 - [License](#license)
 
 ## Usage
 
 To quickly play around with _spaceship_ launch `irb` in your terminal and execute `require "spaceship"`.
 
-In general the classes are pre-fixed with the `Tunes` module. This name is an artifact from when "App Store Connect" was still called "iTunes Connect".
+In general the classes are pre-fixed with the `ConnectAPI` module. If you want to use the legacy web API, make sure to use `Tunes`, which is an artifact from when "App Store Connect" was still called "iTunes Connect".
 
 ### Login
 
 *Note*: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
 
 ```ruby
-Spaceship::Tunes.login("felix@krausefx.com", "password")
 
-Spaceship::Tunes.select_team # call this method to let the user select a team
+token = Spaceship::ConnectAPI::Token.create(
+  key_id: 'the-key-id',
+  issuer_id: 'the-issuer-id',
+  filepath:  File.absolute_path("../AuthKey_the-key-id.p8")
+)
+
+Spaceship::ConnectAPI.token = token
+
 ```
 
 ### Applications
 
 ```ruby
 # Fetch all available applications
-all_apps = Spaceship::Tunes::Application.all
+all_apps = Spaceship::ConnectAPI::App.all
 
-# Find a specific app based on the bundle identifier or Apple ID
-app = Spaceship::Tunes::Application.find("com.krausefx.app")
-# or
-app = Spaceship::Tunes::Application.find(794902327)
+# Find a specific app based on the bundle identifier
+app = Spaceship::ConnectAPI::App.find("com.krausefx.app")
+
+app = Spaceship::ConnectAPI.get_app(app_id: 1013943394).first
 
 # Access information about the app
-app.apple_id        # => 1013943394
+app.id              # => 1013943394
 app.name            # => "Spaceship App"
 app.bundle_id       # => "com.krausefx.app"
+app.sku             # => "SpaceshipApp01"
+app.primary_locale  # => "en-US"
 
 # Show the names of all your apps
-Spaceship::Tunes::Application.all.collect do |app|
+Spaceship::ConnectAPI::App.all.collect do |app|
   app.name
 end
 
 # Create a new app
-app = Spaceship::Tunes::Application.create!(name: "App Name",
-                                primary_language: "English",
-                                         version: "1.0", # initial version
-                                             sku: 123,
-                                       bundle_id: "com.krausefx.app")
+# Currently only works with Apple ID login (not API Key)
+app = Spaceship::ConnectAPI::App.create(name: "App Name",
+                                        version_string: "1.0", # initial version
+                                        sku: "123",
+                                        primary_locale: "English",
+                                        bundle_id: "com.krausefx.app",
+                                        platforms: ["IOS"])
 ```
 
 To update non version specific details, use the following code
@@ -78,21 +90,21 @@ app.update_price_tier!("3")
 
 <img src="/spaceship/assets/docs/AppVersions.png" width="500">
 
-You can have up to 2 app versions at the same time. One is usually the version already available in the App Store (`live_version`) and one being the one you can edit (`edit_version`).
+You can have up to 2 app versions at the same time. One is usually the version already available in the App Store (`get_live_app_store_version`) and one being the one you can edit (`get_edit_app_store_version`).
 
 While you usually can modify some values in the production version (e.g. app description), most options are already locked.
 
 With _spaceship_ you can access the versions like this
 
 ```ruby
-app.live_version # the version that's currently available in the App Store
-app.edit_version # the version that's in `Prepare for Submission` mode
+app.get_live_app_store_version # the version that's currently available in the App Store
+app.get_edit_app_store_version # the version that's in `Prepare for Submission` mode
 ```
 
 You can then go ahead and modify app metadata on the version objects:
 
 ```ruby
-v = app.edit_version
+v = app.get_edit_app_store_version
 
 # Access information
 v.app_status        # => "Waiting for Review"
@@ -201,7 +213,7 @@ attr_reader :screenshots
 ### Select a build for review
 
 ```ruby
-version = app.edit_version
+version = app.get_edit_app_store_version
 
 builds = version.candidate_builds
 version.select_build(builds.first)
@@ -374,6 +386,50 @@ devices = analytics.app_active_devices   # => Array of dates representing raw da
 
 # Get crashes
 crashes = analytics.app_crashes          # => Array of dates representing raw data for each day
+```
+
+### Bundle Id (Auth Key)
+
+```ruby
+# Fetch all bundle identifiers
+all_identifiers = Spaceship::ConnectAPI::BundleId.all
+
+# Find a specific identifier based on the bundle identifier
+bundle_id = Spaceship::ConnectAPI::BundleId.find("com.krausefx.app")
+
+# Access information about the bundle identifer
+bundle_id.name
+bundle_id.platform
+bundle_id.identifier
+bundle_id.seed_id
+
+# Create a new identifier
+identifier = Spaceship::ConnectAPI::BundleId.create(name: "Description of the identifier",
+                                                    identifier: "com.krausefx.app")
+```
+Note: Platform will be set to UNIVERSAL no matter if you specify IOS or MAC_OS and seed_id is by default set to team_id
+
+
+### Bundle Id Capability (Auth Key)
+
+```ruby
+# Fetch all capabilities for bundle identifier
+bundle_id = Spaceship::ConnectAPI::BundleId.find("com.krausefx.app")
+capabilities = bundle_id.get_capabilities
+
+# Create a new capability for bundle identifier
+bundle_id.create_capability(capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::MAPS)
+
+# Create a new capability with known bundle identifier id
+bundle_id_capability = Spaceship::ConnectAPI::BundleIdCapability.create(bundle_id_id: "123456789", 
+                                                                        capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::MAPS)
+
+# Delete an capability from bundle identifier
+capabilities.each do |capability|
+  if capability.capatility_type == Spacehship::ConnectAPI::BundleIdCapability::Type::MAPS
+    capability.delete!
+  end
+end
 ```
 
 ## License

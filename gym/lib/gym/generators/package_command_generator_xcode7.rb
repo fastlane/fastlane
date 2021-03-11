@@ -66,16 +66,16 @@ module Gym
         if path
           # Try to find IPA file in the output directory, used when app thinning was not set
           Gym.cache[:ipa_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
-          FileUtils.mv(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:ipa_path]).downcase).zero?
+          FileUtils.mv(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp?(File.expand_path(Gym.cache[:ipa_path]).downcase)
         elsif Dir.exist?(apps_path)
           # Try to find "generic" IPA file inside "Apps" folder, used when app thinning was set
           files = Dir[File.join(apps_path, "*.ipa")]
           # Generic IPA file doesn't have suffix so its name is the shortest
           path = files.min_by(&:length)
           Gym.cache[:ipa_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
-          FileUtils.cp(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:ipa_path]).downcase).zero?
+          FileUtils.cp(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp?(File.expand_path(Gym.cache[:ipa_path]).downcase)
         else
-          ErrorHandler.handle_empty_archive unless path
+          ErrorHandler.handle_empty_ipa unless path
         end
 
         Gym.cache[:ipa_path]
@@ -99,7 +99,7 @@ module Gym
           Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
           FileUtils.cp(path, Gym.cache[:pkg_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:pkg_path]).downcase).zero?
         else
-          ErrorHandler.handle_empty_archive unless path
+          ErrorHandler.handle_empty_pkg unless path
         end
 
         Gym.cache[:pkg_path]

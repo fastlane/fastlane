@@ -49,6 +49,8 @@ The previous p12 configuration is still currently supported.
 
 ## Quick Start
 
+> Before using _supply_ to connect to Google Play Store, you'll need to set up your app manually first by uploading at least one build to Google Play Store. See [fastlane/fastlane#14686](https://github.com/fastlane/fastlane/issues/14686) for more info.
+
 - `cd [your_project_folder]`
 - `fastlane supply init`
 - Make changes to the downloaded metadata, add images, screenshots and/or an APK
@@ -171,9 +173,10 @@ A common Play publishing scenario might involve uploading an APK version to a te
 
 This can be done using the `--track_promote_to` parameter. The `--track_promote_to` parameter works with the `--track` parameter to command the Play API to promote existing Play track APK version(s) (those active on the track identified by the `--track` param value) to a new track (`--track_promote_to` value).
 
-## Retrieve Track Version Codes
+## Retrieve Track Release Names & Version Codes
 
-Before performing a new APK upload you may want to check existing track version codes, or you may simply want to provide an informational lane that displays the currently promoted version codes for the production track. You can use the `google_play_track_version_codes` action to retrieve existing version codes for a package and track. For more information, see `fastlane action google_play_track_version_codes` help output.
+Before performing a new APK upload you may want to check existing track version codes or release names, or you may simply want to provide an informational lane that displays the currently promoted version codes or release name for the production track. You can use the `google_play_track_version_codes` action to retrieve existing version codes for a package and track. You can use the `google_play_track_release_names` action to retrieve existing release names for a package and track.
+For more information, see the `fastlane action google_play_track_version_codes` and `fastlane action google_play_track_release_names` help output.
 
 ## Migration from AndroidPublisherV2 to AndroidPublisherV3 in _fastlane_ 2.135.0
 
@@ -195,6 +198,6 @@ Before performing a new APK upload you may want to check existing track version 
 - `:check_superseded_tracks`
   - Google Play will automatically remove releases that are superseded now
 - `:deactivate_on_promote`
-  - Google Play will automatically deactive a release from its previous track on promote
+  - Google Play will automatically deactivate a release from its previous track on promote
 
 :

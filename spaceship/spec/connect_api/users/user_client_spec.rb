@@ -1,11 +1,16 @@
 describe Spaceship::ConnectAPI::Users::Client do
-  let(:client) { Spaceship::ConnectAPI::Users::Client.instance }
+  let(:mock_tunes_client) { double('tunes_client') }
+  let(:client) { Spaceship::ConnectAPI::Users::Client.new(another_client: mock_tunes_client) }
   let(:hostname) { Spaceship::ConnectAPI::Users::Client.hostname }
   let(:username) { 'spaceship@krausefx.com' }
   let(:password) { 'so_secret' }
 
   before do
-    Spaceship::Tunes.login(username, password)
+    allow(mock_tunes_client).to receive(:team_id).and_return("123")
+    allow(mock_tunes_client).to receive(:select_team)
+    allow(mock_tunes_client).to receive(:csrf_tokens)
+    allow(Spaceship::TunesClient).to receive(:login).and_return(mock_tunes_client)
+    Spaceship::ConnectAPI.login(username, password, use_portal: false, use_tunes: true)
   end
 
   context 'sends api request' do
@@ -23,6 +28,7 @@ describe Spaceship::ConnectAPI::Users::Client do
       expect(req_mock).to receive(:params=).with(params)
       expect(req_mock).to receive(:options).and_return(options_mock)
       expect(options_mock).to receive(:params_encoder=).with(Faraday::NestedParamsEncoder)
+      allow(req_mock).to receive(:status)
 
       return req_mock
     end
@@ -34,6 +40,7 @@ describe Spaceship::ConnectAPI::Users::Client do
       expect(req_mock).to receive(:body=).with(JSON.generate(body))
       expect(req_mock).to receive(:headers).and_return(header_mock)
       expect(header_mock).to receive(:[]=).with("Content-Type", "application/json")
+      allow(req_mock).to receive(:status)
 
       return req_mock
     end
@@ -45,8 +52,8 @@ describe Spaceship::ConnectAPI::Users::Client do
         it 'succeeds' do
           params = {}
           req_mock = test_request_params(path, params)
-          expect(client).to receive(:request).with(:get).and_yield(req_mock)
-          Spaceship::ConnectAPI.get_users
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_users
         end
       end
     end

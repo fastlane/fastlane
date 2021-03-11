@@ -24,7 +24,9 @@ module Snapshot
         options = []
         options += project_path_array
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
-        options << "-derivedDataPath '#{derived_data_path}'"
+        if derived_data_path && !options.include?("-derivedDataPath #{derived_data_path.shellescape}")
+          options << "-derivedDataPath #{derived_data_path.shellescape}"
+        end
         options << "-resultBundlePath '#{result_bundle_path}'" if result_bundle_path
         if FastlaneCore::Helper.xcode_at_least?(11)
           options << "-testPlan '#{config[:testplan]}'" if config[:testplan]
@@ -38,11 +40,13 @@ module Snapshot
         return options
       end
 
-      def build_settings
+      def build_settings(language, locale)
         config = Snapshot.config
 
         build_settings = []
         build_settings << "FASTLANE_SNAPSHOT=YES"
+        build_settings << "FASTLANE_LANGUAGE=#{language}" if language
+        build_settings << "FASTLANE_LOCALE=#{locale}" if locale
         build_settings << "TEST_TARGET_NAME=#{config[:test_target_name].shellescape}" if config[:test_target_name]
 
         return build_settings

@@ -144,10 +144,13 @@ module Gym
     # Is it an iOS device or a Mac?
     def self.detect_platform
       return if Gym.config[:destination]
-      platform = if Gym.project.mac? || Gym.building_mac_catalyst_for_mac?
-                   min_xcode8? ? "macOS" : "OS X"
-                 elsif Gym.project.tvos?
+
+      platform = if Gym.project.tvos?
                    "tvOS"
+                 elsif Gym.building_for_ios?
+                   "iOS"
+                 elsif Gym.building_for_mac?
+                   min_xcode8? ? "macOS" : "OS X"
                  else
                    "iOS"
                  end

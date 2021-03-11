@@ -10,6 +10,22 @@ module Pilot
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
       [
+        FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                     env_names: ["PILOT_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
+                                     description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                     optional: true,
+                                     conflicting_options: [:username],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_names: ["PILOT_API_KEY", "APP_STORE_CONNECT_API_KEY"],
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                     type: Hash,
+                                     optional: true,
+                                     sensitive: true,
+                                     conflicting_options: [:api_key_path, :username]),
+
         # app upload info
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
@@ -72,7 +88,7 @@ module Pilot
                                      type: Boolean,
                                      env_name: "DEMO_ACCOUNT_REQUIRED",
                                      description: "Do you need a demo account when Apple does review?",
-                                     default_value: false),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :beta_app_review_info,
                                      type: Hash,
                                      env_name: "PILOT_BETA_APP_REVIEW_INFO",
@@ -122,7 +138,7 @@ module Pilot
                                      short_option: "-w",
                                      optional: true,
                                      env_name: "PILOT_CHANGELOG",
-                                     description: "Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog"),
+                                     description: "Provide the 'What to Test' text when uploading a new build"),
         FastlaneCore::ConfigItem.new(key: :skip_submission,
                                      short_option: "-s",
                                      env_name: "PILOT_SKIP_SUBMISSION",
@@ -146,6 +162,12 @@ module Pilot
                                      default_value: false),
 
         # distribution
+        FastlaneCore::ConfigItem.new(key: :distribute_only,
+                                     short_option: "-D",
+                                     env_name: "PILOT_DISTRIBUTE_ONLY",
+                                     description: "Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)",
+                                     default_value: false,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :uses_non_exempt_encryption,
                                      short_option: "-X",
                                      env_name: "PILOT_USES_NON_EXEMPT_ENCRYPTION",

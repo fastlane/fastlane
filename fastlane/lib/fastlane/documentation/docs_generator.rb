@@ -18,7 +18,7 @@ module Fastlane
       output << "```"
       output << "[sudo] gem install fastlane -NV"
       output << "```"
-      output << "or alternatively using `brew cask install fastlane`"
+      output << "or alternatively using `brew install fastlane`"
       output << ""
       output << "# Available Actions"
 

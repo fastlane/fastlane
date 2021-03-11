@@ -1,5 +1,3 @@
-require 'thread'
-
 module Fastlane
   module Actions
     class UploadSymbolsToCrashlyticsAction < Action
@@ -35,58 +33,31 @@ module Fastlane
           UI.message("Using #{max_worker_threads} threads for Crashlytics dSYM upload 🏎")
         end
 
-        dsym_paths.each do |current_path|
-          handle_dsym(params, current_path, max_worker_threads)
+        worker = FastlaneCore::QueueWorker.new(max_worker_threads) do |dsym_path|
+          handle_dsym(params, dsym_path, max_worker_threads)
         end
-
+        worker.batch_enqueue(dsym_paths)
+        worker.start
         UI.success("Successfully uploaded dSYM files to Crashlytics 💯")
       end
 
       # @param current_path this is a path to either a dSYM or a zipped dSYM
       #   this might also be either nested or not, we're flexible
       def self.handle_dsym(params, current_path, max_worker_threads)
-        if current_path.end_with?(".dSYM")
+        if current_path.end_with?(".dSYM", ".zip")
           upload_dsym(params, current_path)
-        elsif current_path.end_with?(".zip")
-          UI.message("Extracting '#{current_path}'...")
-
-          current_path = File.expand_path(current_path)
-          Dir.mktmpdir do |dir|
-            Dir.chdir(dir) do
-              Actions.sh("unzip -qo #{current_path.shellescape}")
-              work_q = Queue.new
-              Dir["*.dSYM"].each do |sub|
-                work_q.push(sub)
-              end
-              execute_uploads(params, max_worker_threads, work_q)
-            end
-          end
         else
           UI.error("Don't know how to handle '#{current_path}'")
         end
-      end
-
-      def self.execute_uploads(params, max_worker_threads, work_q)
-        number_of_threads = [max_worker_threads, work_q.size].min
-        workers = (0...number_of_threads).map do
-          Thread.new do
-            begin
-              while work_q.size > 0
-                current_path = work_q.pop(true)
-                upload_dsym(params, current_path)
-              end
-            rescue => ex
-              UI.error(ex.to_s)
-            end
-          end
-        end
-        workers.map(&:join)
       end
 
       def self.upload_dsym(params, path)
         UI.message("Uploading '#{path}'...")
         command = []
         command << File.expand_path(params[:binary_path]).shellescape
+        if params[:debug]
+          command << "-d"
+        end
         if params[:app_id]
           command << "-ai #{params[:app_id].shellescape}"
         elsif params[:gsp_path]
@@ -99,7 +70,7 @@ module Fastlane
         begin
           command_to_execute = command.join(" ")
           UI.verbose("upload_dsym using command: #{command_to_execute}")
-          Actions.sh(command_to_execute, log: false)
+          Actions.sh(command_to_execute, log: params[:debug])
         rescue => ex
           UI.error(ex.to_s) # it fails, however we don't want to fail everything just for this
         end
@@ -119,7 +90,7 @@ module Fastlane
       end
 
       def self.find_gsp_path(params)
-        return if params[:api_token]
+        return if params[:api_token] && params[:gsp_path].nil?
 
         if params[:gsp_path].to_s.length > 0
           params[:gsp_path] = File.expand_path(params[:gsp_path])
@@ -220,7 +191,12 @@ module Fastlane
                                        verify_block: proc do |value|
                                          min_threads = 1
                                          UI.user_error!("Too few threads (#{value}) minimum number of threads: #{min_threads}") unless value >= min_threads
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :debug,
+                                       env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DEBUG",
+                                       description: "Enable debug mode for upload-symbols",
+                                       type: Boolean,
+                                       default_value: false)
         ]
       end
 

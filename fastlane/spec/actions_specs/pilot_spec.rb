@@ -21,6 +21,22 @@ describe Fastlane do
         expect(values[:changelog]).to eq('custom changelog')
       end
 
+      it "defaults distribute_only to false" do
+        values = Fastlane::FastFile.new.parse("lane :test do
+          pilot
+        end").runner.execute(:test)
+
+        expect(values[:distribute_only]).to eq(false)
+      end
+
+      it "allows setting of distribute_only to true" do
+        values = Fastlane::FastFile.new.parse("lane :test do
+          pilot(distribute_only: true)
+        end").runner.execute(:test)
+
+        expect(values[:distribute_only]).to eq(true)
+      end
+
       describe "Test `apple_id` parameter" do
         it "raises an error if `apple_id` is set to email address" do
           expect do

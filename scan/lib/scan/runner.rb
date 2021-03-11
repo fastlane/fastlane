@@ -16,6 +16,7 @@ module Scan
   class Runner
     def initialize
       @test_command_generator = TestCommandGenerator.new
+      @device_boot_datetime = DateTime.now
     end
 
     def run
@@ -39,12 +40,7 @@ module Scan
         end
       end
 
-      # We call this method, to be sure that all other simulators are killed
-      # And a correct one is freshly launched. Switching between multiple simulator
-      # in case the user specified multiple targets works with no issues
-      # This way it's okay to just call it for the first simulator we're using for
-      # the first test run
-      FastlaneCore::Simulator.launch(Scan.devices.first) if Scan.devices && Scan.config[:prelaunch_simulator]
+      prelaunch_simulators
 
       if Scan.config[:reinstall_app]
         app_identifier = Scan.config[:app_identifier]
@@ -87,6 +83,13 @@ module Scan
     end
 
     def handle_results(tests_exit_status)
+      if Scan.config[:disable_xcpretty]
+        unless tests_exit_status == 0
+          UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+        end
+        return
+      end
+
       result = TestResultParser.new.parse_result(test_results)
       SlackPoster.new.run(result)
 
@@ -107,6 +110,7 @@ module Scan
 
       copy_simulator_logs
       zip_build_products
+      copy_xctestrun
 
       if result[:failures] > 0
         open_report
@@ -147,9 +151,33 @@ module Scan
       UI.message("Successfully zipped build products: #{output_path}")
     end
 
-    def test_results
-      return if Scan.config[:disable_xcpretty]
+    def copy_xctestrun
+      return unless Scan.config[:output_xctestrun]
 
+      # Gets :derived_data_path/Build/Products directory for coping .xctestrun file
+      derived_data_path = Scan.config[:derived_data_path]
+      path = File.join(derived_data_path, "Build", "Products")
+
+      # Gets absolute path of output directory
+      output_directory = File.absolute_path(Scan.config[:output_directory])
+      output_path = File.join(output_directory, "settings.xctestrun")
+
+      # Caching path for action to put into lane_context
+      Scan.cache[:output_xctestrun] = output_path
+
+      # Copy .xctestrun file and moves it to output directory
+      UI.message("Copying .xctestrun file")
+      xctestrun_file = Dir.glob("#{path}/*.xctestrun").first
+
+      if xctestrun_file
+        FileUtils.cp(xctestrun_file, output_path)
+        UI.message("Successfully copied xctestrun file: #{output_path}")
+      else
+        UI.user_error!("Could not find .xctextrun file to copy")
+      end
+    end
+
+    def test_results
       temp_junit_report = Scan.cache[:temp_junit_report]
       return File.read(temp_junit_report) if temp_junit_report && File.file?(temp_junit_report)
 
@@ -165,13 +193,31 @@ module Scan
       File.read(Scan.cache[:temp_junit_report])
     end
 
+    def prelaunch_simulators
+      return unless Scan.devices.to_a.size > 0 # no devices selected, no sims to launch
+
+      # Return early unless the user wants to prelaunch simulators. Or if the user wants simulator logs
+      # then we must prelaunch simulators because Xcode's headless
+      # mode launches and shutsdown the simulators before we can collect the logs.
+      return unless Scan.config[:prelaunch_simulator] || Scan.config[:include_simulator_logs]
+
+      devices_to_shutdown = []
+      Scan.devices.each do |device|
+        devices_to_shutdown << device if device.state == "Shutdown"
+        device.boot
+      end
+      at_exit do
+        devices_to_shutdown.each(&:shutdown)
+      end
+    end
+
     def copy_simulator_logs
       return unless Scan.config[:include_simulator_logs]
 
       UI.header("Collecting system logs")
       Scan.devices.each do |device|
         log_identity = "#{device.name}_#{device.os_type}_#{device.os_version}"
-        FastlaneCore::Simulator.copy_logs(device, log_identity, Scan.config[:output_directory])
+        FastlaneCore::Simulator.copy_logs(device, log_identity, Scan.config[:output_directory], @device_boot_datetime)
       end
     end
 

@@ -116,9 +116,14 @@ module Snapshot
                                      description: "Enabling this option will automatically erase the simulator before running the application",
                                      default_value: false,
                                      is_string: false),
+        FastlaneCore::ConfigItem.new(key: :headless,
+                                     env_name: 'SNAPSHOT_HEADLESS',
+                                     description: "Enabling this option will prevent displaying the simulator window",
+                                     default_value: true,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :override_status_bar,
                                      env_name: 'SNAPSHOT_OVERRIDE_STATUS_BAR',
-                                     description: "Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception",
+                                     description: "Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception",
                                      default_value: false,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :localize_simulator,
@@ -151,6 +156,11 @@ module Snapshot
                                      short_option: "-u",
                                      description: "A list of videos that should be added to the simulator before running the application",
                                      type: Array,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :html_template,
+                                     env_name: 'SNAPSHOT_HTML_TEMPLATE',
+                                     short_option: "-e",
+                                     description: "A path to screenshots.html template",
                                      optional: true),
 
         # Everything around building
@@ -243,6 +253,16 @@ module Snapshot
                                      description: "Sets a custom path for Swift Package Manager dependencies",
                                      type: String,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_package_dependencies_resolution,
+                                     env_name: "SNAPSHOT_SKIP_PACKAGE_DEPENDENCIES_RESOLUTION",
+                                     description: "Skips resolution of Swift Package Manager dependencies",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,
+                                     env_name: "SNAPSHOT_DISABLE_PACKAGE_AUTOMATIC_UPDATES",
+                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :testplan,
                                      env_name: "SNAPSHOT_TESTPLAN",
                                      description: "The testplan associated with the scheme that should be used for testing",
@@ -263,7 +283,22 @@ module Snapshot
                                      is_string: false,
                                      verify_block: proc do |value|
                                        verify_type('skip_testing', [Array, String], value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
+                                     env_name: "SNAPSHOT_DISABLE_XCPRETTY",
+                                     description: "Disable xcpretty formatting of build",
+                                     type: Boolean,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
+                                     env_name: "SNAPSHOT_SUPPRESS_XCODE_OUTPUT",
+                                     description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
+                                     type: Boolean,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :use_system_scm,
+                                     env_name: "SNAPSHOT_USE_SYSTEM_SCM",
+                                     description: "Lets xcodebuild use system's scm configuration",
+                                     type: Boolean,
+                                     default_value: false)
       ]
     end
   end

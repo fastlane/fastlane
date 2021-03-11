@@ -24,6 +24,8 @@ module Screengrab
     end
 
     def run
+      # Standardize the locales
+      @config[:locales].map! { |locale| locale.gsub("_", "-") }
       FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [], title: "Summary for screengrab #{Fastlane::VERSION}")
 
       app_apk_path = @config.fetch(:app_apk_path, ask: false)
@@ -64,9 +66,10 @@ module Screengrab
       # Root is needed to access device paths at /data
       if @config[:use_adb_root]
         run_adb_command("-s #{device_serial} root", print_all: false, print_command: true)
+        run_adb_command("-s #{device_serial} wait-for-device", print_all: false, print_command: true)
       end
 
-      clear_device_previous_screenshots(device_serial, device_screenshots_paths)
+      clear_device_previous_screenshots(@config[:app_package_name], device_serial, device_screenshots_paths)
 
       app_apk_path ||= select_app_apk(discovered_apk_paths)
       tests_apk_path ||= select_tests_apk(discovered_apk_paths)
@@ -81,7 +84,7 @@ module Screengrab
     end
 
     def select_device
-      adb = Fastlane::Helper::AdbHelper.new(adb_host: @config[:adb_host])
+      adb = Fastlane::Helper::AdbHelper.new(adb_path: @android_env.adb_path, adb_host: @config[:adb_host])
       devices = adb.load_all_devices
 
       UI.user_error!('There are no connected and authorized devices or emulators') if devices.empty?
@@ -157,12 +160,12 @@ module Screengrab
       end.flatten
     end
 
-    def clear_device_previous_screenshots(device_serial, device_screenshots_paths)
+    def clear_device_previous_screenshots(app_package_name, device_serial, device_screenshots_paths)
       UI.message('Cleaning screenshots on device')
 
       device_screenshots_paths.each do |device_path|
-        if_device_path_exists(device_serial, device_path) do |path|
-          run_adb_command("-s #{device_serial} shell rm -rf #{path}",
+        if_device_path_exists(app_package_name, device_serial, device_path) do |path|
+          run_adb_command("-s #{device_serial} shell run-as #{app_package_name} rm -rf #{path}",
                           print_all: true,
                           print_command: true)
         end
@@ -296,11 +299,19 @@ module Screengrab
 
       Dir.mktmpdir do |tempdir|
         device_screenshots_paths.each do |device_path|
-          if_device_path_exists(device_serial, device_path) do |path|
+          if_device_path_exists(@config[:app_package_name], device_serial, device_path) do |path|
             next unless path.include?(locale)
-            run_adb_command("-s #{device_serial} pull #{path} #{tempdir}",
-                            print_all: false,
-                            print_command: true)
+            out = run_adb_command("-s #{device_serial} pull #{path} #{tempdir}",
+                                  print_all: false,
+                                  print_command: true,
+                                  raise_errors: false)
+            if out =~ /Permission denied/
+              dir = File.dirname(path)
+              base = File.basename(path)
+              run_adb_command("-s #{device_serial} shell run-as #{@config[:app_package_name]} 'tar -cC #{dir} #{base}' | tar -xvC #{tempdir}",
+                              print_all: false,
+                              print_command: true)
+            end
           end
         end
 
@@ -361,8 +372,8 @@ module Screengrab
 
     # Some device commands fail if executed against a device path that does not exist, so this helper method
     # provides a way to conditionally execute a block only if the provided path exists on the device.
-    def if_device_path_exists(device_serial, device_path)
-      return if run_adb_command("-s #{device_serial} shell ls #{device_path}",
+    def if_device_path_exists(app_package_name, device_serial, device_path)
+      return if run_adb_command("-s #{device_serial} shell run-as #{app_package_name} ls #{device_path}",
                                 print_all: false,
                                 print_command: false).include?('No such file')
 
@@ -380,16 +391,25 @@ module Screengrab
       packages.split("\n").map { |package| package.gsub("package:", "") }
     end
 
-    def run_adb_command(command, print_all: false, print_command: false)
-      adb_path = @android_env.adb_path.chomp("adb")
+    def run_adb_command(command, print_all: false, print_command: false, raise_errors: true)
       adb_host = @config[:adb_host]
       host = adb_host.nil? ? '' : "-H #{adb_host} "
-      output = @executor.execute(command: adb_path + "adb " + host + command,
-                                 print_all: print_all,
-                                 print_command: print_command) || ''
+      output = ''
+      begin
+        errout = nil
+        cmdout = @executor.execute(command: @android_env.adb_path + " " + host + command,
+                                  print_all: print_all,
+                                  print_command: print_command,
+                                  error: raise_errors ? nil : proc { |out, status| errout = out }) || ''
+        output = errout || cmdout
+      rescue => ex
+        if raise_errors
+          raise ex
+        end
+      end
       output.lines.reject do |line|
-        # Debug/Warning output from ADB}
-        line.start_with?('adb: ')
+        # Debug/Warning output from ADB
+        line.start_with?('adb: ') && !line.start_with?('adb: error: ')
       end.join('') # Lines retain their newline chars
     end
 

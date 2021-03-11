@@ -5,15 +5,31 @@ module Fastlane
         require 'pilot'
         require 'pilot/options'
 
+        distribute_only = values[:distribute_only]
+
         changelog = Actions.lane_context[SharedValues::FL_CHANGELOG]
         values[:changelog] ||= changelog if changelog
 
-        values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
-        values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
+        unless distribute_only
+          values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+          values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
+        end
+
+        if values[:api_key_path].nil?
+          values[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        end
 
         return values if Helper.test?
 
-        Pilot::BuildManager.new.upload(values) # we already have the finished config
+        if distribute_only
+          build_manager = Pilot::BuildManager.new
+          build_manager.start(values, should_login: true)
+
+          build_manager.wait_for_build_processing_to_be_complete(false) unless values[:skip_waiting_for_build_processing]
+          build_manager.distribute(values) # we already have the finished config
+        else
+          Pilot::BuildManager.new.upload(values) # we already have the finished config
+        end
       end
 
       #####################################################

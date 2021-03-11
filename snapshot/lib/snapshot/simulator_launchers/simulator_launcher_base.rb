@@ -18,6 +18,7 @@ module Snapshot
 
     def initialize(launcher_configuration: nil)
       @launcher_config = launcher_configuration
+      @device_boot_datetime = DateTime.now
     end
 
     def collected_errors
@@ -68,13 +69,19 @@ module Snapshot
           unless launcher_config.dark_mode.nil?
             interface_style(type, launcher_config.dark_mode)
           end
-        elsif launcher_config.reinstall_app
+        end
+        if launcher_config.reinstall_app && !launcher_config.erase_simulator
           # no need to reinstall if device has been erased
           uninstall_app(type)
         end
         if launcher_config.disable_slide_to_type
           disable_slide_to_type(type)
         end
+      end
+
+      unless launcher_config.headless
+        simulator_path = File.join(Helper.xcode_path, 'Applications', 'Simulator.app')
+        Helper.backticks("open -a #{simulator_path} -g", print: FastlaneCore::Globals.verbose?)
       end
     end
 
@@ -187,7 +194,7 @@ module Snapshot
 
         UI.header("Collecting system logs #{device_name} - #{language}")
         log_identity = Digest::MD5.hexdigest(components.join("-"))
-        FastlaneCore::Simulator.copy_logs(device, log_identity, language_folder)
+        FastlaneCore::Simulator.copy_logs(device, log_identity, language_folder, @device_boot_datetime)
       end
     end
   end

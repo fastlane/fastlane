@@ -5,7 +5,11 @@
 
 import Foundation
 
-class Fastfile: LaneFile { }
+open class Fastfile: LaneFile {
+    override public init() {
+        super.init()
+    }
+}
 
 // Please don't remove the lines below
 // They are used to detect outdated files

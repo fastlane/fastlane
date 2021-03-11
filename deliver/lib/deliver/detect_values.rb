@@ -5,6 +5,7 @@ require 'spaceship/tunes/tunes'
 require 'spaceship/tunes/application'
 
 require_relative 'module'
+require_relative 'languages'
 
 module Deliver
   class DetectValues
@@ -36,9 +37,15 @@ module Deliver
     end
 
     def find_app(options)
-      search_by = options[:app_identifier]
-      search_by = options[:app] if search_by.to_s.length == 0
-      app = Spaceship::Tunes::Application.find(search_by, mac: options[:platform] == "osx")
+      app_identifier = options[:app_identifier]
+      app_id = options[:app] if app_identifier.to_s.empty?
+
+      if !app_identifier.to_s.empty?
+        app = Spaceship::ConnectAPI::App.find(app_identifier)
+      elsif !app_id.kind_of?(Spaceship::ConnectAPI::App) && !app_id.to_s.empty?
+        app = Spaceship::ConnectAPI::App.get(app_id: app_id)
+      end
+
       if app
         options[:app] = app
       else
@@ -82,7 +89,9 @@ module Deliver
       languages = options[:languages]
       return unless languages
 
-      all_languages = Spaceship::Tunes.client.available_languages
+      # 2020-08-24 - Available locales are not available as an endpoint in App Store Connect
+      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is avilable)
+      all_languages = Deliver::Languages::ALL_LANGUAGES
       diff = languages - all_languages
 
       unless diff.empty?

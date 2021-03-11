@@ -22,7 +22,7 @@ module FastlaneCore
     end
 
     def self.installed_identies(in_keychain: nil)
-      install_wwdr_certificate unless wwdr_certificate_installed?
+      install_wwdr_certificates unless wwdr_certificates_installed?
 
       available = list_available_identities(in_keychain: in_keychain)
       # Match for this text against word boundaries to avoid edge cases around multiples of 10 identities!
@@ -81,16 +81,21 @@ module FastlaneCore
       `#{commands.join(' ')}`
     end
 
-    def self.wwdr_certificate_installed?
+    def self.wwdr_certificates_installed?
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
       keychain = wwdr_keychain
-      response = Helper.backticks("security find-certificate -c '#{certificate_name}' #{keychain.shellescape}", print: FastlaneCore::Globals.verbose?)
-      return response.include?("attributes:")
+      response = Helper.backticks("security find-certificate -a -c '#{certificate_name}' #{keychain.shellescape}", print: FastlaneCore::Globals.verbose?)
+      certs = response.split("keychain: \"#{keychain}\"").drop(1)
+      certs.count == 2
     end
 
-    def self.install_wwdr_certificate
-      url = 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
-      file = Tempfile.new('AppleWWDRCA')
+    def self.install_wwdr_certificates
+      install_wwdr_certificate('https://developer.apple.com/certificationauthority/AppleWWDRCA.cer')
+      install_wwdr_certificate('https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer')
+    end
+
+    def self.install_wwdr_certificate(url)
+      file = Tempfile.new(File.basename(url))
       filename = file.path
       keychain = wwdr_keychain
       keychain = "-k #{keychain.shellescape}" unless keychain.empty?

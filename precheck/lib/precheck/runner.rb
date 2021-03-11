@@ -18,10 +18,24 @@ module Precheck
                                          hide_keys: [:output_path],
                                              title: "Summary for precheck #{Fastlane::VERSION}")
 
-      unless Spaceship::Tunes.client
+      if api_token
+
+        # As of 2020-09-15, App Store Connect API does not have support for IAPs yet
+        # This means that API Key will fail if checking for IAPs.
+        #
+        # There is also a check in Deliver::Runner for this.
+        # Please remove check in Deliver when the API support IAPs.
+        if Precheck.config[:include_in_app_purchases]
+          UI.user_error!("Precheck cannot check In-app purchases with the App Store Connect API Key (yet). Exclude In-app purchases from precheck, disable the precheck step in your build step, or use Apple ID login")
+        end
+
+        UI.message("Creating authorization token for App Store Connect API")
+        Spaceship::ConnectAPI.token = api_token
+      elsif Spaceship::Tunes.client.nil?
+        # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
+        # Prompts select team if multiple teams and none specified
         UI.message("Starting login with user '#{Precheck.config[:username]}'")
-        Spaceship::Tunes.login(Precheck.config[:username])
-        Spaceship::Tunes.select_team
+        Spaceship::ConnectAPI.login(Precheck.config[:username], use_portal: false, use_tunes: true)
 
         UI.message("Successfully logged in")
       end
@@ -55,6 +69,12 @@ module Precheck
       end
 
       return true
+    end
+
+    def api_token
+      @api_token ||= Spaceship::ConnectAPI::Token.create(**Precheck.config[:api_key]) if Precheck.config[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(Precheck.config[:api_key_path]) if Precheck.config[:api_key_path]
+      return @api_token
     end
 
     def print_items_not_checked(processor_result: nil)
@@ -160,11 +180,12 @@ module Precheck
     end
 
     def app
-      Spaceship::Tunes::Application.find(Precheck.config[:app_identifier])
+      Spaceship::ConnectAPI::App.find(Precheck.config[:app_identifier])
     end
 
     def latest_app_version
-      @latest_version ||= app.latest_version
+      platform = Spaceship::ConnectAPI::Platform.map(Precheck.config[:platform])
+      @latest_version ||= Precheck.config[:use_live] ? app.get_live_app_store_version(platform: platform) : app.get_latest_app_store_version(platform: platform)
     end
 
     # Makes sure the current App ID exists. If not, it will show an appropriate error message

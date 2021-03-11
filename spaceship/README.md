@@ -83,7 +83,7 @@ Using spaceship, the execution time of [_sigh_](https://docs.fastlane.tools/acti
 
 _spaceship_ is part of _fastlane_:
 
-    sudo gem install fastlane
+    gem install fastlane
 
 # Usage
 
@@ -93,7 +93,7 @@ To try _spaceship_, just run `fastlane spaceship`. It will automatically start t
 
 ![assets/docs/Playground.png](assets/docs/Playground.png)
 
-This requires you to install `pry` using `sudo gem install pry`. `pry` is not installed by default, as most [_fastlane_](https://fastlane.tools) users won't need the `spaceship playground`. You can add the `pry` dependency to your `Gemfile`.
+This requires you to install `pry` using `gem install pry`. `pry` is not installed by default, as most [_fastlane_](https://fastlane.tools) users won't need the `spaceship playground`. You can add the `pry` dependency to your `Gemfile`.
 
 ## Apple Developer Portal API
 
@@ -167,7 +167,7 @@ _spaceship_ uses all those API points to offer this seamless experience.
 _spaceship_ does a lot of magic to get everything working so neatly:
 
 - **Sensible Defaults**: You only have to provide the mandatory information (e.g. new provisioning profiles contain all devices by default)
-- **Local Validation**: When pushing changes back to the Apple Dev Portal _spaceship_ will make sure only valid data is sent to Apple (e.g. automatic repairing of provisioning profiles)
+- **Local Validation**: When pushing changes back to the Apple Developer Portal _spaceship_ will make sure only valid data is sent to Apple (e.g. automatic repairing of provisioning profiles)
 - **Various request/response types**: When working with the different API endpoints, _spaceship_ has to deal with `JSON`, `XML`, `txt`, `plist` and sometimes even `HTML` responses and requests.
 - **Automatic Pagination**: Even if you have thousands of apps, profiles or certificates, _spaceship_ **can** handle your scale. It was heavily tested by first using _spaceship_ to create hundreds of profiles and then accessing them using _spaceship_.
 - **Session, Cookie and CSRF token**: All the security aspects are handled by _spaceship_.

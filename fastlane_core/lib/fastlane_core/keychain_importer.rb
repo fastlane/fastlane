@@ -4,7 +4,7 @@ require 'security'
 
 module FastlaneCore
   class KeychainImporter
-    def self.import_file(path, keychain_path, keychain_password: nil, certificate_password: "", output: FastlaneCore::Globals.verbose?)
+    def self.import_file(path, keychain_path, keychain_password: nil, certificate_password: "", skip_set_partition_list: false, output: FastlaneCore::Globals.verbose?)
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
       command = "security import #{path.shellescape} -k '#{keychain_path.shellescape}'"
@@ -19,7 +19,7 @@ module FastlaneCore
         UI.command_output(stdout.read.to_s) if output
 
         # Set partition list only if success since it can be a time consuming process if a lot of keys are installed
-        if thrd.value.success?
+        if thrd.value.success? && !skip_set_partition_list
           keychain_password ||= resolve_keychain_password(keychain_path)
           set_partition_list(path, keychain_path, keychain_password: keychain_password, output: output)
         else
@@ -39,7 +39,7 @@ module FastlaneCore
       # See https://openradar.appspot.com/28524119
       if Helper.backticks('security -h | grep set-key-partition-list', print: false).length > 0
         command = "security set-key-partition-list"
-        command << " -S apple-tool:,apple:"
+        command << " -S apple-tool:,apple:,codesign:"
         command << " -s" # This is a needed in Catalina to prevent "security: SecKeychainItemCopyAccess: A missing value was detected."
         command << " -k #{keychain_password.to_s.shellescape}"
         command << " #{keychain_path.shellescape}"
@@ -99,7 +99,7 @@ module FastlaneCore
           UI.important("Enter the password for #{keychain_path}")
           UI.important("This passphrase will be stored in your local keychain with the name #{server} and used in future runs")
           UI.important("This prompt can be avoided by specifying the 'keychain_password' option or 'MATCH_KEYCHAIN_PASSWORD' environment variable")
-          keychain_password = FastlaneCore::Helper.ask_password(message: "Password for #{keychain_name} keychain: ", confirm: true)
+          keychain_password = FastlaneCore::Helper.ask_password(message: "Password for #{keychain_name} keychain: ", confirm: true, confirmation_message: "Type password for #{keychain_name} keychain again: ")
           Security::InternetPassword.add(server, "", keychain_password)
         else
           UI.important("Keychain password for #{keychain_path} was not specified and not found in your keychain. Specify the 'keychain_password' option to prevent the UI permission popup when code signing")

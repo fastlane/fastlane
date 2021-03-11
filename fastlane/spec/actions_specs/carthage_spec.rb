@@ -101,6 +101,26 @@ describe Fastlane do
         expect(result).to eq("carthage bootstrap")
       end
 
+      it "adds use-netrc flag to command if use_netrc is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_netrc: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --use-netrc")
+      end
+
+      it "doesn't add a use-netrc flag to command if use_netrc is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_netrc: false
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap")
+      end
+
       it "adds no-use-binaries flag to command if use_binaries is set to false" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage(
@@ -327,6 +347,48 @@ describe Fastlane do
           end").runner.execute(:test)
 
         expect(result).to eq("carthage bootstrap --cache-builds")
+      end
+
+      it "does not add a use_xcframeworks flag to command if use_xcframeworks is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_xcframeworks: false
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap")
+      end
+
+      it "add a use_xcframeworks flag to command if use_xcframeworks is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              use_xcframeworks: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage bootstrap --use-xcframeworks")
+      end
+
+      it "does not add a archive flag to command if archive is set to false" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'build',
+              archive: false
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage build")
+      end
+
+      it "add a archive flag to command if archive is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            carthage(
+              command: 'build',
+              archive: true
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("carthage build --archive")
       end
 
       it "does not set the project directory if none is provided" do
@@ -642,6 +704,42 @@ describe Fastlane do
                 carthage(command: '#{command}')
               end").runner.execute(:test)
               expect(result).to eq("carthage archive")
+            end
+          end
+        end
+
+        context "when --use-xcframeworks option is present with valid command" do
+          it "adds the use_xcframeworks option" do
+            ['update', 'build', 'bootstrap'].each do |command|
+              result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', use_xcframeworks: true)
+              end").runner.execute(:test)
+              expect(result).to eq("carthage #{command} --use-xcframeworks")
+            end
+          end
+        end
+      end
+
+      context "when specify archive" do
+        context "when command is build" do
+          let(:command) { 'build' }
+
+          it "adds the archive option" do
+            result = Fastlane::FastFile.new.parse("lane :test do
+                carthage(command: '#{command}', archive: true)
+              end").runner.execute(:test)
+            expect(result).to eq("carthage build --archive")
+          end
+        end
+
+        context "when archive option is present with invalid command" do
+          it "raises an exception" do
+            ['archive', 'update', 'bootstrap'].each do |command|
+              expect do
+                Fastlane::FastFile.new.parse("lane :test do
+                    carthage(command: '#{command}', archive: true)
+                  end").runner.execute(:test)
+              end.to raise_error("Archive option is available only for 'build' command.")
             end
           end
         end

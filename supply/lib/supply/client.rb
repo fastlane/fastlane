@@ -4,6 +4,7 @@ AndroidPublisher = Google::Apis::AndroidpublisherV3
 
 require 'net/http'
 
+# rubocop:disable Metrics/ClassLength
 module Supply
   class AbstractGoogleServiceClient
     SCOPE = nil
@@ -346,7 +347,8 @@ module Supply
           current_package_name,
           self.current_edit.id,
           upload_source: path_to_aab,
-          content_type: "application/octet-stream"
+          content_type: "application/octet-stream",
+          ack_bundle_installation_warning: Supply.config[:ack_bundle_installation_warning]
         )
       end
 
@@ -406,6 +408,23 @@ module Supply
         return result.releases.flat_map(&:version_codes) || []
       rescue Google::Apis::ClientError => e
         return [] if e.status_code == 404 && (e.to_s.include?("trackEmpty") || e.to_s.include?("Track not found"))
+        raise
+      end
+    end
+
+    # Get list of release names for track
+    def track_releases(track)
+      ensure_active_edit!
+
+      begin
+        result = client.get_edit_track(
+          current_package_name,
+          current_edit.id,
+          track
+        )
+        return result.releases || []
+      rescue Google::Apis::ClientError => e
+        return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
         raise
       end
     end
@@ -529,3 +548,4 @@ module Supply
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
