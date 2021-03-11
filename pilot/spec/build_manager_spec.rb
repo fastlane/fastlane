@@ -441,6 +441,15 @@ describe "Build Manager" do
     it "does not attempt to set demo account required" do
       options = {}
 
+      expect(fake_build_manager).not_to receive(:update_review_detail)
+      expect(fake_build_manager).not_to receive(:update_build_beta_details)
+      fake_build_manager.update_beta_app_meta(options, fake_build)
+    end
+
+    it "does not attempt to set demo account required" do
+      options = { notify_external_testers: true }
+
+      expect(fake_build_manager).not_to receive(:update_review_detail)
       expect(fake_build_manager).to receive(:update_build_beta_details)
       fake_build_manager.update_beta_app_meta(options, fake_build)
     end
@@ -449,7 +458,7 @@ describe "Build Manager" do
       options = { demo_account_required: false }
 
       expect(fake_build_manager).to receive(:update_review_detail)
-      expect(fake_build_manager).to receive(:update_build_beta_details)
+      expect(fake_build_manager).not_to receive(:update_build_beta_details)
 
       fake_build_manager.update_beta_app_meta(options, fake_build)
 
@@ -460,7 +469,7 @@ describe "Build Manager" do
       options = { demo_account_required: true }
 
       expect(fake_build_manager).to receive(:update_review_detail)
-      expect(fake_build_manager).to receive(:update_build_beta_details)
+      expect(fake_build_manager).not_to receive(:update_build_beta_details)
 
       fake_build_manager.update_beta_app_meta(options, fake_build)
 
