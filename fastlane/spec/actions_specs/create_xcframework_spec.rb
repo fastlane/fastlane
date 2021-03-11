@@ -7,17 +7,13 @@ describe Fastlane do
       end
 
       it "requires to either provide :frameworks or :libraries" do
-        begin
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             create_xcframework(
               output: 'UniversalFramework.xcframework'
             )
           end").runner.execute(:test)
-        rescue => e
-          expect(e.to_s).to eq("Please provide either :frameworks or :libraries to be packaged into the xcframework")
-        else
-          fail("Error should have been raised")
-        end
+        end.to raise_error("Please provide either :frameworks or :libraries to be packaged into the xcframework")
       end
 
       it "forbids to provide both :frameworks and :libraries" do
@@ -25,7 +21,7 @@ describe Fastlane do
         allow(File).to receive(:directory?).with('FrameworkA.framework').and_return(true)
         allow(File).to receive(:exist?).with('LibraryA.so').and_return(true)
 
-        begin
+        expect do
           Fastlane::FastFile.new.parse("lane :test do
             create_xcframework(
               frameworks: ['FrameworkA.framework'],
@@ -33,11 +29,7 @@ describe Fastlane do
               output: 'UniversalFramework.xcframework'
             )
           end").runner.execute(:test)
-        rescue => e
-          expect(e.to_s).to eq("Unresolved conflict between options: 'frameworks' and 'libraries'")
-        else
-          fail("Error should have been raised")
-        end
+        end.to raise_error("Unresolved conflict between options: 'frameworks' and 'libraries'")
       end
 
       context "when packaging frameworks" do
@@ -84,36 +76,28 @@ describe Fastlane do
 
           context "and are not directories" do
             it "should fail due to wrong framework" do
-              begin
+              expect do
                 Fastlane::FastFile.new.parse("lane :test do
                   create_xcframework(
                     frameworks: ['FrameworkA.framework', 'FrameworkB.framework'],
                     output: 'UniversalFramework.xcframework'
                   )
                 end").runner.execute(:test)
-              rescue => e
-                expect(e.to_s).to eq("FrameworkA.framework doesn't seem to be a framework")
-              else
-                fail("Error should have been raised")
-              end
+              end.to raise_error("FrameworkA.framework doesn't seem to be a framework")
             end
           end
         end
 
         context "which don't exist" do
           it "should fail due to missing framework" do
-            begin
+            expect do
               Fastlane::FastFile.new.parse("lane :test do
                 create_xcframework(
                   frameworks: ['FrameworkA.framework', 'FrameworkB.framework'],
                   output: 'UniversalFramework.xcframework'
                 )
               end").runner.execute(:test)
-            rescue => e
-              expect(e.to_s).to eq("Couldn't find framework at FrameworkA.framework")
-            else
-              fail("Error should have been raised")
-            end
+            end.to raise_error("Couldn't find framework at FrameworkA.framework")
           end
         end
       end
@@ -128,18 +112,14 @@ describe Fastlane do
         end
 
         it "should fail due to the deleted xcframework" do
-          begin
-            Fastlane::FastFile.new.parse("lane :test do
-              create_xcframework(
-                frameworks: ['FrameworkA.framework', 'FrameworkB.framework'],
-                output: 'UniversalFramework.xcframework'
-              )
-            end").runner.execute(:test)
-          rescue => e
-            expect(e.to_s).to eq("No such file or directory @ apply2files - UniversalFramework.xcframework").or(eq("No such file or directory @ unlink_internal - UniversalFramework.xcframework"))
-          else
-            fail("Error should have been raised")
-          end
+          expect(FileUtils).to receive(:remove_dir).with('UniversalFramework.xcframework')
+
+          Fastlane::FastFile.new.parse("lane :test do
+            create_xcframework(
+              frameworks: ['FrameworkA.framework', 'FrameworkB.framework'],
+              output: 'UniversalFramework.xcframework'
+            )
+          end").runner.execute(:test)
         end
       end
 
@@ -186,36 +166,28 @@ describe Fastlane do
 
           context "which headers is not a directory" do
             it "should fail due to wrong headers directory" do
-              begin
+              expect do
                 Fastlane::FastFile.new.parse("lane :test do
                   create_xcframework(
                     libraries: { 'LibraryA.so' => '', 'LibraryB.so' => 'headers' },
                     output: 'UniversalFramework.xcframework'
                   )
                 end").runner.execute(:test)
-              rescue => e
-                expect(e.to_s).to eq("headers doesn't exist or is not a directory")
-              else
-                fail("Error should have been raised")
-              end
+              end.to raise_error("headers doesn't exist or is not a directory")
             end
           end
         end
 
         context "which don't exist" do
           it "should fail due to missing library" do
-            begin
+            expect do
               Fastlane::FastFile.new.parse("lane :test do
                 create_xcframework(
                   libraries: { 'LibraryA.so' => '' },
                   output: 'UniversalFramework.xcframework'
                 )
               end").runner.execute(:test)
-            rescue => e
-              expect(e.to_s).to eq("Couldn't find library at LibraryA.so")
-            else
-              fail("Error should have been raised")
-            end
+            end.to raise_error("Couldn't find library at LibraryA.so")
           end
         end
       end
