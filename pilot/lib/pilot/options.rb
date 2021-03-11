@@ -182,7 +182,7 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :notify_external_testers,
                                     is_string: false,
                                     env_name: "PILOT_NOTIFY_EXTERNAL_TESTERS",
-                                    description: "Should notify external testers?",
+                                    description: "Should notify external testers? (Not setting a value will use App Store Connect's default which is to notify)",
                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :app_version,
                                      env_name: "PILOT_APP_VERSION",
