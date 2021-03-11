@@ -33,11 +33,11 @@ module Fastlane
         agv_disabled = !system([command_prefix, 'agvtool what-version', command_suffix].join(' '))
         raise "Apple Generic Versioning is not enabled." if agv_disabled && params[:build_number].nil?
 
-        mode = params[:skip_info_plist] ? '' : '-all'
+        mode = params[:skip_info_plist] ? '' : ' -all'
         command = [
           command_prefix,
           'agvtool',
-          params[:build_number] ? "new-version #{mode} #{params[:build_number].to_s.strip}" : "next-version #{mode}",
+          params[:build_number] ? "new-version#{mode} #{params[:build_number].to_s.strip}" : "next-version#{mode}",
           command_suffix
         ].join(' ')
 
