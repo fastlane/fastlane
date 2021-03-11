@@ -34,7 +34,8 @@ module Pilot
       result = transporter.upload(package_path: package_path)
 
       unless result
-        UI.user_error!("Error uploading ipa file, for more information see above")
+        transporter_errors = transporter.displayable_errors
+        UI.user_error!("Error uploading ipa file: \n #{transporter_errors}")
       end
 
       UI.success("Successfully uploaded the new binary to App Store Connect")

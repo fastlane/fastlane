@@ -179,7 +179,11 @@ module Deliver
 
       transporter = transporter_for_selected_team
       result = transporter.upload(package_path: package_path)
-      UI.user_error!("Could not upload binary to App Store Connect. Check out the error above", show_github_issues: true) unless result
+
+      unless result
+        transporter_errors = transporter.displayable_errors
+        UI.user_error!("Error uploading ipa file: \n #{transporter_errors}")
+      end
     end
 
     def reject_version_if_possible

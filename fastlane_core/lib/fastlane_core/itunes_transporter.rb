@@ -94,6 +94,10 @@ module FastlaneCore
       return exit_status.zero?
     end
 
+    def displayable_errors
+      @errors.map { |error| "[Transporter Error Output]: #{error}" }.join("\n").gsub!(/"/, "")
+    end
+
     private
 
     def parse_line(line, hide_output)
@@ -107,7 +111,6 @@ module FastlaneCore
 
       elsif line =~ ERROR_REGEX
         @errors << $1
-        UI.error("[Transporter Error Output]: #{$1}")
 
         # Check if it's a login error
         if $1.include?("Your Apple ID or password was entered incorrectly") ||
@@ -117,9 +120,6 @@ module FastlaneCore
             CredentialsManager::AccountManager.new(user: @user).invalid_credentials
             UI.error("Please run this tool again to apply the new password")
           end
-        elsif $1.include?("Redundant Binary Upload. There already exists a binary upload with build")
-          UI.error($1)
-          UI.error("You have to change the build number of your app to upload your ipa file")
         end
 
         output_done = true
@@ -503,7 +503,11 @@ module FastlaneCore
         handle_error(@password)
       end
 
-      result
+      return result
+    end
+
+    def displayable_errors
+      @transporter_executor.displayable_errors
     end
 
     def provider_ids
