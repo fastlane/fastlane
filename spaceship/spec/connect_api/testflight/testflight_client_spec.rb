@@ -479,29 +479,29 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context "add_beta_tester_to_group" do
-          let(:beta_group_id) { "123" }
-          let(:testerIds) { ["1234", "5678"] }
-          let(:path) { "betaGroups/#{beta_group_id}/relationships/betaTesters" }
-          let(:body) do
-              {
-                  data: testerIds.map do |id|
-                      {
-                          type: "betaTesters",
-                          id: id,
-                      }
-                  end,
-              }
-          end
-          
-          it "succeeds" do
-              url = path
-              req_mock = test_request_body(url, body)
-              
-              expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
-              client.add_beta_tester_to_group(beta_group_id: beta_group_id, testerIds: testerIds)
-          end
+        let(:beta_group_id) { "123" }
+        let(:beta_tester_ids) { ["1234", "5678"] }
+        let(:path) { "betaGroups/#{beta_group_id}/relationships/betaTesters" }
+        let(:body) do
+          {
+              data: beta_tester_ids.map do |id|
+                {
+                      type: "betaTesters",
+                      id: id
+                  }
+              end
+          }
+        end
+
+        it "succeeds" do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.add_beta_tester_to_group(beta_group_id: beta_group_id, beta_tester_ids: beta_tester_ids)
+        end
       end
-      
+
       context 'delete_beta_tester_from_apps' do
         let(:beta_tester_id) { "123" }
         let(:app_ids) { ["1234", "5678"] }
