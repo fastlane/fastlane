@@ -97,6 +97,10 @@ module Spaceship
       def expired?
         @expiration < Time.now
       end
+
+      def write_key_to_file(path)
+        File.open(path, 'w') { |f| f.write(@key) }
+      end
     end
   end
 end

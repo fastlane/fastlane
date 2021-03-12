@@ -134,16 +134,16 @@ module Fastlane
         if api_key_path
           # From xcrun altool for --apiKey:
           # This option will search the following directories in sequence for a private key file with the name of 'AuthKey_<api_key>.p8':  './private_keys', '~/private_keys', '~/.private_keys', and '~/.appstoreconnect/private_keys'.
-          api_key = JSON.parse(File.read(api_key_path))
+          api_key = Spaceship::ConnectAPI::Token.from_json_file(api_key_path)
           api_key_folder_path = '~/.appstoreconnect/private_keys'
-          api_key_file_path = File.join(api_key_folder_path, "AuthKey_#{api_key['key_id']}.p8")
+          api_key_file_path = File.join(api_key_folder_path, "AuthKey_#{api_key.key_id}.p8")
           directory_exists = File.directory?(api_key_folder_path)
           file_exists = File.exist?(api_key_file_path)
           begin
             FileUtils.mkdir_p(api_key_folder_path) unless directory_exists
-            File.open(api_key_file_path, 'w') { |f| f.write(api_key['key']) } unless file_exists
+            api_key.write_key_to_file(api_key_file_path) unless file_exists
 
-            yield(proc { |command| "#{command} --apiKey #{api_key['key_id']} --apiIssuer #{api_key['issuer_id']}" })
+            yield(proc { |command| "#{command} --apiKey #{api_key.key_id} --apiIssuer #{api_key.issuer_id}" })
           ensure
             FileUtils.rm(api_key_file_path) unless file_exists
             FileUtils.rm_r(api_key_folder_path) unless directory_exists
