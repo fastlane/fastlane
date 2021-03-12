@@ -196,6 +196,8 @@ module Fastlane
                                        env_name: 'FL_NOTARIZE_USERNAME',
                                        description: 'Apple ID username',
                                        default_value: username,
+                                       optional: true,
+                                       conflicting_options: [:api_key_path],
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :asc_provider,
                                        env_name: 'FL_NOTARIZE_ASC_PROVIDER',
@@ -218,6 +220,7 @@ module Fastlane
                                        env_name: 'FL_NOTARIZE_API_KEY_PATH',
                                        description: 'Path to AppStore Connect API key',
                                        optional: true,
+                                       conflicting_options: [:username],
                                        is_string: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("API Key not found at '#{value}'") unless File.exist?(value)
