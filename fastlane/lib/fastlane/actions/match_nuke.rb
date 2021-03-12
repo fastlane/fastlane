@@ -1,6 +1,5 @@
 module Fastlane
   module Actions
-
     class MatchNukeAction < Action
       def self.run(params)
         require 'match'
