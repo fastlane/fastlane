@@ -40,5 +40,23 @@ describe Match do
         @e.encrypt_files
       end.to raise_error("No password supplied")
     end
+
+    it "doesn't raise an exception if no env var is supplied but custom password is" do
+      ENV["MATCH_PASSWORD"] = ""
+      expect do
+        @e.encrypt_files(password: "some custom password")
+      end.to_not(raise_error)
+    end
+
+    it "given a custom password argument, then it should be given precedence when encrypting file, even when MATCH_PASSWORD is set" do
+      ENV["MATCH_PASSWORD"] = "something else"
+      new_password = '2"QAHg@v(Qp{=*n^'
+      @e.encrypt_files(password: new_password)
+      expect(File.binread(@full_path)).to_not(eq(@content))
+
+      ENV["MATCH_PASSWORD"] = new_password
+      @e.decrypt_files
+      expect(File.binread(@full_path)).to eq(@content)
+    end
   end
 end
