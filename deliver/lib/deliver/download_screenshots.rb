@@ -68,7 +68,7 @@ module Deliver
           end
 
           path = File.join(containing_folder, file_name)
-          File.binwrite(path, open(url).read)
+          File.binwrite(path, URI.open(url).read)
         end
       end
     end
