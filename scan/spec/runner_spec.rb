@@ -97,7 +97,7 @@ describe Scan do
         @scan = Scan::Runner.new
       end
 
-      it "retry a failed test" do
+      it "retry a failed test", requires_xcodebuild: true do
         error_output = <<-ERROR_OUTPUT
 Failing tests:
   FastlaneAppTests:
@@ -111,7 +111,7 @@ Failing tests:
         @scan.retry_execute(retries: 5, error_output: error_output)
       end
 
-      it "fail to parse error output" do
+      it "fail to parse error output", requires_xcodebuild: true do
         error_output = <<-ERROR_OUTPUT
 Failing tests:
 FastlaneAppTests:
