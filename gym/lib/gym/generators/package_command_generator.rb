@@ -29,6 +29,10 @@ module Gym
         generator.pkg_path
       end
 
+      def binary_path
+        generator.binary_path
+      end
+
       def dsym_path
         generator.dsym_path
       end
