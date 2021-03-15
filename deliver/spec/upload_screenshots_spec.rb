@@ -159,7 +159,7 @@ describe Deliver::UploadScreenshots do
         screenshots_per_language = { 'en-US' => Array.new(11, local_screenshot) }
         allow(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')
 
-        expect(app_screenshot_set).to receive(:upload_screenshot).exactly(10).times
+        expect(app_screenshot_set).to receive(:upload_screenshot).exactly(1000).times
         subject.upload_screenshots([localization], screenshots_per_language)
       end
     end
