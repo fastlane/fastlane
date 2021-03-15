@@ -26,7 +26,7 @@ task(:test_all) do
     # Mix stderr into stdout to let handle `tee` it and then collect warnings by filtering stdout out
     command += " 2>&1 | tee >(grep 'warning:' > #{File.join(ENV['CIRCLE_TEST_REPORTS'], 'ruby_warnings.txt')})" if ENV["CIRCLE_TEST_REPORTS"]
     # tee >(...) occurs syntax error with `sh` helper which uses /bin/sh by default.
-    sh("/bin/bash -c \"#{command}\"")
+    sh("/bin/bash -o pipefail -c \"#{command}\"")
   end
 end
 
