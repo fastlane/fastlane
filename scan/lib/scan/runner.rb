@@ -51,12 +51,12 @@ module Scan
         end
       end
 
-      command = @test_command_generator.generate
-
-      execute(command: command, devices: Scan.devices)
+      execute(retries: Scan.config[:number_of_retries])
     end
 
-    def execute(retries = 0, command: nil, devices: nil)
+    def execute(retries: 0)
+      command = @test_command_generator.generate
+
       prefix_hash = [
         {
           prefix: "Running Tests: ",
@@ -76,11 +76,9 @@ module Scan
                                               error: proc do |error_output|
                                                 begin
                                                   exit_status = $?.exitstatus
-                                                  if retries < Scan.config[:number_of_retries]
+                                                  if retries > 0
                                                     # If there are retries remaining, run the tests again
-                                                    Scan.config[:only_testing] = retryable_tests(error_output)
-                                                    UI.important("Retrying tests: #{Scan.config[:only_testing]}")
-                                                    return retry_tests(retries, @test_command_generator.generate)
+                                                    return retry_execute(retries: retries, error_output: error_output)
                                                   else
                                                     ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
                                                   end
@@ -95,20 +93,36 @@ module Scan
       exit_status
     end
 
+    def retry_execute(retries:, error_output: "")
+      tests = retryable_tests(error_output)
+
+      if tests.empty?
+        UI.crash!("Failed to find failed tests to retry (could not parse error output)")
+      end
+
+      Scan.config[:only_testing] = tests
+      UI.important("Retrying tests: #{Scan.config[:only_testing].join(', ')}")
+
+      retries -= 1
+      UI.important("Number of retries remaining: #{retries}")
+
+      return execute(retries: retries)
+    end
+
     def retryable_tests(input)
       input = Helper.strip_ansi_colors(input)
 
       retryable_tests = []
 
-      failing_tests = input.split("Failing tests:\n")[1]
-                           .split("\n\n")[0]
+      failing_tests = input.split("Failing tests:\n").fetch(1, [])
+                           .split("\n\n").first
 
       suites = failing_tests.split(/(?=\n\s+[\w\s]+:\n)/)
 
       suites.each do |suite|
-        suite_name = suite.match(/\s*([\w\s]+):/).captures[0]
+        suite_name = suite.match(/\s*([\w\s]+):/).captures.first
 
-        test_cases = suite.split(":\n")[1].split("\n").each
+        test_cases = suite.split(":\n").fetch(1, []).split("\n").each
                           .select { |line| line.start_with?(/\s+/) }
                           .map { |line| line.strip.gsub(".", "/").gsub("()", "") }
                           .map { |line| suite_name + "/" + line }
@@ -116,13 +130,7 @@ module Scan
         retryable_tests += test_cases
       end
 
-      retryable_tests.uniq
-    end
-
-    def retry_tests(retries, command)
-      UI.important("Number of retries remaining: #{Scan.config[:number_of_retries] - retries - 1}")
-
-      execute(retries + 1, command: command)
+      return retryable_tests.uniq
     end
 
     def handle_results(tests_exit_status)
