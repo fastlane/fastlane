@@ -233,16 +233,25 @@ describe FastlaneCore do
       end
 
       it 'performs URI.open with block' do
-        is_called_block = false
+        is_block_called = false
         FastlaneCore::Helper.open_uri('https://fastlane.tools') do |content|
           expect(content).to respond_to(:read)
-          is_called_block = true
+          is_block_called = true
         end
-        expect(is_called_block).to be(true)
+        expect(is_block_called).to be(true)
       end
 
       it 'performs URI.open with options' do
         expect(FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb')).to respond_to(:read)
+      end
+
+      it 'performs URI.open with options and block' do
+        is_block_called = false
+        FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb') do |content| 
+          expect(content).to respond_to(:read)
+          is_block_called = true
+        end
+        expect(is_block_called).to be(true)
       end
     end
   end
