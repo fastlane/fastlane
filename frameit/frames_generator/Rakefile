@@ -69,7 +69,7 @@ DEVICE_COLORS = [
 ]
 
 # The versions / renaming scheme should be updated in case FB updates iPads
-IPAD_PRO_12_9_VERSION = "3rd generation"
+IPAD_PRO_12_9_VERSION = "4th generation"
 IPAD_AIR_VERSION = "2019"
 IPAD_MINI_VERSION = "2019"
 IPAD_RENAMING_SCHEME = {
