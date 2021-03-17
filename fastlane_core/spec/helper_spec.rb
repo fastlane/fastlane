@@ -222,5 +222,28 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.fastlane_enabled?).to be(true)
       end
     end
+
+    describe '#open_uri' do
+      before do
+        stub_request(:get, 'https://fastlane.tools').to_return(body: 'SOME_TEXT', status: 200)
+      end
+
+      it 'performs URI.open and return IO like object that can be read' do
+        expect(FastlaneCore::Helper.open_uri('https://fastlane.tools')).to respond_to(:read)
+      end
+
+      it 'performs URI.open with block' do
+        is_called_block = false
+        FastlaneCore::Helper.open_uri('https://fastlane.tools') do |content|
+          expect(content).to respond_to(:read)
+          is_called_block = true
+        end
+        expect(is_called_block).to be(true)
+      end
+
+      it 'performs URI.open with options' do
+        expect(FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb')).to respond_to(:read)
+      end
+    end
   end
 end
