@@ -14,6 +14,11 @@ module Fastlane
         create_command << ['-output', "\"#{params[:output]}\""]
         create_command << ['-allow-internal-distribution'] if params[:allow_internal_distribution]
 
+        if File.directory?(params[:output])
+          UI.message("Deleting existing: #{params[:output]}")
+          FileUtils.remove_dir(params[:output])
+        end
+
         Actions.lane_context[SharedValues::XCFRAMEWORK_PATH] = params[:output]
 
         sh(create_command)

@@ -37,10 +37,10 @@ module Spaceship
           raise "App Store Connect API key JSON is missing field(s): #{missing_keys.join(', ')}"
         end
 
-        self.create(json)
+        self.create(**json)
       end
 
-      def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, is_key_content_base64: false, duration: nil, in_house: nil)
+      def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, is_key_content_base64: false, duration: nil, in_house: nil, **)
         key_id ||= ENV['SPACESHIP_CONNECT_API_KEY_ID']
         issuer_id ||= ENV['SPACESHIP_CONNECT_API_ISSUER_ID']
         filepath ||= ENV['SPACESHIP_CONNECT_API_KEY_FILEPATH']

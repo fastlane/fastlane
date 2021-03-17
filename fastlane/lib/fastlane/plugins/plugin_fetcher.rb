@@ -14,7 +14,7 @@ module Fastlane
       loop do
         url = "https://rubygems.org/api/v1/search.json?query=#{PluginManager.plugin_prefix}&page=#{page}"
         FastlaneCore::UI.verbose("RubyGems API Request: #{url}")
-        results = JSON.parse(open(url).read)
+        results = JSON.parse(URI.open(url).read)
         break if results.count == 0
 
         plugins += results.collect do |current|

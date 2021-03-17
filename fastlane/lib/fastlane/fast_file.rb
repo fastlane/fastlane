@@ -201,13 +201,17 @@ module Fastlane
       # First accepts hash (or named keywords) like other actions
       # Otherwise uses sh method that doesn't have an interface like an action
       if args.count == 1 && args.first.kind_of?(Hash)
-        hash = args.first
-        command = hash.delete(:command)
+        options = args.first
+        command = options.delete(:command)
 
         raise ArgumentError, "sh requires :command keyword in argument" if command.nil?
-
-        new_args = [*command, hash]
-        FastFile.sh(*new_args, &b)
+        log = options[:log].nil? ? true : options[:log]
+        FastFile.sh(*command, step_name: options[:step_name], log: log, error_callback: options[:error_callback], &b)
+      elsif args.count != 1 && args.last.kind_of?(Hash)
+        new_args = args.dup
+        options = new_args.pop
+        log = options[:log].nil? ? true : options[:log]
+        FastFile.sh(*new_args, step_name: options[:step_name], log: log, error_callback: options[:error_callback], &b)
       else
         FastFile.sh(*args, &b)
       end
