@@ -247,7 +247,7 @@ describe FastlaneCore do
 
       it 'performs URI.open with options and block' do
         is_block_called = false
-        FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb') do |content| 
+        FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb') do |content|
           expect(content).to respond_to(:read)
           is_block_called = true
         end
