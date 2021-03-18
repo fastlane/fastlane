@@ -1,6 +1,5 @@
 require_relative 'module'
 require 'spaceship'
-require 'open-uri'
 
 module Deliver
   class DownloadScreenshots
@@ -68,7 +67,7 @@ module Deliver
           end
 
           path = File.join(containing_folder, file_name)
-          File.binwrite(path, URI.open(url).read)
+          File.binwrite(path, FastlaneCore::Helper.open_uri(url).read)
         end
       end
     end
