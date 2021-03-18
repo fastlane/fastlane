@@ -34,7 +34,7 @@ module Precheck
         # There is also a check in Deliver::Runner for this.
         # Please remove check in Deliver when the API support IAPs.
         if Precheck.config[:include_in_app_purchases]
-          UI.user_error!("Precheck cannot check In-app purchases with the App Store Connect API Key (yet). Exclude In-app purchases from precheck or use Apple ID login")
+          UI.user_error!("Precheck cannot check In-app purchases with the App Store Connect API Key (yet). Exclude In-app purchases from precheck, disable the precheck step in your build step, or use Apple ID login")
         end
 
         Spaceship::ConnectAPI.token = api_token

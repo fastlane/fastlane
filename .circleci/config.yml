@@ -67,6 +67,9 @@ jobs:
         type: string
       ruby_version:
         type: string
+      ruby_opt:
+        type: string
+        default: ''
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'en_US.UTF-8'
@@ -98,13 +101,25 @@ jobs:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
       - *cache_restore_rubocop
-      - run: bundle exec fastlane execute_tests
+      - run:
+          name: bundle exec fastlane execute_tests
+          command: |
+            RUBYOPT=<< parameters.ruby_opt >> bundle exec fastlane execute_tests
       - *cache_save_rubocop
+      - run:
+          name: Check compatibility with Ruby 3.0
+          command: |
+            touch ~/test-reports/ruby_warnings.txt
+            # TODO remove 'grep -v ".bundle"' once 3rd party dependencies support Ruby 3.0
+            ! cat ~/test-reports/ruby_warnings.txt | grep -v ".bundle" | grep -E "warning:\s.*(deprecated).*$" && echo "No deprecation message found."
       - store_test_results:
           path: ~/test-reports
       - store_artifacts:
           path: ~/test-reports/rspec
           destination: test-reports
+      - store_artifacts:
+          path: ~/test-reports/ruby_warnings.txt
+          destination: ruby_warnings.txt
       - run:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
@@ -143,6 +158,9 @@ jobs:
       - store_artifacts:
           path: ~/test-reports/rspec
           destination: test-reports
+      - store_artifacts:
+          path: ~/test-reports/ruby_warnings.txt
+          destination: ruby_warnings.txt
       - run:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
@@ -245,19 +263,20 @@ workflows:
           name: 'Execute tests on macOS (Xcode 12.3.0, Ruby 2.7)'
           xcode_version: '12.3.0'
           ruby_version: '2.7'
+          ruby_opt: -W:deprecated
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu'
-          ruby_version: 'fastlanetools/ci:0.2.0'
+          ruby_version: 'fastlanetools/ci:0.3.0'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
           xcode_version: '11.0.0'
           ruby_version: '2.5'
       - validate_documentation:
           name: 'Validate Documentation'
-          ruby_version: 'circleci/ruby:2.4'
+          ruby_version: 'circleci/ruby:2.5'
       - lint_source_code:
           name: 'Lint source code'
           ruby_version: 'circleci/ruby:2.5'
       - modules_load_up_tests:
           name: 'Modules load up tests'
-          ruby_version: 'circleci/ruby:2.4'
+          ruby_version: 'circleci/ruby:2.5'

@@ -99,6 +99,19 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error(/:key_content or :key_filepath is required/)
       end
+
+      it "raise error when duration is higher than 20 minutes" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            app_store_connect_api_key(
+              key_id: 'foo',
+              issuer_id: 'bar',
+              key_content: 'derp',
+              duration: 1300
+            )
+          end").runner.execute(:test)
+        end.to raise_error("The duration can't be more than 1200 (20 minutes) and the value entered was '1300'")
+      end
     end
   end
 end

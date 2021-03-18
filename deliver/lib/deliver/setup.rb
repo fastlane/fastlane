@@ -1,4 +1,3 @@
-require 'open-uri'
 require 'spaceship/tunes/tunes'
 
 require_relative 'module'

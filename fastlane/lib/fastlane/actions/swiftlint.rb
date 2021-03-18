@@ -145,7 +145,7 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          available = ['xcode', 'json', 'csv', 'checkstyle', 'codeclimate', 'junit', 'html', 'emoji', 'sonarqube', 'markdown', 'github-actions-logging']
-                                         UI.warning("Known 'reporter' values are '#{available.join("', '")}'. If you're receiving errors from swiftlint related to the reporter, make sure the reporter identifier you're using is correct and it's supported by your version of swiftlint.") unless available.include?(value)
+                                         UI.important("Known 'reporter' values are '#{available.join("', '")}'. If you're receiving errors from swiftlint related to the reporter, make sure the reporter identifier you're using is correct and it's supported by your version of swiftlint.") unless available.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :quiet,
                                        env_name: "FL_SWIFTLINT_QUIET",

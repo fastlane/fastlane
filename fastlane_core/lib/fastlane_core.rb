@@ -35,6 +35,7 @@ require_relative 'fastlane_core/analytics/analytics_ingester_client'
 require_relative 'fastlane_core/analytics/analytics_session'
 require_relative 'fastlane_core/tag_version'
 require_relative 'fastlane_core/fastlane_pty'
+require_relative 'fastlane_core/queue_worker'
 
 # Third Party code
 require 'colored'

@@ -16,7 +16,7 @@ module Match
 
       ensure_ui_interactive
 
-      to = FastlaneCore::Helper.ask_password(message: "New passphrase for Git Repo: ", confirm: true)
+      new_password = FastlaneCore::Helper.ask_password(message: "New passphrase for Git Repo: ", confirm: true)
 
       # Choose the right storage and encryption implementations
       storage = Storage.for_mode(params[:storage_mode], {
@@ -37,10 +37,10 @@ module Match
       encryption.decrypt_files
 
       encryption.clear_password
-      encryption.store_password(to)
+      encryption.store_password(new_password)
 
       message = "[fastlane] Changed passphrase"
-      files_to_commit = encryption.encrypt_files
+      files_to_commit = encryption.encrypt_files(new_password)
       storage.save_changes!(files_to_commit: files_to_commit, custom_message: message)
     end
 
