@@ -16,7 +16,7 @@ public final class LocaleUtil {
 
     private static final String TAG =  LocaleUtil.class.getSimpleName();
 
-    @SuppressWarnings("JavaReflectionMemberAccess")
+    @SuppressWarnings({"JavaReflectionMemberAccess"})
     @SuppressLint("PrivateApi")
     public static LocaleListCompat changeDeviceLocaleTo(LocaleListCompat locale) {
         if (locale == null) {
@@ -81,7 +81,7 @@ public final class LocaleUtil {
             return null;
         }
 
-        String[] localeParts = localeString.split("_");
+        String[] localeParts = localeString.split("[_\\-]");
 
         if (localeParts.length < 1 || localeParts.length > 3) {
             return null;
@@ -102,17 +102,12 @@ public final class LocaleUtil {
         }
     }
 
-    public static Locale getTestLocale() {
-        return localeFromInstrumentation("testLocale");
+    public static Locale localeFromString(String locale) {
+        return localeFromParts(localePartsFrom(locale));
     }
 
-    public static Locale getEndingLocale() {
-        return localeFromInstrumentation("endingLocale");
-    }
-
-    private static Locale localeFromInstrumentation(String key) {
-        String localeString = InstrumentationRegistry.getArguments().getString(key);
-        return LocaleUtil.localeFromParts(LocaleUtil.localePartsFrom(localeString));
+    public static String getTestLocale() {
+        return InstrumentationRegistry.getArguments().getString("testLocale");
     }
 
     private LocaleUtil() {}

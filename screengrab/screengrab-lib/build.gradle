@@ -64,3 +64,8 @@ dependencies {
     implementation 'androidx.test.uiautomator:uiautomator:2.2.0'
     implementation 'com.jraska:falcon:2.1.1'
 }
+gradle.projectsEvaluated {
+    tasks.withType(JavaCompile){
+        options.compilerArgs << "-Xlint:deprecation"
+    }
+}

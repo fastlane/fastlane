@@ -29,15 +29,17 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
     private static final String APPEND_TIMESTAMP_CONFIG_KEY = "appendTimestamp";
 
     private final Context appContext;
+    private final String locale;
 
-    public FileWritingScreenshotCallback(Context appContext) {
+    public FileWritingScreenshotCallback(Context appContext, String locale) {
         this.appContext = appContext;
+        this.locale = locale;
     }
 
     @Override
     public void screenshotCaptured(String screenshotName, Bitmap screenshot) {
         try {
-            File screenshotDirectory = getFilesDirectory(appContext, Locale.getDefault());
+            File screenshotDirectory = getFilesDirectory(appContext, locale);
             File screenshotFile = getScreenshotFile(screenshotDirectory, screenshotName);
 
             OutputStream fos = null;
@@ -65,7 +67,8 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
     }
 
     @SuppressLint("WorldReadableFiles")
-    private static File getFilesDirectory(Context context, Locale locale) throws IOException {
+    @SuppressWarnings("deprecation")
+    private static File getFilesDirectory(Context context, String locale) throws IOException {
         File base;
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
             base = context.getDir(SCREENGRAB_DIR_NAME, Context.MODE_PRIVATE);
@@ -79,7 +82,7 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
             throw new IOException("Unable to get a world-readable directory");
         }
 
-        File directory = initializeDirectory(new File(base, localeToDirName(locale)));
+        File directory = initializeDirectory(new File(new File(base, locale), "/images/screenshots"));
         if (directory == null) {
             throw new IOException("Unable to get a screenshot storage directory");
         }
@@ -100,17 +103,6 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
         }
 
         return null;
-    }
-
-    private static String localeToDirName(Locale locale) {
-        StringBuilder sb = new StringBuilder(locale.getLanguage());
-        String localeCountry = locale.getCountry();
-
-        if (localeCountry.length() != 0) {
-            sb.append("-").append(localeCountry);
-        }
-
-        return sb.append("/images/screenshots").toString();
     }
 
     private static void createPathTo(File dir) throws IOException {

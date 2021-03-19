@@ -15,6 +15,8 @@ import androidx.test.core.app.ApplicationProvider;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @SuppressWarnings({"unused", "RedundantSuppression"})
 public class CleanStatusBar {
@@ -321,9 +323,6 @@ public class CleanStatusBar {
 
         Context context = ApplicationProvider.getApplicationContext();
 
-        // "warm up" demo mode -- no clue why this is needed
-        // without this, the status bar unreproducibly breaks
-        sendCommand(context, "enter");
         sendCommand(context, "enter");
 
         sendCommand(context, "battery", "level", Integer.toString(batteryLevel),
@@ -364,7 +363,11 @@ public class CleanStatusBar {
         sendCommand(context, "clock", "hhmm", clock);
     }
 
-    private static void sendCommand(@NonNull Context context, @NonNull String... commands)
+    private static void sendCommand(@NonNull Context context, @NonNull String... commands) {
+        sendCommand(context, 30, commands);
+    }
+
+    private static void sendCommand(@NonNull Context context, int maxRetries, @NonNull String... commands)
     {
         Log.v(TAG, Arrays.toString(commands));
         if ((commands.length - 1) % 2 != 0)
@@ -375,10 +378,12 @@ public class CleanStatusBar {
         for (int i = 1; i < commands.length; i += 2) {
             intent.putExtra(commands[i], commands[i + 1]);
         }
+        Log.v(TAG, "created intent");
 
 
         HandlerThread thread = new HandlerThread("DemoModeCallback");
         thread.start();
+        Log.v(TAG, "started thread");
         Handler scheduler = new Handler(thread.getLooper());
 
         FutureTask<Void> callback = new FutureTask<>(new Runnable() {
@@ -387,6 +392,7 @@ public class CleanStatusBar {
                 // no-op
             }
         }, null);
+        Log.v(TAG, "send broadcast");
 
         context.sendOrderedBroadcast(intent,
                 null,
@@ -396,11 +402,16 @@ public class CleanStatusBar {
                 null,
                 null);
         try {
-            callback.get();
+            callback.get(1000L, TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        } catch (TimeoutException e) {
+            Log.v(TAG, "Retry " + Arrays.toString(commands) + " " + maxRetries);
+            if (maxRetries == 0)
+                throw new RuntimeException(e);
+            sendCommand(context, maxRetries - 1, commands);
         } finally {
             thread.quitSafely();
         }
