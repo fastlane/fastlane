@@ -345,5 +345,5 @@ brew install imagemagick
 
 ## Uninstall
 
-- `sudo gem uninstall fastlane`
+- `gem uninstall fastlane`
 - `rm -rf ~/.frameit`

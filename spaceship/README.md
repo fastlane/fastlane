@@ -83,7 +83,7 @@ Using spaceship, the execution time of [_sigh_](https://docs.fastlane.tools/acti
 
 _spaceship_ is part of _fastlane_:
 
-    sudo gem install fastlane
+    gem install fastlane
 
 # Usage
 
@@ -93,7 +93,7 @@ To try _spaceship_, just run `fastlane spaceship`. It will automatically start t
 
 ![assets/docs/Playground.png](assets/docs/Playground.png)
 
-This requires you to install `pry` using `sudo gem install pry`. `pry` is not installed by default, as most [_fastlane_](https://fastlane.tools) users won't need the `spaceship playground`. You can add the `pry` dependency to your `Gemfile`.
+This requires you to install `pry` using `gem install pry`. `pry` is not installed by default, as most [_fastlane_](https://fastlane.tools) users won't need the `spaceship playground`. You can add the `pry` dependency to your `Gemfile`.
 
 ## Apple Developer Portal API
 

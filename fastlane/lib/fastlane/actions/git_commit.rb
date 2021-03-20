@@ -37,7 +37,7 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,
-                                       description: "The file you want to commit",
+                                       description: "The file(s) or directory(ies) you want to commit. You can pass an array of multiple file-paths or fileglobs \"*.txt\" to commit all matching files. The files already staged but not specified and untracked files won't be committed",
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :message,
                                        description: "The commit message that should be used"),

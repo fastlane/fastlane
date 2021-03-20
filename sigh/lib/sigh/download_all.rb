@@ -60,7 +60,7 @@ module Sigh
     end
 
     def api_token
-      api_token ||= Spaceship::ConnectAPI::Token.create(Sigh.config[:api_key]) if Sigh.config[:api_key]
+      api_token ||= Spaceship::ConnectAPI::Token.create(**Sigh.config[:api_key]) if Sigh.config[:api_key]
       api_token ||= Spaceship::ConnectAPI::Token.from_json_file(Sigh.config[:api_key_path]) if Sigh.config[:api_key_path]
       return api_token
     end
