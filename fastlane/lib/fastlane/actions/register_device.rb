@@ -39,7 +39,7 @@ module Fastlane
 
       def self.api_token(params)
         params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
-        api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+        api_token ||= Spaceship::ConnectAPI::Token.create(**params[:api_key]) if params[:api_key]
         api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
         return api_token
       end
@@ -69,7 +69,7 @@ module Fastlane
                                        env_name: "FL_REGISTER_DEVICE_UDID",
                                        description: "Provide the UDID of the device to register as"),
           FastlaneCore::ConfigItem.new(key: :api_key_path,
-                                       env_name: "FL_REGISTER_DEVICE_API_KEY_PATH",
+                                       env_names: ["FL_REGISTER_DEVICE_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
                                        description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                        optional: true,
                                        conflicting_options: [:api_key],
@@ -77,7 +77,7 @@ module Fastlane
                                          UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_key,
-                                       env_name: "FL_REGISTER_DEVICE_API_KEY",
+                                       env_names: ["FL_REGISTER_DEVICE_API_KEY", "APP_STORE_CONNECT_API_KEY"],
                                        description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                        type: Hash,
                                        optional: true,

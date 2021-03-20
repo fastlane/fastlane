@@ -33,10 +33,11 @@ module Fastlane
         agv_disabled = !system([command_prefix, 'agvtool what-version', command_suffix].join(' '))
         raise "Apple Generic Versioning is not enabled." if agv_disabled && params[:build_number].nil?
 
+        mode = params[:skip_info_plist] ? '' : ' -all'
         command = [
           command_prefix,
           'agvtool',
-          params[:build_number] ? "new-version -all #{params[:build_number].to_s.strip}" : 'next-version -all',
+          params[:build_number] ? "new-version#{mode} #{params[:build_number].to_s.strip}" : "next-version#{mode}",
           command_suffix
         ].join(' ')
 
@@ -66,6 +67,12 @@ module Fastlane
                                        description: "Change to a specific version. When you provide this parameter, Apple Generic Versioning does not have to be enabled",
                                        optional: true,
                                        is_string: false),
+          FastlaneCore::ConfigItem.new(key: :skip_info_plist,
+                                       env_name: "FL_BUILD_NUMBER_SKIP_INFO_PLIST",
+                                       description: "Don't update Info.plist files when updating the build version",
+                                       is_string: false,
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                        env_name: "FL_BUILD_NUMBER_PROJECT",
                                        description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",

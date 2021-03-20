@@ -87,6 +87,11 @@ module Spaceship
         return build_beta_detail.ready_for_beta_submission?
       end
 
+      def missing_export_compliance?
+        raise "No build_beta_detail included" unless build_beta_detail
+        return build_beta_detail.missing_export_compliance?
+      end
+
       # This is here temporarily until the removal of Spaceship::TestFlight
       def to_testflight_build
         h = {

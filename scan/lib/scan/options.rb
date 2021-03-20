@@ -69,6 +69,11 @@ module Scan
                                      default_value: false,
                                      type: Boolean,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :ensure_devices_found,
+                                     description: "Should fail if devices not found",
+                                     default_value: false,
+                                     type: Boolean,
+                                     optional: true),
 
         # simulator management
         FastlaneCore::ConfigItem.new(key: :force_quit_simulator,
@@ -268,6 +273,11 @@ module Scan
                                      description: "Should zip the derived data build products and place in output path?",
                                      optional: true,
                                      is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :output_xctestrun,
+                                     type: Boolean,
+                                     env_name: "SCAN_OUTPUT_XCTESTRUN",
+                                     description: "Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?",
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :result_bundle,
                                      short_option: "-z",

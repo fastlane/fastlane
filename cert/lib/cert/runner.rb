@@ -31,7 +31,7 @@ module Cert
     end
 
     def api_token
-      @api_token ||= Spaceship::ConnectAPI::Token.create(Cert.config[:api_key]) if Cert.config[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.create(**Cert.config[:api_key]) if Cert.config[:api_key]
       @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(Cert.config[:api_key_path]) if Cert.config[:api_key_path]
       return @api_token
     end

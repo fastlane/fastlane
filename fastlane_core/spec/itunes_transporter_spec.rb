@@ -830,6 +830,45 @@ describe FastlaneCore do
       end
     end
 
+    describe "with upload error" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11.1')
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+
+        allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
+        stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+      end
+
+      describe "retries when TransporterRequiresApplicationSpecificPasswordError" do
+        it "with app_id and dir" do
+          transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+
+          # Raise error once to test retry
+          expect_any_instance_of(FastlaneCore::JavaTransporterExecutor).to receive(:execute).once.and_raise(FastlaneCore::TransporterRequiresApplicationSpecificPasswordError)
+          expect(transporter).to receive(:handle_two_step_failure)
+
+          # Call original implementation to undo above expect
+          expect_any_instance_of(FastlaneCore::JavaTransporterExecutor).to receive(:execute).and_call_original
+
+          expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command)
+        end
+
+        it "with package_path" do
+          transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+
+          # Raise error once to test retry
+          expect_any_instance_of(FastlaneCore::JavaTransporterExecutor).to receive(:execute).once.and_raise(FastlaneCore::TransporterRequiresApplicationSpecificPasswordError)
+          expect(transporter).to receive(:handle_two_step_failure)
+
+          # Call original implementation to undo above expect
+          expect_any_instance_of(FastlaneCore::JavaTransporterExecutor).to receive(:execute).and_call_original
+
+          expect(transporter.upload(package_path: '/tmp/my.app.id.itmsp')).to eq(xcrun_upload_command)
+        end
+      end
+    end
+
     describe "with simulated no-test environment" do
       before(:each) do
         allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
