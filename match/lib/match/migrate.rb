@@ -92,7 +92,6 @@ module Match
 
     def api_token(params)
       api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path])
-      api_token ||= Spaceship::ConnectAPI.token
       return api_token
     end
 
