@@ -15,28 +15,28 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Jan Piotrowski",
-                        "Stefan Natchev",
-                        "Aaron Brager",
-                        "Manu Wallner",
-                        "Jérôme Lacoste",
-                        "Olivier Halligon",
-                        "Helmut Januschka",
+  spec.authors       = ["Joshua Liebowitz",
                         "Jorge Revuelta H",
-                        "Danielle Tomlinson",
-                        "Jimmy Dee",
-                        "Felix Krause",
-                        "Andrew McBurney",
-                        "Fumiya Nakamura",
-                        "Daniel Jankowski",
-                        "Maksym Grebenets",
                         "Iulian Onofrei",
-                        "Josh Holtz",
-                        "Max Ott",
-                        "Luka Mirosevic",
-                        "Joshua Liebowitz",
                         "Kohki Miki",
-                        "Matthew Ellis"]
+                        "Fumiya Nakamura",
+                        "Manu Wallner",
+                        "Stefan Natchev",
+                        "Olivier Halligon",
+                        "Daniel Jankowski",
+                        "Helmut Januschka",
+                        "Jan Piotrowski",
+                        "Felix Krause",
+                        "Jimmy Dee",
+                        "Maksym Grebenets",
+                        "Andrew McBurney",
+                        "Max Ott",
+                        "Matthew Ellis",
+                        "Aaron Brager",
+                        "Jérôme Lacoste",
+                        "Luka Mirosevic",
+                        "Danielle Tomlinson",
+                        "Josh Holtz"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -104,7 +104,7 @@ Gem::Specification.new do |spec|
 
   # Development only
   spec.add_development_dependency('rake')
-  spec.add_development_dependency('rspec', '~> 3.10.0')
+  spec.add_development_dependency('rspec', '~> 3.10')
   spec.add_development_dependency('rspec_junit_formatter', '~> 0.4.1')
   spec.add_development_dependency('pry')
   spec.add_development_dependency('pry-byebug')
@@ -117,7 +117,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rubocop-require_tools', '>= 0.1.2')
   spec.add_development_dependency('rb-readline') # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency('rest-client', '>= 1.8.0')
-  spec.add_development_dependency('fakefs', '~> 1.2.1')
+  spec.add_development_dependency('fakefs', '~> 1.2')
   spec.add_development_dependency('sinatra', '~> 2.0.8') # Used for mock servers
   spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
   spec.add_development_dependency('climate_control', '~> 0.2.0')

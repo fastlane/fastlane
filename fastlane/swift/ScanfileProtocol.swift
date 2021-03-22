@@ -20,6 +20,9 @@ public protocol ScanfileProtocol: class {
     /// Should skip auto detecting of devices if none were specified
     var skipDetectDevices: Bool { get }
 
+    /// Should fail if devices not found
+    var ensureDevicesFound: Bool { get }
+
     /// Enabling this option will automatically killall Simulator processes before the run
     var forceQuitSimulator: Bool { get }
 
@@ -217,6 +220,7 @@ public extension ScanfileProtocol {
     var device: String? { return nil }
     var devices: [String]? { return nil }
     var skipDetectDevices: Bool { return false }
+    var ensureDevicesFound: Bool { return false }
     var forceQuitSimulator: Bool { return false }
     var resetSimulator: Bool { return false }
     var disableSlideToType: Bool { return true }
@@ -284,4 +288,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.67]
+// FastlaneRunnerAPIVersion [0.9.69]

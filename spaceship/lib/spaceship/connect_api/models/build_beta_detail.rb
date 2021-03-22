@@ -56,6 +56,10 @@ module Spaceship
       def ready_for_beta_submission?
         return external_build_state == ExternalState::READY_FOR_BETA_SUBMISSION
       end
+
+      def missing_export_compliance?
+        return external_build_state == ExternalState::MISSING_EXPORT_COMPLIANCE
+      end
     end
   end
 end
