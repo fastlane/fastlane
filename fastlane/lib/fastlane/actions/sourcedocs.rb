@@ -2,10 +2,14 @@ module Fastlane
   module Actions
     class SourceDocsAction < Action
       def self.run(params)
+        if `which sourcedocs`.to_s.length == 0
+          UI.user_error!("You have to install sourcedocs using `brew install sourcedocs")
+        end
         command = "sourcedocs generate"
         command << " --reproducible-docs #{params[:reproducible]}" if params[:reproducible]
         command << ['-o', "\"#{params[:output]}\""]
         command << " --clean #{params[:clean]}" if params[:clean]
+        command << params[:frameworks].map { |scheme| ['-- -scheme', "\"#{scheme}\""] }.flatten if params[:scheme]
         Actions.sh(command)
       end
 
@@ -27,17 +31,24 @@ module Fastlane
             optional: true
           ),
           FastlaneCore::ConfigItem.new(
-            key: :config,
+            key: :output,
             env_name: 'FL_SOURCEDOCS_OUTPUT',
             description: 'Path to write docs to',
             type: String,
             optional: false
           ),
           FastlaneCore::ConfigItem.new(
-            key: :config,
+            key: :clean,
             env_name: 'FL_SOURCEDOCS_CLEAN',
             description: 'Delete output folder before generating documentation',
             type: Boolean,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :scheme,
+            env_name: 'FL_SOURCEDOCS_SCHEME',
+            description: 'Create documentation for specific scheme',
+            type: String,
             optional: true
           )
         ]
@@ -59,7 +70,8 @@ module Fastlane
 
       def self.example_code
         [
-          "sourcedocs(output: 'docs')"
+          "sourcedocs(output: 'docs')",
+          "sourcedocs(output: 'docs', scheme: 'MyApp')"
         ]
       end
 
