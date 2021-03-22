@@ -1,15 +1,15 @@
 module Fastlane
   module Actions
-    class SourceDocsAction < Action
+    class SourcedocsAction < Action
       def self.run(params)
         if `which sourcedocs`.to_s.length == 0
-          UI.user_error!("You have to install sourcedocs using `brew install sourcedocs")
+          UI.user_error!("You have to install sourcedocs using `brew install sourcedocs`")
         end
-        command = "sourcedocs generate"
-        command << " --reproducible-docs #{params[:reproducible]}" if params[:reproducible]
-        command << ['-o', "\"#{params[:output]}\""]
-        command << " --clean #{params[:clean]}" if params[:clean]
-        command << params[:frameworks].map { |scheme| ['-- -scheme', "\"#{scheme}\""] }.flatten if params[:scheme]
+        command =  "sourcedocs generate"
+        command << " --reproducible-docs" if params[:reproducible]
+        command << " -o #{params[:output]}"
+        command << " --clean" if params[:clean]
+        command << " -- -scheme #{params[:scheme]}" if params[:scheme]
         Actions.sh(command)
       end
 
