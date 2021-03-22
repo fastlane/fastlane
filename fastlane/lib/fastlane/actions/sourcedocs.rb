@@ -2,14 +2,16 @@ module Fastlane
   module Actions
     class SourcedocsAction < Action
       def self.run(params)
-        if `which sourcedocs`.to_s.length == 0
-          UI.user_error!("You have to install sourcedocs using `brew install sourcedocs`")
-        end
+        UI.user_error!("You have to install sourcedocs using `brew install sourcedocs`") if `which sourcedocs`.to_s.length == 0
+
         command =  "sourcedocs generate"
         command << " --reproducible-docs" if params[:reproducible]
         command << " -o #{params[:output]}"
         command << " --clean" if params[:clean]
-        command << " -- -scheme #{params[:scheme]}" if params[:scheme]
+        unless params[:scheme].nil?
+          command << " -- -scheme #{params[:scheme]}"
+          command << " -sdk #{params[:sdk_platform]}" unless params[:sdk_platform].nil?
+        end
         Actions.sh(command)
       end
 
@@ -48,6 +50,13 @@ module Fastlane
             key: :scheme,
             env_name: 'FL_SOURCEDOCS_SCHEME',
             description: 'Create documentation for specific scheme',
+            type: String,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :sdk_platform,
+            env_name: 'FL_SOURCEDOCS_SDK_PlATFORM',
+            description: 'Create documentation for specific sdk platform',
             type: String,
             optional: true
           )
