@@ -107,7 +107,7 @@ task(:generate_device_frames) do
 
   image_assets = []
   devices = Hash.new { |h, k| h[k] = [] }
-  (Dir["raw/Phones/*/Device/*.png"] + Dir["raw/Computers/Apple*/Device/*.png"] + Dir["raw/Tablets/*/Device/*.png"] + Dir["raw/Tablets/*/Device/Device without Pencil/*.png"]).each do |current_raw|
+  (Dir["raw/Phones/*/Device/*.png"] + Dir["raw/Computers/Apple*/Device/*.png"] + Dir["raw/Tablets/*/Device/*.png"] + Dir["raw/Tablets/*/Device/Device without Pencil/*.png"] + Dir["legacy/*.png"]).each do |current_raw|
     basename = File.basename(current_raw)
     next if should_skip_device?(basename)
 
@@ -264,6 +264,11 @@ def sanitize_device_name(filename)
   basename = File.basename(filename, File.extname(filename))
   basename = basename.gsub("Apple", "")
   basename = basename.gsub("-", " ")
+
+  # Directory is named "Nexus 5X" but file named "Nexus 5x"
+  # Need to rename to "Nexus 5X"
+  basename = basename.gsub("Nexus 5x", "Nexus 5X")
+
   DEVICE_COLORS.each { |color| basename.slice!(color) }
   basename.strip.to_s
 end
