@@ -69,12 +69,12 @@ DEVICE_COLORS = [
 ]
 
 # The versions / renaming scheme should be updated in case FB updates iPads
-IPAD_PRO_12_9_VERSION = "3rd generation"
+IPAD_PRO_12_9_VERSION = "4th generation"
 IPAD_AIR_VERSION = "2019"
 IPAD_MINI_VERSION = "2019"
 IPAD_RENAMING_SCHEME = {
-  'iPad Pro 11"' => 'iPad Pro (11-inch)',
-  'iPad Pro 13"' => "iPad Pro (12.9-inch) (#{IPAD_PRO_12_9_VERSION})",
+  'iPad Pro 11' => 'iPad Pro (11-inch)',
+  'iPad Pro 13' => "iPad Pro (12.9-inch) (#{IPAD_PRO_12_9_VERSION})",
   'iPad Air' => "iPad Air (#{IPAD_AIR_VERSION})",
   'iPad Mini' => "iPad Mini (#{IPAD_MINI_VERSION})",
   'iPad' => 'iPad 10.2' # must be the last one so that only 'iPad' without any version will be renamed to 10.2
