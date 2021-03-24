@@ -75,7 +75,7 @@ module FastlaneCore
 
       # Check for Jenkins, Travis CI, ... environment variables
       ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO', 'BUDDY'].each do |current|
-        return true if ENV.key?(current)
+        return true if FastlaneCore::Env.truthy?(current)
       end
       return false
     end
