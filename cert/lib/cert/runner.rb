@@ -24,6 +24,10 @@ module Cert
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
       else
+        # Username is now optional since addition of App Store Connect API Key
+        # Force asking for username to prompt user if not already set
+        Cert.config.fetch(:username, force_ask: true)
+
         UI.message("Starting login with user '#{Cert.config[:username]}'")
         Spaceship::ConnectAPI.login(Cert.config[:username], nil, use_portal: true, use_tunes: false)
         UI.message("Successfully logged in")
