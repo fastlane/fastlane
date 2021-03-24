@@ -170,7 +170,8 @@ module Fastlane
           elsif type != "Bool" && type != "[String]" && type != "Int" && type != "@escaping ((String) -> Void)" && type != "Float" && type != "Double"
             default_value = "\"#{default_value}\""
           elsif type == "Float" || type == "Double"
-            default_value =  BigDecimal(default_value).to_s
+            require 'bigdecimal'
+            default_value = BigDecimal(default_value).to_s
           end
         end
 
