@@ -13,7 +13,7 @@ import Foundation
 struct SocketResponse {
     enum ResponseType {
         case parseFailure(failureInformation: [String])
-        case failure(failureInformation: [String])
+        case failure(failureInformation: [String], failureClass: String?, failureMessage: String?)
         case readyForNext(returnedObject: String?, closureArgumentValue: String?)
         case clientInitiatedCancel
 
@@ -35,12 +35,16 @@ struct SocketResponse {
                 return
 
             } else if status == "failure" {
-                guard let failureInformation = statusDictionary["failure_information"] as? [String] else {
+                guard
+                  let failureInformation = statusDictionary["failure_information"] as? [String],
+                  let failureClass = statusDictionary["failure_class"] as? String?,
+                  let failureMessage = statusDictionary["failure_message"] as? String?
+                else {
                     self = .parseFailure(failureInformation: ["Ruby server indicated failure but Swift couldn't receive it"])
                     return
                 }
 
-                self = .failure(failureInformation: failureInformation)
+                self = .failure(failureInformation: failureInformation, failureClass: failureClass, failureMessage: failureMessage)
                 return
             }
             self = .parseFailure(failureInformation: ["Message status: \(status) not a supported status"])
