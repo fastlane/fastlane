@@ -153,13 +153,9 @@ module FastlaneCore
     def encode_as_utf_8_if_possible(message)
       return message if message.valid_encoding?
 
-      # Try following common encodings and return the first with valid codings
-      #
-      # * UTF-16 - output by genstrings
-      test_string = message.dup
-      [Encoding::UTF_16].each do |dest_encoding|
-        return message.encode(Encoding::UTF_8, dest_encoding) if test_string.force_encoding(dest_encoding).valid_encoding?
-      end
+      # genstrings outputs UTF-16, so we should try to use this encoding if it turns out to be valid
+      test_message = message.dup
+      return message.encode(Encoding::UTF_8, Encoding::UTF_16) if test_message.force_encoding(Encoding::UTF_16).valid_encoding?
 
       # return the original message if no valid encoding is found
       message
