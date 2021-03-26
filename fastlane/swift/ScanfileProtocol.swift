@@ -288,4 +288,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.69]
+// FastlaneRunnerAPIVersion [0.9.70]
