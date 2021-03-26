@@ -78,6 +78,8 @@ Shopping list:
       end
 
       it "finds commands without extensions which are on the PATH" do
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+
         Tempfile.open('foobarbaz') do |f|
           File.chmod(0777, f)
 
@@ -90,7 +92,20 @@ Shopping list:
         end
       end
 
-      it "finds commands with known extensions which are on the PATH" do
+      it "finds commands without extensions which are on the PATH on Windows", if: FastlaneCore::Helper.windows? do
+        Tempfile.open('foobarbaz') do |f|
+          File.chmod(0777, f)
+
+          temp_dir = File.dirname(f)
+          temp_cmd = File.basename(f)
+
+          FastlaneSpec::Env.with_env_values('PATH' => temp_dir) do
+            expect(FastlaneCore::CommandExecutor.which(temp_cmd)).to eq(f.path.gsub('/', '\\'))
+          end
+        end
+      end
+
+      it "finds commands with known extensions which are on the PATH", if: FastlaneCore::Helper.windows? do
         allow(FastlaneCore::Helper).to receive(:windows?).and_return(true)
 
         Tempfile.open(['foobarbaz', '.exe']) do |f|
@@ -99,8 +114,10 @@ Shopping list:
           temp_dir = File.dirname(f)
           temp_cmd = File.basename(f, '.exe')
 
+          FastlaneCore::CommandExecutor.which(temp_cmd)
+
           FastlaneSpec::Env.with_env_values('PATH' => temp_dir, 'PATHEXT' => '.exe') do
-            expect(FastlaneCore::CommandExecutor.which(temp_cmd)).to eq(f.path)
+            expect(FastlaneCore::CommandExecutor.which(temp_cmd)).to eq(f.path.gsub('/', '\\'))
           end
         end
       end

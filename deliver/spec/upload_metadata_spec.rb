@@ -80,7 +80,12 @@ describe Deliver::UploadMetadata do
           notes: "This is a note" }
       end
 
-      it "set review information" do
+      it "skips review information with empty app_review_information" do
+        expect(FastlaneCore::UI).not_to receive(:message).with("Uploading app review information to App Store Connect")
+        uploader.send("set_review_information", version, { app_review_information: {} })
+      end
+
+      it "successfully set review information" do
         expect(version).to receive(:fetch_app_store_review_detail).and_return(app_store_review_detail)
         expect(app_store_review_detail).to receive(:update).with(attributes: {
           "contact_first_name" => app_review_information[:first_name],
@@ -92,6 +97,8 @@ describe Deliver::UploadMetadata do
           "demo_account_required" => true,
           "notes" => app_review_information[:notes]
         })
+
+        expect(FastlaneCore::UI).to receive(:message).with("Uploading app review information to App Store Connect")
 
         uploader.send("set_review_information", version, options)
       end

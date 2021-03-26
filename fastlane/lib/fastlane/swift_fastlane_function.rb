@@ -116,6 +116,7 @@ module Fastlane
     end
 
     def get_type(param: nil, default_value: nil, optional: nil, param_type_override: nil, is_string: true)
+      require 'bigdecimal'
       unless param_type_override.nil?
         type = determine_type_from_override(type_override: param_type_override)
       end
@@ -168,6 +169,9 @@ module Fastlane
             default_value = "[:]"
           elsif type != "Bool" && type != "[String]" && type != "Int" && type != "@escaping ((String) -> Void)" && type != "Float" && type != "Double"
             default_value = "\"#{default_value}\""
+          elsif type == "Float" || type == "Double"
+            require 'bigdecimal'
+            default_value = BigDecimal(default_value).to_s
           end
         end
 

@@ -30,6 +30,10 @@ module Deliver
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
       else
+        # Username is now optional since addition of App Store Connect API Key
+        # Force asking for username to prompt user if not already set
+        options.fetch(:username, force_ask: true)
+
         # Team selection passed though FASTLANE_TEAM_ID and FASTLANE_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
         UI.message("Login to App Store Connect (#{options[:username]})")

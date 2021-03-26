@@ -45,6 +45,10 @@ module Fastlane
         "Boolean value whether the tag exists or not"
       end
 
+      def self.return_type
+        :bool
+      end
+
       def self.output
         [
         ]

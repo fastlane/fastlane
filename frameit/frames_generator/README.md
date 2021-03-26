@@ -4,6 +4,8 @@ Starting in October 2016 we are now using the [Facebook frameset](http://faceboo
 
 To run the wizard to prepare new device assets, just run `rake` in this directory.
 
+There is a `legacy` directory in this directory that contains frames that have been removed from Facebook's frameset but are still needed by users
+
 You will need to run this wizard every time you want update the device assets
 
 This will generate 2 directories:
