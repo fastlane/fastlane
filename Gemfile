@@ -11,6 +11,7 @@ gem "google-apis-core", "< 0.3.0"
 gem "google-apis-iamcredentials_v1", "< 0.2.0"
 gem "google-apis-storage_v1", "< 0.3.0"
 gem "google-cloud-env", "< 1.5.0"
+gem "google-cloud-errors", "< 1.1.0"
 gem "googleauth", "< 0.16.0"
 gem "signet", "< 0.15.0"
 
