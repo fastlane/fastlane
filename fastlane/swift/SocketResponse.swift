@@ -35,15 +35,13 @@ struct SocketResponse {
                 return
 
             } else if status == "failure" {
-                guard
-                  let failureInformation = statusDictionary["failure_information"] as? [String],
-                  let failureClass = statusDictionary["failure_class"] as? String?,
-                  let failureMessage = statusDictionary["failure_message"] as? String?
-                else {
+                guard let failureInformation = statusDictionary["failure_information"] as? [String] else {
                     self = .parseFailure(failureInformation: ["Ruby server indicated failure but Swift couldn't receive it"])
                     return
                 }
 
+                let failureClass = statusDictionary["failure_class"] as? String
+                let failureMessage = statusDictionary["failure_message"] as? String
                 self = .failure(failureInformation: failureInformation, failureClass: failureClass, failureMessage: failureMessage)
                 return
             }

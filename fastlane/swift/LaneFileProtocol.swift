@@ -30,7 +30,7 @@ public extension LaneFileProtocol {
 @objcMembers
 open class LaneFile: NSObject, LaneFileProtocol {
     private(set) static var fastfileInstance: LaneFile?
-    private static var onErrorCalled: [String: Bool] = [:]
+    private static var onErrorCalled = Set<String>()
 
     private static func trimLaneFromName(laneName: String) -> String {
         return String(laneName.prefix(laneName.count - 4))
@@ -39,9 +39,9 @@ open class LaneFile: NSObject, LaneFileProtocol {
     private static func trimLaneWithOptionsFromName(laneName: String) -> String {
         return String(laneName.prefix(laneName.count - 12))
     }
-  
-    public func onError(currentLane: String, errorInfo: String, errorClass: String?, errorMessage: String?) {
-      LaneFile.onErrorCalled[currentLane] = true
+
+    public func onError(currentLane: String, errorInfo _: String, errorClass _: String?, errorMessage _: String?) {
+        LaneFile.onErrorCalled.insert(currentLane)
     }
 
     private static var laneFunctionNames: [String] {
@@ -141,8 +141,8 @@ open class LaneFile: NSObject, LaneFileProtocol {
         _ = fastfileInstance.perform(NSSelectorFromString(laneMethod), with: parameters)
 
         // Call only on success.
-        if !(Self.onErrorCalled[lane] ?? false) {
-          fastfileInstance.afterAll(with: lane)
+        if !LaneFile.onErrorCalled.contains(lane) {
+            fastfileInstance.afterAll(with: lane)
         }
 
         log(message: "Done running lane: \(lane) 🚀")
