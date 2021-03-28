@@ -151,8 +151,8 @@ module Fastlane
 
       def self.example_code
         [
-          "sourcedocs(output: 'docs')",
-          "sourcedocs(output: 'docs', scheme: 'MyApp')"
+          "sourcedocs(output_folder: 'docs')",
+          "sourcedocs(output_folder: 'docs', clean: true, reproducible: true, scheme: 'MyApp')"
         ]
       end
 
