@@ -23,6 +23,10 @@ module Pilot
       else
         config[:username] ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
+        # Username is now optional since addition of App Store Connect API Key
+        # Force asking for username to prompt user if not already set
+        config.fetch(:username, force_ask: true)
+
         UI.message("Login to App Store Connect (#{config[:username]})")
         Spaceship::ConnectAPI.login(config[:username], use_portal: false, use_tunes: true, tunes_team_id: config[:team_id], team_name: config[:team_name])
         UI.message("Login successful")

@@ -32,6 +32,10 @@ module Fastlane
           UI.message("Using App Store Connect API token...")
           Spaceship::ConnectAPI.token = token
         else
+          # Username is now optional since addition of App Store Connect API Key
+          # Force asking for username to prompt user if not already set
+          params.fetch(:username, force_ask: true)
+
           UI.message("Login to App Store Connect (#{params[:username]})")
           Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true, tunes_team_id: params[:team_id], team_name: params[:team_name])
           UI.message("Login successful")
@@ -147,6 +151,7 @@ module Fastlane
                                        short_option: "-u",
                                        env_name: "ITUNESCONNECT_USER",
                                        description: "Your Apple ID Username",
+                                       optional: true,
                                        default_value: user,
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :team_id,

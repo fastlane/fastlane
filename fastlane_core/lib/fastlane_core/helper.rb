@@ -75,7 +75,7 @@ module FastlaneCore
 
       # Check for Jenkins, Travis CI, ... environment variables
       ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO', 'BUDDY'].each do |current|
-        return true if ENV.key?(current)
+        return true if FastlaneCore::Env.truthy?(current)
       end
       return false
     end
@@ -377,6 +377,8 @@ module FastlaneCore
 
     # returns the path of the executable with the correct extension on Windows
     def self.get_executable_path(cmd_path)
+      cmd_path = localize_file_path(cmd_path)
+
       if self.windows?
         # PATHEXT contains the list of file extensions that Windows considers executable, semicolon separated.
         # e.g. ".COM;.EXE;.BAT;.CMD"
@@ -391,6 +393,12 @@ module FastlaneCore
       end
 
       return cmd_path
+    end
+
+    # returns the path with the platform-specific path separator (`/` on UNIX, `\` on Windows)
+    def self.localize_file_path(path)
+      # change `/` to `\` on Windows
+      return self.windows? ? path.gsub('/', '\\') : path
     end
 
     # checks if given file is a valid json file
