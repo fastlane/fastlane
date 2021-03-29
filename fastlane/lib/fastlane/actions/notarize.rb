@@ -35,7 +35,7 @@ module Fastlane
         notarization_upload_command = "xcrun altool --notarize-app -t osx -f \"#{compressed_package_path || package_path}\" --primary-bundle-id #{bundle_id} --output-format xml"
 
         notarization_info = {}
-        with_notarize_authenticator(api_key_path) do |notarize_authenticator|
+        with_notarize_authenticator(params, api_key_path) do |notarize_authenticator|
           notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider] && api_key_path.nil?
 
           notarization_upload_response = Actions.sh(
@@ -130,7 +130,7 @@ module Fastlane
         )
       end
 
-      def self.with_notarize_authenticator(api_key_path)
+      def self.with_notarize_authenticator(params, api_key_path)
         if api_key_path
           # From xcrun altool for --apiKey:
           # This option will search the following directories in sequence for a private key file with the name of 'AuthKey_<api_key>.p8':  './private_keys', '~/private_keys', '~/.private_keys', and '~/.appstoreconnect/private_keys'.
