@@ -35,13 +35,24 @@ module Fastlane
     # rubocop:disable Metrics/BlockNesting
     def self.start(user: nil, is_swift_fastfile: false)
       if FastlaneCore::FastlaneFolder.setup? && !Helper.test?
+        
+        setup_ios = self.new
+
+        # If Fastfile.swift exists, but the swift sources folder does not, rebuild it
+        swift_folder_path = File.expand_path('swift', FastlaneCore::FastlaneFolder.path)
+        if is_swift_fastfile && !File.exists?(swift_folder_path)
+          spinner = TTY::Spinner.new("[:spinner] Restoring Swift classes and FastlaneSwiftRunner.xcodeproj...", format: :dots)
+          spinner.auto_spin
+          setup_ios.setup_swift_support
+          spinner.success
+        end
+
         require 'fastlane/lane_list'
         Fastlane::LaneList.output(FastlaneCore::FastlaneFolder.fastfile_path)
         UI.important("------------------")
         UI.important("fastlane is already set up at path `#{FastlaneCore::FastlaneFolder.path}`, see the available lanes above")
         UI.message("")
 
-        setup_ios = self.new
         setup_ios.add_or_update_gemfile(update_gemfile_if_needed: false)
         setup_ios.suggest_next_steps
         return
