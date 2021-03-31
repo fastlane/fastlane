@@ -29,6 +29,11 @@ module Fastlane
       @source_swift_code_file_folder_path = File.expand_path(File.join(Fastlane::ROOT, "/swift"))
       @target_swift_code_file_folder_path = FastlaneCore::FastlaneFolder.swift_folder_path
 
+      if !File.exists?(target_swift_code_file_folder_path)
+        UI.verbose("FastlaneRunner project cannot be found. Making a new copy.")
+        restore_swift_setup
+      end
+
       manifest_file = File.join(@source_swift_code_file_folder_path, "/upgrade_manifest.json")
       UI.success("loading manifest: #{manifest_file}")
       @manifest_hash = JSON.parse(File.read(manifest_file))
@@ -40,6 +45,14 @@ module Fastlane
       @root_group = @target_project.groups.select { |group| group.name == "Fastlane Runner" }.first
 
       @fastlane_runner_target = @target_project.targets.select { |target| target.name == "FastlaneRunner" }.first
+    end
+
+    def restore_swift_setup
+      runner_source_resources = "#{Fastlane::ROOT}/swift/."
+      destination_path = File.expand_path('swift', FastlaneCore::FastlaneFolder.path)
+      FileUtils.cp_r(runner_source_resources, destination_path)
+      UI.success("Copied Swift fastlane runner project to '#{destination_path}'.")
+      Fastlane::SwiftLaneManager.first_time_setup
     end
 
     def upgrade_if_needed!(dry_run: false)
