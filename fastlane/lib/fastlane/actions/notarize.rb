@@ -10,7 +10,17 @@ module Fastlane
 
         # Add password as a temporary environment variable for altool.
         # Use app specific password if specified.
-        ENV['FL_NOTARIZE_PASSWORD'] = ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'] || apple_id_account.password
+        app_specific_password_key = 'FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'
+        password = ENV[app_specific_password_key] || apple_id_account.password
+
+        message = %{Please specify an app specific password to access App Store Connect for the notarization process.
+          You can do so via the #{app_specific_password_key} environment variable.
+          More information at https://docs.fastlane.tools/best-practices/continuous-integration/#application-specific-passwords.
+        }
+
+        UI.user_error!(message) if password.nil? || password.empty?
+
+        ENV['FL_NOTARIZE_PASSWORD'] = password
 
         # Compress and read bundle identifier only for .app bundle.
         compressed_package_path = nil
