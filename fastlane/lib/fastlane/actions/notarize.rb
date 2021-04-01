@@ -8,6 +8,10 @@ module Fastlane
         print_log = params[:print_log]
         verbose = params[:verbose]
 
+        # Add password as a temporary environment variable for altool.
+        # Use app specific password if specified.
+        ENV['FL_NOTARIZE_PASSWORD'] = ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'] || apple_id_account.password
+
         # Compress and read bundle identifier only for .app bundle.
         compressed_package_path = nil
         if File.extname(package_path) == '.app'
@@ -29,10 +33,6 @@ module Fastlane
         UI.user_error!('Could not read bundle identifier, provide as a parameter') unless bundle_id
 
         apple_id_account = CredentialsManager::AccountManager.new(user: params[:username])
-
-        # Add password as a temporary environment variable for altool.
-        # Use app specific password if specified.
-        ENV['FL_NOTARIZE_PASSWORD'] = ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'] || apple_id_account.password
 
         UI.message('Uploading package to notarization service, might take a while')
 
