@@ -10,10 +10,10 @@ module Fastlane
         print_log = params[:print_log]
         verbose = params[:verbose]
 
-        # Add password as a temporary environment variable for altool.
-        # Use app specific password if specified.
+        # Add the app-specific password as a temporary environment variable for
+        # altool.
         app_specific_password_key = 'FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'
-        password = ENV[app_specific_password_key] || apple_id_account.password
+        password = ENV[app_specific_password_key]
 
         message = %{Please specify an app specific password to access App Store Connect for the notarization process.
           You can do so via the #{app_specific_password_key} environment variable.
