@@ -1,6 +1,8 @@
 module Fastlane
   module Actions
     class NotarizeAction < Action
+      PASSWORD_ENV_KEY = 'FL_NOTARIZE_PASSWORD'
+
       def self.run(params)
         package_path = params[:package]
         bundle_id = params[:bundle_id]
@@ -20,7 +22,7 @@ module Fastlane
 
         UI.user_error!(message) if password.nil? || password.empty?
 
-        ENV['FL_NOTARIZE_PASSWORD'] = password
+        ENV[PASSWORD_ENV_KEY] = password
 
         # Compress and read bundle identifier only for .app bundle.
         compressed_package_path = nil
@@ -46,7 +48,7 @@ module Fastlane
 
         UI.message('Uploading package to notarization service, might take a while')
 
-        notarization_upload_command = "xcrun altool --notarize-app -t osx -f \"#{compressed_package_path || package_path}\" --primary-bundle-id #{bundle_id} -u #{apple_id_account.user} -p @env:FL_NOTARIZE_PASSWORD --output-format xml"
+        notarization_upload_command = "xcrun altool --notarize-app -t osx -f \"#{compressed_package_path || package_path}\" --primary-bundle-id #{bundle_id} -u #{apple_id_account.user} -p @env:#{PASSWORD_ENV_KEY} --output-format xml"
         notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider]
 
         notarization_upload_response = Actions.sh(
@@ -87,7 +89,7 @@ module Fastlane
           # Catching this error allows for polling to continue until the notarization is complete
           error = false
           notarization_info_response = Actions.sh(
-            "xcrun altool --notarization-info #{notarization_request_id} -u #{apple_id_account.user} -p @env:FL_NOTARIZE_PASSWORD --output-format xml",
+            "xcrun altool --notarization-info #{notarization_request_id} -u #{apple_id_account.user} -p @env:#{PASSWORD_ENV_KEY} --output-format xml",
             log: verbose,
             error_callback: lambda { |msg|
               error = true
@@ -123,7 +125,7 @@ module Fastlane
           UI.crash!("Could not notarize package with status '#{notarization_info['Status']}'#{log_suffix}")
         end
       ensure
-        ENV.delete('FL_NOTARIZE_PASSWORD')
+        ENV.delete(PASSWORD_ENV_KEY)
       end
 
       def self.staple(package_path, verbose)
