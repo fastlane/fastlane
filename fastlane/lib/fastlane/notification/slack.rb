@@ -5,7 +5,7 @@ module Fastlane
         @slack_url = slack_url
       end
 
-      # Overriding channel, icon_url and username is only supported legacy incoming webhook.
+      # Overriding channel, icon_url and username is only supported in legacy incoming webhook.
       # And use of attachments is now deprecated.
       # https://api.slack.com/legacy/custom-integrations/messaging/webhooks
       def post_to_legacy_incoming_webhook(channel:, username:, attachments:, link_names:, icon_url:)
