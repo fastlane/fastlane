@@ -1,5 +1,31 @@
 module FastlaneCore
   class Slack
+    def initialize(slack_url:, channel:, username:)
+      @slack_url = slack_url
+      @channel = channel
+      @username = username
+    end
+
+    # Overriding channel, icon_url and username is only supported legacy incoming webhook.
+    # And use of attachments is now deprecated.
+    # https://api.slack.com/legacy/custom-integrations/messaging/webhooks
+    def post_to_legacy_incoming_webhook(attachments:, link_names:, icon_url:)
+      Faraday.post(slack_url) do |request|
+        request.headers['Content-Type'] = 'application/json'
+        request.body = {
+          channel: @channel,
+          attachments: attachments,
+          link_names: link_names,
+          username: @username,
+          icon_url: icon_url
+        }.to_json
+      end
+    end
+
+    def post(blocks:, link_names:)
+      # TODO
+    end
+
     # This is a substitue of this LinkFormatter in slack-notifier
     # https://github.com/stevenosloan/slack-notifier/blob/4bf6582663dc9e5070afe3fdc42d67c14a513354/lib/slack-notifier/util/link_formatter.rb
     class LinkConverter
