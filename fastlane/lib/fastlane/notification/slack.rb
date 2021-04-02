@@ -1,15 +1,15 @@
 module Fastlane
   module Notification
     class Slack
-      def initialize(slack_url)
-        @slack_url = slack_url
+      def initialize(webhook_url)
+        @webhook_url = webhook_url
       end
 
       # Overriding channel, icon_url and username is only supported in legacy incoming webhook.
       # And use of attachments is now deprecated.
       # https://api.slack.com/legacy/custom-integrations/messaging/webhooks
       def post_to_legacy_incoming_webhook(channel:, username:, attachments:, link_names:, icon_url:)
-        Faraday.post(slack_url) do |request|
+        Faraday.post(@webhook_url) do |request|
           request.headers['Content-Type'] = 'application/json'
           request.body = {
             channel: channel,
@@ -25,9 +25,9 @@ module Fastlane
       # https://github.com/stevenosloan/slack-notifier/blob/4bf6582663dc9e5070afe3fdc42d67c14a513354/lib/slack-notifier/util/link_formatter.rb
       class LinkConverter
         HTML_PATTERN = %r{<a .*? href=['"](?<link>#{URI.regexp})['"].*?>(?<label>.+?)<\/a>}
-        MARKDOWN_PATTERN = %r{\[(?<label>[^\[\]]*?)\]\((?<link>)#{URI.regexp}|(mailto:#{URI::MailTo::EMAIL_REGEXP}))\)}
+        MARKDOWN_PATTERN = %r{\[(?<label>[^\[\]]*?)\]\((?<link>#{URI.regexp}|mailto:#{URI::MailTo::EMAIL_REGEXP})\)}
 
-        def self.format(string)
+        def self.convert(string)
           convert_markdown_to_slack_link(convert_html_to_slack_link(string.scrub))
         end
 
