@@ -1,5 +1,9 @@
 module Fastlane
   module Actions
+    module SharedValues
+      JIRA_JSON = :JIRA_JSON
+    end
+
     class JiraAction < Action
       def self.run(params)
         Actions.verify_gem!('jira-ruby')
@@ -21,10 +25,27 @@ module Fastlane
                     password: password
                   }
 
-        client = JIRA::Client.new(options)
-        issue = client.Issue.find(ticket_id)
-        comment = issue.comments.build
-        comment.save({ 'body' => comment_text })
+        begin
+          client = JIRA::Client.new(options)
+          issue = client.Issue.find(ticket_id)
+          comment = issue.comments.build
+          comment.save({ 'body' => comment_text })
+
+          # An exact representation of the JSON returned from the JIRA API
+          # https://github.com/sumoheavy/jira-ruby/blob/master/lib/jira/base.rb#L67
+          json_response = comment.attrs
+        rescue => exception
+          UI.error("Exception: #{exception}")
+        ensure
+          if json_response.nil?
+            UI.error('Failed to add a comment on JIRA ticket')
+            return nil
+          else
+            Actions.lane_context[SharedValues::JIRA_JSON] = json_response
+            UI.success('Successfully added a comment on JIRA ticket')
+            return json_response
+          end
+        end
       end
 
       #####################################################
@@ -32,7 +53,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Leave a comment on JIRA tickets"
+        "Leave a comment on JIRA ticket"
       end
 
       def self.available_options
@@ -56,7 +77,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_JIRA_PASSWORD",
-                                       description: "Password for Jira",
+                                       description: "Password or API token for Jira",
                                        sensitive: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No password") if value.to_s.length == 0
@@ -76,11 +97,25 @@ module Fastlane
         ]
       end
 
+      def self.output
+        [
+          ['JIRA_JSON', 'The whole JIRA api JSON object']
+        ]
+      end
+
       def self.return_value
+        [
+          "A hash containing all relevant information of the JIRA comment",
+          "Access things like JIRA comment 'id', 'author', 'body'"
+        ].join("\n")
+      end
+
+      def self.return_type
+        :hash
       end
 
       def self.authors
-        ["iAmChrisTruman"]
+        ["iAmChrisTruman", "crazymanish"]
       end
 
       def self.is_supported?(platform)
@@ -92,16 +127,16 @@ module Fastlane
           'jira(
             url: "https://bugs.yourdomain.com",
             username: "Your username",
-            password: "Your password",
-            ticket_id: "Ticket ID, i.e. IOS-123",
+            password: "Your password or API token",
+            ticket_id: "IOS-123",
             comment_text: "Text to post as a comment"
-          )',
+          )', # How to get API token: https://developer.atlassian.com/cloud/jira/platform/basic-auth-for-rest-apis/#get-an-api-token
           'jira(
             url: "https://yourserverdomain.com",
             context_path: "/jira",
             username: "Your username",
-            password: "Your password",
-            ticket_id: "Ticket ID, i.e. IOS-123",
+            password: "Your password or API token",
+            ticket_id: "IOS-123",
             comment_text: "Text to post as a comment"
           )'
         ]
