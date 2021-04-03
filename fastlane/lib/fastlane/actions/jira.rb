@@ -34,9 +34,6 @@ module Fastlane
           # An exact representation of the JSON returned from the JIRA API
           # https://github.com/sumoheavy/jira-ruby/blob/master/lib/jira/base.rb#L67
           json_response = comment.attrs
-        rescue => exception
-          UI.error("Exception: #{exception}")
-        ensure
           if json_response.nil?
             UI.error('Failed to add a comment on JIRA ticket')
             return nil
@@ -45,6 +42,8 @@ module Fastlane
             UI.success('Successfully added a comment on JIRA ticket')
             return json_response
           end
+        rescue => exception
+          UI.error("Exception: #{exception}")
         end
       end
 
