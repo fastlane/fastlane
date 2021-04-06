@@ -43,7 +43,12 @@ module Fastlane
             return json_response
           end
         rescue => exception
-          UI.error("Exception: #{exception}")
+          message = "Received exception when adding a JIRA comment: #{exception}"
+          if params[:fail_on_error]
+            UI.user_error!(message)
+          else
+            UI.error(message)
+          end
         end
       end
 
@@ -92,13 +97,19 @@ module Fastlane
                                        description: "Text to add to the ticket as a comment",
                                        verify_block: proc do |value|
                                          UI.user_error!("No comment specified") if value.to_s.length == 0
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :fail_on_error,
+                                       env_name: "FL_JIRA_FAIL_ON_ERROR",
+                                       description: "Should an error adding the JIRA comment cause a failure?",
+                                       type: Boolean,
+                                       optional: true,
+                                       default_value: true) # Default value is true for 'Backward compatibility'
         ]
       end
 
       def self.output
         [
-          ['JIRA_JSON', 'The whole JIRA api JSON object']
+          ['JIRA_JSON', 'The whole JIRA API JSON object']
         ]
       end
 
@@ -137,6 +148,11 @@ module Fastlane
             password: "Your password or API token",
             ticket_id: "IOS-123",
             comment_text: "Text to post as a comment"
+          )',
+          'jira(
+            ticket_id: "IOS-123",
+            comment_text: "Text to post as a comment",
+            fail_on_error: false
           )'
         ]
       end
