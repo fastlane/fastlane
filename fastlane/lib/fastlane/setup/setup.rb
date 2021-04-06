@@ -36,16 +36,8 @@ module Fastlane
     def self.start(user: nil, is_swift_fastfile: false)
       if FastlaneCore::FastlaneFolder.setup? && !Helper.test?
 
-        setup_ios = self.new
-
         # If Fastfile.swift exists, but the swift sources folder does not, rebuild it
-        swift_folder_path = File.expand_path('swift', FastlaneCore::FastlaneFolder.path)
-        if is_swift_fastfile && !File.exist?(swift_folder_path)
-          spinner = TTY::Spinner.new("[:spinner] Restoring Swift classes and FastlaneSwiftRunner.xcodeproj...", format: :dots)
-          spinner.auto_spin
-          setup_ios.setup_swift_support
-          spinner.success
-        end
+        setup_swift_support if is_swift_fastfile
 
         require 'fastlane/lane_list'
         Fastlane::LaneList.output(FastlaneCore::FastlaneFolder.fastfile_path)
@@ -53,6 +45,7 @@ module Fastlane
         UI.important("fastlane is already set up at path `#{FastlaneCore::FastlaneFolder.path}`, see the available lanes above")
         UI.message("")
 
+        setup_ios = self.new
         setup_ios.add_or_update_gemfile(update_gemfile_if_needed: false)
         setup_ios.suggest_next_steps
         return
@@ -137,6 +130,24 @@ module Fastlane
       end
     end
     # rubocop:enable Metrics/BlockNesting
+
+    def self.setup_swift_support
+      runner_source_resources = "#{Fastlane::ROOT}/swift/."
+      destination_path = File.expand_path('swift', FastlaneCore::FastlaneFolder.path)
+
+      # Return eearly if already setup
+      return if File.exist?(destination_path)
+
+      # Show message if Fastfile.swift exists but missing Swift classes and Xcode project
+      if FastlaneCore::FastlaneFolder.swift?
+        UI.important("Restoring Swift classes and FastlaneSwiftRunner.xcodeproj...")
+      end
+
+      FileUtils.cp_r(runner_source_resources, destination_path)
+      UI.success("Copied Swift fastlane runner project to '#{destination_path}'.")
+
+      Fastlane::SwiftLaneManager.first_time_setup
+    end
 
     def initialize(is_swift_fastfile: nil, user: nil, project_path: nil, had_multiple_projects_to_choose_from: nil, preferred_setup_method: nil)
       self.is_swift_fastfile = is_swift_fastfile
@@ -271,19 +282,10 @@ module Fastlane
 
     def finish_up
       write_fastfile!
-      setup_swift_support if is_swift_fastfile
+      self.class.setup_swift_support if is_swift_fastfile
       show_analytics_note
       explain_concepts
       suggest_next_steps
-    end
-
-    def setup_swift_support
-      runner_source_resources = "#{Fastlane::ROOT}/swift/."
-      destination_path = File.expand_path('swift', FastlaneCore::FastlaneFolder.path)
-      FileUtils.cp_r(runner_source_resources, destination_path)
-      UI.success("Copied Swift fastlane runner project to '#{destination_path}'.")
-
-      Fastlane::SwiftLaneManager.first_time_setup
     end
 
     def fastfile_template_content
