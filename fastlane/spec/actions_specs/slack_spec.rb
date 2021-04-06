@@ -1,13 +1,17 @@
-describe Fastlane do
-  describe Fastlane::FastFile do
-    describe "Slack Action" do
+require 'slack-notifier'
+
+describe Fastlane::Actions do
+  describe Fastlane::Actions::SlackAction do
+    describe Fastlane::Actions::SlackAction::Runner do
       before :each do
         ENV['SLACK_URL'] = 'https://127.0.0.1'
       end
 
+      subject { Fastlane::Actions::SlackAction::Runner.new }
+
       it "trims long messages to show the bottom of the messages" do
         long_text = "a" * 10_000
-        expect(Fastlane::Actions::SlackAction.trim_message(long_text).length).to eq(7000)
+        expect(subject.trim_message(long_text).length).to eq(7000)
       end
 
       it "works so perfect, like Slack does" do
@@ -17,7 +21,6 @@ describe Fastlane do
 
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
-        require 'fastlane/actions/slack'
         options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           message: message,
@@ -30,24 +33,27 @@ describe Fastlane do
           default_payloads: [:lane, :test_result, :git_branch, :git_author, :last_git_commit_hash]
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
-
-        expect(notifier.config.defaults[:username]).to eq('fastlane')
-        expect(notifier.config.defaults[:channel]).to eq(channel)
-
-        expect(attachments[:color]).to eq('danger')
-        expect(attachments[:text]).to eq(message)
-        expect(attachments[:pretext]).to eq(nil)
-
-        fields = attachments[:fields]
-        expect(fields[1][:title]).to eq('Built by')
-        expect(fields[1][:value]).to eq('Jenkins')
-
-        expect(fields[2][:title]).to eq('Lane')
-        expect(fields[2][:value]).to eq(lane_name)
-
-        expect(fields[3][:title]).to eq('Result')
-        expect(fields[3][:value]).to eq('Error')
+        expected_args = {
+          channel: channel,
+          username: 'fastlane',
+          attachments: [
+            hash_including(
+              color: 'danger',
+              pretext: nil,
+              text: message,
+              fields: array_including(
+                { title: 'Built by', value: 'Jenkins', short: false },
+                { title: 'Lane', value: lane_name, short: true },
+                { title: 'Result', value: 'Error', short: true }
+              )
+            )
+          ],
+          link_names: false,
+          icon_url: 'https://fastlane.tools/assets/img/fastlane_icon.png',
+          fail_on_error: true
+        }
+        expect(subject).to receive(:post_message).with(expected_args)
+        subject.run(options)
       end
 
       it "works so perfect, like Slack does with pretext" do
@@ -58,7 +64,6 @@ describe Fastlane do
 
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
-        require 'fastlane/actions/slack'
         options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           message: message,
@@ -67,14 +72,18 @@ describe Fastlane do
           channel: channel
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
+        expected_args = hash_including(
+          attachments: [
+            hash_including(
+              color: 'danger',
+              pretext: pretext,
+              text: message
+            )
+          ]
+        )
 
-        expect(notifier.config.defaults[:username]).to eq('fastlane')
-        expect(notifier.config.defaults[:channel]).to eq(channel)
-
-        expect(attachments[:color]).to eq('danger')
-        expect(attachments[:text]).to eq(message)
-        expect(attachments[:pretext]).to eq(pretext)
+        expect(subject).to receive(:post_message).with(expected_args)
+        subject.run(options)
       end
 
       it "merges attachment_properties when specified" do
@@ -101,18 +110,18 @@ describe Fastlane do
           }
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
-
-        fields = attachments[:fields]
-
-        expect(fields[0][:title]).to eq('Lane')
-        expect(fields[0][:value]).to eq(lane_name)
-
-        expect(fields[1][:title]).to eq('My Field')
-        expect(fields[1][:value]).to eq('My Value')
-        expect(fields[1][:short]).to eq(true)
-
-        expect(attachments[:thumb_url]).to eq('https://example.com/path/to/thumb.png')
+        expected_args = hash_including(
+          attachments: [
+            hash_including(
+              fields: array_including(
+                { title: 'Lane', value: lane_name, short: true },
+                { title: 'My Field', value: 'My Value', short: true }
+              )
+            )
+          ]
+        )
+        expect(subject).to receive(:post_message).with(expected_args)
+        subject.run(options)
       end
 
       it "parses default_payloads from a comma delimited string" do
@@ -122,7 +131,6 @@ describe Fastlane do
 
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
-        require 'fastlane/actions/slack'
         options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           message: message,
@@ -131,15 +139,18 @@ describe Fastlane do
           default_payloads: "lane,test_result"
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
-
-        fields = attachments[:fields]
-
-        expect(fields[0][:title]).to eq('Lane')
-        expect(fields[0][:value]).to eq(lane_name)
-
-        expect(fields[1][:title]).to eq('Result')
-        expect(fields[1][:value]).to eq('Error')
+        expected_args = hash_including(
+          attachments: [
+            hash_including(
+              fields: [
+                { title: 'Lane', value: lane_name, short: true },
+                { title: 'Result', value: 'Error', short: true }
+              ]
+            )
+          ]
+        )
+        expect(subject).to receive(:post_message).with(expected_args)
+        subject.run(options)
       end
 
       # https://github.com/fastlane/fastlane/issues/14234
@@ -156,14 +167,18 @@ describe Fastlane do
           default_payloads: [:git_branch, :last_git_commit_hash]
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
-
-        fields = attachments[:fields]
-
-        expect(fields.count).to eq(2)
-
-        expect(fields[0][:title]).to eq('Git Branch')
-        expect(fields[1][:title]).to eq('Git Commit Hash')
+        expected_args = hash_including(
+          attachments: [
+            hash_including(
+              fields: [
+                { title: 'Git Branch', value: anything, short: true },
+                { title: 'Git Commit Hash', value: anything, short: false }
+              ]
+            )
+          ]
+        )
+        expect(subject).to receive(:post_message).with(expected_args)
+        subject.run(options)
       end
 
       it "receives default_payloads as nil and falls back to its default value" do
@@ -182,18 +197,23 @@ describe Fastlane do
           channel: channel,
           default_payloads: nil
         })
-        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
 
-        fields = attachments[:fields]
-        expect(fields[0][:title]).to eq('Lane')
-        expect(fields[0][:value]).to eq(lane_name)
-        expect(fields[1][:title]).to eq('Result')
-        expect(fields[2][:title]).to eq('Git Branch')
-        expect(fields[3][:title]).to eq('Git Author')
-        expect(fields[4][:title]).to eq('Git Commit')
-        expect(fields[5][:title]).to eq('Git Commit Hash')
-
-        expect(fields.count).to eq(6)
+        expected_args = hash_including(
+          attachments: [
+            hash_including(
+              fields: [
+                { title: 'Lane', value: lane_name, short: true },
+                { title: 'Result', value: anything, short: true },
+                { title: 'Git Branch', value: anything, short: true },
+                { title: 'Git Author', value: anything, short: true },
+                { title: 'Git Commit', value: anything, short: false },
+                { title: 'Git Commit Hash', value: anything, short: false }
+              ]
+            )
+          ]
+        )
+        expect(subject).to receive(:post_message).with(expected_args)
+        subject.run(options)
       end
 
       # https://github.com/fastlane/fastlane/issues/14141
@@ -207,7 +227,6 @@ describe Fastlane do
 
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
-        require 'fastlane/actions/slack'
         options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           message: input_message,
@@ -215,13 +234,16 @@ describe Fastlane do
           channel: channel
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
-
-        expect(notifier.config.defaults[:username]).to eq('fastlane')
-        expect(notifier.config.defaults[:channel]).to eq(channel)
-
-        expect(attachments[:color]).to eq('danger')
-        expect(attachments[:text]).to eq(expected_message)
+        expected_args = hash_including(
+          attachments: [
+            hash_including(
+              color: 'danger',
+              text: expected_message
+            )
+          ]
+        )
+        expect(subject).to receive(:post_message).with(expected_args)
+        subject.run(options)
       end
 
       # https://github.com/fastlane/fastlane/issues/14141
@@ -235,7 +257,6 @@ describe Fastlane do
 
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME] = lane_name
 
-        require 'fastlane/actions/slack'
         options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
           slack_url: 'https://127.0.0.1',
           pretext: input_pretext,
@@ -243,13 +264,16 @@ describe Fastlane do
           channel: channel
         })
 
-        notifier, attachments = Fastlane::Actions::SlackAction.run(options)
-
-        expect(notifier.config.defaults[:username]).to eq('fastlane')
-        expect(notifier.config.defaults[:channel]).to eq(channel)
-
-        expect(attachments[:color]).to eq('danger')
-        expect(attachments[:pretext]).to eq(expected_pretext)
+        expected_args = hash_including(
+          attachments: [
+            hash_including(
+              color: 'danger',
+              pretext: expected_pretext
+            )
+          ]
+        )
+        expect(subject).to receive(:post_message).with(expected_args)
+        subject.run(options)
       end
     end
   end
