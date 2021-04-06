@@ -17,20 +17,20 @@ public protocol LaneFileProtocol: class {
     func recordLaneDescriptions()
     func beforeAll(with lane: String)
     func afterAll(with lane: String)
-    func onError(currentLane: String, errorInfo: String)
+    func onError(currentLane: String, errorInfo: String, errorClass: String?, errorMessage: String?)
 }
 
 public extension LaneFileProtocol {
     var fastlaneVersion: String { return "" } // Defaults to "" because that means any is fine
     func beforeAll(with _: String) {} // No-op by default
     func afterAll(with _: String) {} // No-op by default
-    func onError(currentLane _: String, errorInfo _: String) {} // No-op by default
     func recordLaneDescriptions() {} // No-op by default
 }
 
 @objcMembers
 open class LaneFile: NSObject, LaneFileProtocol {
     private(set) static var fastfileInstance: LaneFile?
+    private static var onErrorCalled = Set<String>()
 
     private static func trimLaneFromName(laneName: String) -> String {
         return String(laneName.prefix(laneName.count - 4))
@@ -38,6 +38,10 @@ open class LaneFile: NSObject, LaneFileProtocol {
 
     private static func trimLaneWithOptionsFromName(laneName: String) -> String {
         return String(laneName.prefix(laneName.count - 12))
+    }
+
+    public func onError(currentLane: String, errorInfo _: String, errorClass _: String?, errorMessage _: String?) {
+        LaneFile.onErrorCalled.insert(currentLane)
     }
 
     private static var laneFunctionNames: [String] {
@@ -137,7 +141,9 @@ open class LaneFile: NSObject, LaneFileProtocol {
         _ = fastfileInstance.perform(NSSelectorFromString(laneMethod), with: parameters)
 
         // Call only on success.
-        fastfileInstance.afterAll(with: lane)
+        if !LaneFile.onErrorCalled.contains(lane) {
+            fastfileInstance.afterAll(with: lane)
+        }
 
         log(message: "Done running lane: \(lane) 🚀")
         return true

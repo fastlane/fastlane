@@ -13,7 +13,7 @@ import Foundation
 struct SocketResponse {
     enum ResponseType {
         case parseFailure(failureInformation: [String])
-        case failure(failureInformation: [String])
+        case failure(failureInformation: [String], failureClass: String?, failureMessage: String?)
         case readyForNext(returnedObject: String?, closureArgumentValue: String?)
         case clientInitiatedCancel
 
@@ -40,7 +40,9 @@ struct SocketResponse {
                     return
                 }
 
-                self = .failure(failureInformation: failureInformation)
+                let failureClass = statusDictionary["failure_class"] as? String
+                let failureMessage = statusDictionary["failure_message"] as? String
+                self = .failure(failureInformation: failureInformation, failureClass: failureClass, failureMessage: failureMessage)
                 return
             }
             self = .parseFailure(failureInformation: ["Message status: \(status) not a supported status"])
