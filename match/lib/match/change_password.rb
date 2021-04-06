@@ -40,7 +40,7 @@ module Match
       encryption.store_password(new_password)
 
       message = "[fastlane] Changed passphrase"
-      files_to_commit = encryption.encrypt_files(new_password)
+      files_to_commit = encryption.encrypt_files(password: new_password)
       storage.save_changes!(files_to_commit: files_to_commit, custom_message: message)
     end
 
