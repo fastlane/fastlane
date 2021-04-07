@@ -92,6 +92,38 @@ describe Scan do
       end
     end
 
+    describe "retry_execute" do
+      before(:each) do
+        @scan = Scan::Runner.new
+      end
+
+      it "retry a failed test", requires_xcodebuild: true do
+        error_output = <<-ERROR_OUTPUT
+Failing tests:
+  FastlaneAppTests:
+          FastlaneAppTests.testCoinToss()
+          ERROR_OUTPUT
+
+        expect(Fastlane::UI).to receive(:important).with("Retrying tests: FastlaneAppTests/FastlaneAppTests/testCoinToss").once
+        expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
+        expect(@scan).to receive(:execute)
+
+        @scan.retry_execute(retries: 5, error_output: error_output)
+      end
+
+      it "fail to parse error output", requires_xcodebuild: true do
+        error_output = <<-ERROR_OUTPUT
+Failing tests:
+FastlaneAppTests:
+FastlaneAppTests.testCoinToss()
+          ERROR_OUTPUT
+
+        expect do
+          @scan.retry_execute(retries: 5, error_output: error_output)
+        end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Failed to find failed tests to retry (could not parse error output)")
+      end
+    end
+
     describe "test_results" do
       before(:each) do
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
