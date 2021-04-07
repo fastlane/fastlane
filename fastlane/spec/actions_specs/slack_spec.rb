@@ -3,11 +3,7 @@ require 'slack-notifier'
 describe Fastlane::Actions do
   describe Fastlane::Actions::SlackAction do
     describe Fastlane::Actions::SlackAction::Runner do
-      before :each do
-        ENV['SLACK_URL'] = 'https://127.0.0.1'
-      end
-
-      subject { Fastlane::Actions::SlackAction::Runner.new }
+      subject { Fastlane::Actions::SlackAction::Runner.new('https://127.0.0.1') }
 
       it "trims long messages to show the bottom of the messages" do
         long_text = "a" * 10_000
