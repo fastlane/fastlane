@@ -158,7 +158,7 @@ module FastlaneCore
       return message.encode(Encoding::UTF_8, Encoding::UTF_16) if test_message.force_encoding(Encoding::UTF_16).valid_encoding?
 
       # replace any invalid with empty string
-      return message.encode(Encoding::UTF_8, invalid: :replace, replace: "")
+      message.encode(Encoding::UTF_8, invalid: :replace)
     end
 
     def verify_interactive!(message)
