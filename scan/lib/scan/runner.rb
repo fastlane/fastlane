@@ -123,7 +123,7 @@ module Scan
         suite_name = suite.match(/\s*([\w\s]+):/).captures.first
 
         test_cases = suite.split(":\n").fetch(1, []).split("\n").each
-                          .select { |line| line.start_with?(/\s+/) }
+                          .select { |line| line.match?(/^\s+/) }
                           .map { |line| line.strip.gsub(".", "/").gsub("()", "") }
                           .map { |line| suite_name + "/" + line }
 
