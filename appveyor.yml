@@ -23,7 +23,7 @@ init:
 # cloning the repository happens here
 
 install:
-  - set PATH=C:\Ruby24-x64\bin;%PATH%
+  - set PATH=C:\Ruby26-x64\bin;%PATH%
   - bundle install
   # iconv
   - appveyor DownloadFile

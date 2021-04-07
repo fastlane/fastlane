@@ -15,28 +15,30 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Matthew Ellis",
-                        "Jorge Revuelta H",
-                        "Jérôme Lacoste",
+  spec.authors       = ["Luka Mirosevic",
                         "Max Ott",
-                        "Josh Holtz",
-                        "Aaron Brager",
+                        "Joshua Liebowitz",
+                        "Jérôme Lacoste",
+                        "Manu Wallner",
+                        "Stefan Natchev",
                         "Andrew McBurney",
+                        "Roger Oba",
                         "Daniel Jankowski",
-                        "Fumiya Nakamura",
+                        "Satoshi Namai",
                         "Jimmy Dee",
                         "Kohki Miki",
                         "Iulian Onofrei",
-                        "Manu Wallner",
-                        "Stefan Natchev",
-                        "Felix Krause",
-                        "Joshua Liebowitz",
-                        "Jan Piotrowski",
-                        "Olivier Halligon",
-                        "Luka Mirosevic",
-                        "Danielle Tomlinson",
+                        "Fumiya Nakamura",
+                        "Josh Holtz",
                         "Helmut Januschka",
-                        "Maksym Grebenets"]
+                        "Felix Krause",
+                        "Jan Piotrowski",
+                        "Aaron Brager",
+                        "Maksym Grebenets",
+                        "Jorge Revuelta H",
+                        "Danielle Tomlinson",
+                        "Matthew Ellis",
+                        "Olivier Halligon"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -71,6 +73,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('tty-screen', '>= 0.6.3', '< 1.0.0') # detect the terminal width
   spec.add_dependency('tty-spinner', '>= 0.8.0', '< 1.0.0') # loading indicators
 
+  spec.add_dependency('artifactory', '~> 3.0') # Used to export to an artifactory server
   spec.add_dependency('babosa', '>= 1.0.3', "< 2.0.0") # library for creating human-friendly identifiers, aka "slugs"
   spec.add_dependency('colored') # colored terminal output
   spec.add_dependency('commander-fastlane', '>= 4.4.6', '< 5.0.0') # CLI parser
@@ -83,6 +86,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
   spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
+  spec.add_dependency('naturally', '~> 2.2') # Used to sort strings with numbers in a human-friendly way
   spec.add_dependency('rubyzip', '>= 2.0.0', '< 3.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
@@ -102,7 +106,7 @@ Gem::Specification.new do |spec|
 
   # Development only
   spec.add_development_dependency('rake')
-  spec.add_development_dependency('rspec', '~> 3.9.0')
+  spec.add_development_dependency('rspec', '~> 3.10')
   spec.add_development_dependency('rspec_junit_formatter', '~> 0.4.1')
   spec.add_development_dependency('pry')
   spec.add_development_dependency('pry-byebug')
@@ -115,7 +119,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rubocop-require_tools', '>= 0.1.2')
   spec.add_development_dependency('rb-readline') # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency('rest-client', '>= 1.8.0')
-  spec.add_development_dependency('fakefs', '~> 1.2.1')
+  spec.add_development_dependency('fakefs', '~> 1.2')
   spec.add_development_dependency('sinatra', '~> 2.0.8') # Used for mock servers
   spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
   spec.add_development_dependency('climate_control', '~> 0.2.0')

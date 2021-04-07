@@ -1,5 +1,5 @@
 // Runner.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 //
 //  ** NOTE **
@@ -140,7 +140,7 @@ extension Runner {
         dispatchGroup.leave()
     }
 
-    fileprivate func testDispatchTimeoutResult(_ timeoutResult: DispatchTimeoutResult, failureMessage: String, timeToWait _: DispatchTimeInterval) -> Bool {
+    private func testDispatchTimeoutResult(_ timeoutResult: DispatchTimeoutResult, failureMessage: String, timeToWait _: DispatchTimeInterval) -> Bool {
         switch timeoutResult {
         case .success:
             return true

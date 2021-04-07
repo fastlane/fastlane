@@ -1,12 +1,14 @@
 module Fastlane
   module Actions
     class NotarizeAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         package_path = params[:package]
         bundle_id = params[:bundle_id]
         try_early_stapling = params[:try_early_stapling]
         print_log = params[:print_log]
         verbose = params[:verbose]
+        api_key_path = params[:api_key_path]
 
         # Compress and read bundle identifier only for .app bundle.
         compressed_package_path = nil
@@ -28,68 +30,73 @@ module Fastlane
 
         UI.user_error!('Could not read bundle identifier, provide as a parameter') unless bundle_id
 
-        apple_id_account = CredentialsManager::AccountManager.new(user: params[:username])
-
-        # Add password as a temporary environment variable for altool.
-        # Use app specific password if specified.
-        ENV['FL_NOTARIZE_PASSWORD'] = ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'] || apple_id_account.password
-
         UI.message('Uploading package to notarization service, might take a while')
 
-        notarization_upload_command = "xcrun altool --notarize-app -t osx -f \"#{compressed_package_path || package_path}\" --primary-bundle-id #{bundle_id} -u #{apple_id_account.user} -p @env:FL_NOTARIZE_PASSWORD --output-format xml"
-        notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider]
-
-        notarization_upload_response = Actions.sh(
-          notarization_upload_command,
-          log: verbose
-        )
-
-        FileUtils.rm_rf(compressed_package_path) if compressed_package_path
-
-        notarization_upload_plist = Plist.parse_xml(notarization_upload_response)
-        notarization_request_id = notarization_upload_plist['notarization-upload']['RequestUUID']
-
-        UI.success("Successfully uploaded package to notarization service with request identifier #{notarization_request_id}")
+        notarization_upload_command = "xcrun altool --notarize-app -t osx -f \"#{compressed_package_path || package_path}\" --primary-bundle-id #{bundle_id} --output-format xml"
 
         notarization_info = {}
-        while notarization_info.empty? || (notarization_info['Status'] == 'in progress')
-          if notarization_info.empty?
-            UI.message('Waiting to query request status')
-          elsif try_early_stapling
-            UI.message('Request in progress, trying early staple')
+        with_notarize_authenticator(params, api_key_path) do |notarize_authenticator|
+          notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider] && api_key_path.nil?
 
-            begin
-              self.staple(package_path, verbose)
-              UI.message('Successfully notarized and early stapled package.')
-
-              return
-            rescue
-              UI.message('Early staple failed, waiting to query again')
-            end
-          end
-
-          sleep(30)
-
-          UI.message('Querying request status')
-
-          # As of July 2020, the request UUID might not be available for polling yet which returns an error code
-          # This is now handled with the error_callback (which prevents an error from being raised)
-          # Catching this error allows for polling to continue until the notarization is complete
-          error = false
-          notarization_info_response = Actions.sh(
-            "xcrun altool --notarization-info #{notarization_request_id} -u #{apple_id_account.user} -p @env:FL_NOTARIZE_PASSWORD --output-format xml",
-            log: verbose,
-            error_callback: lambda { |msg|
-              error = true
-              UI.error("Error polling for notarization info: #{msg}")
-            }
+          notarization_upload_response = Actions.sh(
+            notarize_authenticator.call(notarization_upload_command),
+            log: verbose
           )
 
-          unless error
-            notarization_info_plist = Plist.parse_xml(notarization_info_response)
-            notarization_info = notarization_info_plist['notarization-info']
+          FileUtils.rm_rf(compressed_package_path) if compressed_package_path
+
+          notarization_upload_plist = Plist.parse_xml(notarization_upload_response)
+
+          if notarization_upload_plist.key?('product-errors') && notarization_upload_plist['product-errors'].any?
+            UI.important("🚫 Could not upload package to notarization service! Here are the reasons:")
+            notarization_upload_plist['product-errors'].each { |product_error| UI.error("#{product_error['message']} (#{product_error['code']})") }
+            UI.user_error!("Package upload to notarization service cancelled. Please check the error messages above.")
+          end
+
+          notarization_request_id = notarization_upload_plist['notarization-upload']['RequestUUID']
+
+          UI.success("Successfully uploaded package to notarization service with request identifier #{notarization_request_id}")
+
+          while notarization_info.empty? || (notarization_info['Status'] == 'in progress')
+            if notarization_info.empty?
+              UI.message('Waiting to query request status')
+            elsif try_early_stapling
+              UI.message('Request in progress, trying early staple')
+
+              begin
+                self.staple(package_path, verbose)
+                UI.message('Successfully notarized and early stapled package.')
+
+                return
+              rescue
+                UI.message('Early staple failed, waiting to query again')
+              end
+            end
+
+            sleep(30)
+
+            UI.message('Querying request status')
+
+            # As of July 2020, the request UUID might not be available for polling yet which returns an error code
+            # This is now handled with the error_callback (which prevents an error from being raised)
+            # Catching this error allows for polling to continue until the notarization is complete
+            error = false
+            notarization_info_response = Actions.sh(
+              notarize_authenticator.call("xcrun altool --notarization-info #{notarization_request_id} --output-format xml"),
+              log: verbose,
+              error_callback: lambda { |msg|
+                error = true
+                UI.error("Error polling for notarization info: #{msg}")
+              }
+            )
+
+            unless error
+              notarization_info_plist = Plist.parse_xml(notarization_info_response)
+              notarization_info = notarization_info_plist['notarization-info']
+            end
           end
         end
+        # rubocop:enable Metrics/PerceivedComplexity
 
         log_url = notarization_info['LogFileURL']
         ENV['FL_NOTARIZE_LOG_FILE_URL'] = log_url
@@ -121,6 +128,35 @@ module Fastlane
           "xcrun stapler staple \"#{package_path}\"",
           log: verbose
         )
+      end
+
+      def self.with_notarize_authenticator(params, api_key_path)
+        if api_key_path
+          # From xcrun altool for --apiKey:
+          # This option will search the following directories in sequence for a private key file with the name of 'AuthKey_<api_key>.p8':  './private_keys', '~/private_keys', '~/.private_keys', and '~/.appstoreconnect/private_keys'.
+          api_key = Spaceship::ConnectAPI::Token.from_json_file(api_key_path)
+          api_key_folder_path = File.expand_path('~/.appstoreconnect/private_keys')
+          api_key_file_path = File.join(api_key_folder_path, "AuthKey_#{api_key.key_id}.p8")
+          directory_exists = File.directory?(api_key_folder_path)
+          file_exists = File.exist?(api_key_file_path)
+          begin
+            FileUtils.mkdir_p(api_key_folder_path) unless directory_exists
+            api_key.write_key_to_file(api_key_file_path) unless file_exists
+
+            yield(proc { |command| "#{command} --apiKey #{api_key.key_id} --apiIssuer #{api_key.issuer_id}" })
+          ensure
+            FileUtils.rm(api_key_file_path) unless file_exists
+            FileUtils.rm_r(api_key_folder_path) unless directory_exists
+          end
+        else
+          apple_id_account = CredentialsManager::AccountManager.new(user: params[:username])
+
+          # Add password as a temporary environment variable for altool.
+          # Use app specific password if specified.
+          ENV['FL_NOTARIZE_PASSWORD'] = ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'] || apple_id_account.password
+
+          yield(proc { |command| "#{command} -u #{apple_id_account.user} -p @env:FL_NOTARIZE_PASSWORD" })
+        end
       end
 
       def self.description
@@ -160,6 +196,8 @@ module Fastlane
                                        env_name: 'FL_NOTARIZE_USERNAME',
                                        description: 'Apple ID username',
                                        default_value: username,
+                                       optional: true,
+                                       conflicting_options: [:api_key_path],
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :asc_provider,
                                        env_name: 'FL_NOTARIZE_ASC_PROVIDER',
@@ -177,7 +215,16 @@ module Fastlane
                                        description: 'Whether to log requests',
                                        optional: true,
                                        default_value: false,
-                                       type: Boolean)
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                       env_name: 'FL_NOTARIZE_API_KEY_PATH',
+                                       description: 'Path to AppStore Connect API key',
+                                       optional: true,
+                                       conflicting_options: [:username],
+                                       is_string: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("API Key not found at '#{value}'") unless File.exist?(value)
+                                       end)
         ]
       end
 

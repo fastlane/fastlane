@@ -24,6 +24,8 @@ module Screengrab
     end
 
     def run
+      # Standardize the locales
+      @config[:locales].map! { |locale| locale.gsub("_", "-") }
       FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [], title: "Summary for screengrab #{Fastlane::VERSION}")
 
       app_apk_path = @config.fetch(:app_apk_path, ask: false)
@@ -306,7 +308,7 @@ module Screengrab
             if out =~ /Permission denied/
               dir = File.dirname(path)
               base = File.basename(path)
-              run_adb_command("-s #{device_serial} shell run-as #{@config[:app_package_name]} 'tar -cC #{dir} #{base}' | tar -xvC #{tempdir}",
+              run_adb_command("-s #{device_serial} shell run-as #{@config[:app_package_name]} \"tar -cC #{dir} #{base}\" | tar -xv -f- -C #{tempdir}",
                               print_all: false,
                               print_command: true)
             end
@@ -390,13 +392,12 @@ module Screengrab
     end
 
     def run_adb_command(command, print_all: false, print_command: false, raise_errors: true)
-      adb_path = @android_env.adb_path.chomp("adb")
       adb_host = @config[:adb_host]
       host = adb_host.nil? ? '' : "-H #{adb_host} "
       output = ''
       begin
         errout = nil
-        cmdout = @executor.execute(command: adb_path + "adb " + host + command,
+        cmdout = @executor.execute(command: @android_env.adb_path + " " + host + command,
                                   print_all: print_all,
                                   print_command: print_command,
                                   error: raise_errors ? nil : proc { |out, status| errout = out }) || ''

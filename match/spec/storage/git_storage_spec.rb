@@ -228,5 +228,31 @@ describe Match do
         expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
       end
     end
+
+    describe "ssh-agent utilities" do
+      it "wraps any given command in ssh-agent shell when using a raw private key" do
+        given_command = "any random command"
+        private_key = "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"
+
+        storage = Match::Storage::GitStorage.new(
+          git_private_key: private_key
+        )
+
+        expected_command = "ssh-agent bash -c 'ssh-add - <<< \"#{private_key}\"; #{given_command}'"
+        expect(storage.command_from_private_key(given_command)).to eq(expected_command)
+      end
+
+      it "wraps any given command in ssh-agent shell when using a private key file" do
+        given_command = "any random command"
+        private_key = "#{Dir.mktmpdir}/fastlane.match.id_dsa"
+
+        storage = Match::Storage::GitStorage.new(
+          git_private_key: private_key
+        )
+
+        expected_command = "ssh-agent bash -c 'ssh-add - <<< \"#{File.expand_path(private_key).shellescape}\"; #{given_command}'"
+        expect(storage.command_from_private_key(given_command)).to eq(expected_command)
+      end
+    end
   end
 end

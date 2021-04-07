@@ -13,7 +13,7 @@ module Deliver
 
       [
         FastlaneCore::ConfigItem.new(key: :api_key_path,
-                                     env_name: "DELIVER_API_KEY_PATH",
+                                     env_names: ["DELIVER_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
                                      description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                      optional: true,
                                      conflicting_options: [:api_key],
@@ -21,7 +21,7 @@ module Deliver
                                        UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :api_key,
-                                     env_name: "DELIVER_API_KEY",
+                                     env_names: ["DELIVER_API_KEY", "APP_STORE_CONNECT_API_KEY"],
                                      description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                      type: Hash,
                                      optional: true,
@@ -32,6 +32,7 @@ module Deliver
                                      short_option: "-u",
                                      env_name: "DELIVER_USERNAME",
                                      description: "Your Apple ID Username",
+                                     optional: true,
                                      default_value: user,
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :app_identifier,

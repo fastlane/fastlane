@@ -31,10 +31,11 @@ module Pilot
                                                                       platform: platform)
 
       transporter = transporter_for_selected_team(options)
-      result = transporter.upload(fetch_app_id, package_path)
+      result = transporter.upload(package_path: package_path)
 
       unless result
-        UI.user_error!("Error uploading ipa file, for more information see above")
+        transporter_errors = transporter.displayable_errors
+        UI.user_error!("Error uploading ipa file: \n #{transporter_errors}")
       end
 
       UI.success("Successfully uploaded the new binary to App Store Connect")
@@ -90,8 +91,13 @@ module Pilot
 
     def wait_for_build_processing_to_be_complete(return_when_build_appears = false)
       platform = fetch_app_platform
-      app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
-      app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
+      if config[:ipa]
+        app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
+        app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
+      else
+        app_version = config[:app_version]
+        app_build = config[:build_number]
+      end
 
       latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(
         app_id: app.id,
@@ -248,9 +254,13 @@ module Pilot
         end
       end
 
-      update_build_beta_details(build, {
-        auto_notify_enabled: options[:notify_external_testers]
-      })
+      if options[:notify_external_testers].nil?
+        UI.important("Using App Store Connect's default for notifying external testers (which is true) - set `notify_external_testers` for full control")
+      else
+        update_build_beta_details(build, {
+          auto_notify_enabled: options[:notify_external_testers]
+        })
+      end
     end
 
     def self.truncate_changelog(changelog)
@@ -423,7 +433,14 @@ module Pilot
 
         UI.important("Export compliance has been set to '#{uses_non_exempt_encryption}'. Need to wait for build to finishing processing again...")
         UI.important("Set 'ITSAppUsesNonExemptEncryption' in the 'Info.plist' to skip this step and speed up the submission")
-        return wait_for_build_processing_to_be_complete
+
+        loop do
+          build = Spaceship::ConnectAPI::Build.get(build_id: uploaded_build.id)
+          return build unless build.missing_export_compliance?
+
+          UI.message("Waiting for build #{uploaded_build.id} to process export compliance")
+          sleep(5)
+        end
       else
         return uploaded_build
       end

@@ -1,16 +1,10 @@
 module Fastlane
   module Actions
-    module SharedValues
-      GIT_BRANCH_ENV_VARS = %w(GIT_BRANCH BRANCH_NAME TRAVIS_BRANCH BITRISE_GIT_BRANCH CI_BUILD_REF_NAME CI_COMMIT_REF_NAME WERCKER_GIT_BRANCH BUILDKITE_BRANCH APPCENTER_BRANCH CIRCLE_BRANCH).reject do |branch|
-        # Removing because tests break on CircleCI
-        Helper.test? && branch == "CIRCLE_BRANCH"
-      end.freeze
-    end
-
     class GitBranchAction < Action
       def self.run(params)
-        env_name = SharedValues::GIT_BRANCH_ENV_VARS.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
-        ENV.fetch(env_name.to_s) { `git symbolic-ref HEAD --short 2>/dev/null`.strip }
+        branch = Actions.git_branch
+        return "" if branch == "HEAD" # Backwards compatibility with the original (and documented) implementation
+        branch
       end
 
       #####################################################
@@ -22,7 +16,7 @@ module Fastlane
       end
 
       def self.details
-        "If no branch could be found, this action will return an empty string"
+        "If no branch could be found, this action will return an empty string. This is a wrapper for the internal action Actions.git_branch"
       end
 
       def self.available_options

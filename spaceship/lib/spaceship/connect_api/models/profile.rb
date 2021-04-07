@@ -67,12 +67,13 @@ module Spaceship
       # API
       #
 
-      def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
-        resps = Spaceship::ConnectAPI.get_profiles(filter: filter, includes: includes).all_pages
+      def self.all(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_profiles(filter: filter, includes: includes).all_pages
         return resps.flat_map(&:to_models)
       end
 
-      def self.create(name: nil, profile_type: nil, bundle_id_id: nil, certificate_ids: nil, device_ids: nil, template_name: nil)
+      def self.create(client: nil, name: nil, profile_type: nil, bundle_id_id: nil, certificate_ids: nil, device_ids: nil, template_name: nil)
         # map direct_kext to direct
         case profile_type
         when ProfileType::MAC_APP_DIRECT_KEXT
@@ -80,8 +81,9 @@ module Spaceship
         when ProfileType::MAC_CATALYST_APP_DIRECT_KEXT
           profile_type = ProfileType::MAC_CATALYST_APP_DIRECT
         end
-
-        resp = Spaceship::ConnectAPI.post_profiles(
+      
+        client ||= Spaceship::ConnectAPI
+        resp = client.post_profiles(
           bundle_id_id: bundle_id_id,
           certificates: certificate_ids,
           devices: device_ids,
@@ -94,13 +96,15 @@ module Spaceship
         return resp.to_models.first
       end
 
-      def fetch_all_devices(filter: {}, includes: nil, sort: nil)
-        resps = Spaceship::ConnectAPI.get_devices(profile_id: id, filter: filter, includes: includes).all_pages
+      def fetch_all_devices(client: nil, filter: {}, includes: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_devices(profile_id: id, filter: filter, includes: includes).all_pages
         return resps.flat_map(&:to_models)
       end
 
-      def delete!
-        return Spaceship::ConnectAPI.delete_profile(profile_id: id)
+      def delete!(client: nil)
+        client ||= Spaceship::ConnectAPI
+        return client.delete_profile(profile_id: id)
       end
     end
   end

@@ -99,14 +99,20 @@ If your machine is currently using SSH to authenticate with GitHub, you'll want 
 Using parameter:
 
 ```
-match(git_basic_authorization: '<YOUR KEY>')
+match(git_basic_authorization: '<YOUR BASE64 KEY>')
 ```
 
 Using environment variable:
 
 ```
-ENV['MATCH_GIT_BASIC_AUTHORIZATION'] = '<YOUR KEY>'
+ENV['MATCH_GIT_BASIC_AUTHORIZATION'] = '<YOUR BASE64 KEY>'
 match
+```
+
+To generate your base64 key [according to RFC 7617](https://tools.ietf.org/html/rfc7617), run this:
+
+```
+echo -n your_github_username:your_personal_access_token | base64
 ```
 
 You can find more information about GitHub basic authentication and personal token generation here: [https://developer.github.com/v3/auth/#basic-authentication](https://developer.github.com/v3/auth/#basic-authentication)
@@ -390,7 +396,7 @@ lane :beta do
 end
 ```
 
-By using the `force_for_new_devices` parameter, _match_ will check if the device count has changed since the last time you ran _match_, and automatically re-generate the provisioning profile if necessary. You can also use `force: true` to re-generate the provisioning profile on each run.
+By using the `force_for_new_devices` parameter, _match_ will check if the (enabled) device count has changed since the last time you ran _match_, and automatically re-generate the provisioning profile if necessary. You can also use `force: true` to re-generate the provisioning profile on each run.
 
 _**Important:** The `force_for_new_devices` parameter is ignored for App Store provisioning profiles since they don't contain any device information._
 

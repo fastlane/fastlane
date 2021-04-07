@@ -10,8 +10,8 @@ module Fastlane
       rescue Gem::LoadError
         UI.error("Could not find gem '#{gem_name}'")
         UI.error("")
-        UI.error("If you installed fastlane using `sudo gem install fastlane` run")
-        UI.command("sudo gem install #{gem_name}")
+        UI.error("If you installed fastlane using `gem install fastlane` run")
+        UI.command("gem install #{gem_name}")
         UI.error("to install the missing gem")
         UI.error("")
         UI.error("If you use a Gemfile add this to your Gemfile:")

@@ -1,6 +1,4 @@
-require 'deliver/queue_worker'
-
-describe Deliver::QueueWorker do
+describe FastlaneCore::QueueWorker do
   describe '#new' do
     it 'should initialize an instance' do
       expect(described_class.new { |_| }).to be_kind_of(described_class)

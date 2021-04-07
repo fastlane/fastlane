@@ -8,6 +8,7 @@ module Fastlane
     end
 
     class BuildAppAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(values)
         require 'gym'
 
@@ -50,7 +51,8 @@ module Fastlane
               begin
                 profile = FastlaneCore::ProvisioningProfile.parse(profile_path)
                 app_id_prefix = profile["ApplicationIdentifierPrefix"].first
-                bundle_id = profile["Entitlements"]["application-identifier"].gsub("#{app_id_prefix}.", "")
+                entitlements = profile["Entitlements"]
+                bundle_id = (entitlements["application-identifier"] || entitlements["com.apple.application-identifier"]).gsub("#{app_id_prefix}.", "")
                 values[:export_options][:provisioningProfiles][bundle_id] = profile["Name"]
               rescue => ex
                 UI.error("Couldn't load profile at path: #{profile_path}")
@@ -116,6 +118,10 @@ module Fastlane
 
       def self.return_value
         "The absolute path to the generated ipa file"
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.author

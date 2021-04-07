@@ -80,7 +80,12 @@ describe Deliver::UploadMetadata do
           notes: "This is a note" }
       end
 
-      it "set review information" do
+      it "skips review information with empty app_review_information" do
+        expect(FastlaneCore::UI).not_to receive(:message).with("Uploading app review information to App Store Connect")
+        uploader.send("set_review_information", version, { app_review_information: {} })
+      end
+
+      it "successfully set review information" do
         expect(version).to receive(:fetch_app_store_review_detail).and_return(app_store_review_detail)
         expect(app_store_review_detail).to receive(:update).with(attributes: {
           "contact_first_name" => app_review_information[:first_name],
@@ -92,6 +97,8 @@ describe Deliver::UploadMetadata do
           "demo_account_required" => true,
           "notes" => app_review_information[:notes]
         })
+
+        expect(FastlaneCore::UI).to receive(:message).with("Uploading app review information to App Store Connect")
 
         uploader.send("set_review_information", version, options)
       end
@@ -439,6 +446,18 @@ describe Deliver::UploadMetadata do
 
         expect(languages.sort).to eql(['de-DE', 'el', 'en-US'])
       end
+
+      it "languages are 'en-US', 'default'" do
+        options[:languages] = []
+
+        create_filesystem_language('default')
+        create_filesystem_language('en-US')
+
+        uploader.load_from_filesystem(options)
+        languages = uploader.detect_languages(options)
+
+        expect(languages.sort).to eql(['default', 'en-US'])
+      end
     end
 
     context "detected languages with only config options" do
@@ -465,6 +484,24 @@ describe Deliver::UploadMetadata do
         languages = uploader.detect_languages(options)
 
         expect(languages.sort).to eql(['default', 'es-MX'])
+      end
+    end
+
+    context 'detect languages with file system with default folder' do
+      it "languages are 'en-US', 'default'" do
+        options[:languages] = []
+
+        create_filesystem_language('default')
+        create_filesystem_language('en-US')
+        create_metadata(
+          File.join(tmpdir, 'default', "#{Deliver::UploadMetadata::LOCALISED_VERSION_VALUES[:description]}.txt"),
+          'something'
+        )
+
+        uploader.load_from_filesystem(options)
+        languages = uploader.detect_languages(options)
+
+        expect(languages.sort).to eql(['default', 'en-US'])
       end
     end
 

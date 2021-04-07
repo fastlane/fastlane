@@ -36,6 +36,11 @@ module Match
         git_branch: params[:git_branch],
         git_full_name: params[:git_full_name],
         git_user_email: params[:git_user_email],
+
+        git_private_key: params[:git_private_key],
+        git_basic_authorization: params[:git_basic_authorization],
+        git_bearer_authorization: params[:git_bearer_authorization],
+
         clone_branch_directly: params[:clone_branch_directly],
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
         google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
@@ -116,7 +121,7 @@ module Match
     end
 
     def api_token
-      @api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.create(**params[:api_key]) if params[:api_key]
       @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
       return @api_token
     end

@@ -77,7 +77,7 @@ module Fastlane
       end
 
       def self.try_create_device(name: nil, platform: nil, udid: nil)
-        Spaceship::ConnectAPI::Device.create(name: name, platform: platform, udid: udid)
+        Spaceship::ConnectAPI::Device.find_or_create(udid, name: name, platform: platform)
       rescue => ex
         UI.error(ex.to_s)
         UI.crash!("Failed to register new device (name: #{name}, UDID: #{udid})")
@@ -85,7 +85,7 @@ module Fastlane
 
       def self.api_token(params)
         params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
-        api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+        api_token ||= Spaceship::ConnectAPI::Token.create(**params[:api_key]) if params[:api_key]
         api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
         return api_token
       end
@@ -118,7 +118,7 @@ module Fastlane
                                          UI.user_error!("Could not find file '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_key_path,
-                                       env_name: "FL_REGISTER_DEVICES_API_KEY_PATH",
+                                       env_names: ["FL_REGISTER_DEVICES_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
                                        description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                        optional: true,
                                        conflicting_options: [:api_key],
@@ -126,7 +126,7 @@ module Fastlane
                                          UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :api_key,
-                                       env_name: "FL_REGISTER_DEVICES_API_KEY",
+                                       env_names: ["FL_REGISTER_DEVICES_API_KEY", "APP_STORE_CONNECT_API_KEY"],
                                        description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                        type: Hash,
                                        optional: true,
@@ -155,6 +155,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
+                                       optional: true,
                                        default_value: user,
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :platform,

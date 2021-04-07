@@ -139,7 +139,7 @@ module Match
     # rubocop:enable Metrics/PerceivedComplexity
 
     def api_token(params)
-      @api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.create(**params[:api_key]) if params[:api_key]
       @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
       return @api_token
     end
@@ -355,7 +355,7 @@ module Match
         devices = Spaceship::ConnectAPI::Device.all
         unless device_classes.empty?
           devices = devices.select do |device|
-            device_classes.include?(device.device_class)
+            device_classes.include?(device.device_class) && device.enabled?
           end
         end
 
