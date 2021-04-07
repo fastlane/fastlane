@@ -157,7 +157,7 @@ module FastlaneCore
       test_message = message.dup
       return message.encode(Encoding::UTF_8, Encoding::UTF_16) if test_message.force_encoding(Encoding::UTF_16).valid_encoding?
 
-      # return the original message if no valid encoding is found
+      # replace any invalid with empty string
       return message.encode(Encoding::UTF_8, invalid: :replace, replace: "")
     end
 
