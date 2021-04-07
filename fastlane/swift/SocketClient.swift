@@ -303,8 +303,8 @@ extension SocketClient: StreamDelegate {
             }
 
         case let .failure(failureInformation, failureClass, failureMessage):
-          LaneFile.fastfileInstance?.onError(currentLane: ArgumentProcessor(args: CommandLine.arguments).currentLane, errorInfo: failureInformation.joined(), errorClass: failureClass, errorMessage: failureMessage)
-          socketDelegate?.commandExecuted(serverResponse: .serverError) {
+            LaneFile.fastfileInstance?.onError(currentLane: ArgumentProcessor(args: CommandLine.arguments).currentLane, errorInfo: failureInformation.joined(), errorClass: failureClass, errorMessage: failureMessage)
+            socketDelegate?.commandExecuted(serverResponse: .serverError) {
                 $0.writeSemaphore.signal()
                 self.handleFailure(message: failureInformation)
             }

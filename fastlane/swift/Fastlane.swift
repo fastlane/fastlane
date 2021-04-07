@@ -4705,30 +4705,36 @@ public func jazzy(config: String? = nil,
 }
 
 /**
- Leave a comment on JIRA tickets
+  Leave a comment on a Jira ticket
 
- - parameters:
-   - url: URL for Jira instance
-   - contextPath: Appends to the url (ex: "/jira")
-   - username: Username for JIRA instance
-   - password: Password for Jira
-   - ticketId: Ticket ID for Jira, i.e. IOS-123
-   - commentText: Text to add to the ticket as a comment
+  - parameters:
+    - url: URL for Jira instance
+    - contextPath: Appends to the url (ex: "/jira")
+    - username: Username for Jira instance
+    - password: Password or API token for Jira
+    - ticketId: Ticket ID for Jira, i.e. IOS-123
+    - commentText: Text to add to the ticket as a comment
+    - failOnError: Should an error adding the Jira comment cause a failure?
+
+  - returns: A hash containing all relevant information of the Jira comment
+ Access Jira comment 'id', 'author', 'body', and more
  */
-public func jira(url: String,
-                 contextPath: String = "",
-                 username: String,
-                 password: String,
-                 ticketId: String,
-                 commentText: String)
+@discardableResult public func jira(url: String,
+                                    contextPath: String = "",
+                                    username: String,
+                                    password: String,
+                                    ticketId: String,
+                                    commentText: String,
+                                    failOnError: Bool = true) -> [String: Any]
 {
     let command = RubyCommand(commandID: "", methodName: "jira", className: nil, args: [RubyCommand.Argument(name: "url", value: url),
                                                                                         RubyCommand.Argument(name: "context_path", value: contextPath),
                                                                                         RubyCommand.Argument(name: "username", value: username),
                                                                                         RubyCommand.Argument(name: "password", value: password),
                                                                                         RubyCommand.Argument(name: "ticket_id", value: ticketId),
-                                                                                        RubyCommand.Argument(name: "comment_text", value: commentText)])
-    _ = runner.executeCommand(command)
+                                                                                        RubyCommand.Argument(name: "comment_text", value: commentText),
+                                                                                        RubyCommand.Argument(name: "fail_on_error", value: failOnError)])
+    return parseDictionary(fromString: runner.executeCommand(command))
 }
 
 /**
@@ -5302,14 +5308,16 @@ public func nexusUpload(file: String,
    - ascProvider: Provider short name for accounts associated with multiple providers
    - printLog: Whether to print notarization log file, listing issues on failure and warnings on success
    - verbose: Whether to log requests
+   - apiKeyPath: Path to AppStore Connect API key
  */
 public func notarize(package: String,
                      tryEarlyStapling: Bool = false,
                      bundleId: String? = nil,
-                     username: String,
+                     username: String? = nil,
                      ascProvider: String? = nil,
                      printLog: Bool = false,
-                     verbose: Bool = false)
+                     verbose: Bool = false,
+                     apiKeyPath: String? = nil)
 {
     let command = RubyCommand(commandID: "", methodName: "notarize", className: nil, args: [RubyCommand.Argument(name: "package", value: package),
                                                                                             RubyCommand.Argument(name: "try_early_stapling", value: tryEarlyStapling),
@@ -5317,7 +5325,8 @@ public func notarize(package: String,
                                                                                             RubyCommand.Argument(name: "username", value: username),
                                                                                             RubyCommand.Argument(name: "asc_provider", value: ascProvider),
                                                                                             RubyCommand.Argument(name: "print_log", value: printLog),
-                                                                                            RubyCommand.Argument(name: "verbose", value: verbose)])
+                                                                                            RubyCommand.Argument(name: "verbose", value: verbose),
+                                                                                            RubyCommand.Argument(name: "api_key_path", value: apiKeyPath)])
     _ = runner.executeCommand(command)
 }
 
@@ -6411,6 +6420,7 @@ public func rubyVersion() {
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - numberOfRetries: The number of times a test can fail before scan should stop retrying
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
  More information: https://docs.fastlane.tools/actions/scan/
@@ -6484,6 +6494,7 @@ public func runTests(workspace: String? = nil,
                      skipPackageDependenciesResolution: Bool = false,
                      disablePackageAutomaticUpdates: Bool = false,
                      useSystemScm: Bool = false,
+                     numberOfRetries: Int = 0,
                      failBuild: Bool = true)
 {
     let command = RubyCommand(commandID: "", methodName: "run_tests", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -6555,6 +6566,7 @@ public func runTests(workspace: String? = nil,
                                                                                              RubyCommand.Argument(name: "skip_package_dependencies_resolution", value: skipPackageDependenciesResolution),
                                                                                              RubyCommand.Argument(name: "disable_package_automatic_updates", value: disablePackageAutomaticUpdates),
                                                                                              RubyCommand.Argument(name: "use_system_scm", value: useSystemScm),
+                                                                                             RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries),
                                                                                              RubyCommand.Argument(name: "fail_build", value: failBuild)])
     _ = runner.executeCommand(command)
 }
@@ -6708,6 +6720,7 @@ public func say(text: Any,
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - numberOfRetries: The number of times a test can fail before scan should stop retrying
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
  More information: https://docs.fastlane.tools/actions/scan/
@@ -6781,6 +6794,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                  skipPackageDependenciesResolution: Bool = scanfile.skipPackageDependenciesResolution,
                  disablePackageAutomaticUpdates: Bool = scanfile.disablePackageAutomaticUpdates,
                  useSystemScm: Bool = scanfile.useSystemScm,
+                 numberOfRetries: Int = scanfile.numberOfRetries,
                  failBuild: Bool = scanfile.failBuild)
 {
     let command = RubyCommand(commandID: "", methodName: "scan", className: nil, args: [RubyCommand.Argument(name: "workspace", value: workspace),
@@ -6852,6 +6866,7 @@ public func scan(workspace: Any? = scanfile.workspace,
                                                                                         RubyCommand.Argument(name: "skip_package_dependencies_resolution", value: skipPackageDependenciesResolution),
                                                                                         RubyCommand.Argument(name: "disable_package_automatic_updates", value: disablePackageAutomaticUpdates),
                                                                                         RubyCommand.Argument(name: "use_system_scm", value: useSystemScm),
+                                                                                        RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries),
                                                                                         RubyCommand.Argument(name: "fail_build", value: failBuild)])
     _ = runner.executeCommand(command)
 }
@@ -7737,6 +7752,57 @@ public func sonar(projectConfigurationPath: String? = nil,
                                                                                          RubyCommand.Argument(name: "pull_request_branch", value: pullRequestBranch),
                                                                                          RubyCommand.Argument(name: "pull_request_base", value: pullRequestBase),
                                                                                          RubyCommand.Argument(name: "pull_request_key", value: pullRequestKey)])
+    _ = runner.executeCommand(command)
+}
+
+/**
+ Generate docs using SourceDocs
+
+ - parameters:
+   - allModules: Generate documentation for all modules in a Swift package
+   - spmModule: Generate documentation for Swift Package Manager module
+   - moduleName: Generate documentation for a Swift module
+   - linkBeginning: The text to begin links with
+   - linkEnding: The text to end links with (default: .md)
+   - outputFolder: Output directory to clean (default: Documentation/Reference)
+   - minAcl: Access level to include in documentation [private, fileprivate, internal, public, open] (default: public)
+   - moduleNamePath: Include the module name as part of the output folder path
+   - clean: Delete output folder before generating documentation
+   - collapsible: Put methods, properties and enum cases inside collapsible blocks
+   - tableOfContents: Generate a table of contents with properties and methods for each type
+   - reproducible: Generate documentation that is reproducible: only depends on the sources
+   - scheme: Create documentation for specific scheme
+   - sdkPlatform: Create documentation for specific sdk platform
+ */
+public func sourcedocs(allModules: Bool? = nil,
+                       spmModule: String? = nil,
+                       moduleName: String? = nil,
+                       linkBeginning: String? = nil,
+                       linkEnding: String? = nil,
+                       outputFolder: String,
+                       minAcl: String? = nil,
+                       moduleNamePath: Bool? = nil,
+                       clean: Bool? = nil,
+                       collapsible: Bool? = nil,
+                       tableOfContents: Bool? = nil,
+                       reproducible: Bool? = nil,
+                       scheme: String? = nil,
+                       sdkPlatform: String? = nil)
+{
+    let command = RubyCommand(commandID: "", methodName: "sourcedocs", className: nil, args: [RubyCommand.Argument(name: "all_modules", value: allModules),
+                                                                                              RubyCommand.Argument(name: "spm_module", value: spmModule),
+                                                                                              RubyCommand.Argument(name: "module_name", value: moduleName),
+                                                                                              RubyCommand.Argument(name: "link_beginning", value: linkBeginning),
+                                                                                              RubyCommand.Argument(name: "link_ending", value: linkEnding),
+                                                                                              RubyCommand.Argument(name: "output_folder", value: outputFolder),
+                                                                                              RubyCommand.Argument(name: "min_acl", value: minAcl),
+                                                                                              RubyCommand.Argument(name: "module_name_path", value: moduleNamePath),
+                                                                                              RubyCommand.Argument(name: "clean", value: clean),
+                                                                                              RubyCommand.Argument(name: "collapsible", value: collapsible),
+                                                                                              RubyCommand.Argument(name: "table_of_contents", value: tableOfContents),
+                                                                                              RubyCommand.Argument(name: "reproducible", value: reproducible),
+                                                                                              RubyCommand.Argument(name: "scheme", value: scheme),
+                                                                                              RubyCommand.Argument(name: "sdk_platform", value: sdkPlatform)])
     _ = runner.executeCommand(command)
 }
 
@@ -9821,4 +9887,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.115]
+// FastlaneRunnerAPIVersion [0.9.116]
