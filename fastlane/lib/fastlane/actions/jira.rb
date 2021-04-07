@@ -34,16 +34,13 @@ module Fastlane
           # An exact representation of the JSON returned from the JIRA API
           # https://github.com/sumoheavy/jira-ruby/blob/master/lib/jira/base.rb#L67
           json_response = comment.attrs
-          if json_response.nil?
-            UI.error('Failed to add a comment on JIRA ticket')
-            return nil
-          else
-            Actions.lane_context[SharedValues::JIRA_JSON] = json_response
-            UI.success('Successfully added a comment on JIRA ticket')
-            return json_response
-          end
+          raise 'Failed to add a comment on Jira ticket' if json_response.nil?
+
+          Actions.lane_context[SharedValues::JIRA_JSON] = json_response
+          UI.success('Successfully added a comment on Jira ticket')
+          return json_response
         rescue => exception
-          message = "Received exception when adding a JIRA comment: #{exception}"
+          message = "Received exception when adding a Jira comment: #{exception}"
           if params[:fail_on_error]
             UI.user_error!(message)
           else
@@ -57,7 +54,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Leave a comment on JIRA ticket"
+        "Leave a comment on a Jira ticket"
       end
 
       def self.available_options
@@ -75,7 +72,7 @@ module Fastlane
                                       default_value: ""),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "FL_JIRA_USERNAME",
-                                       description: "Username for JIRA instance",
+                                       description: "Username for Jira instance",
                                        verify_block: proc do |value|
                                          UI.user_error!("No username") if value.to_s.length == 0
                                        end),
@@ -100,7 +97,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :fail_on_error,
                                        env_name: "FL_JIRA_FAIL_ON_ERROR",
-                                       description: "Should an error adding the JIRA comment cause a failure?",
+                                       description: "Should an error adding the Jira comment cause a failure?",
                                        type: Boolean,
                                        optional: true,
                                        default_value: true) # Default value is true for 'Backward compatibility'
@@ -109,14 +106,14 @@ module Fastlane
 
       def self.output
         [
-          ['JIRA_JSON', 'The whole JIRA API JSON object']
+          ['JIRA_JSON', 'The whole Jira API JSON object']
         ]
       end
 
       def self.return_value
         [
-          "A hash containing all relevant information of the JIRA comment",
-          "Access things like JIRA comment 'id', 'author', 'body'"
+          "A hash containing all relevant information of the Jira comment",
+          "Access Jira comment 'id', 'author', 'body', and more"
         ].join("\n")
       end
 
