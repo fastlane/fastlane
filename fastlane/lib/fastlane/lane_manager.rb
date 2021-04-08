@@ -107,12 +107,13 @@ module Fastlane
 
       puts(table)
 
+      fastlane_command_prefix = Helper.bundler? ? "bundle exec " : ""
       i = UI.input("Which number would you like run?")
 
       i = i.to_i - 1
       if i >= 0 && available[i]
         selection = available[i].last.pretty_name
-        UI.important("Running lane `#{selection}`. Next time you can do this by directly typing `fastlane #{selection}` 🚀.")
+        UI.important("Running lane `#{selection}`. Next time you can do this by directly typing `#{fastlane_command_prefix}fastlane #{selection}` 🚀.")
         platform = selection.split(' ')[0]
         lane_name = selection.split(' ')[1]
 
@@ -123,7 +124,7 @@ module Fastlane
 
         return platform, lane_name # yeah
       else
-        UI.user_error!("Run `fastlane` the next time you need to build, test or release your app 🚀")
+        UI.user_error!("Run `#{fastlane_command_prefix}fastlane` the next time you need to build, test or release your app 🚀")
       end
     end
   end
