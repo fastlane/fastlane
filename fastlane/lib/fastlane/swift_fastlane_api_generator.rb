@@ -49,12 +49,15 @@ module Fastlane
       tool_objects = generate_lanefile_tool_objects(classes: tool_details.map(&:swift_class))
       file_content << tool_objects
 
-      old_file_content = File.read(fastlane_swift_api_path)
+      old_file_content = File.exist?(fastlane_swift_api_path) ? File.read(fastlane_swift_api_path) : ""
       new_file_content = file_content.join("\n")
 
+      api_version = "0.0.0"
+      old_api_version = ""
+
       # compare old file content to potential new file content
-      api_version = determine_api_version(new_file_content: new_file_content, old_file_content: old_file_content)
-      old_api_version = find_api_version_string(content: old_file_content)
+#      api_version = determine_api_version(new_file_content: new_file_content, old_file_content: old_file_content)
+#      old_api_version = find_api_version_string(content: old_file_content)
 
       # if there is a change, we need to write out the new file
       if api_version != old_api_version
@@ -386,12 +389,14 @@ func parseInt(fromString: String, function: String = #function) -> Int {
         old_file_content = File.read(target_path)
       end
 
-      # compare old file content to potential new file content
-      api_version = determine_api_version(new_file_content: new_file_content, old_file_content: old_file_content)
-      old_api_version = find_api_version_string(content: old_file_content)
+      api_version = "0.0.0"
 
-      # we don't need to write this file out because the file versions are exactly the same
-      return nil if api_version == old_api_version
+      # compare old file content to potential new file content
+#      api_version = determine_api_version(new_file_content: new_file_content, old_file_content: old_file_content)
+#      old_api_version = find_api_version_string(content: old_file_content)
+#
+#      # we don't need to write this file out because the file versions are exactly the same
+#      return nil if api_version == old_api_version
 
       # use api_version to generate the disclaimer
       api_version_disclaimer = autogen_version_warning_text(api_version: api_version)

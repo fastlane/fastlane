@@ -132,21 +132,25 @@ module Fastlane
     # rubocop:enable Metrics/BlockNesting
 
     def self.setup_swift_support
-      runner_source_resources = "#{Fastlane::ROOT}/swift/."
-      destination_path = File.expand_path('swift', FastlaneCore::FastlaneFolder.path)
+      #runner_source_resources = "#{Fastlane::ROOT}/swift/."
+      destination_path = File.absolute_path(FastlaneCore::FastlaneFolder.swift_folder_path)
+      FileUtils.mkdir_p(destination_path)
 
-      # Return eearly if already setup
-      return if File.exist?(destination_path)
+      swift_generator = Fastlane::SwiftFastlaneAPIGenerator.new(target_output_path: destination_path)
+      generated_files = swift_generator.generate_swift
 
-      # Show message if Fastfile.swift exists but missing Swift classes and Xcode project
-      if FastlaneCore::FastlaneFolder.swift?
-        UI.important("Restoring Swift classes and FastlaneSwiftRunner.xcodeproj...")
-      end
-
-      FileUtils.cp_r(runner_source_resources, destination_path)
-      UI.success("Copied Swift fastlane runner project to '#{destination_path}'.")
-
-      Fastlane::SwiftLaneManager.first_time_setup
+#      # Return eearly if already setup
+#      return if File.exist?(destination_path)
+#
+#      # Show message if Fastfile.swift exists but missing Swift classes and Xcode project
+#      if FastlaneCore::FastlaneFolder.swift?
+#        UI.important("Restoring Swift classes and FastlaneSwiftRunner.xcodeproj...")
+#      end
+#
+#      FileUtils.cp_r(runner_source_resources, destination_path)
+#      UI.success("Copied Swift fastlane runner project to '#{destination_path}'.")
+#
+#      Fastlane::SwiftLaneManager.first_time_setup
     end
 
     def initialize(is_swift_fastfile: nil, user: nil, project_path: nil, had_multiple_projects_to_choose_from: nil, preferred_setup_method: nil)
