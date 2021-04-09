@@ -223,7 +223,7 @@ module Supply
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :mapping,
                                      env_name: "SUPPLY_MAPPING",
-                                     description: "Path to the mapping file to upload",
+                                     description: "Path to the mapping file to upload (mapping.txt or native-debug-symbols.zip alike)",
                                      short_option: "-d",
                                      conflicting_options: [:mapping_paths],
                                      optional: true,
@@ -235,7 +235,7 @@ module Supply
                                      conflicting_options: [:mapping],
                                      optional: true,
                                      type: Array,
-                                     description: "An array of paths to mapping files to upload",
+                                     description: "An array of paths to mapping files to upload (mapping.txt or native-debug-symbols.zip alike)",
                                      short_option: "-s",
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
