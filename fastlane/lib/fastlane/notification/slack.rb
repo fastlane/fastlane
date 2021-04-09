@@ -27,7 +27,7 @@ module Fastlane
       # This is a substitue of this LinkFormatter in slack-notifier
       # https://github.com/stevenosloan/slack-notifier/blob/4bf6582663dc9e5070afe3fdc42d67c14a513354/lib/slack-notifier/util/link_formatter.rb
       class LinkConverter
-        HTML_PATTERN = %r{<a .*? href=['"](?<link>#{URI.regexp})['"].*?>(?<label>.+?)<\/a>}
+        HTML_PATTERN = %r{<a.*?href=['"](?<link>#{URI.regexp})['"].*?>(?<label>.+?)<\/a>}
         MARKDOWN_PATTERN = %r{\[(?<label>[^\[\]]*?)\]\((?<link>#{URI.regexp}|mailto:#{URI::MailTo::EMAIL_REGEXP})\)}
 
         def self.convert(string)
