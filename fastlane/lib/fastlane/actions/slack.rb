@@ -170,7 +170,6 @@ module Fastlane
       end
 
       def self.run(options)
-        require 'slack-notifier'
         Runner.new(options[:slack_url]).run(options)
       end
 
