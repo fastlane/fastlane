@@ -1,3 +1,5 @@
+require 'fastlane/notification/slack'
+
 # rubocop:disable Style/CaseEquality
 # rubocop:disable Style/MultilineTernaryOperator
 # rubocop:disable Style/NestedTernaryOperator
@@ -6,12 +8,12 @@ module Fastlane
     class SlackAction < Action
       class Runner
         def initialize(slack_url)
-          @notifier = Slack::Notifier.new(slack_url)
+          @notifier = Fastlane::Notification::Slack.new(slack_url)
         end
 
         def run(options)
           options[:message] = self.class.trim_message(options[:message].to_s || '')
-          options[:message] = Slack::Notifier::Util::LinkFormatter.format(options[:message])
+          options[:message] = Fastlane::Notification::Slack::LinkConverter.convert(options[:message])
 
           options[:pretext] = options[:pretext].gsub('\n', "\n") unless options[:pretext].nil?
 
@@ -37,21 +39,21 @@ module Fastlane
         end
 
         def post_message(channel:, username:, attachments:, link_names:, icon_url:, fail_on_error:)
-          results = @notifier.ping('', channel: channel, username: username, link_names: link_names, icon_url: icon_url, attachments: attachments)
-        rescue => exception
-          UI.error("Exception: #{exception}")
-        ensure
-          result = results.first if results
-          if !result.nil? && result.code.to_i == 200
-            UI.success('Successfully sent Slack notification')
+          @notifier.post_to_legacy_incoming_webhook(
+            channel: channel,
+            username: username,
+            link_names: link_names,
+            icon_url: icon_url,
+            attachments: attachments
+          )
+          UI.success('Successfully sent Slack notification')
+        rescue => error
+          UI.error("Exception: #{error}")
+          message = "Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile, this is usually caused by a misspelled or changed group/channel name or an expired SLACK_URL"
+          if fail_on_error
+            UI.user_error!(message)
           else
-            UI.verbose(result) unless result.nil?
-            message = "Error pushing Slack message, maybe the integration has no permission to post on this channel? Try removing the channel parameter in your Fastfile, this is usually caused by a misspelled or changed group/channel name or an expired SLACK_URL"
-            if fail_on_error
-              UI.user_error!(message)
-            else
-              UI.error(message)
-            end
+            UI.error(message)
           end
         end
 
@@ -84,7 +86,7 @@ module Fastlane
           slack_attachment[:fields] += options[:payload].map do |k, v|
             {
               title: k.to_s,
-              value: Slack::Notifier::Util::LinkFormatter.format(v.to_s),
+              value: Fastlane::Notification::Slack::LinkConverter.convert(v.to_s),
               short: false
             }
           end

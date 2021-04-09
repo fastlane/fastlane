@@ -3,13 +3,16 @@ module Fastlane
     class Slack
       def initialize(webhook_url)
         @webhook_url = webhook_url
+        @client = Faraday.new do |conn|
+          conn.use Faraday::Response::RaiseError
+        end
       end
 
       # Overriding channel, icon_url and username is only supported in legacy incoming webhook.
       # And use of attachments is now deprecated.
       # https://api.slack.com/legacy/custom-integrations/messaging/webhooks
       def post_to_legacy_incoming_webhook(channel:, username:, attachments:, link_names:, icon_url:)
-        Faraday.post(@webhook_url) do |request|
+        @client.post(@webhook_url) do |request|
           request.headers['Content-Type'] = 'application/json'
           request.body = {
             channel: channel,
