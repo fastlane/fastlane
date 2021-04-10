@@ -13,4 +13,27 @@ describe Spaceship::SpaceauthRunner do
       Spaceship::SpaceauthRunner.new.run
     end.to output(/export FASTLANE_SESSION=.*name: DES.*name: myacinfo.*name: dqsid.*/).to_stdout
   end
+
+  describe 'exports_to_clipboard option' do
+    before :each do
+      # Save clipboard
+      @clipboard = `pbpaste`
+    end
+
+    after :each do
+      # Restore clipboard
+      require 'open3'
+      Open3.popen3('pbcopy') { |input, _, _| input << @clipboard }
+    end
+
+    it 'when true, it should copy "export FASTLANE_SESSION=…" command to clipboard' do
+      Spaceship::SpaceauthRunner.new(exports_to_clipboard: true).run
+      expect(`pbpaste`).to match(/export FASTLANE_SESSION=.*/)
+    end
+
+    it 'when false, it should not copy "export FASTLANE_SESSION=…" command to clipboard' do
+      Spaceship::SpaceauthRunner.new(exports_to_clipboard: false).run
+      expect(`pbpaste`).to eq(@clipboard)
+    end
+  end
 end
