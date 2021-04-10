@@ -4,7 +4,7 @@ module Fastlane
       def initialize(webhook_url)
         @webhook_url = webhook_url
         @client = Faraday.new do |conn|
-          conn.use Faraday::Response::RaiseError
+          conn.use(Faraday::Response::RaiseError)
         end
       end
 
@@ -19,7 +19,7 @@ module Fastlane
             username: username,
             icon_url: icon_url,
             attachments: attachments,
-            link_names: link_names,
+            link_names: link_names
           }.to_json
         end
       end
@@ -28,7 +28,7 @@ module Fastlane
       # https://github.com/stevenosloan/slack-notifier/blob/4bf6582663dc9e5070afe3fdc42d67c14a513354/lib/slack-notifier/util/link_formatter.rb
       class LinkConverter
         HTML_PATTERN = %r{<a.*?href=['"](?<link>#{URI.regexp})['"].*?>(?<label>.+?)<\/a>}
-        MARKDOWN_PATTERN = %r{\[(?<label>[^\[\]]*?)\]\((?<link>#{URI.regexp}|mailto:#{URI::MailTo::EMAIL_REGEXP})\)}
+        MARKDOWN_PATTERN = /\[(?<label>[^\[\]]*?)\]\((?<link>#{URI.regexp}|mailto:#{URI::MailTo::EMAIL_REGEXP})\)/
 
         def self.convert(string)
           convert_markdown_to_slack_link(convert_html_to_slack_link(string.scrub))

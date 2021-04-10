@@ -5,7 +5,7 @@ describe Fastlane::Notification::Slack do
         %|Hello <a href="https://fastlane.tools">fastlane</a>| => 'Hello <https://fastlane.tools|fastlane>',
         %|Hello <a href='https://fastlane.tools'>fastlane</a>| => 'Hello <https://fastlane.tools|fastlane>',
         %|Hello <a id="foo" href="https://fastlane.tools">fastlane</a>| => 'Hello <https://fastlane.tools|fastlane>',
-        %|Hello <a href="https://fastlane.tools">fastlane</a> <a href="https://github.com/fastlane">GitHub</a>| => 'Hello <https://fastlane.tools|fastlane> <https://github.com/fastlane|GitHub>',
+        %|Hello <a href="https://fastlane.tools">fastlane</a> <a href="https://github.com/fastlane">GitHub</a>| => 'Hello <https://fastlane.tools|fastlane> <https://github.com/fastlane|GitHub>'
       }.each do |input, output|
         expect(described_class.convert(input)).to eq(output)
       end
@@ -19,7 +19,7 @@ describe Fastlane::Notification::Slack do
         %|Hello [[fastlane](https://fastlane.tools) in brackets]| => 'Hello [<https://fastlane.tools|fastlane> in brackets]',
         %|Hello [](https://fastlane.tools)| => 'Hello <https://fastlane.tools>',
         %|Hello ([fastlane](https://fastlane.tools) in parens)| => 'Hello (<https://fastlane.tools|fastlane> in parens)',
-        %|Hello ([fastlane(:rocket:)](https://fastlane.tools) in parens)| => 'Hello (<https://fastlane.tools|fastlane(:rocket:)> in parens)',
+        %|Hello ([fastlane(:rocket:)](https://fastlane.tools) in parens)| => 'Hello (<https://fastlane.tools|fastlane(:rocket:)> in parens)'
       }.each do |input, output|
         expect(described_class.convert(input)).to eq(output)
       end
