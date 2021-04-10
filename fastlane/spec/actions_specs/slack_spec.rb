@@ -7,7 +7,7 @@ describe Fastlane::Actions do
 
       it "trims long messages to show the bottom of the messages" do
         long_text = "a" * 10_000
-        expect(subject.trim_message(long_text).length).to eq(7000)
+        expect(described_class.trim_message(long_text).length).to eq(7000)
       end
 
       it "works so perfect, like Slack does" do

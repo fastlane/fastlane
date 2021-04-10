@@ -10,7 +10,7 @@ module Fastlane
         end
 
         def run(options)
-          options[:message] = self.trim_message(options[:message].to_s || '')
+          options[:message] = self.class.trim_message(options[:message].to_s || '')
           options[:message] = Slack::Notifier::Util::LinkFormatter.format(options[:message])
 
           options[:pretext] = options[:pretext].gsub('\n', "\n") unless options[:pretext].nil?
@@ -22,7 +22,7 @@ module Fastlane
 
           username = options[:use_webhook_configured_username_and_icon] ? nil : options[:username]
 
-          slack_attachment = generate_slack_attachments(options)
+          slack_attachment = self.class.generate_slack_attachments(options)
           link_names = options[:link_names]
           icon_url = options[:use_webhook_configured_username_and_icon] ? nil : options[:icon_url]
 
@@ -58,7 +58,7 @@ module Fastlane
         # As there is a text limit in the notifications, we are
         # usually interested in the last part of the message
         # e.g. for tests
-        def trim_message(message)
+        def self.trim_message(message)
           # We want the last 7000 characters, instead of the first 7000, as the error is at the bottom
           start_index = [message.length - 7000, 0].max
           message = message[start_index..-1]
@@ -67,7 +67,7 @@ module Fastlane
           message.gsub('\n', "\n")
         end
 
-        def generate_slack_attachments(options)
+        def self.generate_slack_attachments(options)
           color = (options[:success] ? 'good' : 'danger')
           should_add_payload = ->(payload_name) { options[:default_payloads].map(&:to_sym).include?(payload_name.to_sym) }
 
@@ -153,7 +153,7 @@ module Fastlane
         end
 
         # Adapted from https://stackoverflow.com/a/30225093/158525
-        def deep_merge(a, b)
+        def self.deep_merge(a, b)
           merger = proc do |key, v1, v2|
             Hash === v1 && Hash === v2 ?
               v1.merge(v2, &merger) : Array === v1 && Array === v2 ?
@@ -286,6 +286,19 @@ module Fastlane
 
       def self.details
         "Create an Incoming WebHook and export this as `SLACK_URL`. Can send a message to **#channel** (by default), a direct message to **@username** or a message to a private group **group** with success (green) or failure (red) status."
+      end
+
+      #####################################################
+      # @!group Helper
+      #####################################################
+
+      def self.trim_message(message)
+        Runner.trim_message(message)
+      end
+
+      def self.generate_slack_attachments(options)
+        UI.deprecation('`Fastlane::Actions::Slack.generate_slack_attachments` is subject to be removed as Slack recommends migrating `attachments` to Block Kit. fastlane will also the same direction.')
+        Runner.generate_slack_attachments(options)
       end
     end
   end
