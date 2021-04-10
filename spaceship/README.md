@@ -123,6 +123,14 @@ This will authenticate you and provide a string that can be transferred to your 
 export FASTLANE_SESSION='---\n- !ruby/object:HTTP::Cookie\n  name: DES5c148586dfd451e55afbaaa5f62418f91\n  value: HSARMTKNSRVTWFla1+yO4gVPowH17VaaaxPFnUdMUegQZxqy1Ie1c2v6bM1vSOzIbuOmrl/FNenlScsd/NbF7/Lw4cpnL15jsyg0TOJwP32tC/NguPiyOaaaU+jrj4tf4uKdIywVaaaFSRVT\n  domain: idmsa.apple.com\n  for_domain: true\n  path: "/"\n  secure: true\n  httponly: true\n  expires: 2016-04-27 23:55:56.000000000 Z\n  max_age: \n  created_at: 2016-03-28 16:55:57.032086000 -07:00\n  accessed_at: 2016-03-28 19:11:17.828141000 -07:00\n'
 ```
 
+Alternatively, pass in the `--exports_to_clipboard` option so that the export code is automatically copied to clipboard, which you can then execute by running `eval $(pbpaste)` right after running `spaceauth`, for instance:
+
+```sh
+fastlane spaceauth -u user@example.org --exports_to_clipboard && eval $(pbpaste)
+```
+
+This is specially helpful in a CI environment.
+
 #### Transporter
 
 See [Continuous Integration > Authentication with Apple services > Application specific passwords](https://docs.fastlane.tools/best-practices/continuous-integration/#application-specific-passwords)
