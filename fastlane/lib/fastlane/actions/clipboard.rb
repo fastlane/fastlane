@@ -31,7 +31,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        true
+        return Helper.mac?
       end
 
       def self.example_code
