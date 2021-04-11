@@ -15,7 +15,7 @@ describe Spaceship::SpaceauthRunner do
     end.to output(/export FASTLANE_SESSION=.*name: DES.*name: myacinfo.*name: dqsid.*/).to_stdout
   end
 
-  describe 'exports_to_clipboard option', :if => FastlaneCore::Helper.mac? do
+  describe 'exports_to_clipboard option', if: FastlaneCore::Clipboard.is_supported? do
     before :each do
       # Save clipboard
       @clipboard = FastlaneCore::Clipboard.paste

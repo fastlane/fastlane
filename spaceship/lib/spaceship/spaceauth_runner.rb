@@ -1,6 +1,7 @@
 require 'colored'
 require 'credentials_manager/appfile_config'
 require 'yaml'
+require 'fastlane_core'
 
 require_relative 'tunes/tunes_client'
 
@@ -64,10 +65,10 @@ module Spaceship
 
       if @exports_to_clipboard
         FastlaneCore::Clipboard.copy(content: export_command)
-        UI.success("Successfully copied export command into your clipboard 🎨")
+        puts("Successfully copied export command into your clipboard 🎨".green)
       elsif mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true)
         FastlaneCore::Clipboard.copy(content: yaml)
-        UI.success("Successfully copied text into your clipboard 🎨")
+        puts("Successfully copied text into your clipboard 🎨".green)
       end
     end
 

@@ -27,11 +27,11 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx", "joshdholtz"]
+        ["KrauseFx", "joshdholtz", "rogerluan"]
       end
 
       def self.is_supported?(platform)
-        return Helper.mac?
+        return FastlaneCore::Clipboard.is_supported?
       end
 
       def self.example_code
