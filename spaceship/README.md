@@ -131,6 +131,20 @@ fastlane spaceauth -u user@example.org --exports_to_clipboard && eval $(pbpaste)
 
 This is specially helpful in a CI environment.
 
+Note: `--exports_to_clipboard` uses `pbcopy`, and both `pbcopy` and `pbpaste` are only available in macOS. If you use a different OS, make sure you create an alias to `pbcopy` and `pbpaste`, such as:
+
+```sh
+# On Linux:
+
+alias pbcopy='xsel --clipboard --input'
+alias pbpaste='xsel --clipboard --output'
+
+# or
+
+alias pbcopy='xclip -selection clipboard'
+alias pbpaste='xclip -selection clipboard -o'
+```
+
 #### Transporter
 
 See [Continuous Integration > Authentication with Apple services > Application specific passwords](https://docs.fastlane.tools/best-practices/continuous-integration/#application-specific-passwords)
