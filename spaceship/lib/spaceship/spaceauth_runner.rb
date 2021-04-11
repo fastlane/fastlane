@@ -63,12 +63,11 @@ module Spaceship
       puts(export_command.cyan.underline)
 
       if @exports_to_clipboard
-        require 'open3'
-        Open3.popen3('pbcopy') { |input, _, _| input << export_command }
+        FastlaneCore::Clipboard.copy(content: export_command)
+        UI.success("Successfully copied export command into your clipboard 🎨")
       elsif mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true)
-        require 'open3'
-        Open3.popen3('pbcopy') { |input, _, _| input << yaml }
-        puts("Successfully copied text into your clipboard 🎨".green)
+        FastlaneCore::Clipboard.copy(content: yaml)
+        UI.success("Successfully copied text into your clipboard 🎨")
       end
     end
 

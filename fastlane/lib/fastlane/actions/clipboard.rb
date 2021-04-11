@@ -7,10 +7,7 @@ module Fastlane
         truncated_value = value[0..800].gsub(/\s\w+\s*$/, '...')
         UI.message("Storing '#{truncated_value}' in the clipboard 🎨")
 
-        if FastlaneCore::Helper.mac?
-          require 'open3'
-          Open3.popen3('pbcopy') { |input, _, _| input << value }
-        end
+        FastlaneCore::Clipboard.copy(content: value)
       end
 
       #####################################################

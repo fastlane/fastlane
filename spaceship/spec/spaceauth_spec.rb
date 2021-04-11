@@ -1,4 +1,5 @@
 require_relative 'tunes/tunes_stubbing'
+require 'fastlane_core/clipboard'
 
 describe Spaceship::SpaceauthRunner do
   let(:user_cookie) { TunesStubbing.itc_read_fixture_file('spaceauth_cookie.yml') }
@@ -14,26 +15,25 @@ describe Spaceship::SpaceauthRunner do
     end.to output(/export FASTLANE_SESSION=.*name: DES.*name: myacinfo.*name: dqsid.*/).to_stdout
   end
 
-  describe 'exports_to_clipboard option' do
+  describe 'exports_to_clipboard option', :if => FastlaneCore::Helper.mac? do
     before :each do
       # Save clipboard
-      @clipboard = `pbpaste`
+      @clipboard = FastlaneCore::Clipboard.paste
     end
 
     after :each do
       # Restore clipboard
-      require 'open3'
-      Open3.popen3('pbcopy') { |input, _, _| input << @clipboard }
+      FastlaneCore::Clipboard.copy(content: @clipboard)
     end
 
     it 'when true, it should copy "export FASTLANE_SESSION=…" command to clipboard' do
       Spaceship::SpaceauthRunner.new(exports_to_clipboard: true).run
-      expect(`pbpaste`).to match(/export FASTLANE_SESSION=.*/)
+      expect(FastlaneCore::Clipboard.paste).to match(/export FASTLANE_SESSION=.*/)
     end
 
     it 'when false, it should not copy "export FASTLANE_SESSION=…" command to clipboard' do
       Spaceship::SpaceauthRunner.new(exports_to_clipboard: false).run
-      expect(`pbpaste`).to eq(@clipboard)
+      expect(FastlaneCore::Clipboard.paste).to eq(@clipboard)
     end
   end
 end
