@@ -5,8 +5,7 @@ module Fastlane
         variables = params[:env_vars]
         missing_variables = variables.select { |variable| ENV[variable].to_s.strip.empty? }
 
-        is_one = missing_variables.length == 1
-        UI.user_error!("Missing environment variable#{is_one ? '' : 's'} '#{missing_variables.join('\', \'')}'") unless missing_variables.empty?
+        UI.user_error!("Missing environment variable(s) '#{missing_variables.join('\', \'')}'") unless missing_variables.empty?
 
         is_one = variables.length == 1
         UI.success("Environment variable#{is_one ? '' : 's'} '#{variables.join('\', \'')}' #{is_one ? 'is' : 'are'} set!")

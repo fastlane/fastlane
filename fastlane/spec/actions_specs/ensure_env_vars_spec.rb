@@ -41,7 +41,7 @@ describe Fastlane do
                 ensure_env_vars(env_vars: [\'MISSING\'])
               end').runner.execute(:test)
             end.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
-              expect(error.message).to eq('Missing environment variable \'MISSING\'')
+              expect(error.message).to eq('Missing environment variable(s) \'MISSING\'')
             end
           end
         end
@@ -53,7 +53,7 @@ describe Fastlane do
                 ensure_env_vars(env_vars: [\'MISSING_FIRST\', \'MISSING_SECOND\'])
               end').runner.execute(:test)
             end.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
-              expect(error.message).to eq('Missing environment variables \'MISSING_FIRST\', \'MISSING_SECOND\'')
+              expect(error.message).to eq('Missing environment variable(s) \'MISSING_FIRST\', \'MISSING_SECOND\'')
             end
           end
         end
@@ -69,7 +69,7 @@ describe Fastlane do
                 ensure_env_vars(env_vars: [\'MISSING\'])
               end').runner.execute(:test)
             end.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
-              expect(error.message).to eq('Missing environment variable \'MISSING\'')
+              expect(error.message).to eq('Missing environment variable(s) \'MISSING\'')
             end
           end
         end
