@@ -1,3 +1,4 @@
+require 'fastlane_core'
 require 'open3'
 
 module FastlaneCore
