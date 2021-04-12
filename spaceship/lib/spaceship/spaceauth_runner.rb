@@ -66,6 +66,13 @@ module Spaceship
         FastlaneCore::Clipboard.copy(content: @yaml)
         puts("Successfully copied the session string into your clipboard 🎨".green)
       end
+
+      return self
+    end
+
+    def session_string
+      FastlaneCore::UI.user_error!("`#{__method__}` method called before calling `run` in `SpaceauthRunner`") unless @yaml
+      @yaml
     end
 
     def mac?

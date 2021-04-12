@@ -36,4 +36,17 @@ describe Spaceship::SpaceauthRunner do
       expect(FastlaneCore::Clipboard.paste).to eq(@clipboard)
     end
   end
+
+  describe '#session_string' do
+    it 'should return the session when called after run' do
+      expect(Spaceship::SpaceauthRunner.new.run.session_string).to match(%r{.*domain: idmsa.apple.com.*path: \"\/appleauth\/auth\/\".*})
+    end
+
+    it 'should throw when called before run' do
+      expect(FastlaneCore::UI).to receive(:user_error!).with(/method called before calling `run` in `SpaceauthRunner`/).and_raise("boom")
+      expect do
+        Spaceship::SpaceauthRunner.new.session_string
+      end.to raise_error("boom")
+    end
+  end
 end
