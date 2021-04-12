@@ -5,6 +5,18 @@ require:
   - ./rubocop/missing_keys_on_shared_area.rb
   - ./rubocop/is_string_usage.rb
 
+AllCops:
+  TargetRubyVersion: 2.4
+  Include:
+    - '*/lib/assets/*Template'
+    - '*/lib/assets/*TemplateAndroid'
+  Exclude:
+    - '**/lib/assets/custom_action_template.rb'
+    - './vendor/**/*'
+    - '**/lib/assets/DefaultFastfileTemplate'
+    - '**/lib/assets/MatchfileTemplate'
+    - '**/spec/fixtures/broken_files/broken_file.rb'
+
 Style/MultipleComparison:
   Enabled: false
 
@@ -239,18 +251,6 @@ Style/PerlBackrefs:
 Layout/SpaceAroundOperators:
   Exclude:
     - '**/spec/actions_specs/xcodebuild_spec.rb'
-
-AllCops:
-  TargetRubyVersion: 2.4
-  Include:
-    - '*/lib/assets/*Template'
-    - '*/lib/assets/*TemplateAndroid'
-  Exclude:
-    - '**/lib/assets/custom_action_template.rb'
-    - './vendor/**/*'
-    - '**/lib/assets/DefaultFastfileTemplate'
-    - '**/lib/assets/MatchfileTemplate'
-    - '**/spec/fixtures/broken_files/broken_file.rb'
 
 # They have not to be snake_case
 Naming/FileName:
