@@ -147,7 +147,7 @@ alias pbpaste='xclip -selection clipboard -o'
 
 #### Transporter
 
-See [Continuous Integration > Authentication with Apple services > Application specific passwords](https://docs.fastlane.tools/best-practices/continuous-integration/#application-specific-passwords)
+See [Continuous Integration > Authenticating with Apple services > Method 3: Application-specific passwords](https://docs.fastlane.tools/best-practices/continuous-integration/#method-3-application-specific-passwords)
 
 ## _spaceship_ in use
 
