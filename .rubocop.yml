@@ -8,6 +8,9 @@ require:
 AllCops:
   TargetRubyVersion: 2.4
   Include:
+    - '**/*.rb'
+    - '**/*file'
+    - '**/*.gemspec'
     - '*/lib/assets/*Template'
     - '*/lib/assets/*TemplateAndroid'
   Exclude:
