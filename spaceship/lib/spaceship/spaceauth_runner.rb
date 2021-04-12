@@ -51,24 +51,20 @@ module Spaceship
         cookie.name.start_with?("myacinfo") || cookie.name == "dqsid" || cookie.name.start_with?("DES")
       end
 
-      yaml = cookies.to_yaml.gsub("\n", "\\n")
-      export_command = "export FASTLANE_SESSION='#{yaml}'"
+      @yaml = cookies.to_yaml.gsub("\n", "\\n")
 
       puts("---")
       puts("")
       puts("Pass the following via the FASTLANE_SESSION environment variable:")
-      puts(yaml.cyan.underline)
+      puts(@yaml.cyan.underline)
       puts("")
       puts("")
       puts("Example:")
-      puts(export_command.cyan.underline)
+      puts("export FASTLANE_SESSION='#{@yaml}'".cyan.underline)
 
-      if @exports_to_clipboard
-        FastlaneCore::Clipboard.copy(content: export_command)
-        puts("Successfully copied export command into your clipboard 🎨".green)
-      elsif mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true)
-        FastlaneCore::Clipboard.copy(content: yaml)
-        puts("Successfully copied text into your clipboard 🎨".green)
+      if @exports_to_clipboard || (mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true))
+        FastlaneCore::Clipboard.copy(content: @yaml)
+        puts("Successfully copied the session string into your clipboard 🎨".green)
       end
     end
 

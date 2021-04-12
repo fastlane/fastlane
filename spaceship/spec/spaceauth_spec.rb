@@ -26,12 +26,12 @@ describe Spaceship::SpaceauthRunner do
       FastlaneCore::Clipboard.copy(content: @clipboard)
     end
 
-    it 'when true, it should copy "export FASTLANE_SESSION=…" command to clipboard' do
+    it 'when true, it should copy the session to clipboard' do
       Spaceship::SpaceauthRunner.new(exports_to_clipboard: true).run
-      expect(FastlaneCore::Clipboard.paste).to match(/export FASTLANE_SESSION=.*/)
+      expect(FastlaneCore::Clipboard.paste).to match(%r{.*domain: idmsa.apple.com.*path: \"\/appleauth\/auth\/\".*})
     end
 
-    it 'when false, it should not copy "export FASTLANE_SESSION=…" command to clipboard' do
+    it 'when false, it should not copy the session to clipboard' do
       Spaceship::SpaceauthRunner.new(exports_to_clipboard: false).run
       expect(FastlaneCore::Clipboard.paste).to eq(@clipboard)
     end
