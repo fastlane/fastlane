@@ -280,6 +280,9 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.4.1)
       parser (>= 2.7.1.5)
+    rubocop-performance (1.10.2)
+      rubocop (>= 0.90.0, < 2.0)
+      rubocop-ast (>= 0.4.0)
     rubocop-require_tools (0.1.2)
       rubocop (>= 0.49.1)
     ruby-progressbar (1.11.0)
@@ -385,7 +388,8 @@ DEPENDENCIES
   rest-client (>= 1.8.0)
   rspec (~> 3.10)
   rspec_junit_formatter (~> 0.4.1)
-  rubocop
+  rubocop (= 1.12.1)
+  rubocop-performance
   rubocop-require_tools
   signet (< 0.15.0)
   sinatra (~> 2.0.8)
