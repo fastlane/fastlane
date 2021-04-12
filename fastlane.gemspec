@@ -115,8 +115,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('yard', '~> 0.9.11')
   spec.add_development_dependency('webmock', '~> 3.8')
   spec.add_development_dependency('coveralls', '~> 0.8.13')
-  spec.add_development_dependency('rubocop', Fastlane::RUBOCOP_REQUIREMENT)
-  spec.add_development_dependency('rubocop-require_tools', '>= 0.1.2')
+  spec.add_development_dependency('rubocop')
+  spec.add_development_dependency('rubocop-require_tools')
   spec.add_development_dependency('rb-readline') # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
   spec.add_development_dependency('rest-client', '>= 1.8.0')
   spec.add_development_dependency('fakefs', '~> 1.2')
