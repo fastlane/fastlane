@@ -297,7 +297,7 @@ module Fastlane
       end
 
       def self.generate_slack_attachments(options)
-        UI.deprecation('`Fastlane::Actions::Slack.generate_slack_attachments` is subject to be removed as Slack recommends migrating `attachments` to Block Kit. fastlane will also the same direction.')
+        UI.deprecated('`Fastlane::Actions::Slack.generate_slack_attachments` is subject to be removed as Slack recommends migrating `attachments` to Block Kit. fastlane will also follow the same direction.')
         Runner.generate_slack_attachments(options)
       end
     end
