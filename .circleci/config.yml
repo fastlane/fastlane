@@ -179,6 +179,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
+            bundle update
       - *bundle_install
       - *cache_save_bundler
       - run: bundle exec fastlane generate_swift_api
