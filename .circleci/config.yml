@@ -1,6 +1,8 @@
 ---
 
 version: 2.1
+orbs:
+    shellcheck: circleci/shellcheck@2.2.2
 
 aliases:
   # common - cache
@@ -94,7 +96,6 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            brew install shellcheck
       - *bundle_install
       - *cache_save_bundler
       - run:
@@ -178,7 +179,6 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            brew install shellcheck
       - *bundle_install
       - *cache_save_bundler
       - run: bundle exec fastlane generate_swift_api
