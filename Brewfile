@@ -1,1 +1,2 @@
+ghc
 shellcheck

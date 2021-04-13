@@ -94,6 +94,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
+            brew install ghc
             brew install shellcheck
       - *bundle_install
       - *cache_save_bundler
@@ -178,6 +179,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
+            brew install ghc
             brew install shellcheck
       - *bundle_install
       - *cache_save_bundler
