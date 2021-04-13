@@ -10,6 +10,7 @@
 		0311E387230AC1B20060BB5C /* Plugins.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0311E386230AC1B20060BB5C /* Plugins.swift */; };
 		0311E38B230AC9490060BB5C /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0311E38A230AC9490060BB5C /* Actions.swift */; };
 		1257253924B7992C00E04FA3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1257253824B7992B00E04FA3 /* main.swift */; };
+		12D2EB8D2620D83C00844013 /* ConfigItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D2EB8C2620D83B00844013 /* ConfigItem.swift */; };
 		B302067B1F5E3E9000DE6EBD /* SnapshotfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */; };
 		B302067C1F5E3E9000DE6EBD /* GymfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */; };
 		B302067D1F5E3E9000DE6EBD /* MatchfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */; };
@@ -43,6 +44,7 @@
 		0311E386230AC1B20060BB5C /* Plugins.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Plugins.swift; path = ../Plugins.swift; sourceTree = "<group>"; };
 		0311E38A230AC9490060BB5C /* Actions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Actions.swift; path = ../Actions.swift; sourceTree = "<group>"; };
 		1257253824B7992B00E04FA3 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = ../main.swift; sourceTree = "<group>"; };
+		12D2EB8C2620D83B00844013 /* ConfigItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ConfigItem.swift; path = ../ConfigItem.swift; sourceTree = "<group>"; };
 		B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotfileProtocol.swift; path = ../SnapshotfileProtocol.swift; sourceTree = "<group>"; };
 		B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GymfileProtocol.swift; path = ../GymfileProtocol.swift; sourceTree = "<group>"; };
 		B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MatchfileProtocol.swift; path = ../MatchfileProtocol.swift; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 			children = (
 				B3144C08200553C800470AFE /* README.txt */,
 				B3BA659E1F5A269100B34850 /* LaneFileProtocol.swift */,
+				12D2EB8C2620D83B00844013 /* ConfigItem.swift */,
 			);
 			name = "Fastfile Components";
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				D55B28C91F6C588300DC42C5 /* Snapshotfile.swift in Sources */,
 				B3BA65A61F5A269100B34850 /* Fastlane.swift in Sources */,
 				D55B28C81F6C588300DC42C5 /* Screengrabfile.swift in Sources */,
+				12D2EB8D2620D83C00844013 /* ConfigItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

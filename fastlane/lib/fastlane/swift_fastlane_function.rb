@@ -97,6 +97,8 @@ module Fastlane
         return "Bool"
       elsif type_override == Float
         return "Float"
+      elsif type_override == String
+        return "String"
       elsif type_override == :string_callback
         # David Hart:
         # It doesn't make sense to add escaping annotations to optional closures because they aren't function types:
@@ -190,7 +192,13 @@ module Fastlane
         if default_value.nil?
           "#{param}: #{type}"
         else
-          "#{param}: #{type} = #{default_value}"
+          if type == "((String) -> Void)?"
+            "#{param}: #{type} = nil"
+          elsif optional
+            "#{param}: ConfigItem<#{type}> = .current(#{default_value})"
+          else
+            "#{param}: #{type} = #{default_value}"
+          end
         end
       end
 
@@ -271,12 +279,20 @@ module Fastlane
         return "[]" # return empty list for argument
       end
 
-      argument_object_strings = @param_names.zip(param_type_overrides).map do |name, type_override|
+      argument_object_strings = @param_names.zip(param_type_overrides, param_default_values, param_optionality_values).map do |name, type_override, default_value, is_optional|
         sanitized_name = camel_case_lower(string: name)
         sanitized_name = sanitize_reserved_word(word: sanitized_name)
         type_string = type_override == :string_callback ? ", type: .stringClosure" : nil
+        require 'pry-byebug'
+        # binding.pry if function_name == "deliver"
+        method_call = unless type_override == :string_callback || !is_optional 
+                        ".get()"
+                      else
+                        nil
+                      end 
 
-        "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}#{type_string})"
+
+        "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}#{method_call}#{type_string})"
       end
       return argument_object_strings
     end
@@ -414,7 +430,13 @@ module Fastlane
         param = sanitize_reserved_word(word: param)
         static_var_for_parameter_name = param
 
-        "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"
+        if type == "((String) -> Void)?"
+          "#{param}: #{type} = nil"
+        elsif optional
+          "#{param}: ConfigItem<#{type}> = .current(#{self.class_name.downcase}.#{static_var_for_parameter_name})"
+        else
+          "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"
+        end
       end
 
       return param_names_and_types
