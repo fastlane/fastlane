@@ -283,8 +283,7 @@ module Fastlane
         sanitized_name = camel_case_lower(string: name)
         sanitized_name = sanitize_reserved_word(word: sanitized_name)
         type_string = type_override == :string_callback ? ", type: .stringClosure" : nil
-        require 'pry-byebug'
-        # binding.pry if function_name == "deliver"
+
         method_call = unless type_override == :string_callback || !is_optional 
                         ".get()"
                       else

@@ -28,54 +28,52 @@ public enum ConfigItem<T> {
 }
 
 extension Optional: ExpressibleByIntegerLiteral where Wrapped: ExpressibleByIntegerLiteral {
-  public typealias IntegerLiteralType = Wrapped.IntegerLiteralType
-  public init(integerLiteral value: Wrapped.IntegerLiteralType) {
-    self = .some(.init(integerLiteral: value))
-  }
+    public typealias IntegerLiteralType = Wrapped.IntegerLiteralType
+    public init(integerLiteral value: Wrapped.IntegerLiteralType) {
+        self = .some(.init(integerLiteral: value))
+    }
 }
 
 extension Optional: ExpressibleByUnicodeScalarLiteral where Wrapped: ExpressibleByUnicodeScalarLiteral {
-  public typealias UnicodeScalarLiteralType = Wrapped.UnicodeScalarLiteralType
-  public init(unicodeScalarLiteral value: Wrapped.UnicodeScalarLiteralType) {
-    self = .some(.init(unicodeScalarLiteral: value))
-  }
+    public typealias UnicodeScalarLiteralType = Wrapped.UnicodeScalarLiteralType
+    public init(unicodeScalarLiteral value: Wrapped.UnicodeScalarLiteralType) {
+        self = .some(.init(unicodeScalarLiteral: value))
+    }
 }
 
 extension Optional: ExpressibleByExtendedGraphemeClusterLiteral where Wrapped: ExpressibleByStringLiteral {
-  public typealias ExtendedGraphemeClusterLiteralType = Wrapped.ExtendedGraphemeClusterLiteralType
-  public init(extendedGraphemeClusterLiteral value: Wrapped.ExtendedGraphemeClusterLiteralType) {
-    self = .some(.init(extendedGraphemeClusterLiteral: value))
-  }
+    public typealias ExtendedGraphemeClusterLiteralType = Wrapped.ExtendedGraphemeClusterLiteralType
+    public init(extendedGraphemeClusterLiteral value: Wrapped.ExtendedGraphemeClusterLiteralType) {
+        self = .some(.init(extendedGraphemeClusterLiteral: value))
+    }
 }
 
 extension Optional: ExpressibleByStringLiteral where Wrapped: ExpressibleByStringLiteral {
-  public typealias StringLiteralType = Wrapped.StringLiteralType
-  public init(stringLiteral value: Wrapped.StringLiteralType) {
-    self = .some(.init(stringLiteral: value))
-  }
+    public typealias StringLiteralType = Wrapped.StringLiteralType
+    public init(stringLiteral value: Wrapped.StringLiteralType) {
+        self = .some(.init(stringLiteral: value))
+    }
 }
 
 extension ConfigItem: ExpressibleByUnicodeScalarLiteral where T == String? {
-  public typealias UnicodeScalarLiteralType = String
-  public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
-    self = .new(value)
-  }
+    public typealias UnicodeScalarLiteralType = String
+    public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
+        self = .new(value)
+    }
 }
 
-
 extension ConfigItem: ExpressibleByExtendedGraphemeClusterLiteral where T == String? {
-  public typealias ExtendedGraphemeClusterLiteralType = String
-  public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
-    self = .new(value)
-  }
+    public typealias ExtendedGraphemeClusterLiteralType = String
+    public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
+        self = .new(value)
+    }
 }
 
 extension ConfigItem: ExpressibleByStringLiteral where T == String? {
-  
-  public typealias StringLiteralType = String
+    public typealias StringLiteralType = String
 
     public init(stringLiteral value: StringLiteralType) {
-      self = .new(value)
+        self = .new(value)
     }
 }
 
@@ -86,7 +84,7 @@ extension ConfigItem: ExpressibleByNilLiteral {
 }
 
 extension ConfigItem: ExpressibleByIntegerLiteral where T == Int? {
-  public typealias IntegerLiteralType = Int
+    public typealias IntegerLiteralType = Int
 
     public init(integerLiteral value: IntegerLiteralType) {
         self = .new(value)
