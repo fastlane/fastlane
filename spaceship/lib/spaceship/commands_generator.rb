@@ -39,10 +39,10 @@ module Spaceship
       command :spaceauth do |c|
         c.syntax = 'fastlane spaceship spaceauth'
         c.description = 'Authentication helper for spaceship/fastlane to work with Apple 2-Step/2FA'
-        c.option('--exports_to_clipboard', 'Whether the export method should be copied to clipboard. When using this option, the session can be exported to an env var by calling `eval $(pbpaste)`')
+        c.option('--copy_to_clipboard', 'Whether the session string should be copied to clipboard. For more info see https://docs.fastlane.tools/best-practices/continuous-integration/#storing-a-manually-verified-session-using-spaceauth`')
 
         c.action do |args, options|
-          Spaceship::SpaceauthRunner.new(username: options.user, exports_to_clipboard: options.exports_to_clipboard).run
+          Spaceship::SpaceauthRunner.new(username: options.user, copy_to_clipboard: options.copy_to_clipboard).run
         end
       end
 

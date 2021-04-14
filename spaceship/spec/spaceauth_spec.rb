@@ -15,7 +15,7 @@ describe Spaceship::SpaceauthRunner do
     end.to output(/export FASTLANE_SESSION=.*name: DES.*name: myacinfo.*name: dqsid.*/).to_stdout
   end
 
-  describe 'exports_to_clipboard option', if: FastlaneCore::Clipboard.is_supported? do
+  describe 'copy_to_clipboard option', if: FastlaneCore::Clipboard.is_supported? do
     before :each do
       # Save clipboard
       @clipboard = FastlaneCore::Clipboard.paste
@@ -27,12 +27,12 @@ describe Spaceship::SpaceauthRunner do
     end
 
     it 'when true, it should copy the session to clipboard' do
-      Spaceship::SpaceauthRunner.new(exports_to_clipboard: true).run
+      Spaceship::SpaceauthRunner.new(copy_to_clipboard: true).run
       expect(FastlaneCore::Clipboard.paste).to match(%r{.*domain: idmsa.apple.com.*path: \"\/appleauth\/auth\/\".*})
     end
 
     it 'when false, it should not copy the session to clipboard' do
-      Spaceship::SpaceauthRunner.new(exports_to_clipboard: false).run
+      Spaceship::SpaceauthRunner.new(copy_to_clipboard: false).run
       expect(FastlaneCore::Clipboard.paste).to eq(@clipboard)
     end
   end

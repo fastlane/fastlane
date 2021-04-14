@@ -7,11 +7,11 @@ require_relative 'tunes/tunes_client'
 
 module Spaceship
   class SpaceauthRunner
-    def initialize(username: nil, exports_to_clipboard: nil)
+    def initialize(username: nil, copy_to_clipboard: nil)
       @username = username
       @username ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
       @username ||= ask("Username: ")
-      @exports_to_clipboard = exports_to_clipboard
+      @copy_to_clipboard = copy_to_clipboard
     end
 
     def run
@@ -62,7 +62,7 @@ module Spaceship
       puts("Example:")
       puts("export FASTLANE_SESSION='#{@yaml}'".cyan.underline)
 
-      if @exports_to_clipboard || (mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true))
+      if @copy_to_clipboard || (mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true))
         FastlaneCore::Clipboard.copy(content: @yaml)
         puts("Successfully copied the session string into your clipboard 🎨".green)
       end
