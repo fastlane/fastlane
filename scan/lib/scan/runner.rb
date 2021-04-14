@@ -55,6 +55,8 @@ module Scan
     end
 
     def execute(retries: 0)
+      Scan.cache[:retry_attempt] = Scan.config[:number_of_retries] - retries
+
       command = @test_command_generator.generate
 
       prefix_hash = [
