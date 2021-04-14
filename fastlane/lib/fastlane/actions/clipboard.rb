@@ -31,7 +31,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        return FastlaneCore::Clipboard.is_supported?
+        FastlaneCore::Clipboard.is_supported?
       end
 
       def self.example_code
