@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class GitBranchAction < Action
       def self.run(params)
-        branch = Actions.git_branch
+        branch = Actions.git_branch || ""
         return "" if branch == "HEAD" # Backwards compatibility with the original (and documented) implementation
         branch
       end

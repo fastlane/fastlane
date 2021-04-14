@@ -1,6 +1,8 @@
 ---
 
 version: 2.1
+orbs:
+    shellcheck: circleci/shellcheck@2.2.2 # brew install shellcheck stopped working so using this
 
 aliases:
   # common - cache
@@ -94,7 +96,6 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            brew install shellcheck
       - *bundle_install
       - *cache_save_bundler
       - run:
@@ -178,7 +179,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            brew install shellcheck
+            brew update # Needed because this lane uses "brew bundle" and CircleCI's brew install is too old for that
       - *bundle_install
       - *cache_save_bundler
       - run: bundle exec fastlane generate_swift_api
