@@ -332,7 +332,20 @@ Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS scre
 
 ## Use a clean status bar
 
-You can set `override_status_bar` to `true` in snapshot to set the status bar to Tuesday January 9th at 9:41AM with full battery and reception.
+You can set `override_status_bar` to `true` in snapshot to set the status bar to Tuesday January 9th at 9:41AM with full battery and reception. If you need more granular customization, to set a Carrier name for example, also set `override_status_bar_arguments` to the specific arguments to be passed to the `xcrun simctl status_bar override` command. Run `xcrun simctl status_bar --help` to see the options available.
+
+### Examples
+
+```ruby
+# Sets the time to 9:41AM with full battery and reception, with the default carrier name: Carrier
+override_status_bar(true)
+```
+
+```ruby
+# Set the time to 9:41AM, battery at 75% and charging, on the TELUS LTE network
+override_status_bar(true)
+override_status_bar_arguments("--time 9:41 --dataNetwork lte --cellularMode active --cellularBars 4 --batteryState charging --batteryLevel 75 --operatorName TELUS")
+```
 
 ## Gray artifacts around text
 
