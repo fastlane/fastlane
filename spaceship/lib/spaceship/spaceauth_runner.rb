@@ -6,10 +6,12 @@ require_relative 'tunes/tunes_client'
 
 module Spaceship
   class SpaceauthRunner
-    def initialize(username: nil)
+    def initialize(username: nil, output: nil)
       @username = username
       @username ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
       @username ||= ask("Username: ")
+
+      @output = output
     end
 
     def run
@@ -51,19 +53,24 @@ module Spaceship
 
       yaml = cookies.to_yaml.gsub("\n", "\\n")
 
-      puts("---")
-      puts("")
-      puts("Pass the following via the FASTLANE_SESSION environment variable:")
-      puts(yaml.cyan.underline)
-      puts("")
-      puts("")
-      puts("Example:")
-      puts("export FASTLANE_SESSION='#{yaml}'".cyan.underline)
+      if @output.nil?
+        puts("---")
+        puts("")
+        puts("Pass the following via the FASTLANE_SESSION environment variable:")
+        puts(yaml.cyan.underline, force: true)
+        puts("")
+        puts("")
+        puts("Example:")
+        puts("export FASTLANE_SESSION='#{yaml}'".cyan.underline)
 
-      if mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true)
-        require 'open3'
-        Open3.popen3('pbcopy') { |input, _, _| input << yaml }
-        puts("Successfully copied text into your clipboard 🎨".green)
+        if mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true)
+          require 'open3'
+          Open3.popen3('pbcopy') { |input, _, _| input << yaml }
+          puts("Successfully copied text into your clipboard 🎨".green)
+        end
+      else
+        puts("Writing session token to file #{@output}")
+        File.write(@output, yaml)
       end
     end
 

@@ -39,9 +39,13 @@ module Spaceship
       command :spaceauth do |c|
         c.syntax = 'fastlane spaceship spaceauth'
         c.description = 'Authentication helper for spaceship/fastlane to work with Apple 2-Step/2FA'
+        c.option('-o', '--output OUTPUT', 'Writes the session token to a specified file')
 
         c.action do |args, options|
-          Spaceship::SpaceauthRunner.new(username: options.user).run
+          Spaceship::SpaceauthRunner.new(
+            username: options.user,
+            output: options.output
+          ).run
         end
       end
 
