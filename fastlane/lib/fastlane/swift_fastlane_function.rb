@@ -29,10 +29,10 @@ module Fastlane
       @sample_return_value = non_empty(string: sample_return_value)
       @param_type_overrides = key_type_overrides
 
-      # rubocop:disable LineLength
+      # rubocop:disable Layout/LineLength
       # class instance?
       @reserved_words = %w[associativity break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func guard if in infix init inout internal lazy let mutating nil operator override precedence private public repeat required return self static struct subscript super switch throws true try var weak where while willSet].to_set
-      # rubocop:enable LineLength
+      # rubocop:enable Layout/LineLength
     end
 
     def sanitize_reserved_word(word: nil)
