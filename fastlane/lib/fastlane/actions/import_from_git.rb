@@ -43,7 +43,7 @@ module Fastlane
                                        is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :cache_path,
-                                       description: "The path to a directory where the repository should be cloned into. This is ignored if `version` is not specified. Defaults to `nil`, which causes the repository to be cloned on every call, to a temporary directory",
+                                       description: "The path to a directory where the repository should be cloned into. Defaults to `nil`, which causes the repository to be cloned on every call, to a temporary directory",
                                        default_value: nil,
                                        optional: true)
         ]
