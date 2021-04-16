@@ -1,3 +1,5 @@
+inherit_from: .rubocop_todo.yml
+
 require:
   - rubocop/require_tools
   - rubocop-performance
@@ -210,9 +212,6 @@ Layout/LineLength:
 # Configuration parameters: CountKeywordArgs.
 Metrics/ParameterLists:
   Max: 17
-
-Metrics/PerceivedComplexity:
-  Max: 18
 
 # Sometimes it's easier to read without guards
 Style/GuardClause:
