@@ -62,7 +62,9 @@ module Spaceship
       puts("Example:")
       puts("export FASTLANE_SESSION='#{@yaml}'".cyan.underline)
 
-      if @copy_to_clipboard || (mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true))
+      if @copy_to_clipboard == false
+        puts("Skipped asking to copy the session string into your clipboard ⏭️".green)
+      elsif @copy_to_clipboard || (mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true))
         FastlaneCore::Clipboard.copy(content: @yaml)
         puts("Successfully copied the session string into your clipboard 🎨".green)
       end
