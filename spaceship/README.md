@@ -115,7 +115,7 @@ See [Continuous Integration > Authenticating with Apple services > Method 2: Two
 
 #### Transporter
 
-See [Continuous Integration > Authenticating with Apple services > Method 3: Application-specific passwords](https://docs.fastlane.tools/best-practices/continuous-integration/#method-3-application-specific-passwords)
+See [Getting Started > iOS > Authentication > Method 3: Application-specific passwords](https://docs.fastlane.tools/getting-started/ios/authentication/#method-3-application-specific-passwords)
 
 ## _spaceship_ in use
 
