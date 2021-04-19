@@ -15,7 +15,7 @@ module Spaceship
 
         def find(email)
           all.each do |member|
-            if member.email_address == email
+            if member.email_address.downcase == email
               return member
             end
           end

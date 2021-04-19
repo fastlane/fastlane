@@ -123,7 +123,15 @@ module Fastlane
     # Can be replaced using the environment variable `GIT_BRANCH`
     def self.git_branch
       env_name = SharedValues::GIT_BRANCH_ENV_VARS.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
-      ENV.fetch(env_name.to_s) { Actions.sh("git rev-parse --abbrev-ref HEAD", log: false).chomp }
+      ENV.fetch(env_name.to_s) do
+        # Rescues if not a git repo or no commits in a git repo
+        begin
+          Actions.sh("git rev-parse --abbrev-ref HEAD", log: false).chomp
+        rescue => err
+          UI.verbose("Error getting git branch: #{err.message}")
+          nil
+        end
+      end
     end
 
     private_class_method
