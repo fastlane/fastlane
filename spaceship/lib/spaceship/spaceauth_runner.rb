@@ -1,15 +1,17 @@
 require 'colored'
 require 'credentials_manager/appfile_config'
 require 'yaml'
+require 'fastlane_core'
 
 require_relative 'tunes/tunes_client'
 
 module Spaceship
   class SpaceauthRunner
-    def initialize(username: nil)
+    def initialize(username: nil, copy_to_clipboard: nil)
       @username = username
       @username ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
       @username ||= ask("Username: ")
+      @copy_to_clipboard = copy_to_clipboard
     end
 
     def run
@@ -22,7 +24,7 @@ module Spaceship
         puts("Could not login to App Store Connect".red)
         puts("Please check your credentials and try again.".yellow)
         puts("This could be an issue with App Store Connect,".yellow)
-        puts("Please try unsetting the FASTLANE_SESSION environment variable".yellow)
+        puts("Please try unsetting the FASTLANE_SESSION environment variable by calling 'unset FASTLANE_SESSION'".yellow)
         puts("(if it is set) and re-run `fastlane spaceauth`".yellow)
         puts("")
         puts("Exception type: #{ex.class}")
@@ -49,22 +51,30 @@ module Spaceship
         cookie.name.start_with?("myacinfo") || cookie.name == "dqsid" || cookie.name.start_with?("DES")
       end
 
-      yaml = cookies.to_yaml.gsub("\n", "\\n")
+      @yaml = cookies.to_yaml.gsub("\n", "\\n")
 
       puts("---")
       puts("")
       puts("Pass the following via the FASTLANE_SESSION environment variable:")
-      puts(yaml.cyan.underline)
+      puts(@yaml.cyan.underline)
       puts("")
       puts("")
       puts("Example:")
-      puts("export FASTLANE_SESSION='#{yaml}'".cyan.underline)
+      puts("export FASTLANE_SESSION='#{@yaml}'".cyan.underline)
 
-      if mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true)
-        require 'open3'
-        Open3.popen3('pbcopy') { |input, _, _| input << yaml }
-        puts("Successfully copied text into your clipboard 🎨".green)
+      if @copy_to_clipboard == false
+        puts("Skipped asking to copy the session string into your clipboard ⏭️".green)
+      elsif @copy_to_clipboard || (mac? && Spaceship::Client::UserInterface.interactive? && agree("🙄 Should fastlane copy the cookie into your clipboard, so you can easily paste it? (y/n)", true))
+        FastlaneCore::Clipboard.copy(content: @yaml)
+        puts("Successfully copied the session string into your clipboard 🎨".green)
       end
+
+      return self
+    end
+
+    def session_string
+      FastlaneCore::UI.user_error!("`#{__method__}` method called before calling `run` in `SpaceauthRunner`") unless @yaml
+      @yaml
     end
 
     def mac?
