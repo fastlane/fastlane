@@ -267,6 +267,7 @@ Naming/FileName:
     - '**/Fastfile'
     - '**/Deliverfile'
     - '**/Snapfile'
+    - '**/Pluginfile'
     - '**/*.gemspec'
 
 # We're not there yet
