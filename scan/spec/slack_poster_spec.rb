@@ -2,6 +2,11 @@ require 'scan'
 require 'slack-notifier'
 
 describe Scan::SlackPoster do
+  before do
+    # mock the network request part
+    allow_any_instance_of(Fastlane::Actions::SlackAction::Runner).to receive(:post_message).with(any_args)
+  end
+
   describe "slack_url handling" do
     describe "without a slack_url set" do
       it "skips Slack posting", requires_xcodebuild: true do
