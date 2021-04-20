@@ -164,8 +164,10 @@ module Scan
 
     # The path to the result bundle
     def result_bundle_path
+      retry_count = Scan.cache[:retry_attempt] || 0
+      attempt = retry_count > 0 ? "-#{retry_count}" : ""
       ext = FastlaneCore::Helper.xcode_version.to_i >= 11 ? '.xcresult' : '.test_result'
-      path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + ext
+      path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + attempt + ext
       if File.directory?(path)
         FileUtils.remove_dir(path)
       end
