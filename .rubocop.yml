@@ -22,6 +22,7 @@ AllCops:
     - '**/lib/assets/DefaultFastfileTemplate'
     - '**/lib/assets/MatchfileTemplate'
     - '**/spec/fixtures/broken_files/broken_file.rb'
+    - '**/*.provisionprofile'
 
 Style/MultipleComparison:
   Enabled: false
