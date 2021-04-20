@@ -9,7 +9,7 @@ module Fastlane
       end
 
       # Overriding channel, icon_url and username is only supported in legacy incoming webhook.
-      # And use of attachments is now deprecated.
+      # Also note that the use of attachments has been discouraged by Slack, in favor of Block Kit.
       # https://api.slack.com/legacy/custom-integrations/messaging/webhooks
       def post_to_legacy_incoming_webhook(channel:, username:, attachments:, link_names:, icon_url:)
         @client.post(@webhook_url) do |request|
@@ -24,7 +24,7 @@ module Fastlane
         end
       end
 
-      # This is a substitue of this LinkFormatter in slack-notifier
+      # This class was inspired by `LinkFormatter` in `slack-notifier` gem
       # https://github.com/stevenosloan/slack-notifier/blob/4bf6582663dc9e5070afe3fdc42d67c14a513354/lib/slack-notifier/util/link_formatter.rb
       class LinkConverter
         HTML_PATTERN = %r{<a.*?href=['"](?<link>#{URI.regexp})['"].*?>(?<label>.+?)<\/a>}
