@@ -1,5 +1,5 @@
 describe Screengrab::Runner do
-  let(:config) { {} }
+  let(:config) { { tests_package_name: "com.package.app", test_instrumentation_runner: "Runner" } }
   let(:ui) { Screengrab::UI }
   let(:mock_android_environment) { double(Screengrab.android_environment) }
   let(:mock_executor) { class_double('FastlaneCore::CommandExecutor') }
@@ -32,7 +32,6 @@ describe Screengrab::Runner do
       before do
         config[:launch_arguments] = ["username hjanuschka", "build_type x500"]
         config[:locales] = %w(en-US)
-        config[:ending_locale] = 'en-US'
         config[:use_timestamp_suffix] = true
       end
       it 'sets custom launch_arguments' do
@@ -40,15 +39,14 @@ describe Screengrab::Runner do
         allow(@runner).to receive(:pull_screenshots_from_device)
 
         expect(mock_executor).to receive(:execute)
-          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp true \\\n-e username hjanuschka -e build_type x500 \\\n/"))
-        @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, config[:launch_arguments], 27)
+          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en-US \\\n-e appendTimestamp true \\\n-e username hjanuschka -e build_type x500 \\\ncom.package.app/Runner"))
+        @runner.run_tests_for_locale('device', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, config[:launch_arguments], 27)
       end
     end
 
     context 'when a locale is specified' do
       before do
         config[:locales] = %w(en-US)
-        config[:ending_locale] = 'en-US'
       end
 
       context 'when tests produce a failure' do
@@ -67,7 +65,7 @@ describe Screengrab::Runner do
 
             expect(ui).to receive(:test_failure!).with("Tests failed for locale en-US on device #{device_serial}").and_call_original
 
-            expect { @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil, 27) }.to raise_fastlane_test_failure
+            expect { @runner.run_tests_for_locale('device', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil, 27) }.to raise_fastlane_test_failure
           end
         end
 
@@ -82,7 +80,7 @@ describe Screengrab::Runner do
 
             expect(ui).to receive(:error).with("Tests failed").and_call_original
 
-            @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil, 27)
+            @runner.run_tests_for_locale('device', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil, 27)
           end
         end
       end
@@ -93,7 +91,7 @@ describe Screengrab::Runner do
         before do
           @runner = Screengrab::Runner.new(
             mock_executor,
-            FastlaneCore::Configuration.create(Screengrab::Options.available_options, { use_timestamp_suffix: false }),
+            FastlaneCore::Configuration.create(Screengrab::Options.available_options, { use_timestamp_suffix: false, tests_package_name: "com.package.app", test_instrumentation_runner: "Runner" }),
             mock_android_environment
           )
         end
@@ -102,8 +100,8 @@ describe Screengrab::Runner do
           allow(@runner).to receive(:pull_screenshots_from_device)
 
           expect(mock_executor).to receive(:execute)
-            .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp false \\\n/androidx.test.runner.AndroidJUnitRunner"))
-          @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil, 27)
+            .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en-US \\\n-e appendTimestamp false \\\ncom.package.app/Runner"))
+          @runner.run_tests_for_locale('device', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil, 27)
         end
       end
 
@@ -111,7 +109,7 @@ describe Screengrab::Runner do
         before do
           @runner = Screengrab::Runner.new(
             mock_executor,
-            FastlaneCore::Configuration.create(Screengrab::Options.available_options, {}),
+            FastlaneCore::Configuration.create(Screengrab::Options.available_options, { tests_package_name: "com.package.app", test_instrumentation_runner: "Runner" }),
             mock_android_environment
           )
         end
@@ -120,8 +118,8 @@ describe Screengrab::Runner do
           allow(@runner).to receive(:pull_screenshots_from_device)
 
           expect(mock_executor).to receive(:execute)
-            .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n-e appendTimestamp true \\\n/androidx.test.runner.AndroidJUnitRunner"))
-          @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil, 27)
+            .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en-US \\\n-e appendTimestamp true \\\ncom.package.app/Runner"))
+          @runner.run_tests_for_locale('device', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil, 27)
         end
       end
     end
@@ -130,7 +128,7 @@ describe Screengrab::Runner do
       before do
         @runner = Screengrab::Runner.new(
           mock_executor,
-          FastlaneCore::Configuration.create(Screengrab::Options.available_options, {}),
+          FastlaneCore::Configuration.create(Screengrab::Options.available_options, { tests_package_name: "com.package.app", test_instrumentation_runner: "Runner" }),
           mock_android_environment
         )
       end
@@ -139,8 +137,8 @@ describe Screengrab::Runner do
         allow(@runner).to receive(:pull_screenshots_from_device)
 
         expect(mock_executor).to receive(:execute)
-          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en_US \\\n-e endingLocale en_US \\\n--no-hidden-api-checks \\\n-e appendTimestamp true \\\n/androidx.test.runner.AndroidJUnitRunner"))
-        @runner.run_tests_for_locale('device', 'path', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil, 28)
+          .with(hash_including(command: "adb -s device_serial shell am instrument --no-window-animation -w \\\n-e testLocale en-US \\\n--no-hidden-api-checks \\\n-e appendTimestamp true \\\ncom.package.app/Runner"))
+        @runner.run_tests_for_locale('device', 'en-US', device_serial, test_classes_to_use, test_packages_to_use, nil, 28)
       end
     end
   end
