@@ -294,7 +294,6 @@ module Screengrab
         determine_internal_screenshots_paths(device_serial, @config[:app_package_name], [locale])
       ].flatten
 
-
       # Make a temp directory into which to pull the screenshots before they are moved to their final location.
       # This makes directory cleanup easier, as the temp directory will be removed when the block completes.
 
