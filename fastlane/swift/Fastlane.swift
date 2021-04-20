@@ -7973,8 +7973,8 @@ public func ssh(username: String,
    - skipUploadScreenshots: Whether to skip uploading SCREENSHOTS
    - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal
    - validateOnly: Only validate changes with Google Play rather than actually publish
-   - mapping: Path to the mapping file to upload
-   - mappingPaths: An array of paths to mapping files to upload
+   - mapping: Path to the mapping file to upload (mapping.txt or native-debug-symbols.zip alike)
+   - mappingPaths: An array of paths to mapping files to upload (mapping.txt or native-debug-symbols.zip alike)
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - checkSupersededTracks: **DEPRECATED!** Google Play does this automatically now - Check the other tracks for superseded versions and disable them
    - timeout: Timeout for read, open, and send (in seconds)
@@ -9186,8 +9186,8 @@ public func uploadToAppStore(apiKeyPath: String? = nil,
    - skipUploadScreenshots: Whether to skip uploading SCREENSHOTS
    - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal
    - validateOnly: Only validate changes with Google Play rather than actually publish
-   - mapping: Path to the mapping file to upload
-   - mappingPaths: An array of paths to mapping files to upload
+   - mapping: Path to the mapping file to upload (mapping.txt or native-debug-symbols.zip alike)
+   - mappingPaths: An array of paths to mapping files to upload (mapping.txt or native-debug-symbols.zip alike)
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - checkSupersededTracks: **DEPRECATED!** Google Play does this automatically now - Check the other tracks for superseded versions and disable them
    - timeout: Timeout for read, open, and send (in seconds)
@@ -9887,4 +9887,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.117]
+// FastlaneRunnerAPIVersion [0.9.118]
