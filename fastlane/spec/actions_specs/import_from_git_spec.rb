@@ -234,7 +234,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end
 
-        # Respects the specified version even if the branch is specified
+        # Respects the specified version even if the branch is specified.
         it "works with new tags and branch" do
           Dir.chdir(source_directory_path) do
             `git checkout "master" 2>&1`

@@ -342,7 +342,7 @@ module Fastlane
             # Update the repo if it's eligible for caching but the version isn't specified
             UI.message("Fetching remote git branches and updating git repo...")
             Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-              Actions.sh("cd #{clone_folder.shellescape} && git fetch --all -q && git checkout #{checkout_param.shellescape} #{checkout_path} && git reset --hard && git merge")
+              Actions.sh("cd #{clone_folder.shellescape} && git fetch --all --quiet && git checkout #{checkout_param.shellescape} #{checkout_path} && git reset --hard && git merge")
             end
           else
             Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{checkout_path}")
