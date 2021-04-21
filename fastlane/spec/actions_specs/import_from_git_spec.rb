@@ -210,7 +210,7 @@ describe Fastlane do
         end
 
         # Meaning, `git fetch` and `git merge` are performed when caching is eligible
-        # and the version isn't specified in the local clone.
+        # and the version isn't specified.
         it "works with updated branch" do
           Dir.chdir(source_directory_path) do
             `git checkout "version-2.1" 2>&1`
