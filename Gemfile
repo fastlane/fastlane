@@ -7,7 +7,7 @@ gem "danger-junit", "~> 1.0"
 gem "ox", " 2.14.1"
 
 # Locking this in until Ruby 2.4 is no longer officially supported by fastlane
-gem "google-apis-core", "< 0.6.0"
+gem "google-apis-core", "< 0.8.6"
 gem "google-apis-iamcredentials_v1", "< 0.2.0"
 gem "google-apis-storage_v1", "< 0.3.0"
 gem "google-cloud-core", "< 1.6.0"

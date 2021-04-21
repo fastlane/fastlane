@@ -364,7 +364,7 @@ DEPENDENCIES
   fastlane-plugin-clubmate
   fastlane-plugin-ruby
   fastlane-plugin-slack_train (>= 0.2.0)
-  google-apis-core (< 0.6.0)
+  google-apis-core (< 0.8.6)
   google-apis-iamcredentials_v1 (< 0.2.0)
   google-apis-storage_v1 (< 0.3.0)
   google-cloud-core (< 1.6.0)
