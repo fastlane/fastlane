@@ -209,7 +209,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end
 
-        # Meaning, `git fetch` and `git merge` are performed when caching is eligible
+        # Meaning, `git fetch` and `git rebase` are performed when caching is eligible
         # and the version isn't specified.
         it "works with updated branch" do
           Dir.chdir(source_directory_path) do
