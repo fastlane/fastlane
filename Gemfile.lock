@@ -324,11 +324,7 @@ GEM
       unf_ext
     unf_ext (0.0.7.7)
     unicode-display_width (1.7.0)
-<<<<<<< HEAD
     webmock (3.12.1)
-=======
-    webmock (3.12.0)
->>>>>>> cd0438d7d3008e1180d4ca58f24286d8292fad68
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
@@ -368,7 +364,7 @@ DEPENDENCIES
   fastlane-plugin-clubmate
   fastlane-plugin-ruby
   fastlane-plugin-slack_train (>= 0.2.0)
-  google-apis-core (< 0.3.0)
+  google-apis-core (< 0.6.0)
   google-apis-iamcredentials_v1 (< 0.2.0)
   google-apis-storage_v1 (< 0.3.0)
   google-cloud-core (< 1.6.0)
@@ -376,7 +372,7 @@ DEPENDENCIES
   google-cloud-errors (< 1.1.0)
   google-cloud-storage (< 1.31.0)
   googleauth (< 0.16.0)
-  ox (= 2.13.2)
+  ox (= 2.14.1)
   pry
   pry-byebug
   pry-rescue
