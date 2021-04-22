@@ -149,7 +149,7 @@ module Fastlane
         if include_metadata
           lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\")"
         else
-          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipScreenshots: true, skipMetadata: true)"
+          lane << "\tuploadToAppStore(username: \"#{self.user}\", skipScreenshots: true, skipMetadata: true, app: \"#{self.app_identifier}\")"
         end
         lane << "}"
       else
@@ -219,7 +219,7 @@ module Fastlane
                 "\tcaptureScreenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
 
         if automatic_upload
-          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipBinaryUpload: true, skipMetadata: true)"
+          lane << "\tuploadToAppStore(username: \"#{self.user}\", skipBinaryUpload: true, skipMetadata: true, app: \"#{self.app_identifier}\")"
         end
         lane << "}"
       else
