@@ -23,7 +23,7 @@ module Fastlane
       def take_off
         before_import_time = Time.now
 
-        if !ENV["FASTLANE_DISABLE_ANIMATION"]
+        if ENV["FASTLANE_DISABLE_ANIMATION"].nil?
           # Usually in the fastlane code base we use
           #
           #   Helper.show_loading_indicator

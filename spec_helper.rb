@@ -119,7 +119,7 @@ module FastlaneSpec
     # a wrapper to temporarily modify the values of ARGV to
     # avoid errors like: "warning: already initialized constant ARGV"
     # if no block is given, modifies ARGV for good
-    # rubocop:disable Style/MethodName
+    # rubocop:disable Naming/MethodName
     def self.with_ARGV(argv)
       copy = ARGV.dup
       ARGV.clear
@@ -133,7 +133,7 @@ module FastlaneSpec
         ARGV.concat(copy)
       end
     end
-    # rubocop:enable Style/MethodName
+    # rubocop:enable Naming/MethodName
 
     def self.with_verbose(verbose)
       orig_verbose = FastlaneCore::Globals.verbose?

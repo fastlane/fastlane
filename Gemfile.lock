@@ -218,10 +218,9 @@ GEM
     os (1.1.1)
     ox (2.13.2)
     parallel (1.20.1)
-    parser (2.7.2.0)
+    parser (3.0.1.0)
       ast (~> 2.4.1)
     plist (3.6.0)
-    powerpack (0.1.3)
     pry (0.14.0)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -238,11 +237,11 @@ GEM
     rack (2.2.3)
     rack-protection (2.0.8.1)
       rack
-    rainbow (2.2.2)
-      rake
+    rainbow (3.0.0)
     rake (13.0.3)
     rb-readline (0.5.5)
     rchardet (1.8.0)
+    regexp_parser (2.1.1)
     representable (3.0.4)
       declarative (< 0.1.0)
       declarative-option (< 0.2.0)
@@ -270,13 +269,20 @@ GEM
     rspec-support (3.10.2)
     rspec_junit_formatter (0.4.1)
       rspec-core (>= 2, < 4, != 2.12.0)
-    rubocop (0.49.1)
+    rubocop (1.12.1)
       parallel (~> 1.10)
-      parser (>= 2.3.3.1, < 3.0)
-      powerpack (~> 0.1)
-      rainbow (>= 1.99.1, < 3.0)
+      parser (>= 3.0.0.0)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.8, < 3.0)
+      rexml
+      rubocop-ast (>= 1.2.0, < 2.0)
       ruby-progressbar (~> 1.7)
-      unicode-display_width (~> 1.0, >= 1.0.1)
+      unicode-display_width (>= 1.4.0, < 3.0)
+    rubocop-ast (1.4.1)
+      parser (>= 2.7.1.5)
+    rubocop-performance (1.10.2)
+      rubocop (>= 0.90.0, < 2.0)
+      rubocop-ast (>= 0.4.0)
     rubocop-require_tools (0.1.2)
       rubocop (>= 0.49.1)
     ruby-progressbar (1.11.0)
@@ -382,8 +388,9 @@ DEPENDENCIES
   rest-client (>= 1.8.0)
   rspec (~> 3.10)
   rspec_junit_formatter (~> 0.4.1)
-  rubocop (= 0.49.1)
-  rubocop-require_tools (>= 0.1.2)
+  rubocop (= 1.12.1)
+  rubocop-performance
+  rubocop-require_tools
   signet (< 0.15.0)
   sinatra (~> 2.0.8)
   webmock (~> 3.8)
@@ -392,4 +399,4 @@ DEPENDENCIES
   yard (~> 0.9.11)
 
 BUNDLED WITH
-   2.2.9
+   2.2.16

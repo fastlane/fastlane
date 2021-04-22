@@ -295,7 +295,7 @@ module Fastlane
         end
 
         # Parses the file to find all included actions
-        # rubocop:disable PerceivedComplexity
+        # rubocop:disable Metrics/PerceivedComplexity
         def parse_file(file, debug_state: false)
           lines = File.read(file).lines
           actions = []
