@@ -338,13 +338,17 @@ You can set `override_status_bar` to `true` in snapshot to set the status bar to
 
 ```ruby
 # Sets the time to 9:41AM with full battery and reception, with the default carrier name: Carrier
-override_status_bar(true)
+capture_ios_screenshots(
+	override_status_bar: true
+)
 ```
 
 ```ruby
 # Set the time to 9:41AM, battery at 75% and charging, on the TELUS LTE network
-override_status_bar(true)
-override_status_bar_arguments("--time 9:41 --dataNetwork lte --cellularMode active --cellularBars 4 --batteryState charging --batteryLevel 75 --operatorName TELUS")
+capture_ios_screenshots(
+	override_status_bar: true,
+	override_status_bar_arguments: "--time 9:41 --dataNetwork lte --cellularMode active --cellularBars 4 --batteryState charging --batteryLevel 75 --operatorName TELUS"
+)
 ```
 
 ## Gray artifacts around text
