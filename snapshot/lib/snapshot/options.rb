@@ -130,6 +130,7 @@ module Snapshot
                                      env_name: 'SNAPSHOT_OVERRIDE_STATUS_BAR_ARGUMENTS',
                                      description: "Fully customize the status bar by setting each option here. See `xcrun simctl status_bar --help`",
                                      default_value: "",
+                                     type: String,
                                      is_string: true),
         FastlaneCore::ConfigItem.new(key: :localize_simulator,
                                      env_name: 'SNAPSHOT_LOCALIZE_SIMULATOR',
