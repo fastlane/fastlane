@@ -9,7 +9,7 @@ PATH
       babosa (>= 1.0.3, < 2.0.0)
       bundler (>= 1.12.0, < 3.0.0)
       colored
-      commander-fastlane (>= 4.4.6, < 5.0.0)
+      commander (~> 4.4.6)
       dotenv (>= 2.1.1, < 3.0.0)
       emoji_regex (>= 0.1, < 4.0)
       excon (>= 0.71.0, < 1.0.0)
@@ -78,7 +78,7 @@ GEM
     coderay (1.1.3)
     colored (1.2)
     colored2 (3.1.2)
-    commander-fastlane (4.4.6)
+    commander (4.4.6)
       highline (~> 1.7.2)
     cork (0.3.0)
       colored2 (~> 3.1)
