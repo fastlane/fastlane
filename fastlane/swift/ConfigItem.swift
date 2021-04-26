@@ -11,24 +11,25 @@
 import Foundation
 
 public enum ConfigItem<T> {
-    case current(T)
-    case new(T)
+    case fastlaneDefault(T)
+    case userDefined(T)
     case `nil`
 
     public func get() -> T {
         switch self {
-        case let .current(value):
+        case let .fastlaneDefault(value):
             return value
-        case let .new(value):
+        case let .userDefined(value):
             return value
         case .nil:
-            fatalError("\(#function) getting called in a nil value")
+            preconditionFailure("\(#function) was called from a `ConfigItem.nil`, yet its matching Ruby config item is not optional")
         }
     }
 }
 
 extension Optional: ExpressibleByIntegerLiteral where Wrapped: ExpressibleByIntegerLiteral {
     public typealias IntegerLiteralType = Wrapped.IntegerLiteralType
+
     public init(integerLiteral value: Wrapped.IntegerLiteralType) {
         self = .some(.init(integerLiteral: value))
     }
@@ -36,6 +37,7 @@ extension Optional: ExpressibleByIntegerLiteral where Wrapped: ExpressibleByInte
 
 extension Optional: ExpressibleByUnicodeScalarLiteral where Wrapped: ExpressibleByUnicodeScalarLiteral {
     public typealias UnicodeScalarLiteralType = Wrapped.UnicodeScalarLiteralType
+
     public init(unicodeScalarLiteral value: Wrapped.UnicodeScalarLiteralType) {
         self = .some(.init(unicodeScalarLiteral: value))
     }
@@ -43,6 +45,7 @@ extension Optional: ExpressibleByUnicodeScalarLiteral where Wrapped: Expressible
 
 extension Optional: ExpressibleByExtendedGraphemeClusterLiteral where Wrapped: ExpressibleByStringLiteral {
     public typealias ExtendedGraphemeClusterLiteralType = Wrapped.ExtendedGraphemeClusterLiteralType
+
     public init(extendedGraphemeClusterLiteral value: Wrapped.ExtendedGraphemeClusterLiteralType) {
         self = .some(.init(extendedGraphemeClusterLiteral: value))
     }
@@ -50,6 +53,7 @@ extension Optional: ExpressibleByExtendedGraphemeClusterLiteral where Wrapped: E
 
 extension Optional: ExpressibleByStringLiteral where Wrapped: ExpressibleByStringLiteral {
     public typealias StringLiteralType = Wrapped.StringLiteralType
+
     public init(stringLiteral value: Wrapped.StringLiteralType) {
         self = .some(.init(stringLiteral: value))
     }
@@ -58,14 +62,14 @@ extension Optional: ExpressibleByStringLiteral where Wrapped: ExpressibleByStrin
 extension ConfigItem: ExpressibleByUnicodeScalarLiteral where T == String? {
     public typealias UnicodeScalarLiteralType = String
     public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
-        self = .new(value)
+        self = .userDefined(value)
     }
 }
 
 extension ConfigItem: ExpressibleByExtendedGraphemeClusterLiteral where T == String? {
     public typealias ExtendedGraphemeClusterLiteralType = String
     public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
-        self = .new(value)
+        self = .userDefined(value)
     }
 }
 
@@ -73,7 +77,7 @@ extension ConfigItem: ExpressibleByStringLiteral where T == String? {
     public typealias StringLiteralType = String
 
     public init(stringLiteral value: StringLiteralType) {
-        self = .new(value)
+        self = .userDefined(value)
     }
 }
 
@@ -87,31 +91,31 @@ extension ConfigItem: ExpressibleByIntegerLiteral where T == Int? {
     public typealias IntegerLiteralType = Int
 
     public init(integerLiteral value: IntegerLiteralType) {
-        self = .new(value)
+        self = .userDefined(value)
     }
 }
 
 extension ConfigItem: ExpressibleByArrayLiteral where T == [String] {
     public typealias ArrayLiteralElement = String
 
-    public init(arrayLiteral elements: String...) {
-        self = .new(elements)
+    public init(arrayLiteral elements: ArrayLiteralElement...) {
+        self = .userDefined(elements)
     }
 }
 
 extension ConfigItem: ExpressibleByFloatLiteral where T == Float {
     public typealias FloatLiteralType = Float
 
-    public init(floatLiteral value: Float) {
-        self = .new(value)
+    public init(floatLiteral value: FloatLiteralType) {
+        self = .userDefined(value)
     }
 }
 
 extension ConfigItem: ExpressibleByBooleanLiteral where T == Bool {
     public typealias BooleanLiteralType = Bool
 
-    public init(booleanLiteral value: Bool) {
-        self = .new(value)
+    public init(booleanLiteral value: BooleanLiteralType) {
+        self = .userDefined(value)
     }
 }
 
@@ -125,6 +129,6 @@ extension ConfigItem: ExpressibleByDictionaryLiteral where T == [String: Any] {
         elements.forEach {
             dict[$0.0] = $0.1
         }
-        self = .new(dict)
+        self = .userDefined(dict)
     }
 }

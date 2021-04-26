@@ -156,6 +156,7 @@ module Fastlane
       return "#{type}#{optional_specifier}"
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
     def parameters
       unless @param_names
         return ""
@@ -195,7 +196,7 @@ module Fastlane
           if type == "((String) -> Void)?"
             "#{param}: #{type} = nil"
           elsif optional
-            "#{param}: ConfigItem<#{type}> = .current(#{default_value})"
+            "#{param}: ConfigItem<#{type}> = .fastlaneDefault(#{default_value})"
           else
             "#{param}: #{type} = #{default_value}"
           end
@@ -284,14 +285,7 @@ module Fastlane
         sanitized_name = sanitize_reserved_word(word: sanitized_name)
         type_string = type_override == :string_callback ? ", type: .stringClosure" : nil
 
-        method_call = unless type_override == :string_callback || !is_optional 
-                        ".get()"
-                      else
-                        nil
-                      end 
-
-
-        "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}#{method_call}#{type_string})"
+        "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}#{type_string})"
       end
       return argument_object_strings
     end
@@ -322,13 +316,19 @@ module Fastlane
 
     def implementation
       args = build_argument_list
+      implm = "let args: [RubyCommand.Argument] = [#{args.join(",\n")}]\n"
+      unless args.empty?
+        implm += ".compactMap {\n"
+        implm += "guard let configItem = $0.value as? ConfigItem<Any?> else { return $0 }\n"
+        implm += "switch configItem {\n"
+        implm += "case .userDefined:\n"
+        implm += "return RubyCommand.Argument(name: $0.name, value: configItem.get())\n"
+        implm += "default:\n"
+        implm += "return nil\n"
+        implm += "}\n}\n"
+      end
+      implm += "let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: args)\n"
 
-      implm = "  let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: ["
-      # Get the indent of the first argument in the list to give each
-      # subsequent argument it's own line with proper indenting
-      indent = ' ' * implm.length
-      implm += args.join(",\n#{indent}")
-      implm += "])\n"
       return implm + "  #{return_statement}"
     end
   end
@@ -432,7 +432,7 @@ module Fastlane
         if type == "((String) -> Void)?"
           "#{param}: #{type} = nil"
         elsif optional
-          "#{param}: ConfigItem<#{type}> = .current(#{self.class_name.downcase}.#{static_var_for_parameter_name})"
+          "#{param}: ConfigItem<#{type}> = .fastlaneDefault(#{self.class_name.downcase}.#{static_var_for_parameter_name})"
         else
           "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"
         end
