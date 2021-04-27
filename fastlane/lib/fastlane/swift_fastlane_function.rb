@@ -283,9 +283,13 @@ module Fastlane
       argument_object_strings = @param_names.zip(param_type_overrides, param_default_values, param_optionality_values).map do |name, type_override, default_value, is_optional|
         sanitized_name = camel_case_lower(string: name)
         sanitized_name = sanitize_reserved_word(word: sanitized_name)
-        type_string = type_override == :string_callback ? ", type: .stringClosure" : nil
+        type_string = type_override == :string_callback ? ".stringClosure" : "nil"
 
-        "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}#{type_string})"
+        if !(type_override == :string_callback || !is_optional)
+          { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = #{sanitized_name}.asRubyArgument(name: \"#{name}\", type: #{type_string})" }
+        else
+          { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}, type: #{type_string})" }
+        end
       end
       return argument_object_strings
     end
@@ -316,16 +320,12 @@ module Fastlane
 
     def implementation
       args = build_argument_list
-      implm = "let args: [RubyCommand.Argument] = [#{args.join(",\n")}]\n"
-      unless args.empty?
-        implm += ".compactMap {\n"
-        implm += "guard let configItem = $0.value as? ConfigItem<Any?> else { return $0 }\n"
-        implm += "switch configItem {\n"
-        implm += "case .userDefined:\n"
-        implm += "return RubyCommand.Argument(name: $0.name, value: configItem.get())\n"
-        implm += "default:\n"
-        implm += "return nil\n"
-        implm += "}\n}\n"
+      implm = "#{args.group_by { |h| h[:arg] }.keys.join("\n")}\n"
+      if args.empty?
+        implm += "let args: [RubyCommand.Argument] = []\n"
+      else
+        implm += "let args = [#{args.group_by { |h| h[:name] }.keys.join(",\n")}]\n"
+        implm += ".compactMap { $0 }\n"
       end
       implm += "let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: args)\n"
 

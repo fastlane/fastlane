@@ -15,15 +15,11 @@ public enum ConfigItem<T> {
     case userDefined(T)
     case `nil`
 
-    public func get() -> T {
-        switch self {
-        case let .fastlaneDefault(value):
-            return value
-        case let .userDefined(value):
-            return value
-        case .nil:
-            preconditionFailure("\(#function) was called from a `ConfigItem.nil`, yet its matching Ruby config item is not optional")
+    func asRubyArgument(name: String, type: RubyCommand.Argument.ArgType? = nil) -> RubyCommand.Argument? {
+        if case let .userDefined(value) = self {
+            return RubyCommand.Argument(name: name, value: value, type: type)
         }
+        return nil
     }
 }
 
