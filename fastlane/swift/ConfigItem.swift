@@ -117,11 +117,10 @@ extension ConfigItem: ExpressibleByBooleanLiteral where T == Bool {
 
 extension ConfigItem: ExpressibleByDictionaryLiteral where T == [String: Any] {
     public typealias Key = String
-
     public typealias Value = Any
 
-    public init(dictionaryLiteral elements: (String, Any)...) {
-        var dict: [String: Any] = [:]
+    public init(dictionaryLiteral elements: (Key, Value)...) {
+        var dict: [Key: Value] = [:]
         elements.forEach {
             dict[$0.0] = $0.1
         }
