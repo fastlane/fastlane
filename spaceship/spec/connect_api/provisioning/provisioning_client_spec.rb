@@ -77,7 +77,7 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
           params = {}
           req_mock = test_request_body(path, params)
           expect(client).to receive(:request).with(:post).and_yield(req_mock)
-          client.get_certificates(profile_id: 123456789)
+          client.get_certificates(profile_id: '123456789')
         end
       end
     end
