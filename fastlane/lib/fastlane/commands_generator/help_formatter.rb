@@ -1,6 +1,6 @@
 module Fastlane
   class CommandsGenerator
-    class TerminalCompact < ::Commander::HelpFormatter::TerminalCompact
+    class HelpFormatter < ::Commander::HelpFormatter::TerminalCompact
       def template(name)
         if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.6')
           ERB.new(File.read(File.join(File.dirname(__FILE__), "#{name}.erb")), nil, '-')
