@@ -235,7 +235,6 @@ module Deliver
                                      env_name: "DELIVER_TEAM_ID",
                                      description: "The ID of your App Store Connect team if you're in multiple teams",
                                      optional: true,
-                                     # type: Any,
                                      skip_type_validation: true, # as we also allow integers, which we convert to strings anyway
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
@@ -298,7 +297,6 @@ module Deliver
                                      env_name: "DELIVER_PRECHECK_DEFAULT_RULE_LEVEL",
                                      description: "The default precheck rule level unless otherwise configured",
                                      type: Symbol,
-                                     skip_type_validation: true,
                                      default_value: :warn),
 
         # App Metadata
