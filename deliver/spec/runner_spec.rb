@@ -42,9 +42,14 @@ describe Deliver::Runner do
       ipa: 'ACME.ipa',
       app_identifier: 'com.acme.acme',
       app_version: '1.0.7',
-      app: double('app', { id: 'YI8C2AS' }),
       platform: 'ios'
     }
+  end
+
+  before do
+    allow(Deliver).to receive(:cache).and_return({
+      app: double('app', { id: 'YI8C2AS' })
+    })
   end
 
   describe :upload_binary do

@@ -298,6 +298,7 @@ CrossPlatform/ForkUsage:
 Lint/IsStringUsage:
   Include:
     - 'cert/**/*'
+    - 'deliver/**/*'
     - 'gym/**/*'
     - 'match/**/*'
     - 'screengrab/**/*'

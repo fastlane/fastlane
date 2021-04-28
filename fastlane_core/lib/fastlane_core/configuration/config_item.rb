@@ -262,6 +262,8 @@ module FastlaneCore
         return value.to_i if value.to_i.to_s == value.to_s
       elsif data_type == Float
         return value.to_f if value.to_f.to_s == value.to_s
+      elsif data_type == Symbol
+        return value.to_sym if value.to_sym.to_s == value.to_s
       elsif allow_shell_conversion
         return value.shelljoin if value.kind_of?(Array)
         return value.map { |k, v| "#{k.to_s.shellescape}=#{v.shellescape}" }.join(' ') if value.kind_of?(Hash)

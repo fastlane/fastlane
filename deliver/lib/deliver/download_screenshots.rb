@@ -13,7 +13,7 @@ module Deliver
     end
 
     def self.download(options, folder_path)
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       if options[:use_live_version]

@@ -32,6 +32,12 @@ module FastlaneCore
 
         # Boolean is a fastlane thing, it's either TrueClass, or FalseClass, but we won't know
         # that until runtime, so nil is the best we get
+        if type == Symbol
+          type = String
+        end
+
+        # Boolean is a fastlane thing, it's either TrueClass, or FalseClass, but we won't know
+        # that until runtime, so nil is the best we get
         if type == Fastlane::Boolean
           type = nil
         end
