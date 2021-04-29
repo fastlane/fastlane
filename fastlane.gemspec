@@ -83,14 +83,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency('artifactory', '~> 3.0') # Used to export to an artifactory server
   spec.add_dependency('babosa', '>= 1.0.3', "< 2.0.0") # library for creating human-friendly identifiers, aka "slugs"
   spec.add_dependency('colored') # colored terminal output
-  spec.add_dependency('commander', '= 4.4.4') # CLI parser
+  spec.add_dependency('commander', '~> 4.6') # CLI parser
   spec.add_dependency('excon', '>= 0.71.0', '< 1.0.0') # Great HTTP Client
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
   spec.add_dependency('faraday', '~> 1.0') # The faraday gem is used for deploygate, hockey and testfairy actions.
   spec.add_dependency('faraday_middleware', '~> 1.0') # Same as faraday
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
-  spec.add_dependency('highline', '>= 1.7.2', '< 2.0.0') # user inputs (e.g. passwords)
+  spec.add_dependency('highline', '~> 2.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
   spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
   spec.add_dependency('naturally', '~> 2.2') # Used to sort strings with numbers in a human-friendly way
