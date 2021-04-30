@@ -1,6 +1,7 @@
 require 'commander'
 
 require 'fastlane/version'
+require 'fastlane/commands_generator/help_formatter'
 require 'fastlane_core/fastlane_folder'
 require 'fastlane_core/configuration/configuration'
 require_relative 'android_environment'
@@ -26,7 +27,7 @@ module Screengrab
       program :help, 'Authors', 'Andrea Falcone <asfalcone@google.com>, Michael Furtak <mfurtak@google.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'Documentation', 'https://docs.fastlane.tools/actions/screengrab/'
-      program :help_formatter, :compact
+      program :help_formatter, Fastlane::CommandsGenerator::HelpFormatter
 
       global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }
 

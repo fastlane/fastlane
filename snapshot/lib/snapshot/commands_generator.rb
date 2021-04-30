@@ -1,5 +1,7 @@
 require 'commander'
 
+require 'fastlane/commands_generator/help_formatter'
+
 require_relative 'module'
 require_relative 'runner'
 require_relative 'options'
@@ -21,7 +23,7 @@ module Snapshot
       program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'Documentation', 'https://docs.fastlane.tools/actions/snapshot/'
-      program :help_formatter, :compact
+      program :help_formatter, Fastlane::CommandsGenerator::HelpFormatter
 
       global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }
 
