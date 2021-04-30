@@ -65,7 +65,6 @@ Gem::Specification.new do |spec|
   # spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = Dir["*/lib"]
 
-  spec.add_dependency('slack-notifier', '>= 2.0.0', '< 3.0.0') # Slack notifications
   spec.add_dependency('xcodeproj', '>= 1.13.0', '< 2.0.0') # Modify Xcode projects
   spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output
   spec.add_dependency('terminal-notifier', '>= 2.0.0', '< 3.0.0') # macOS notifications
