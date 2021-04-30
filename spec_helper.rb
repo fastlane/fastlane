@@ -124,6 +124,9 @@ module FastlaneSpec
       copy = ARGV.dup
       ARGV.clear
       ARGV.concat(argv)
+      # Commander::Methods imports delegate methods that shares the singleton
+      # so this prevents Commander from choosing wrong command previously cached.
+      Commander::Runner.instance_variable_set(:@instance, nil)
       begin
         # Do not check for "block_given?". This method is useless without a
         # block, and must fail if used like that.
