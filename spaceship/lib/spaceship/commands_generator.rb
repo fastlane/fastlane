@@ -3,7 +3,7 @@ require 'highline'
 HighLine.track_eof = false
 
 require 'fastlane/version'
-require 'fastlane/commands_generator/help_formatter'
+require 'fastlane_core/ui/help_formatter'
 require_relative 'playground'
 require_relative 'spaceauth_runner'
 
@@ -22,7 +22,7 @@ module Spaceship
       program :help, 'Author', 'Felix Krause <spaceship@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'GitHub', 'https://github.com/fastlane/fastlane/tree/master/spaceship'
-      program :help_formatter, Fastlane::CommandsGenerator::HelpFormatter
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('-u', '--user USERNAME', 'Specify the Apple ID you want to log in with')
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }

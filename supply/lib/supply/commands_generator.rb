@@ -1,6 +1,6 @@
 require "commander"
 require "fastlane_core"
-require 'fastlane/commands_generator/help_formatter'
+require 'fastlane_core/ui/help_formatter'
 require "supply"
 
 HighLine.track_eof = false
@@ -20,7 +20,7 @@ module Supply
       program :help, 'Author', 'Felix Krause <supply@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'Documentation', 'https://docs.fastlane.tools/actions/supply/'
-      program :help_formatter, Fastlane::CommandsGenerator::HelpFormatter
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       always_trace!
 

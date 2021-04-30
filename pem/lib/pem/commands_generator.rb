@@ -2,7 +2,7 @@ require 'commander'
 
 require 'fastlane/version'
 require 'fastlane_core/configuration/configuration'
-require 'fastlane/commands_generator/help_formatter'
+require 'fastlane_core/ui/help_formatter'
 require_relative 'options'
 require_relative 'manager'
 
@@ -23,7 +23,7 @@ module PEM
       program :help, 'Author', 'Felix Krause <pem@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'Documentation', 'https://docs.fastlane.tools/actions/pem/'
-      program :help_formatter, Fastlane::CommandsGenerator::HelpFormatter
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
       global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')

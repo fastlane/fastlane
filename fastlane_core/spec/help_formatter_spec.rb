@@ -1,7 +1,4 @@
-require 'commander'
-require 'fastlane/commands_generator'
-
-describe Fastlane::CommandsGenerator::HelpFormatter do
+describe FastlaneCore::HelpFormatter do
   MockCommand = Struct.new(:name, :summary, :description, :options)
   class MockCommanderRunner
     attr_accessor :commands, :program, :options, :aliases, :default_command

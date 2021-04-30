@@ -4,7 +4,7 @@ require "fastlane_core/configuration/commander_generator"
 require "fastlane_core/configuration/configuration"
 require "fastlane_core/helper"
 require "fastlane/version"
-require 'fastlane/commands_generator/help_formatter'
+require 'fastlane_core/ui/help_formatter'
 
 require_relative 'module'
 require_relative 'options'
@@ -27,7 +27,7 @@ module Precheck
       program :help, "Author", "Joshua Liebowitz <taquitos@gmail.com>, @taquitos"
       program :help, "Website", "https://fastlane.tools"
       program :help, "Documentation", "https://docs.fastlane.tools/actions/precheck/"
-      program :help_formatter, Fastlane::CommandsGenerator::HelpFormatter
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option("--verbose") { FastlaneCore::Globals.verbose = true }
 

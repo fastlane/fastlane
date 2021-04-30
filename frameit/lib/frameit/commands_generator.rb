@@ -1,6 +1,6 @@
 require 'commander'
 require 'fastlane/version'
-require 'fastlane/commands_generator/help_formatter'
+require 'fastlane_core/ui/help_formatter'
 require 'fastlane_core/globals'
 require 'fastlane_core/configuration/configuration'
 
@@ -28,7 +28,7 @@ module Frameit
       program :help, 'Author', 'Felix Krause <frameit@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'Documentation', 'https://docs.fastlane.tools/actions/frameit/'
-      program :help_formatter, Fastlane::CommandsGenerator::HelpFormatter
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
       global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
