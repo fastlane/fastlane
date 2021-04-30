@@ -92,6 +92,12 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
+      def fetch_all_certificates(client: nil, filter: {}, includes: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_certificates(profile_id: id, filter: filter, includes: includes).all_pages
+        return resps.flat_map(&:to_models)
+      end
+
       def delete!(client: nil)
         client ||= Spaceship::ConnectAPI
         return client.delete_profile(profile_id: id)
