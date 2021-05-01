@@ -1,5 +1,16 @@
 describe FastlaneCore::HelpFormatter do
-  MockCommand = Struct.new(:name, :summary, :description, :options)
+  class MockCommand
+    attr_accessor :name, :summary, :description, :options, :examples
+
+    def initialize(name, summary, description, options, examples)
+      @name = name
+      @summary = summary
+      @description = description
+      @options = options
+      @examples = examples
+    end
+  end
+
   class MockCommanderRunner
     attr_accessor :commands, :program, :options, :aliases, :default_command
 
@@ -34,9 +45,9 @@ describe FastlaneCore::HelpFormatter do
       }
     ]
     commander.commands = {
-      foo: MockCommand.new('foo', 'Print foo', 'Print foo description', []),
-      bar: MockCommand.new('bar', 'Print bar', 'Print bar description', []),
-      foo_bar: MockCommand.new('foo_bar', 'Print foo bar', 'Print foo bar description', default_command_options)
+      foo: MockCommand.new('foo', 'Print foo', 'Print foo description', [], []),
+      bar: MockCommand.new('bar', 'Print bar', 'Print bar description', [], []),
+      foo_bar: MockCommand.new('foo_bar', 'Print foo bar', 'Print foo bar description', default_command_options, [])
     }
   end
 
@@ -51,5 +62,11 @@ describe FastlaneCore::HelpFormatter do
     help = described_class.new(commander).render
     expect(help).not_to match(/\(\* default\)/)
     expect(help).not_to match(/\* Print foo bar/)
+  end
+
+  it 'should still renders a subcommand with super class\'s template' do
+    command = commander.commands[:foo]
+    help = described_class.new(commander).render_command(command)
+    expect(help).to match(/#{command.description}/)
   end
 end
