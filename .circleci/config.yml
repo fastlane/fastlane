@@ -89,10 +89,6 @@ jobs:
           command: |
             ruby -v
       - run:
-          name: debug | brew version
-          command: |
-            brew -v
-      - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
@@ -175,13 +171,12 @@ jobs:
       - *cache_save_git
       - *cache_restore_bundler
       - *set_ruby
-      - run:
-          name: Setup Build
-          command: |
-            mkdir -p ~/test-reports
-            brew update # Needed because this lane uses "brew bundle" and CircleCI's brew install is too old for that
       - *bundle_install
       - *cache_save_bundler
+      - run:
+          name: debug | brew version
+          command: |
+            brew -v
       - run: bundle exec fastlane generate_swift_api
 
   validate_documentation:
@@ -261,8 +256,8 @@ workflows:
           xcode_version: '11.4.0'
           ruby_version: '2.6'
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 12.3.0, Ruby 2.7)'
-          xcode_version: '12.3.0'
+          name: 'Execute tests on macOS (Xcode 12.4.0, Ruby 2.7)'
+          xcode_version: '12.4.0'
           ruby_version: '2.7'
           ruby_opt: -W:deprecated
       - tests_ubuntu:
@@ -270,8 +265,8 @@ workflows:
           ruby_version: 'fastlanetools/ci:0.3.0'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
-          xcode_version: '11.0.0'
-          ruby_version: '2.5'
+          xcode_version: '12.4.0'
+          ruby_version: '2.7'
       - validate_documentation:
           name: 'Validate Documentation'
           ruby_version: 'circleci/ruby:2.5'
