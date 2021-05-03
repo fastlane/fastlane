@@ -91,7 +91,7 @@
 
           .app-changelog-list {
               list-style-type: square;
-              
+
               font-weight: 300;
           }
 
@@ -137,10 +137,10 @@
           }
         </style>
     </head>
-    
+
     <body>
       <div class="app-icons">
-        
+
         <% if @options[:app_icon] %>
         <div class="app-icon">
           Large App Icon:<br>
@@ -182,7 +182,7 @@
             <% end %>
           <% end %>
         </div>
-        
+
         <% if @options[:keywords] and @options[:keywords][language] %>
           <div class="app-keyword">
               <div class="cat-headline">Keywords</div>
@@ -193,7 +193,7 @@
               </ul>
           </div>
         <% end %>
-        
+
         <% if @options[:description] %>
           <div class="app-description">
                <div class="cat-headline">Description</div>
@@ -202,7 +202,7 @@
                </div>
           </div>
         <% end %>
-        
+
         <% if @options[:release_notes] %>
           <div class="app-changelog">
               <div class="cat-headline">Changelog</div>
@@ -216,7 +216,7 @@
               <%= (@options[:promotional_text][language] || '').gsub("\n", "<br />") %>
           </div>
         <% end %>
-        
+
         <div class="app-screenshots">
           <div class="cat-headline">Screenshots</div>
 
@@ -237,7 +237,7 @@
               <div class="app-screenshot-row">
 
               <% screenshots.each_with_index do |screenshot, index| %>
-                <a href="<%= URI.escape(screenshot.path) %>" target="_blank"><img class="app-screenshot" src="<%= render_relative_path(@export_path, URI.escape(screenshot.path)) %>" title="Screenshot #<%=index%> for <%=language%>"></a>
+                <a href="<%= Addressable::URI.encode(screenshot.path) %>" target="_blank"><img class="app-screenshot" src="<%= render_relative_path(@export_path, Addressable::URI.encode(screenshot.path)) %>" title="Screenshot #<%=index%> for <%=language%>"></a>
               <% end %>
               </div>
             <% end %>
@@ -250,7 +250,7 @@
                 <% if options[:overwrite_screenshots] %>
                   <b>--overwrite_screenshots</b> is set, existing screenshots will be removed, but none will be uploaded.
                 <% else %>
-                  The existing screenshots on App Store Connect will be kept. 
+                  The existing screenshots on App Store Connect will be kept.
                   if you want to remove them you have to use the <i>--overwrite_screenshots</i> flag.
                 <% end %>
               <p>
@@ -259,7 +259,7 @@
             </div>
           <% end %>
           </div>
-        
+
         <hr />
       <% end # end data
       %>
