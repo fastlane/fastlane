@@ -232,7 +232,7 @@ module Fastlane
       # Adds newlines between each documentation element.
       documentation = documentation_elements.flat_map { |element| [element, separator] }.tap(&:pop).join("\n")
 
-      return "/**\n#{documentation}\n*/\n"
+      return "/**\n#{documentation.gsub('/*', '/\\*')}\n*/\n"
     end
 
     def swift_parameter_documentation
