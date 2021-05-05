@@ -97,6 +97,8 @@ module Fastlane
         return "Bool"
       elsif type_override == Float
         return "Float"
+      elsif type_override == String
+        return "String"
       elsif type_override == :string_callback
         # David Hart:
         # It doesn't make sense to add escaping annotations to optional closures because they aren't function types:
@@ -154,6 +156,7 @@ module Fastlane
       return "#{type}#{optional_specifier}"
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
     def parameters
       unless @param_names
         return ""
@@ -190,7 +193,13 @@ module Fastlane
         if default_value.nil?
           "#{param}: #{type}"
         else
-          "#{param}: #{type} = #{default_value}"
+          if type == "((String) -> Void)?"
+            "#{param}: #{type} = nil"
+          elsif optional && type.end_with?('?')
+            "#{param}: OptionalConfigValue<#{type}> = .fastlaneDefault(#{default_value})"
+          else
+            "#{param}: #{type} = #{default_value}"
+          end
         end
       end
 
@@ -271,12 +280,16 @@ module Fastlane
         return "[]" # return empty list for argument
       end
 
-      argument_object_strings = @param_names.zip(param_type_overrides).map do |name, type_override|
+      argument_object_strings = @param_names.zip(param_type_overrides, param_default_values, param_optionality_values).map do |name, type_override, default_value, is_optional|
         sanitized_name = camel_case_lower(string: name)
         sanitized_name = sanitize_reserved_word(word: sanitized_name)
-        type_string = type_override == :string_callback ? ", type: .stringClosure" : nil
+        type_string = type_override == :string_callback ? ".stringClosure" : "nil"
 
-        "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}#{type_string})"
+        if !(type_override == :string_callback || !(is_optional && default_value.nil?))
+          { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = #{sanitized_name}.asRubyArgument(name: \"#{name}\", type: #{type_string})" }
+        else
+          { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}, type: #{type_string})" }
+        end
       end
       return argument_object_strings
     end
@@ -307,13 +320,15 @@ module Fastlane
 
     def implementation
       args = build_argument_list
+      implm = "#{args.group_by { |h| h[:arg] }.keys.join("\n")}\n"
+      if args.empty?
+        implm += "let args: [RubyCommand.Argument] = []\n"
+      else
+        implm += "let args = [#{args.group_by { |h| h[:name] }.keys.join(",\n")}]\n"
+        implm += ".compactMap { $0 }\n"
+      end
+      implm += "let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: args)\n"
 
-      implm = "  let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: ["
-      # Get the indent of the first argument in the list to give each
-      # subsequent argument it's own line with proper indenting
-      indent = ' ' * implm.length
-      implm += args.join(",\n#{indent}")
-      implm += "])\n"
       return implm + "  #{return_statement}"
     end
   end
@@ -414,7 +429,13 @@ module Fastlane
         param = sanitize_reserved_word(word: param)
         static_var_for_parameter_name = param
 
-        "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"
+        if type == "((String) -> Void)?"
+          "#{param}: #{type} = nil"
+        elsif optional && type.end_with?('?')
+          "#{param}: OptionalConfigValue<#{type}> = .fastlaneDefault(#{self.class_name.downcase}.#{static_var_for_parameter_name})"
+        else
+          "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"
+        end
       end
 
       return param_names_and_types
