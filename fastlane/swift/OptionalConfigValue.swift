@@ -1,4 +1,4 @@
-// ConfigItem.swift
+// OptionalConfigValue.swift
 // Copyright (c) 2021 FastlaneTools
 
 //
@@ -10,7 +10,7 @@
 
 import Foundation
 
-public enum ConfigItem<T> {
+public enum OptionalConfigValue<T> {
     case fastlaneDefault(T)
     case userDefined(T)
     case `nil`
@@ -55,21 +55,23 @@ extension Optional: ExpressibleByStringLiteral where Wrapped: ExpressibleByStrin
     }
 }
 
-extension ConfigItem: ExpressibleByUnicodeScalarLiteral where T == String? {
+extension OptionalConfigValue: ExpressibleByUnicodeScalarLiteral where T == String? {
     public typealias UnicodeScalarLiteralType = String
+
     public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
         self = .userDefined(value)
     }
 }
 
-extension ConfigItem: ExpressibleByExtendedGraphemeClusterLiteral where T == String? {
+extension OptionalConfigValue: ExpressibleByExtendedGraphemeClusterLiteral where T == String? {
     public typealias ExtendedGraphemeClusterLiteralType = String
+
     public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
         self = .userDefined(value)
     }
 }
 
-extension ConfigItem: ExpressibleByStringLiteral where T == String? {
+extension OptionalConfigValue: ExpressibleByStringLiteral where T == String? {
     public typealias StringLiteralType = String
 
     public init(stringLiteral value: StringLiteralType) {
@@ -77,13 +79,13 @@ extension ConfigItem: ExpressibleByStringLiteral where T == String? {
     }
 }
 
-extension ConfigItem: ExpressibleByNilLiteral {
+extension OptionalConfigValue: ExpressibleByNilLiteral {
     public init(nilLiteral _: ()) {
         self = .nil
     }
 }
 
-extension ConfigItem: ExpressibleByIntegerLiteral where T == Int? {
+extension OptionalConfigValue: ExpressibleByIntegerLiteral where T == Int? {
     public typealias IntegerLiteralType = Int
 
     public init(integerLiteral value: IntegerLiteralType) {
@@ -91,7 +93,7 @@ extension ConfigItem: ExpressibleByIntegerLiteral where T == Int? {
     }
 }
 
-extension ConfigItem: ExpressibleByArrayLiteral where T == [String] {
+extension OptionalConfigValue: ExpressibleByArrayLiteral where T == [String] {
     public typealias ArrayLiteralElement = String
 
     public init(arrayLiteral elements: ArrayLiteralElement...) {
@@ -99,7 +101,7 @@ extension ConfigItem: ExpressibleByArrayLiteral where T == [String] {
     }
 }
 
-extension ConfigItem: ExpressibleByFloatLiteral where T == Float {
+extension OptionalConfigValue: ExpressibleByFloatLiteral where T == Float {
     public typealias FloatLiteralType = Float
 
     public init(floatLiteral value: FloatLiteralType) {
@@ -107,7 +109,7 @@ extension ConfigItem: ExpressibleByFloatLiteral where T == Float {
     }
 }
 
-extension ConfigItem: ExpressibleByBooleanLiteral where T == Bool {
+extension OptionalConfigValue: ExpressibleByBooleanLiteral where T == Bool {
     public typealias BooleanLiteralType = Bool
 
     public init(booleanLiteral value: BooleanLiteralType) {
@@ -115,7 +117,7 @@ extension ConfigItem: ExpressibleByBooleanLiteral where T == Bool {
     }
 }
 
-extension ConfigItem: ExpressibleByDictionaryLiteral where T == [String: Any] {
+extension OptionalConfigValue: ExpressibleByDictionaryLiteral where T == [String: Any] {
     public typealias Key = String
     public typealias Value = Any
 

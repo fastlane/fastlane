@@ -195,8 +195,8 @@ module Fastlane
         else
           if type == "((String) -> Void)?"
             "#{param}: #{type} = nil"
-          elsif optional
-            "#{param}: ConfigItem<#{type}> = .fastlaneDefault(#{default_value})"
+          elsif optional && type.end_with?('?')
+            "#{param}: OptionalConfigValue<#{type}> = .fastlaneDefault(#{default_value})"
           else
             "#{param}: #{type} = #{default_value}"
           end
@@ -285,7 +285,7 @@ module Fastlane
         sanitized_name = sanitize_reserved_word(word: sanitized_name)
         type_string = type_override == :string_callback ? ".stringClosure" : "nil"
 
-        if !(type_override == :string_callback || !is_optional)
+        if !(type_override == :string_callback || !(is_optional && default_value.nil?))
           { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = #{sanitized_name}.asRubyArgument(name: \"#{name}\", type: #{type_string})" }
         else
           { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}, type: #{type_string})" }
@@ -431,8 +431,8 @@ module Fastlane
 
         if type == "((String) -> Void)?"
           "#{param}: #{type} = nil"
-        elsif optional
-          "#{param}: ConfigItem<#{type}> = .fastlaneDefault(#{self.class_name.downcase}.#{static_var_for_parameter_name})"
+        elsif optional && type.end_with?('?')
+          "#{param}: OptionalConfigValue<#{type}> = .fastlaneDefault(#{self.class_name.downcase}.#{static_var_for_parameter_name})"
         else
           "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"
         end
