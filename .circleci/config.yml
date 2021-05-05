@@ -107,8 +107,8 @@ jobs:
           name: Check compatibility with Ruby 3.0
           command: |
             touch ~/test-reports/ruby_warnings.txt
-            # TODO remove 'grep -v ".bundle"' once 3rd party dependencies support Ruby 3.0
-            ! cat ~/test-reports/ruby_warnings.txt | grep -v ".bundle" | grep -E "warning:\s.*(deprecated).*$" && echo "No deprecation message found."
+            ! cat ~/test-reports/ruby_warnings.txt | grep -E "warning:\s.*(deprecated).*$" && echo "No deprecation message found."
+            ! cat ~/test-reports/ruby_warnings.txt | grep -E "warning:\s.*(obsolete).*$" && echo "No obsolete message found."
       - store_test_results:
           path: ~/test-reports
       - store_artifacts:
