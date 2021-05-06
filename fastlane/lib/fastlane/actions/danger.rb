@@ -17,6 +17,7 @@ module Fastlane
         cmd << "--danger_id=#{danger_id}" if danger_id
         cmd << "--dangerfile=#{dangerfile}" if dangerfile
         cmd << "--fail-on-errors=true" if params[:fail_on_errors]
+        cmd << "--fail-if-no-pr=true" if params[:fail_if_no_pr]
         cmd << "--new-comment" if params[:new_comment]
         cmd << "--remove-previous-comments" if params[:remove_previous_comments]
         cmd << "--base=#{base}" if base
@@ -99,7 +100,13 @@ module Fastlane
                                        env_name: "FL_DANGER_PR",
                                        description: "Run danger on a specific pull request. e.g. \"https://github.com/danger/danger/pull/518\"",
                                        is_string: true,
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :fail_if_no_pr,
+                                       env_name: "FL_DANGER_FAIL_IF_NO_PR",
+                                       description: "Fail Danger execution if no PR is found",
+                                       type: Boolean,
+                                       optional: true,
+                                       default_value: false)
         ]
       end
 
