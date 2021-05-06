@@ -68,7 +68,8 @@ app = Spaceship::ConnectAPI::App.create(name: "App Name",
                                         sku: "123",
                                         primary_locale: "English",
                                         bundle_id: "com.krausefx.app",
-                                        platforms: ["IOS"])
+                                        platforms: ["IOS"],
+                                        company_name: "krause inc")
 ```
 
 To update non version specific details, use the following code
