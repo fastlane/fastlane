@@ -178,11 +178,11 @@ jobs:
           command: |
             brew -v
       - run:
-          name: brew update
+          name: brew update if needed # temporary solution for this https://discuss.circleci.com/t/macos-image-users-homebrew-brownout-2021-04-26/39872/2
           command: |
-            # temporary solution for this https://discuss.circleci.com/t/macos-image-users-homebrew-brownout-2021-04-26/39872/2
-            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow
-            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask fetch --unshallow
+            ruby -e 'exit(1) if `brew -v` =~ /2\.\d+\.\d+/' ||\
+            brew update || \
+            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow && \
             brew update
       - run: bundle exec fastlane generate_swift_api
 
