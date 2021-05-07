@@ -237,7 +237,7 @@
               <div class="app-screenshot-row">
 
               <% screenshots.each_with_index do |screenshot, index| %>
-                <a href="<%= Addressable::URI.encode(screenshot.path) %>" target="_blank"><img class="app-screenshot" src="<%= render_relative_path(@export_path, Addressable::URI.encode(screenshot.path)) %>" title="Screenshot #<%=index%> for <%=language%>"></a>
+                <a href="<%= render_relative_path(@export_path, Addressable::URI.encode(screenshot.path)) %>" target="_blank"><img class="app-screenshot" src="<%= render_relative_path(@export_path, Addressable::URI.encode(screenshot.path)) %>" title="Screenshot #<%=index%> for <%=language%>"></a>
               <% end %>
               </div>
             <% end %>
