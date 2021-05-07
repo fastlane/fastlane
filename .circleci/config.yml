@@ -177,6 +177,13 @@ jobs:
           name: debug | brew version
           command: |
             brew -v
+      - run:
+          name: brew update
+          command: |
+            # temporary solution for this https://discuss.circleci.com/t/macos-image-users-homebrew-brownout-2021-04-26/39872/2
+            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow
+            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask fetch --unshallow
+            brew update
       - run: bundle exec fastlane generate_swift_api
 
   validate_documentation:
