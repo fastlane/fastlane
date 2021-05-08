@@ -286,6 +286,14 @@ module Pilot
                                      verify_block: proc do |value|
                                        UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
                                      end),
+        FastlaneCore::ConfigItem.new(key: :wait_processing_timeout_duration,
+                                     env_name: "PILOT_WAIT_PROCESSING_TIMEOUT_DURATION",
+                                     description: "Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception",
+                                     optional: true,
+                                     type: Integer,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
+                                     end),
         FastlaneCore::ConfigItem.new(key: :wait_for_uploaded_build,
                                      env_name: "PILOT_WAIT_FOR_UPLOADED_BUILD",
                                      deprecated: "No longer needed with the transition over to the App Store Connect API",
