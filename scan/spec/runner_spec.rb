@@ -111,6 +111,20 @@ Failing tests:
         @scan.retry_execute(retries: 5, error_output: error_output)
       end
 
+      it "retry a failed test even if scheme name has non-whitespace character", requires_xcodebuild: true do
+        error_output = <<-ERROR_OUTPUT
+Failing tests:
+  Fastlane-App-Tests:
+          FastlaneAppTests.testCoinToss()
+          ERROR_OUTPUT
+
+        expect(Fastlane::UI).to receive(:important).with("Retrying tests: Fastlane-App-Tests/FastlaneAppTests/testCoinToss").once
+        expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
+        expect(@scan).to receive(:execute)
+
+        @scan.retry_execute(retries: 5, error_output: error_output)
+      end
+
       it "fail to parse error output", requires_xcodebuild: true do
         error_output = <<-ERROR_OUTPUT
 Failing tests:
