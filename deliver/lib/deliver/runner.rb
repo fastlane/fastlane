@@ -30,6 +30,10 @@ module Deliver
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
       else
+        # Username is now optional since addition of App Store Connect API Key
+        # Force asking for username to prompt user if not already set
+        options.fetch(:username, force_ask: true)
+
         # Team selection passed though FASTLANE_TEAM_ID and FASTLANE_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
         UI.message("Login to App Store Connect (#{options[:username]})")
@@ -39,7 +43,7 @@ module Deliver
     end
 
     def api_token
-      @api_token ||= Spaceship::ConnectAPI::Token.create(options[:api_key]) if options[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.create(**options[:api_key]) if options[:api_key]
       @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(options[:api_key_path]) if options[:api_key_path]
       return @api_token
     end
@@ -83,7 +87,7 @@ module Deliver
 
       if options[:api_key] || options[:api_key_path]
         if options[:precheck_include_in_app_purchases]
-          UI.user_error!("Precheck cannot check In-app purchases with the App Store Connect API Key (yet). Exclude In-app purchases from precheck or use Apple ID login")
+          UI.user_error!("Precheck cannot check In-app purchases with the App Store Connect API Key (yet). Exclude In-app purchases from precheck, disable the precheck step in your build step, or use Apple ID login")
         end
 
         precheck_options[:api_key] = options[:api_key]
@@ -178,8 +182,12 @@ module Deliver
       end
 
       transporter = transporter_for_selected_team
-      result = transporter.upload(options[:app].id, package_path)
-      UI.user_error!("Could not upload binary to App Store Connect. Check out the error above", show_github_issues: true) unless result
+      result = transporter.upload(package_path: package_path)
+
+      unless result
+        transporter_errors = transporter.displayable_errors
+        UI.user_error!("Error uploading ipa file: \n #{transporter_errors}")
+      end
     end
 
     def reject_version_if_possible

@@ -69,6 +69,17 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
           client.get_certificates
         end
       end
+
+      context 'get_certificates_for_profile' do
+        let(:path) { "profiles/123456789/certificates" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_body(path, params)
+          expect(client).to receive(:request).with(:post).and_yield(req_mock)
+          client.get_certificates(profile_id: '123456789')
+        end
+      end
     end
 
     describe "devices" do

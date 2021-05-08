@@ -21,6 +21,9 @@ module Spaceship
       attr_accessor :created_date
 
       attr_accessor :app_store_version_submission
+      attr_accessor :app_store_version_phased_release
+      attr_accessor :app_store_review_detail
+      attr_accessor :app_store_version_localizations
 
       module AppStoreState
         READY_FOR_SALE = "READY_FOR_SALE"
@@ -30,6 +33,7 @@ module Spaceship
         IN_REVIEW = "IN_REVIEW"
         WAITING_FOR_REVIEW = "WAITING_FOR_REVIEW"
         DEVELOPER_REJECTED = "DEVELOPER_REJECTED"
+        DEVELOPER_REMOVED_FROM_SALE = "DEVELOPER_REMOVED_FROM_SALE"
         REJECTED = "REJECTED"
         PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
         METADATA_REJECTED = "METADATA_REJECTED"
@@ -57,7 +61,10 @@ module Spaceship
         "createdDate" =>  "created_date",
 
         "appStoreVersionSubmission" => "app_store_version_submission",
-        "build" => "build"
+        "build" => "build",
+        "appStoreVersionPhasedRelease" => "app_store_version_phased_release",
+        "appStoreReviewDetail" => "app_store_review_detail",
+        "appStoreVersionLocalizations" => "app_store_version_localizations"
       })
 
       ESSENTIAL_INCLUDES = [

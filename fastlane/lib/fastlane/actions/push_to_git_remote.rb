@@ -32,8 +32,10 @@ module Fastlane
         # optionally add the set-upstream component
         command << '--set-upstream' if params[:set_upstream]
 
+        # optionally add the --push_options components
+        params[:push_options].each { |push_option| command << "--push-option=#{push_option}" } if params[:push_options]
+
         # execute our command
-        Actions.sh('pwd')
         return command.join(' ') if Helper.test?
 
         Actions.sh(command.join(' '))
@@ -84,7 +86,12 @@ module Fastlane
                                        env_name: "FL_GIT_PUSH_USE_SET_UPSTREAM",
                                        description: "Whether or not to use --set-upstream",
                                        type: Boolean,
-                                       default_value: false)
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :push_options,
+                                       env_name: "FL_GIT_PUSH_PUSH_OPTION",
+                                       description: "Array of strings to be passed using the '--push-option' option",
+                                       type: Array,
+                                       default_value: [])
         ]
       end
 

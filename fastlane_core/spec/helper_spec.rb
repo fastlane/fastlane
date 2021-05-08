@@ -210,5 +210,49 @@ describe FastlaneCore do
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: true, print: false)
       end
     end
+
+    describe "#fastlane_enabled?" do
+      it "returns false when FastlaneCore::FastlaneFolder.path is nil" do
+        expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+        expect(FastlaneCore::Helper.fastlane_enabled?).to be(false)
+      end
+
+      it "returns true when FastlaneCore::FastlaneFolder.path is not nil" do
+        expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return('./fastlane')
+        expect(FastlaneCore::Helper.fastlane_enabled?).to be(true)
+      end
+    end
+
+    describe '#open_uri' do
+      before do
+        stub_request(:get, 'https://fastlane.tools').to_return(body: 'SOME_TEXT', status: 200)
+      end
+
+      it 'performs URI.open and return IO like object that can be read' do
+        expect(FastlaneCore::Helper.open_uri('https://fastlane.tools')).to respond_to(:read)
+      end
+
+      it 'performs URI.open with block' do
+        is_block_called = false
+        FastlaneCore::Helper.open_uri('https://fastlane.tools') do |content|
+          expect(content).to respond_to(:read)
+          is_block_called = true
+        end
+        expect(is_block_called).to be(true)
+      end
+
+      it 'performs URI.open with options' do
+        expect(FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb')).to respond_to(:read)
+      end
+
+      it 'performs URI.open with options and block' do
+        is_block_called = false
+        FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb') do |content|
+          expect(content).to respond_to(:read)
+          is_block_called = true
+        end
+        expect(is_block_called).to be(true)
+      end
+    end
   end
 end

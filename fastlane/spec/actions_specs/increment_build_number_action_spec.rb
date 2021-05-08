@@ -39,6 +39,19 @@ describe Fastlane do
           expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to eq('24')
         end
 
+        it "skips info plist updating" do
+          expect(Fastlane::Actions).to receive(:sh)
+            .with(/agvtool new[-]version 24 && cd [-]/)
+            .once
+            .and_return("")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            increment_build_number(build_number: 24, xcodeproj: '.xcproject', skip_info_plist: true)
+          end").runner.execute(:test)
+
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to eq('24')
+        end
+
         it "displays error when $(SRCROOT) detected" do
           expect(Fastlane::Actions).to receive(:sh)
             .with(/agvtool new[-]version [-]all 24 && cd [-]/)

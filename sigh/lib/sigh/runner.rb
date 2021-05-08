@@ -21,6 +21,10 @@ module Sigh
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
       else
+        # Username is now optional since addition of App Store Connect API Key
+        # Force asking for username to prompt user if not already set
+        Sigh.config.fetch(:username, force_ask: true)
+
         # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
         UI.message("Starting login with user '#{Sigh.config[:username]}'")
@@ -60,7 +64,7 @@ module Sigh
     end
 
     def api_token
-      @api_token ||= Spaceship::ConnectAPI::Token.create(Sigh.config[:api_key]) if Sigh.config[:api_key]
+      @api_token ||= Spaceship::ConnectAPI::Token.create(**Sigh.config[:api_key]) if Sigh.config[:api_key]
       @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(Sigh.config[:api_key_path]) if Sigh.config[:api_key_path]
       return @api_token
     end
@@ -327,7 +331,7 @@ module Sigh
         UI.important("Found more than one code signing identity. Choosing the first one. Check out `fastlane sigh --help` to see all available options.")
         UI.important("Available Code Signing Identities for current filters:")
         certificates.each do |c|
-          str = ["\t- Name:", c.display_name, "- ID:", c.id + " - Expires", c.expires.strftime("%d/%m/%Y")].join(" ")
+          str = ["\t- Name:", c.display_name, "- ID:", c.id + " - Expires", Time.parse(c.expiration_date).strftime("%Y-%m-%d")].join(" ")
           UI.message(str.green)
         end
       end

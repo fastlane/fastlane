@@ -1,5 +1,5 @@
 // DeliverfileProtocol.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 public protocol DeliverfileProtocol: class {
     /// Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
@@ -9,7 +9,7 @@ public protocol DeliverfileProtocol: class {
     var apiKey: [String: Any]? { get }
 
     /// Your Apple ID Username
-    var username: String { get }
+    var username: String? { get }
 
     /// The bundle identifier of your app
     var appIdentifier: String? { get }
@@ -192,7 +192,7 @@ public protocol DeliverfileProtocol: class {
 public extension DeliverfileProtocol {
     var apiKeyPath: String? { return nil }
     var apiKey: [String: Any]? { return nil }
-    var username: String { return "" }
+    var username: String? { return nil }
     var appIdentifier: String? { return nil }
     var appVersion: String? { return nil }
     var ipa: String? { return nil }
@@ -256,4 +256,4 @@ public extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.51]
+// FastlaneRunnerAPIVersion [0.9.66]

@@ -1,5 +1,9 @@
 ---
 
+version: 2.1
+orbs:
+    shellcheck: circleci/shellcheck@2.2.2 # brew install shellcheck stopped working so using this
+
 aliases:
   # common - cache
   - &cache_restore_git
@@ -19,26 +23,13 @@ aliases:
   - &cache_restore_bundler
     restore_cache:
       name: cache | restore bundle
-      key: v2-gems-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+      key: v3-gems-{{ arch }}-<< parameters.ruby_version >>-{{ checksum "Gemfile.lock" }}
   - &cache_save_bundler
     save_cache:
       name: cache | store bundle
-      key: v2-gems-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile" }}-{{ checksum "fastlane.gemspec" }}
+      key: v3-gems-{{ arch }}-<< parameters.ruby_version >>-{{ checksum "Gemfile.lock" }}
       paths:
         - ".bundle"
-
-  - &cache_restore_homebrew
-    restore_cache:
-      name: cache | restore homebrew
-      keys:
-        - v3-homebrew-{{ epoch }}
-        - v3-homebrew
-  - &cache_save_homebrew
-    save_cache:
-      name: cache | store homebrew
-      key: v3-homebrew-{{ epoch }}
-      paths:
-        - "/usr/local/Homebrew"
 
   - &cache_restore_rubocop
     restore_cache:
@@ -60,24 +51,38 @@ aliases:
         echo "ruby-${_RUBY_VERSION}" > ~/.ruby-version
         echo 'chruby ruby-${_RUBY_VERSION}' >> ~/.bash_profile
 
-version: 2
+  - &bundle_install
+    run:
+      name: bundle install
+      command: |
+        gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
+        bundle config set --local path .bundle
+        bundle check || bundle install --jobs=4 --retry=3
 
 jobs:
-  'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)': &tests_macos  # define alias
+  tests_macos: &tests_macos_base
+    description: 'Execute tests on macOS with given Xcode and Ruby version'
     macos:
-      xcode: '10.2.1'
+      xcode: << parameters.xcode_version >>
+    parameters:
+      xcode_version:
+        type: string
+      ruby_version:
+        type: string
+      ruby_opt:
+        type: string
+        default: ''
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'en_US.UTF-8'
       LANG: 'en_US.UTF-8'
-      _RUBY_VERSION: '2.4'
+      _RUBY_VERSION: << parameters.ruby_version >>
     shell: '/bin/bash --login -eo pipefail'
     steps:
       - *cache_restore_git
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
-      - *cache_restore_homebrew
       - *set_ruby
       - run:
           name: debug | ruby version
@@ -87,48 +92,47 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            brew update
-            brew untap caskroom/versions || true
-            brew install shellcheck
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-      - *cache_save_homebrew
+      - *bundle_install
       - *cache_save_bundler
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
       - *cache_restore_rubocop
-      - run: bundle exec fastlane execute_tests
+      - run:
+          name: bundle exec fastlane execute_tests
+          command: |
+            RUBYOPT=<< parameters.ruby_opt >> bundle exec fastlane execute_tests
       - *cache_save_rubocop
+      - run:
+          name: Check compatibility with Ruby 3.0
+          command: |
+            touch ~/test-reports/ruby_warnings.txt
+            # TODO remove 'grep -v ".bundle"' once 3rd party dependencies support Ruby 3.0
+            ! cat ~/test-reports/ruby_warnings.txt | grep -v ".bundle" | grep -E "warning:\s.*(deprecated).*$" && echo "No deprecation message found."
       - store_test_results:
           path: ~/test-reports
       - store_artifacts:
           path: ~/test-reports/rspec
           destination: test-reports
+      - store_artifacts:
+          path: ~/test-reports/ruby_warnings.txt
+          destination: ruby_warnings.txt
       - run:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always  # Run this even when tests fail
-  'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)':
-    <<: *tests_macos
-    macos:
-      xcode: '11.0.0'
-    environment:
-      _RUBY_VERSION: '2.5'
-  'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)':
-    <<: *tests_macos
-    macos:
-      xcode: '11.4.0'
-    environment:
-      _RUBY_VERSION: '2.6'
 
-  'Execute tests on Ubuntu':
+  tests_ubuntu:
+    parameters:
+      ruby_version:
+        type: string
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'C.UTF-8'
       LANG: 'C.UTF-8'
       FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
     docker:
-      - image: 'fastlanetools/ci:0.2.0'
+      - image: << parameters.ruby_version >>
     steps:
       - *cache_restore_git
       - checkout
@@ -138,7 +142,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
+      - *bundle_install
       - *cache_save_bundler
       - run:
           name: Check PR Metadata
@@ -151,38 +155,36 @@ jobs:
       - store_artifacts:
           path: ~/test-reports/rspec
           destination: test-reports
+      - store_artifacts:
+          path: ~/test-reports/ruby_warnings.txt
+          destination: ruby_warnings.txt
       - run:
           name: Post Test Results to GitHub
           command: bundle exec danger || echo "danger failed"
           when: always  # Run this even when tests fail
 
-  "Validate Fastlane.swift Generation":
-    <<: *tests_macos
-    macos:
-      xcode: '11.0.0'
-    environment:
-      _RUBY_VERSION: '2.5'
+  validate_fastlane_swift_generation:
+    <<: *tests_macos_base
     steps:
       - *cache_restore_git
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
-      - *cache_restore_homebrew
       - *set_ruby
-      - run:
-          name: Setup Build
-          command: |
-            mkdir -p ~/test-reports
-            brew untap caskroom/versions
-            brew install shellcheck
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-      - *cache_save_homebrew
+      - *bundle_install
       - *cache_save_bundler
+      - run:
+          name: debug | brew version
+          command: |
+            brew -v
       - run: bundle exec fastlane generate_swift_api
 
-  "Validate Documentation":
+  validate_documentation:
+    parameters:
+      ruby_version:
+        type: string
     docker:
-      - image: circleci/ruby:2.4
+      - image: << parameters.ruby_version >>
     steps:
       - *cache_restore_git
       - checkout
@@ -193,37 +195,36 @@ jobs:
           name: Setup Build
           command: |
             gem update --system
-            gem install bundler
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-
+      - *bundle_install
       - *cache_save_bundler
 
       - run: bundle exec fastlane validate_docs
 
-  "Lint Source Code":
+  lint_source_code:
+    parameters:
+      ruby_version:
+        type: string
     docker:
-      - image: circleci/ruby:2.5
+      - image: << parameters.ruby_version >>
     steps:
       - *cache_restore_git
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
-
-      - run:
-          name: Setup Build
-          command: |
-            bundle check --path .bundle || bundle install --jobs=4 --retry=3 --path .bundle
-
+      - *bundle_install
       - *cache_save_bundler
 
       - run: bundle exec fastlane lint_source
 
-  "Execute modules load up tests":
+  modules_load_up_tests:
+    parameters:
+      ruby_version:
+        type: string
     environment:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
     docker:
-      - image: circleci/ruby:2.4
+      - image: << parameters.ruby_version >>
     shell: /bin/bash --login -eo pipefail
     steps:
       - *cache_restore_git
@@ -242,16 +243,36 @@ workflows:
   version: 2
   build:
     jobs:
-      - 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)'
-      - 'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)'
-      - 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)'
-      - 'Execute tests on Ubuntu'
-
-      - "Validate Fastlane.swift Generation"
-      - "Validate Documentation"
-
-      - "Lint Source Code"
-
-      - "Execute modules load up tests"
-
-...
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)'
+          xcode_version: '10.2.1'
+          ruby_version: '2.4'
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)'
+          xcode_version: '11.0.0'
+          ruby_version: '2.5'
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)'
+          xcode_version: '11.4.0'
+          ruby_version: '2.6'
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 12.4.0, Ruby 2.7)'
+          xcode_version: '12.4.0'
+          ruby_version: '2.7'
+          ruby_opt: -W:deprecated
+      - tests_ubuntu:
+          name: 'Execute tests on Ubuntu'
+          ruby_version: 'fastlanetools/ci:0.3.0'
+      - validate_fastlane_swift_generation:
+          name: 'Validate Fastlane.swift generation'
+          xcode_version: '12.4.0'
+          ruby_version: '2.7'
+      - validate_documentation:
+          name: 'Validate Documentation'
+          ruby_version: 'circleci/ruby:2.5'
+      - lint_source_code:
+          name: 'Lint source code'
+          ruby_version: 'circleci/ruby:2.5'
+      - modules_load_up_tests:
+          name: 'Modules load up tests'
+          ruby_version: 'circleci/ruby:2.5'

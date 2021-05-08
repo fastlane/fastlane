@@ -201,13 +201,17 @@ module Fastlane
       # First accepts hash (or named keywords) like other actions
       # Otherwise uses sh method that doesn't have an interface like an action
       if args.count == 1 && args.first.kind_of?(Hash)
-        hash = args.first
-        command = hash.delete(:command)
+        options = args.first
+        command = options.delete(:command)
 
         raise ArgumentError, "sh requires :command keyword in argument" if command.nil?
-
-        new_args = [*command, hash]
-        FastFile.sh(*new_args, &b)
+        log = options[:log].nil? ? true : options[:log]
+        FastFile.sh(*command, step_name: options[:step_name], log: log, error_callback: options[:error_callback], &b)
+      elsif args.count != 1 && args.last.kind_of?(Hash)
+        new_args = args.dup
+        options = new_args.pop
+        log = options[:log].nil? ? true : options[:log]
+        FastFile.sh(*new_args, step_name: options[:step_name], log: log, error_callback: options[:error_callback], &b)
       else
         FastFile.sh(*args, &b)
       end
@@ -280,7 +284,7 @@ module Fastlane
 
         action_launched('import_from_git')
 
-        is_eligible_for_caching = !version.nil? && !cache_path.nil?
+        is_eligible_for_caching = !cache_path.nil?
 
         UI.message("Eligible for caching") if is_eligible_for_caching
 
@@ -334,7 +338,15 @@ module Fastlane
             UI.user_error!("No tag found matching #{version.inspect}") if checkout_param.nil?
           end
 
-          Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{checkout_path}")
+          if is_eligible_for_caching && version.nil?
+            # Update the repo if it's eligible for caching but the version isn't specified
+            UI.message("Fetching remote git branches and updating git repo...")
+            Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+              Actions.sh("cd #{clone_folder.shellescape} && git fetch --all --quiet && git checkout #{checkout_param.shellescape} #{checkout_path} && git reset --hard && git rebase")
+            end
+          else
+            Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{checkout_path}")
+          end
 
           # Knowing that we check out all the files and directories when the
           # current call is eligible for caching, we don't need to also

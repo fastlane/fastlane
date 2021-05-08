@@ -94,6 +94,10 @@ module FastlaneCore
       return exit_status.zero?
     end
 
+    def displayable_errors
+      @errors.map { |error| "[Transporter Error Output]: #{error}" }.join("\n").gsub!(/"/, "")
+    end
+
     private
 
     def parse_line(line, hide_output)
@@ -107,7 +111,6 @@ module FastlaneCore
 
       elsif line =~ ERROR_REGEX
         @errors << $1
-        UI.error("[Transporter Error Output]: #{$1}")
 
         # Check if it's a login error
         if $1.include?("Your Apple ID or password was entered incorrectly") ||
@@ -117,9 +120,6 @@ module FastlaneCore
             CredentialsManager::AccountManager.new(user: @user).invalid_credentials
             UI.error("Please run this tool again to apply the new password")
           end
-        elsif $1.include?("Redundant Binary Upload. There already exists a binary upload with build")
-          UI.error($1)
-          UI.error("You have to change the build number of your app to upload your ipa file")
         end
 
         output_done = true
@@ -160,11 +160,10 @@ module FastlaneCore
       end
 
       deliver_additional_params = env_deliver_additional_params.to_s.strip
-      if !deliver_additional_params.include?("-t ")
-        UI.user_error!("Invalid transport parameter")
-      else
-        return deliver_additional_params
+      if deliver_additional_params.include?("-t ")
+        UI.important("Apple recommends you don’t specify the -t transport and instead allow Transporter to use automatic transport discovery to determine the best transport mode for your packages. For more information, please read Apple's Transporter User Guide 2.1: https://help.apple.com/itc/transporteruserguide/#/apdATD1E1288-D1E1A1303-D1E1288A1126")
       end
+      return deliver_additional_params
     end
   end
 
@@ -472,11 +471,13 @@ module FastlaneCore
     # Uploads the modified package back to App Store Connect
     # @param app_id [Integer] The unique App ID
     # @param dir [String] the path in which the package file is located
+    # @param package_path [String] the path to the package file (used instead of app_id and dir)
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transferring
-    def upload(app_id, dir)
-      actual_dir = File.join(dir, "#{app_id}.itmsp")
+    def upload(app_id = nil, dir = nil, package_path: nil)
+      raise "app_id and dir are required or package_path is required" if (app_id.nil? || dir.nil?) && package_path.nil?
+      actual_dir = package_path || File.join(dir, "#{app_id}.itmsp")
 
       UI.message("Going to upload updated app to App Store Connect")
       UI.success("This might take a few minutes. Please don't interrupt the script.")
@@ -491,7 +492,7 @@ module FastlaneCore
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
-        return upload(app_id, dir)
+        return upload(app_id, dir, package_path: package_path)
       end
 
       if result
@@ -502,7 +503,11 @@ module FastlaneCore
         handle_error(@password)
       end
 
-      result
+      return result
+    end
+
+    def displayable_errors
+      @transporter_executor.displayable_errors
     end
 
     def provider_ids

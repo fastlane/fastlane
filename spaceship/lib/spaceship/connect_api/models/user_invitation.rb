@@ -53,6 +53,19 @@ module Spaceship
         return all(client: client, filter: { email: email }, includes: includes)
       end
 
+      def self.create(client: nil, email: nil, first_name: nil, last_name: nil, roles: [], provisioning_allowed: nil, all_apps_visible: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.post_user_invitation(
+          email: email,
+          first_name: first_name,
+          last_name: last_name,
+          roles: roles,
+          provisioning_allowed: provisioning_allowed,
+          all_apps_visible: all_apps_visible
+        )
+        return resp.to_models.first
+      end
+
       def delete!(client: nil)
         client ||= Spaceship::ConnectAPI
         client.delete_user_invitation(user_invitation_id: id)

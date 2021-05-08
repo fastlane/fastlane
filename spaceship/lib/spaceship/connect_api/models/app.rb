@@ -117,7 +117,8 @@ module Spaceship
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_APPLE_RELEASE,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_DEVELOPER_RELEASE,
           Spaceship::ConnectAPI::AppInfo::AppStoreState::PROCESSING_FOR_APP_STORE,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::IN_REVIEW
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::IN_REVIEW,
+          Spaceship::ConnectAPI::AppInfo::AppStoreState::DEVELOPER_REMOVED_FROM_SALE
         ]
 
         resp = client.get_app_infos(app_id: id, includes: includes)
@@ -141,6 +142,12 @@ module Spaceship
         return resp.to_models.select do |model|
           states.include?(model.app_store_state)
         end.first
+      end
+
+      def fetch_latest_app_info(client: nil, includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_app_infos(app_id: id, includes: includes)
+        return resp.to_models.first
       end
 
       #
@@ -196,7 +203,7 @@ module Spaceship
       # @return (Bool) Was something changed?
       def ensure_version!(version_string, platform: nil, client: nil)
         client ||= Spaceship::ConnectAPI
-        app_store_version = get_edit_app_store_version(platform: platform)
+        app_store_version = get_edit_app_store_version(client: client, platform: platform)
 
         if app_store_version
           if version_string != app_store_version.version_string
@@ -230,7 +237,10 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
+          appStoreState: [
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
+            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REMOVED_FROM_SALE
+          ].join(","),
           platform: platform
         }
         return get_app_store_versions(client: client, filter: filter, includes: includes).first
@@ -282,8 +292,13 @@ module Spaceship
 
       def get_app_store_versions(client: nil, filter: {}, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.flat_map(&:to_models)
+        if limit.nil?
+          resps = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+          return resps.flat_map(&:to_models)
+        else
+          resp = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
+          return resp.to_models
+        end
       end
 
       #

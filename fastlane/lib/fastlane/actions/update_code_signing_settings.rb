@@ -140,7 +140,7 @@ module Fastlane
                                        env_name: "FL_PROJECT_SIGNING_BUILD_CONFIGURATIONS",
                                        optional: true,
                                        type: Array,
-                                       description: "Specify build_configurations you want to toggle the signing mech. (default to all targets)",
+                                       description: "Specify build_configurations you want to toggle the signing mech. (default to all configurations)",
                                        is_string: false),
           FastlaneCore::ConfigItem.new(key: :code_sign_identity,
                                        env_name: "FL_CODE_SIGN_IDENTITY",

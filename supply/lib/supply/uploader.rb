@@ -304,6 +304,7 @@ module Supply
       mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
       mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
         if mapping_path
+          UI.message("Preparing mapping at path '#{mapping_path}', version code #{version_code} for upload...")
           client.upload_mapping(mapping_path, version_code)
         end
       end

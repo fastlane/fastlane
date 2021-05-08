@@ -1,5 +1,7 @@
+require 'fastlane_core'
+require 'spaceship'
+
 require_relative 'module'
-require_relative 'queue_worker'
 
 module Deliver
   # upload description, rating, etc.
@@ -198,7 +200,7 @@ module Deliver
       sleep(1)
 
       # Update app store version localizations
-      store_version_worker = Deliver::QueueWorker.new do |app_store_version_localization|
+      store_version_worker = FastlaneCore::QueueWorker.new do |app_store_version_localization|
         attributes = localized_version_attributes_by_locale[app_store_version_localization.locale]
         if attributes
           UI.message("Uploading metadata to App Store Connect for localized version '#{app_store_version_localization.locale}'")
@@ -209,7 +211,7 @@ module Deliver
       store_version_worker.start
 
       # Update app info localizations
-      app_info_worker = Deliver::QueueWorker.new do |app_info_localization|
+      app_info_worker = FastlaneCore::QueueWorker.new do |app_info_localization|
         attributes = localized_info_attributes_by_locale[app_info_localization.locale]
         if attributes
           UI.message("Uploading metadata to App Store Connect for localized info '#{app_info_localization.locale}'")
@@ -375,9 +377,7 @@ module Deliver
       # Check folder list (an empty folder signifies a language is required)
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
-        language = File.basename(lang_folder)
-        enabled_languages << language unless enabled_languages.include?(language)
+        enabled_languages << lang_folder.basename unless enabled_languages.include?(lang_folder.basename)
       end
 
       return unless enabled_languages.include?("default")
@@ -416,10 +416,7 @@ module Deliver
       # Check folder list (an empty folder signifies a language is required)
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
-
-        language = File.basename(lang_folder)
-        enabled_languages << language unless enabled_languages.include?(language)
+        enabled_languages << lang_folder.basename unless enabled_languages.include?(lang_folder.basename)
       end
 
       # Mapping to strings because :default symbol can be passed in
@@ -530,14 +527,13 @@ module Deliver
       # Load localised data
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        language = File.basename(lang_folder)
         (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
-          path = File.join(lang_folder, "#{key}.txt")
+          path = File.join(lang_folder.path, "#{key}.txt")
           next unless File.exist?(path)
 
           UI.message("Loading '#{path}'...")
           options[key] ||= {}
-          options[key][language] ||= File.read(path)
+          options[key][lang_folder.basename] ||= File.read(path)
         end
       end
 
@@ -596,8 +592,9 @@ module Deliver
     end
 
     def set_review_information(version, options)
-      return unless options[:app_review_information]
       info = options[:app_review_information]
+      return if info.nil? || info.empty?
+
       info = info.collect { |k, v| [k.to_sym, v] }.to_h
       UI.user_error!("`app_review_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
 

@@ -13,7 +13,7 @@ module Deliver
 
       [
         FastlaneCore::ConfigItem.new(key: :api_key_path,
-                                     env_name: "DELIVER_API_KEY_PATH",
+                                     env_names: ["DELIVER_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
                                      description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                      optional: true,
                                      conflicting_options: [:api_key],
@@ -21,7 +21,7 @@ module Deliver
                                        UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :api_key,
-                                     env_name: "DELIVER_API_KEY",
+                                     env_names: ["DELIVER_API_KEY", "APP_STORE_CONNECT_API_KEY"],
                                      description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                      type: Hash,
                                      optional: true,
@@ -32,6 +32,7 @@ module Deliver
                                      short_option: "-u",
                                      env_name: "DELIVER_USERNAME",
                                      description: "Your Apple ID Username",
+                                     optional: true,
                                      default_value: user,
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
@@ -277,7 +278,7 @@ module Deliver
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
-        # rubocop:disable Metrics/LineLength
+        # rubocop:disable Layout/LineLength
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "DELIVER_ITC_PROVIDER",
                                      description: "The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
@@ -285,7 +286,7 @@ module Deliver
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_provider),
                                      default_value_dynamic: true),
-        # rubocop:enable Metrics/LineLength
+        # rubocop:enable Layout/LineLength
 
         # precheck
         FastlaneCore::ConfigItem.new(key: :run_precheck_before_submit,

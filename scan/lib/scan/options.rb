@@ -69,6 +69,11 @@ module Scan
                                      default_value: false,
                                      type: Boolean,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :ensure_devices_found,
+                                     description: "Should fail if devices not found",
+                                     default_value: false,
+                                     type: Boolean,
+                                     optional: true),
 
         # simulator management
         FastlaneCore::ConfigItem.new(key: :force_quit_simulator,
@@ -269,6 +274,11 @@ module Scan
                                      optional: true,
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :output_xctestrun,
+                                     type: Boolean,
+                                     env_name: "SCAN_OUTPUT_XCTESTRUN",
+                                     description: "Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?",
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :result_bundle,
                                      short_option: "-z",
                                      env_name: "SCAN_RESULT_BUNDLE",
@@ -411,6 +421,11 @@ module Scan
                                      description: "Only post on Slack if the tests fail",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :slack_default_payloads,
+                                     env_name: "SCAN_SLACK_DEFAULT_PAYLOADS",
+                                     description: "Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack",
+                                     optional: true,
+                                     type: Array),
 
         # misc
         FastlaneCore::ConfigItem.new(key: :destination,
@@ -445,7 +460,28 @@ module Scan
                                     env_name: "SCAN_CLONED_SOURCE_PACKAGES_PATH",
                                     description: "Sets a custom path for Swift Package Manager dependencies",
                                     type: String,
-                                    optional: true)
+                                    optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_package_dependencies_resolution,
+                                     env_name: "SCAN_SKIP_PACKAGE_DEPENDENCIES_RESOLUTION",
+                                     description: "Skips resolution of Swift Package Manager dependencies",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,
+                                     env_name: "SCAN_DISABLE_PACKAGE_AUTOMATIC_UPDATES",
+                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :use_system_scm,
+                                    env_name: "SCAN_USE_SYSTEM_SCM",
+                                    description: "Lets xcodebuild use system's scm configuration",
+                                    optional: true,
+                                    type: Boolean,
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :number_of_retries,
+                                    env_name: 'SCAN_NUMBER_OF_RETRIES',
+                                    description: "The number of times a test can fail before scan should stop retrying",
+                                    type: Integer,
+                                    default_value: 0)
 
       ]
     end

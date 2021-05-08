@@ -327,12 +327,14 @@ module Supply
     def upload_mapping(path_to_mapping, apk_version_code)
       ensure_active_edit!
 
+      extension = File.extname(path_to_mapping).downcase
+
       call_google_api do
         client.upload_edit_deobfuscationfile(
           current_package_name,
           current_edit.id,
           apk_version_code,
-          "proguard",
+          extension == ".zip" ? "nativeCode" : "proguard",
           upload_source: path_to_mapping,
           content_type: "application/octet-stream"
         )

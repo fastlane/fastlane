@@ -57,6 +57,7 @@ module Spaceship
     InternalServerError = Spaceship::InternalServerError
     BadGatewayError = Spaceship::BadGatewayError
     AccessForbiddenError = Spaceship::AccessForbiddenError
+    TooManyRequestsError = Spaceship::TooManyRequestsError
 
     def self.hostname
       raise "You must implement self.hostname"
@@ -133,7 +134,7 @@ module Spaceship
       if teams.count > 1
         puts("The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now.")
       end
-      @current_team_id ||= teams[0]['contentProvider']['contentProviderId']
+      @current_team_id ||= user_details_data['sessionToken']['contentProviderId']
     end
 
     # Set a new team ID which will be used from now on
@@ -169,6 +170,9 @@ module Spaceship
       end
 
       handle_itc_response(response.body)
+
+      # clear user_details_data cache, as session switch will have changed sessionToken attribute
+      @_cached_user_details = nil
 
       @current_team_id = team_id
     end
@@ -402,6 +406,7 @@ module Spaceship
     # This will also handle 2 step verification and 2 factor authentication
     #
     # It is called in `send_login_request` of sub classes (which the method `login`, above, transferred over to via `do_login`)
+    # rubocop:disable Metrics/PerceivedComplexity
     def send_shared_login_request(user, password)
       # Check if we have a cached/valid session
       #
@@ -505,9 +510,19 @@ module Spaceship
           # User Credentials are wrong
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
         elsif response.status == 412 && AUTH_TYPES.include?(response.body["authType"])
+
+          if try_upgrade_2fa_later(response)
+            store_cookie
+            fetch_olympus_session
+            return true
+          end
+
           # Need to acknowledge Apple ID and Privacy statement - https://github.com/fastlane/fastlane/issues/12577
           # Looking for status of 412 might be enough but might be safer to keep looking only at what is being reported
-          raise AppleIDAndPrivacyAcknowledgementNeeded.new, "Need to acknowledge to Apple's Apple ID and Privacy statement. Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement."
+          raise AppleIDAndPrivacyAcknowledgementNeeded.new, "Need to acknowledge to Apple's Apple ID and Privacy statement. " \
+                                                            "Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement. " \
+                                                            "Your account might also be asked to upgrade to 2FA. " \
+                                                            "Set SPACESHIP_SKIP_2FA_UPGRADE=1 for fastlane to automaticaly bypass 2FA upgrade if possible."
         elsif (response['Set-Cookie'] || "").include?("itctx")
           raise "Looks like your Apple ID is not enabled for App Store Connect, make sure to be able to login online"
         else
@@ -516,6 +531,7 @@ module Spaceship
         end
       end
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
     # Update (29th March 2019) olympus migrates to new appstoreconnect API
@@ -642,6 +658,17 @@ module Spaceship
         logger.warn(msg)
 
         sleep(3) unless Object.const_defined?("SpecHelper")
+        retry
+      end
+      raise ex # re-raise the exception
+    rescue TooManyRequestsError => ex
+      tries -= 1
+      unless tries.zero?
+        msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after #{ex.retry_after} seconds (remaining: #{tries})..."
+        puts(msg) if Spaceship::Globals.verbose?
+        logger.warn(msg)
+
+        sleep(ex.retry_after) unless Object.const_defined?("SpecHelper")
         retry
       end
       raise ex # re-raise the exception
@@ -856,10 +883,7 @@ module Spaceship
         response = @client.send(method, url_or_path, params, headers, &block)
         log_response(method, url_or_path, response, headers, &block)
 
-        resp_hash = response.to_hash
-        if resp_hash[:status] == 401
-          handle_401(response)
-        end
+        handle_error(response)
 
         if response.body.to_s.include?("<title>302 Found</title>")
           raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
@@ -869,20 +893,23 @@ module Spaceship
           raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
         end
 
-        if resp_hash[:status] == 403
-          msg = "Access forbidden"
-          logger.warn(msg)
-          raise AccessForbiddenError.new, msg
-        end
-
         return response
       end
     end
 
-    def handle_401(response)
-      msg = "Auth lost"
-      logger.warn(msg)
-      raise UnauthorizedAccessError.new, "Unauthorized Access"
+    def handle_error(response)
+      case response.status
+      when 401
+        msg = "Auth lost"
+        logger.warn(msg)
+        raise UnauthorizedAccessError.new, "Unauthorized Access"
+      when 403
+        msg = "Access forbidden"
+        logger.warn(msg)
+        raise AccessForbiddenError.new, msg
+      when 429
+        raise TooManyRequestsError, response.to_hash
+      end
     end
 
     def send_request_auto_paginate(method, url_or_path, params, headers, &block)
@@ -911,3 +938,4 @@ module Spaceship
 end
 
 require 'spaceship/two_step_or_factor_client'
+require 'spaceship/upgrade_2fa_later_client'

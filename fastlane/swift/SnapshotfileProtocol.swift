@@ -1,5 +1,5 @@
 // SnapshotfileProtocol.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 public protocol SnapshotfileProtocol: class {
     /// Path the workspace file
@@ -50,8 +50,11 @@ public protocol SnapshotfileProtocol: class {
     /// Enabling this option will prevent displaying the simulator window
     var headless: Bool { get }
 
-    /// Enabling this option wil automatically override the status bar to show 9:41 AM, full battery, and full reception
+    /// Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception
     var overrideStatusBar: Bool { get }
+
+    /// Fully customize the status bar by setting each option here. See `xcrun simctl status_bar --help`
+    var overrideStatusBarArguments: String? { get }
 
     /// Enabling this option will configure the Simulator's system language
     var localizeSimulator: Bool { get }
@@ -119,6 +122,12 @@ public protocol SnapshotfileProtocol: class {
     /// Sets a custom path for Swift Package Manager dependencies
     var clonedSourcePackagesPath: String? { get }
 
+    /// Skips resolution of Swift Package Manager dependencies
+    var skipPackageDependenciesResolution: Bool { get }
+
+    /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+    var disablePackageAutomaticUpdates: Bool { get }
+
     /// The testplan associated with the scheme that should be used for testing
     var testplan: String? { get }
 
@@ -133,6 +142,9 @@ public protocol SnapshotfileProtocol: class {
 
     /// Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
     var suppressXcodeOutput: Bool? { get }
+
+    /// Lets xcodebuild use system's scm configuration
+    var useSystemScm: Bool { get }
 }
 
 public extension SnapshotfileProtocol {
@@ -153,6 +165,7 @@ public extension SnapshotfileProtocol {
     var eraseSimulator: Bool { return false }
     var headless: Bool { return true }
     var overrideStatusBar: Bool { return false }
+    var overrideStatusBarArguments: String? { return nil }
     var localizeSimulator: Bool { return false }
     var darkMode: Bool? { return nil }
     var appIdentifier: String? { return nil }
@@ -175,13 +188,16 @@ public extension SnapshotfileProtocol {
     var concurrentSimulators: Bool { return true }
     var disableSlideToType: Bool { return false }
     var clonedSourcePackagesPath: String? { return nil }
+    var skipPackageDependenciesResolution: Bool { return false }
+    var disablePackageAutomaticUpdates: Bool { return false }
     var testplan: String? { return nil }
     var onlyTesting: String? { return nil }
     var skipTesting: String? { return nil }
     var disableXcpretty: Bool? { return nil }
     var suppressXcodeOutput: Bool? { return nil }
+    var useSystemScm: Bool { return false }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.43]
+// FastlaneRunnerAPIVersion [0.9.58]

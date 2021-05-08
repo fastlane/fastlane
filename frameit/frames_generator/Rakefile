@@ -69,12 +69,12 @@ DEVICE_COLORS = [
 ]
 
 # The versions / renaming scheme should be updated in case FB updates iPads
-IPAD_PRO_12_9_VERSION = "3rd generation"
+IPAD_PRO_12_9_VERSION = "4th generation"
 IPAD_AIR_VERSION = "2019"
 IPAD_MINI_VERSION = "2019"
 IPAD_RENAMING_SCHEME = {
-  'iPad Pro 11"' => 'iPad Pro (11-inch)',
-  'iPad Pro 13"' => "iPad Pro (12.9-inch) (#{IPAD_PRO_12_9_VERSION})",
+  'iPad Pro 11' => 'iPad Pro (11-inch)',
+  'iPad Pro 13' => "iPad Pro (12.9-inch) (#{IPAD_PRO_12_9_VERSION})",
   'iPad Air' => "iPad Air (#{IPAD_AIR_VERSION})",
   'iPad Mini' => "iPad Mini (#{IPAD_MINI_VERSION})",
   'iPad' => 'iPad 10.2' # must be the last one so that only 'iPad' without any version will be renamed to 10.2
@@ -107,7 +107,7 @@ task(:generate_device_frames) do
 
   image_assets = []
   devices = Hash.new { |h, k| h[k] = [] }
-  (Dir["raw/Phones/*/Device/*.png"] + Dir["raw/Computers/Apple*/Device/*.png"] + Dir["raw/Tablets/*/Device/*.png"] + Dir["raw/Tablets/*/Device/Device without Pencil/*.png"]).each do |current_raw|
+  (Dir["raw/Phones/*/Device/*.png"] + Dir["raw/Computers/Apple*/Device/*.png"] + Dir["raw/Tablets/*/Device/*.png"] + Dir["raw/Tablets/*/Device/Device without Pencil/*.png"] + Dir["legacy/*.png"]).each do |current_raw|
     basename = File.basename(current_raw)
     next if should_skip_device?(basename)
 
@@ -264,6 +264,11 @@ def sanitize_device_name(filename)
   basename = File.basename(filename, File.extname(filename))
   basename = basename.gsub("Apple", "")
   basename = basename.gsub("-", " ")
+
+  # Directory is named "Nexus 5X" but file named "Nexus 5x"
+  # Need to rename to "Nexus 5X"
+  basename = basename.gsub("Nexus 5x", "Nexus 5X")
+
   DEVICE_COLORS.each { |color| basename.slice!(color) }
   basename.strip.to_s
 end
