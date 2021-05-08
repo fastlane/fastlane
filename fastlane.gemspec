@@ -105,7 +105,7 @@ Gem::Specification.new do |spec|
   # If you upgrade this gem, make sure to upgrade the users of it as well.
   spec.add_dependency('google-apis-playcustomapp_v1', '~> 0.1') # Google API Client to access Play Publishing API
   spec.add_dependency('google-apis-androidpublisher_v3', '~> 0.1') # Google API Client to access Play Publishing API
-  spec.add_dependency('google-cloud-storage') # Access Google Cloud Storage for match
+  spec.add_dependency('google-cloud-storage', '~> 1.31') # Access Google Cloud Storage for match
 
   spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
 
