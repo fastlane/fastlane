@@ -595,7 +595,7 @@ module Deliver
       info = options[:app_review_information]
       return if info.nil? || info.empty?
 
-      info = info.collect { |k, v| [k.to_sym, v] }.to_h
+      info = info.transform_keys(&:to_sym)
       UI.user_error!("`app_review_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
 
       attributes = {}

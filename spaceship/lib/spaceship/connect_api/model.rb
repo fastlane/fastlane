@@ -30,7 +30,7 @@ module Spaceship
       # Creates alias for :minOsVersion to :min_os_version
       #
       def attr_mapping(attr_map)
-        self.reverse_attr_map ||= attr_map.invert.each_with_object({}) { |(k, v), memo| memo[k.to_sym] = v; }
+        self.reverse_attr_map ||= attr_map.invert.transform_keys(&:to_sym)
         attr_map.each do |key, value|
           # Actual
           reader = value.to_sym
