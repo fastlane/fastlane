@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>tools.fastlane</groupId>
+  <artifactId>screengrab</artifactId>
+  <version>2.0.0</version>
+
+  <name>screengrab</name>
+  <description>Screengrab is a commandline tool that automates taking localized screenshots of your Android app.</description>
+  <url>https://github.com/fastlane/fastlane</url>
+  
+  <licenses>
+      <license>
+          <name>MIT License</name>
+          <url>http://www.opensource.org/licenses/mit-license.php</url>
+          <distribution>repo</distribution>
+      </license>
+  </licenses>
+  
+  <developers>
+      <developer>
+          <name>Josh Holtz</name>
+          <email>me@joshholtz.com</email>
+          <organization>fastlane</organization>
+          <organizationUrl>https://github.com/fastlane</organizationUrl>
+      </developer>
+  </developers>
+    
+  <scm>
+      <connection>scm:git:https://github.com/fastlane/fastlane.git</connection>
+      <developerConnection>scm:git:ssh://github.com/fastlane.git</developerConnection>
+      <url>https://github.com/fastlane/fastlane</url>
+      <tag>2.0.0</tag>
+  </scm>
+
+  <!-- We are deploying to Sonatype, so enter Sonatype Distribution Stuff Here -->
+  <distributionManagement>
+      <snapshotRepository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      </snapshotRepository>
+      <repository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      </repository>
+  </distributionManagement>
+</project>
