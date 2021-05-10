@@ -100,15 +100,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency('bundler', '>= 1.12.0', '< 3.0.0') # Used for fastlane plugins
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
   spec.add_dependency('jwt', '>= 2.1.0', '< 3') # Used for generating authentication tokens for App Store Connect API
-
-  # The Google API Client gem is *not* API stable between minor versions - hence the specific version locking here.
-  # If you upgrade this gem, make sure to upgrade the users of it as well.
-  spec.add_dependency('google-apis-playcustomapp_v1', '~> 0.1') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-apis-playcustomapp_v1', '~> 0.1') # Google API Client to access Custom app Publishing API
   spec.add_dependency('google-apis-androidpublisher_v3', '~> 0.1') # Google API Client to access Play Publishing API
   spec.add_dependency('google-cloud-storage', '~> 1.31') # Access Google Cloud Storage for match
-
   spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
-
   spec.add_dependency('aws-sdk-s3', '~> 1.0') # Used for S3 storage in fastlane match
 
   # Development only
