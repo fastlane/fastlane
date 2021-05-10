@@ -24,13 +24,14 @@
           <organizationUrl>https://github.com/fastlane</organizationUrl>
       </developer>
   </developers>
-    
+
+  <!--
   <scm>
       <connection>scm:git:https://github.com/fastlane/fastlane.git</connection>
       <developerConnection>scm:git:ssh://github.com/fastlane.git</developerConnection>
       <url>https://github.com/fastlane/fastlane</url>
       <tag>2.0.0</tag>
-  </scm>
+  </scm>-->
 
   <!-- We are deploying to Sonatype, so enter Sonatype Distribution Stuff Here -->
   <distributionManagement>
