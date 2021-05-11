@@ -5,17 +5,23 @@ String lookupProperty(Project project, String gradlePropName, String envVarName)
 Object[] versionInfo = screengrabVersion(rootProject.file('version.properties'))
 String versionNameString = versionInfo[0] as String
 
+Properties properties = new Properties()
+def propertiesFile = project.rootProject.file('local.properties')
+if (propertiesFile.exists()) {
+ properties.load(propertiesFile.newDataInputStream())
+}
+
 buildscript {
     repositories {
-        jcenter()
+      mavenCentral()
+      jcenter()
     }
     dependencies {
-        classpath 'com.novoda:bintray-release:0.9.1'
     }
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 29
@@ -25,18 +31,6 @@ android {
     }
 }
 
-publish {
-    userOrg = 'fastlane'
-    repoName = 'fastlane'
-    groupId = 'tools.fastlane'
-    artifactId = 'screengrab'
-    publishVersion = versionNameString
-    desc = 'Fastlane Screengrab API'
-    website = 'https://docs.fastlane.tools/actions/screengrab/'
-    bintrayUser = lookupProperty(project, 'bintrayUser', 'BINTRAY_USER')
-    bintrayKey = lookupProperty(project, 'bintrayKey', 'BINTRAY_KEY')
-}
-
 dependencies {
     api "androidx.annotation:annotation:1.1.0"
     api 'androidx.test:runner:1.2.0'
@@ -44,4 +38,84 @@ dependencies {
     api 'androidx.test.espresso:espresso-core:3.2.0'
     api 'androidx.test.uiautomator:uiautomator:2.2.0'
     api 'com.jraska:falcon:2.1.1'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                groupId 'tools.fastlane'
+                artifactId 'screengrab'
+                version versionNameString
+
+                artifact(bundleReleaseAar)
+                pom.withXml {
+                    final dependenciesNode = asNode().appendNode('dependencies')
+
+                    ext.addDependency = { Dependency dep, String scope ->
+                        if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
+                            return // invalid dependencies should be ignored
+
+                        final dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('artifactId', dep.name)
+
+                        if (dep.version == 'unspecified') {
+                            dependencyNode.appendNode('groupId', project.ext.pomGroupID)
+                            dependencyNode.appendNode('version', project.ext.pomVersion)
+                            System.println("${project.ext.pomGroupID} ${dep.name} ${project.ext.pomVersion}")
+                        } else {
+                            dependencyNode.appendNode('groupId', dep.group)
+                            dependencyNode.appendNode('version', dep.version)
+                            System.println("${dep.group} ${dep.name} ${dep.version}")
+                        }
+
+                        dependencyNode.appendNode('scope', scope)
+                        // Some dependencies may have types, such as aar, that should be mentioned in the POM file
+                        def artifactsList = dep.properties['artifacts']
+                        if (artifactsList != null && artifactsList.size() > 0) {
+                            final artifact = artifactsList[0]
+                            dependencyNode.appendNode('type', artifact.getType())
+                        }
+
+                        if (!dep.transitive) {
+                            // In case of non transitive dependency, all its dependencies should be force excluded from them POM file
+                            final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                            exclusionNode.appendNode('groupId', '*')
+                            exclusionNode.appendNode('artifactId', '*')
+                        } else if (!dep.properties.excludeRules.empty) {
+                            // For transitive with exclusions, all exclude rules should be added to the POM file
+                            final exclusions = dependencyNode.appendNode('exclusions')
+                            dep.properties.excludeRules.each { ExcludeRule rule ->
+                                final exclusionNode = exclusions.appendNode('exclusion')
+                                exclusionNode.appendNode('groupId', rule.group ?: '*')
+                                exclusionNode.appendNode('artifactId', rule.module ?: '*')
+                            }
+                        }
+                    }
+
+                    configurations.api.getDependencies().each { dep -> addDependency(dep, "compile") }
+                    configurations.implementation.getDependencies().each { dep -> addDependency(dep, "runtime") }
+                }
+            }
+        }
+        repositories {
+            maven {
+                //url 'https://oss.sonatype.org/content/repositories/snapshots'
+                //url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+                url properties.getProperty('sonatypeStagingProfileId')
+                credentials {
+                    username properties.getProperty('ossrhUsername')
+                    password properties.getProperty('ossrhPassword')
+                }
+            }
+        }
+    }
+}
+
+task cleanBuildPublishLocal(type: GradleBuild) {
+    tasks = ['clean', 'build', 'publishToMavenLocal']
+}
+
+task cleanBuildPublish(type: GradleBuild) {
+    tasks = ['clean', 'build', 'publish']
 }
