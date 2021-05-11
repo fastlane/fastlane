@@ -326,7 +326,8 @@ module Fastlane
         implm += "let args: [RubyCommand.Argument] = []\n"
       else
         implm += "let args = [#{args.group_by { |h| h[:name] }.keys.join(",\n")}]\n"
-        implm += ".compactMap { $0?.nilify(when: { $0.value == nil }) }\n"
+        implm += ".filter { $0?.value != nil }\n"
+        implm += ".compactMap { $0 }\n"
       end
       implm += "let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: args)\n"
 

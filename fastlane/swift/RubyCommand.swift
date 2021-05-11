@@ -70,14 +70,6 @@ struct RubyCommand: RubyCommandable {
                 return ""
             }
         }
-
-        func nilify(when condition: (Self) -> Bool) -> Self? {
-            if condition(self) {
-                return nil
-            } else {
-                return self
-            }
-        }
     }
 
     let commandID: String
