@@ -3,6 +3,9 @@ require 'spaceship/connect_api'
 require_relative 'ui/ui'
 
 module FastlaneCore
+  class BuildWatcherError < StandardError
+  end
+
   class BuildWatcher
     VersionMatches = Struct.new(:version, :builds)
 
@@ -84,8 +87,7 @@ module FastlaneCore
             UI.message("Searching for the latest build")
             versions = [nil]
           else
-            error_message = "FastlaneCore::BuildWatcher has no app version to watch"
-            UI.crash!(error_message)
+            raise BuildWatcherError.new, "There is no app version to watch"
           end
         end
 
@@ -109,8 +111,8 @@ module FastlaneCore
           error_builds = matched_builds.map do |build|
             "#{build.app_version}(#{build.version}) for #{build.platform} - #{build.processing_state}"
           end.join("\n")
-          error_message = "FastlaneCore::BuildWatcher found more than 1 matching build: \n#{error_builds}"
-          UI.crash!(error_message)
+          error_message = "Found more than 1 matching build: \n#{error_builds}"
+          raise BuildWatcherError.new, error_message
         end
 
         version_match = version_matches.reject do |match|

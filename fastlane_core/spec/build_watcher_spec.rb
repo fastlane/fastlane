@@ -119,7 +119,7 @@ describe FastlaneCore::BuildWatcher do
 
       expect do
         FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false)
-      end.to raise_error("FastlaneCore::BuildWatcher found more than 1 matching build: \n#{error_builds}")
+      end.to raise_error(FastlaneCore::BuildWatcherError, "Found more than 1 matching build: \n#{error_builds}")
     end
 
     it 'sleeps 10 seconds by default' do
@@ -331,7 +331,7 @@ describe FastlaneCore::BuildWatcher do
 
           expect do
             FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, build_version: '1', poll_interval: 0, select_latest: false, return_spaceship_testflight_build: false)
-          end.to raise_error("FastlaneCore::BuildWatcher has no app version to watch")
+          end.to raise_error(FastlaneCore::BuildWatcherError, "There is no app version to watch")
         end
       end
 
@@ -364,7 +364,7 @@ describe FastlaneCore::BuildWatcher do
 
           expect do
             FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, build_version: '1', poll_interval: 0, select_latest: false, return_spaceship_testflight_build: false)
-          end.to raise_error("FastlaneCore::BuildWatcher has no app version to watch")
+          end.to raise_error(FastlaneCore::BuildWatcherError, "There is no app version to watch")
         end
       end
     end
