@@ -286,5 +286,69 @@ describe FastlaneCore::BuildWatcher do
         end
       end
     end
+
+    describe 'without app version' do
+      describe 'without build number' do
+        let(:options_no_version) do
+          { app_id: 'some-app-id', version: nil, build_number: nil, platform: 'IOS' }
+        end
+
+        it 'returns a ready to submit build when select_latest is true' do
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_no_version).and_return([ready_build])
+
+          allow(UI).to receive(:important)
+          allow(UI).to receive(:success)
+
+          expect(FastlaneCore::BuildWatcher).to receive(:sleep).never
+          found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, poll_interval: 0, select_latest: true, return_spaceship_testflight_build: false)
+
+          expect(found_build).to eq(ready_build)
+        end
+
+        it 'does not return a ready to submit build when select_latest is false' do
+          expect(Spaceship::ConnectAPI::Build).to_not(receive(:all))
+
+          allow(UI).to receive(:important)
+          allow(UI).to receive(:message)
+
+          # Break loop after 3 times
+          allow(FastlaneCore::BuildWatcher).to receive(:loop).and_yield.and_yield.and_yield.and_return(nil)
+          found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, poll_interval: 0, select_latest: false, return_spaceship_testflight_build: false)
+
+          expect(found_build).to eq(nil)
+        end
+      end
+
+      describe 'with build number' do
+        let(:options_no_version_but_with_build_number) do
+          { app_id: 'some-app-id', version: nil, build_number: '1', platform: 'IOS' }
+        end
+
+        it 'returns a ready to submit build when select_latest is true' do
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_no_version_but_with_build_number).and_return([ready_build])
+
+          allow(UI).to receive(:important)
+          allow(UI).to receive(:success)
+
+          expect(FastlaneCore::BuildWatcher).to receive(:sleep).never
+          found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, build_version: '1', poll_interval: 2, select_latest: true, return_spaceship_testflight_build: false)
+
+          expect(found_build).to eq(ready_build)
+        end
+
+        it 'does not return a ready to submit build when select_latest is false' do
+          expect(Spaceship::ConnectAPI::Build).to_not(receive(:all))
+
+          allow(UI).to receive(:important)
+          allow(UI).to receive(:message)
+
+          # Break loop after 3 times
+          allow(FastlaneCore::BuildWatcher).to receive(:loop).and_yield.and_yield.and_yield.and_return(nil)
+          found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, build_version: '1', poll_interval: 0, select_latest: false, return_spaceship_testflight_build: false)
+
+          expect(found_build).to eq(nil)
+        end
+      end
+    end
   end
 end
