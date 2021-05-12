@@ -80,7 +80,7 @@ module FastlaneCore
 
         UI.important("There is no app version to watch") if versions.empty?
         if versions.empty? && select_latest
-          UI.important("Watch build version should not be present when there is no app version to watch") unless watched_build_version.nil?
+          UI.message("Watch build version should not be present when there is no app version to watch") unless watched_build_version.nil?
           UI.important("Search for the latest build")
           versions = [nil]
         end
