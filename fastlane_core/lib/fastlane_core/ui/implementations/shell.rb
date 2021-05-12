@@ -145,7 +145,10 @@ module FastlaneCore
     def password(message)
       verify_interactive!(message)
 
-      ask("#{format_string}#{message.to_s.yellow}") { |q| q.echo = "*" }
+      ask("#{format_string}#{message.to_s.yellow}") do |q|
+        q.whitespace = :chomp
+        q.echo = "*"
+      end
     end
 
     private
