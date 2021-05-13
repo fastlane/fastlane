@@ -130,6 +130,7 @@ module Fastlane
       end
     end
 
+    # Returns the CI's ENV git branch or fallback to checked out git branch
     def self.git_branch_using_ci_env
       begin
         env_name = SharedValues::GIT_BRANCH_ENV_VARS.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
