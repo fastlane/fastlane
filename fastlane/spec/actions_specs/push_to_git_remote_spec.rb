@@ -146,7 +146,23 @@ describe Fastlane do
         end
       end
 
-      context "runs git push without local_branch" do
+      context "runs git push without CI ENV git branch when current branch is HEAD" do
+        it "should raise an error if get current local branch is HEAD and CI ENV git branch failed" do
+          allow(Fastlane::Actions).to receive(:sh)
+            .with("git rev-parse --abbrev-ref HEAD", log: false)
+            .and_return("HEAD")
+          allow(Fastlane::Actions).to receive(:git_branch).and_return(nil)
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Failed to get the current branch.").and_call_original
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              push_to_git_remote
+            end").runner.execute(:test)
+          end.to raise_error("Failed to get the current branch.")
+        end
+      end
+
+      context "runs git push without CI ENV git branch and without local_branch" do
         it "should raise an error if get current local branch and CI ENV git branch both failed" do
           allow(Fastlane::Actions).to receive(:sh)
             .with("git rev-parse --abbrev-ref HEAD", log: false)
