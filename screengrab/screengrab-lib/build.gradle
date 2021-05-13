@@ -22,6 +22,7 @@ buildscript {
 
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 android {
     compileSdkVersion 29
@@ -50,6 +51,26 @@ afterEvaluate {
 
                 artifact(bundleReleaseAar)
                 pom.withXml {
+                    asNode().appendNode('name', 'screengrab')
+                    asNode().appendNode('url', 'https://github.com/fastlane/fastlane')
+                    asNode().appendNode('description', 'Screengrab is a commandline tool that automates taking localized screenshots')
+
+                    final licensesNode = asNode().appendNode('licenses')
+                    final licenseNode = licensesNode.appendNode('license')
+                    licenseNode.appendNode('name', 'MIT License')
+                    licenseNode.appendNode('url', 'http://www.opensource.org/licenses/mit-license.php')
+
+                    final scmNode = asNode().appendNode('scm')
+                    scmNode.appendNode('url', 'https://github.com/fastlane/fastlane')
+                    scmNode.appendNode('connection', 'scm:git:git://github.com/fastlane/fastlane.git')
+
+                    final developersNode = asNode().appendNode('developers')
+                    final developerNode = developersNode.appendNode('developer')
+                    developerNode.appendNode('email', 'me@joshholtz.com')
+                    developerNode.appendNode('name', 'Josh Holtz')
+                    developerNode.appendNode('url', 'https://github.com/joshdholtz')
+                    developerNode.appendNode('id', 'joshdholtz')
+
                     final dependenciesNode = asNode().appendNode('dependencies')
 
                     ext.addDependency = { Dependency dep, String scope ->
@@ -110,6 +131,16 @@ afterEvaluate {
             }
         }
     }
+}
+
+/*
+ * Requires the following settings in ~/.gradle/gradle.properties
+ * signing.keyId=516466E9 # last 8 digits of signing key (can get with `gpg -K`) 
+ * signing.password=
+ * signing.secretKeyRingFile=/Users/josh/.gnupg/secring.gpg # export with `gpg --keyring secring.gpg --export-secret-keys > ~/.gnupg/secring.gpg`
+ */
+signing {
+    sign publishing.publications
 }
 
 task cleanBuildPublishLocal(type: GradleBuild) {
