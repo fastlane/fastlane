@@ -119,23 +119,23 @@ module Fastlane
       return nil
     end
 
-    # Returns the current git branch, or "HEAD" if it's not checked out to any branch
+    # Returns the CI's ENV git branch or fallback to local checked out git branch
     def self.git_branch
+      begin
+        env_name = SharedValues::GIT_BRANCH_ENV_VARS.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
+        ENV.fetch(env_name.to_s) { self.local_git_branch }
+      rescue
+        nil
+      end
+    end
+
+    # Returns the local checked out git branch, or "HEAD" if it's not checked out to any branch
+    def self.local_git_branch
       # Rescues if not a git repo or no commits in a git repo
       begin
         Actions.sh("git rev-parse --abbrev-ref HEAD", log: false).chomp
       rescue => err
         UI.verbose("Error getting git branch: #{err.message}")
-        nil
-      end
-    end
-
-    # Returns the CI's ENV git branch or fallback to checked out git branch
-    def self.git_branch_using_ci_env
-      begin
-        env_name = SharedValues::GIT_BRANCH_ENV_VARS.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
-        ENV.fetch(env_name.to_s) { self.git_branch }
-      rescue
         nil
       end
     end

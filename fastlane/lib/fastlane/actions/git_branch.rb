@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class GitBranchAction < Action
       def self.run(params)
-        branch = Actions.git_branch_using_ci_env || ""
+        branch = Actions.git_branch || ""
         return "" if branch == "HEAD" # Backwards compatibility with the original (and documented) implementation
         branch
       end
@@ -12,14 +12,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Returns the current git branch name, possibly as managed by CI ENV variables"
+        "Returns the name of the current git branch, possibly as managed by CI ENV vars"
       end
 
       def self.details
-        [
-          "If no branch found, this action will return an empty string. This is a wrapper for the internal action Actions.git_branch",
-          "Note: This action is managed by CI ENV means it will always returns same git branch name even if you switch branches over the CI in a single job"
-        ].join("\n")
+        "If no branch could be found, this action will return an empty string. This is a wrapper for the internal action Actions.git_branch"
       end
 
       def self.available_options

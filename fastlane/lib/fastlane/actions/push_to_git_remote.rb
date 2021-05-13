@@ -4,7 +4,10 @@ module Fastlane
     class PushToGitRemoteAction < Action
       def self.run(params)
         local_branch = params[:local_branch]
-        local_branch ||= Actions.git_branch.gsub(%r{#{params[:remote]}\/}, '') if Actions.git_branch
+
+        checkout_branch = Actions.local_git_branch
+        checkout_branch = Actions.git_branch unless checkout_branch && checkout_branch != "HEAD"
+        local_branch ||= checkout_branch.gsub(%r{#{params[:remote]}\/}, '') if checkout_branch
         UI.user_error!('Failed to get the current branch.') unless local_branch
 
         remote_branch = params[:remote_branch] || local_branch

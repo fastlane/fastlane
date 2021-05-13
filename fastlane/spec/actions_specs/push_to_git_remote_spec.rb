@@ -2,6 +2,9 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Git Push to Remote Action" do
       before(:each) do
+        allow(Fastlane::Actions).to receive(:sh)
+          .with("git rev-parse --abbrev-ref HEAD", log: false)
+          .and_return("master")
         allow(Fastlane::Actions).to receive(:git_branch).and_return("master")
       end
 
@@ -114,8 +117,26 @@ describe Fastlane do
         expect(result).to eq("git push origin master:master --tags --push-option=something-to-tell-remote-git-server --push-option=something-else")
       end
 
+      context "runs git push with CI ENV git-branch when local branch is HEAD" do
+        it "should raise an error if get current branch failed" do
+          allow(Fastlane::Actions).to receive(:sh)
+            .with("git rev-parse --abbrev-ref HEAD", log: false)
+            .and_return("HEAD")
+          allow(Fastlane::Actions).to receive(:git_branch).and_return("master")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+              push_to_git_remote
+            end").runner.execute(:test)
+
+          expect(result).to eq("git push origin master:master --tags")
+        end
+      end
+
       context "runs git push without local_branch" do
         it "should raise an error if get current branch failed" do
+          allow(Fastlane::Actions).to receive(:sh)
+            .with("git rev-parse --abbrev-ref HEAD", log: false)
+            .and_return(nil)
           allow(Fastlane::Actions).to receive(:git_branch).and_return(nil)
           expect(FastlaneCore::UI).to receive(:user_error!).with("Failed to get the current branch.").and_call_original
 
