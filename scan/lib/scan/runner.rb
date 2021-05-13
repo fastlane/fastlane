@@ -122,7 +122,7 @@ module Scan
       suites = failing_tests.split(/(?=\n\s+[\w\s]+:\n)/)
 
       suites.each do |suite|
-        suite_name = suite.match(/\s*([\w\s]+):/).captures.first
+        suite_name = suite.match(/\s*([\w\s\S]+):/).captures.first
 
         test_cases = suite.split(":\n").fetch(1, []).split("\n").each
                           .select { |line| line.match?(/^\s+/) }
