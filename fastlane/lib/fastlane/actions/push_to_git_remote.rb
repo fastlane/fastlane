@@ -5,7 +5,7 @@ module Fastlane
       def self.run(params)
         local_branch = params[:local_branch]
 
-        # Let's get the current checkouted git branch or fallback to CI's ENV git branch if it's head
+        # Let's find the current checked out git branch or fallback to CI's ENV git branch if it's HEAD
         current_branch = Actions.local_git_branch
         current_branch = Actions.git_branch unless current_branch && current_branch != "HEAD"
         local_branch ||= current_branch.gsub(%r{#{params[:remote]}\/}, '') if current_branch

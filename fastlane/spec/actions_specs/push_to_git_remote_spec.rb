@@ -116,8 +116,8 @@ describe Fastlane do
         expect(result).to eq("git push origin master:master --tags --push-option=something-to-tell-remote-git-server --push-option=something-else")
       end
 
-      context "runs git push with fallback CI ENV git-branch when no current branch" do
-        it "should user CI ENV git branch if get current local branch failed" do
+      context "runs git push with CI ENV git branch when no current branch" do
+        it "should use CI ENV git branch if get current local branch failed" do
           allow(Fastlane::Actions).to receive(:sh)
             .with("git rev-parse --abbrev-ref HEAD", log: false)
             .and_return(nil)
@@ -131,8 +131,8 @@ describe Fastlane do
         end
       end
 
-      context "runs git push with fallback CI ENV git-branch when current branch is HEAD" do
-        it "should user CI ENV git branch if get current local branch is HEAD" do
+      context "runs git push with CI ENV git branch when current branch is HEAD" do
+        it "should use CI ENV git branch if get current local branch is HEAD" do
           allow(Fastlane::Actions).to receive(:sh)
             .with("git rev-parse --abbrev-ref HEAD", log: false)
             .and_return("HEAD")
@@ -147,7 +147,7 @@ describe Fastlane do
       end
 
       context "runs git push without local_branch" do
-        it "should raise an error if get current branch failed" do
+        it "should raise an error if get current local branch and CI ENV git branch both failed" do
           allow(Fastlane::Actions).to receive(:sh)
             .with("git rev-parse --abbrev-ref HEAD", log: false)
             .and_return(nil)
