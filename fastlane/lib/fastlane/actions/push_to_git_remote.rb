@@ -3,12 +3,12 @@ module Fastlane
     # Push local changes to the remote branch
     class PushToGitRemoteAction < Action
       def self.run(params)
-        local_branch = params[:local_branch]
+        # Let's find the local checked out git branch or fallback to CI's ENV git branch if it's HEAD
+        local_checked_out_branch = Actions.local_git_branch
+        local_checked_out_branch = Actions.git_branch unless local_checked_out_branch && local_checked_out_branch != "HEAD"
 
-        # Let's find the current checked out git branch or fallback to CI's ENV git branch if it's HEAD
-        current_branch = Actions.local_git_branch
-        current_branch = Actions.git_branch unless current_branch && current_branch != "HEAD"
-        local_branch ||= current_branch.gsub(%r{#{params[:remote]}\/}, '') if current_branch
+        local_branch = params[:local_branch]
+        local_branch ||= local_checked_out_branch.gsub(%r{#{params[:remote]}\/}, '') if local_checked_out_branch
         UI.user_error!('Failed to get the current branch.') unless local_branch
 
         remote_branch = params[:remote_branch] || local_branch
