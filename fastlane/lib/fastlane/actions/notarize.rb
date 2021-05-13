@@ -8,7 +8,8 @@ module Fastlane
         try_early_stapling = params[:try_early_stapling]
         print_log = params[:print_log]
         verbose = params[:verbose]
-        api_key_path = params[:api_key_path]
+
+        api_token = self.make_api_token(params)
 
         # Compress and read bundle identifier only for .app bundle.
         compressed_package_path = nil
@@ -35,8 +36,8 @@ module Fastlane
         notarization_upload_command = "xcrun altool --notarize-app -t osx -f \"#{compressed_package_path || package_path}\" --primary-bundle-id #{bundle_id} --output-format xml"
 
         notarization_info = {}
-        with_notarize_authenticator(params, api_key_path) do |notarize_authenticator|
-          notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider] && api_key_path.nil?
+        with_notarize_authenticator(params, api_token) do |notarize_authenticator|
+          notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider] && api_token.nil?
 
           notarization_upload_response = Actions.sh(
             notarize_authenticator.call(notarization_upload_command),
@@ -123,6 +124,15 @@ module Fastlane
         ENV.delete('FL_NOTARIZE_PASSWORD')
       end
 
+      def self.make_api_token(params)
+        api_key = params[:api_key] || Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        api_key_path = params[:api_key_path]
+
+        api_token = Spaceship::ConnectAPI::Token.create(**api_key) if api_key
+        api_token ||= Spaceship::ConnectAPI::Token.from_json_file(api_key_path) if api_key_path
+        return api_token
+      end
+
       def self.staple(package_path, verbose)
         Actions.sh(
           "xcrun stapler staple \"#{package_path}\"",
@@ -130,20 +140,19 @@ module Fastlane
         )
       end
 
-      def self.with_notarize_authenticator(params, api_key_path)
-        if api_key_path
+      def self.with_notarize_authenticator(params, api_token)
+        if api_token
           # From xcrun altool for --apiKey:
           # This option will search the following directories in sequence for a private key file with the name of 'AuthKey_<api_key>.p8':  './private_keys', '~/private_keys', '~/.private_keys', and '~/.appstoreconnect/private_keys'.
-          api_key = Spaceship::ConnectAPI::Token.from_json_file(api_key_path)
           api_key_folder_path = File.expand_path('~/.appstoreconnect/private_keys')
-          api_key_file_path = File.join(api_key_folder_path, "AuthKey_#{api_key.key_id}.p8")
+          api_key_file_path = File.join(api_key_folder_path, "AuthKey_#{api_token.key_id}.p8")
           directory_exists = File.directory?(api_key_folder_path)
           file_exists = File.exist?(api_key_file_path)
           begin
             FileUtils.mkdir_p(api_key_folder_path) unless directory_exists
-            api_key.write_key_to_file(api_key_file_path) unless file_exists
+            api_token.write_key_to_file(api_key_file_path) unless file_exists
 
-            yield(proc { |command| "#{command} --apiKey #{api_key.key_id} --apiIssuer #{api_key.issuer_id}" })
+            yield(proc { |command| "#{command} --apiKey #{api_token.key_id} --apiIssuer #{api_token.issuer_id}" })
           ensure
             FileUtils.rm(api_key_file_path) unless file_exists
             FileUtils.rm_r(api_key_folder_path) unless directory_exists
@@ -217,14 +226,20 @@ module Fastlane
                                        default_value: false,
                                        type: Boolean),
           FastlaneCore::ConfigItem.new(key: :api_key_path,
-                                       env_name: 'FL_NOTARIZE_API_KEY_PATH',
-                                       description: 'Path to AppStore Connect API key',
+                                       env_names: ['FL_NOTARIZE_API_KEY_PATH', 'APP_STORE_CONNECT_API_KEY_PATH'],
+                                       description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                        optional: true,
-                                       conflicting_options: [:username],
-                                       is_string: true,
+                                       conflicting_options: [:username, :api_key],
                                        verify_block: proc do |value|
-                                         UI.user_error!("API Key not found at '#{value}'") unless File.exist?(value)
-                                       end)
+                                         UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :api_key,
+                                       env_names: ["SIGH_API_KEY", "APP_STORE_CONNECT_API_KEY"],
+                                       description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                       type: Hash,
+                                       optional: true,
+                                       sensitive: true,
+                                       conflicting_options: [:username, :api_key_path]),
         ]
       end
 
