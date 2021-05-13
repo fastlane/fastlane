@@ -12,11 +12,14 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Returns the name of the current git branch, possibly as managed by CI ENV vars"
+        "Returns the name of the current git branch, possibly as managed by CI ENV variables"
       end
 
       def self.details
-        "If no branch could be found, this action will return an empty string. This is a wrapper for the internal action Actions.git_branch"
+        [
+          "If no branch found, this action will return an empty string. This is a wrapper for the internal action Actions.git_branch",
+          "Note: This action is managed by CI ENV means it will always returns same git branch name even if you switch branches over the CI in a single job"
+        ].join("\n")
       end
 
       def self.available_options
@@ -24,9 +27,7 @@ module Fastlane
       end
 
       def self.output
-        [
-          ['GIT_BRANCH_ENV_VARS', 'The git branch environment variables']
-        ]
+        []
       end
 
       def self.authors
