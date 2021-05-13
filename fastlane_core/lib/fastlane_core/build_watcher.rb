@@ -147,7 +147,7 @@ module FastlaneCore
         if current_time > end_time
           UI.crash!("FastlaneCore::BuildWatcher exceeded the '#{timeout_duration.to_i} second(s)' timeout duration, Stopping now!")
         else
-          UI.message("Will 'force stop' watching build after pending '#{pending_duration.to_i} second(s)' timeout duration ~ #{end_time} time!")
+          UI.message("Will 'force stop' watching build after pending #{pending_duration.to_i} second(s) timeout duration around #{end_time} time!")
         end
       end
     end
