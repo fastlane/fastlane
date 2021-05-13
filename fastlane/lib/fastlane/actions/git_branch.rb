@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class GitBranchAction < Action
       def self.run(params)
-        branch = Actions.git_branch(should_priority_to_ci_env: true) || ""
+        branch = Actions.git_branch_using_ci_env || ""
         return "" if branch == "HEAD" # Backwards compatibility with the original (and documented) implementation
         branch
       end
