@@ -12,7 +12,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Returns the name of the current git branch, possibly as managed by CI ENV variables"
+        "Returns the current git branch name, possibly as managed by CI ENV variables"
       end
 
       def self.details
