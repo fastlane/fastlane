@@ -111,7 +111,7 @@ Failing tests:
         @scan.retry_execute(retries: 5, error_output: error_output)
       end
 
-      it "retry a failed test even if scheme name has non-whitespace character", requires_xcodebuild: true do
+      it "retry a failed test when scheme name has non-whitespace character", requires_xcodebuild: true do
         error_output = <<-ERROR_OUTPUT
 Failing tests:
   Fastlane-App-Tests:
