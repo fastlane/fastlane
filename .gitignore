@@ -21,6 +21,7 @@ local.properties
 
 ## Specific to screengrab
 /screengrab/example/fastlane/metadata/
+/screengrab/target/
 
 ## Specific to RubyMotion:
 .dat*
