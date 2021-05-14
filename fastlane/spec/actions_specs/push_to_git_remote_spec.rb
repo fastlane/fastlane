@@ -5,7 +5,7 @@ describe Fastlane do
         allow(Fastlane::Actions).to receive(:sh)
           .with("git rev-parse --abbrev-ref HEAD", log: false)
           .and_return(nil)
-          allow(Fastlane::Actions).to receive(:git_branch).and_return("master")
+        allow(Fastlane::Actions).to receive(:git_branch).and_return("master")
       end
 
       it "runs git push with defaults" do
