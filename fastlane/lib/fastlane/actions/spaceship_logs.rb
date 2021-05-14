@@ -124,7 +124,7 @@ module Fastlane
       end
 
       def self.return_type
-        :array
+        :array_of_strings
       end
 
       def self.author

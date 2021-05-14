@@ -592,9 +592,10 @@ module Deliver
     end
 
     def set_review_information(version, options)
-      return unless options[:app_review_information]
       info = options[:app_review_information]
-      info = info.collect { |k, v| [k.to_sym, v] }.to_h
+      return if info.nil? || info.empty?
+
+      info = info.transform_keys(&:to_sym)
       UI.user_error!("`app_review_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
 
       attributes = {}

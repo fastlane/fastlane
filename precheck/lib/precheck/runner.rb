@@ -39,6 +39,10 @@ module Precheck
 
         Spaceship::ConnectAPI.token = api_token
       elsif Spaceship::Tunes.client.nil?
+        # Username is now optional since addition of App Store Connect API Key
+        # Force asking for username to prompt user if not already set
+        Precheck.config.fetch(:username, force_ask: true)
+
         # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
         UI.message("Starting login with user '#{Precheck.config[:username]}'")

@@ -243,8 +243,12 @@ module Gym
     # Moves over the binary and dsym file to the output directory
     # @return (String) The path to the resulting pkg file
     def move_pkg
-      FileUtils.mv(PackageCommandGenerator.binary_path, File.expand_path(Gym.config[:output_directory]), force: true)
       binary_path = File.expand_path(File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.binary_path)))
+      if File.exist?(binary_path)
+        UI.important(" Removing #{File.basename(binary_path)}") if FastlaneCore::Globals.verbose?
+        FileUtils.rm_rf(binary_path)
+      end
+      FileUtils.mv(PackageCommandGenerator.binary_path, File.expand_path(Gym.config[:output_directory]), force: true)
 
       UI.success("Successfully exported and signed the pkg file:")
       UI.message(binary_path)

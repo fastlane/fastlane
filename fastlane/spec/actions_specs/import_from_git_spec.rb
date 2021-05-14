@@ -197,8 +197,9 @@ describe Fastlane do
           end.not_to raise_error
         end
 
-        it "ignores it when branch is specified" do
-          expect(UI).not_to receive(:message).with(caching_message)
+        it "works with branch" do
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:message).with(caching_message)
           expect(UI).to receive(:important).with('Works since v2.1')
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -208,26 +209,53 @@ describe Fastlane do
           end").runner.execute(:test)
         end
 
-        # Because we don't know if the specified value represents a branch or a
-        # tag. And knowing that it doesn't make sense to cache a branch, that
-        # points to a different commit when one is added, as opposed to a tag,
-        # we decided to enable caching only when used with the `version` param.
-        it "ignores it when tag is specified via branch param" do
-          expect(UI).not_to receive(:message).with(caching_message)
-          expect(UI).to receive(:important).with('Works since v1')
+        # Meaning, `git fetch` and `git rebase` are performed when caching is eligible
+        # and the version isn't specified.
+        it "works with updated branch" do
+          Dir.chdir(source_directory_path) do
+            `git checkout "version-2.1" 2>&1`
+            File.write('fastlane/Fastfile', <<-FASTFILE)
+              lane :works do
+                UI.important('Works until v5')
+              end
+            FASTFILE
+            `git add .`
+            `git commit --message "Version 5"`
+          end
+
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:message).with(caching_message)
+          expect(UI).to receive(:important).with('Works until v5')
 
           Fastlane::FastFile.new.parse("lane :test do
-            import_from_git(url: '#{source_directory_path}', branch: '3', cache_path: '#{cache_directory_path}')
+            import_from_git(url: '#{source_directory_path}', branch: 'version-2.1', cache_path: '#{cache_directory_path}')
 
             works
           end").runner.execute(:test)
         end
 
-        it "ignores it when version is not specified" do
-          expect(UI).not_to receive(:message).with(caching_message)
+        # Respects the specified version even if the branch is specified.
+        it "works with new tags and branch" do
+          Dir.chdir(source_directory_path) do
+            `git checkout "master" 2>&1`
+            File.write('fastlane/Fastfile', <<-FASTFILE)
+              lane :works do
+                UI.important('Works until v6')
+              end
+            FASTFILE
+            `git add .`
+            `git commit --message "Version 6"`
+            `git tag "6"`
+          end
+
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:message).with(caching_message)
+          expect(UI).to receive(:important).with('Works until v6')
 
           Fastlane::FastFile.new.parse("lane :test do
-            import_from_git(url: '#{source_directory_path}', cache_path: '#{cache_directory_path}')
+            import_from_git(url: '#{source_directory_path}', branch: 'version-2.1', version: '6', cache_path: '#{cache_directory_path}')
+
+            works
           end").runner.execute(:test)
         end
 

@@ -34,22 +34,22 @@ module Screengrab
     def find_platform_tools(android_home)
       return nil unless android_home
 
-      platform_tools_path = File.join(android_home, 'platform-tools')
+      platform_tools_path = Helper.localize_file_path(File.join(android_home, 'platform-tools'))
       File.directory?(platform_tools_path) ? platform_tools_path : nil
     end
 
     def find_build_tools(android_home, build_tools_version)
       return nil unless android_home
 
-      build_tools_dir = File.join(android_home, 'build-tools')
+      build_tools_dir = Helper.localize_file_path(File.join(android_home, 'build-tools'))
 
       return nil unless build_tools_dir && File.directory?(build_tools_dir)
 
-      return File.join(build_tools_dir, build_tools_version) if build_tools_version
+      return Helper.localize_file_path(File.join(build_tools_dir, build_tools_version)) if build_tools_version
 
       version = select_build_tools_version(build_tools_dir)
 
-      return version ? File.join(build_tools_dir, version) : nil
+      return version ? Helper.localize_file_path(File.join(build_tools_dir, version)) : nil
     end
 
     def select_build_tools_version(build_tools_dir)
@@ -74,6 +74,7 @@ module Screengrab
       return FastlaneCore::CommandExecutor.which('adb') unless platform_tools_path
 
       adb_path = Helper.get_executable_path(File.join(platform_tools_path, 'adb'))
+      adb_path = Helper.localize_file_path(adb_path)
       return executable_command?(adb_path) ? adb_path : nil
     end
 
@@ -81,6 +82,7 @@ module Screengrab
       return FastlaneCore::CommandExecutor.which('aapt') unless build_tools_path
 
       aapt_path = Helper.get_executable_path(File.join(build_tools_path, 'aapt'))
+      aapt_path = Helper.localize_file_path(aapt_path)
       return executable_command?(aapt_path) ? aapt_path : nil
     end
 
