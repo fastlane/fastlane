@@ -105,7 +105,6 @@ module Fastlane
                                        env_name: "FL_DANGER_FAIL_IF_NO_PR",
                                        description: "Fail Danger execution if no PR is found",
                                        type: Boolean,
-                                       optional: true,
                                        default_value: false)
         ]
       end
