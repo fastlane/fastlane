@@ -23,14 +23,6 @@ public enum OptionalConfigValue<T> {
     }
 }
 
-extension Optional: ExpressibleByIntegerLiteral where Wrapped: ExpressibleByIntegerLiteral {
-    public typealias IntegerLiteralType = Wrapped.IntegerLiteralType
-
-    public init(integerLiteral value: Wrapped.IntegerLiteralType) {
-        self = .some(.init(integerLiteral: value))
-    }
-}
-
 extension Optional: ExpressibleByUnicodeScalarLiteral where Wrapped: ExpressibleByUnicodeScalarLiteral {
     public typealias UnicodeScalarLiteralType = Wrapped.UnicodeScalarLiteralType
 
