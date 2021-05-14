@@ -4,12 +4,12 @@ describe Supply do
     before do
       stub_request(:post, "https://www.googleapis.com/oauth2/v4/token").
         to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
-      stub_request(:post, "https://www.googleapis.com/androidpublisher/v3/applications/test-app/edits").
+      stub_request(:post, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/test-app/edits").
         to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
     end
 
     it "displays error messages from the API" do
-      stub_request(:post, "https://www.googleapis.com/upload/androidpublisher/v3/applications/test-app/edits/1/listings/en-US/icon").
+      stub_request(:post, "https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/test-app/edits/1/listings/en-US/icon").
         to_return(status: 403, body: '{"error":{"message":"Ensure project settings are enabled."}}', headers: { 'Content-Type' => 'application/json' })
 
       expect(UI).to receive(:user_error!).with("Google Api Error: Invalid request - Ensure project settings are enabled.")
