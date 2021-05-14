@@ -3431,6 +3431,7 @@ public func createXcframework(frameworks: OptionalConfigValue<[String]?> = .fast
    - base: A branch/tag/commit to use as the base of the diff. [master|dev|stable]
    - head: A branch/tag/commit to use as the head. [master|dev|stable]
    - pr: Run danger on a specific pull request. e.g. "https://github.com/danger/danger/pull/518"
+   - failIfNoPr: Fail Danger execution if no PR is found
 
  Formalize your Pull Request etiquette.
  More information: [https://github.com/danger/danger](https://github.com/danger/danger).
@@ -3445,7 +3446,8 @@ public func danger(useBundleExec: Bool = true,
                    removePreviousComments: Bool = false,
                    base: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    head: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                   pr: OptionalConfigValue<String?> = .fastlaneDefault(nil))
+                   pr: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                   failIfNoPr: Bool = false)
 {
     let useBundleExecArg = RubyCommand.Argument(name: "use_bundle_exec", value: useBundleExec, type: nil)
     let verboseArg = RubyCommand.Argument(name: "verbose", value: verbose, type: nil)
@@ -3458,6 +3460,7 @@ public func danger(useBundleExec: Bool = true,
     let baseArg = base.asRubyArgument(name: "base", type: nil)
     let headArg = head.asRubyArgument(name: "head", type: nil)
     let prArg = pr.asRubyArgument(name: "pr", type: nil)
+    let failIfNoPrArg = RubyCommand.Argument(name: "fail_if_no_pr", value: failIfNoPr, type: nil)
     let args = [useBundleExecArg,
                 verboseArg,
                 dangerIdArg,
@@ -3468,7 +3471,8 @@ public func danger(useBundleExec: Bool = true,
                 removePreviousCommentsArg,
                 baseArg,
                 headArg,
-                prArg]
+                prArg,
+                failIfNoPrArg]
         .compactMap { $0 }
     let command = RubyCommand(commandID: "", methodName: "danger", className: nil, args: args)
     _ = runner.executeCommand(command)
@@ -3984,7 +3988,7 @@ public func downloadDsyms(username: String,
 public func downloadFromPlayStore(packageName: String,
                                   versionName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   track: String = "production",
-                                  metadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                  metadataPath: String = "./metadata",
                                   key: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   issuer: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   jsonKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -3995,7 +3999,7 @@ public func downloadFromPlayStore(packageName: String,
     let packageNameArg = RubyCommand.Argument(name: "package_name", value: packageName, type: nil)
     let versionNameArg = versionName.asRubyArgument(name: "version_name", type: nil)
     let trackArg = RubyCommand.Argument(name: "track", value: track, type: nil)
-    let metadataPathArg = metadataPath.asRubyArgument(name: "metadata_path", type: nil)
+    let metadataPathArg = RubyCommand.Argument(name: "metadata_path", value: metadataPath, type: nil)
     let keyArg = key.asRubyArgument(name: "key", type: nil)
     let issuerArg = issuer.asRubyArgument(name: "issuer", type: nil)
     let jsonKeyArg = jsonKey.asRubyArgument(name: "json_key", type: nil)
@@ -10279,7 +10283,7 @@ public func supply(packageName: String,
                    releaseStatus: String = "completed",
                    track: String = "production",
                    rollout: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                   metadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                   metadataPath: String = "./metadata",
                    key: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    issuer: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    jsonKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -10316,7 +10320,7 @@ public func supply(packageName: String,
     let releaseStatusArg = RubyCommand.Argument(name: "release_status", value: releaseStatus, type: nil)
     let trackArg = RubyCommand.Argument(name: "track", value: track, type: nil)
     let rolloutArg = rollout.asRubyArgument(name: "rollout", type: nil)
-    let metadataPathArg = metadataPath.asRubyArgument(name: "metadata_path", type: nil)
+    let metadataPathArg = RubyCommand.Argument(name: "metadata_path", value: metadataPath, type: nil)
     let keyArg = key.asRubyArgument(name: "key", type: nil)
     let issuerArg = issuer.asRubyArgument(name: "issuer", type: nil)
     let jsonKeyArg = jsonKey.asRubyArgument(name: "json_key", type: nil)
@@ -11841,7 +11845,7 @@ public func uploadToPlayStore(packageName: String,
                               releaseStatus: String = "completed",
                               track: String = "production",
                               rollout: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                              metadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                              metadataPath: String = "./metadata",
                               key: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               issuer: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               jsonKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -11878,7 +11882,7 @@ public func uploadToPlayStore(packageName: String,
     let releaseStatusArg = RubyCommand.Argument(name: "release_status", value: releaseStatus, type: nil)
     let trackArg = RubyCommand.Argument(name: "track", value: track, type: nil)
     let rolloutArg = rollout.asRubyArgument(name: "rollout", type: nil)
-    let metadataPathArg = metadataPath.asRubyArgument(name: "metadata_path", type: nil)
+    let metadataPathArg = RubyCommand.Argument(name: "metadata_path", value: metadataPath, type: nil)
     let keyArg = key.asRubyArgument(name: "key", type: nil)
     let issuerArg = issuer.asRubyArgument(name: "issuer", type: nil)
     let jsonKeyArg = jsonKey.asRubyArgument(name: "json_key", type: nil)
@@ -12702,4 +12706,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.119]
+// FastlaneRunnerAPIVersion [0.9.120]
