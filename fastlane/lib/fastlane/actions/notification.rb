@@ -13,7 +13,7 @@ module Fastlane
           app_icon: :appIcon,
           content_image: :contentImage
         }
-        options = options.transform_keys { |k| option_map.fetch(k, k) }
+        options = Hash[options.map { |k, v| [option_map.fetch(k, k), v] }]
         TerminalNotifier.notify(message, options)
       end
 
