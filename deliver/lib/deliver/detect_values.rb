@@ -49,7 +49,7 @@ module Deliver
       end
 
       if app
-        Deliver.cache = app
+        Deliver.cache[:app] = app
       else
         UI.user_error!("Could not find app with app identifier '#{options[:app_identifier]}' in your App Store Connect account (#{options[:username]} - Team: #{Spaceship::Tunes.client.team_id})")
       end
