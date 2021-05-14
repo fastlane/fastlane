@@ -118,7 +118,7 @@ module FastlaneCore
           discover_devices(child_item, device_types, discovered_device_udids)
         end
 
-        is_supported_device = device_types.any? { |device_type| usb_item['_name'] == device_type }
+        is_supported_device = device_types.any?(usb_item['_name'])
         serial_num = usb_item['serial_num'] || ''
         has_serial_number = serial_num.length == 40 || serial_num.length == 24
 
