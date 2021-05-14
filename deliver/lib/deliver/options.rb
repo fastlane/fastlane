@@ -442,6 +442,7 @@ module Deliver
                                      short_option: "-p",
                                      env_name: "DELIVER_APP_ID",
                                      description: "The (spaceship) app ID of the app you want to use/modify",
+                                     optional: true,
                                      type: Integer)
       ]
     end
