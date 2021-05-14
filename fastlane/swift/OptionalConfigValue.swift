@@ -71,6 +71,8 @@ extension OptionalConfigValue: ExpressibleByStringLiteral where T == String? {
     }
 }
 
+extension OptionalConfigValue: ExpressibleByStringInterpolation where T == String? {}
+
 extension OptionalConfigValue: ExpressibleByNilLiteral {
     public init(nilLiteral _: ()) {
         self = .nil
