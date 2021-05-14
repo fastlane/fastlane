@@ -48,9 +48,9 @@ module Deliver
         app = Spaceship::ConnectAPI::App.get(app_id: app_id)
       end
 
-      if app
-        Deliver.cache[:app] = app
-      else
+      Deliver.cache[:app] = app
+
+      unless app
         UI.user_error!("Could not find app with app identifier '#{options[:app_identifier]}' in your App Store Connect account (#{options[:username]} - Team: #{Spaceship::Tunes.client.team_id})")
       end
     end
