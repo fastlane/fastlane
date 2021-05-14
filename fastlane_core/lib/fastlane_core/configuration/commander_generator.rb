@@ -30,8 +30,7 @@ module FastlaneCore
           type = option.is_string ? String : nil
         end
 
-        # Boolean is a fastlane thing, it's either TrueClass, or FalseClass, but we won't know
-        # that until runtime, so nil is the best we get
+        # OptionParser doesn't like symbol but a symbol and string can be easily cast with `to_sym` and `to_s`
         if type == Symbol
           type = String
         end
