@@ -18,7 +18,7 @@ module Fastlane
         end
 
         if params[:mode] == :fix && version < Gem::Version.new('0.43.0')
-          UI.deprecated("Your version of swiftlint (#{version}) does not support autocorrect mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
+          UI.important("Your version of swiftlint (#{version}) does not support fix mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
           UI.important("For now, switching swiftlint mode `from :fix to :autocorrect` for you 😇")
           params[:mode] = :autocorrect
         end
