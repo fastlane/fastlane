@@ -103,7 +103,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :mode,
                                        env_name: "FL_SWIFTLINT_MODE",
                                        description: "SwiftLint mode: :lint, :fix, :autocorrect or :analyze",
-                                       is_string: false,
+                                       type: Symbol,
                                        default_value: :lint,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :path,
