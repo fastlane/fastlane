@@ -205,6 +205,16 @@ describe Fastlane do
           expect(result).to eq("swiftlint lint")
         end
 
+        it "supports fix mode option" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :fix
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint --fix")
+        end
+
         it "supports autocorrect mode option" do
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
@@ -213,6 +223,20 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq("swiftlint autocorrect")
+        end
+
+        it "switches autocorrect mode to fix mode option if swiftlint does not support it" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.43.0'))
+          expect(FastlaneCore::UI).to receive(:deprecated).with("Your version of swiftlint (0.43.0) has deprecated autocorrect mode, please start using fix mode in input param")
+          expect(FastlaneCore::UI).to receive(:important).with("For now, switching swiftlint mode `from :autocorrect to :fix` for you 😇")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :autocorrect
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint --fix")
         end
       end
 
@@ -376,6 +400,17 @@ describe Fastlane do
           expect(result).to eq("swiftlint lint --no-cache")
         end
 
+        it "adds no-cache option if mode is :fix" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :fix,
+              no_cache: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint --fix --no-cache")
+        end
+
         it "omits format option if mode is :analyze" do
           result = Fastlane::FastFile.new.parse("lane :test do
             swiftlint(
@@ -409,6 +444,17 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq("swiftlint lint")
+        end
+
+        it "doesn't add no-cache option if mode is :fix" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            swiftlint(
+              mode: :fix,
+              no_cache: false
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint --fix")
         end
       end
 
