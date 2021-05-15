@@ -117,8 +117,37 @@ describe Fastlane do
         expect(result).to eq("git push origin master:master --tags --push-option=something-to-tell-remote-git-server --push-option=something-else")
       end
 
-      context "runs git push when checked out commit is HEAD" do
-        it "try to use CI ENV git branch if checked out commit is HEAD" do
+      context "runs git push using a checked out commit git branch" do
+        it "should use the checked out commit git branch" do
+          allow(Fastlane::Actions).to receive(:sh)
+            .with("git rev-parse --abbrev-ref HEAD", log: false)
+            .and_return("staging")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+              push_to_git_remote
+            end").runner.execute(:test)
+
+          expect(result).to eq("git push origin staging:staging --tags")
+        end
+      end
+
+      context "runs git push when checked out commit git branch is different than CI ENV git branch" do
+        it "should use the checked out commit git branch if different than CI ENV" do
+          allow(Fastlane::Actions).to receive(:sh)
+            .with("git rev-parse --abbrev-ref HEAD", log: false)
+            .and_return("staging")
+          allow(Fastlane::Actions).to receive(:git_branch).and_return("master")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+              push_to_git_remote
+            end").runner.execute(:test)
+
+          expect(result).to eq("git push origin staging:staging --tags")
+        end
+      end
+
+      context "runs git push when checked out commit is detached HEAD and running on CI" do
+        it "try to use CI ENV git branch if checked out commit is detached HEAD" do
           allow(Fastlane::Actions).to receive(:sh)
             .with("git rev-parse --abbrev-ref HEAD", log: false)
             .and_return("HEAD")
@@ -132,8 +161,8 @@ describe Fastlane do
         end
       end
 
-      context "runs git push when checked out commit is HEAD and not running on CI" do
-        it "should raise an error if checked out commit is HEAD and not running on CI" do
+      context "runs git push when checked out commit is detached HEAD and not running on CI" do
+        it "should raise an error if checked out commit is detached HEAD and not running on CI" do
           allow(Fastlane::Actions).to receive(:sh)
             .with("git rev-parse --abbrev-ref HEAD", log: false)
             .and_return("HEAD")
