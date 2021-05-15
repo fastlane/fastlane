@@ -17,6 +17,12 @@ module Fastlane
           params[:mode] = :fix
         end
 
+        if params[:mode] == :fix && version < Gem::Version.new('0.43.0')
+          UI.deprecated("Your version of swiftlint (#{version}) does not support autocorrect mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
+          UI.important("For now, switching swiftlint mode `from :fix to :autocorrect` for you 😇")
+          params[:mode] = :autocorrect
+        end
+
         mode_format = params[:mode] == :fix ? "--" : ""
         command = (params[:executable] || "swiftlint").dup
         command << " #{mode_format}#{params[:mode]}"
