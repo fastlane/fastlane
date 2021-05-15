@@ -122,11 +122,9 @@ module Fastlane
     # Returns the current git branch, or "HEAD" if it's not checked out to any branch
     # Can be replaced using the environment variable `GIT_BRANCH`
     def self.git_branch
-      begin
-        env_name = SharedValues::GIT_BRANCH_ENV_VARS.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
-        ENV.fetch(env_name.to_s) { self.git_branch_name_using_HEAD }
-      rescue
-        nil
+      env_name = SharedValues::GIT_BRANCH_ENV_VARS.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
+      ENV.fetch(env_name.to_s) do
+        self.git_branch_name_using_HEAD
       end
     end
 
