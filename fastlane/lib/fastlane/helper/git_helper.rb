@@ -119,7 +119,8 @@ module Fastlane
       return nil
     end
 
-    # Returns the CI's ENV git branch name or fallback to current git branch name using HEAD
+    # Returns the current git branch, or "HEAD" if it's not checked out to any branch
+    # Can be replaced using the environment variable `GIT_BRANCH`
     def self.git_branch
       begin
         env_name = SharedValues::GIT_BRANCH_ENV_VARS.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
