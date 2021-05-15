@@ -131,7 +131,7 @@ describe Fastlane do
         end
       end
 
-      context "runs git push when checked out commit git branch is different than CI ENV git branch" do
+      context "runs git push when checked out commit git branch is different than git branch name is set in CI ENV" do
         it "should use the checked out commit git branch if different than CI ENV" do
           allow(Fastlane::Actions).to receive(:sh)
             .with("git rev-parse --abbrev-ref HEAD", log: false)
@@ -146,8 +146,8 @@ describe Fastlane do
         end
       end
 
-      context "runs git push when checked out commit is detached HEAD and running on CI" do
-        it "try to use CI ENV git branch if checked out commit is detached HEAD" do
+      context "runs git push when checked out commit is detached HEAD and git branch name is set in CI ENV" do
+        it "should use CI ENV git branch if checked out commit is detached HEAD" do
           allow(Fastlane::Actions).to receive(:sh)
             .with("git rev-parse --abbrev-ref HEAD", log: false)
             .and_return("HEAD")
@@ -161,8 +161,8 @@ describe Fastlane do
         end
       end
 
-      context "runs git push when checked out commit is detached HEAD and not running on CI" do
-        it "should raise an error if checked out commit is detached HEAD and not running on CI" do
+      context "runs git push when checked out commit is detached HEAD and git branch name is not set in CI ENV" do
+        it "should raise an error if checked out commit is detached HEAD and git branch name is not set in CI ENV" do
           allow(Fastlane::Actions).to receive(:sh)
             .with("git rev-parse --abbrev-ref HEAD", log: false)
             .and_return("HEAD")
@@ -177,8 +177,8 @@ describe Fastlane do
         end
       end
 
-      context "runs git push without local_branch and not running on CI" do
-        it "should raise an error if get current local branch failed and not running on CI" do
+      context "runs git push without local_branch and git branch name is not set in CI ENV" do
+        it "should raise an error if get current local branch failed and git branch name is not set in CI ENV" do
           allow(Fastlane::Actions).to receive(:sh)
             .with("git rev-parse --abbrev-ref HEAD", log: false)
             .and_return(nil)
