@@ -15,6 +15,11 @@ module Fastlane
           values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
         end
 
+        # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
+        unless values[:api_key_path]
+          values[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        end
+
         return values if Helper.test?
 
         if distribute_only

@@ -1,4 +1,3 @@
-require 'fastlane'
 require_relative 'options'
 require_relative 'spaceship_ensure'
 require_relative 'encryption'
