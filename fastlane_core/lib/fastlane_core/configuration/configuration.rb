@@ -212,7 +212,7 @@ module FastlaneCore
     # if 'force_ask' is true, the option is not required to be optional to ask
     # rubocop:disable Metrics/PerceivedComplexity
     def fetch(key, ask: true, force_ask: false)
-      UI.crash!("Key '#{key}' must be a symbol. Example :app_id.") unless key.kind_of?(Symbol)
+      UI.crash!("Key '#{key}' must be a symbol. Example :#{key}") unless key.kind_of?(Symbol)
 
       option = verify_options_key!(key)
 
