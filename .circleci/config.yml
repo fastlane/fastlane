@@ -78,6 +78,7 @@ jobs:
         type: string
         default: ''
     environment:
+      HOMEBREW_NO_AUTO_UPDATE: 1 # see https://circleci.com/docs/2.0/testing-ios/#optimizing-homebrew
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'en_US.UTF-8'
       LANG: 'en_US.UTF-8'
