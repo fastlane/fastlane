@@ -711,12 +711,12 @@ module Spaceship
       @csrf_tokens || {}
     end
 
-    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
+    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, client = @client, &block)
       headers.merge!(csrf_tokens)
       headers['User-Agent'] = USER_AGENT
 
       # Before encoding the parameters, log them
-      log_request(method, url_or_path, params, headers, &block)
+      #log_request(method, url_or_path, params, headers, &block)
 
       # form-encode the params only if there are params, and the block is not supplied.
       # this is so that certain requests can be made using the block for more control
@@ -725,25 +725,11 @@ module Spaceship
       end
 
       response = if auto_paginate
-                   send_request_auto_paginate(method, url_or_path, params, headers, &block)
+                   send_request_auto_paginate(method, url_or_path, params, headers, client, &block)
                  else
-                   send_request(method, url_or_path, params, headers, &block)
+                   send_request(method, url_or_path, params, headers, client, &block)
                  end
 
-      return response
-    end
-
-    def request_test(client, method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
-      headers.merge!(csrf_tokens)
-      headers['User-Agent'] = USER_AGENT
-      headers['Content-Type'] = 'application/vnd.api+json'
-      headers['X-Requested-With'] = 'XMLHttpRequest'
-      params = params.to_json
-
-      # Before encoding the parameters, log them
-      #log_request(method, url_or_path, params, headers, &block)
-
-      response = send_request_noclient(client, method, url_or_path, params, headers, &block)
       return response
     end
 
@@ -896,9 +882,9 @@ module Spaceship
 
     # Actually sends the request to the remote server
     # Automatically retries the request up to 3 times if something goes wrong
-    def send_request(method, url_or_path, params, headers, &block)
+    def send_request(method, url_or_path, params, headers, client, &block)
       with_retry do
-        response = @client.send(method, url_or_path, params, headers, &block)
+        response = client.send(method, url_or_path, params, headers, &block)
         log_response(method, url_or_path, response, headers, &block)
 
         handle_error(response)
@@ -915,32 +901,32 @@ module Spaceship
       end
     end
 
-    # Actually sends the request to the remote server
-    # Automatically retries the request up to 3 times if something goes wrong
-    def send_request_noclient(client, method, url_or_path, params, headers, &block)
-      say "\nSENDING #{method} REQUEST"
-      with_retry do
-        response = client.send(method, url_or_path, params, headers, &block)
-        log_response(method, url_or_path, response, headers, &block)
+    # # Actually sends the request to the remote server
+    # # Automatically retries the request up to 3 times if something goes wrong
+    # def send_request_noclient(client, method, url_or_path, params, headers, &block)
+    #   say "\nSENDING #{method} REQUEST"
+    #   with_retry do
+    #     response = client.send(method, url_or_path, params, headers, &block)
+    #     log_response(method, url_or_path, response, headers, &block)
 
-        resp_hash = response.to_hash
-        if resp_hash[:status] == 401
-          msg = "Auth lost"
-          logger.warn(msg)
-          raise UnauthorizedAccessError.new, "Unauthorized Access"
-        end
+    #     resp_hash = response.to_hash
+    #     if resp_hash[:status] == 401
+    #       msg = "Auth lost"
+    #       logger.warn(msg)
+    #       raise UnauthorizedAccessError.new, "Unauthorized Access"
+    #     end
 
-        if response.body.to_s.include?("<title>302 Found</title>")
-          raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
-        end
+    #     if response.body.to_s.include?("<title>302 Found</title>")
+    #       raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
+    #     end
 
-        if response.body.to_s.include?("<h3>Bad Gateway</h3>")
-          raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
-        end
+    #     if response.body.to_s.include?("<h3>Bad Gateway</h3>")
+    #       raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
+    #     end
 
-        return response
-      end
-    end
+    #     return response
+    #   end
+    # end
 
     def handle_error(response)
       case response.status
@@ -957,12 +943,12 @@ module Spaceship
       end
     end
 
-    def send_request_auto_paginate(method, url_or_path, params, headers, &block)
-      response = send_request(method, url_or_path, params, headers, &block)
+    def send_request_auto_paginate(method, url_or_path, params, headers, client, &block)
+      response = send_request(method, url_or_path, params, headers, client, &block)
       return response unless should_process_next_rel?(response)
       last_response = response
       while last_response.env.rels[:next]
-        last_response = send_request(method, last_response.env.rels[:next], params, headers, &block)
+        last_response = send_request(method, last_response.env.rels[:next], params, headers, client, &block)
         break unless should_process_next_rel?(last_response)
         response.body['data'].concat(last_response.body['data'])
       end

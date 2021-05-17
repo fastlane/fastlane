@@ -172,8 +172,12 @@ module Spaceship
     def update_service_for_app(app, service)
       ensure_csrf(Spaceship::Portal::App)
       data = Spaceship::Portal::UpdateBundleRequest.new(app, service).to_hash
-      say "\nDATA:\n#{data}"
-      response = request_test(@client_v1_api, :patch, "v1/bundleIds/#{app.app_id}", {data: data}).to_yaml
+      params = {data: data}.to_json
+      say "\nDATA:\n#{params}"
+      headers = {}
+      headers['Content-Type'] = 'application/vnd.api+json'
+      headers['X-Requested-With'] = 'XMLHttpRequest'
+      response = request(:patch, "v1/bundleIds/#{app.app_id}", params, headers, false, client_v1_api).to_yaml
       say "\nUPDATE_SERVICE_RESPONSE:\n#{response}"
 
       details_for_app(app)
