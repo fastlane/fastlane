@@ -63,10 +63,6 @@ module Spaceship
       raise "You must implement self.hostname"
     end
 
-    def self.hostname_test
-      "https://developer.apple.com/services-account/"
-    end
-
     #####################################################
     # @!group Teams + User
     #####################################################
@@ -900,33 +896,6 @@ module Spaceship
         return response
       end
     end
-
-    # # Actually sends the request to the remote server
-    # # Automatically retries the request up to 3 times if something goes wrong
-    # def send_request_noclient(client, method, url_or_path, params, headers, &block)
-    #   say "\nSENDING #{method} REQUEST"
-    #   with_retry do
-    #     response = client.send(method, url_or_path, params, headers, &block)
-    #     log_response(method, url_or_path, response, headers, &block)
-
-    #     resp_hash = response.to_hash
-    #     if resp_hash[:status] == 401
-    #       msg = "Auth lost"
-    #       logger.warn(msg)
-    #       raise UnauthorizedAccessError.new, "Unauthorized Access"
-    #     end
-
-    #     if response.body.to_s.include?("<title>302 Found</title>")
-    #       raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
-    #     end
-
-    #     if response.body.to_s.include?("<h3>Bad Gateway</h3>")
-    #       raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
-    #     end
-
-    #     return response
-    #   end
-    # end
 
     def handle_error(response)
       case response.status

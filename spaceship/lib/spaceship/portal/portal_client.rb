@@ -34,7 +34,6 @@ module Spaceship
       super(cookie: cookie, current_team_id: current_team_id, csrf_tokens: csrf_tokens, timeout: timeout)
       @client_v1_api = Faraday.new(self.class.hostname_v1_api, @options) do |c|
         c.response(:json, content_type: /\bjson$/)
-        c.response(:plist, content_type: /\bplist$/)
         c.use(:cookie_jar, jar: @cookie)
         c.use(FaradayMiddleware::RelsMiddleware)
         c.use(Spaceship::StatsMiddleware)
