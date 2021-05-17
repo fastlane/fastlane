@@ -177,7 +177,7 @@ module Spaceship
       headers = {}
       headers['Content-Type'] = 'application/vnd.api+json'
       headers['X-Requested-With'] = 'XMLHttpRequest'
-      response = request(:patch, "v1/bundleIds/#{app.app_id}", params, headers, false, client_v1_api).to_yaml
+      response = request(:patch, "v1/bundleIds/#{app.app_id}", params, headers, false, @client_v1_api).to_yaml
       say "\nUPDATE_SERVICE_RESPONSE:\n#{response}"
 
       details_for_app(app)
