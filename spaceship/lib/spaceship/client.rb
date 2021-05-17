@@ -234,26 +234,28 @@ module Spaceship
         end
       end
 
-      @client_test = Faraday.new(self.class.hostname_test, options) do |c|
-        c.response(:json, content_type: /\bjson$/)
-        c.response(:xml, content_type: /\bxml$/)
-        c.response(:plist, content_type: /\bplist$/)
-        c.use(:cookie_jar, jar: @cookie)
-        c.use(FaradayMiddleware::RelsMiddleware)
-        c.adapter(Faraday.default_adapter)
+      if self.class.hostname_test
+        @client_test = Faraday.new(self.class.hostname_test, options) do |c|
+          c.response(:json, content_type: /\bjson$/)
+          c.response(:xml, content_type: /\bxml$/)
+          c.response(:plist, content_type: /\bplist$/)
+          c.use(:cookie_jar, jar: @cookie)
+          c.use(FaradayMiddleware::RelsMiddleware)
+          c.adapter(Faraday.default_adapter)
 
-        if ENV['SPACESHIP_DEBUG']
-          # for debugging only
-          # This enables tracking of networking requests using Charles Web Proxy
-          c.proxy = "https://127.0.0.1:8888"
-          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
-        elsif ENV["SPACESHIP_PROXY"]
-          c.proxy = ENV["SPACESHIP_PROXY"]
-          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
-        end
+          if ENV['SPACESHIP_DEBUG']
+            # for debugging only
+            # This enables tracking of networking requests using Charles Web Proxy
+            c.proxy = "https://127.0.0.1:8888"
+            c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
+          elsif ENV["SPACESHIP_PROXY"]
+            c.proxy = ENV["SPACESHIP_PROXY"]
+            c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
+          end
 
-        if ENV["DEBUG"]
-          puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
+          if ENV["DEBUG"]
+            puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
+          end
         end
       end
     end
