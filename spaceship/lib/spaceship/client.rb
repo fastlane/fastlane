@@ -205,7 +205,7 @@ module Spaceship
     end
 
     def initialize(cookie: nil, current_team_id: nil, csrf_tokens: nil, timeout: nil)
-      options = {
+      @options = {
        request: {
           timeout:       (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i,
           open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i
@@ -215,30 +215,7 @@ module Spaceship
       @csrf_tokens = csrf_tokens
       @cookie = cookie || HTTP::CookieJar.new
 
-      @client = Faraday.new(self.class.hostname, options) do |c|
-        c.response(:json, content_type: /\bjson$/)
-        c.response(:plist, content_type: /\bplist$/)
-        c.use(:cookie_jar, jar: @cookie)
-        c.use(FaradayMiddleware::RelsMiddleware)
-        c.use(Spaceship::StatsMiddleware)
-        c.adapter(Faraday.default_adapter)
-
-        if ENV['SPACESHIP_DEBUG']
-          # for debugging only
-          # This enables tracking of networking requests using Charles Web Proxy
-          c.proxy = "https://127.0.0.1:8888"
-          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
-        elsif ENV["SPACESHIP_PROXY"]
-          c.proxy = ENV["SPACESHIP_PROXY"]
-          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
-        end
-
-        if ENV["DEBUG"]
-          puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
-        end
-      end
-
-      @client_test = Faraday.new(self.class.hostname_test, options) do |c|
+      @client = Faraday.new(self.class.hostname, @options) do |c|
         c.response(:json, content_type: /\bjson$/)
         c.response(:plist, content_type: /\bplist$/)
         c.use(:cookie_jar, jar: @cookie)
@@ -756,7 +733,7 @@ module Spaceship
       return response
     end
 
-    def request_test(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
+    def request_test(client, method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
       headers.merge!(csrf_tokens)
       headers['User-Agent'] = USER_AGENT
       headers['Content-Type'] = 'application/vnd.api+json'
@@ -766,7 +743,7 @@ module Spaceship
       # Before encoding the parameters, log them
       #log_request(method, url_or_path, params, headers, &block)
 
-      response = send_request_noclient(method, url_or_path, params, headers, &block)
+      response = send_request_noclient(client, method, url_or_path, params, headers, &block)
       return response
     end
 
@@ -940,16 +917,10 @@ module Spaceship
 
     # Actually sends the request to the remote server
     # Automatically retries the request up to 3 times if something goes wrong
-    def send_request_noclient(method, url_or_path, params, headers, &block)
+    def send_request_noclient(client, method, url_or_path, params, headers, &block)
       say "\nSENDING #{method} REQUEST"
       with_retry do
-        response = request(method) do |req|
-          req.url(url_or_path)
-          req.body = params
-          req.headers = headers
-          req.headers["Cookie"] = @cookie
-        end
-        say "\n#{response}"
+        response = client.send(method, url_or_path, params, headers, &block)
         log_response(method, url_or_path, response, headers, &block)
 
         resp_hash = response.to_hash

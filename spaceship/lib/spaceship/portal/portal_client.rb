@@ -26,8 +26,33 @@ module Spaceship
     end
 
 
-    def self.hostname_test
+    def self.hostname_v1_api
       "https://developer.apple.com/services-account/"
+    end
+
+    def initialize
+      @client_v1_api = Faraday.new(self.class.hostname_v1_api, @options) do |c|
+        c.response(:json, content_type: /\bjson$/)
+        c.response(:plist, content_type: /\bplist$/)
+        c.use(:cookie_jar, jar: @cookie)
+        c.use(FaradayMiddleware::RelsMiddleware)
+        c.use(Spaceship::StatsMiddleware)
+        c.adapter(Faraday.default_adapter)
+
+        if ENV['SPACESHIP_DEBUG']
+          # for debugging only
+          # This enables tracking of networking requests using Charles Web Proxy
+          c.proxy = "https://127.0.0.1:8888"
+          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
+        elsif ENV["SPACESHIP_PROXY"]
+          c.proxy = ENV["SPACESHIP_PROXY"]
+          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
+        end
+
+        if ENV["DEBUG"]
+          puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
+        end
+      end
     end
 
     def send_login_request(user, password)
@@ -147,7 +172,7 @@ module Spaceship
       ensure_csrf(Spaceship::Portal::App)
       data = Spaceship::Portal::UpdateBundleRequest.new(app, service).to_hash
       say "\nDATA:\n#{data}"
-      response = request_test(:patch, "v1/bundleIds/#{app.app_id}", {data: data}).to_yaml
+      response = request_test(@client_v1_api, :patch, "v1/bundleIds/#{app.app_id}", {data: data}).to_yaml
       say "\nUPDATE_SERVICE_RESPONSE:\n#{response}"
 
       details_for_app(app)
