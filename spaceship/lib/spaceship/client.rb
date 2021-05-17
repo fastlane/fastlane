@@ -240,7 +240,6 @@ module Spaceship
 
       @client_test = Faraday.new(self.class.hostname_test, options) do |c|
         c.response(:json, content_type: /\bjson$/)
-        c.response(:xml, content_type: /\bxml$/)
         c.response(:plist, content_type: /\bplist$/)
         c.use(:cookie_jar, jar: @cookie)
         c.use(FaradayMiddleware::RelsMiddleware)
