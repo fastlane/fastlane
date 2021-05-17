@@ -941,7 +941,7 @@ module Spaceship
     # Actually sends the request to the remote server
     # Automatically retries the request up to 3 times if something goes wrong
     def send_request_noclient(method, url_or_path, params, headers, &block)
-      say "\nSENDING #{method.name} REQUEST"
+      say "\nSENDING #{method} REQUEST"
       with_retry do
         response = request(method) do |req|
           req.url(url_or_path)
