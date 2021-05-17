@@ -766,7 +766,7 @@ module Spaceship
       # Before encoding the parameters, log them
       #log_request(method, url_or_path, params, headers, &block)
 
-      response = send_request_test(method, url_or_path, params, headers, &block)
+      response = send_request_noclient(method, url_or_path, params, headers, &block)
       return response
     end
 
@@ -940,10 +940,16 @@ module Spaceship
 
     # Actually sends the request to the remote server
     # Automatically retries the request up to 3 times if something goes wrong
-    def send_request_test(method, url_or_path, params, headers, &block)
-      say "\nSENDING PATCH REQUEST"
+    def send_request_noclient(method, url_or_path, params, headers, &block)
+      say "\nSENDING #{method.name} REQUEST"
       with_retry do
-        response = @client_test.send(method, url_or_path, params, headers, &block)
+        response = request(method) do |req|
+          req.url(url_or_path)
+          req.body = params
+          req.headers = headers
+          req.headers["Cookie"] = @cookie
+        end
+        say "\n#{response}"
         log_response(method, url_or_path, response, headers, &block)
 
         resp_hash = response.to_hash
