@@ -63,10 +63,6 @@ module Spaceship
       raise "You must implement self.hostname"
     end
 
-    def self.hostname_test
-      raise "You must implement self.hostname_test"
-    end
-
     #####################################################
     # @!group Teams + User
     #####################################################
