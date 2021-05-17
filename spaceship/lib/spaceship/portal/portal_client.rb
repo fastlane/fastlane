@@ -10,6 +10,7 @@ require_relative 'provisioning_profile'
 require_relative 'certificate'
 require_relative 'website_push'
 require_relative 'persons'
+require_relative 'update_bundle_request'
 
 module Spaceship
   # rubocop:disable Metrics/ClassLength
