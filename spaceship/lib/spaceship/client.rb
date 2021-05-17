@@ -64,7 +64,7 @@ module Spaceship
     end
 
     def self.hostname_test
-      "You must implement self.hostname_test"
+      "https://developer.apple.com/services-account/"
     end
 
     #####################################################
