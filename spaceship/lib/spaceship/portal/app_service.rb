@@ -10,7 +10,25 @@ module Spaceship
       # @return (Object) The current value for this service
       # @example
       #   false
-      attr_accessor :value
+      attr_accessor :
+
+      # @return (Hash) The current capability_settings hash, if applicable, for this service
+      # @example
+      #   {
+      #      key: "DATA_PROTECTION_PERMISSION_LEVEL",
+      #      options:
+      #      [
+      #        {
+      #          key: "COMPLETE_PROTECTION"
+      #        }
+      #      ]
+      #    }
+      attr_accessor :capability_settings
+
+      # @return (String) The current capability_settings value, if applicable, for this service
+      # @example
+      #   "COMPLETE_PROTECTION"
+      attr_accessor :capability_settings_value
 
       # @return (String) The service URI for this service
       # @example
@@ -40,31 +58,31 @@ module Spaceship
         return m
       end
 
-      AccessWifi = AppService.new_service("AWEQ28MY3E")
-      AppGroup = AppService.new_service("APG3427HIY")
-      ApplePay = AppService.new_service("OM633U5T5G")
-      AssociatedDomains = AppService.new_service("SKC3T5S89Y")
-      ClassKit = AppService.new_service("PKTJAN2017")
-      AutoFillCredential = AppService.new_service("CPEQ28MX4E")
-      DataProtection = AppService.new_service("dataProtection", values: { off: "", complete: "complete", unless_open: "unlessopen", until_first_auth: "untilfirstauth" })
-      GameCenter = AppService.new_service("gameCenter")
-      HealthKit = AppService.new_service("HK421J6T7P")
-      HomeKit = AppService.new_service("homeKit")
-      Hotspot = AppService.new_service("HSC639VEI8")
-      Cloud = AppService.new_service("iCloud")
+      AccessWifi = AppService.new_service("ACCESS_WIFI_INFORMATION")
+      AppGroup = AppService.new_service("APP_GROUPS")
+      ApplePay = AppService.new_service("APPLE_PAY")
+      AssociatedDomains = AppService.new_service("ASSOCIATED_DOMAINS")
+      ClassKit = AppService.new_service("CLASSKIT")
+      AutoFillCredential = AppService.new_service("AUTOFILL_CREDENTIAL_PROVIDER")
+      DataProtection = AppService.new_service("DATA_PROTECTION", settings: {complete: "COMPLETE_PROTECTION", unless_open: "PROTECTED_UNLESS_OPEN", until_first_auth: "PROTECTED_UNTIL_FIRST_USER_AUTH" }, key: "DATA_PROTECTION_PERMISSION_LEVEL")
+      GameCenter = AppService.new_service("GAME_CENTER")
+      HealthKit = AppService.new_service("HEALTHKIT")
+      HomeKit = AppService.new_service("HOMEKIT")
+      Hotspot = AppService.new_service("HOT_SPOT")
+      Cloud = AppService.new_service("ICLOUD")
       CloudKit = AppService.new_service("cloudKitVersion", values: { xcode5_compatible: 1, cloud_kit: 2 })
-      InAppPurchase = AppService.new_service("inAppPurchase")
-      InterAppAudio = AppService.new_service("IAD53UNK2F")
-      Multipath = AppService.new_service("MP49FN762P")
-      NetworkExtension = AppService.new_service("NWEXT04537")
-      NFCTagReading = AppService.new_service("NFCTRMAY17")
-      PersonalVPN = AppService.new_service("V66P55NK2I")
-      Passbook = AppService.new_service("passbook")
-      PushNotification = AppService.new_service("push")
-      SiriKit = AppService.new_service("SI015DKUHP")
+      InAppPurchase = AppService.new_service("IN_APP_PURCHASE")
+      InterAppAudio = AppService.new_service("INTER_APP_AUDIO")
+      Multipath = AppService.new_service("MULTIPATH")
+      NetworkExtension = AppService.new_service("NETWORK_EXTENSIONS")
+      NFCTagReading = AppService.new_service("NFC_TAG_READING")
+      PersonalVPN = AppService.new_service("PERSONAL_VPN")
+      Passbook = AppService.new_service("pass")
+      PushNotification = AppService.new_service("PUSH_NOTIFICATIONS")
+      SiriKit = AppService.new_service("SIRIKIT")
       VPNConfiguration = AppService.new_service("V66P55NK2I")
-      Wallet = AppService.new_service("passbook")
-      WirelessAccessory = AppService.new_service("WC421J6T7P")
+      Wallet = AppService.new_service("WALLET")
+      WirelessAccessory = AppService.new_service("WIRELESS_ACCESSORY_CONFIGURATION")
 
       constants.each do |c|
         name = c.to_s

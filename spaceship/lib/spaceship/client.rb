@@ -63,6 +63,10 @@ module Spaceship
       raise "You must implement self.hostname"
     end
 
+    def self.hostname_test
+      raise "You must implement self.hostname_test"
+    end
+
     #####################################################
     # @!group Teams + User
     #####################################################
@@ -217,6 +221,29 @@ module Spaceship
         c.use(:cookie_jar, jar: @cookie)
         c.use(FaradayMiddleware::RelsMiddleware)
         c.use(Spaceship::StatsMiddleware)
+        c.adapter(Faraday.default_adapter)
+
+        if ENV['SPACESHIP_DEBUG']
+          # for debugging only
+          # This enables tracking of networking requests using Charles Web Proxy
+          c.proxy = "https://127.0.0.1:8888"
+          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
+        elsif ENV["SPACESHIP_PROXY"]
+          c.proxy = ENV["SPACESHIP_PROXY"]
+          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
+        end
+
+        if ENV["DEBUG"]
+          puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
+        end
+      end
+
+      @client_test = Faraday.new(self.class.hostname_test, options) do |c|
+        c.response(:json, content_type: /\bjson$/)
+        c.response(:xml, content_type: /\bxml$/)
+        c.response(:plist, content_type: /\bplist$/)
+        c.use(:cookie_jar, jar: @cookie)
+        c.use(FaradayMiddleware::RelsMiddleware)
         c.adapter(Faraday.default_adapter)
 
         if ENV['SPACESHIP_DEBUG']
@@ -729,6 +756,20 @@ module Spaceship
       return response
     end
 
+    def request_test(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
+      headers.merge!(csrf_tokens)
+      headers['User-Agent'] = USER_AGENT
+      headers['Content-Type'] = 'application/vnd.api+json'
+      headers['X-Requested-With'] = 'XMLHttpRequest'
+      params = params.to_json
+
+      # Before encoding the parameters, log them
+      #log_request(method, url_or_path, params, headers, &block)
+
+      response = send_request_test(method, url_or_path, params, headers, &block)
+      return response
+    end
+
     def parse_response(response, expected_key = nil)
       if response.body
         # If we have an `expected_key`, select that from response.body Hash
@@ -884,6 +925,33 @@ module Spaceship
         log_response(method, url_or_path, response, headers, &block)
 
         handle_error(response)
+
+        if response.body.to_s.include?("<title>302 Found</title>")
+          raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
+        end
+
+        if response.body.to_s.include?("<h3>Bad Gateway</h3>")
+          raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
+        end
+
+        return response
+      end
+    end
+
+    # Actually sends the request to the remote server
+    # Automatically retries the request up to 3 times if something goes wrong
+    def send_request_test(method, url_or_path, params, headers, &block)
+      say "\nSENDING PATCH REQUEST"
+      with_retry do
+        response = @client_test.send(method, url_or_path, params, headers, &block)
+        log_response(method, url_or_path, response, headers, &block)
+
+        resp_hash = response.to_hash
+        if resp_hash[:status] == 401
+          msg = "Auth lost"
+          logger.warn(msg)
+          raise UnauthorizedAccessError.new, "Unauthorized Access"
+        end
 
         if response.body.to_s.include?("<title>302 Found</title>")
           raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"

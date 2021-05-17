@@ -24,6 +24,11 @@ module Spaceship
       "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/"
     end
 
+
+    def self.hostname_test
+      "https://developer.apple.com/services-account/"
+    end
+
     def send_login_request(user, password)
       response = send_shared_login_request(user, password)
       return response if self.cookie.include?("myacinfo")
@@ -139,13 +144,10 @@ module Spaceship
 
     def update_service_for_app(app, service)
       ensure_csrf(Spaceship::Portal::App)
-
-      request(:post, service.service_uri, {
-        teamId: team_id,
-        displayId: app.app_id,
-        featureType: service.service_id,
-        featureValue: service.value
-      })
+      data = Spaceship::Portal::UpdateBundleRequest.new(app, service).to_hash
+      say "\nDATA:\n#{data}"
+      response = request_test(:patch, "v1/bundleIds/#{app.app_id}", {data: data}).to_yaml
+      say "\nUPDATE_SERVICE_RESPONSE:\n#{response}"
 
       details_for_app(app)
     end
