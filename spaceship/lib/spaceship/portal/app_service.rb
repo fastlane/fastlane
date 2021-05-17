@@ -35,9 +35,22 @@ module Spaceship
       #    "account/ios/identifiers/updateService.action"
       attr_accessor :service_uri
 
-      def initialize(service_id, value)
+      def initialize(service_id, value: true, settings: nil, key: nil)
         @service_id = service_id
         @value = value
+        if settings
+          @capability_settings_value = settings
+          @capability_settings = [{
+              key: key,
+              options: [
+                {
+                  key: settings
+                }
+              ]
+            }]
+        else
+          @capability_settings = []
+        end
 
         if @service_id == "push"
           # Push notifications have a special URI
@@ -48,11 +61,18 @@ module Spaceship
         end
       end
 
-      def self.new_service(id, values: { on: true, off: false })
+      def self.new_service(id, values: { on: true, off: false }, settings: nil, key: nil)
         m = Module.new
         values.each do |k, v|
           m.define_singleton_method(k) do
-            AppService.new(id, v)
+            AppService.new(id, value: v)
+          end
+        end
+        if settings
+          settings.each do |k, v|
+            m.define_singleton_method(k) do
+              AppService.new(id, settings: v, key:key)
+            end
           end
         end
         return m
