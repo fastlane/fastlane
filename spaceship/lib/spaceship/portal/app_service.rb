@@ -10,7 +10,7 @@ module Spaceship
       # @return (Object) The current value for this service
       # @example
       #   false
-      attr_accessor :
+      attr_accessor :value
 
       # @return (Hash) The current capability_settings hash, if applicable, for this service
       # @example
