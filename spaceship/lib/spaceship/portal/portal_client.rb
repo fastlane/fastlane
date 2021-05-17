@@ -31,7 +31,7 @@ module Spaceship
     end
 
     def initialize(cookie: nil, current_team_id: nil, csrf_tokens: nil, timeout: nil)
-      super(cookie, current_team_id, csrf_tokens, timeout)
+      super(cookie: cookie, current_team_id: current_team_id, csrf_tokens: csrf_tokens, timeout: timeout)
       @client_v1_api = Faraday.new(self.class.hostname_v1_api, @options) do |c|
         c.response(:json, content_type: /\bjson$/)
         c.response(:plist, content_type: /\bplist$/)
