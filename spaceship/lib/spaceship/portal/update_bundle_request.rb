@@ -36,7 +36,7 @@ module Spaceship
         }
 
         relationships = {
-          bundleIdCapabilities: JSONApiBase.new(data: [BundleIdCapability.new(service).to_hash])
+          bundleIdCapabilities: JSONApiBase.new(data: [BundleIdCapability.new(service).to_hash]).to_hash
         }
         super(type: "bundleIds", id: app.app_id, attributes: attributes, relationships: relationships)
       end
@@ -50,7 +50,7 @@ module Spaceship
           settings:service.capability_settings
         }
         relationships = {
-          capability: JSONApiBase.new(type: "capabilities", id: service.service_id)
+          capability: JSONApiBase.new(type: "capabilities", id: service.service_id).to_hash
         }
         super(type: "bundleIdCapabilities", attributes: attributes, relationships: relationships)
       end
