@@ -15,14 +15,30 @@ module Spaceship
       def to_hash
         hash = {}
         self.instance_variables.each {|var|
-          say "\nVAR: #{var}"
-          say "\nVAR: #{self.instance_variable_get(var)}"
           if self.instance_variable_get(var) != nil
-            say "\nAdding: #{var}"
             hash[var.to_s.delete("@")] = self.instance_variable_get(var) 
           end
         }
+        say "\nTO_HASH_DEEP:\n#{self.class.to_hash_deep(self)}"
         return hash
+      end
+
+      def self.to_hash_deep(var)
+        result = {}
+        if var.is_a? Hash 
+          var.each { |key, value|
+            result[key] = self.class.to_hash_deep(value)
+          }
+        elsif var.is_a? JSONApiBase
+          var.instance_variables.each {|v|
+            if var.instance_variable_get(v) != nil
+              hash[v.to_s.delete("@")] = self.class.to_hash_deep(var.instance_variable_get(v))
+            end
+          }
+        else
+          return var
+        end
+        return result
       end
     end
 
@@ -57,7 +73,7 @@ module Spaceship
           settings:service.capability_settings
         }
         relationships = {
-          capability: JSONApiBase.new(type: "capabilities", id: service.service_id).to_hash
+          capability: JSONApiBase.new(data: JSONApiBase.new(type: "capabilities", id: service.service_id).to_hash).to_hash
         }
         super(type: "bundleIdCapabilities", attributes: attributes, relationships: relationships)
       end
