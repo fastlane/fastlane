@@ -12706,4 +12706,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.121]
+// FastlaneRunnerAPIVersion [0.9.122]
