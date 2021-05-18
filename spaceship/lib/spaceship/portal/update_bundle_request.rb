@@ -14,6 +14,8 @@ module Spaceship
 
       def self.to_hash_deep(var)
         result = {}
+        say "\nVAR: #{var}"
+        say "\nVAR: #{self.instance_variable_get(var)}"
         if var.is_a? Hash 
           var.each { |key, value|
             result[key] = JSONApiBase::to_hash_deep(value)
