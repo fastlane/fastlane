@@ -17,7 +17,8 @@ module Spaceship
         self.instance_variables.each {|var|
           say "\nVAR: #{var}"
           say "\nVAR: #{self.instance_variable_get(var)}"
-          if !self.instance_variable_get(var).nil? 
+          if self.instance_variable_get(var) != nil
+            say "\nAdding: #{var}"
             hash[var.to_s.delete("@")] = self.instance_variable_get(var) 
           end
         }
