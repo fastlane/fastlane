@@ -30,29 +30,10 @@ module Spaceship
       "https://developer.apple.com/services-account/"
     end
 
+    #A second client is needed for hostnames that do not require a protocol version to be appended
     def initialize(cookie: nil, current_team_id: nil, csrf_tokens: nil, timeout: nil)
       super(cookie: cookie, current_team_id: current_team_id, csrf_tokens: csrf_tokens, timeout: timeout)
-      @client_v1_api = Faraday.new(self.class.hostname_v1_api, @options) do |c|
-        c.response(:json, content_type: /\bjson$/)
-        c.use(:cookie_jar, jar: @cookie)
-        c.use(FaradayMiddleware::RelsMiddleware)
-        c.use(Spaceship::StatsMiddleware)
-        c.adapter(Faraday.default_adapter)
-
-        if ENV['SPACESHIP_DEBUG']
-          # for debugging only
-          # This enables tracking of networking requests using Charles Web Proxy
-          c.proxy = "https://127.0.0.1:8888"
-          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
-        elsif ENV["SPACESHIP_PROXY"]
-          c.proxy = ENV["SPACESHIP_PROXY"]
-          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
-        end
-
-        if ENV["DEBUG"]
-          puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
-        end
-      end
+      @client_v1_api = build_client(self.class.hostname_v1_api)
     end
 
     def send_login_request(user, password)

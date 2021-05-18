@@ -38,27 +38,8 @@ module Spaceship
       def initialize(service_id, value: true, settings: nil, key: nil)
         @service_id = service_id
         @value = value
-        if settings
-          @capability_settings_value = settings
-          @capability_settings = [{
-              key: key,
-              options: [
-                {
-                  key: settings
-                }
-              ]
-            }]
-        else
-          @capability_settings = []
-        end
-
-        if @service_id == "push"
-          # Push notifications have a special URI
-          @service_uri = "account/ios/identifiers/updatePushService.action"
-        else
-          # Default service URI
-          @service_uri = "account/ios/identifiers/updateService.action"
-        end
+        @capability_settings_value = settings
+        @capability_settings = build_compatibility_settings(settings, key)
       end
 
       def self.new_service(id, values: { on: true, off: false }, settings: nil, key: nil)
@@ -76,6 +57,21 @@ module Spaceship
           end
         end
         return m
+      end
+
+      def build_compatibility_settings(settings, key)
+        if settings.nil? || key.nil?
+          return []
+        end
+        compatibility_settings = [{
+          key: key,
+          options: [
+            {
+              key: settings
+            }
+          ]
+        }]
+        return compatibility_settings
       end
 
       AccessWifi = AppService.new_service("ACCESS_WIFI_INFORMATION")
@@ -118,7 +114,7 @@ module Spaceship
         self.class == other.class &&
           self.service_id == other.service_id &&
           self.value == other.value &&
-          self.service_uri == other.service_uri
+          self.capability_settings_value == other.capability_settings_value
       end
     end
   end

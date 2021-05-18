@@ -210,8 +210,12 @@ module Spaceship
       @current_team_id = current_team_id
       @csrf_tokens = csrf_tokens
       @cookie = cookie || HTTP::CookieJar.new
+      @client = build_client(self.class.hostname)
+    end
 
-      @client = Faraday.new(self.class.hostname, @options) do |c|
+    # @return (Faraday) Builds client based off of supplied hostname, global options, and global cookies.
+    def build_client(hostname)
+      client = Faraday.new(hostname, @options) do |c|
         c.response(:json, content_type: /\bjson$/)
         c.response(:plist, content_type: /\bplist$/)
         c.use(:cookie_jar, jar: @cookie)
@@ -233,6 +237,7 @@ module Spaceship
           puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
         end
       end
+      return client
     end
 
     #####################################################
