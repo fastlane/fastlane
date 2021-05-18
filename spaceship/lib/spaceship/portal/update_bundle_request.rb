@@ -4,7 +4,7 @@ module Spaceship
 
       attr_accessor :type, :id, :attributes, :relationships, :data
 
-      def initialize (type: nil, id: nil, attributes: nil, relationships: nil, data: nil)
+      def initialize(type: nil, id: nil, attributes: nil, relationships: nil, data: nil)
         @type = type
         @id = id
         @attributes = attributes
@@ -21,11 +21,42 @@ module Spaceship
         }
         return hash
       end
+
+      #Takes in an object (defaults to self) and converts it into a JSON:API hash object that can be used for requests
+      def to_hash_deep(obj = self)
+        result = {}
+        if obj.is_a? Spaceship::Portal::JSONApiBase
+          hash = obj.to_hash
+          hash.each {|key, val|
+            result[key] = to_hash_deep(val)
+          }
+        elsif obj.is_a? Hash
+          obj.each {|key, val|
+            result[key] = to_hash_deep(val)
+          }
+        elsif obj.is_a? Array
+          result = []
+          obj.each{|val|
+            result.push(to_hash_deep(val))
+          }
+        else
+          return obj
+        end
+        return result
+      end
     end
 
+    #Top level object that holds the data for an update bundle request
     class UpdateBundleRequest < JSONApiBase
+      def initialize(app, service)
+        data = UpdateBundleRequestContents.new(app, service)
+        super(data: data)
+      end
+    end
 
-      def initialize (app, service)
+    class UpdateBundleRequestContents < JSONApiBase
+
+      def initialize(app, service)
         attributes = {
           identifier: app.bundle_id,
           permissions:
@@ -40,7 +71,7 @@ module Spaceship
         }
 
         relationships = {
-          bundleIdCapabilities: JSONApiBase.new(data: [BundleIdCapability.new(service).to_hash]).to_hash
+          bundleIdCapabilities: JSONApiBase.new(data: [BundleIdCapability.new(service)])
         }
         super(type: "bundleIds", id: app.app_id, attributes: attributes, relationships: relationships)
       end
@@ -48,13 +79,13 @@ module Spaceship
 
     class BundleIdCapability < JSONApiBase
 
-      def initialize (service)
+      def initialize(service)
         attributes = {
           enabled: service.value,
           settings:service.capability_settings
         }
         relationships = {
-          capability: JSONApiBase.new(data: JSONApiBase.new(type: "capabilities", id: service.service_id).to_hash).to_hash
+          capability: JSONApiBase.new(data: JSONApiBase.new(type: "capabilities", id: service.service_id))
         }
         super(type: "bundleIdCapabilities", attributes: attributes, relationships: relationships)
       end

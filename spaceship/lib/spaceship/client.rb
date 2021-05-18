@@ -717,7 +717,7 @@ module Spaceship
       headers['User-Agent'] = USER_AGENT
 
       # Before encoding the parameters, log them
-      #log_request(method, url_or_path, params, headers, &block)
+      log_request(method, url_or_path, params, headers, &block)
 
       # form-encode the params only if there are params, and the block is not supplied.
       # this is so that certain requests can be made using the block for more control
@@ -840,7 +840,8 @@ module Spaceship
           body_to_log = "[non JSON body]"
         end
       end
-      params_to_log = Hash(params).dup # to also work with nil
+      params = params.nil? ? "{}" : params
+      params_to_log = (params.is_a? String) ? JSON.parse(params) : Hash(params).dup # to also work with nil
       params_to_log.delete(:accountPassword) # Dev Portal
       params_to_log.delete(:theAccountPW) # iTC
       params_to_log = params_to_log.collect do |key, value|
