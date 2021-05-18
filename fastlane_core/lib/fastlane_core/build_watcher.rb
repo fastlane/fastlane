@@ -82,13 +82,9 @@ module FastlaneCore
         versions = [watched_app_version, watched_app_version_alternate].compact
 
         if versions.empty?
-          if select_latest
-            UI.message("Watched build version should not be present when there is no app version to watch") unless watched_build_version.nil?
-            UI.message("Searching for the latest build")
-            versions = [nil]
-          else
-            raise BuildWatcherError.new, "There is no app version to watch"
-          end
+          message = watched_build_version.nil? ? "Searching for the latest build" : "Searching for the latest build with build number: #{watched_build_version}"
+          UI.message(message)
+          versions = [nil]
         end
 
         version_matches = versions.map do |version|

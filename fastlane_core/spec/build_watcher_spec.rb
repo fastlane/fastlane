@@ -103,23 +103,52 @@ describe FastlaneCore::BuildWatcher do
       expect(found_build).to eq(ready_build)
     end
 
-    it 'raises error when multiple builds found' do
-      builds = [ready_build, ready_build]
+    describe 'multiple builds found' do
+      describe 'select_latest is false' do
+        it 'raises error select_latest is false' do
+          builds = [ready_build, ready_build]
 
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return([])
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
-      expect(FastlaneCore::BuildWatcher).to receive(:sleep)
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return(builds)
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return([])
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
+          expect(FastlaneCore::BuildWatcher).to receive(:sleep)
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return(builds)
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
 
-      expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: #{ready_build.app_version}, build_version: #{ready_build.version}, platform: #{ready_build.platform}")
-      expect(UI).to receive(:message).with("Waiting for the build to show up in the build list - this may take a few minutes (check your email for processing issues if this continues)")
+          expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: #{ready_build.app_version}, build_version: #{ready_build.version}, platform: #{ready_build.platform}")
+          expect(UI).to receive(:message).with("Waiting for the build to show up in the build list - this may take a few minutes (check your email for processing issues if this continues)")
 
-      error_builds = builds.map { |b| "#{b.app_version}(#{b.version}) for #{b.platform} - #{b.processing_state}" }.join("\n")
+          error_builds = builds.map { |b| "#{b.app_version}(#{b.version}) for #{b.platform} - #{b.processing_state}" }.join("\n")
 
-      expect do
-        FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false)
-      end.to raise_error(FastlaneCore::BuildWatcherError, "Found more than 1 matching build: \n#{error_builds}")
+          expect do
+            FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false, select_latest: false)
+          end.to raise_error(FastlaneCore::BuildWatcherError, "Found more than 1 matching build: \n#{error_builds}")
+        end
+      end
+
+      describe 'select_latest is true' do
+        let(:newest_ready_build) do
+          double(
+            app_version: "1.0",
+            version: "2",
+            processed?: true,
+            platform: 'IOS',
+            processing_state: 'VALID'
+          )
+        end
+
+        it 'returns latest build' do
+          builds = [newest_ready_build, ready_build]
+
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return(builds)
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
+
+          expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: #{ready_build.app_version}, build_version: #{ready_build.version}, platform: #{ready_build.platform}")
+
+          found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false, select_latest: true)
+
+          expect(found_build).to eq(newest_ready_build)
+        end
+      end
     end
 
     it 'sleeps 10 seconds by default' do
@@ -323,15 +352,34 @@ describe FastlaneCore::BuildWatcher do
           expect(found_build).to eq(ready_build)
         end
 
-        it 'raises error when select_latest is false' do
-          expect(Spaceship::ConnectAPI::Build).to_not(receive(:all))
+        it 'returns a ready to submit build when select_latest is false' do
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_no_version).and_return([ready_build])
 
-          expect(UI).to_not(receive(:important))
-          expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: , build_version: #{ready_build.version}, platform: #{ready_build.platform}")
+          expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: , build_version: , platform: #{ready_build.platform}")
+          expect(UI).to receive(:message).with("Searching for the latest build")
+          expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version} for #{ready_build.platform}")
 
-          expect do
-            FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, build_version: '1', poll_interval: 0, select_latest: false, return_spaceship_testflight_build: false)
-          end.to raise_error(FastlaneCore::BuildWatcherError, "There is no app version to watch")
+          expect(FastlaneCore::BuildWatcher).to_not(receive(:sleep))
+          found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, poll_interval: 0, select_latest: false, return_spaceship_testflight_build: false)
+
+          expect(found_build).to eq(ready_build)
+        end
+
+        it 'waits when a build is still processing and returns a ready to submit build when select_latest is false' do
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_no_version).and_return([processing_build])
+          expect(FastlaneCore::BuildWatcher).to receive(:sleep)
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_no_version).and_return([ready_build])
+
+          expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: , build_version: , platform: #{ready_build.platform}")
+          expect(UI).to receive(:message).with("Searching for the latest build")
+          expect(UI).to receive(:message).with("Waiting for App Store Connect to finish processing the new build (1.0 - 1) for #{processing_build.platform}")
+          expect(UI).to receive(:message).with("Searching for the latest build")
+          expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version} for #{ready_build.platform}")
+
+          expect(FastlaneCore::BuildWatcher).to_not(receive(:sleep))
+          found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, poll_interval: 0, select_latest: false, return_spaceship_testflight_build: false)
+
+          expect(found_build).to eq(ready_build)
         end
       end
 
@@ -344,8 +392,7 @@ describe FastlaneCore::BuildWatcher do
           expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_no_version_but_with_build_number).and_return([ready_build])
 
           expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: , build_version: #{ready_build.version}, platform: #{ready_build.platform}")
-          expect(UI).to receive(:message).with("Watched build version should not be present when there is no app version to watch")
-          expect(UI).to receive(:message).with("Searching for the latest build")
+          expect(UI).to receive(:message).with("Searching for the latest build with build number: #{ready_build.version}")
           expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version} for #{ready_build.platform}")
 
           expect(FastlaneCore::BuildWatcher).to_not(receive(:sleep))
@@ -354,17 +401,51 @@ describe FastlaneCore::BuildWatcher do
           expect(found_build).to eq(ready_build)
         end
 
-        it 'raises error when select_latest is false' do
-          expect(Spaceship::ConnectAPI::Build).to_not(receive(:all))
+        it 'waits when a build is still processing and returns a ready to submit build when select_latest is true' do
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_no_version_but_with_build_number).and_return([processing_build])
+          expect(FastlaneCore::BuildWatcher).to receive(:sleep)
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_no_version_but_with_build_number).and_return([ready_build])
 
-          expect(UI).to_not(receive(:important))
           expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: , build_version: #{ready_build.version}, platform: #{ready_build.platform}")
+          expect(UI).to receive(:message).with("Searching for the latest build with build number: #{ready_build.version}")
+          expect(UI).to receive(:message).with("Waiting for App Store Connect to finish processing the new build (1.0 - 1) for #{processing_build.platform}")
+          expect(UI).to receive(:message).with("Searching for the latest build with build number: #{ready_build.version}")
+          expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version} for #{ready_build.platform}")
 
           expect(FastlaneCore::BuildWatcher).to_not(receive(:sleep))
+          found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, build_version: '1', poll_interval: 2, select_latest: true, return_spaceship_testflight_build: false)
 
-          expect do
-            FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, build_version: '1', poll_interval: 0, select_latest: false, return_spaceship_testflight_build: false)
-          end.to raise_error(FastlaneCore::BuildWatcherError, "There is no app version to watch")
+          expect(found_build).to eq(ready_build)
+        end
+
+        it 'returns a ready to submit build when select_latest is false' do
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_no_version_but_with_build_number).and_return([ready_build])
+
+          expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: , build_version: #{ready_build.version}, platform: #{ready_build.platform}")
+          expect(UI).to receive(:message).with("Searching for the latest build with build number: #{ready_build.version}")
+          expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version} for #{ready_build.platform}")
+
+          expect(FastlaneCore::BuildWatcher).to_not(receive(:sleep))
+          found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, build_version: '1', poll_interval: 2, select_latest: false, return_spaceship_testflight_build: false)
+
+          expect(found_build).to eq(ready_build)
+        end
+
+        it 'waits when a build is still processing and returns a ready to submit build when select_latest is false' do
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_no_version_but_with_build_number).and_return([processing_build])
+          expect(FastlaneCore::BuildWatcher).to receive(:sleep)
+          expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_no_version_but_with_build_number).and_return([ready_build])
+
+          expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: , build_version: #{ready_build.version}, platform: #{ready_build.platform}")
+          expect(UI).to receive(:message).with("Searching for the latest build with build number: #{ready_build.version}")
+          expect(UI).to receive(:message).with("Waiting for App Store Connect to finish processing the new build (1.0 - 1) for #{processing_build.platform}")
+          expect(UI).to receive(:message).with("Searching for the latest build with build number: #{ready_build.version}")
+          expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version} for #{ready_build.platform}")
+
+          expect(FastlaneCore::BuildWatcher).to_not(receive(:sleep))
+          found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, build_version: '1', poll_interval: 2, select_latest: false, return_spaceship_testflight_build: false)
+
+          expect(found_build).to eq(ready_build)
         end
       end
     end
