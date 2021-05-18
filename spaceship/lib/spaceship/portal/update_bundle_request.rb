@@ -14,8 +14,8 @@ module Spaceship
 
       def to_hash
         hash = {}
-        self.instance_variables.each { |var| 
-          if !var.nil? 
+        self.instance_variables.each {|var| 
+          if !self.instance_variable_get(var).nil? 
             hash[var.to_s.delete("@")] = self.instance_variable_get(var) 
           end
         }
