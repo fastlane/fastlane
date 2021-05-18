@@ -2,13 +2,14 @@ module Spaceship
   module Portal
     class JSONApiBase
 
-      attr_accessor :type, :id, :attributes, :relationships
+      attr_accessor :type, :id, :attributes, :relationships, :data
 
-      def initialize
-        @type = nil;
-        @id = nil;
-        @attributes = {};
-        @relationships = {};
+      def initialize (type: nil, id: nil, attributes: nil, relationships: nil, data: nil)
+        @type = type
+        @id = id
+        @attributes = attributes
+        @relationships = relationships
+        @data = data
       end
 
       def to_hash
@@ -21,9 +22,7 @@ module Spaceship
     class UpdateBundleRequest < JSONApiBase
 
       def initialize (app, service)
-        self.type = "bundleIds"
-        self.id = app.app_id
-        self.attributes = {
+        attributes = {
           identifier: app.bundle_id,
           permissions:
           {
@@ -36,31 +35,24 @@ module Spaceship
           teamId: app.prefix
         }
 
-        self.relationships = {
-          bundleIdCapabilities: {
-            data: [BundleIdCapability.new(service).to_hash]
-          }
+        relationships = {
+          bundleIdCapabilities: JSONApiBase.new(data: [BundleIdCapability.new(service).to_hash])
         }
-
+        super(type: "bundleIds", id: app.app_id, attributes: attributes, relationships: relationships)
       end
     end
 
     class BundleIdCapability < JSONApiBase
 
       def initialize (service)
-        self.type = "bundleIdCapabilities"
-        self.attributes = {
-                            enabled: service.value,
-                            settings:service.capability_settings
-                          }
-        self.relationships = {
-            capability: {
-                data: {
-                    type: "capabilities",
-                    id: service.service_id
-                }
-            }
+        attributes = {
+          enabled: service.value,
+          settings:service.capability_settings
         }
+        relationships = {
+          capability: JSONApiBase.new(type: "capabilities", id: service.service_id)
+        }
+        super(type: "bundleIdCapabilities", attributes: attributes, relationships: relationships)
       end
     end
   end
