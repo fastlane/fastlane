@@ -12,26 +12,6 @@ module Spaceship
         @data = data
       end
 
-      def self.to_hash_deep(var)
-        result = {}
-        say "\nVAR: #{var}"
-        if var.is_a? Hash 
-          var.each { |key, value|
-            result[key] = JSONApiBase::to_hash_deep(value)
-          }
-        elsif var.is_a? JSONApiBase
-          var.instance_variables.each {|v|
-            say "\nVAR VAL: #{var.instance_variable_get(v)}"
-            if var.instance_variable_get(v) != nil
-              hash[v.to_s.delete("@")] = JSONApiBase::to_hash_deep(var.instance_variable_get(v))
-            end
-          }
-        else
-          return var
-        end
-        return result
-      end
-
       def to_hash
         hash = {}
         self.instance_variables.each {|var|
@@ -39,7 +19,6 @@ module Spaceship
             hash[var.to_s.delete("@")] = self.instance_variable_get(var) 
           end
         }
-        say "\nTO_HASH_DEEP:\n#{self.class.to_hash_deep(self)}"
         return hash
       end
     end
