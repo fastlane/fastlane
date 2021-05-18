@@ -16,12 +16,12 @@ module Spaceship
         result = {}
         if var.is_a? Hash 
           var.each { |key, value|
-            result[key] = self.class.to_hash_deep(value)
+            result[key] = JSONApiBase::to_hash_deep(value)
           }
         elsif var.is_a? JSONApiBase
           var.instance_variables.each {|v|
             if var.instance_variable_get(v) != nil
-              hash[v.to_s.delete("@")] = self.class.to_hash_deep(var.instance_variable_get(v))
+              hash[v.to_s.delete("@")] = JSONApiBase::to_hash_deep(var.instance_variable_get(v))
             end
           }
         else
