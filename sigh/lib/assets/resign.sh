@@ -75,6 +75,9 @@
 # new features August 2020
 # 1. fixes usage for users with GNU-sed in their $PATH
 #
+# new features May 2021
+# 1. fix entitlements merging when changing team
+#
 
 # Logging functions
 
