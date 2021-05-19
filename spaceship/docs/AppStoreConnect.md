@@ -311,22 +311,27 @@ Right now, _spaceship_ can't modify or create internal testers.
 
 ```ruby
 # Load all sandbox testers
-testers = Spaceship::Tunes::SandboxTester.all
+testers = Spaceship::ConnectAPI::SandboxTester.all
+
+# Delete sandbox testers
+testers.each do |tester|
+  if UI.confirm("Delete #{tester.email}?")
+    tester.delete!
+  end
+end
 
 # Create a sandbox tester
-testers = Spaceship::Tunes::SandboxTester.create!(
-  email: 'sandbox@test.com', # required
-  password: 'Passwordtest1', # required. Must contain >=8 characters, >=1 uppercase, >=1 lowercase, >=1 numeric.
-  country: 'US', # optional, defaults to 'US'
-  first_name: 'Steve', # optional, defaults to 'Test'
-  last_name: 'Brule', # optional, defaults to 'Test'
+testers = Spaceship::ConnectAPI::SandboxTester.create(
+  first_name: "Test", # required
+  last_name: "Three", # required
+  email: "sandbox@test.com", # required
+  password: "Passwordtest1", # required. Must contain >=8 characters, >=1 uppercase, >=1 lowercase, >=1 numeric.
+  confirm_password: "Passwordtest1", # required
+  secret_question: "Question", # required. Must contain >=6 characters
+  secret_answer: "Answer", # required. Must contain >=6 characters
+  birth_date: "1980-03-01", # required
+  app_store_territory: "USA" # required
 )
-
-# Delete sandbox testers by email
-Spaceship::Tunes::SandboxTester.delete!(['sandbox@test.com', 'sandbox2@test.com'])
-
-# Delete all sandbox testers
-Spaceship::Tunes::SandboxTester.delete_all!
 ```
 
 ### App ratings & reviews
