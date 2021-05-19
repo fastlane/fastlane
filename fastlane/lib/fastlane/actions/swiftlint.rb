@@ -11,13 +11,12 @@ module Fastlane
           UI.user_error!("Your version of swiftlint (#{version}) does not support autocorrect mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
         end
 
+        # See 'Breaking' section release notes here: https://github.com/realm/SwiftLint/releases/tag/0.43.0
         if params[:mode] == :autocorrect && version >= Gem::Version.new('0.43.0')
           UI.deprecated("Your version of swiftlint (#{version}) has deprecated autocorrect mode, please start using fix mode in input param")
           UI.important("For now, switching swiftlint mode `from :autocorrect to :fix` for you 😇")
           params[:mode] = :fix
-        end
-
-        if params[:mode] == :fix && version < Gem::Version.new('0.43.0')
+        elsif params[:mode] == :fix && version < Gem::Version.new('0.43.0')
           UI.important("Your version of swiftlint (#{version}) does not support fix mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
           UI.important("For now, switching swiftlint mode `from :fix to :autocorrect` for you 😇")
           params[:mode] = :autocorrect
@@ -68,7 +67,7 @@ module Fastlane
       end
 
       def self.supported_no_cache_option(params)
-        if params[:mode] == :autocorrect || params[:mode] == :fix || params[:mode] == :lint
+        if [:autocorrect, :fix, :lint].include?(params[:mode])
           return " --no-cache"
         else
           return ""
