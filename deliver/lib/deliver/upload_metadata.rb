@@ -82,7 +82,7 @@ module Deliver
     def upload(options)
       return if options[:skip_metadata]
 
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
 

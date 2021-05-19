@@ -118,7 +118,7 @@ module Deliver
       app_version = options[:app_version]
       UI.message("Making sure the latest version on App Store Connect matches '#{app_version}'...")
 
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       changed = app.ensure_version!(app_version, platform: platform)
@@ -167,14 +167,14 @@ module Deliver
 
       if upload_ipa
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
-          app_id: options[:app].id,
+          app_id: Deliver.cache[:app].id,
           ipa_path: options[:ipa],
           package_path: "/tmp",
           platform: options[:platform]
         )
       elsif upload_pkg
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
-          app_id: options[:app].id,
+          app_id: Deliver.cache[:app].id,
           pkg_path: options[:pkg],
           package_path: "/tmp",
           platform: options[:platform]
@@ -191,7 +191,7 @@ module Deliver
     end
 
     def reject_version_if_possible
-      app = options[:app]
+      app = Deliver.cache[:app]
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       if app.reject_version_if_possible!(platform: platform)
         UI.success("Successfully rejected previous version!")

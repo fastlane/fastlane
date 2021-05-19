@@ -7,7 +7,7 @@ require 'fastlane_core/pkg_file_analyser'
 module Deliver
   class SubmitForReview
     def submit!(options)
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       version = app.get_edit_app_store_version(platform: platform)
