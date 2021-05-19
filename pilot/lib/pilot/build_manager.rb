@@ -105,6 +105,7 @@ module Pilot
         app_version: app_version,
         build_version: app_build,
         poll_interval: config[:wait_processing_interval],
+        timeout_duration: config[:wait_processing_timeout_duration],
         return_when_build_appears: return_when_build_appears,
         return_spaceship_testflight_build: false
       )
