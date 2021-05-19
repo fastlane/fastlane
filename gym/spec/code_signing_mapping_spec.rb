@@ -105,40 +105,48 @@ describe Gym::CodeSigningMapping do
       expect(result).to eq({ "identifier.1": "value.1" })
     end
 
-    describe "handle conflicts" do
-      it "Both primary and secondary are available, and both match the export method, it should prefer the primary mapping" do
-        result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "Ap-pStoreValue2" },
-                                       secondary_mapping: { "identifier.1" => "Ap-pStoreValue1" },
-                                           export_method: "app-store")
+    context "Both primary and secondary are available" do
+      context "Both match the export method" do
+        it "should prefer the primary mapping" do
+          result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "Ap-pStoreValue2" },
+                                         secondary_mapping: { "identifier.1" => "Ap-pStoreValue1" },
+                                             export_method: "app-store")
 
-        expect(result).to eq({ "identifier.1": "Ap-pStoreValue2" })
+          expect(result).to eq({ "identifier.1": "Ap-pStoreValue2" })
+        end
       end
 
-      it "Both primary and secondary are available, and the secondary is the only one that matches the export type" do
-        result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "Ap-p StoreValue1" },
-                                       secondary_mapping: { "identifier.1" => "Ad-HocValue" },
-                                           export_method: "app-store")
+      context "The primary is the only one that matches the export type" do
+        it "should prefer the primary mapping" do
+          result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "Ap-p StoreValue1" },
+                                         secondary_mapping: { "identifier.1" => "Ad-HocValue" },
+                                             export_method: "app-store")
 
-        expect(result).to eq({ "identifier.1": "Ap-p StoreValue1" })
+          expect(result).to eq({ "identifier.1": "Ap-p StoreValue1" })
+        end
       end
 
-      it "Both primary and secondary are available, and the seocndary is the only one that matches the export type" do
-        result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "Ap-p StoreValue1" },
-                                       secondary_mapping: { "identifier.1" => "Ad-HocValue" },
-                                           export_method: "ad-hoc")
+      context "The secondary is the only one that matches the export type" do
+        it "should prefer the secondary mapping" do
+          result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "Ap-p StoreValue1" },
+                                         secondary_mapping: { "identifier.1" => "Ad-HocValue" },
+                                             export_method: "ad-hoc")
 
-        expect(result).to eq({ "identifier.1": "Ad-HocValue" })
+          expect(result).to eq({ "identifier.1": "Ad-HocValue" })
+        end
       end
 
-      it "both primary and secondary are available, and neither of them match the export type, it should choose the secondary_mapping" do
-        result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "AppStore" },
-                                       secondary_mapping: { "identifier.1" => "Adhoc" },
-                                           export_method: "development")
+      context "Neither of them match the export type" do
+        it "should choose the secondary_mapping" do
+          result = csm.merge_profile_mapping(primary_mapping: { "identifier.1" => "AppStore" },
+                                         secondary_mapping: { "identifier.1" => "Adhoc" },
+                                             export_method: "development")
 
-        expect(result).to eq({ "identifier.1": "Adhoc" })
+          expect(result).to eq({ "identifier.1": "Adhoc" })
+        end
       end
 
-      context "when both primary and secondary are available and same value" do
+      context "Both have the same value" do
         let(:result) do
           csm.merge_profile_mapping(primary_mapping: { primary_key => "AppStore" },
                                     secondary_mapping: { secondary_key => "AppStore" },
