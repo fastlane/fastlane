@@ -11,8 +11,20 @@ module Fastlane
           UI.user_error!("Your version of swiftlint (#{version}) does not support autocorrect mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
         end
 
+        # See 'Breaking' section release notes here: https://github.com/realm/SwiftLint/releases/tag/0.43.0
+        if params[:mode] == :autocorrect && version >= Gem::Version.new('0.43.0')
+          UI.deprecated("Your version of swiftlint (#{version}) has deprecated autocorrect mode, please start using fix mode in input param")
+          UI.important("For now, switching swiftlint mode `from :autocorrect to :fix` for you 😇")
+          params[:mode] = :fix
+        elsif params[:mode] == :fix && version < Gem::Version.new('0.43.0')
+          UI.important("Your version of swiftlint (#{version}) does not support fix mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
+          UI.important("For now, switching swiftlint mode `from :fix to :autocorrect` for you 😇")
+          params[:mode] = :autocorrect
+        end
+
+        mode_format = params[:mode] == :fix ? "--" : ""
         command = (params[:executable] || "swiftlint").dup
-        command << " #{params[:mode]}"
+        command << " #{mode_format}#{params[:mode]}"
         command << optional_flags(params)
 
         if params[:files]
@@ -55,7 +67,7 @@ module Fastlane
       end
 
       def self.supported_no_cache_option(params)
-        if params[:mode] == :autocorrect || params[:mode] == :lint
+        if [:autocorrect, :fix, :lint].include?(params[:mode])
           return " --no-cache"
         else
           return ""
@@ -89,8 +101,8 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :mode,
                                        env_name: "FL_SWIFTLINT_MODE",
-                                       description: "SwiftLint mode: :lint, :autocorrect or :analyze",
-                                       is_string: false,
+                                       description: "SwiftLint mode: :lint, :fix, :autocorrect or :analyze",
+                                       type: Symbol,
                                        default_value: :lint,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :path,
