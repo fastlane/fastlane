@@ -79,17 +79,14 @@ module Deliver
     require_relative 'loader'
 
     # Make sure to call `load_from_filesystem` before calling upload
-    def upload(options)
+    def upload(options, prepare_languages)
       return if options[:skip_metadata]
 
       app = options[:app]
-
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
 
-      enabled_languages = detect_languages(options)
-
-      app_store_version_localizations = verify_available_version_languages!(options, app, enabled_languages) unless options[:edit_live]
-      app_info_localizations = verify_available_info_languages!(options, app, enabled_languages) unless options[:edit_live]
+      app_store_version_localizations = prepare_languages.app_store_version_localizations
+      app_info_localizations = prepare_languages.app_info_localizations
 
       if options[:edit_live]
         # not all values are editable when using live_version
@@ -357,74 +354,6 @@ module Deliver
       return Time.at(time_in_s_to_hour).utc.strftime("%Y-%m-%dT%H:%M:%S%:z")
     end
 
-    # If the user is using the 'default' language, then assign values where they are needed
-    def assign_defaults(options)
-      # Normalizes languages keys from symbols to strings
-      normalize_language_keys(options)
-
-      # Build a complete list of the required languages
-      enabled_languages = detect_languages(options)
-
-      # Get all languages used in existing settings
-      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
-        current = options[key]
-        next unless current && current.kind_of?(Hash)
-        current.each do |language, value|
-          enabled_languages << language unless enabled_languages.include?(language)
-        end
-      end
-
-      # Check folder list (an empty folder signifies a language is required)
-      ignore_validation = options[:ignore_language_directory_validation]
-      Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        enabled_languages << lang_folder.basename unless enabled_languages.include?(lang_folder.basename)
-      end
-
-      return unless enabled_languages.include?("default")
-      UI.message("Detected languages: " + enabled_languages.to_s)
-
-      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
-        current = options[key]
-        next unless current && current.kind_of?(Hash)
-
-        default = current["default"]
-        next if default.nil?
-
-        enabled_languages.each do |language|
-          value = current[language]
-          next unless value.nil?
-
-          current[language] = default
-        end
-        current.delete("default")
-      end
-    end
-
-    def detect_languages(options)
-      # Build a complete list of the required languages
-      enabled_languages = options[:languages] || []
-
-      # Get all languages used in existing settings
-      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
-        current = options[key]
-        next unless current && current.kind_of?(Hash)
-        current.each do |language, value|
-          enabled_languages << language unless enabled_languages.include?(language)
-        end
-      end
-
-      # Check folder list (an empty folder signifies a language is required)
-      ignore_validation = options[:ignore_language_directory_validation]
-      Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        enabled_languages << lang_folder.basename unless enabled_languages.include?(lang_folder.basename)
-      end
-
-      # Mapping to strings because :default symbol can be passed in
-      enabled_languages
-        .map(&:to_s)
-        .uniq
-    end
-
     def fetch_edit_app_store_version(app, platform, wait_time: 10)
       retry_if_nil("Cannot find edit app store version", wait_time: wait_time) do
         app.get_edit_app_store_version(platform: platform)
@@ -449,75 +378,6 @@ module Deliver
 
         return nil if tries.zero?
       end
-    end
-
-    # Finding languages to enable
-    def verify_available_info_languages!(options, app, languages)
-      app_info = fetch_edit_app_info(app)
-
-      unless app_info
-        UI.user_error!("Cannot update languages - could not find an editable info")
-        return
-      end
-
-      localizations = app_info.get_app_info_localizations
-
-      languages = (languages || []).reject { |lang| lang == "default" }
-      locales_to_enable = languages - localizations.map(&:locale)
-
-      if locales_to_enable.count > 0
-        lng_text = "language"
-        lng_text += "s" if locales_to_enable.count != 1
-        Helper.show_loading_indicator("Activating info #{lng_text} #{locales_to_enable.join(', ')}...")
-
-        locales_to_enable.each do |locale|
-          app_info.create_app_info_localization(attributes: {
-            locale: locale
-          })
-        end
-
-        Helper.hide_loading_indicator
-
-        # Refresh version localizations
-        localizations = app_info.get_app_info_localizations
-      end
-
-      return localizations
-    end
-
-    # Finding languages to enable
-    def verify_available_version_languages!(options, app, languages)
-      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
-      version = fetch_edit_app_store_version(app, platform)
-
-      unless version
-        UI.user_error!("Cannot update languages - could not find an editable version for '#{platform}'")
-        return
-      end
-
-      localizations = version.get_app_store_version_localizations
-
-      languages = (languages || []).reject { |lang| lang == "default" }
-      locales_to_enable = languages - localizations.map(&:locale)
-
-      if locales_to_enable.count > 0
-        lng_text = "language"
-        lng_text += "s" if locales_to_enable.count != 1
-        Helper.show_loading_indicator("Activating version #{lng_text} #{locales_to_enable.join(', ')}...")
-
-        locales_to_enable.each do |locale|
-          version.create_app_store_version_localization(attributes: {
-            locale: locale
-          })
-        end
-
-        Helper.hide_loading_indicator
-
-        # Refresh version localizations
-        localizations = version.get_app_store_version_localizations
-      end
-
-      return localizations
     end
 
     # Loads the metadata files and stores them into the options object
@@ -572,6 +432,48 @@ module Deliver
         path = resolve_review_info_path.call(option_name)
         next if path.nil?
         options[:app_review_information][option_name] ||= File.read(path)
+      end
+    end
+
+    # If the user is using the 'default' language, then assign values where they are needed
+    def assign_defaults(options, prepare_languages)
+      enabled_languages = prepare_languages.enabled_languages
+
+      # Normalizes languages keys from symbols to strings
+      normalize_language_keys(options)
+
+      # Get all languages used in existing settings
+      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+        current.each do |language, value|
+          enabled_languages << language unless enabled_languages.include?(language)
+        end
+      end
+
+      # Check folder list (an empty folder signifies a language is required)
+      ignore_validation = options[:ignore_language_directory_validation]
+      Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
+        enabled_languages << lang_folder.basename unless enabled_languages.include?(lang_folder.basename)
+      end
+
+      return unless enabled_languages.include?("default")
+      UI.message("Detected languages: " + enabled_languages.to_s)
+
+      (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+
+        default = current["default"]
+        next if default.nil?
+
+        enabled_languages.each do |language|
+          value = current[language]
+          next unless value.nil?
+
+          current[language] = default
+        end
+        current.delete("default")
       end
     end
 

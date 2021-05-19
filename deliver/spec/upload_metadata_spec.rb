@@ -3,6 +3,7 @@ require 'tempfile'
 
 describe Deliver::UploadMetadata do
   let(:uploader) { Deliver::UploadMetadata.new }
+  let(:prepare_languages) { Deliver::PrepareLanguages.new }
   let(:tmpdir) { Dir.mktmpdir }
 
   describe '#load_from_filesystem' do
@@ -274,7 +275,8 @@ describe Deliver::UploadMetadata do
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-          uploader.upload(options)
+          prepare_languages.prepare!(options)
+          uploader.upload(options, prepare_languages)
         end
       end
 
@@ -298,7 +300,8 @@ describe Deliver::UploadMetadata do
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-          uploader.upload(options)
+          prepare_languages.prepare!(options)
+          uploader.upload(options, prepare_languages)
         end
       end
 
@@ -331,7 +334,8 @@ describe Deliver::UploadMetadata do
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-          uploader.upload(options)
+          prepare_languages.prepare!(options)
+          uploader.upload(options, prepare_languages)
         end
 
         it 'with false' do
@@ -358,7 +362,8 @@ describe Deliver::UploadMetadata do
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-          uploader.upload(options)
+          prepare_languages.prepare!(options)
+          uploader.upload(options, prepare_languages)
         end
       end
 
@@ -386,7 +391,8 @@ describe Deliver::UploadMetadata do
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-          uploader.upload(options)
+          prepare_languages.prepare!(options)
+          uploader.upload(options, prepare_languages)
         end
 
         it 'with false' do
@@ -413,7 +419,8 @@ describe Deliver::UploadMetadata do
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-          uploader.upload(options)
+          prepare_languages.prepare!(options)
+          uploader.upload(options, prepare_languages)
         end
       end
     end
@@ -442,7 +449,7 @@ describe Deliver::UploadMetadata do
         create_filesystem_language('el')
 
         uploader.load_from_filesystem(options)
-        languages = uploader.detect_languages(options)
+        languages = prepare_languages.detect_languages(options)
 
         expect(languages.sort).to eql(['de-DE', 'el', 'en-US'])
       end
@@ -454,7 +461,7 @@ describe Deliver::UploadMetadata do
         create_filesystem_language('en-US')
 
         uploader.load_from_filesystem(options)
-        languages = uploader.detect_languages(options)
+        languages = prepare_languages.detect_languages(options)
 
         expect(languages.sort).to eql(['default', 'en-US'])
       end
@@ -465,7 +472,7 @@ describe Deliver::UploadMetadata do
         options[:languages] = ['en-AU', 'en-CA', 'en-GB']
 
         uploader.load_from_filesystem(options)
-        languages = uploader.detect_languages(options)
+        languages = prepare_languages.detect_languages(options)
 
         expect(languages.sort).to eql(['en-AU', 'en-CA', 'en-GB'])
       end
@@ -481,7 +488,7 @@ describe Deliver::UploadMetadata do
         }
 
         uploader.load_from_filesystem(options)
-        languages = uploader.detect_languages(options)
+        languages = prepare_languages.detect_languages(options)
 
         expect(languages.sort).to eql(['default', 'es-MX'])
       end
@@ -499,7 +506,7 @@ describe Deliver::UploadMetadata do
         )
 
         uploader.load_from_filesystem(options)
-        languages = uploader.detect_languages(options)
+        languages = prepare_languages.detect_languages(options)
 
         expect(languages.sort).to eql(['default', 'en-US'])
       end
@@ -519,7 +526,7 @@ describe Deliver::UploadMetadata do
         create_filesystem_language('el')
 
         uploader.load_from_filesystem(options)
-        languages = uploader.detect_languages(options)
+        languages = prepare_languages.detect_languages(options)
 
         expect(languages.sort).to eql(['de-DE', 'default', 'el', 'en-AU', 'en-CA', 'en-GB', 'en-US', 'es-MX'])
       end
@@ -534,12 +541,22 @@ describe Deliver::UploadMetadata do
           'es-MX' => 'something else else'
         }
 
+        all_langs = options[:languages] + options[:release_notes].keys
+        mocks = all_langs.map do |lang|
+          version = double("version - #{lang}")
+          allow(version).to receive(:locale).and_return(lang)
+          version
+        end
+        expect(prepare_languages).to receive(:verify_available_version_languages!).and_return(mocks)
+        expect(prepare_languages).to receive(:verify_available_info_languages!).and_return(mocks)
+
         create_filesystem_language('en-US')
         create_filesystem_language('de-DE')
         create_filesystem_language('el')
 
         uploader.load_from_filesystem(options)
-        uploader.assign_defaults(options)
+        prepare_languages.prepare!(options)
+        uploader.assign_defaults(options, prepare_languages)
 
         expect(options[:release_notes]["en-US"]).to eql('something else')
         expect(options[:release_notes]["es-MX"]).to eql('something else else')
