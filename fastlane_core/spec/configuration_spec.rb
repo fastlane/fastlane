@@ -671,7 +671,7 @@ describe FastlaneCore do
           it "raises an error if a non symbol was given" do
             expect do
               @config.fetch(123)
-            end.to raise_error("Key '123' must be a symbol. Example :app_id.")
+            end.to raise_error("Key '123' must be a symbol. Example :123")
           end
 
           it "raises an error if this option does not exist" do
