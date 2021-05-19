@@ -363,19 +363,6 @@ describe FastlaneCore::BuildWatcher do
             FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, poll_interval: 0, select_latest: false, return_spaceship_testflight_build: false)
           end.to raise_error(FastlaneCore::BuildWatcherError, "There is no app version to watch")
         end
-
-        # it 'waits when a build is still processing and returns a ready to submit build when select_latest is false' do
-        it 'raises error when build is still processing select_latest is false' do
-          expect(Spaceship::ConnectAPI::Build).to_not(receive(:all))
-          expect(FastlaneCore::BuildWatcher).to_not(receive(:sleep))
-
-          expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: , build_version: , platform: #{ready_build.platform}")
-          expect(UI).to_not(receive(:message).with("Searching for the latest build"))
-
-          expect do
-            FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, poll_interval: 0, select_latest: false, return_spaceship_testflight_build: false)
-          end.to raise_error(FastlaneCore::BuildWatcherError, "There is no app version to watch")
-        end
       end
 
       describe 'with build number' do
@@ -414,18 +401,6 @@ describe FastlaneCore::BuildWatcher do
         end
 
         it 'raises error when select_latest is false' do
-          expect(Spaceship::ConnectAPI::Build).to_not(receive(:all))
-          expect(FastlaneCore::BuildWatcher).to_not(receive(:sleep))
-
-          expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: , build_version: #{ready_build.version}, platform: #{ready_build.platform}")
-          expect(UI).to_not(receive(:message).with("Searching for the latest build with build number: #{ready_build.version}"))
-
-          expect do
-            FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, build_version: '1', poll_interval: 2, select_latest: false, return_spaceship_testflight_build: false)
-          end.to raise_error(FastlaneCore::BuildWatcherError, "There is no app version to watch")
-        end
-
-        it 'raises error when build is still processing and select_latest is false' do
           expect(Spaceship::ConnectAPI::Build).to_not(receive(:all))
           expect(FastlaneCore::BuildWatcher).to_not(receive(:sleep))
 
