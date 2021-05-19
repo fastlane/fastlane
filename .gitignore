@@ -21,6 +21,7 @@ local.properties
 
 ## Specific to screengrab
 /screengrab/example/fastlane/metadata/
+/screengrab/target/
 
 ## Specific to RubyMotion:
 .dat*
@@ -39,7 +40,7 @@ build/
 
 # for a library or gem, you might want to ignore these files since the code is
 # intended to run in multiple environments; otherwise, check them in:
-Gemfile.lock
+# Gemfile.lock
 .ruby-version
 .ruby-gemset
 

@@ -99,14 +99,20 @@ If your machine is currently using SSH to authenticate with GitHub, you'll want 
 Using parameter:
 
 ```
-match(git_basic_authorization: '<YOUR KEY>')
+match(git_basic_authorization: '<YOUR BASE64 KEY>')
 ```
 
 Using environment variable:
 
 ```
-ENV['MATCH_GIT_BASIC_AUTHORIZATION'] = '<YOUR KEY>'
+ENV['MATCH_GIT_BASIC_AUTHORIZATION'] = '<YOUR BASE64 KEY>'
 match
+```
+
+To generate your base64 key [according to RFC 7617](https://tools.ietf.org/html/rfc7617), run this:
+
+```
+echo -n your_github_username:your_personal_access_token | base64
 ```
 
 You can find more information about GitHub basic authentication and personal token generation here: [https://developer.github.com/v3/auth/#basic-authentication](https://developer.github.com/v3/auth/#basic-authentication)
@@ -390,7 +396,7 @@ lane :beta do
 end
 ```
 
-By using the `force_for_new_devices` parameter, _match_ will check if the device count has changed since the last time you ran _match_, and automatically re-generate the provisioning profile if necessary. You can also use `force: true` to re-generate the provisioning profile on each run.
+By using the `force_for_new_devices` parameter, _match_ will check if the (enabled) device count has changed since the last time you ran _match_, and automatically re-generate the provisioning profile if necessary. You can also use `force: true` to re-generate the provisioning profile on each run.
 
 _**Important:** The `force_for_new_devices` parameter is ignored for App Store provisioning profiles since they don't contain any device information._
 
@@ -491,6 +497,15 @@ fastlane match import
 ```
 
 You'll be prompted for the certificate (`.cer`), the private key (`.p12`) and the provisioning profiles (`.mobileprovision` or `.provisionprofile`) paths. _match_ will first validate the certificate (`.cer`) against the Developer Portal before importing the certificate, the private key and the provisioning profiles into the specified _match_ repository.
+
+However if there is no access to the developer portal but there are certificates, private keys and profiles provided, you can use the `skip_certificate_matching` option to tell _match_ not to verify the certificates. Like this:
+
+```no-highlight
+fastlane match import --skip_certificate_matching true
+```
+This will skip login to Apple Developer Portal and will import the provided certificate, private key and profile directly to the certificates repo.
+
+Please be careful when using this option and ensure the certificates and profiles match the type (development, adhoc, appstore, enterprise, developer_id) and are not revoked or expired.
 
 ### Manual Decrypt
 

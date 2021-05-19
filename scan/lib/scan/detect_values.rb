@@ -162,7 +162,10 @@ module Scan
               filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)
             end
           ).tap do |array|
-            UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty?
+            if array.empty?
+              UI.test_failure!("No device found with name '#{device_string}'") if Scan.config[:ensure_devices_found]
+              UI.error("Ignoring '#{device_string}', couldn’t find matching simulator")
+            end
           end
         end
 
@@ -187,15 +190,12 @@ module Scan
         end
       end
 
+      # Convert array to lazy enumerable (evaluate map only when needed)
       # grab the first unempty evaluated array
-      if default
-        Scan.devices = [matches, default].lazy.map { |x|
-          arr = x.call
-          arr unless arr.empty?
-        }.reject(&:nil?).first
-      else
-        Scan.devices = []
-      end
+      Scan.devices = [matches, default].lazy.reject(&:nil?).map { |x|
+        arr = x.call
+        arr unless arr.empty?
+      }.reject(&:nil?).first
     end
 
     def self.min_xcode8?
@@ -212,7 +212,9 @@ module Scan
       end
 
       # building up the destination now
-      if Scan.devices && Scan.devices.count > 0
+      if Scan.building_mac_catalyst_for_mac?
+        Scan.config[:destination] = ["platform=macOS,variant=Mac Catalyst"]
+      elsif Scan.devices && Scan.devices.count > 0
         Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" }
       elsif Scan.project.mac_app?
         Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]

@@ -43,17 +43,32 @@ describe Spaceship::ConnectAPI::Client do
       expect(client.users_request_client).to eq(users_client)
     end
 
-    it '#auth' do
-      key_id = "key_id"
-      issuer_id = "issuer_id"
-      filepath = "filepath"
+    context '#auth' do
+      it 'with filepath' do
+        key_id = "key_id"
+        issuer_id = "issuer_id"
+        filepath = "filepath"
 
-      token = double('token')
+        token = double('token')
 
-      expect(Spaceship::ConnectAPI::Token).to receive(:create).with(key_id: key_id, issuer_id: issuer_id, filepath: filepath).and_return(token)
-      expect(Spaceship::ConnectAPI::Client).to receive(:new).with(token: token)
+        expect(Spaceship::ConnectAPI::Token).to receive(:create).with(key_id: key_id, issuer_id: issuer_id, filepath: filepath, key: nil, duration: nil, in_house: nil).and_return(token)
+        expect(Spaceship::ConnectAPI::Client).to receive(:new).with(token: token)
 
-      Spaceship::ConnectAPI::Client.auth(key_id: key_id, issuer_id: issuer_id, filepath: filepath)
+        Spaceship::ConnectAPI::Client.auth(key_id: key_id, issuer_id: issuer_id, filepath: filepath)
+      end
+
+      it 'with key' do
+        key_id = "key_id"
+        issuer_id = "issuer_id"
+        key = "key"
+
+        token = double('token')
+
+        expect(Spaceship::ConnectAPI::Token).to receive(:create).with(key_id: key_id, issuer_id: issuer_id, filepath: nil, key: key, duration: 100, in_house: true).and_return(token)
+        expect(Spaceship::ConnectAPI::Client).to receive(:new).with(token: token)
+
+        Spaceship::ConnectAPI::Client.auth(key_id: key_id, issuer_id: issuer_id, key: key, duration: 100, in_house: true)
+      end
     end
 
     context '#login' do
@@ -191,6 +206,7 @@ describe Spaceship::ConnectAPI::Client do
       it "with portal client" do
         mock_portal_client =  double('portal client')
         allow(mock_portal_client).to receive(:team_id)
+        allow(mock_portal_client).to receive(:csrf_tokens)
 
         client = Spaceship::ConnectAPI::Client.new(portal_client: mock_portal_client)
 

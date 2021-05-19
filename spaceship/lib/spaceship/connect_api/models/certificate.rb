@@ -1,4 +1,7 @@
 require_relative '../model'
+
+require 'openssl'
+
 module Spaceship
   class ConnectAPI
     class Certificate
@@ -6,6 +9,7 @@ module Spaceship
 
       attr_accessor :certificate_content
       attr_accessor :display_name
+      attr_accessor :expiration_date
       attr_accessor :name
       attr_accessor :platform
       attr_accessor :serial_number
@@ -47,13 +51,55 @@ module Spaceship
         Time.parse(expiration_date) > Time.now
       end
 
+      # Create a new code signing request that can be used to
+      # generate a new certificate
+      # @example
+      #  Create a new certificate signing request
+      #  csr, pkey = Spaceship.certificate.create_certificate_signing_request
+      #
+      #  # Use the signing request to create a new distribution certificate
+      #  Spaceship.certificate.production.create!(csr: csr)
+      def self.create_certificate_signing_request
+        key = OpenSSL::PKey::RSA.new(2048)
+        csr = OpenSSL::X509::Request.new
+        csr.version = 0
+        csr.subject = OpenSSL::X509::Name.new([
+                                                ['CN', 'PEM', OpenSSL::ASN1::UTF8STRING]
+                                              ])
+        csr.public_key = key.public_key
+        csr.sign(key, OpenSSL::Digest::SHA1.new)
+        return [csr, key]
+      end
+
       #
       # API
       #
 
-      def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
-        resps = Spaceship::ConnectAPI.get_certificates(filter: filter, includes: includes).all_pages
+      def self.all(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_certificates(filter: filter, includes: includes).all_pages
         return resps.flat_map(&:to_models)
+      end
+
+      def self.create(client: nil, certificate_type: nil, csr_content: nil)
+        client ||= Spaceship::ConnectAPI
+        attributes = {
+          certificateType: certificate_type,
+          csrContent: csr_content
+        }
+        resp = client.post_certificate(attributes: attributes)
+        return resp.to_models.first
+      end
+
+      def self.get(client: nil, certificate_id: nil, includes: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_certificate(certificate_id: certificate_id, includes: includes)
+        return resp.to_models.first
+      end
+
+      def delete!(client: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_certificate(certificate_id: id)
       end
     end
   end

@@ -40,7 +40,7 @@ module Fastlane
                        end
 
             # Create zip
-            Actions.sh(%(cd "#{xcarchive_folder}" && zip -r -X "#{zip_file}" "#{xcarchive_file}" > /dev/null))
+            Actions.sh(%(cd "#{xcarchive_folder}" && zip -r -X -y "#{zip_file}" "#{xcarchive_file}" > /dev/null))
 
             # Moved to its final destination
             FileUtils.mv(zip_file, full_destination)

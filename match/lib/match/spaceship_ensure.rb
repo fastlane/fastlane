@@ -4,28 +4,38 @@ require_relative 'module'
 module Match
   # Ensures the certificate and profiles are also available on App Store Connect
   class SpaceshipEnsure
-    def initialize(user, team_id, team_name)
-      # We'll try to manually fetch the password
-      # to tell the user that a password is optional
-      require 'credentials_manager/account_manager'
+    attr_accessor :team_id
 
-      keychain_entry = CredentialsManager::AccountManager.new(user: user)
-
-      if keychain_entry.password(ask_if_missing: false).to_s.length == 0
-        UI.important("You can also run `fastlane match` in readonly mode to not require any access to the")
-        UI.important("Developer Portal. This way you only share the keys and credentials")
-        UI.command("fastlane match --readonly")
-        UI.important("More information https://docs.fastlane.tools/actions/match/#access-control")
-      end
-
-      # Prompts select team if multiple teams and none specified
+    def initialize(user, team_id, team_name, api_token)
       UI.message("Verifying that the certificate and profile are still valid on the Dev Portal...")
-      Spaceship::ConnectAPI.login(user, use_portal: true, use_tunes: false, portal_team_id: team_id, team_name: team_name)
+
+      if api_token
+        UI.message("Creating authorization token for App Store Connect API")
+        Spaceship::ConnectAPI.token = api_token
+        self.team_id = team_id
+      else
+        # We'll try to manually fetch the password
+        # to tell the user that a password is optional
+        require 'credentials_manager/account_manager'
+
+        keychain_entry = CredentialsManager::AccountManager.new(user: user)
+
+        if keychain_entry.password(ask_if_missing: false).to_s.length == 0
+          UI.important("You can also run `fastlane match` in readonly mode to not require any access to the")
+          UI.important("Developer Portal. This way you only share the keys and credentials")
+          UI.command("fastlane match --readonly")
+          UI.important("More information https://docs.fastlane.tools/actions/match/#access-control")
+        end
+
+        # Prompts select team if multiple teams and none specified
+        Spaceship::ConnectAPI.login(user, use_portal: true, use_tunes: false, portal_team_id: team_id, team_name: team_name)
+        self.team_id = Spaceship::ConnectAPI.client.portal_team_id
+      end
     end
 
     # The team ID of the currently logged in team
     def team_id
-      return Spaceship::ConnectAPI.client.portal_team_id
+      return @team_id
     end
 
     def bundle_identifier_exists(username: nil, app_identifier: nil, platform: nil)
@@ -45,12 +55,8 @@ module Match
       UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")
     end
 
-    def certificates_exists(username: nil, certificate_ids: [], platform: nil)
-      if platform == :catalyst.to_s
-        platform = :macos.to_s
-      end
-
-      Spaceship.certificate.all(mac: platform == "macos").each do |cert|
+    def certificates_exists(username: nil, certificate_ids: [])
+      Spaceship::ConnectAPI::Certificate.all.each do |cert|
         certificate_ids.delete(cert.id)
       end
       return if certificate_ids.empty?

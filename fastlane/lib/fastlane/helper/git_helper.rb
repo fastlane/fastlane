@@ -2,6 +2,13 @@ module Fastlane
   module Actions
     GIT_MERGE_COMMIT_FILTERING_OPTIONS = [:include_merges, :exclude_merges, :only_include_merges].freeze
 
+    module SharedValues
+      GIT_BRANCH_ENV_VARS = %w(GIT_BRANCH BRANCH_NAME TRAVIS_BRANCH BITRISE_GIT_BRANCH CI_BUILD_REF_NAME CI_COMMIT_REF_NAME WERCKER_GIT_BRANCH BUILDKITE_BRANCH APPCENTER_BRANCH CIRCLE_BRANCH).reject do |branch|
+        # Removing because tests break on CircleCI
+        Helper.test? && branch == "CIRCLE_BRANCH"
+      end.freeze
+    end
+
     def self.git_log_between(pretty_format, from, to, merge_commit_filtering, date_format = nil, ancestry_path)
       command = %w(git log)
       command << "--pretty=#{pretty_format}"
@@ -112,14 +119,19 @@ module Fastlane
       return nil
     end
 
-    # Returns the current git branch - can be replaced using the environment variable `GIT_BRANCH`
+    # Returns the current git branch, or "HEAD" if it's not checked out to any branch
+    # Can be replaced using the environment variable `GIT_BRANCH`
     def self.git_branch
-      return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH'].to_s.length > 0 # set by Jenkins
-      s = Actions.sh("git rev-parse --abbrev-ref HEAD", log: false).chomp
-      return s.to_s.strip if s.to_s.length > 0
-      nil
-    rescue
-      nil
+      env_name = SharedValues::GIT_BRANCH_ENV_VARS.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
+      ENV.fetch(env_name.to_s) do
+        # Rescues if not a git repo or no commits in a git repo
+        begin
+          Actions.sh("git rev-parse --abbrev-ref HEAD", log: false).chomp
+        rescue => err
+          UI.verbose("Error getting git branch: #{err.message}")
+          nil
+        end
+      end
     end
 
     private_class_method

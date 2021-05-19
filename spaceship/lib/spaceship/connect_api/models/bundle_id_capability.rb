@@ -41,6 +41,21 @@ module Spaceship
         MARZIPAN = "MARZIPAN" # Catalyst
       end
 
+      module Settings
+        ICLOUD_VERSION = "ICLOUD_VERSION"
+        DATA_PROTECTION_PERMISSION_LEVEL = "DATA_PROTECTION_PERMISSION_LEVEL"
+        APPLE_ID_AUTH_APP_CONSENT = "APPLE_ID_AUTH_APP_CONSENT"
+      end
+
+      module Options
+        XCODE_5 = "XCODE_5"
+        XCODE_6 = "XCODE_6"
+        COMPLETE_PROTECTION = "COMPLETE_PROTECTION"
+        PROTECTED_UNLESS_OPEN = "PROTECTED_UNLESS_OPEN"
+        PROTECTED_UNTIL_FIRST_USER_AUTH = "PROTECTED_UNTIL_FIRST_USER_AUTH"
+        PRIMARY_APP_CONSENT = "PRIMARY_APP_CONSENT"
+      end
+
       def self.type
         return "bundleIdCapabilities"
       end
@@ -59,12 +74,21 @@ module Spaceship
       # API
       #
 
-      def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
-        return users_client.get_users(filter: filter, includes: includes)
+      def self.all(client: nil, bundle_id_id:, limit: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_bundle_id_capabilities(bundle_id_id: bundle_id_id, limit: limit).all_pages
+        return resp.flat_map(&:to_models)
       end
 
-      def self.find(email: nil, includes: nil)
-        return all(filter: { email: email }, includes: includes)
+      def self.create(client: nil, bundle_id_id:, capability_type:, settings: [])
+        client ||= Spaceship::ConnectAPI
+        resp = client.post_bundle_id_capability(bundle_id_id: bundle_id_id, capability_type: capability_type, settings: settings)
+        return resp.to_models.first
+      end
+
+      def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_bundle_id_capability(bundle_id_capability_id: id)
       end
     end
   end

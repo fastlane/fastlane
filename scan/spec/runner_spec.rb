@@ -64,6 +64,78 @@ describe Scan do
           end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed")
         end
       end
+
+      describe "with scan option :disable_xcpretty set to true" do
+        it "does not generate a temp junit report", requires_xcodebuild: true do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            project: './scan/examples/standard/app.xcodeproj',
+            disable_xcpretty: true
+          })
+
+          Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
+          @scan.handle_results(0)
+          expect(Scan.cache[:temp_junit_report]).to(eq('/var/folders/non_existent_file.junit'))
+        end
+
+        it "fails if tests_exit_status is not 0", requires_xcodebuild: true do
+          expect do
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+              output_directory: '/tmp/scan_results',
+              project: './scan/examples/standard/app.xcodeproj',
+              disable_xcpretty: true
+            })
+
+            @scan.handle_results(1)
+          end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Test execution failed. Exit status: 1")
+        end
+      end
+    end
+
+    describe "retry_execute" do
+      before(:each) do
+        @scan = Scan::Runner.new
+      end
+
+      it "retry a failed test", requires_xcodebuild: true do
+        error_output = <<-ERROR_OUTPUT
+Failing tests:
+  FastlaneAppTests:
+          FastlaneAppTests.testCoinToss()
+          ERROR_OUTPUT
+
+        expect(Fastlane::UI).to receive(:important).with("Retrying tests: FastlaneAppTests/FastlaneAppTests/testCoinToss").once
+        expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
+        expect(@scan).to receive(:execute)
+
+        @scan.retry_execute(retries: 5, error_output: error_output)
+      end
+
+      it "retry a failed test when project scheme name has non-whitespace character", requires_xcodebuild: true do
+        error_output = <<-ERROR_OUTPUT
+Failing tests:
+  Fastlane-App-Tests:
+          FastlaneAppTests.testCoinToss()
+          ERROR_OUTPUT
+
+        expect(Fastlane::UI).to receive(:important).with("Retrying tests: Fastlane-App-Tests/FastlaneAppTests/testCoinToss").once
+        expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
+        expect(@scan).to receive(:execute)
+
+        @scan.retry_execute(retries: 5, error_output: error_output)
+      end
+
+      it "fail to parse error output", requires_xcodebuild: true do
+        error_output = <<-ERROR_OUTPUT
+Failing tests:
+FastlaneAppTests:
+FastlaneAppTests.testCoinToss()
+          ERROR_OUTPUT
+
+        expect do
+          @scan.retry_execute(retries: 5, error_output: error_output)
+        end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Failed to find failed tests to retry (could not parse error output)")
+      end
     end
 
     describe "test_results" do
@@ -105,21 +177,6 @@ describe Scan do
           expect(Scan.cache[:temp_junit_report]).to_not(eq('/var/folders/non_existent_file.junit'))
         end
       end
-
-      describe "with scan option :disable_xcpretty set to true" do
-        it "does not generate a temp junit report", requires_xcodebuild: true do
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-            output_directory: '/tmp/scan_results',
-            project: './scan/examples/standard/app.xcodeproj',
-            include_simulator_logs: false,
-            disable_xcpretty: true
-          })
-
-          Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
-          expect(@scan.test_results).to(be_nil)
-          expect(Scan.cache[:temp_junit_report]).to(eq('/var/folders/non_existent_file.junit'))
-        end
-      end
     end
 
     describe "#zip_build_products" do
@@ -155,6 +212,37 @@ describe Scan do
 
         scan = Scan::Runner.new
         scan.zip_build_products
+      end
+    end
+
+    describe "output_xctestrun" do
+      it "copies .xctestrun file when :output_xctestrun is true", requires_xcodebuild: true do
+        Dir.mktmpdir("scan_results") do |tmp_dir|
+          # Configuration
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            derived_data_path: File.join(tmp_dir, 'derived_data'),
+            output_directory: File.join(tmp_dir, 'output'),
+            project: './scan/examples/standard/app.xcodeproj',
+            output_xctestrun: true
+          })
+
+          # Make output directory
+          FileUtils.mkdir_p(Scan.config[:output_directory])
+
+          # Make derived data directory
+          path = File.join(Scan.config[:derived_data_path], "Build/Products")
+          FileUtils.mkdir_p(path)
+
+          # Create .xctestrun file that will be copied
+          xctestrun_path = File.join(path, 'something-project-something.xctestrun')
+          FileUtils.touch(xctestrun_path)
+
+          scan = Scan::Runner.new
+          scan.copy_xctestrun
+
+          output_path = File.join(Scan.config[:output_directory], 'settings.xctestrun')
+          expect(File.file?(output_path)).to eq(true)
+        end
       end
     end
   end

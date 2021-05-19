@@ -17,7 +17,7 @@ module Spaceship
       #####################################################
 
       # Instantiates a client with cookie session or a JWT token.
-      def initialize(cookie: nil, current_team_id: nil, token: nil, another_client: nil)
+      def initialize(cookie: nil, current_team_id: nil, token: nil, csrf_tokens: nil, another_client: nil)
         params_count = [cookie, token, another_client].compact.size
         if params_count != 1
           raise "Must initialize with one of :cookie, :token, or :another_client"
@@ -25,10 +25,10 @@ module Spaceship
 
         if token.nil?
           if another_client.nil?
-            super(cookie: cookie, current_team_id: current_team_id, timeout: 1200)
+            super(cookie: cookie, current_team_id: current_team_id, csrf_tokens: csrf_tokens, timeout: 1200)
             return
           end
-          super(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id)
+          super(cookie: another_client.instance_variable_get(:@cookie), current_team_id: another_client.team_id, csrf_tokens: another_client.csrf_tokens)
         else
           options = {
             request: {
@@ -150,19 +150,30 @@ module Spaceship
 
       protected
 
+      class TimeoutRetryError < StandardError
+        def initialize(msg)
+          super
+        end
+      end
+
       def with_asc_retry(tries = 5, &_block)
         tries = 1 if Object.const_defined?("SpecHelper")
+
         response = yield
 
         status = response.status if response
 
         if [500, 504].include?(status)
           msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
-          raise msg
+          raise TimeoutRetryError, msg
         end
 
         return response
-      rescue => error
+      rescue UnauthorizedAccessError => error
+        # Catch unathorized access and re-raising
+        # There is no need to try again
+        raise error
+      rescue TimeoutRetryError => error
         tries -= 1
         puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
@@ -185,16 +196,32 @@ module Spaceship
 
         raise UnexpectedResponse, response.body['error'] if response.body['error']
 
-        raise UnexpectedResponse, handle_errors(response) if response.body['errors']
+        raise UnexpectedResponse, format_errors(response) if response.body['errors']
 
         raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
 
         store_csrf_tokens(response)
 
-        return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, client: self)
+        return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, headers: response.headers, client: self)
       end
 
-      def handle_errors(response)
+      # Overridden from Spaceship::Client
+      def handle_error(response)
+        case response.status.to_i
+        when 401
+          raise UnauthorizedAccessError, format_errors(response) if response && (response.body || {})['errors']
+        when 403
+          error = (response.body['errors'] || []).first || {}
+          error_code = error['code']
+          if error_code == "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
+            raise ProgramLicenseAgreementUpdated, format_errors(response) if response && (response.body || {})['errors']
+          else
+            raise AccessForbiddenError, format_errors(response) if response && (response.body || {})['errors']
+          end
+        end
+      end
+
+      def format_errors(response)
         # Example error format
         # {
         # "errors":[
@@ -238,8 +265,23 @@ module Spaceship
         # ]
         # }
 
+        # Detail is missing in this response making debugging super hard
+        # {"errors" =>
+        #   [
+        #     {
+        #       "id"=>"80ea6cff-0043-4543-9cd1-3e26b0fce383",
+        #       "status"=>"409",
+        #       "code"=>"ENTITY_ERROR.RELATIONSHIP.INVALID",
+        #       "title"=>"The provided entity includes a relationship with an invalid value",
+        #       "source"=>{
+        #         "pointer"=>"/data/relationships/primarySubcategoryOne"
+        #       }
+        #     }
+        #   ]
+        # }
+
         return response.body['errors'].map do |error|
-          messages = [[error['title'], error['detail']].compact.join(" - ")]
+          messages = [[error['title'], error['detail'], error.dig("source", "pointer")].compact.join(" - ")]
 
           meta = error["meta"] || {}
           associated_errors = meta["associatedErrors"] || {}

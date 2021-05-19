@@ -127,6 +127,14 @@ module Gym
         UI.build_failure!("Archive invalid")
       end
 
+      def handle_empty_ipa
+        UI.build_failure!("IPA invalid")
+      end
+
+      def handle_empty_pkg
+        UI.build_failure!("PKG invalid")
+      end
+
       private
 
       # Just to make things easier

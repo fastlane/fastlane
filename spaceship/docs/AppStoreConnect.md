@@ -12,6 +12,8 @@
   * [Testers](#testers)
   * [App ratings & reviews](#app-ratings--reviews)
   * [App Analytics](#app-analytics)
+  * [Bundle Id](#bundle-id-auth-key)
+  * [Bundle Id Capability](#bundle-id-capability-auth-key)
 - [License](#license)
 
 ## Usage
@@ -60,13 +62,14 @@ Spaceship::ConnectAPI::App.all.collect do |app|
 end
 
 # Create a new app
-// Not working yet
+# Currently only works with Apple ID login (not API Key)
 app = Spaceship::ConnectAPI::App.create(name: "App Name",
-                                        primary_language: "English",
                                         version_string: "1.0", # initial version
                                         sku: "123",
+                                        primary_locale: "English",
                                         bundle_id: "com.krausefx.app",
-                                        platforms: ["IOS"])
+                                        platforms: ["IOS"],
+                                        company_name: "krause inc")
 ```
 
 To update non version specific details, use the following code
@@ -384,6 +387,50 @@ devices = analytics.app_active_devices   # => Array of dates representing raw da
 
 # Get crashes
 crashes = analytics.app_crashes          # => Array of dates representing raw data for each day
+```
+
+### Bundle Id (Auth Key)
+
+```ruby
+# Fetch all bundle identifiers
+all_identifiers = Spaceship::ConnectAPI::BundleId.all
+
+# Find a specific identifier based on the bundle identifier
+bundle_id = Spaceship::ConnectAPI::BundleId.find("com.krausefx.app")
+
+# Access information about the bundle identifer
+bundle_id.name
+bundle_id.platform
+bundle_id.identifier
+bundle_id.seed_id
+
+# Create a new identifier
+identifier = Spaceship::ConnectAPI::BundleId.create(name: "Description of the identifier",
+                                                    identifier: "com.krausefx.app")
+```
+Note: Platform will be set to UNIVERSAL no matter if you specify IOS or MAC_OS and seed_id is by default set to team_id
+
+
+### Bundle Id Capability (Auth Key)
+
+```ruby
+# Fetch all capabilities for bundle identifier
+bundle_id = Spaceship::ConnectAPI::BundleId.find("com.krausefx.app")
+capabilities = bundle_id.get_capabilities
+
+# Create a new capability for bundle identifier
+bundle_id.create_capability(capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::MAPS)
+
+# Create a new capability with known bundle identifier id
+bundle_id_capability = Spaceship::ConnectAPI::BundleIdCapability.create(bundle_id_id: "123456789", 
+                                                                        capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::MAPS)
+
+# Delete an capability from bundle identifier
+capabilities.each do |capability|
+  if capability.capatility_type == Spacehship::ConnectAPI::BundleIdCapability::Type::MAPS
+    capability.delete!
+  end
+end
 ```
 
 ## License

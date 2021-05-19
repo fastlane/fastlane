@@ -54,10 +54,30 @@ module Sigh
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
                                      default_value_dynamic: true),
+
+        # App Store Connect API
+        FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                     env_names: ["SIGH_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
+                                     description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                     optional: true,
+                                     conflicting_options: [:api_key],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_names: ["SIGH_API_KEY", "APP_STORE_CONNECT_API_KEY"],
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                     type: Hash,
+                                     optional: true,
+                                     sensitive: true,
+                                     conflicting_options: [:api_key_path]),
+
+        # Apple ID
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "SIGH_USERNAME",
                                      description: "Your Apple ID Username",
+                                     optional: true,
                                      default_value: user,
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :team_id,
@@ -82,6 +102,8 @@ module Sigh
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
+
+        # Other options
         FastlaneCore::ConfigItem.new(key: :provisioning_name,
                                      short_option: "-n",
                                      env_name: "SIGH_PROVISIONING_PROFILE_NAME",

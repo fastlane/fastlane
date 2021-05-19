@@ -15,6 +15,7 @@ module Fastlane
         require 'credentials_manager/appfile_config'
 
         Sigh.config = values # we already have the finished config
+        Sigh.config[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
 
         path = Sigh::Manager.start
 
@@ -65,6 +66,10 @@ module Fastlane
 
       def self.return_value
         "The UUID of the profile sigh just fetched/generated"
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.details

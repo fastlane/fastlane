@@ -27,7 +27,8 @@ module Spaceship
         "expirationDate" => "expiration_date",
 
         "bundleId" => "bundle_id",
-        "certificates" => "certificates"
+        "certificates" => "certificates",
+        "devices" => "devices"
       })
 
       module ProfileState
@@ -64,13 +65,15 @@ module Spaceship
       # API
       #
 
-      def self.all(filter: {}, includes: nil, limit: nil, sort: nil)
-        resps = Spaceship::ConnectAPI.get_profiles(filter: filter, includes: includes).all_pages
+      def self.all(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_profiles(filter: filter, includes: includes).all_pages
         return resps.flat_map(&:to_models)
       end
 
-      def self.create(name: nil, profile_type: nil, bundle_id_id: nil, certificate_ids: nil, device_ids: nil, template_name: nil)
-        resp = Spaceship::ConnectAPI.post_profiles(
+      def self.create(client: nil, name: nil, profile_type: nil, bundle_id_id: nil, certificate_ids: nil, device_ids: nil, template_name: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.post_profiles(
           bundle_id_id: bundle_id_id,
           certificates: certificate_ids,
           devices: device_ids,
@@ -83,8 +86,21 @@ module Spaceship
         return resp.to_models.first
       end
 
-      def delete!
-        return Spaceship::ConnectAPI.delete_profile(profile_id: id)
+      def fetch_all_devices(client: nil, filter: {}, includes: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_devices(profile_id: id, filter: filter, includes: includes).all_pages
+        return resps.flat_map(&:to_models)
+      end
+
+      def fetch_all_certificates(client: nil, filter: {}, includes: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_certificates(profile_id: id, filter: filter, includes: includes).all_pages
+        return resps.flat_map(&:to_models)
+      end
+
+      def delete!(client: nil)
+        client ||= Spaceship::ConnectAPI
+        return client.delete_profile(profile_id: id)
       end
     end
   end

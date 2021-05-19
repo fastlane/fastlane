@@ -1,3 +1,5 @@
+require 'base64'
+
 module Fastlane
   module Actions
     module SharedValues
@@ -9,6 +11,7 @@ module Fastlane
         key_id = options[:key_id]
         issuer_id = options[:issuer_id]
         key_content = options[:key_content]
+        is_key_content_base64 = options[:is_key_content_base64]
         key_filepath = options[:key_filepath]
         duration = options[:duration]
         in_house = options[:in_house]
@@ -26,7 +29,8 @@ module Fastlane
         key = {
           key_id: key_id,
           issuer_id: issuer_id,
-          key: key_content || File.binread(key_filepath),
+          key: key_content || File.binread(File.expand_path(key_filepath)),
+          is_key_content_base64: is_key_content_base64,
           duration: duration,
           in_house: in_house
         }
@@ -54,7 +58,7 @@ module Fastlane
                                        optional: true,
                                        conflicting_options: [:key_content],
                                        verify_block: proc do |value|
-                                         UI.user_error!("Couldn't find key p8 file at path '#{value}'") unless File.exist?(value)
+                                         UI.user_error!("Couldn't find key p8 file at path '#{value}'") unless File.exist?(File.expand_path(value))
                                        end),
           FastlaneCore::ConfigItem.new(key: :key_content,
                                        env_name: "APP_STORE_CONNECT_API_KEY_KEY",
@@ -62,14 +66,23 @@ module Fastlane
                                        sensitive: true,
                                        optional: true,
                                        conflicting_options: [:filepath]),
+          FastlaneCore::ConfigItem.new(key: :is_key_content_base64,
+                                       env_name: "APP_STORE_CONNECT_API_KEY_IS_KEY_CONTENT_BASE64",
+                                       description: "Whether :key_content is Base64 encoded or not",
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :duration,
                                        env_name: "APP_STORE_CONNECT_API_KEY_DURATION",
                                        description: "The token session duration",
                                        optional: true,
-                                       type: Integer),
+                                       default_value: Spaceship::ConnectAPI::Token::MAX_TOKEN_DURATION,
+                                       type: Integer,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The duration can't be more than 1200 (20 minutes) and the value entered was '#{value}'") unless value <= 1200
+                                       end),
           FastlaneCore::ConfigItem.new(key: :in_house,
                                        env_name: "APP_STORE_CONNECT_API_KEY_IN_HOUSE",
-                                       description: "Is App Store or Enterprise (in house) team? App Store Connect API cannot not determine this on its own (yet)",
+                                       description: "Is App Store or Enterprise (in house) team? App Store Connect API cannot determine this on its own (yet)",
                                        optional: true,
                                        type: Boolean)
         ]
@@ -86,7 +99,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        true
+        [:ios, :mac, :tvos].include?(platform)
       end
 
       def self.details

@@ -99,7 +99,7 @@ describe Fastlane do
         it 'downloads all dsyms of all builds in train 1.07.0' do
           expect(build_resp).to receive(:to_models).and_return([build1])
 
-          [[build1, '1.7.0', '3', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
+          [[build1, '1.07.0', '3', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
@@ -135,9 +135,6 @@ describe Fastlane do
 
       context 'when version is latest' do
         it 'downloads only dsyms of latest build in latest train' do
-          expect(app).to receive(:get_edit_app_store_version).and_return(version)
-          expect(version).to receive(:version_string).and_return('2.0.0')
-
           expect(Spaceship::ConnectAPI).to receive(:get_builds).and_return([build2, build1])
 
           expect(build_resp).to receive(:to_models).and_return([build1, build2])
@@ -229,7 +226,7 @@ describe Fastlane do
           [[build1, '1.0.0', '1', '2020-09-12T10:00:00+01:00'],
            [build2, '1.0.0', '2', '2020-09-12T11:00:00+01:00'],
            [build3, '1.7.0', '4', '2020-09-12T12:00:00+01:00'],
-           [build4, '2.0.0', '1', '2020-09-12T13:00:00+01:00']].each do |build, verison, build_number, uploaded_date|
+           [build4, '2.0.0', '1', '2020-09-12T13:00:00+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)

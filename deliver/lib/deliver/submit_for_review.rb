@@ -57,7 +57,7 @@ module Deliver
 
     def update_export_compliance(options, app, build)
       submission_information = options[:submission_information] || {}
-      submission_information = submission_information.collect { |k, v| [k.to_sym, v] }.to_h
+      submission_information = submission_information.transform_keys(&:to_sym)
 
       uses_encryption = submission_information[:export_compliance_uses_encryption]
 
@@ -87,7 +87,7 @@ module Deliver
 
     def update_idfa(options, app, version)
       submission_information = options[:submission_information] || {}
-      submission_information = submission_information.collect { |k, v| [k.to_sym, v] }.to_h
+      submission_information = submission_information.transform_keys(&:to_sym)
 
       uses_idfa = submission_information[:add_id_info_uses_idfa]
 
@@ -163,7 +163,7 @@ module Deliver
 
     def update_submission_information(options, app)
       submission_information = options[:submission_information] || {}
-      submission_information = submission_information.collect { |k, v| [k.to_sym, v] }.to_h
+      submission_information = submission_information.transform_keys(&:to_sym)
 
       content_rights = submission_information[:content_rights_contains_third_party_content]
 

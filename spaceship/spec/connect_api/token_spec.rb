@@ -4,16 +4,39 @@ describe Spaceship::ConnectAPI::Token do
   let(:key_id) { 'BA5176BF04' }
   let(:issuer_id) { '693fbb20-54a0-4d94-88ce-8a6caf875439' }
 
-  context '#from_json_file' do
-    let(:fake_api_key_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key.json" }
-    let(:fake_api_key_in_house_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key_in_house.json" }
+  let(:fake_api_key_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key.json" }
+  let(:fake_api_key_extra_fields_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key_extra_fields.json" }
+  let(:fake_api_key_base64_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key_base64.json" }
+  let(:fake_api_key_in_house_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key_in_house.json" }
 
+  context '#from_json_file' do
     it 'successfully creates token' do
       token = Spaceship::ConnectAPI::Token.from_json_file(fake_api_key_json_path)
 
       expect(token.key_id).to eq("D485S484")
       expect(token.issuer_id).to eq("061966a2-5f3c-4185-af13-70e66d2263f5")
       expect(token.in_house).to be_nil
+    end
+
+    it 'successfully creates token with extra fields' do
+      token = Spaceship::ConnectAPI::Token.from_json_file(fake_api_key_extra_fields_json_path)
+
+      expect(token.key_id).to eq("D485S484")
+      expect(token.issuer_id).to eq("061966a2-5f3c-4185-af13-70e66d2263f5")
+      expect(token.in_house).to be_nil
+    end
+
+    it 'successfully creates token with base64 encoded key' do
+      json = JSON.parse(File.read(fake_api_key_json_path), { symbolize_names: true })
+
+      expect(Base64).to receive(:decode64).and_call_original
+      expect(OpenSSL::PKey::EC).to receive(:new).with(json[:key]).and_call_original
+
+      token64 = Spaceship::ConnectAPI::Token.from_json_file(fake_api_key_base64_json_path)
+
+      expect(token64.key_id).to eq("D485S484")
+      expect(token64.issuer_id).to eq("061966a2-5f3c-4185-af13-70e66d2263f5")
+      expect(token64.in_house).to be_nil
     end
 
     it 'successfully creates token with in_house' do
@@ -55,9 +78,8 @@ describe Spaceship::ConnectAPI::Token do
 
   context '#create' do
     let(:private_key) do
-      key = OpenSSL::PKey::EC.new('prime256v1')
-      key.generate_key
-      key
+      json = JSON.parse(File.read(fake_api_key_json_path), { symbolize_names: true })
+      json[:key]
     end
 
     it "with arguments with key" do

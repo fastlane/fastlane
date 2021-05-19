@@ -118,7 +118,7 @@ module FastlaneCore
           discover_devices(child_item, device_types, discovered_device_udids)
         end
 
-        is_supported_device = device_types.any? { |device_type| usb_item['_name'] == device_type }
+        is_supported_device = device_types.any?(usb_item['_name'])
         serial_num = usb_item['serial_num'] || ''
         has_serial_number = serial_num.length == 40 || serial_num.length == 24
 
@@ -301,7 +301,7 @@ module FastlaneCore
         Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
       end
 
-      def copy_logs(device, log_identity, logs_destination_dir)
+      def copy_logs(device, log_identity, logs_destination_dir, log_collection_start_time)
         logs_destination_dir = File.expand_path(logs_destination_dir)
         os_version = FastlaneCore::CommandExecutor.execute(command: 'sw_vers -productVersion', print_all: false, print_command: false)
 
@@ -310,7 +310,7 @@ module FastlaneCore
 
         are_logarchives_supported = device_supports_logarchives && host_computer_supports_logarchives
         if are_logarchives_supported
-          copy_logarchive(device, log_identity, logs_destination_dir)
+          copy_logarchive(device, log_identity, logs_destination_dir, log_collection_start_time)
         else
           copy_logfile(device, log_identity, logs_destination_dir)
         end
@@ -340,13 +340,17 @@ module FastlaneCore
         UI.success("Copying file '#{logfile_src}' to '#{logfile_dst}'...")
       end
 
-      def copy_logarchive(device, log_identity, logs_destination_dir)
+      def copy_logarchive(device, log_identity, logs_destination_dir, log_collection_start_time)
         require 'shellwords'
 
         logarchive_dst = File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive")
         FileUtils.rm_rf(logarchive_dst)
         FileUtils.mkdir_p(File.expand_path("..", logarchive_dst))
-        command = "xcrun simctl spawn #{device.udid} log collect --output #{logarchive_dst.shellescape} 2>/dev/null"
+
+        logs_collection_start = log_collection_start_time.strftime('%Y-%m-%d %H:%M:%S')
+        command = "xcrun simctl spawn #{device.udid} log collect "
+        command << "--start '#{logs_collection_start}' "
+        command << "--output #{logarchive_dst.shellescape} 2>/dev/null"
         FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
       end
     end

@@ -1,5 +1,5 @@
 // MainProcess.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 //
 //  ** NOTE **
@@ -28,7 +28,7 @@ class MainProcess {
     @objc func connectToFastlaneAndRunLane(_ fastfile: LaneFile?) {
         runner.startSocketThread(port: argumentProcessor.port)
 
-        let completedRun = Fastfile.runLane(from: fastfile, named: argumentProcessor.currentLane, parameters: argumentProcessor.laneParameters())
+        let completedRun = Fastfile.runLane(from: fastfile, named: argumentProcessor.currentLane, with: argumentProcessor.laneParameters())
         if completedRun {
             runner.disconnectFromFastlaneProcess()
         }
@@ -56,6 +56,8 @@ class MainProcess {
                 print(stdout)
                 self.timeBetweenPrints = Int(self.lastPrintDate.timeIntervalSinceNow)
             }
+
+            // swiftformat:disable:next redundantSelf
             _ = Runner.waitWithPolling(self.timeBetweenPrints, toEventually: { $0 > 5 }, timeout: 10)
             thread.start()
         #endif
