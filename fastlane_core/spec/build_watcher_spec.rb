@@ -153,7 +153,8 @@ describe FastlaneCore::BuildWatcher do
       expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return([ready_build])
       expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
 
-      expect(UI).to receive(:message).with(/Will 'force stop' watching build after pending [0-5]{1} timeout duration around (2[0-9]{3}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [+-][0-9]{2}[0-9]{2}) time!/)
+      expect(UI).to receive(:message).with(/Will timeout watching build after [4-5]{1} seconds around (2[0-9]{3}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [+-][0-9]{2}[0-9]{2}) time!/)
+      expect(UI).to receive(:verbose).with(/Will timeout watching build after pending [0-5]{1} seconds around (2[0-9]{3}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} [+-][0-9]{2}[0-9]{2}) time!/)
       expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: #{ready_build.app_version}, build_version: #{ready_build.version}, platform: #{ready_build.platform}")
       expect(UI).to receive(:message).with("Waiting for App Store Connect to finish processing the new build (1.0 - 1) for #{ready_build.platform}")
       expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version} for #{ready_build.platform}")
@@ -168,7 +169,7 @@ describe FastlaneCore::BuildWatcher do
 
       expect do
         FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false, timeout_duration: -1)
-      end.to raise_error("FastlaneCore::BuildWatcher exceeded the '-1' timeout duration, Stopping now!")
+      end.to raise_error("FastlaneCore::BuildWatcher exceeded the '-1' seconds, Stopping now!")
     end
 
     describe 'alternate versions' do

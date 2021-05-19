@@ -24,6 +24,11 @@ module FastlaneCore
         UI.message("Waiting for processing on... app_id: #{app_id}, app_version: #{app_version}, build_version: #{build_version}, platform: #{platform}")
 
         build_watching_start_time = Time.new
+        unless timeout_duration.nil?
+          end_time = build_watching_start_time + timeout_duration
+          UI.message("Will timeout watching build after #{timeout_duration} seconds around #{end_time} time!")
+        end
+
         showed_info = false
         loop do
           matched_build, app_version_queried = matching_build(watched_app_version: app_version, watched_build_version: build_version, app_id: app_id, platform: platform, select_latest: select_latest)
@@ -145,9 +150,9 @@ module FastlaneCore
         pending_duration = end_time - current_time
 
         if current_time > end_time
-          UI.crash!("FastlaneCore::BuildWatcher exceeded the '#{timeout_duration.to_i}' timeout duration, Stopping now!")
+          UI.crash!("FastlaneCore::BuildWatcher exceeded the '#{timeout_duration.to_i}' seconds, Stopping now!")
         else
-          UI.message("Will 'force stop' watching build after pending #{pending_duration.to_i} timeout duration around #{end_time} time!")
+          UI.verbose("Will timeout watching build after pending #{pending_duration.to_i} seconds around #{end_time} time!")
         end
       end
     end
