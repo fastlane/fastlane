@@ -195,7 +195,7 @@ module Fastlane
         else
           if type == "((String) -> Void)?"
             "#{param}: #{type} = nil"
-          elsif optional && type.end_with?('?')
+          elsif optional && type.end_with?('?') && !type.start_with?('Any')
             "#{param}: OptionalConfigValue<#{type}> = .fastlaneDefault(#{default_value})"
           else
             "#{param}: #{type} = #{default_value}"
@@ -280,12 +280,13 @@ module Fastlane
         return "[]" # return empty list for argument
       end
 
-      argument_object_strings = @param_names.zip(param_type_overrides, param_default_values, param_optionality_values).map do |name, type_override, default_value, is_optional|
+      argument_object_strings = @param_names.zip(param_type_overrides, param_default_values, param_optionality_values, param_is_strings).map do |name, type_override, default_value, is_optional, is_string|
+        type = get_type(param: name, default_value: default_value, optional: is_optional, param_type_override: type_override, is_string: is_string)
         sanitized_name = camel_case_lower(string: name)
         sanitized_name = sanitize_reserved_word(word: sanitized_name)
         type_string = type_override == :string_callback ? ".stringClosure" : "nil"
 
-        if !(type_override == :string_callback || !(is_optional && default_value.nil?))
+        if !(type_override == :string_callback || !(is_optional && default_value.nil? && !type.start_with?('Any')))
           { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = #{sanitized_name}.asRubyArgument(name: \"#{name}\", type: #{type_string})" }
         else
           { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}, type: #{type_string})" }
@@ -325,6 +326,7 @@ module Fastlane
         implm += "let args: [RubyCommand.Argument] = []\n"
       else
         implm += "let args = [#{args.group_by { |h| h[:name] }.keys.join(",\n")}]\n"
+        implm += ".filter { $0?.value != nil }\n"
         implm += ".compactMap { $0 }\n"
       end
       implm += "let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: args)\n"
@@ -431,7 +433,7 @@ module Fastlane
 
         if type == "((String) -> Void)?"
           "#{param}: #{type} = nil"
-        elsif optional && type.end_with?('?')
+        elsif optional && type.end_with?('?') && !type.start_with?('Any')
           "#{param}: OptionalConfigValue<#{type}> = .fastlaneDefault(#{self.class_name.downcase}.#{static_var_for_parameter_name})"
         else
           "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"
