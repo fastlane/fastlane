@@ -26,7 +26,7 @@ describe Fastlane do
           key: File.binread(fake_api_key_p8_path),
           is_key_content_base64: false,
           duration: 1200,
-          in_house: nil
+          in_house: false
         }
 
         expect(result).to eq(hash)
