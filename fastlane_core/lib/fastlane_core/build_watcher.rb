@@ -26,7 +26,7 @@ module FastlaneCore
         build_watching_start_time = Time.new
         unless timeout_duration.nil?
           end_time = build_watching_start_time + timeout_duration
-          UI.message("Will timeout watching build after #{timeout_duration} seconds around #{end_time} time!")
+          UI.message("Will timeout watching build after #{timeout_duration} seconds around #{end_time}...")
         end
 
         showed_info = false
@@ -152,7 +152,7 @@ module FastlaneCore
         if current_time > end_time
           UI.crash!("FastlaneCore::BuildWatcher exceeded the '#{timeout_duration.to_i}' seconds, Stopping now!")
         else
-          UI.verbose("Will timeout watching build after pending #{pending_duration.to_i} seconds around #{end_time} time!")
+          UI.verbose("Will timeout watching build after pending #{pending_duration.to_i} seconds around #{end_time}...")
         end
       end
     end
