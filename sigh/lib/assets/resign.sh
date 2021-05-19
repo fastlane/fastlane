@@ -824,7 +824,7 @@ function resign {
                 fi
 
                 OLD_ICLOUD_ENV=$(echo "$ENTITLEMENTS_VALUE" | sed -e 's,<string>\(.*\)</string>,\1,g')
-                if [[ "$CERTIFICATE" =~ "Distribution:" ]]; then
+                if [[ "$certificate_name" =~ "Distribution:" ]]; then
                     NEW_ICLOUD_ENV="Production"
                 else
                     NEW_ICLOUD_ENV="Development"
