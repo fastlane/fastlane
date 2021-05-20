@@ -12,7 +12,6 @@ module Spaceship
       attr_accessor :public_link_limit_enabled
       attr_accessor :public_link_limit
       attr_accessor :public_link
-
       attr_accessor :beta_testers
 
       attr_mapping({
