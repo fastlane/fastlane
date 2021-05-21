@@ -685,8 +685,8 @@ module Deliver
       unless errors.empty?
         errors.each do |error|
           UI.error(error)
-          UI.user_error!("There are Age Rating deprecation errors that cannot be solved automatically... Please apply any fixes and try again")
         end
+        UI.user_error!("There are Age Rating deprecation errors that cannot be solved automatically... Please apply any fixes and try again")
       end
 
       UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values || !deprecation_messages.empty?
