@@ -677,7 +677,7 @@ module Deliver
       end
 
       # Handle App Store Connect deprecation/migrations of keys/values if possible
-      attributes, deprecation_messages, errors = Spaceship::ConnectAPI::AgeRatingDeclaration.map_deprecations_if_possible!(attributes)
+      attributes, deprecation_messages, errors = Spaceship::ConnectAPI::AgeRatingDeclaration.map_deprecation_if_possible(attributes)
       deprecation_messages.each do |message|
         UI.deprecated(message)
       end

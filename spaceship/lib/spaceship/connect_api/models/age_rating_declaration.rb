@@ -93,30 +93,24 @@ module Spaceship
         1 => true
       }
 
-      def self.map_deprecations_if_possible!(hash)
+      def self.map_deprecation_if_possible(attributes)
+        attributes = attributes.dup
         messages = []
         errors = []
 
-        # Deprecated as of App Store Connect API 1.3
-        # If 'gamblingAndContests' found, set value for 'contests' and 'gambling'
-        if hash.key?('gamblingAndContests')
-          value = hash.delete('gamblingAndContests')
+        value = attributes.delete('gamblingAndContests')
+        return attributes, messages, errors if value.nil?
 
-          # gambling can be mapped without any issues because both 'gamblingAndContests' and 'gambling' are booleans
-          hash['gambling'] = value
+        messages << "Age Rating 'gamblingAndContests' has been deprecated and split into 'gambling' and 'contests'"
 
-          # contests can only be mapped from false to 'NONE' (need to error if true)
-          if value == true
-            errors << "'gamblingAndContests' could not be mapped to 'contests' - 'contests' requires a value of 'NONE', 'INFREQUENT_OR_MILD', or 'FREQUENT_OR_INTENSE'"
-            hash['contests'] = value # setting to unchanged value
-          else
-            hash['contests'] = 'NONE'
-          end
-
-          messages << "Age Rating 'gamblingAndContests' has been deprecated and split into 'gambling' and 'contests'"
+        attributes['gambling'] = value
+        if value == true
+          errors << "'gamblingAndContests' could not be mapped to 'contests' - 'contests' requires a value of 'NONE', 'INFREQUENT_OR_MILD', or 'FREQUENT_OR_INTENSE'"
+        else
+          attributes['contests'] = 'NONE'
         end
 
-        return hash, messages, errors
+        return attributes, messages, errors
       end
 
       def self.map_key_from_itc(key)

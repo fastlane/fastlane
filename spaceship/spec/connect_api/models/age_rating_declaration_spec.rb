@@ -22,9 +22,9 @@ describe Spaceship::ConnectAPI::AgeRatingDeclaration do
   end
 
   describe "Helpers" do
-    describe "#map_deprecations_if_possible!" do
+    describe "#map_deprecation_if_possible" do
       it "successful migration of gamblingAndContests" do
-        hash, messages, errors = Spaceship::ConnectAPI::AgeRatingDeclaration.map_deprecations_if_possible!(asc_1_2_false_gambling)
+        hash, messages, errors = Spaceship::ConnectAPI::AgeRatingDeclaration.map_deprecation_if_possible(asc_1_2_false_gambling)
 
         expect(hash).to eq({
           "gambling" => false,
@@ -37,7 +37,7 @@ describe Spaceship::ConnectAPI::AgeRatingDeclaration do
       end
 
       it "unsuccessful migration of gamblingAndContests" do
-        hash, messages, errors = Spaceship::ConnectAPI::AgeRatingDeclaration.map_deprecations_if_possible!(asc_1_2_true_gambling)
+        hash, messages, errors = Spaceship::ConnectAPI::AgeRatingDeclaration.map_deprecation_if_possible(asc_1_2_true_gambling)
 
         expect(hash).to eq({
           "gambling" => true,
