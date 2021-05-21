@@ -18,12 +18,10 @@ module Spaceship
         #
 
         def get_age_rating_declaration(app_info_id: nil, app_store_version_id: nil)
-          raise "Keyword 'app_store_version_id' is deprecated and 'app_info_id' is required" if app_store_version_id
+          raise "Keyword 'app_store_version_id' is deprecated and 'app_info_id' is required" if app_store_version_id || app_info_if.nil?
 
-          if app_info_id
-            params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-            tunes_request_client.get("appInfos/#{app_info_id}/ageRatingDeclaration", params)
-          end
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.get("appInfos/#{app_info_id}/ageRatingDeclaration", params)
         end
 
         def patch_age_rating_declaration(age_rating_declaration_id: nil, attributes: nil)
