@@ -6,6 +6,8 @@ module Spaceship
 
       # Rating
       attr_accessor :alcohol_tobacco_or_drug_use_or_references
+      attr_accessor :contests
+      attr_accessor :gambling
       attr_accessor :gambling_simulated
       attr_accessor :medical_or_treatment_information
       attr_accessor :profanity_or_crude_humor
@@ -16,12 +18,15 @@ module Spaceship
       attr_accessor :violence_realistic_prolonged_graphic_or_sadistic
       attr_accessor :violence_realistic
 
-      # boolean
-      attr_accessor :gambling_and_contests
+      # Boolean
+      attr_accessor :seventeen_plus
       attr_accessor :unrestricted_web_access
 
       # KidsAge
       attr_accessor :kids_age_band
+
+      # Deprecated as of App Store Connect API 1.3
+      attr_accessor :gambling_and_contests
 
       module Rating
         NONE = "NONE"
@@ -37,10 +42,12 @@ module Spaceship
 
       attr_mapping({
         "alcoholTobaccoOrDrugUseOrReferences" => "alcohol_tobacco_or_drug_use_or_references",
-        "gamblingAndContests" => "gambling_and_contests",
+        "contests" => "contests",
+        "gambling" => "gambling",
         "gamblingSimulated" => "gambling_simulated",
         "medicalOrTreatmentInformation" => "medical_or_treatment_information",
         "profanityOrCrudeHumor" => "profanity_or_crude_humor",
+        "seventeenPlus" => "seventeen_plus",
         "sexualContentGraphicAndNudity" => "sexual_content_graphic_and_nudity",
         "sexualContentOrNudity" => "sexual_content_or_nudity",
         "horrorOrFearThemes" => "horror_or_fear_themes",
@@ -49,7 +56,10 @@ module Spaceship
         "violenceCartoonOrFantasy" => "violence_cartoon_or_fantasy",
         "violenceRealisticProlongedGraphicOrSadistic" => "violence_realistic_prolonged_graphic_or_sadistic",
         "violenceRealistic" => "violence_realistic",
-        "kidsAgeBand" => "kids_age_band"
+        "kidsAgeBand" => "kids_age_band",
+
+        # Deprecated as of App Store Connect API 1.3
+        "gamblingAndContests" => "gambling_and_contests",
       })
 
       def self.type
@@ -82,6 +92,31 @@ module Spaceship
         0 => false,
         1 => true
       }
+
+      def self.map_deprecations_if_possible!(hash)
+        messages = []
+        errors = []
+
+        # Deprecated as of App Store Connect API 1.3
+        # If 'gamblingAndContests' found, set value for 'contests' and 'gambling'
+        if hash.key?('gamblingAndContests')
+          value = hash.delete('gamblingAndContests')
+
+          # gambling can be mapped without any issues because both 'gamblingAndContests' and 'gambling' are booleans
+          hash['gambling'] = value
+
+          # contests can only be mapped from false to 'NONE' (need to skip and error if true)
+          if value == true
+            errors << "'gamblingAndContests' could not be mapped to 'contests' - 'contests' requires a value of 'NONE', 'INFREQUENT_OR_MILD', or 'FREQUENT_OR_INTENSE'"
+          else
+            hash['contests'] = 'NONE'
+          end
+
+          messages << "Age Rating 'gamblingAndContests' has been deprecated and split into 'gambling' and 'contests'"
+        end
+
+        return hash, messages, errors
+      end
 
       def self.map_key_from_itc(key)
         key = key.gsub("MZGenre.", "")
