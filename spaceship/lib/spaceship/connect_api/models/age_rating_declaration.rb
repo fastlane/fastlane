@@ -105,9 +105,10 @@ module Spaceship
           # gambling can be mapped without any issues because both 'gamblingAndContests' and 'gambling' are booleans
           hash['gambling'] = value
 
-          # contests can only be mapped from false to 'NONE' (need to skip and error if true)
+          # contests can only be mapped from false to 'NONE' (need to error if true)
           if value == true
             errors << "'gamblingAndContests' could not be mapped to 'contests' - 'contests' requires a value of 'NONE', 'INFREQUENT_OR_MILD', or 'FREQUENT_OR_INTENSE'"
+            hash['contests'] = value # setting to unchanged value
           else
             hash['contests'] = 'NONE'
           end
