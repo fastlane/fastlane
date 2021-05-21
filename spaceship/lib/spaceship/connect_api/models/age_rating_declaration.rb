@@ -106,6 +106,7 @@ module Spaceship
         attributes['gambling'] = value
         if value == true
           errors << "'gamblingAndContests' could not be mapped to 'contests' - 'contests' requires a value of 'NONE', 'INFREQUENT_OR_MILD', or 'FREQUENT_OR_INTENSE'"
+          attributes['contests'] = value
         else
           attributes['contests'] = 'NONE'
         end
