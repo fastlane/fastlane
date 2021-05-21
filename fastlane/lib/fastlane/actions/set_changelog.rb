@@ -117,6 +117,8 @@ module Fastlane
                                      env_names: ["FL_SET_CHANGELOG_API_KEY", "APP_STORE_CONNECT_API_KEY"],
                                      description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                      type: Hash,
+                                     default_value: Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY],
+                                     default_value_dynamic: true,
                                      optional: true,
                                      sensitive: true,
                                      conflicting_options: [:api_key_path]),

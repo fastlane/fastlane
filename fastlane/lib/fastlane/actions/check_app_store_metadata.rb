@@ -5,6 +5,11 @@ module Fastlane
 
     class CheckAppStoreMetadataAction < Action
       def self.run(config)
+        # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
+        unless config[:api_key_path]
+          config[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        end
+
         require 'precheck'
         Precheck.config = config
         return Precheck::Runner.new.run
