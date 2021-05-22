@@ -151,14 +151,6 @@ describe FastlaneCore do
         expect(auto_convert_value).to be(true)
       end
 
-      it "auto convert to 'true' Boolean type if default value is '1' string" do
-        result = FastlaneCore::ConfigItem.new(key: :foo,
-                                     type: FastlaneCore::Boolean,
-                                     default_value: "1")
-        auto_convert_value = result.auto_convert_value(result.default_value)
-        expect(auto_convert_value).to be(true)
-      end
-
       it "auto convert to 'false' Boolean type if default value is 'no' string" do
         result = FastlaneCore::ConfigItem.new(key: :foo,
                                      type: FastlaneCore::Boolean,
@@ -203,14 +195,6 @@ describe FastlaneCore do
         result = FastlaneCore::ConfigItem.new(key: :foo,
                                      type: FastlaneCore::Boolean,
                                      default_value: "OFF")
-        auto_convert_value = result.auto_convert_value(result.default_value)
-        expect(auto_convert_value).to be(false)
-      end
-
-      it "auto convert to 'false' Boolean type if default value is '0' string" do
-        result = FastlaneCore::ConfigItem.new(key: :foo,
-                                     type: FastlaneCore::Boolean,
-                                     default_value: "0")
         auto_convert_value = result.auto_convert_value(result.default_value)
         expect(auto_convert_value).to be(false)
       end

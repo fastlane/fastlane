@@ -276,9 +276,9 @@ module FastlaneCore
       elsif data_type != String
         # Special treatment if the user specified true, false, on, off or YES, NO
         # There is no boolean type, so we just do it here
-        if %w(yes YES true TRUE on ON 1).include?(value)
+        if %w(yes YES true TRUE on ON).include?(value)
           return true
-        elsif %w(no NO false FALSE off OFF 0).include?(value)
+        elsif %w(no NO false FALSE off OFF).include?(value)
           return false
         end
       end
