@@ -274,11 +274,11 @@ module FastlaneCore
         rescue JSON::ParserError
         end
       elsif data_type != String
-        # Special treatment if the user specified true, false or YES, NO
+        # Special treatment if the user specified true, false, on, off or YES, NO
         # There is no boolean type, so we just do it here
-        if %w(yes YES true TRUE 1).include?(value)
+        if %w(yes YES true TRUE on ON 1).include?(value)
           return true
-        elsif %w(no NO false FALSE 0).include?(value)
+        elsif %w(no NO false FALSE off OFF 0).include?(value)
           return false
         end
       end
