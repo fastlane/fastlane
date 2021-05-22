@@ -22,30 +22,30 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Jorge Revuelta H",
-                        "Iulian Onofrei",
+  spec.authors       = ["Manu Wallner",
                         "Aaron Brager",
-                        "Daniel Jankowski",
-                        "Max Ott",
-                        "Fumiya Nakamura",
-                        "Jan Piotrowski",
-                        "Matthew Ellis",
-                        "Joshua Liebowitz",
-                        "Maksym Grebenets",
-                        "Jimmy Dee",
                         "Luka Mirosevic",
-                        "Olivier Halligon",
-                        "Danielle Tomlinson",
                         "Satoshi Namai",
+                        "Jimmy Dee",
+                        "Matthew Ellis",
+                        "Jan Piotrowski",
                         "Jérôme Lacoste",
-                        "Roger Oba",
-                        "Manu Wallner",
-                        "Helmut Januschka",
-                        "Felix Krause",
-                        "Kohki Miki",
                         "Stefan Natchev",
+                        "Olivier Halligon",
+                        "Max Ott",
                         "Andrew McBurney",
-                        "Josh Holtz"]
+                        "Joshua Liebowitz",
+                        "Danielle Tomlinson",
+                        "Iulian Onofrei",
+                        "Roger Oba",
+                        "Felix Krause",
+                        "Jorge Revuelta H",
+                        "Kohki Miki",
+                        "Helmut Januschka",
+                        "Daniel Jankowski",
+                        "Maksym Grebenets",
+                        "Josh Holtz",
+                        "Fumiya Nakamura"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
