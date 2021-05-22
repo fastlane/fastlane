@@ -366,6 +366,7 @@ module Pilot
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
       # Use JWT auth
+      api_token = Spaceship::ConnectAPI.token
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
         return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)

@@ -26,9 +26,11 @@ module Deliver
     end
 
     def login
-      if api_token
+      if (api_token = Spaceship::ConnectAPI::Token.from(hash: options[:api_key], filepath: options[:api_key_path]))
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
+      elsif !Spaceship::ConnectAPI.token.nil?
+        UI.message("Using existing authorization token for App Store Connect API")
       else
         # Username is now optional since addition of App Store Connect API Key
         # Force asking for username to prompt user if not already set
@@ -40,12 +42,6 @@ module Deliver
         Spaceship::ConnectAPI.login(options[:username], nil, use_portal: false, use_tunes: true)
         UI.message("Login successful")
       end
-    end
-
-    def api_token
-      @api_token ||= Spaceship::ConnectAPI::Token.create(**options[:api_key]) if options[:api_key]
-      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(options[:api_key_path]) if options[:api_key_path]
-      return @api_token
     end
 
     def run
@@ -210,6 +206,7 @@ module Deliver
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team
       # Use JWT auth
+      api_token = Spaceship::ConnectAPI.token
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
         return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)

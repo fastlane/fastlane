@@ -16,9 +16,11 @@ module Fastlane
 
         platform = Spaceship::ConnectAPI::BundleIdPlatform.map(platform)
 
-        if (token = api_token(params))
-          UI.message("Using App Store Connect API token...")
-          Spaceship::ConnectAPI.token = token
+        if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
+          UI.message("Creating authorization token for App Store Connect API")
+          Spaceship::ConnectAPI.token = api_token
+        elsif !Spaceship::ConnectAPI.token.nil?
+          UI.message("Using existing authorization token for App Store Connect API")
         else
           UI.message("Login to App Store Connect (#{params[:username]})")
           credentials = CredentialsManager::AccountManager.new(user: params[:username])
@@ -35,13 +37,6 @@ module Fastlane
 
         UI.success("Successfully registered new device")
         return udid
-      end
-
-      def self.api_token(params)
-        params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
-        api_token ||= Spaceship::ConnectAPI::Token.create(**params[:api_key]) if params[:api_key]
-        api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
-        return api_token
       end
 
       def self.description
@@ -80,6 +75,8 @@ module Fastlane
                                        env_names: ["FL_REGISTER_DEVICE_API_KEY", "APP_STORE_CONNECT_API_KEY"],
                                        description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                        type: Hash,
+                                       default_value: Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        sensitive: true,
                                        conflicting_options: [:api_key_path]),
