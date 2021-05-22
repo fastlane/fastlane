@@ -254,10 +254,10 @@ module Fastlane
 
           Actions.execute_action(action_name) do
             if Fastlane::Actions.is_deprecated?(class_ref)
-              puts("==========================================".deprecated)
-              puts("This action (#{method_sym}) is deprecated".deprecated)
-              puts(class_ref.deprecated_notes.to_s.remove_markdown.deprecated) if class_ref.deprecated_notes
-              puts("==========================================\n".deprecated)
+              UI.deprecated("==========================================")
+              UI.deprecated("This action (#{method_sym}) is deprecated")
+              UI.deprecated(class_ref.deprecated_notes.to_s.remove_markdown) if class_ref.deprecated_notes
+              UI.deprecated("==========================================\n")
             end
             class_ref.runner = self # needed to call another action from an action
             return class_ref.run(configurations)
