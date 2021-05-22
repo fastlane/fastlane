@@ -180,8 +180,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :warnings, env_name: "FL_APPLEDOC_WARNINGS", description: "Documentation generation warnings", is_string: true, optional: true),
 
           # MISCELLANEOUS
-          FastlaneCore::ConfigItem.new(key: :logformat, env_name: "FL_APPLEDOC_LOGFORMAT", description: "Log format [0-3]", is_string: false, optional: true),
-          FastlaneCore::ConfigItem.new(key: :verbose, env_name: "FL_APPLEDOC_VERBOSE", description: "Log verbosity level [0-6,xcode]", is_string: false, optional: true)
+          FastlaneCore::ConfigItem.new(key: :logformat, env_name: "FL_APPLEDOC_LOGFORMAT", description: "Log format [0-3]", type: Integer, optional: true),
+          FastlaneCore::ConfigItem.new(key: :verbose, env_name: "FL_APPLEDOC_VERBOSE", description: "Log verbosity level [0-6,xcode]", type: Integer, optional: true)
         ]
       end
 
