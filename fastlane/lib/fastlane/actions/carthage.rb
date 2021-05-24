@@ -230,7 +230,7 @@ module Fastlane
             configuration: "Release",                       # Build configuration to use when building
             cache_builds: true,                             # By default Carthage will rebuild a dependency regardless of whether its the same resolved version as before.
             toolchain: "com.apple.dt.toolchain.Swift_2_3",  # Specify the xcodebuild toolchain
-            new_resolver: false,                            # Use the new resolver to resolve depdendency graph
+            new_resolver: false,                            # Use the new resolver to resolve dependency graph
             log_path: "carthage.log"                        # Path to the xcode build output
           )'
         ]
