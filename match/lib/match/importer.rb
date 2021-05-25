@@ -93,15 +93,17 @@ module Match
         dest_cert_path = File.join(output_dir_certs, "#{cert_name}.cer")
         dest_p12_path = File.join(output_dir_certs, "#{p12_name}.p12")
       else
-        # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
-        token = api_token(params)
-        if token
+        if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
           UI.message("Creating authorization token for App Store Connect API")
-          Spaceship::ConnectAPI.token = token
+          Spaceship::ConnectAPI.token = api_token
+        elsif !Spaceship::ConnectAPI.token.nil?
+          UI.message("Using existing authorization token for App Store Connect API")
         else
           UI.message("Login to App Store Connect (#{params[:username]})")
           Spaceship::ConnectAPI.login(params[:username], use_portal: true, use_tunes: false, portal_team_id: params[:team_id], team_name: params[:team_name])
         end
+
+        # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
         certs = Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: certificate_type })
 
         # Base64 encode contents to find match from API to find a cert ID
@@ -146,12 +148,6 @@ module Match
       file_path = File.exist?(file_path) ? file_path : nil
       UI.user_error!("#{file_description} does not exist at path: #{file_path}") unless !file_path.nil? || optional
       file_path
-    end
-
-    def api_token(params)
-      @api_token ||= Spaceship::ConnectAPI::Token.create(**params[:api_key]) if params[:api_key]
-      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
-      return @api_token
     end
   end
 end

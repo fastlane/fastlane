@@ -1,5 +1,4 @@
 require 'spaceship/tunes/application'
-require_relative 'tester_util'
 require_relative 'module'
 require_relative 'manager'
 

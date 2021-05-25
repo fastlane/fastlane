@@ -84,9 +84,13 @@ module Spaceship
         # certificates
         #
 
-        def get_certificates(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_certificates(profile_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = provisioning_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          provisioning_request_client.get("certificates", params)
+          if profile_id.nil?
+            provisioning_request_client.get("certificates", params)
+          else
+            provisioning_request_client.get("profiles/#{profile_id}/certificates", params)
+          end
         end
 
         def get_certificate(certificate_id: nil, includes: nil)

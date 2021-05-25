@@ -269,12 +269,12 @@ module Pilot
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
-        # rubocop:disable Metrics/LineLength
+        # rubocop:disable Layout/LineLength
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "PILOT_ITC_PROVIDER",
                                      description: "The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
                                      optional: true),
-        # rubocop:enable Metrics/LineLength
+        # rubocop:enable Layout/LineLength
 
         # waiting and uploaded build
         FastlaneCore::ConfigItem.new(key: :wait_processing_interval,
@@ -282,6 +282,14 @@ module Pilot
                                      env_name: "PILOT_WAIT_PROCESSING_INTERVAL",
                                      description: "Interval in seconds to wait for App Store Connect processing",
                                      default_value: 30,
+                                     type: Integer,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :wait_processing_timeout_duration,
+                                     env_name: "PILOT_WAIT_PROCESSING_TIMEOUT_DURATION",
+                                     description: "Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception",
+                                     optional: true,
                                      type: Integer,
                                      verify_block: proc do |value|
                                        UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
