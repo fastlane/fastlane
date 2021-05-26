@@ -125,7 +125,7 @@ module Sigh
         c.description = 'Manage installed provisioning profiles on your system.'
 
         c.option('-f', '--force', 'Force remove all expired provisioning profiles. Required on CI.')
-        c.option('-e', '--clean_expired', 'Remove all expired provisioning profiles.')
+        global_option('-e', '--clean_expired', 'Remove all expired provisioning profiles.')
 
         c.option('-p', '--clean_pattern STRING', String, 'Remove any provisioning profiles that matches the regular expression.')
         c.example('Remove all "iOS Team Provisioning" provisioning profiles', 'fastlane sigh manage -p "iOS\ ?Team Provisioning Profile"')
