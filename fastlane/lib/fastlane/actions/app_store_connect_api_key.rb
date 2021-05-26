@@ -40,7 +40,7 @@ module Fastlane
 
         # Creates Spaceship API Key session
         # User does not need to pass the token into any actions because of this
-        Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(key) if options[:set_spaceship_token]
+        Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(**key) if options[:set_spaceship_token]
 
         return key
       end
