@@ -68,7 +68,7 @@ module Fastlane
 
         filter = { app: app.id }
         filter["preReleaseVersion.platform"] = platform
-        build_resps = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion").all_pages
+        build_resps = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion,buildBundles").all_pages
         builds = build_resps.flat_map(&:to_models)
 
         builds.each do |build|
@@ -107,31 +107,24 @@ module Fastlane
           end
 
           UI.verbose("Build_version: #{asc_build_number} matches #{build_number}, grabbing dsym_url") if build_number
-          get_details_and_download_dsym(app: app, train: asc_app_version, build_number: asc_build_number, uploaded_date: uploaded_date, platform: itc_platform, wait_for_dsym_processing: wait_for_dsym_processing, wait_timeout: wait_timeout, output_directory: output_directory)
+
+          build.build_bundles&.each do |build_bundle|
+            download_dsym(build_bundle: build_bundle, build: build, app: app, wait_for_dsym_processing: wait_for_dsym_processing, wait_timeout: wait_timeout, output_directory: output_directory)
+          end
         end
       end
 
-      def self.get_details_and_download_dsym(app: nil, train: nil, build_number: nil, uploaded_date: nil, platform: nil, wait_for_dsym_processing: nil, wait_timeout: nil, output_directory: nil)
+      def self.download_dsym(build_bundle: nil, build: nil, app: nil, wait_for_dsym_processing: nil, wait_timeout: nil, output_directory: nil)
         start = Time.now
         download_url = nil
 
         loop do
-          begin
-            resp = Spaceship::Tunes.client.build_details(app_id: app.id, train: train, build_number: build_number, platform: platform)
-
-            resp['apple_id'] = app.id
-            build_details = Spaceship::Tunes::BuildDetails.factory(resp)
-
-            download_url = build_details.dsym_url
-            UI.verbose("dsym_url: #{download_url}")
-          rescue Spaceship::TunesClient::ITunesConnectError => ex
-            UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
-          end
+          download_url = build_bundle.dsym_url
 
           unless download_url
             if !wait_for_dsym_processing || (Time.now - start) > wait_timeout
               # In some cases, AppStoreConnect does not process the dSYMs, thus no error should be thrown.
-              UI.message("Could not find any dSYM for #{build_number} (#{train})")
+              UI.message("Could not find any dSYM for #{build.version} (#{build.app_version})")
             else
               UI.message("Waiting for dSYM file to appear...")
               sleep(30)
@@ -143,10 +136,10 @@ module Fastlane
         end
 
         if download_url
-          self.download(download_url, app.bundle_id, train, build_number, uploaded_date, output_directory)
-          return if build_number
+          self.download(download_url, build, app, output_directory)
+          return if build.version
         else
-          UI.message("No dSYM URL for #{build_number} (#{train})")
+          UI.message("No dSYM URL for #{build.version} (#{build.app_version})")
         end
       end
       # rubocop:enable Metrics/PerceivedComplexity
@@ -154,7 +147,7 @@ module Fastlane
       def self.get_latest_build!(app_id: nil, platform: nil)
         filter = { app: app_id }
         filter["preReleaseVersion.platform"] = platform
-        latest_build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion").first
+        latest_build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion,buildBundles").first
 
         if latest_build.nil?
           UI.user_error!("Could not find any build for platform #{platform}") if platform
@@ -164,18 +157,18 @@ module Fastlane
         return latest_build
       end
 
-      def self.download(download_url, bundle_id, train_number, build_version, uploaded_date, output_directory)
+      def self.download(download_url, build, app, output_directory)
         result = self.download_file(download_url)
-        path   = write_dsym(result, bundle_id, train_number, build_version, output_directory)
-        UI.success("🔑  Successfully downloaded dSYM file for #{train_number} - #{build_version} to '#{path}'")
+        path   = write_dsym(result, app.bundle_id, build.app_version, build.version, output_directory)
+        UI.success("🔑  Successfully downloaded dSYM file for #{build.app_version} - #{build.version} to '#{path}'")
 
         Actions.lane_context[SharedValues::DSYM_PATHS] ||= []
         Actions.lane_context[SharedValues::DSYM_PATHS] << File.expand_path(path)
 
-        unless uploaded_date.nil?
-          Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE] ||= uploaded_date
+        unless build.uploaded_date.nil?
+          Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE] ||= build.uploaded_date
           current_latest = Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE]
-          Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE] = [current_latest, uploaded_date].max
+          Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE] = [current_latest, build.uploaded_date].max
           UI.verbose("Most recent build uploaded_date #{Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE]}")
         end
       end

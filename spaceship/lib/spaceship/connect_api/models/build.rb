@@ -19,6 +19,7 @@ module Spaceship
       attr_accessor :beta_build_metrics
       attr_accessor :beta_build_localizations
       attr_accessor :build_beta_detail
+      attr_accessor :build_bundles
       attr_accessor :pre_release_version
       attr_accessor :individual_testers
 
@@ -38,10 +39,12 @@ module Spaceship
         "betaBuildLocalizations" => "beta_build_localizations",
         "buildBetaDetail" => "build_beta_detail",
         "preReleaseVersion" => "pre_release_version",
-        "individualTesters" => "individual_testers"
+        "individualTesters" => "individual_testers",
+        "buildBundles" => "build_bundles",
+        "preReleaseVersion" => "pre_release_version"
       })
 
-      ESSENTIAL_INCLUDES = "app,buildBetaDetail,preReleaseVersion"
+      ESSENTIAL_INCLUDES = "app,buildBetaDetail,preReleaseVersion,buildBundles"
 
       module ProcessingState
         PROCESSING = "PROCESSING"

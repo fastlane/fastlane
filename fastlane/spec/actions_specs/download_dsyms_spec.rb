@@ -16,12 +16,10 @@ describe Fastlane do
       let(:build5) { double('build5') }
       let(:build6) { double('build6') }
 
-      let(:empty_build) { double('empty_build') }
+      let(:build_bundle) { double('build_bundle') }
+      let(:empty_build_bundle) { double('empty_build_bundle') }
 
-      let(:build_detail_resp) { double('build_detail_resp') }
-      let(:build_detail) { double('build_detail') }
-      let(:empty_build_detail_resp) { double('empty_build_detail_resp') }
-      let(:empty_build_detail) { double('empty_build_detail') }
+      let(:empty_build) { double('empty_build') }
 
       let(:download_url) { 'https://example.com/myapp-dsym' }
 
@@ -38,11 +36,16 @@ describe Fastlane do
         allow(Spaceship::ConnectAPI).to receive(:get_builds).and_return(build_resp)
         allow(build_resp).to receive(:all_pages).and_return([build_resp])
 
-        allow(build_detail_resp).to receive(:[]=).with("apple_id", app.id)
-        allow(empty_build_detail).to receive(:[]=).with("apple_id", app.id)
+        allow(build1).to receive(:build_bundles).and_return([build_bundle])
+        allow(build2).to receive(:build_bundles).and_return([build_bundle])
+        allow(build3).to receive(:build_bundles).and_return([build_bundle])
+        allow(build4).to receive(:build_bundles).and_return([build_bundle])
+        allow(build5).to receive(:build_bundles).and_return([build_bundle])
+        allow(build6).to receive(:build_bundles).and_return([build_bundle])
 
-        allow(build_detail).to receive(:dsym_url).and_return(download_url)
-        allow(empty_build_detail).to receive(:dsym_url).and_return(nil)
+        allow(build_bundle).to receive(:dsym_url).and_return(download_url)
+
+        allow(empty_build).to receive(:build_bundles).and_return(nil)
 
         allow(Fastlane::Actions::DownloadDsymsAction).to receive(:download)
       end
@@ -80,11 +83,9 @@ describe Fastlane do
            [build5, '2.0.0', '2', '2020-09-12T14:00:00+01:00'],
            [build6, '2.0.0', '5', '2020-09-12T15:00:00+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number)
+            expect(build).to receive(:version).and_return(build_number).twice
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
-            expect(tunes_client).to receive(:build_details).with(app_id: app.id, train: version, build_number: build_number, platform: :ios).and_return(build_detail_resp)
-            expect(Spaceship::Tunes::BuildDetails).to receive(:factory).with(build_detail_resp).and_return(build_detail)
-            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, version, build_number, DateTime.parse(uploaded_date), nil)
+            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
 
           expect(Fastlane::Actions::DownloadDsymsAction).not_to(receive(:download))
@@ -101,11 +102,9 @@ describe Fastlane do
 
           [[build1, '1.07.0', '3', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number)
+            expect(build).to receive(:version).and_return(build_number).twice
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
-            expect(tunes_client).to receive(:build_details).with(app_id: app.id, train: version, build_number: build_number, platform: :ios).and_return(build_detail_resp)
-            expect(Spaceship::Tunes::BuildDetails).to receive(:factory).with(build_detail_resp).and_return(build_detail)
-            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, version, build_number, DateTime.parse(uploaded_date), nil)
+            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -120,11 +119,9 @@ describe Fastlane do
 
           [[build1, '2.0.0', '2', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number)
+            expect(build).to receive(:version).and_return(build_number).twice
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
-            expect(tunes_client).to receive(:build_details).with(app_id: app.id, train: version, build_number: build_number, platform: :ios).and_return(build_detail_resp)
-            expect(Spaceship::Tunes::BuildDetails).to receive(:factory).with(build_detail_resp).and_return(build_detail)
-            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, version, build_number, DateTime.parse(uploaded_date), nil)
+            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -147,12 +144,10 @@ describe Fastlane do
 
           [[build2, '2.0.0', '3', '2020-09-12T11:00:00+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version).twice
-            expect(build).to receive(:version).and_return(build_number).twice
+            expect(build).to receive(:version).and_return(build_number).exactly(3).times
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
 
-            expect(tunes_client).to receive(:build_details).with(app_id: app.id, train: version, build_number: build_number, platform: :ios).and_return(build_detail_resp)
-            expect(Spaceship::Tunes::BuildDetails).to receive(:factory).with(build_detail_resp).and_return(build_detail)
-            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, version, build_number, DateTime.parse(uploaded_date), nil)
+            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -179,12 +174,10 @@ describe Fastlane do
 
           [[build2, '1.0.0', '42', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number)
+            expect(build).to receive(:version).and_return(build_number).twice
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
 
-            expect(tunes_client).to receive(:build_details).with(app_id: app.id, train: version, build_number: build_number, platform: :ios).and_return(build_detail_resp)
-            expect(Spaceship::Tunes::BuildDetails).to receive(:factory).with(build_detail_resp).and_return(build_detail)
-            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, version, build_number, DateTime.parse(uploaded_date), nil)
+            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -205,12 +198,10 @@ describe Fastlane do
 
           [[build2, '2.0.0', '42', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number)
+            expect(build).to receive(:version).and_return(build_number).twice
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
 
-            expect(tunes_client).to receive(:build_details).with(app_id: app.id, train: version, build_number: build_number, platform: :ios).and_return(build_detail_resp)
-            expect(Spaceship::Tunes::BuildDetails).to receive(:factory).with(build_detail_resp).and_return(build_detail)
-            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, version, build_number, DateTime.parse(uploaded_date), nil)
+            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -235,11 +226,9 @@ describe Fastlane do
           [[build5, '2.0.0', '2', '2020-09-12T14:00:00+01:00'],
            [build6, '2.0.0', '5', '2020-09-12T15:00:00+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number)
+            expect(build).to receive(:version).and_return(build_number).twice
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
-            expect(tunes_client).to receive(:build_details).with(app_id: app.id, train: version, build_number: build_number, platform: :ios).and_return(build_detail_resp)
-            expect(Spaceship::Tunes::BuildDetails).to receive(:factory).with(build_detail_resp).and_return(build_detail)
-            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, app.bundle_id, version, build_number, DateTime.parse(uploaded_date), nil)
+            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
 
           expect(Fastlane::Actions::DownloadDsymsAction).not_to(receive(:download))
