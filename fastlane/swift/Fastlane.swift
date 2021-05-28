@@ -10592,7 +10592,7 @@ public func swiftlint(mode: String = "lint",
                       outputFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       configFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       strict: Bool = false,
-                      files: Any? = nil,
+                      files: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                       ignoreExitStatus: Bool = false,
                       raiseIfSwiftlintError: Bool = false,
                       reporter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -10607,7 +10607,7 @@ public func swiftlint(mode: String = "lint",
     let outputFileArg = outputFile.asRubyArgument(name: "output_file", type: nil)
     let configFileArg = configFile.asRubyArgument(name: "config_file", type: nil)
     let strictArg = RubyCommand.Argument(name: "strict", value: strict, type: nil)
-    let filesArg = RubyCommand.Argument(name: "files", value: files, type: nil)
+    let filesArg = files.asRubyArgument(name: "files", type: nil)
     let ignoreExitStatusArg = RubyCommand.Argument(name: "ignore_exit_status", value: ignoreExitStatus, type: nil)
     let raiseIfSwiftlintErrorArg = RubyCommand.Argument(name: "raise_if_swiftlint_error", value: raiseIfSwiftlintError, type: nil)
     let reporterArg = reporter.asRubyArgument(name: "reporter", type: nil)
@@ -12928,4 +12928,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.123]
+// FastlaneRunnerAPIVersion [0.9.124]
