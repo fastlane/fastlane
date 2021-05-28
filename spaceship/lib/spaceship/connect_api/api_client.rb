@@ -211,7 +211,8 @@ module Spaceship
         when 401
           raise UnauthorizedAccessError, format_errors(response) if response && (response.body || {})['errors']
         when 403
-          error = (response.body['errors'] || []).first || {}
+          json_body = response_body_as_json(response.body)
+          error = (json_body['errors'] || []).first || {}
           error_code = error['code']
           if error_code == "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
             raise ProgramLicenseAgreementUpdated, format_errors(response) if response && (response.body || {})['errors']
@@ -219,6 +220,14 @@ module Spaceship
             raise AccessForbiddenError, format_errors(response) if response && (response.body || {})['errors']
           end
         end
+      end
+
+      def response_body_as_json(body)
+        if body.kind_of?(Hash)
+          return body
+        end
+
+        return JSON.parse(body)
       end
 
       def format_errors(response)
@@ -280,7 +289,21 @@ module Spaceship
         #   ]
         # }
 
-        return response.body['errors'].map do |error|
+        # Membership expired
+        # {
+        #   "errors" : [
+        #     {
+        #       "id" : "UUID",
+        #       "status" : "403",
+        #       "code" : "FORBIDDEN_ERROR",
+        #       "title" : "This request is forbidden for security reasons",
+        #       "detail" : "Team ID: 'ID' is not associated with an active membership. To check your teams membership status, sign in your account on the developer website. https://developer.apple.com/account/"
+        #     }
+        #   ]
+        # }
+
+        json_body = response_body_as_json(response.body)
+        return json_body['errors'].map do |error|
           messages = [[error['title'], error['detail'], error.dig("source", "pointer")].compact.join(" - ")]
 
           meta = error["meta"] || {}
