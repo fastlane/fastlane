@@ -164,7 +164,8 @@ module Screengrab
 
       device_screenshots_paths.each do |device_path|
         if_device_path_exists(app_package_name, device_serial, device_path) do |path|
-          run_adb_command("-s #{device_serial.shellescape} shell run-as #{app_package_name.shellescape.shellescape} rm -rf #{path.shellescape.shellescape}",
+          run_adb_command("-s #{device_serial.shellescape} shell rm -rf #{path.shellescape.shellescape}",
+          # run_adb_command("-s #{device_serial.shellescape} shell run-as #{app_package_name.shellescape.shellescape} rm -rf #{path.shellescape.shellescape}",
                           print_all: true,
                           print_command: true)
         end
@@ -309,7 +310,8 @@ module Screengrab
             if out =~ /Permission denied/
               dir = File.dirname(path)
               base = File.basename(path)
-              run_adb_command("-s #{device_serial.shellescape} shell run-as #{@config[:app_package_name].shellescape.shellescape} \"tar -cC #{dir} #{base}\" | tar -xv -f- -C #{tempdir}",
+              run_adb_command("-s #{device_serial.shellescape} shell  \"tar -cC #{dir} #{base}\" | tar -xv -f- -C #{tempdir}",
+              # run_adb_command("-s #{device_serial.shellescape} shell run-as #{@config[:app_package_name].shellescape.shellescape} \"tar -cC #{dir} #{base}\" | tar -xv -f- -C #{tempdir}",
                               print_all: false,
                               print_command: true)
             end
@@ -374,7 +376,8 @@ module Screengrab
     # Some device commands fail if executed against a device path that does not exist, so this helper method
     # provides a way to conditionally execute a block only if the provided path exists on the device.
     def if_device_path_exists(app_package_name, device_serial, device_path)
-      return if run_adb_command("-s #{device_serial.shellescape} shell run-as #{app_package_name.shellescape.shellescape} ls #{device_path.shellescape.shellescape}",
+      return if run_adb_command("-s #{device_serial.shellescape} shell ls #{device_path.shellescape.shellescape}",
+      # return if run_adb_command("-s #{device_serial.shellescape} shell run-as #{app_package_name.shellescape.shellescape} ls #{device_path.shellescape.shellescape}",
                                 print_all: false,
                                 print_command: false).include?('No such file')
 

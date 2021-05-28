@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Locale;
 
 /**
  * Default {@link ScreenshotCallback} implementation that stores the captured Bitmap on the file
@@ -30,7 +29,6 @@ public class FileWritingScreenshotCallback implements ScreenshotCallback {
 
     private final Context appContext;
     private final String locale;
-
     public FileWritingScreenshotCallback(Context appContext, String locale) {
         this.appContext = appContext;
         this.locale = locale;
