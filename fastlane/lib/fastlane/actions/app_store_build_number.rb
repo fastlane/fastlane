@@ -27,10 +27,11 @@ module Fastlane
 
       def self.get_build_number(params)
         # Prompts select team if multiple teams and none specified
-        token = self.api_token(params)
-        if token
-          UI.message("Using App Store Connect API token...")
-          Spaceship::ConnectAPI.token = token
+        if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
+          UI.message("Creating authorization token for App Store Connect API")
+          Spaceship::ConnectAPI.token = api_token
+        elsif !Spaceship::ConnectAPI.token.nil?
+          UI.message("Using existing authorization token for App Store Connect API")
         else
           # Username is now optional since addition of App Store Connect API Key
           # Force asking for username to prompt user if not already set
@@ -102,13 +103,6 @@ module Fastlane
         versions.map(&:to_s).sort_by { |v| Gem::Version.new(v) }
       end
 
-      def self.api_token(params)
-        params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
-        api_token ||= Spaceship::ConnectAPI::Token.create(**params[:api_key]) if params[:api_key]
-        api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
-        return api_token
-      end
-
       #####################################################
       # @!group Documentation
       #####################################################
@@ -133,6 +127,8 @@ module Fastlane
                                        env_names: ["APPSTORE_BUILD_NUMBER_API_KEY", "APP_STORE_CONNECT_API_KEY"],
                                        description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                        type: Hash,
+                                       default_value: Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        sensitive: true,
                                        conflicting_options: [:api_key_path]),

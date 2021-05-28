@@ -12,6 +12,7 @@ module Spaceship
       attr_accessor :public_link_limit_enabled
       attr_accessor :public_link_limit
       attr_accessor :public_link
+      attr_accessor :beta_testers
 
       attr_mapping({
         "name" => "name",
@@ -21,7 +22,8 @@ module Spaceship
         "publicLinkId" => "public_link_id",
         "publicLinkLimitEnabled" => "public_link_limit_enabled",
         "publicLinkLimit" => "public_link_limit",
-        "publicLink" => "public_link"
+        "publicLink" => "public_link",
+        "betaTesters" => "beta_testers"
       })
 
       def self.type

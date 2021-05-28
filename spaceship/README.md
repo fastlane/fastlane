@@ -111,11 +111,11 @@ When your Apple account has 2 factor verification enabled, you'll automatically 
 
 #### Web sessions
 
-See [Continuous Integration > Authenticating with Apple services > Method 2: Two-step or two-factor authentication > Storing a manually verified session using spaceauth](https://docs.fastlane.tools/best-practices/continuous-integration/#storing-a-manually-verified-session-using-spaceauth)
+See [Best Practices > Continuous Integration > Authenticating with Apple services > Method 2: Two-step or two-factor authentication > Storing a manually verified session using spaceauth](https://docs.fastlane.tools/best-practices/continuous-integration/#storing-a-manually-verified-session-using-spaceauth)
 
 #### Transporter
 
-See [Getting Started > iOS > Authentication > Method 3: Application-specific passwords](https://docs.fastlane.tools/getting-started/ios/authentication/#method-3-application-specific-passwords)
+See [Best Practices > Continuous Integration > Authenticating with Apple services > Method 3: Application-specific passwords](https://docs.fastlane.tools/best-practices/continuous-integration/#method-3-application-specific-passwords)
 
 ## _spaceship_ in use
 

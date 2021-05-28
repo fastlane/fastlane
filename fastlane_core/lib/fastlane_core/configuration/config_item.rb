@@ -262,6 +262,8 @@ module FastlaneCore
         return value.to_i if value.to_i.to_s == value.to_s
       elsif data_type == Float
         return value.to_f if value.to_f.to_s == value.to_s
+      elsif data_type == Symbol
+        return value.to_sym if value.to_sym.to_s == value.to_s
       elsif allow_shell_conversion
         return value.shelljoin if value.kind_of?(Array)
         return value.map { |k, v| "#{k.to_s.shellescape}=#{v.shellescape}" }.join(' ') if value.kind_of?(Hash)
@@ -272,11 +274,11 @@ module FastlaneCore
         rescue JSON::ParserError
         end
       elsif data_type != String
-        # Special treatment if the user specified true, false or YES, NO
+        # Special treatment if the user specified true, false, on, off or YES, NO
         # There is no boolean type, so we just do it here
-        if %w(YES yes true TRUE).include?(value)
+        if %w(yes YES true TRUE on ON).include?(value)
           return true
-        elsif %w(NO no false FALSE).include?(value)
+        elsif %w(no NO false FALSE off OFF).include?(value)
           return false
         end
       end

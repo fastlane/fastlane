@@ -233,10 +233,10 @@ module Supply
         end
       end
 
-      AndroidPublisher::LocalizedText.new({
+      AndroidPublisher::LocalizedText.new(
         language: language,
         text: changelog_text
-      })
+      )
     end
 
     def upload_changelogs(release_notes, release, track)

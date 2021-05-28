@@ -48,6 +48,11 @@ aliases:
     run:
       name: Set Ruby version
       command: | # see https://circleci.com/docs/2.0/testing-ios/#using-ruby
+        if [ "${_RUBY_VERSION}" = "3.0" ]; then
+          # See https://circleci.com/docs/2.0/testing-ios/#supported-xcode-versions
+          echo "Ruby 3.0 is not installed in macOS image based on Xcode 12.4.0"
+          ruby-install ruby 3.0
+        fi
         echo "ruby-${_RUBY_VERSION}" > ~/.ruby-version
         echo 'chruby ruby-${_RUBY_VERSION}' >> ~/.bash_profile
 
@@ -89,10 +94,6 @@ jobs:
           command: |
             ruby -v
       - run:
-          name: debug | brew version
-          command: |
-            brew -v
-      - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
@@ -111,8 +112,8 @@ jobs:
           name: Check compatibility with Ruby 3.0
           command: |
             touch ~/test-reports/ruby_warnings.txt
-            # TODO remove 'grep -v ".bundle"' once 3rd party dependencies support Ruby 3.0
-            ! cat ~/test-reports/ruby_warnings.txt | grep -v ".bundle" | grep -E "warning:\s.*(deprecated).*$" && echo "No deprecation message found."
+            ! cat ~/test-reports/ruby_warnings.txt | grep -E "warning:\s.*(deprecated).*$" && echo "No deprecation message found."
+            ! cat ~/test-reports/ruby_warnings.txt | grep -E "warning:\s.*(obsolete).*$" && echo "No obsolete message found."
       - store_test_results:
           path: ~/test-reports
       - store_artifacts:
@@ -175,13 +176,21 @@ jobs:
       - *cache_save_git
       - *cache_restore_bundler
       - *set_ruby
-      - run:
-          name: Setup Build
-          command: |
-            mkdir -p ~/test-reports
-            brew update # Needed because this lane uses "brew bundle" and CircleCI's brew install is too old for that
       - *bundle_install
       - *cache_save_bundler
+      - run:
+          name: debug | brew version
+          command: |
+            brew -v
+      - run:
+          name: brew update if needed # temporary solution for this https://discuss.circleci.com/t/macos-image-users-homebrew-brownout-2021-04-26/39872/2
+          command: |
+            # if the version is not 3.x.x, try brew update
+            ruby -e 'exit(1) if `brew -v` =~ /2\.\d+\.\d+/' ||\
+            brew update || \
+            # if brew update fails due to shallow clone, try unshallowing and then brew update again
+            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow && \
+            brew update
       - run: bundle exec fastlane generate_swift_api
 
   validate_documentation:
@@ -249,29 +258,30 @@ workflows:
   build:
     jobs:
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.4)'
+          name: 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.5)'
           xcode_version: '10.2.1'
-          ruby_version: '2.4'
-      - tests_macos:
-          name: 'Execute tests on macOS (Xcode 11.0.0, Ruby 2.5)'
-          xcode_version: '11.0.0'
           ruby_version: '2.5'
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)'
           xcode_version: '11.4.0'
           ruby_version: '2.6'
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 12.3.0, Ruby 2.7)'
-          xcode_version: '12.3.0'
+          name: 'Execute tests on macOS (Xcode 12.4.0, Ruby 2.7)'
+          xcode_version: '12.4.0'
           ruby_version: '2.7'
+          ruby_opt: -W:deprecated
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 12.4.0, Ruby 3.0)'
+          xcode_version: '12.4.0'
+          ruby_version: '3.0'
           ruby_opt: -W:deprecated
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu'
           ruby_version: 'fastlanetools/ci:0.3.0'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
-          xcode_version: '11.0.0'
-          ruby_version: '2.5'
+          xcode_version: '12.4.0'
+          ruby_version: '2.7'
       - validate_documentation:
           name: 'Validate Documentation'
           ruby_version: 'circleci/ruby:2.5'

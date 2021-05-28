@@ -279,13 +279,13 @@ module Supply
     def update_listing_for_language(language: nil, title: nil, short_description: nil, full_description: nil, video: nil)
       ensure_active_edit!
 
-      listing = AndroidPublisher::Listing.new({
+      listing = AndroidPublisher::Listing.new(
         language: language,
         title: title,
         full_description: full_description,
         short_description: short_description,
         video: video
-      })
+      )
 
       call_google_api do
         client.update_edit_listing(

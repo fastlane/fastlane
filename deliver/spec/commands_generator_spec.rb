@@ -17,10 +17,10 @@ describe Deliver::CommandsGenerator do
   describe ":run option handling" do
     it "can use the username short flag from tool options" do
       # leaving out the command name defaults to 'run'
-      stub_commander_runner_args(['--description', 'My description', '-u', 'me@it.com'])
+      stub_commander_runner_args(['--description', '{"en-US": "My description"}', '-u', 'me@it.com'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
+        description: { "en-US" => "My description" },
         username: 'me@it.com'
       })
 
@@ -31,10 +31,10 @@ describe Deliver::CommandsGenerator do
 
     it "can use the app_identifier flag from tool options" do
       # leaving out the command name defaults to 'run'
-      stub_commander_runner_args(['--description', 'My description', '--app_identifier', 'abcd'])
+      stub_commander_runner_args(['--description', '{"en-US": "My description"}', '--app_identifier', 'abcd'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
+        description: { "en-US" => "My description" },
         app_identifier: 'abcd'
       })
 
@@ -46,10 +46,10 @@ describe Deliver::CommandsGenerator do
 
   describe ":submit_build option handling" do
     it "can use the username short flag from tool options" do
-      stub_commander_runner_args(['submit_build', '--description', 'My description', '-u', 'me@it.com'])
+      stub_commander_runner_args(['submit_build', '--description', '{"en-US": "My description"}', '-u', 'me@it.com'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
+        description: { "en-US" => "My description" },
         username: 'me@it.com',
         submit_for_review: true,
         build_number: 'latest'
@@ -61,10 +61,10 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the app_identifier flag from tool options" do
-      stub_commander_runner_args(['submit_build', '--description', 'My description', '--app_identifier', 'abcd'])
+      stub_commander_runner_args(['submit_build', '--description', '{"en-US": "My description"}', '--app_identifier', 'abcd'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
+        description: { "en-US" => "My description" },
         app_identifier: 'abcd',
         submit_for_review: true,
         build_number: 'latest'
@@ -86,10 +86,10 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the username short flag from tool options" do
-      stub_commander_runner_args(['init', '--description', 'My description', '-u', 'me@it.com'])
+      stub_commander_runner_args(['init', '--description', '{"en-US": "My description"}', '-u', 'me@it.com'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
+        description: { "en-US" => "My description" },
         username: 'me@it.com',
         run_precheck_before_submit: false
       })
@@ -101,10 +101,10 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the app_identifier flag from tool options" do
-      stub_commander_runner_args(['init', '--description', 'My description', '--app_identifier', 'abcd'])
+      stub_commander_runner_args(['init', '--description', '{"en-US": "My description"}', '--app_identifier', 'abcd'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
+        description: { "en-US" => "My description" },
         app_identifier: 'abcd',
         run_precheck_before_submit: false
       })
@@ -126,10 +126,9 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the username short flag from tool options" do
-      stub_commander_runner_args(['generate_summary', '--description', 'My description', '-u', 'me@it.com', '-f', 'true'])
+      stub_commander_runner_args(['generate_summary', '-u', 'me@it.com', '-f', 'true'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
         username: 'me@it.com',
         force: true
       })
@@ -141,10 +140,9 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the app_identifier flag from tool options" do
-      stub_commander_runner_args(['generate_summary', '--description', 'My description', '--app_identifier', 'abcd', '-f', 'true'])
+      stub_commander_runner_args(['generate_summary', '--app_identifier', 'abcd', '-f', 'true'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
         app_identifier: 'abcd',
         force: true
       })
@@ -165,10 +163,9 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the username short flag from tool options" do
-      stub_commander_runner_args(['download_screenshots', '--description', 'My description', '-u', 'me@it.com', '-w', 'screenshots/path'])
+      stub_commander_runner_args(['download_screenshots', '-u', 'me@it.com', '-w', 'screenshots/path'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
         username: 'me@it.com',
         screenshots_path: 'screenshots/path'
       })
@@ -180,10 +177,9 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the app_identifier flag from tool options" do
-      stub_commander_runner_args(['download_screenshots', '--description', 'My description', '--app_identifier', 'abcd', '-w', 'screenshots/path'])
+      stub_commander_runner_args(['download_screenshots', '--app_identifier', 'abcd', '-w', 'screenshots/path'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
         app_identifier: 'abcd',
         screenshots_path: 'screenshots/path'
       })
@@ -202,10 +198,9 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the app_identifier flag from tool options" do
-      stub_commander_runner_args(['download_metadata', '--description', 'My description', '--app_identifier', 'abcd', '-m', 'metadata/path', '--force'])
+      stub_commander_runner_args(['download_metadata', '--app_identifier', 'abcd', '-m', 'metadata/path', '--force'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
         app_identifier: 'abcd',
         metadata_path: 'metadata/path',
         force: true
@@ -217,7 +212,7 @@ describe Deliver::CommandsGenerator do
       expect(Deliver::Runner).to receive(:new) do |actual_options|
         expect(expected_options._values).to eq(actual_options._values)
         # ugly work-around to do the work that DetectValues would normally do
-        actual_options[:app] = fake_app
+        Deliver.cache[:app] = fake_app
       end
 
       fake_setup = "fake_setup"

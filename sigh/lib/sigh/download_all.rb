@@ -9,9 +9,11 @@ module Sigh
   class DownloadAll
     # Download all valid provisioning profiles
     def download_all(download_xcode_profiles: false)
-      if (token = api_token)
+      if (api_token = Spaceship::ConnectAPI::Token.from(hash: Sigh.config[:api_key], filepath: Sigh.config[:api_key_path]))
         UI.message("Creating authorization token for App Store Connect API")
-        Spaceship::ConnectAPI.token = token
+        Spaceship::ConnectAPI.token = api_token
+      elsif !Spaceship::ConnectAPI.token.nil?
+        UI.message("Using existing authorization token for App Store Connect API")
       else
         # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
@@ -57,12 +59,6 @@ module Sigh
       # but works on both web session and official API
       profiles = Spaceship::ConnectAPI::Profile.all(filter: { profileType: profile_types.join(",") }, includes: "bundleId")
       download_profiles(profiles)
-    end
-
-    def api_token
-      api_token ||= Spaceship::ConnectAPI::Token.create(**Sigh.config[:api_key]) if Sigh.config[:api_key]
-      api_token ||= Spaceship::ConnectAPI::Token.from_json_file(Sigh.config[:api_key_path]) if Sigh.config[:api_key_path]
-      return api_token
     end
 
     # @param profiles [Array] Array of all the provisioning profiles we want to download

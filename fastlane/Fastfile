@@ -89,9 +89,9 @@ lane :execute_tests do
     sh("bundle check || bundle install")
     sh("rake install")
 
-    # Ensure the file size of the fastlane gem is below 1 MB
-    size_in_mb = File.size("pkg/fastlane-#{version}.gem").to_f / (1024 * 1024)
-    UI.user_error!("fastlane gem is above 1 MB, make sure no additional resources are included by mistake") if size_in_mb > 1
+    # Ensure the file size of the fastlane gem is below 1.5 MB
+    size_in_mb = File.size("pkg/fastlane-#{version}.gem").to_f / (1024 * 1024 * 1.5)
+    UI.user_error!("fastlane gem is above 1.5 MB, make sure no additional resources are included by mistake") if size_in_mb > 1
 
     # Run the tests
     sh("bundle exec rake test_all")
@@ -323,7 +323,7 @@ end
 
 lane :release_brew do
   version = local_version
-  sh("cd .. && brew bump-formula-pr fastlane --url=https://github.com/fastlane/fastlane/archive/#{version}.tar.gz")
+  sh("cd .. && brew bump-formula-pr fastlane --force --url=https://github.com/fastlane/fastlane/archive/#{version}.tar.gz")
 end
 
 lane :release_github do
