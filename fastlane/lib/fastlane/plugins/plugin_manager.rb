@@ -326,7 +326,7 @@ module Fastlane
           no_action_found = true
           [current[0].red, current[1][:version_number], "No actions found".red]
         else
-          [current[0], current[1][:version_number], current[1][:actions].join(",\n")]
+          [current[0], current[1][:version_number], current[1][:actions].join(", ")]
         end
       end
 
