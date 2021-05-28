@@ -137,8 +137,6 @@ module Sigh
 
       default_command(:renew)
 
-      # Please see: https://github.com/fastlane/fastlane/pull/18760#discussion_r640767528
-      ARGV << "--verbose" if ARGV.include?('-e')
       run!
     end
 
