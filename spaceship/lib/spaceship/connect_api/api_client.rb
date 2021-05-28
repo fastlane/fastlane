@@ -208,20 +208,25 @@ module Spaceship
       # Overridden from Spaceship::Client
       def handle_error(response)
         body = response.body
-        body = JSON.parse(body) if body.kind_of?(String)
 
-        case response.status.to_i
-        when 401
-          raise UnauthorizedAccessError, format_errors(response) if response && (body || {})['errors']
-        when 403
-          error = (body['errors'] || []).first || {}
-          error_code = error['code']
-          if error_code == "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
-            raise ProgramLicenseAgreementUpdated, format_errors(response) if response && (body || {})['errors']
-          else
-            raise AccessForbiddenError, format_errors(response) if response && (body || {})['errors']
+        unless body.empty?
+          body = JSON.parse(body) if body.kind_of?(String)
+
+          case response.status.to_i
+          when 401
+            raise UnauthorizedAccessError, format_errors(response) if response && (body || {})['errors']
+          when 403
+            error = (body['errors'] || []).first || {}
+            error_code = error['code']
+            if error_code == "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
+              raise ProgramLicenseAgreementUpdated, format_errors(response) if response && (body || {})['errors']
+            else
+              raise AccessForbiddenError, format_errors(response) if response && (body || {})['errors']
+            end
           end
         end
+
+        return false
       end
 
       def format_errors(response)
