@@ -48,7 +48,7 @@ platform(:android) do
   desc("Build debug and test APK for screenshots")
   lane(:build_and_screengrab) do
     gradle(task: "assembleDebug assembleAndroidTest")
-    capture_android_screenshots
+    capture_android_screenshots()
   end
 
   # You can define as many lanes as you want

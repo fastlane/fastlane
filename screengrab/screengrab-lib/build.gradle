@@ -1,7 +1,17 @@
+buildscript {
+    repositories {
+      mavenCentral()
+      jcenter()
+    }
+    dependencies {
+    }
+}
+
 plugins {
     id "com.jfrog.bintray" version "1.8.4"
     id "com.android.library"
     id "maven-publish"
+    id "signing"
 }
 
 static String lookupProperty(Project project, String gradlePropName, String envVarName) {
@@ -16,19 +26,6 @@ def propertiesFile = project.rootProject.file('local.properties')
 if (propertiesFile.exists()) {
  properties.load(propertiesFile.newDataInputStream())
 }
-
-buildscript {
-    repositories {
-      mavenCentral()
-      jcenter()
-    }
-    dependencies {
-    }
-}
-
-apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
 
 android {
     compileSdkVersion 30

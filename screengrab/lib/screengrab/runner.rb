@@ -138,8 +138,8 @@ module Screengrab
       device_ext_storage = get_device_environment_variable(device_serial, "EXTERNAL_STORAGE")
       return locales.map do |locale|
         [
-          "#{device_ext_storage}/#{app_package_name}/screengrab/#{locale}/images/screenshots",
-          "#{device_ext_storage}/Android/data/#{app_package_name}/files/screengrab/#{locale}/images/screenshots"
+          File.join(device_ext_storage, app_package_name, 'screengrab', locale, "images", "screenshots"),
+          File.join(device_ext_storage, "Android", "data", app_package_name, 'files', 'screengrab', locale, "images", "screenshots")
         ]
       end.flatten
     end
