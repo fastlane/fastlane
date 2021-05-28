@@ -107,7 +107,8 @@ module Pilot
         poll_interval: config[:wait_processing_interval],
         timeout_duration: config[:wait_processing_timeout_duration],
         return_when_build_appears: return_when_build_appears,
-        return_spaceship_testflight_build: false
+        return_spaceship_testflight_build: false,
+        select_latest: config[:distribute_only]
       )
 
       unless latest_build.app_version == app_version && latest_build.version == app_build

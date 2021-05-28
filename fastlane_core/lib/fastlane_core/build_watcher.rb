@@ -92,8 +92,8 @@ module FastlaneCore
 
         if versions.empty?
           if select_latest
-            UI.message("Watched build version should not be present when there is no app version to watch") unless watched_build_version.nil?
-            UI.message("Searching for the latest build")
+            message = watched_build_version.nil? ? "Searching for the latest build" : "Searching for the latest build with build number: #{watched_build_version}"
+            UI.message(message)
             versions = [nil]
           else
             raise BuildWatcherError.new, "There is no app version to watch"
