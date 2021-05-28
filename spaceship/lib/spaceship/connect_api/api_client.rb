@@ -207,26 +207,21 @@ module Spaceship
 
       # Overridden from Spaceship::Client
       def handle_error(response)
-        body = response.body
+        body = response.body.empty? ? {} : response.body
+        body = JSON.parse(body) if body.kind_of?(String)
 
-        unless body.empty?
-          body = JSON.parse(body) if body.kind_of?(String)
-
-          case response.status.to_i
-          when 401
-            raise UnauthorizedAccessError, format_errors(response) if response && (body || {})['errors']
-          when 403
-            error = (body['errors'] || []).first || {}
-            error_code = error['code']
-            if error_code == "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
-              raise ProgramLicenseAgreementUpdated, format_errors(response) if response && (body || {})['errors']
-            else
-              raise AccessForbiddenError, format_errors(response) if response && (body || {})['errors']
-            end
+        case response.status.to_i
+        when 401
+          raise UnauthorizedAccessError, format_errors(response) if response && body['errors']
+        when 403
+          error = (body['errors'] || []).first || {}
+          error_code = error['code']
+          if error_code == "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
+            raise ProgramLicenseAgreementUpdated, format_errors(response) if response && body['errors']
+          else
+            raise AccessForbiddenError, format_errors(response) if response && body['errors']
           end
         end
-
-        return false
       end
 
       def format_errors(response)
@@ -301,8 +296,9 @@ module Spaceship
         #   ]
         # }
 
-        body = response.body
+        body = response.body.empty? ? {} : response.body
         body = JSON.parse(body) if body.kind_of?(String)
+
         return body['errors'].map do |error|
           messages = [[error['title'], error['detail'], error.dig("source", "pointer")].compact.join(" - ")]
 
