@@ -162,7 +162,7 @@ describe Fastlane do
       end
 
       context "runs git push when checked out commit is detached HEAD and git branch name is not set in CI ENV" do
-        it "should raise an error if checked out commit is detached HEAD and git branch name is not set in CI ENV" do
+        it "should raise an error" do
           allow(Fastlane::Actions).to receive(:sh)
             .with("git rev-parse --abbrev-ref HEAD", log: false)
             .and_return("HEAD")
