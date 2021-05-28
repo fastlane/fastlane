@@ -24,7 +24,9 @@ module Fastlane
       end
 
       def self.output
-        []
+        [
+          ['GIT_BRANCH_ENV_VARS', 'The git branch environment variables']
+        ]
       end
 
       def self.authors
