@@ -207,27 +207,21 @@ module Spaceship
 
       # Overridden from Spaceship::Client
       def handle_error(response)
+        body = response.body
+        body = JSON.parse(body) if body.kind_of?(String)
+
         case response.status.to_i
         when 401
-          raise UnauthorizedAccessError, format_errors(response) if response && (response.body || {})['errors']
+          raise UnauthorizedAccessError, format_errors(response) if response && (body || {})['errors']
         when 403
-          json_body = response_body_as_json(response.body)
-          error = (json_body['errors'] || []).first || {}
+          error = (body['errors'] || []).first || {}
           error_code = error['code']
           if error_code == "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
-            raise ProgramLicenseAgreementUpdated, format_errors(response) if response && (response.body || {})['errors']
+            raise ProgramLicenseAgreementUpdated, format_errors(response) if response && (body || {})['errors']
           else
-            raise AccessForbiddenError, format_errors(response) if response && (response.body || {})['errors']
+            raise AccessForbiddenError, format_errors(response) if response && (body || {})['errors']
           end
         end
-      end
-
-      def response_body_as_json(body)
-        if body.kind_of?(Hash)
-          return body
-        end
-
-        return JSON.parse(body)
       end
 
       def format_errors(response)
@@ -302,8 +296,9 @@ module Spaceship
         #   ]
         # }
 
-        json_body = response_body_as_json(response.body)
-        return json_body['errors'].map do |error|
+        body = response.body
+        body = JSON.parse(body) if body.kind_of?(String)
+        return body['errors'].map do |error|
           messages = [[error['title'], error['detail'], error.dig("source", "pointer")].compact.join(" - ")]
 
           meta = error["meta"] || {}
