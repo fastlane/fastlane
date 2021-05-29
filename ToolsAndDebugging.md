@@ -4,7 +4,7 @@ For detailed instructions on how to get started with contributing to _fastlane_,
 
 ## Debug using [pry](https://pry.github.io/)
 
-Before you’re able to use [pry](http://pry.github.io/), make sure to have completed the [YourFirstPR.md][first-pr] setup part, as this will install all required development dependencies.
+Before you’re able to use [pry](https://pry.github.io/), make sure to have completed the [YourFirstPR.md][first-pr] setup part, as this will install all required development dependencies.
 
 To add a breakpoint anywhere in the _fastlane_ codebase, add the following 2 lines wherever you want to jump in
 
