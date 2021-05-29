@@ -325,7 +325,8 @@ module Fastlane
       if args.empty?
         implm += "let args: [RubyCommand.Argument] = []\n"
       else
-        implm += "let args = [#{args.group_by { |h| h[:name] }.keys.join(",\n")}]\n"
+        implm += "let array: [RubyCommand.Argument?] = [#{args.group_by { |h| h[:name] }.keys.join(",\n")}]\n"
+        implm += "let args: [RubyCommand.Argument] = array\n"
         implm += ".filter { $0?.value != nil }\n"
         implm += ".compactMap { $0 }\n"
       end
