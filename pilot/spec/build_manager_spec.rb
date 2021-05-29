@@ -562,15 +562,35 @@ describe "Build Manager" do
       }
     end
 
-    it "with API token" do
-      options = {}
-      allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
+    describe "with API token" do
+      it "uses the existing API token if possible" do
+        options = {}
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
+        expect(UI).to receive(:message).with("Using existing authorization token for App Store Connect API")
 
-      transporter = fake_manager.send(:transporter_for_selected_team, options)
-      expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
-      expect(transporter.instance_variable_get(:@user)).to be_nil
-      expect(transporter.instance_variable_get(:@password)).to be_nil
-      expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
+        transporter = fake_manager.send(:transporter_for_selected_team, options)
+        expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
+        expect(transporter.instance_variable_get(:@user)).to be_nil
+        expect(transporter.instance_variable_get(:@password)).to be_nil
+        expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
+      end
+
+      it "creates and sets new API token if required" do
+        options = {}
+        options[:api_key] = "api_key"
+        options[:api_key_path] = "api_key_path"
+
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
+        expect(Spaceship::ConnectAPI::Token).to receive(:from).with(hash: "api_key", filepath: "api_key_path").and_return(true)
+        expect(UI).to receive(:message).with("Creating authorization token for App Store Connect API")
+        expect(Spaceship::ConnectAPI).to receive(:token=)
+
+        transporter = fake_manager.send(:transporter_for_selected_team, options)
+        expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
+        expect(transporter.instance_variable_get(:@user)).to be_nil
+        expect(transporter.instance_variable_get(:@password)).to be_nil
+        expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
+      end
     end
 
     describe "with itc_provider" do
