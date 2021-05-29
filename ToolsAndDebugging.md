@@ -2,7 +2,7 @@
 
 For detailed instructions on how to get started with contributing to _fastlane_, first check out [YourFirstPR.md][first-pr] and [Testing.md](Testing.md). This guide will focus on more advanced instructions on how to debug _fastlane_ and _spaceship_ issues and work on patches.
 
-## Debug using [pry](http://pry.github.io/)
+## Debug using [pry](https://pry.github.io/)
 
 Before you’re able to use [pry](http://pry.github.io/), make sure to have completed the [YourFirstPR.md][first-pr] setup part, as this will install all required development dependencies.
 
