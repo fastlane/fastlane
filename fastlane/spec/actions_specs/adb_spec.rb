@@ -1,6 +1,21 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "adb" do
+      it "calls AdbHelper to trigger command" do
+        expect_any_instance_of(Fastlane::Helper::AdbHelper)
+          .to receive(:trigger)
+          .with(command: "fake command", serial: "fake serial")
+          .and_return("some stub adb response")
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          adb(command: 'fake command', serial: 'fake serial')
+        end").runner.execute(:test)
+
+        expect(result).to eq("some stub adb response")
+      end
+    end
+
+    describe "adb on non windows" do
       before(:each) do
         allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
       end
