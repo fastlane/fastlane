@@ -563,9 +563,12 @@ describe "Build Manager" do
     end
 
     describe "with API token" do
+      before(:each) do
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
+      end
+
       it "uses the existing API token if possible" do
         options = {}
-        allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
         expect(UI).to receive(:message).with("Using existing authorization token for App Store Connect API")
 
         transporter = fake_manager.send(:transporter_for_selected_team, options)
@@ -580,7 +583,6 @@ describe "Build Manager" do
         options[:api_key] = "api_key"
         options[:api_key_path] = "api_key_path"
 
-        allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
         expect(Spaceship::ConnectAPI::Token).to receive(:from).with(hash: "api_key", filepath: "api_key_path").and_return(true)
         expect(UI).to receive(:message).with("Creating authorization token for App Store Connect API")
         expect(Spaceship::ConnectAPI).to receive(:token=)
