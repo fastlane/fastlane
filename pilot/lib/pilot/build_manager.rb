@@ -400,7 +400,7 @@ module Pilot
         Spaceship::ConnectAPI.token = api_token
       elsif !Spaceship::ConnectAPI.token.nil?
         UI.message("Using existing authorization token for App Store Connect API")
-      }
+      end
 
       return Spaceship::ConnectAPI.token
     end
