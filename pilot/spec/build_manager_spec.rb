@@ -580,7 +580,7 @@ describe "Build Manager" do
         expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
       end
 
-      it "creates and sets new API token using the input api_key and api_key_path" do
+      it "creates and sets new API token using the input api_key and api_key_path params" do
         expect(Spaceship::ConnectAPI::Token).to receive(:from).with(hash: "api_key", filepath: "api_key_path").and_return(true)
         expect(UI).to receive(:message).with("Creating authorization token for App Store Connect API")
         expect(Spaceship::ConnectAPI).to receive(:token=)
