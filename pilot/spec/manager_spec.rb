@@ -20,7 +20,7 @@ describe Pilot do
           fake_manager.start(options)
 
           expected_options = { api_key: fake_api_key }
-          expect(fake_manager.instance_variable_get(:@config)).to eql(expected_options)
+          expect(fake_manager.instance_variable_get(:@config)).to eq(expected_options)
         end
 
         it "doesn't call login" do
@@ -40,7 +40,7 @@ describe Pilot do
           options = {}
           fake_manager.start(options)
 
-          expect(fake_manager.instance_variable_get(:@config)).to eql(options)
+          expect(fake_manager.instance_variable_get(:@config)).to eq(options)
         end
       end
 
@@ -53,7 +53,7 @@ describe Pilot do
           options = {}
           fake_manager.start(options, should_login: true)
 
-          expect(fake_manager.instance_variable_get(:@config)).to eql(options)
+          expect(fake_manager.instance_variable_get(:@config)).to eq(options)
         end
       end
 
@@ -66,24 +66,75 @@ describe Pilot do
           options = {}
           fake_manager.start(options, should_login: false)
 
-          expect(fake_manager.instance_variable_get(:@config)).to eql(options)
+          expect(fake_manager.instance_variable_get(:@config)).to eq(options)
         end
       end
     end
 
-    context "#login" do
-      it "token auth" do
-        fake_manager.instance_variable_set(:@config, { api_key: fake_api_key })
+    describe "what happens on 'login'" do
+      context "when using app store connect api token" do
+        before(:each) do
+          allow(Spaceship::ConnectAPI)
+            .to receive(:token)
+            .and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
+        end
 
-        expect(Spaceship::ConnectAPI).to receive(:token=)
-        fake_manager.login
+        it "uses the existing API token if found" do
+          expect(Spaceship::ConnectAPI::Token).to receive(:from).with(hash: nil, filepath: nil).and_return(false)
+          expect(UI).to receive(:message).with("Using existing authorization token for App Store Connect API")
+
+          fake_manager.instance_variable_set(:@config, {})
+          fake_manager.login
+        end
+
+        it "creates and sets new API token using config api_key and api_key_path" do
+          expect(Spaceship::ConnectAPI::Token).to receive(:from).with(hash: "api_key", filepath: "api_key_path").and_return(true)
+          expect(UI).to receive(:message).with("Creating authorization token for App Store Connect API")
+          expect(Spaceship::ConnectAPI).to receive(:token=)
+
+          options = {}
+          options[:api_key] = "api_key"
+          options[:api_key_path] = "api_key_path"
+
+          fake_manager.instance_variable_set(:@config, options)
+          fake_manager.login
+        end
       end
 
-      it "web session auth" do
-        fake_manager.instance_variable_set(:@config, { username: "username" })
+      shared_examples "performing the spaceship login using username and password by pilot" do
+        before(:each) do
+          expect(fake_manager.config).to receive(:fetch).with(:username, force_ask: true)
+          expect(UI).to receive(:message).with("Login to App Store Connect (username)")
+          expect(Spaceship::ConnectAPI).to receive(:login)
+          expect(UI).to receive(:message).with("Login successful")
+        end
 
-        expect(Spaceship::ConnectAPI).to receive(:login)
-        fake_manager.login
+        it "performs the login using username and password" do
+          fake_manager.login
+        end
+      end
+
+      context "when using web session" do
+        context "when username input param is given" do
+          before(:each) do
+            fake_manager.instance_variable_set(:@config, { username: "username" })
+          end
+
+          it_behaves_like "performing the spaceship login using username and password by pilot"
+        end
+
+        context "when username input param is not given but found apple_id in AppFile" do
+          before(:each) do
+            fake_manager.instance_variable_set(:@config, {})
+
+            allow(CredentialsManager::AppfileConfig)
+              .to receive(:try_fetch_value)
+              .with(:apple_id)
+              .and_return("username")
+          end
+
+          it_behaves_like "performing the spaceship login using username and password by pilot"
+        end
       end
     end
   end
