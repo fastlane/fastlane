@@ -568,7 +568,6 @@ describe "Build Manager" do
       end
 
       it "uses the existing API token if found" do
-        expect(Spaceship::ConnectAPI::Token).to receive(:from).with(hash: nil, filepath: nil).and_return(false)
         expect(UI).to receive(:message).with("Using existing authorization token for App Store Connect API")
 
         options = {}
