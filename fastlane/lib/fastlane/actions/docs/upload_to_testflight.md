@@ -173,7 +173,7 @@ The resulting output will look like this:
 
 ### Remove a tester
 
-This command will only remove external beta testers.
+This command will remove beta tester from app (from all internal and external groups)
 
 ```no-highlight
 fastlane pilot remove felix@krausefx.com
