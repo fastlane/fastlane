@@ -63,7 +63,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :includes_lane,
                                        env_name: "FL_GIT_TAG_INCLUDES_LANE",
                                        description: "Whether the current lane should be included in the tag and message composition, e.g. '<grouping>/<lane>/<prefix><build_number><postfix>'",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :prefix,
                                        env_name: "FL_GIT_TAG_PREFIX",
@@ -78,7 +78,7 @@ module Fastlane
                                        description: "The build number. Defaults to the result of increment_build_number if you\'re using it",
                                        default_value: Actions.lane_context[Actions::SharedValues::BUILD_NUMBER],
                                        default_value_dynamic: true,
-                                       is_string: false,
+                                       type: Integer,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_GIT_TAG_MESSAGE",
@@ -94,13 +94,13 @@ module Fastlane
                                        env_name: "FL_GIT_TAG_FORCE",
                                        description: "Force adding the tag",
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :sign,
                                        env_name: "FL_GIT_TAG_SIGN",
                                        description: "Make a GPG-signed tag, using the default e-mail address's key",
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false)
         ]
       end
