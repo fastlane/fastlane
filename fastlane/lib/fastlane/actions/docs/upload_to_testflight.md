@@ -135,16 +135,16 @@ The output will look like this:
 
 ### Add a new tester
 
-To add a new tester to both your App Store Connect account and to your app (if given), use the `pilot add` command. This will create a new tester (if necessary) or add an existing tester to the app to test.
+To add a new tester to your App Store Connect account and to associate it to at least one testing group of your app, use the `pilot add` command. This will create a new tester (if necessary) or add an existing tester to the app to test.
 
 ```no-highlight
-fastlane pilot add email@invite.com
+fastlane pilot add email@invite.com -g group-1,group-2
 ```
 
 Additionally you can specify the app identifier (if necessary):
 
 ```no-highlight
-fastlane pilot add email@email.com -a com.krausefx.app
+fastlane pilot add email@email.com -a com.krausefx.app -g group-1,group-2
 ```
 
 ### Find a tester
@@ -177,6 +177,12 @@ This command will only remove external beta testers.
 
 ```no-highlight
 fastlane pilot remove felix@krausefx.com
+```
+
+You can also use `groups` option to remove the tester from the groups specified:
+
+```no-highlight
+fastlane pilot remove felix@krausefx.com -g group-1,group-2
 ```
 
 ### Export testers
