@@ -154,7 +154,7 @@ describe Fastlane do
           add_git_tag ({
             tag: '#{tag}',
             grouping: 'grouping',
-            build_number: #{build_number},
+            build_number: 'build_number',
             prefix: 'prefix',
           })
         end").runner.execute(:test)
