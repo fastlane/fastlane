@@ -205,7 +205,7 @@ describe Fastlane do
           end
 
           it "sets the correct filters and fetches the latest testflight build number with any platform" do
-            expected_filter = {:app=> app_id}
+            expected_filter = { app: app_id }
             expect(Spaceship::ConnectAPI::Platform).to receive(:map).with(nil).and_return(nil)
             expect(UI).to receive(:message).with("Fetching the latest build number for any version")
             expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
@@ -224,7 +224,7 @@ describe Fastlane do
           end
 
           it "sets the correct filters and fetches the latest testflight build number with correct platform" do
-            expected_filter = {:app=> app_id, "preReleaseVersion.platform"=> platform}
+            expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform }
             expect(UI).to receive(:message).with("Fetching the latest build number for any version")
             expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on #{platform} platform is build: #{build_number}")
@@ -242,7 +242,7 @@ describe Fastlane do
           end
 
           it "sets the correct filters and fetches the latest testflight build number with any platform of given version" do
-            expected_filter = {:app=> app_id, "preReleaseVersion.version"=> app_version}
+            expected_filter = { :app => app_id, "preReleaseVersion.version" => app_version }
             expect(Spaceship::ConnectAPI::Platform).to receive(:map).with(nil).and_return(nil)
             expect(UI).to receive(:message).with("Fetching the latest build number for version #{app_version}")
             expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
@@ -261,7 +261,7 @@ describe Fastlane do
           end
 
           it "sets the correct filters and password and fetches the latest testflight build number with correct platform of given version" do
-            expected_filter = {:app=> app_id, "preReleaseVersion.platform"=> platform, "preReleaseVersion.version"=> app_version}
+            expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform, "preReleaseVersion.version" => app_version }
             expect(UI).to receive(:message).with("Fetching the latest build number for version #{app_version}")
             expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on #{platform} platform is build: #{build_number}")
