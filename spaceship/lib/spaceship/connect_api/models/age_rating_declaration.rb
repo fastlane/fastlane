@@ -7,11 +7,11 @@ module Spaceship
       # Rating
       attr_accessor :alcohol_tobacco_or_drug_use_or_references
       attr_accessor :contests
-      attr_accessor :gambling
       attr_accessor :gambling_simulated
       attr_accessor :medical_or_treatment_information
       attr_accessor :profanity_or_crude_humor
       attr_accessor :sexual_content_graphic_and_nudity
+      attr_accessor :sexual_content_or_nudity
       attr_accessor :horror_or_fear_themes
       attr_accessor :mature_or_suggestive_themes
       attr_accessor :violence_cartoon_or_fantasy
@@ -19,6 +19,7 @@ module Spaceship
       attr_accessor :violence_realistic
 
       # Boolean
+      attr_accessor :gambling
       attr_accessor :seventeen_plus
       attr_accessor :unrestricted_web_access
 
