@@ -178,7 +178,7 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :distribute_external,
                                      is_string: false,
                                      env_name: "PILOT_DISTRIBUTE_EXTERNAL",
-                                     description: "Should the build be distributed to external testers?",
+                                     description: "Should the build be distributed to external testers? If set to true, use of `groups` option is required",
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :notify_external_testers,
                                     is_string: false,
@@ -227,7 +227,7 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :groups,
                                      short_option: "-g",
                                      env_name: "PILOT_GROUPS",
-                                     description: "Associate tester to one group or more by group name / group id. E.g. `-g \"Team 1\",\"Team 2\"`",
+                                     description: "Associate tester to one group or more by group name / group id. E.g. `-g \"Team 1\",\"Team 2\"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups ",
                                      optional: true,
                                      type: Array,
                                      verify_block: proc do |value|
