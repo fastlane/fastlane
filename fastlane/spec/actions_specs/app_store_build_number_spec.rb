@@ -276,9 +276,9 @@ describe Fastlane do
           before(:each) do
             expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform, "preReleaseVersion.version" => app_version }
             allow(Spaceship::ConnectAPI)
-            .to receive(:get_builds)
-            .with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1)
-            .and_return([nil])
+              .to receive(:get_builds)
+              .with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1)
+              .and_return([nil])
 
             options[:version] = app_version
             options[:platform] = platform
@@ -298,9 +298,9 @@ describe Fastlane do
           before(:each) do
             expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform, "preReleaseVersion.version" => app_version }
             allow(Spaceship::ConnectAPI)
-            .to receive(:get_builds)
-            .with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1)
-            .and_return([nil])
+              .to receive(:get_builds)
+              .with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1)
+              .and_return([nil])
 
             options[:version] = app_version
             options[:platform] = platform
