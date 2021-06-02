@@ -78,7 +78,7 @@ module Fastlane
                                        description: "The build number. Defaults to the result of increment_build_number if you\'re using it",
                                        default_value: Actions.lane_context[Actions::SharedValues::BUILD_NUMBER],
                                        default_value_dynamic: true,
-                                       skip_type_validation: true, # skipping validation because we allow integer and string both
+                                       skip_type_validation: true, # skipping validation because we both allow integer and string
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_GIT_TAG_MESSAGE",
