@@ -3,10 +3,6 @@ describe Fastlane do
     describe "Unlock keychain Integration" do
       let(:keychain_path) { Tempfile.new('foo').path }
 
-      before(:each) do
-        allow(FastlaneCore::Helper).to receive(:keychain_path).with(keychain_path).and_return(keychain_path)
-      end
-
       it "works with path and password and existing keychain" do
         result = Fastlane::FastFile.new.parse("lane :test do
           unlock_keychain ({
