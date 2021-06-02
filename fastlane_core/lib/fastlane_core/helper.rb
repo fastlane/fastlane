@@ -174,6 +174,18 @@ module FastlaneCore
       Gem::Version.new(installed_xcode_version) >= Gem::Version.new(version)
     end
 
+    # Swift
+    #
+
+    # @return Swift version
+    def self.swift_version
+      if system("which swift > /dev/null 2>&1")
+        output = `swift --version`
+        return output.split("\n").first.match(/version ([0-9.]+)/).captures.first
+      end
+      return nil
+    end
+
     # iTMSTransporter
     #
 
