@@ -260,7 +260,7 @@ describe Fastlane do
             options[:platform] = platform
           end
 
-          it "sets the correct filters and password and fetches the latest testflight build number with correct platform of given version" do
+          it "sets the correct filters and fetches the latest testflight build number with correct platform of given version" do
             expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform, "preReleaseVersion.version" => app_version }
             expect(UI).to receive(:message).with("Fetching the latest build number for version #{app_version}")
             expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
@@ -268,6 +268,52 @@ describe Fastlane do
 
             result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_number(options)
             expect(result.build_nr).to eq(build_number)
+            expect(result.build_v).to eq(app_version)
+          end
+        end
+
+        context "when could not found the build and 'initial_build_number' is NOT given in input options" do
+          before(:each) do
+            expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform, "preReleaseVersion.version" => app_version }
+            allow(Spaceship::ConnectAPI)
+            .to receive(:get_builds)
+            .with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1)
+            .and_return([nil])
+
+            options[:version] = app_version
+            options[:platform] = platform
+            options[:initial_build_number] = nil
+          end
+
+          it "raises an exception" do
+            expect(UI).to receive(:message).with("Fetching the latest build number for version #{app_version}")
+            expect(UI).to receive(:important).with("Could not find a build for version #{app_version} on #{platform} platform on App Store Connect")
+            expect(UI).to receive(:user_error!).with("Could not find a build on App Store Connect - and 'initial_build_number' option is not set")
+
+            Fastlane::Actions::AppStoreBuildNumberAction.get_build_number(options)
+          end
+        end
+
+        context "when could not found the build but 'initial_build_number' is given in input options" do
+          before(:each) do
+            expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform, "preReleaseVersion.version" => app_version }
+            allow(Spaceship::ConnectAPI)
+            .to receive(:get_builds)
+            .with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1)
+            .and_return([nil])
+
+            options[:version] = app_version
+            options[:platform] = platform
+            options[:initial_build_number] = 5678
+          end
+
+          it "fallbacks to 'initial_build_number' input param" do
+            expect(UI).to receive(:message).with("Fetching the latest build number for version #{app_version}")
+            expect(UI).to receive(:important).with("Could not find a build for version #{app_version} on #{platform} platform on App Store Connect")
+            expect(UI).to receive(:message).with("Using initial build number of 5678")
+
+            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_number(options)
+            expect(result.build_nr).to eq(5678)
             expect(result.build_v).to eq(app_version)
           end
         end
