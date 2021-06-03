@@ -366,8 +366,11 @@ module Pilot
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
+      # Ensure that `Spaceship::ConnectAPI.token` is set correctly, if required
+      login
+
       # Use JWT auth
-      api_token = app_store_connect_api_token(options)
+      api_token = Spaceship::ConnectAPI.token
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
         return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)
@@ -391,18 +394,6 @@ module Pilot
         UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")
         return generic_transporter
       end
-    end
-
-    # This with return existing authorization token for App Store Connect API or create new token if possible
-    def app_store_connect_api_token(options)
-      if (api_token = Spaceship::ConnectAPI::Token.from(hash: options[:api_key], filepath: options[:api_key_path]))
-        UI.message("Creating authorization token for App Store Connect API")
-        Spaceship::ConnectAPI.token = api_token
-      elsif !Spaceship::ConnectAPI.token.nil?
-        UI.message("Using existing authorization token for App Store Connect API")
-      end
-
-      return Spaceship::ConnectAPI.token
     end
 
     def distribute_build(uploaded_build, options)

@@ -501,8 +501,8 @@ describe "Build Manager" do
       end
 
       it "NOT when skip_waiting_for_build_processing and apple_id are set" do
-        # should not execute Manager.login (which does spaceship login)
-        expect(fake_build_manager).not_to(receive(:login))
+        # should execute Manager.login (which will set `spaceship token` if required)
+        expect(fake_build_manager).to (receive(:login))
 
         fake_build_manager.upload(upload_options)
       end
@@ -562,38 +562,19 @@ describe "Build Manager" do
       }
     end
 
-    describe "with API token" do
-      before(:each) do
-        allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
-      end
+    before(:each) do
+      allow(fake_manager).to receive(:login)
+    end
 
-      it "uses the existing API token if found" do
-        expect(UI).to receive(:message).with("Using existing authorization token for App Store Connect API")
+    it "with API token" do
+      options = {}
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
 
-        options = {}
-
-        transporter = fake_manager.send(:transporter_for_selected_team, options)
-        expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
-        expect(transporter.instance_variable_get(:@user)).to be_nil
-        expect(transporter.instance_variable_get(:@password)).to be_nil
-        expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
-      end
-
-      it "creates and sets new API token using the input api_key and api_key_path params" do
-        expect(Spaceship::ConnectAPI::Token).to receive(:from).with(hash: "api_key", filepath: "api_key_path").and_return(true)
-        expect(UI).to receive(:message).with("Creating authorization token for App Store Connect API")
-        expect(Spaceship::ConnectAPI).to receive(:token=)
-
-        options = {}
-        options[:api_key] = "api_key"
-        options[:api_key_path] = "api_key_path"
-
-        transporter = fake_manager.send(:transporter_for_selected_team, options)
-        expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
-        expect(transporter.instance_variable_get(:@user)).to be_nil
-        expect(transporter.instance_variable_get(:@password)).to be_nil
-        expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
-      end
+      transporter = fake_manager.send(:transporter_for_selected_team, options)
+      expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
+      expect(transporter.instance_variable_get(:@user)).to be_nil
+      expect(transporter.instance_variable_get(:@password)).to be_nil
+      expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
     end
 
     describe "with itc_provider" do
