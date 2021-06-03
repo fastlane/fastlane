@@ -7,14 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		152478242668BA190010D0E4 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152478232668BA190010D0E4 /* SnapshotHelper.swift */; };
 		2FE467571D5A605000E9FF83 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FE467561D5A605000E9FF83 /* main.m */; };
 		2FE4675A1D5A605000E9FF83 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FE467591D5A605000E9FF83 /* AppDelegate.m */; };
 		2FE4675D1D5A605000E9FF83 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FE4675C1D5A605000E9FF83 /* ViewController.m */; };
 		2FE467601D5A605000E9FF83 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2FE4675E1D5A605000E9FF83 /* Main.storyboard */; };
 		2FE467621D5A605000E9FF83 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2FE467611D5A605000E9FF83 /* Assets.xcassets */; };
 		2FE4677C1D5A608A00E9FF83 /* ExampleTVUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE4677B1D5A608A00E9FF83 /* ExampleTVUITests.swift */; };
-		2FE467831D5A609600E9FF83 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D49E121BC805AC00C47C4F /* SnapshotHelper.swift */; };
-		64D49E131BC805AC00C47C4F /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D49E121BC805AC00C47C4F /* SnapshotHelper.swift */; };
 		CA0BF1641A1117FD007D51BE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0BF1631A1117FD007D51BE /* main.m */; };
 		CA0BF1671A1117FD007D51BE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0BF1661A1117FD007D51BE /* AppDelegate.m */; };
 		CA0BF16A1A1117FD007D51BE /* FirstViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0BF1691A1117FD007D51BE /* FirstViewController.m */; };
@@ -27,7 +26,6 @@
 		DB6ADD811E30E65E0031038C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DB6ADD801E30E65E0031038C /* Assets.xcassets */; };
 		DB6ADD841E30E65E0031038C /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DB6ADD821E30E65E0031038C /* MainMenu.xib */; };
 		DB6ADD8F1E30E65E0031038C /* ExampleMacOSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD8E1E30E65E0031038C /* ExampleMacOSUITests.swift */; };
-		DB6ADD971E30E68E0031038C /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D49E121BC805AC00C47C4F /* SnapshotHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +53,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		152478232668BA190010D0E4 /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = fastlane/SnapshotHelper.swift; sourceTree = SOURCE_ROOT; };
 		2FE467531D5A605000E9FF83 /* ExampleTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExampleTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FE467561D5A605000E9FF83 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		2FE467581D5A605000E9FF83 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -67,7 +66,6 @@
 		2FE467791D5A608A00E9FF83 /* ExampleTVUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExampleTVUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FE4677B1D5A608A00E9FF83 /* ExampleTVUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleTVUITests.swift; sourceTree = "<group>"; };
 		2FE4677D1D5A608A00E9FF83 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		64D49E121BC805AC00C47C4F /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = ../../lib/assets/SnapshotHelper.swift; sourceTree = "<group>"; };
 		CA0BF15E1A1117FD007D51BE /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA0BF1621A1117FD007D51BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CA0BF1631A1117FD007D51BE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -230,7 +228,7 @@
 		CAF3CF391B33E9AB006CEDE9 /* ExampleUITests */ = {
 			isa = PBXGroup;
 			children = (
-				64D49E121BC805AC00C47C4F /* SnapshotHelper.swift */,
+				152478232668BA190010D0E4 /* SnapshotHelper.swift */,
 				CAF3CF3A1B33E9AB006CEDE9 /* ExampleUITests.swift */,
 				CAF3CF3C1B33E9AB006CEDE9 /* Info.plist */,
 			);
@@ -496,7 +494,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2FE4677C1D5A608A00E9FF83 /* ExampleTVUITests.swift in Sources */,
-				2FE467831D5A609600E9FF83 /* SnapshotHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -516,7 +513,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAF3CF3B1B33E9AB006CEDE9 /* ExampleUITests.swift in Sources */,
-				64D49E131BC805AC00C47C4F /* SnapshotHelper.swift in Sources */,
+				152478242668BA190010D0E4 /* SnapshotHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -533,7 +530,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB6ADD8F1E30E65E0031038C /* ExampleMacOSUITests.swift in Sources */,
-				DB6ADD971E30E68E0031038C /* SnapshotHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
