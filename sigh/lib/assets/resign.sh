@@ -78,6 +78,8 @@
 # new features May 2021
 # 1. fix entitlements merging when changing team
 #
+# new features June 2021
+# 1. fix the way app entitlements are extracted
 
 # Logging functions
 
@@ -788,7 +790,7 @@ function resign {
 
             # Get the entry from app's entitlements
             # Read it with PlistBuddy as XML, then strip the header and <plist></plist> part
-            ENTITLEMENTS_VALUE="$(PlistBuddy -x -c "Print $KEY" "$APP_ENTITLEMENTS" 2>/dev/null | /usr/bin/sed -e 's,.*<plist[^>]*>\(.*\)</plist>,\1,g')"
+            ENTITLEMENTS_VALUE="$(PlistBuddy -x -c "Print $KEY" "$APP_ENTITLEMENTS" 2>/dev/null | tr -d '\n' | /usr/bin/sed -e 's,.*<plist[^>]*>\(.*\)</plist>,\1,g')"
             if [[ -z "$ENTITLEMENTS_VALUE" ]]; then
                 log "No value for '$KEY'"
                 continue
@@ -801,11 +803,11 @@ function resign {
             if [[ "$ID_TYPE" == "APP_ID" ]]; then
                 # Replace old value with new value in patched entitlements
                 log "Replacing old app ID '$OLD_APP_ID' with new app ID '$NEW_APP_ID'"
-                ENTITLEMENTS_VALUE=$(echo "$ENTITLEMENTS_VALUE" | sed "s/$OLD_APP_ID/$NEW_APP_ID/g")
+                ENTITLEMENTS_VALUE=$(echo "$ENTITLEMENTS_VALUE" | /usr/bin/sed -e "s/$OLD_APP_ID/$NEW_APP_ID/g")
             elif [[ "$ID_TYPE" == "TEAM_ID" ]]; then
                 # Replace old team identifier with new value
                 log "Replacing old team ID '$OLD_TEAM_ID' with new team ID '$NEW_TEAM_ID'"
-                ENTITLEMENTS_VALUE=$(echo "$ENTITLEMENTS_VALUE" | sed "s/$OLD_TEAM_ID/$NEW_TEAM_ID/g")
+                ENTITLEMENTS_VALUE=$(echo "$ENTITLEMENTS_VALUE" | /usr/bin/sed -e "s/$OLD_TEAM_ID/$NEW_TEAM_ID/g")
             elif [[ "$ID_TYPE" == "ICLOUD_ENV" ]]; then
                 # Add specific iCloud Environment key to patched entitlements
                 # This value is set by Xcode during export (manually selected for Development and AdHoc, automatically set to Production for Store)
@@ -823,14 +825,14 @@ function resign {
                     fi
                 fi
 
-                OLD_ICLOUD_ENV=$(echo "$ENTITLEMENTS_VALUE" | sed -e 's,<string>\(.*\)</string>,\1,g')
+                OLD_ICLOUD_ENV=$(echo "$ENTITLEMENTS_VALUE" | /usr/bin/sed -e 's,<string>\(.*\)</string>,\1,g')
                 if [[ "$certificate_name" =~ "Distribution:" ]]; then
                     NEW_ICLOUD_ENV="Production"
                 else
                     NEW_ICLOUD_ENV="Development"
                 fi
                 log "Replacing iCloud environment '$OLD_ICLOUD_ENV' with '$NEW_ICLOUD_ENV'"
-                ENTITLEMENTS_VALUE=$(echo "$ENTITLEMENTS_VALUE" | sed "s/$OLD_ICLOUD_ENV/$NEW_ICLOUD_ENV/g")
+                ENTITLEMENTS_VALUE=$(echo "$ENTITLEMENTS_VALUE" | /usr/bin/sed -e "s/$OLD_ICLOUD_ENV/$NEW_ICLOUD_ENV/g")
             fi
 
             # Remove the entry for current key from profisioning profile entitlements (if exists)
@@ -841,21 +843,8 @@ function resign {
             # otherwise it interprets they key path as nested keys
             # TODO: Should be able to replace with echo ${KEY//\./\\\\.} and remove shellcheck disable directive
             # shellcheck disable=SC2001
-            PLUTIL_KEY=$(echo "$KEY" | /usr/bin/sed 's/\./\\\./g')
+            PLUTIL_KEY=$(echo "$KEY" | /usr/bin/sed -e 's/\./\\\./g')
             plutil -insert "$PLUTIL_KEY" -xml "$ENTITLEMENTS_VALUE" "$PATCHED_ENTITLEMENTS"
-
-            # Patch the ID value if specified
-            if [[ "$ID_TYPE" == "APP_ID" ]]; then
-                # Replace old value with new value in patched entitlements
-                log "Replacing old app identifier prefix '$OLD_APP_ID' with new value '$NEW_APP_ID'"
-                /usr/bin/sed -i .bak "s/$OLD_APP_ID/$NEW_APP_ID/g" "$PATCHED_ENTITLEMENTS"
-            elif [[ "$ID_TYPE" == "TEAM_ID" ]]; then
-                # Replace old team identifier with new value
-                log "Replacing old team ID '$OLD_TEAM_ID' with new team ID: '$NEW_TEAM_ID'"
-                /usr/bin/sed -i .bak "s/$OLD_TEAM_ID/$NEW_TEAM_ID/g" "$PATCHED_ENTITLEMENTS"
-            else
-                continue
-            fi
         done
 
         # Replace old bundle ID with new bundle ID in patched entitlements
