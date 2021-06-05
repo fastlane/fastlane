@@ -272,7 +272,7 @@ describe Fastlane do
           end
         end
 
-        context "when could not found the build and 'initial_build_number' is NOT given in input options" do
+        context "when could not find the build and 'initial_build_number' is NOT given in input options" do
           before(:each) do
             expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform, "preReleaseVersion.version" => app_version }
             allow(Spaceship::ConnectAPI)
@@ -294,7 +294,7 @@ describe Fastlane do
           end
         end
 
-        context "when could not found the build but 'initial_build_number' is given in input options" do
+        context "when could not find the build but 'initial_build_number' is given in input options" do
           before(:each) do
             expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform, "preReleaseVersion.version" => app_version }
             allow(Spaceship::ConnectAPI)
