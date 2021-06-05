@@ -124,13 +124,18 @@ module Fastlane
     def self.git_branch
       env_name = SharedValues::GIT_BRANCH_ENV_VARS.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
       ENV.fetch(env_name.to_s) do
-        # Rescues if not a git repo or no commits in a git repo
-        begin
-          Actions.sh("git rev-parse --abbrev-ref HEAD", log: false).chomp
-        rescue => err
-          UI.verbose("Error getting git branch: #{err.message}")
-          nil
-        end
+        self.git_branch_name_using_HEAD
+      end
+    end
+
+    # Returns the checked out git branch name or "HEAD" if you're in detached HEAD state
+    def self.git_branch_name_using_HEAD
+      # Rescues if not a git repo or no commits in a git repo
+      begin
+        Actions.sh("git rev-parse --abbrev-ref HEAD", log: false).chomp
+      rescue => err
+        UI.verbose("Error getting git branch: #{err.message}")
+        nil
       end
     end
 
