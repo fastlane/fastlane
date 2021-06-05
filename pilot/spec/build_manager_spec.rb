@@ -501,8 +501,8 @@ describe "Build Manager" do
       end
 
       it "NOT when skip_waiting_for_build_processing and apple_id are set" do
-        # should execute Manager.login (which will set `spaceship token` if required)
-        expect(fake_build_manager).to (receive(:login))
+        # should not execute Manager.login (which does spaceship login)
+        expect(fake_build_manager).not_to (receive(:login))
 
         fake_build_manager.upload(upload_options)
       end
@@ -560,10 +560,6 @@ describe "Build Manager" do
           "name" => "456 name"
         }
       }
-    end
-
-    before(:each) do
-      allow(fake_manager).to receive(:login)
     end
 
     it "with API token" do
