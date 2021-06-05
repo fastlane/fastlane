@@ -9,17 +9,6 @@ describe Fastlane do
       let(:issuer_id) { "32423-234234-234324-234" }
 
       it "with key_filepath" do
-        expect(Spaceship::ConnectAPI::Token).to receive(:create)
-        expect(Spaceship::ConnectAPI).to receive(:token=)
-
-        result = Fastlane::FastFile.new.parse("lane :test do
-          app_store_connect_api_key(
-            key_id: '#{key_id}',
-            issuer_id: '#{issuer_id}',
-            key_filepath: '#{fake_api_key_p8_path}',
-          )
-        end").runner.execute(:test)
-
         hash = {
           key_id: key_id,
           issuer_id: issuer_id,
@@ -29,6 +18,17 @@ describe Fastlane do
           in_house: false
         }
 
+        expect(Spaceship::ConnectAPI::Token).to receive(:create).with(hash).and_return("some fake token")
+        expect(Spaceship::ConnectAPI).to receive(:token=).with("some fake token")
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          app_store_connect_api_key(
+            key_id: '#{key_id}',
+            issuer_id: '#{issuer_id}',
+            key_filepath: '#{fake_api_key_p8_path}',
+          )
+        end").runner.execute(:test)
+
         expect(result).to eq(hash)
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY]).to eq(hash)
       end
@@ -37,8 +37,17 @@ describe Fastlane do
         let(:key_content) { File.binread(fake_api_key_p8_path).gsub("\r", '') }
 
         it "with plain text" do
-          expect(Spaceship::ConnectAPI::Token).to receive(:create)
-          expect(Spaceship::ConnectAPI).to receive(:token=)
+          hash = {
+            key_id: key_id,
+            issuer_id: issuer_id,
+            key: key_content,
+            is_key_content_base64: false,
+            duration: 200,
+            in_house: true
+          }
+
+          expect(Spaceship::ConnectAPI::Token).to receive(:create).with(hash).and_return("some fake token")
+          expect(Spaceship::ConnectAPI).to receive(:token=).with("some fake token")
 
           result = Fastlane::FastFile.new.parse("lane :test do
             app_store_connect_api_key(
@@ -50,21 +59,22 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
+          expect(result).to eq(hash)
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY]).to eq(hash)
+        end
+
+        it "with base64 encoded" do
           hash = {
             key_id: key_id,
             issuer_id: issuer_id,
             key: key_content,
-            is_key_content_base64: false,
+            is_key_content_base64: true,
             duration: 200,
             in_house: true
           }
 
-          expect(result).to eq(hash)
-        end
-
-        it "with base64 encoded" do
-          expect(Spaceship::ConnectAPI::Token).to receive(:create)
-          expect(Spaceship::ConnectAPI).to receive(:token=)
+          expect(Spaceship::ConnectAPI::Token).to receive(:create).with(hash).and_return("some fake token")
+          expect(Spaceship::ConnectAPI).to receive(:token=).with("some fake token")
 
           result = Fastlane::FastFile.new.parse("lane :test do
             app_store_connect_api_key(
@@ -77,16 +87,8 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-          hash = {
-            key_id: key_id,
-            issuer_id: issuer_id,
-            key: key_content,
-            is_key_content_base64: true,
-            duration: 200,
-            in_house: true
-          }
-
           expect(result).to eq(hash)
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY]).to eq(hash)
         end
       end
 
@@ -112,6 +114,32 @@ describe Fastlane do
             )
           end").runner.execute(:test)
         end.to raise_error("The duration can't be more than 1200 (20 minutes) and the value entered was '1300'")
+      end
+
+      it "doesn't create and set api token if 'set_spaceship_token' input option is FALSE" do
+        expect(Spaceship::ConnectAPI::Token).not_to receive(:create)
+        expect(Spaceship::ConnectAPI).not_to receive(:token=)
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          app_store_connect_api_key(
+            key_id: '#{key_id}',
+            issuer_id: '#{issuer_id}',
+            key_filepath: '#{fake_api_key_p8_path}',
+            set_spaceship_token: false
+          )
+        end").runner.execute(:test)
+
+        hash = {
+          key_id: key_id,
+          issuer_id: issuer_id,
+          key: File.binread(fake_api_key_p8_path),
+          is_key_content_base64: false,
+          duration: 1200,
+          in_house: false
+        }
+
+        expect(result).to eq(hash)
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY]).to eq(hash)
       end
     end
   end
