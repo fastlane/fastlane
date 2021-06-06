@@ -101,5 +101,103 @@ describe FastlaneCore do
         end
       end
     end
+
+    describe "ConfigItem Boolean type auto_convert value" do
+      it "auto convert to 'true' Boolean type if default value is 'yes' string" do
+        result = FastlaneCore::ConfigItem.new(key: :foo,
+                                     type: FastlaneCore::Boolean,
+                                     default_value: "yes")
+        auto_convert_value = result.auto_convert_value(result.default_value)
+        expect(auto_convert_value).to be(true)
+      end
+
+      it "auto convert to 'true' Boolean type if default value is 'YES' string" do
+        result = FastlaneCore::ConfigItem.new(key: :foo,
+                                     type: FastlaneCore::Boolean,
+                                     default_value: "YES")
+        auto_convert_value = result.auto_convert_value(result.default_value)
+        expect(auto_convert_value).to be(true)
+      end
+
+      it "auto convert to 'true' Boolean type if default value is 'true' string" do
+        result = FastlaneCore::ConfigItem.new(key: :foo,
+                                     type: FastlaneCore::Boolean,
+                                     default_value: "true")
+        auto_convert_value = result.auto_convert_value(result.default_value)
+        expect(auto_convert_value).to be(true)
+      end
+
+      it "auto convert to 'true' Boolean type if default value is 'TRUE' string" do
+        result = FastlaneCore::ConfigItem.new(key: :foo,
+                                     type: FastlaneCore::Boolean,
+                                     default_value: "TRUE")
+        auto_convert_value = result.auto_convert_value(result.default_value)
+        expect(auto_convert_value).to be(true)
+      end
+
+      it "auto convert to 'true' Boolean type if default value is 'on' string" do
+        result = FastlaneCore::ConfigItem.new(key: :foo,
+                                     type: FastlaneCore::Boolean,
+                                     default_value: "on")
+        auto_convert_value = result.auto_convert_value(result.default_value)
+        expect(auto_convert_value).to be(true)
+      end
+
+      it "auto convert to 'true' Boolean type if default value is 'ON' string" do
+        result = FastlaneCore::ConfigItem.new(key: :foo,
+                                     type: FastlaneCore::Boolean,
+                                     default_value: "ON")
+        auto_convert_value = result.auto_convert_value(result.default_value)
+        expect(auto_convert_value).to be(true)
+      end
+
+      it "auto convert to 'false' Boolean type if default value is 'no' string" do
+        result = FastlaneCore::ConfigItem.new(key: :foo,
+                                     type: FastlaneCore::Boolean,
+                                     default_value: "no")
+        auto_convert_value = result.auto_convert_value(result.default_value)
+        expect(auto_convert_value).to be(false)
+      end
+
+      it "auto convert to 'false' Boolean type if default value is 'NO' string" do
+        result = FastlaneCore::ConfigItem.new(key: :foo,
+                                     type: FastlaneCore::Boolean,
+                                     default_value: "NO")
+        auto_convert_value = result.auto_convert_value(result.default_value)
+        expect(auto_convert_value).to be(false)
+      end
+
+      it "auto convert to 'false' Boolean type if default value is 'false' string" do
+        result = FastlaneCore::ConfigItem.new(key: :foo,
+                                     type: FastlaneCore::Boolean,
+                                     default_value: "false")
+        auto_convert_value = result.auto_convert_value(result.default_value)
+        expect(auto_convert_value).to be(false)
+      end
+
+      it "auto convert to 'false' Boolean type if default value is 'FALSE' string" do
+        result = FastlaneCore::ConfigItem.new(key: :foo,
+                                     type: FastlaneCore::Boolean,
+                                     default_value: "FALSE")
+        auto_convert_value = result.auto_convert_value(result.default_value)
+        expect(auto_convert_value).to be(false)
+      end
+
+      it "auto convert to 'false' Boolean type if default value is 'off' string" do
+        result = FastlaneCore::ConfigItem.new(key: :foo,
+                                     type: FastlaneCore::Boolean,
+                                     default_value: "off")
+        auto_convert_value = result.auto_convert_value(result.default_value)
+        expect(auto_convert_value).to be(false)
+      end
+
+      it "auto convert to 'false' Boolean type if default value is 'OFF' string" do
+        result = FastlaneCore::ConfigItem.new(key: :foo,
+                                     type: FastlaneCore::Boolean,
+                                     default_value: "OFF")
+        auto_convert_value = result.auto_convert_value(result.default_value)
+        expect(auto_convert_value).to be(false)
+      end
+    end
   end
 end

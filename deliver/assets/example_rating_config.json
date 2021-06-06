@@ -1,15 +1,17 @@
 {
-  "violenceCartoonOrFantasy": "NONE",
-  "violenceRealistic": "INFREQUENT_OR_MILD",
-  "violenceRealisticProlongedGraphicOrSadistic": "FREQUENT_OR_INTENSE",
-  "profanityOrCrudeHumor": "NONE",
-  "matureOrSuggestiveThemes": "NONE",
-  "horrorOrFearThemes": "NONE",
-  "medicalOrTreatmentInformation": "NONE",
   "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+  "contests": "NONE",
   "gamblingSimulated": "NONE",
-  "sexualContentOrNudity": "NONE",
+  "horrorOrFearThemes": "NONE",
+  "matureOrSuggestiveThemes": "NONE",
+  "medicalOrTreatmentInformation": "NONE",
+  "profanityOrCrudeHumor": "NONE",
   "sexualContentGraphicAndNudity": "NONE",
-  "unrestrictedWebAccess": true,
-  "gamblingAndContests": false
+  "sexualContentOrNudity": "NONE",
+  "violenceCartoonOrFantasy": "NONE",
+  "violenceRealisticProlongedGraphicOrSadistic": "FREQUENT_OR_INTENSE",
+  "violenceRealistic": "INFREQUENT_OR_MILD",
+  "gambling": false,  
+  "seventeenPlus": false,
+  "unrestrictedWebAccess": true
 }

@@ -472,11 +472,16 @@ module Scan
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :use_system_scm,
-                                     env_name: "SCAN_USE_SYSTEM_SCM",
-                                     description: "Lets xcodebuild use system's scm configuration",
-                                     optional: true,
-                                     type: Boolean,
-                                     default_value: false)
+                                    env_name: "SCAN_USE_SYSTEM_SCM",
+                                    description: "Lets xcodebuild use system's scm configuration",
+                                    optional: true,
+                                    type: Boolean,
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :number_of_retries,
+                                    env_name: 'SCAN_NUMBER_OF_RETRIES',
+                                    description: "The number of times a test can fail before scan should stop retrying",
+                                    type: Integer,
+                                    default_value: 0)
 
       ]
     end

@@ -49,7 +49,8 @@ module Fastlane
           # Escape channel's name to guarantee it is a valid URL resource.
           # First of all we verify that the value is not already escaped,
           # escaping an escaped value will produce a wrong channel name.
-          escaped_channel = URI.unescape(channel) == channel ? URI.escape(channel) : channel
+          require 'addressable/uri'
+          escaped_channel = Addressable::URI.encode(channel) == channel ? Addressable::URI.encode(channel) : channel
           if user?(channel)
             params = { 'message' => message, 'message_format' => message_format }
             json_headers = { 'Content-Type' => 'application/json',

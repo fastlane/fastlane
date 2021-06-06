@@ -15,15 +15,27 @@ describe Fastlane::Actions::GitBranchAction do
 
   describe "with no CI set ENV values" do
     it "gets the value from Git directly" do
-      expect(Fastlane::Actions::GitBranchAction).to receive(:`)
-        .with('git symbolic-ref HEAD --short 2>/dev/null')
-        .and_return('branch-name')
+      expect(Fastlane::Actions).to receive(:sh)
+        .with("git rev-parse --abbrev-ref HEAD", log: false)
+        .and_return("branch-name")
 
       result = Fastlane::FastFile.new.parse("lane :test do
         git_branch
       end").runner.execute(:test)
 
       expect(result).to eq("branch-name")
+    end
+
+    it "returns empty string if git is at HEAD" do
+      expect(Fastlane::Actions).to receive(:sh)
+        .with("git rev-parse --abbrev-ref HEAD", log: false)
+        .and_return("HEAD")
+
+      result = Fastlane::FastFile.new.parse("lane :test do
+        git_branch
+      end").runner.execute(:test)
+
+      expect(result).to eq("")
     end
   end
 end

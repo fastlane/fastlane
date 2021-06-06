@@ -209,6 +209,9 @@ public protocol ScanfileProtocol: class {
     /// Lets xcodebuild use system's scm configuration
     var useSystemScm: Bool { get }
 
+    /// The number of times a test can fail before scan should stop retrying
+    var numberOfRetries: Int { get }
+
     /// Should this step stop the build if the tests fail? Set this to false if you're using trainer
     var failBuild: Bool { get }
 }
@@ -283,9 +286,10 @@ public extension ScanfileProtocol {
     var skipPackageDependenciesResolution: Bool { return false }
     var disablePackageAutomaticUpdates: Bool { return false }
     var useSystemScm: Bool { return false }
+    var numberOfRetries: Int { return 0 }
     var failBuild: Bool { return true }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.69]
+// FastlaneRunnerAPIVersion [0.9.80]

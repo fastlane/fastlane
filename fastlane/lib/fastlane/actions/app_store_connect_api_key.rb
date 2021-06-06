@@ -1,4 +1,5 @@
 require 'base64'
+require 'spaceship'
 
 module Fastlane
   module Actions
@@ -36,6 +37,10 @@ module Fastlane
         }
 
         Actions.lane_context.set_sensitive(SharedValues::APP_STORE_CONNECT_API_KEY, key)
+
+        # Creates Spaceship API Key session
+        # User does not need to pass the token into any actions because of this
+        Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(**key) if options[:set_spaceship_token]
 
         return key
       end
@@ -83,8 +88,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :in_house,
                                        env_name: "APP_STORE_CONNECT_API_KEY_IN_HOUSE",
                                        description: "Is App Store or Enterprise (in house) team? App Store Connect API cannot determine this on its own (yet)",
-                                       optional: true,
-                                       type: Boolean)
+                                       type: Boolean,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :set_spaceship_token,
+                                       env_name: "APP_STORE_CONNECT_API_KEY_SET_SPACESHIP_TOKEN",
+                                       description: "Authorizes all Spaceship::ConnectAPI requests by automatically setting Spaceship::ConnectAPI.token",
+                                       type: Boolean,
+                                       default_value: true)
         ]
       end
 
@@ -99,7 +109,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        true
+        [:ios, :mac, :tvos].include?(platform)
       end
 
       def self.details

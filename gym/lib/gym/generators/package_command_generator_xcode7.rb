@@ -4,6 +4,7 @@
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
+require 'addressable/uri'
 require 'tempfile'
 require 'xcodeproj'
 
@@ -154,12 +155,12 @@ module Gym
 
       def normalize_export_options(hash)
         # Normalize some values
-        hash[:onDemandResourcesAssetPacksBaseURL] = URI.escape(hash[:onDemandResourcesAssetPacksBaseURL]) if hash[:onDemandResourcesAssetPacksBaseURL]
+        hash[:onDemandResourcesAssetPacksBaseURL] = Addressable::URI.encode(hash[:onDemandResourcesAssetPacksBaseURL]) if hash[:onDemandResourcesAssetPacksBaseURL]
         if hash[:manifest]
-          hash[:manifest][:appURL] = URI.escape(hash[:manifest][:appURL]) if hash[:manifest][:appURL]
-          hash[:manifest][:displayImageURL] = URI.escape(hash[:manifest][:displayImageURL]) if hash[:manifest][:displayImageURL]
-          hash[:manifest][:fullSizeImageURL] = URI.escape(hash[:manifest][:fullSizeImageURL]) if hash[:manifest][:fullSizeImageURL]
-          hash[:manifest][:assetPackManifestURL] = URI.escape(hash[:manifest][:assetPackManifestURL]) if hash[:manifest][:assetPackManifestURL]
+          hash[:manifest][:appURL] = Addressable::URI.encode(hash[:manifest][:appURL]) if hash[:manifest][:appURL]
+          hash[:manifest][:displayImageURL] = Addressable::URI.encode(hash[:manifest][:displayImageURL]) if hash[:manifest][:displayImageURL]
+          hash[:manifest][:fullSizeImageURL] = Addressable::URI.encode(hash[:manifest][:fullSizeImageURL]) if hash[:manifest][:fullSizeImageURL]
+          hash[:manifest][:assetPackManifestURL] = Addressable::URI.encode(hash[:manifest][:assetPackManifestURL]) if hash[:manifest][:assetPackManifestURL]
         end
         hash
       end

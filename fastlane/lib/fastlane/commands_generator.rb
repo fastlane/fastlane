@@ -1,5 +1,6 @@
 require 'commander'
 require 'fastlane/new_action'
+require 'fastlane_core/ui/help_formatter'
 
 HighLine.track_eof = false
 
@@ -85,7 +86,7 @@ module Fastlane
       program :help, 'Author', 'Felix Krause <fastlane@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'GitHub', 'https://github.com/fastlane/fastlane'
-      program :help_formatter, :compact
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
       global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') do

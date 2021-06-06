@@ -123,8 +123,8 @@ module Match
       end
 
       def api_token
-        api_token ||= Spaceship::ConnectAPI::Token.create(**self.api_key) if self.api_key
-        api_token ||= Spaceship::ConnectAPI::Token.from_json_file(self.api_key_path) if self.api_key_path
+        api_token = Spaceship::ConnectAPI::Token.from(hash: self.api_key, filepath: self.api_key_path)
+        api_token ||= Spaceship::ConnectAPI.token
         return api_token
       end
 

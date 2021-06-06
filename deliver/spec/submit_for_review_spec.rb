@@ -13,10 +13,13 @@ describe Deliver::SubmitForReview do
     let(:selected_build) { double('selected_build') }
     let(:idfa_declaration) { double('idfa_declaration') }
 
+    before do
+      allow(Deliver).to receive(:cache).and_return({ app: app })
+    end
+
     context 'submit fails' do
       it 'no version' do
         options = {
-          app: app,
           platform: Spaceship::ConnectAPI::Platform::IOS
         }
 
@@ -31,7 +34,6 @@ describe Deliver::SubmitForReview do
 
       it 'needs to set export_compliance_uses_encryption' do
         options = {
-          app: app,
           platform: Spaceship::ConnectAPI::Platform::IOS
         }
 
@@ -49,7 +51,6 @@ describe Deliver::SubmitForReview do
 
       it 'needs to set export_compliance_uses_encryption' do
         options = {
-          app: app,
           platform: Spaceship::ConnectAPI::Platform::IOS
         }
 
@@ -72,7 +73,6 @@ describe Deliver::SubmitForReview do
     context 'submits successfully' do
       it 'no options' do
         options = {
-          app: app,
           platform: Spaceship::ConnectAPI::Platform::IOS
         }
 
@@ -92,7 +92,6 @@ describe Deliver::SubmitForReview do
       context 'export_compliance_uses_encryption' do
         it 'sets to false' do
           options = {
-            app: app,
             platform: Spaceship::ConnectAPI::Platform::IOS,
             submission_information: {
               export_compliance_uses_encryption: false
@@ -118,7 +117,6 @@ describe Deliver::SubmitForReview do
       context 'content_rights_contains_third_party_content' do
         it 'sets to true' do
           options = {
-            app: app,
             platform: Spaceship::ConnectAPI::Platform::IOS,
             submission_information: {
               content_rights_contains_third_party_content: true
@@ -146,7 +144,6 @@ describe Deliver::SubmitForReview do
       context 'IDFA' do
         it 'submission information with idfa false with no idfa' do
           options = {
-            app: app,
             platform: Spaceship::ConnectAPI::Platform::IOS,
             submission_information: {
               add_id_info_uses_idfa: false
@@ -169,7 +166,6 @@ describe Deliver::SubmitForReview do
 
         it 'submission information with idfa false with existing idfa' do
           options = {
-            app: app,
             platform: Spaceship::ConnectAPI::Platform::IOS,
             submission_information: {
               add_id_info_uses_idfa: false
@@ -193,7 +189,6 @@ describe Deliver::SubmitForReview do
 
         it 'submission information with idfa true with no idfa' do
           options = {
-            app: app,
             platform: Spaceship::ConnectAPI::Platform::IOS,
             submission_information: {
               add_id_info_uses_idfa: true,
@@ -228,7 +223,6 @@ describe Deliver::SubmitForReview do
 
         it 'submission information with idfa true with existing idfa' do
           options = {
-            app: app,
             platform: Spaceship::ConnectAPI::Platform::IOS,
             submission_information: {
               add_id_info_uses_idfa: true,

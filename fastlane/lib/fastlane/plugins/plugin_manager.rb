@@ -155,11 +155,10 @@ module Fastlane
     #####################################################
 
     def self.fetch_gem_info_from_rubygems(gem_name)
-      require 'open-uri'
       require 'json'
       url = "https://rubygems.org/api/v1/gems/#{gem_name}.json"
       begin
-        JSON.parse(URI.open(url).read)
+        JSON.parse(FastlaneCore::Helper.open_uri(url).read)
       rescue
         nil
       end
@@ -327,7 +326,7 @@ module Fastlane
           no_action_found = true
           [current[0].red, current[1][:version_number], "No actions found".red]
         else
-          [current[0], current[1][:version_number], current[1][:actions].join("\n")]
+          [current[0], current[1][:version_number], current[1][:actions].join(", ")]
         end
       end
 

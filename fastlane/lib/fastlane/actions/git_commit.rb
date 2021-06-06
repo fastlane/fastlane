@@ -42,11 +42,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :message,
                                        description: "The commit message that should be used"),
           FastlaneCore::ConfigItem.new(key: :skip_git_hooks,
-                                       description: "Set to true to pass --no-verify to git",
+                                       description: "Set to true to pass `--no-verify` to git",
+                                       default_value: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :allow_nothing_to_commit,
                                        description: "Set to true to allow commit without any git changes in the files you want to commit",
+                                       default_value: false,
                                        type: Boolean,
                                        optional: true)
         ]

@@ -308,7 +308,7 @@ module Screengrab
             if out =~ /Permission denied/
               dir = File.dirname(path)
               base = File.basename(path)
-              run_adb_command("-s #{device_serial} shell run-as #{@config[:app_package_name]} 'tar -cC #{dir} #{base}' | tar -xvC #{tempdir}",
+              run_adb_command("-s #{device_serial} shell run-as #{@config[:app_package_name]} \"tar -cC #{dir} #{base}\" | tar -xv -f- -C #{tempdir}",
                               print_all: false,
                               print_command: true)
             end

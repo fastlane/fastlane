@@ -15,7 +15,7 @@ module RuboCop
             value = pair.value
             next unless key.source.to_sym == :is_string && (value.source.to_s == "false" || value.source.to_s == "true")
             if node.parent.children[0].source == "FastlaneCore::ConfigItem"
-              add_offense(pair, :expression)
+              add_offense(pair, location: :expression)
             end
           end
         end

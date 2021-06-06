@@ -1,5 +1,6 @@
 require 'commander'
 require 'fastlane/version'
+require 'fastlane_core/ui/help_formatter'
 
 require_relative 'download_screenshots'
 require_relative 'options'
@@ -48,7 +49,7 @@ module Deliver
       program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'Documentation', 'https://docs.fastlane.tools/actions/deliver/'
-      program :help_formatter, :compact
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
       global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
@@ -167,7 +168,7 @@ module Deliver
           return 0 unless res
 
           require 'deliver/setup'
-          app = options[:app]
+          app = Deliver.cache[:app]
           platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
           v = app.get_latest_app_store_version(platform: platform)
           if options[:app_version].to_s.length > 0

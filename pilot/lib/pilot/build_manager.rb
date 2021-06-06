@@ -105,8 +105,10 @@ module Pilot
         app_version: app_version,
         build_version: app_build,
         poll_interval: config[:wait_processing_interval],
+        timeout_duration: config[:wait_processing_timeout_duration],
         return_when_build_appears: return_when_build_appears,
-        return_spaceship_testflight_build: false
+        return_spaceship_testflight_build: false,
+        select_latest: config[:distribute_only]
       )
 
       unless latest_build.app_version == app_version && latest_build.version == app_build
@@ -364,7 +366,11 @@ module Pilot
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
+      # Ensure that user is authenticated
+      start(options)
+
       # Use JWT auth
+      api_token = Spaceship::ConnectAPI.token
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
         return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)
@@ -447,7 +453,7 @@ module Pilot
     end
 
     def update_review_detail(build, info)
-      info = info.collect { |k, v| [k.to_sym, v] }.to_h
+      info = info.transform_keys(&:to_sym)
 
       attributes = {}
       attributes[:contactEmail] = info[:contact_email] if info.key?(:contact_email)
@@ -463,7 +469,7 @@ module Pilot
     end
 
     def update_localized_app_review(build, info_by_lang, default_info: nil)
-      info_by_lang = info_by_lang.collect { |k, v| [k.to_sym, v] }.to_h
+      info_by_lang = info_by_lang.transform_keys(&:to_sym)
 
       if default_info
         info_by_lang.delete(:default)
@@ -509,7 +515,7 @@ module Pilot
     end
 
     def update_localized_build_review(build, info_by_lang, default_info: nil)
-      info_by_lang = info_by_lang.collect { |k, v| [k.to_sym, v] }.to_h
+      info_by_lang = info_by_lang.transform_keys(&:to_sym)
 
       if default_info
         info_by_lang.delete(:default)

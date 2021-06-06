@@ -112,7 +112,7 @@ module Snapshot
       end
     end
 
-    def override_status_bar(device_type)
+    def override_status_bar(device_type, arguments = nil)
       device_udid = TestCommandGenerator.device_udid(device_type)
 
       UI.message("Launch Simulator #{device_type}")
@@ -120,9 +120,13 @@ module Snapshot
 
       UI.message("Overriding Status Bar")
 
-      # The time needs to be passed as ISO8601 so the simulator formats it correctly
-      time = Time.new(2007, 1, 9, 9, 41, 0)
-      Helper.backticks("xcrun simctl status_bar #{device_udid} override --time #{time.iso8601} --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100 &> /dev/null")
+      if arguments.nil? || arguments.empty?
+        # The time needs to be passed as ISO8601 so the simulator formats it correctly
+        time = Time.new(2007, 1, 9, 9, 41, 0)
+        arguments = "--time #{time.iso8601} --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100"
+      end
+
+      Helper.backticks("xcrun simctl status_bar #{device_udid} override #{arguments} &> /dev/null")
     end
 
     def clear_status_bar(device_type)

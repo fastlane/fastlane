@@ -233,10 +233,10 @@ module Supply
         end
       end
 
-      AndroidPublisher::LocalizedText.new({
+      AndroidPublisher::LocalizedText.new(
         language: language,
         text: changelog_text
-      })
+      )
     end
 
     def upload_changelogs(release_notes, release, track)
@@ -304,6 +304,7 @@ module Supply
       mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
       mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
         if mapping_path
+          UI.message("Preparing mapping at path '#{mapping_path}', version code #{version_code} for upload...")
           client.upload_mapping(mapping_path, version_code)
         end
       end
