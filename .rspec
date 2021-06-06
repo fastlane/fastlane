@@ -6,4 +6,3 @@ RSpec::Core::RakeTask.new(:spec)
 --require ./spec_helper
 --color
 --format d
---exclude-pattern snapshot/example/fastlane/Snapfile
