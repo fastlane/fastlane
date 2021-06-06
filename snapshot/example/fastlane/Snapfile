@@ -1,17 +1,24 @@
 # Uncomment the lines below you want to change by removing the # in the beginning
 
 # A list of devices you want to take the screenshots from
-devices([
-   "iPhone SE (2nd generation)", 
-   "iPhone 12 Pro Max"
-])
+devices(
+  [
+    "iPhone 6s",
+    "iPad Air"
+  ]
+)
 
- languages([
-  "en-US",
-  "de-DE",
-  "it-IT",
-#   ["pt", "pt_BR"] # Portuguese with Brazilian locale
- ])
+languages(
+  [
+    "en-US",
+    "de-DE",
+    "it-IT",
+    [
+      "pt",
+      "pt_BR" # Portuguese with Brazilian locale
+    ]
+  ]
+)
 
 # The name of the scheme which contains the UI Tests
 scheme("ExampleUITests")
