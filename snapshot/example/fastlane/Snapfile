@@ -3,8 +3,8 @@
 # A list of devices you want to take the screenshots from
 devices(
   [
-    "iPhone SE (2nd generation)",
-    "iPhone 12 Pro Max"
+    "iPhone 6s",
+    "iPad Air"
   ]
 )
 
