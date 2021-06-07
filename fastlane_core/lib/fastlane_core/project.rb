@@ -123,9 +123,13 @@ module FastlaneCore
     # Get all available schemes in an array
     def schemes
       @schemes ||= if workspace?
-                     workspace.schemes.reject do |k, v|
-                       v.include?("Pods/Pods.xcodeproj")
-                     end.keys
+                     if FastlaneCore::Env.truthy?("FASTLANE_INCLUDE_PODS_PROJECT_SCHEMES")
+                       workspace.schemes.keys
+                     else
+                       workspace.schemes.reject do |k, v|
+                         v.include?("Pods/Pods.xcodeproj")
+                       end.keys
+                     end
                    else
                      Xcodeproj::Project.schemes(path)
                    end
