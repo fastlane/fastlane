@@ -1,0 +1,8 @@
+desc 'Ensure Git status is clean'
+lane :ensure_git_status_clean do
+  # Can't use ensure_git_status_clean action because in tests, Actions.sh does
+  # not run the actual command, and instead returns the command itself as
+  # output.
+  status = `git status --porcelain`
+  UI.build_failure!("Git tree not clean:\n#{status}, #{`pwd`}, #{`git diff`}") unless status.empty?
+end

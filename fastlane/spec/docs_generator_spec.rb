@@ -1,13 +1,15 @@
 require 'fastlane/documentation/docs_generator'
+require 'tempfile'
 
 describe Fastlane do
   describe Fastlane::DocsGenerator do
     it "generates new markdown docs" do
-      output_path = "/tmp/documentation.md"
       ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
-      Fastlane::DocsGenerator.run(ff, output_path)
 
-      output = File.read(output_path)
+      output = Tempfile.open(['documentation', '.md']) do |output_file|
+        Fastlane::DocsGenerator.run(ff, output_file.path)
+        output_file.read
+      end
 
       expect(output).to include('gem install fastlane')
       expect(output).to include('# Available Actions')
@@ -22,11 +24,12 @@ describe Fastlane do
     end
 
     it "generates new markdown docs but skips empty platforms" do
-      output_path = "/tmp/documentation.md"
       ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfilePlatformDocumentation')
-      Fastlane::DocsGenerator.run(ff, output_path)
 
-      output = File.read(output_path)
+      output = Tempfile.open(['documentation', '.md']) do |output_file|
+        Fastlane::DocsGenerator.run(ff, output_file.path)
+        output_file.read
+      end
 
       expect(output).to include('gem install fastlane')
       expect(output).to include('# Available Actions')
@@ -39,6 +42,16 @@ describe Fastlane do
       expect(output).not_to(include('## Mac'))
       expect(output).not_to(include('mac_lane'))
       expect(output).not_to(include("I'm a mac private_lane"))
+    end
+
+    it "produces no diff on any platform with default Git SCM settings" do
+      FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_DOCS' => 'false') do
+        Dir.chdir('fastlane/spec/fixtures/docs') do
+          # Run a lane, which will trigger fastlane docs generation, and then
+          # verify that no changes are made in that subtree.
+          Fastlane::FastFile.new('Fastfile').runner.execute(:ensure_git_status_clean)
+        end
+      end
     end
   end
 end

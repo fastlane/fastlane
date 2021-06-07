@@ -50,7 +50,8 @@ module Fastlane
       output << ""
 
       begin
-        File.write(output_path, output.join("\n"))
+        # Explicitly write in Text mode ("t") to produce OS-specific line endings.
+        File.write(output_path, output.join("\n"), mode: "wt")
         UI.success("Successfully generated documentation at path '#{File.expand_path(output_path)}'") if FastlaneCore::Globals.verbose?
       rescue => ex
         UI.error(ex)

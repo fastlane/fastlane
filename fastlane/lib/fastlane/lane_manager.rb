@@ -69,10 +69,6 @@ module Fastlane
       return ff
     end
 
-    def self.skip_docs?
-      Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
-    end
-
     # Lane chooser if user didn't provide a lane
     # @param platform: is probably nil, but user might have called `fastlane android`, and only wants to list those actions
     def self.choose_lane(ff, platform)
