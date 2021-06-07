@@ -3,7 +3,7 @@ module Fastlane
   # Takes care of all common things like printing the lane description tables and loading .env files
   class LaneManagerBase
     def self.skip_docs?
-      Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
+      FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
     end
 
     # All the finishing up that needs to be done
