@@ -79,7 +79,7 @@ module Fastlane
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_BETWEEN',
                                        description: 'Array containing two Git revision values between which to collect messages, you mustn\'t use it with :commits_count key at the same time',
                                        optional: true,
-                                       skip_type_validation: true), # allow Array, String both
+                                       skip_type_validation: true, # allow Array, String both
                                        conflicting_options: [:commits_count],
                                        verify_block: proc do |value|
                                          if value.kind_of?(String)
