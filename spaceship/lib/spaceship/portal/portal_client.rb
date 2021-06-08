@@ -239,7 +239,7 @@ module Spaceship
       }
       params.merge!(ident_params)
       enable_services.each do |k, v|
-        params[v.service_id.to_sym] = v.value
+        params[v.service_id_legacy.to_sym] = v.value unless v.service_id_legacy == nil
       end
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/addAppId.action", params)
       parse_response(r, 'appId')
