@@ -280,7 +280,7 @@ workflows:
           ruby_version: 'fastlanetools/ci:0.3.0'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
-          xcode_version: '12.4.0'
+          xcode_version: '12.5.0'
           ruby_version: '2.7'
       - validate_documentation:
           name: 'Validate Documentation'
