@@ -37,7 +37,7 @@ describe Snapshot do
         @test_command_generator = Snapshot::TestCommandGenerator.new
       end
       it "returns true with only iOS devices" do
-        devices = ["iPhone 8", "iPad Air 2", "iPhone X", "iPhone 8 plus"]
+        devices = ["iPhone 8", "iPad Air 2", "iPhone X", "iPhone 8 plus", "iPod touch (7th generation)"]
         result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
         expect(result).to be(true)
       end
@@ -48,14 +48,26 @@ describe Snapshot do
         expect(result).to be(true)
       end
 
-      it "returns false with mixed device OS" do
-        devices = ["Apple TV 1080p", "iPad Air 2", "iPhone 8"]
+      it "returns false with mixed device OS of Apple TV and iPhone" do
+        devices = ["Apple TV 1080p", "iPhone 8"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(false)
+      end
+
+      it "returns false with mixed device OS of Apple TV and iPad" do
+        devices = ["Apple TV 1080p", "iPad Air 2"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(false)
+      end
+
+      it "returns false with mixed device OS of Apple TV and iPod" do
+        devices = ["Apple TV 1080p", "iPod touch (7th generation)"]
         result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
         expect(result).to be(false)
       end
 
       it "returns true with custom named iOS devices" do
-        devices = ["11.0 - iPhone X", "11.0 - iPad Air 2"]
+        devices = ["11.0 - iPhone X", "11.0 - iPad Air 2", "13.0 - iPod touch"]
         result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
         expect(result).to be(true)
       end
