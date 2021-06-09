@@ -82,13 +82,8 @@ module Fastlane
                                        type: Array, # allow Array, String both
                                        conflicting_options: [:commits_count],
                                        verify_block: proc do |value|
-                                         if value.kind_of?(String)
-                                           UI.user_error!(":between must contain comma") unless value.include?(',')
-                                         else
-                                           UI.user_error!(":between must be of type array") unless value.kind_of?(Array)
-                                           UI.user_error!(":between must not contain nil values") if value.any?(&:nil?)
-                                           UI.user_error!(":between must be an array of size 2") unless (value || []).size == 2
-                                         end
+                                         UI.user_error!(":between must not contain nil values") if value.any?(&:nil?)
+                                         UI.user_error!(":between must be an array of size 2") unless (value || []).size == 2
                                        end),
           FastlaneCore::ConfigItem.new(key: :commits_count,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_COUNT',
