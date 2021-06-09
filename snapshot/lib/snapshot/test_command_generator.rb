@@ -69,7 +69,7 @@ module Snapshot
         # Check each device to see if it is an iOS device
         all_ios = devices.map do |device|
           device = device.downcase
-          device.include?('iphone') || device.include?('ipad')
+          device.include?('iphone') || device.include?('ipad') || device.include?('ipod')
         end
         # Return true if all devices are iOS devices
         return true unless all_ios.include?(false)
