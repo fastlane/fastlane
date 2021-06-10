@@ -46,7 +46,6 @@ module Produce
       personal_vpn: [SERVICE_ON, SERVICE_OFF],
       passbook: [SERVICE_ON, SERVICE_OFF],
       push_notification: [SERVICE_ON, SERVICE_OFF],
-      push_notification: [SERVICE_ON, SERVICE_OFF],
       sign_in_with_apple: [SERVICE_PRIMARY_APP_CONSENT],
       siri_kit: [SERVICE_ON, SERVICE_OFF],
       system_extension: [SERVICE_ON, SERVICE_OFF],
