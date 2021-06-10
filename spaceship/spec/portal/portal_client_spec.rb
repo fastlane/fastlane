@@ -5,7 +5,7 @@ describe Spaceship::Client do
   subject { Spaceship.client }
   let(:username) { 'spaceship@krausefx.com' }
   let(:password) { 'so_secret' }
-  let(:app) { Spaceship::Portal::App.new({ "appIdId" => "ABCD1234", "name" => "Production App", "identifier" => "web.com.fastlane.example", "prefix" => "XXXXXXXXXX", "type" => "explicit" })}
+  let(:app) { Spaceship::Portal::App.new({ "appIdId" => "ABCD1234", "name" => "Production App", "identifier" => "web.com.fastlane.example", "prefix" => "XXXXXXXXXX", "type" => "explicit" }) }
   describe '#login' do
     it 'sets the session cookies' do
       response = subject.login(username, password)

@@ -1,7 +1,6 @@
 module Spaceship
   module Portal
     class JSONApiBase
-
       attr_accessor :type, :id, :attributes, :relationships, :data
 
       def initialize(type: nil, id: nil, attributes: nil, relationships: nil, data: nil)
@@ -15,9 +14,9 @@ module Spaceship
       # Converts self to a JSON:API-formatted hash object.
       def to_hash
         hash = {}
-        self.instance_variables.each {|var|
-          if self.instance_variable_get(var) != nil
-            hash[var.to_s.delete("@")] = self.instance_variable_get(var) 
+        self.instance_variables.each { |var|
+          unless self.instance_variable_get(var).nil?
+            hash[var.to_s.delete("@")] = self.instance_variable_get(var)
           end
         }
         return hash
@@ -26,18 +25,18 @@ module Spaceship
       # Takes in an object (defaults to self) and deeply converts it into a JSON:API-formatted hash object that can be used for requests.
       def to_hash_deep(obj = self)
         result = {}
-        if obj.is_a? Spaceship::Portal::JSONApiBase
+        if obj.kind_of?(Spaceship::Portal::JSONApiBase)
           hash = obj.to_hash
-          hash.each {|key, val|
+          hash.each { |key, val|
             result[key] = to_hash_deep(val)
           }
-        elsif obj.is_a? Hash
-          obj.each {|key, val|
+        elsif obj.kind_of?(Hash)
+          obj.each { |key, val|
             result[key] = to_hash_deep(val)
           }
-        elsif obj.is_a? Array
+        elsif obj.kind_of?(Array)
           result = []
-          obj.each{|val|
+          obj.each { |val|
             result.push(to_hash_deep(val))
           }
         else
@@ -56,7 +55,6 @@ module Spaceship
     end
 
     class UpdateBundleRequestContents < JSONApiBase
-
       def initialize(app, service)
         attributes = {
           identifier: app.bundle_id,
@@ -79,11 +77,10 @@ module Spaceship
     end
 
     class BundleIdCapability < JSONApiBase
-
       def initialize(service)
         attributes = {
           enabled: service.value,
-          settings:service.capability_settings
+          settings: service.capability_settings
         }
         relationships = {
           capability: JSONApiBase.new(data: JSONApiBase.new(type: "capabilities", id: service.service_id))

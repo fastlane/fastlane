@@ -7,7 +7,6 @@ module Spaceship
       #   "ACCESS_WIFI_INFORMATION"
       attr_accessor :service_id
 
-
       # @return (String) The identifier used by the Dev Portal LEGACY to represent this service
       # @example
       #   "AWEQ28MY3E"
@@ -59,7 +58,7 @@ module Spaceship
         if settings
           settings.each do |k, v|
             m.define_singleton_method(k) do
-              AppService.new(id, service_id_legacy: service_id_legacy, settings: v, key:key)
+              AppService.new(id, service_id_legacy: service_id_legacy, settings: v, key: key)
             end
           end
         end
@@ -99,13 +98,13 @@ module Spaceship
       AssociatedDomains = AppService.new_service("ASSOCIATED_DOMAINS", service_id_legacy: "SKC3T5S89Y")
       AutoFillCredential = AppService.new_service("AUTOFILL_CREDENTIAL_PROVIDER", service_id_legacy: "CPEQ28MX4E")
       ClassKit = AppService.new_service("CLASSKIT", service_id_legacy: "PKTJAN2017")
-      Cloud = AppService.new_service("ICLOUD", service_id_legacy: "iCloud", settings: {xcode6_compatible: "XCODE_6", xcode5_compatible: "XCODE_5"}, key: "ICLOUD_VERSION")
+      Cloud = AppService.new_service("ICLOUD", service_id_legacy: "iCloud", settings: { xcode6_compatible: "XCODE_6", xcode5_compatible: "XCODE_5" }, key: "ICLOUD_VERSION")
       CustomNetworkProtocol = AppService.new_service("NETWORK_CUSTOM_PROTOCOL")
-      DataProtection = AppService.new_service("DATA_PROTECTION", settings: {complete: "COMPLETE_PROTECTION", unless_open: "PROTECTED_UNLESS_OPEN", until_first_auth: "PROTECTED_UNTIL_FIRST_USER_AUTH" }, key: "DATA_PROTECTION_PERMISSION_LEVEL")
+      DataProtection = AppService.new_service("DATA_PROTECTION", settings: { complete: "COMPLETE_PROTECTION", unless_open: "PROTECTED_UNLESS_OPEN", until_first_auth: "PROTECTED_UNTIL_FIRST_USER_AUTH" }, key: "DATA_PROTECTION_PERMISSION_LEVEL")
       ExtendedVirtualAddressSpace = AppService.new_service("EXTENDED_VIRTUAL_ADDRESSING")
       FileProviderTestingMode = AppService.new_service("FILEPROVIDER_TESTINGMODE")
       Fonts = AppService.new_service("FONT_INSTALLATION")
-      GameCenter = AppService.new_service("GAME_CENTER", service_id_legacy: "gameCenter", settings: {ios: "GAME_CENTER_IOS", macos: "GAME_CENTER_MACOS"}, key: "GAME_CENTER_SETTING")
+      GameCenter = AppService.new_service("GAME_CENTER", service_id_legacy: "gameCenter", settings: { ios: "GAME_CENTER_IOS", macos: "GAME_CENTER_MACOS" }, key: "GAME_CENTER_SETTING")
       HealthKit = AppService.new_service("HEALTHKIT", service_id_legacy: "HK421J6T7P")
       HLSInterstitialPreview = AppService.new_service("HLS_INTERSTITIAL_PREVIEW")
       HomeKit = AppService.new_service("HOMEKIT", service_id_legacy: "homeKit")
@@ -121,7 +120,7 @@ module Spaceship
       PersonalVPN = AppService.new_service("PERSONAL_VPN", service_id_legacy: "V66P55NK2I")
       Passbook = AppService.new_service("pass", service_id_legacy: "passbook")
       PushNotification = AppService.new_service("PUSH_NOTIFICATIONS", service_id_legacy: "push")
-      SignInWithApple = AppService.new_service("APPLE_ID_AUTH", settings: {on: "PRIMARY_APP_CONSENT"}, key: "APPLE_ID_AUTH_APP_CONSENT")
+      SignInWithApple = AppService.new_service("APPLE_ID_AUTH", settings: { on: "PRIMARY_APP_CONSENT" }, key: "APPLE_ID_AUTH_APP_CONSENT")
       SiriKit = AppService.new_service("SIRIKIT", service_id_legacy: "SI015DKUHP")
       SystemExtension = AppService.new_service("SYSTEM_EXTENSION_INSTALL")
       UserManagement = AppService.new_service("USER_MANAGEMENT")
@@ -129,7 +128,7 @@ module Spaceship
       Wallet = AppService.new_service("WALLET", service_id_legacy: "passbook")
       WirelessAccessory = AppService.new_service("WIRELESS_ACCESSORY_CONFIGURATION", service_id_legacy: "WC421J6T7P")
 
-      #Additional Capabilities
+      # Additional Capabilities
       CarPlayAudioApp = AppService.new_service("CARPLAY_PLAYABLE_CONTENT")
       CarPlayMessagingApp = AppService.new_service("CARPLAY_MESSAGING")
       CarPlayNavigationApp = AppService.new_service("CARPLAY_NAVIGATION")

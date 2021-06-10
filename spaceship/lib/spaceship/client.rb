@@ -841,7 +841,7 @@ module Spaceship
         end
       end
       params = params.nil? ? "{}" : params
-      params_to_log = (params.is_a? String) ? JSON.parse(params) : Hash(params).dup # to also work with nil
+      params_to_log = (params.kind_of?(String)) ? JSON.parse(params) : Hash(params).dup # to also work with nil
       params_to_log.delete(:accountPassword) # Dev Portal
       params_to_log.delete(:theAccountPW) # iTC
       params_to_log = params_to_log.collect do |key, value|
