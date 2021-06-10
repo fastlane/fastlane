@@ -5,7 +5,7 @@ describe Spaceship::Client do
   subject { Spaceship.client }
   let(:username) { 'spaceship@krausefx.com' }
   let(:password) { 'so_secret' }
-
+  let(:app) { Spaceship::Portal::App.new({ "appIdId" => "ABCD1234", "name" => "Production App", "identifier" => "web.com.fastlane.example", "prefix" => "XXXXXXXXXX", "type" => "explicit" })}
   describe '#login' do
     it 'sets the session cookies' do
       response = subject.login(username, password)
@@ -177,6 +177,64 @@ describe Spaceship::Client do
       it 'should make a request to delete the app group' do
         response = subject.delete_app_group!('2GKKV64NUG')
         expect(response['resultCode']).to eq(0)
+      end
+    end
+
+    describe '#update_service' do
+      it 'should make a request to turn APP_ATTEST on' do
+        service = Spaceship.app_service.app_attest.on
+        response = subject.update_service(app, service)
+        expect(response.status).to eq(200)
+      end
+      it 'should make a request to turn APP_ATTEST off' do
+        service = Spaceship.app_service.app_attest.off
+        response = subject.update_service(app, service)
+        expect(response.status).to eq(200)
+      end
+      it 'should make a request to turn ACCESS_WIFI on' do
+        service = Spaceship.app_service.access_wifi.on
+        response = subject.update_service(app, service)
+        expect(response.status).to eq(200)
+      end
+      it 'should make a request to turn ACCESS_WIFI off' do
+        service = Spaceship.app_service.access_wifi.off
+        response = subject.update_service(app, service)
+        expect(response.status).to eq(200)
+      end
+      it 'should make a request to turn DATA_PROTECTION complete' do
+        service = Spaceship.app_service.data_protection.complete
+        response = subject.update_service(app, service)
+        expect(response.status).to eq(200)
+      end
+      it 'should make a request to turn DATA_PROTECTION unless_open' do
+        service = Spaceship.app_service.data_protection.unless_open
+        response = subject.update_service(app, service)
+        expect(response.status).to eq(200)
+      end
+      it 'should make a request to turn DATA_PROTECTION until_first_auth' do
+        service = Spaceship.app_service.data_protection.until_first_auth
+        response = subject.update_service(app, service)
+        expect(response.status).to eq(200)
+      end
+      it 'should make a request to turn DATA_PROTECTION off' do
+        service = Spaceship.app_service.data_protection.off
+        response = subject.update_service(app, service)
+        expect(response.status).to eq(200)
+      end
+      it 'should make a request to turn ICLOUD xcode6_compatible' do
+        service = Spaceship.app_service.cloud.xcode6_compatible
+        response = subject.update_service(app, service)
+        expect(response.status).to eq(200)
+      end
+      it 'should make a request to turn ICLOUD xcode5_compatible' do
+        service = Spaceship.app_service.cloud.xcode5_compatible
+        response = subject.update_service(app, service)
+        expect(response.status).to eq(200)
+      end
+      it 'should make a request to turn ICLOUD off' do
+        service = Spaceship.app_service.cloud.off
+        response = subject.update_service(app, service)
+        expect(response.status).to eq(200)
       end
     end
 

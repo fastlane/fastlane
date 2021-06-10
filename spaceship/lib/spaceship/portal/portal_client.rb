@@ -150,17 +150,18 @@ module Spaceship
     end
 
     def update_service_for_app(app, service)
+      update_service(app, service)
+      details_for_app(app)
+    end
+
+    def update_service(app, service)
       ensure_csrf(Spaceship::Portal::App)
       data = Spaceship::Portal::UpdateBundleRequest.new(app, service).to_hash_deep
-      say "\nDATA:\n#{data}"
       params = data.to_json
       headers = {}
       headers['Content-Type'] = 'application/vnd.api+json'
       headers['X-Requested-With'] = 'XMLHttpRequest'
-      response = request(:patch, "v1/bundleIds/#{app.app_id}", params, headers, false, @client_v1_api).to_yaml
-      say "\nUPDATE_SERVICE_RESPONSE:\n#{response}"
-
-      details_for_app(app)
+      request(:patch, "v1/bundleIds/#{app.app_id}", params, headers, false, @client_v1_api)
     end
 
     def associate_groups_with_app(app, groups)

@@ -48,6 +48,7 @@ def before_each_spaceship
   PortalStubbing.adp_stub_persons
   PortalStubbing.adp_stub_website_pushes
   PortalStubbing.adp_stub_passbooks
+  PortalStubbing.adp_stub_update_service
 
   TunesStubbing.itc_stub_applications
   TunesStubbing.itc_stub_app_versions

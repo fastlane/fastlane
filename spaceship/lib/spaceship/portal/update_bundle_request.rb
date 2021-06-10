@@ -12,6 +12,7 @@ module Spaceship
         @data = data
       end
 
+      # Converts self to a JSON:API-formatted hash object.
       def to_hash
         hash = {}
         self.instance_variables.each {|var|
@@ -22,7 +23,7 @@ module Spaceship
         return hash
       end
 
-      #Takes in an object (defaults to self) and converts it into a JSON:API hash object that can be used for requests
+      # Takes in an object (defaults to self) and deeply converts it into a JSON:API-formatted hash object that can be used for requests.
       def to_hash_deep(obj = self)
         result = {}
         if obj.is_a? Spaceship::Portal::JSONApiBase
@@ -46,7 +47,7 @@ module Spaceship
       end
     end
 
-    #Top level object that holds the data for an update bundle request
+    # Top level object that holds the data for an update bundle request.
     class UpdateBundleRequest < JSONApiBase
       def initialize(app, service)
         data = UpdateBundleRequestContents.new(app, service)
