@@ -34,9 +34,7 @@ module Fastlane
       end
 
       def self.example_code
-        [
-          'git_default_remote_branch'
-        ]
+        ['git_default_remote_branch']
       end
 
       def self.return_type
