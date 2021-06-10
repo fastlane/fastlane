@@ -243,7 +243,7 @@ module Produce
         end
       end
 
-      if options.healthkit
+      if options.health_kit
         UI.message("\tHealthKit")
 
         if on
@@ -263,7 +263,7 @@ module Produce
         end
       end
 
-      if options.homekit
+      if options.home_kit
         UI.message("\tHomeKit")
 
         if on
@@ -437,7 +437,7 @@ module Produce
         end
       end
 
-      if options.sirikit
+      if options.siri_kit
         UI.message("\tSiriKit")
 
         if on
