@@ -143,7 +143,7 @@ module Fastlane
     def self.git_default_remote_branch_name
       # Rescues if not a git repo or no remote repo
       begin
-        Actions.sh("variable=$(git remote) && git remote show $variable | grep \"HEAD branch\" | sed 's/.*: //'", log: false).chomp
+        Actions.sh("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false).chomp
       rescue => err
         UI.verbose("Error getting git default remote branch: #{err.message}")
         nil

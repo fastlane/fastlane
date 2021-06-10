@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class GitDefaultRemoteBranchAction < Action
       def self.run(params)
-        Actions.git_default_remote_branch_name || ""
+        Actions.git_default_remote_branch_name || "No remote default available"
       end
 
       #####################################################
@@ -14,7 +14,7 @@ module Fastlane
       end
 
       def self.details
-        "If no default remote branch could be found, this action will return an empty string. This is a wrapper for the internal action Actions.git_default_remote_branch_name"
+        "If no default remote branch could be found, this action will return a message indicating the lack of a default remote branch. This is a wrapper for the internal action Actions.git_default_remote_branch_name"
       end
 
       def self.available_options
