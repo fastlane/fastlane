@@ -230,7 +230,14 @@ module Produce
         UI.message("\tGame Center")
 
         if on
-          app.update_service(Spaceship.app_service.game_center.on)
+          case options.game_center
+          when "macos"
+            app.update_service(Spaceship.app_service.game_center.macos)
+          when "ios"
+            app.update_service(Spaceship.app_service.game_center.ios)
+          else
+            UI.user_error!("Unknown service '#{options.game_center}'. Valid values: 'ios', 'macos', 'off'")
+          end
         else
           app.update_service(Spaceship.app_service.game_center.off)
         end

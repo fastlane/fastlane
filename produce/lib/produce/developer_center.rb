@@ -53,12 +53,12 @@ module Produce
       vpn_configuration: [SERVICE_ON, SERVICE_OFF],
       wallet: [SERVICE_ON, SERVICE_OFF],
       wireless_accessory: [SERVICE_ON, SERVICE_OFF],
-      CarPlayAudioApp: [SERVICE_ON, SERVICE_OFF],
-      CarPlayMessagingApp: [SERVICE_ON, SERVICE_OFF],
-      CarPlayNavigationApp: [SERVICE_ON, SERVICE_OFF],
-      CarPlayVoipCallingApp: [SERVICE_ON, SERVICE_OFF],
-      CriticalAlerts: [SERVICE_ON, SERVICE_OFF],
-      HotspotHelper: [SERVICE_ON, SERVICE_OFF],
+      car_play_audio_app: [SERVICE_ON, SERVICE_OFF],
+      car_play_messaging_app: [SERVICE_ON, SERVICE_OFF],
+      car_play_navigation_app: [SERVICE_ON, SERVICE_OFF],
+      car_play_voip_calling_app: [SERVICE_ON, SERVICE_OFF],
+      critical_alerts: [SERVICE_ON, SERVICE_OFF],
+      hotspot_helper: [SERVICE_ON, SERVICE_OFF],
     }
 
     def run

@@ -327,16 +327,16 @@ class PortalStubbing
       # DATA_PROTECTION
       stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
         with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "identifier" => "web.com.fastlane.example", "permissions" => { "edit" => true, "delete" => false }, "seedId" => "XXXXXXXXXX", "name" => "Production App", "wildcard" => false, "teamId" => "XXXXXXXXXX" },
-"relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [{ "key" => "DATA_PROTECTION_PERMISSION_LEVEL", "options" => [{ "key" => "COMPLETE_PROTECTION" }] }] }, "relationships" => { "capability" => { "data" => { "type" => "capabilities", "id" => "DATA_PROTECTION" } } } }] } } } }).
-        to_return(status: 200)
+"relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [{ "key" => "DATA_PROTECTION_PERMISSION_LEVEL", "options" => [{ "key" => "COMPLETE_PROTECTION" }] }] }, "relationships" => { "capability" =>
+        { "data" => { "type" => "capabilities", "id" => "DATA_PROTECTION" } } } }] } } } }).to_return(status: 200)
       stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
         with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "identifier" => "web.com.fastlane.example", "permissions" => { "edit" => true, "delete" => false }, "seedId" => "XXXXXXXXXX", "name" => "Production App", "wildcard" => false, "teamId" => "XXXXXXXXXX" },
-"relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [{ "key" => "DATA_PROTECTION_PERMISSION_LEVEL", "options" => [{ "key" => "PROTECTED_UNLESS_OPEN" }] }] }, "relationships" => { "capability" => { "data" => { "type" => "capabilities", "id" => "DATA_PROTECTION" } } } }] } } } }).
-        to_return(status: 200)
+"relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [{ "key" => "DATA_PROTECTION_PERMISSION_LEVEL", "options" => [{ "key" => "PROTECTED_UNLESS_OPEN" }] }] }, "relationships" => { "capability" =>
+        { "data" => { "type" => "capabilities", "id" => "DATA_PROTECTION" } } } }] } } } }).to_return(status: 200)
       stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
         with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "identifier" => "web.com.fastlane.example", "permissions" => { "edit" => true, "delete" => false }, "seedId" => "XXXXXXXXXX", "name" => "Production App", "wildcard" => false, "teamId" => "XXXXXXXXXX" },
-"relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [{ "key" => "DATA_PROTECTION_PERMISSION_LEVEL", "options" => [{ "key" => "PROTECTED_UNTIL_FIRST_USER_AUTH" }] }] }, "relationships" => { "capability" => { "data" => { "type" => "capabilities", "id" => "DATA_PROTECTION" } } } }] } } } }).
-        to_return(status: 200)
+"relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [{ "key" => "DATA_PROTECTION_PERMISSION_LEVEL", "options" => [{ "key" => "PROTECTED_UNTIL_FIRST_USER_AUTH" }] }] }, "relationships" => { "capability" =>
+        { "data" => { "type" => "capabilities", "id" => "DATA_PROTECTION" } } } }] } } } }).to_return(status: 200)
       stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
         with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "identifier" => "web.com.fastlane.example", "permissions" => { "edit" => true, "delete" => false }, "seedId" => "XXXXXXXXXX", "name" => "Production App", "wildcard" => false, "teamId" => "XXXXXXXXXX" },
 "relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => false, "settings" => [] }, "relationships" => { "capability" => { "data" => { "type" => "capabilities", "id" => "DATA_PROTECTION" } } } }] } } } }).
