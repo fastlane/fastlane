@@ -108,7 +108,7 @@ module Fastlane
                                        env_name: "FL_BADGE_SHIELD_IO_TIMEOUT",
                                        description: "Set custom duration for the timeout of the shields.io request in seconds",
                                        optional: true,
-                                       skip_type_validation: true, # allow integers, strings both
+                                       type: Integer, # allow integers, strings both
                                        verify_block: proc do |value|
                                          UI.user_error!("shield_io_timeout needs to be an integer > 0") if value.to_i < 1
                                        end),
