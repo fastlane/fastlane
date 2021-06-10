@@ -468,7 +468,7 @@ module Produce
       end
 
       # deprecated
-      if options.vpn_conf
+      if options.vpn_configuration
         UI.message("\tVPN Configuration")
 
         if on
@@ -488,7 +488,7 @@ module Produce
         end
       end
 
-      if options.wireless_conf
+      if options.wireless_accessory
         UI.message("\tWireless Accessory Configuration")
 
         if on
