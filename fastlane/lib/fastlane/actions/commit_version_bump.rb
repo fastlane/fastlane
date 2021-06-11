@@ -175,6 +175,7 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :ignore,
                                        description: "A regular expression used to filter matched plist files to be modified",
+                                       skip_type_validation: true, # allows Regex
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :include,
                                        description: "A list of extra files to be included in the version bump (string array or comma-separated string)",
@@ -233,7 +234,7 @@ module Fastlane
             include: %w[package.json custom.cfg] # include other updated files as part of the version bump
           )',
           'commit_version_bump(
-            ignore: "/OtherProject/" # ignore files matching a regular expression
+            ignore: /OtherProject/ # ignore files matching a regular expression
           )',
           'commit_version_bump(
             no_verify: true           # optional, default: false
