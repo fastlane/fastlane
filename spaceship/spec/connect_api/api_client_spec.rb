@@ -157,6 +157,14 @@ describe Spaceship::ConnectAPI::APIClient do
           client.send(:handle_error, mock_response)
         end.to raise_error(Spaceship::UnauthorizedAccessError, /Unknown error/)
       end
+
+      it 'raises UnauthorizedAccessError when body is string' do
+        allow(mock_response).to receive(:body).and_return('{"errors":[{"title": "Some title", "detail": "some detail"}]}')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::UnauthorizedAccessError, /Some title - some detail/)
+      end
     end
 
     describe "status of 403" do
@@ -179,13 +187,19 @@ describe Spaceship::ConnectAPI::APIClient do
       end
 
       it 'raises AccessForbiddenError with no errors in body' do
-        allow(mock_response).to receive(:body).and_return({
-
-        })
+        allow(mock_response).to receive(:body).and_return({})
 
         expect do
           client.send(:handle_error, mock_response)
         end.to raise_error(Spaceship::AccessForbiddenError, /Unknown error/)
+      end
+
+      it 'raises AccessForbiddenError when body is string' do
+        allow(mock_response).to receive(:body).and_return('{"errors":[{"title": "Some title", "detail": "some detail"}]}')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::AccessForbiddenError, /Some title - some detail/)
       end
 
       it 'raises AccessForbiddenError with errors in body' do
