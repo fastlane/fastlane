@@ -212,14 +212,14 @@ module Spaceship
 
         case response.status.to_i
         when 401
-          raise UnauthorizedAccessError, format_errors(response) if response && body['errors']
+          raise UnauthorizedAccessError, format_errors(response)
         when 403
           error = (body['errors'] || []).first || {}
           error_code = error['code']
           if error_code == "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
-            raise ProgramLicenseAgreementUpdated, format_errors(response) if response && body['errors']
+            raise ProgramLicenseAgreementUpdated, format_errors(response)
           else
-            raise AccessForbiddenError, format_errors(response) if response && body['errors']
+            raise AccessForbiddenError, format_errors(response)
           end
         end
       end
@@ -299,7 +299,7 @@ module Spaceship
         body = response.body.empty? ? {} : response.body
         body = JSON.parse(body) if body.kind_of?(String)
 
-        return body['errors'].map do |error|
+        formatted_errors = (body['errors'] || []).map do |error|
           messages = [[error['title'], error['detail'], error.dig("source", "pointer")].compact.join(" - ")]
 
           meta = error["meta"] || {}
@@ -309,6 +309,12 @@ module Spaceship
             [[associated_error["title"], associated_error["detail"]].compact.join(" - ")]
           end
         end.flatten.join("\n")
+
+        if formatted_errors.empty?
+          formatted_errors << "Unknown error"
+        end
+
+        return formatted_errors
       end
 
       private
