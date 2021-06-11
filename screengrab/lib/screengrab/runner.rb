@@ -134,6 +134,12 @@ module Screengrab
       return value.strip
     end
 
+    # Don't need to use to use run-as if external
+    def use_adb_run_as?(path, device_serial)
+      device_ext_storage = get_device_environment_variable(device_serial, "EXTERNAL_STORAGE")
+      return !path.start_with?(device_ext_storage)
+    end
+
     def determine_external_screenshots_path(device_serial, app_package_name, locales)
       device_ext_storage = get_device_environment_variable(device_serial, "EXTERNAL_STORAGE")
       return locales.map do |locale|
@@ -164,7 +170,10 @@ module Screengrab
 
       device_screenshots_paths.each do |device_path|
         if_device_path_exists(app_package_name, device_serial, device_path) do |path|
-          run_adb_command("-s #{device_serial.shellescape} shell rm -rf #{path.shellescape.shellescape}",
+          # Determine if path needs the run-as permission
+          run_as = use_adb_run_as?(path, device_serial) ? " run-as #{app_package_name.shellescape.shellescape}" : ""
+
+          run_adb_command("-s #{device_serial.shellescape} shell#{run_as} rm -rf #{path.shellescape.shellescape}",
           # run_adb_command("-s #{device_serial.shellescape} shell run-as #{app_package_name.shellescape.shellescape} rm -rf #{path.shellescape.shellescape}",
                           print_all: true,
                           print_command: true)
@@ -310,7 +319,11 @@ module Screengrab
             if out =~ /Permission denied/
               dir = File.dirname(path)
               base = File.basename(path)
-              run_adb_command("-s #{device_serial.shellescape} shell  \"tar -cC #{dir} #{base}\" | tar -xv -f- -C #{tempdir}",
+
+              # Determine if path needs the run-as permission
+              run_as = use_adb_run_as?(path, device_serial) ? " run-as #{@config[:app_package_name].shellescape.shellescape}" : ""
+
+              run_adb_command("-s #{device_serial.shellescape} shell#{run_as}  \"tar -cC #{dir} #{base}\" | tar -xv -f- -C #{tempdir}",
               # run_adb_command("-s #{device_serial.shellescape} shell run-as #{@config[:app_package_name].shellescape.shellescape} \"tar -cC #{dir} #{base}\" | tar -xv -f- -C #{tempdir}",
                               print_all: false,
                               print_command: true)
@@ -376,11 +389,15 @@ module Screengrab
     # Some device commands fail if executed against a device path that does not exist, so this helper method
     # provides a way to conditionally execute a block only if the provided path exists on the device.
     def if_device_path_exists(app_package_name, device_serial, device_path)
-      return if run_adb_command("-s #{device_serial.shellescape} shell ls #{device_path.shellescape.shellescape}",
+      # Determine if path needs the run-as permission
+      run_as = use_adb_run_as?(device_path, device_serial) ? " run-as #{app_package_name.shellescape.shellescape}" : ""
+
+
+      return if run_adb_command("-s #{device_serial.shellescape} shell#{run_as} ls #{device_path.shellescape.shellescape}",
       # return if run_adb_command("-s #{device_serial.shellescape} shell run-as #{app_package_name.shellescape.shellescape} ls #{device_path.shellescape.shellescape}",
                                 print_all: false,
                                 print_command: false).include?('No such file')
-
+      
       yield(device_path)
     rescue
       # Some versions of ADB will have a non-zero exit status for this, which will cause the executor to raise.
