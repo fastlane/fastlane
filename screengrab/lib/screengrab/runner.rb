@@ -174,7 +174,6 @@ module Screengrab
           run_as = use_adb_run_as?(path, device_serial) ? " run-as #{app_package_name.shellescape.shellescape}" : ""
 
           run_adb_command("-s #{device_serial.shellescape} shell#{run_as} rm -rf #{path.shellescape.shellescape}",
-          # run_adb_command("-s #{device_serial.shellescape} shell run-as #{app_package_name.shellescape.shellescape} rm -rf #{path.shellescape.shellescape}",
                           print_all: true,
                           print_command: true)
         end
@@ -324,7 +323,6 @@ module Screengrab
               run_as = use_adb_run_as?(path, device_serial) ? " run-as #{@config[:app_package_name].shellescape.shellescape}" : ""
 
               run_adb_command("-s #{device_serial.shellescape} shell#{run_as}  \"tar -cC #{dir} #{base}\" | tar -xv -f- -C #{tempdir}",
-              # run_adb_command("-s #{device_serial.shellescape} shell run-as #{@config[:app_package_name].shellescape.shellescape} \"tar -cC #{dir} #{base}\" | tar -xv -f- -C #{tempdir}",
                               print_all: false,
                               print_command: true)
             end
@@ -392,12 +390,10 @@ module Screengrab
       # Determine if path needs the run-as permission
       run_as = use_adb_run_as?(device_path, device_serial) ? " run-as #{app_package_name.shellescape.shellescape}" : ""
 
-
       return if run_adb_command("-s #{device_serial.shellescape} shell#{run_as} ls #{device_path.shellescape.shellescape}",
-      # return if run_adb_command("-s #{device_serial.shellescape} shell run-as #{app_package_name.shellescape.shellescape} ls #{device_path.shellescape.shellescape}",
                                 print_all: false,
                                 print_command: false).include?('No such file')
-      
+
       yield(device_path)
     rescue
       # Some versions of ADB will have a non-zero exit status for this, which will cause the executor to raise.
