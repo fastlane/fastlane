@@ -133,28 +133,27 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :notes,
                                        env_name: "CRASHLYTICS_NOTES",
                                        description: "The release notes as string - uses :notes_path under the hood",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :groups,
                                        env_name: "CRASHLYTICS_GROUPS",
                                        description: "The groups used for distribution, separated by commas",
-                                       optional: true,
-                                       is_string: false),
+                                       skip_type_validation: true, # allows String, Array
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :emails,
                                        env_name: "CRASHLYTICS_EMAILS",
                                        description: "Pass email addresses of testers, separated by commas",
-                                       optional: true,
-                                       is_string: false),
+                                       skip_type_validation: true, # allows String, Array
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :notifications,
                                        env_name: "CRASHLYTICS_NOTIFICATIONS",
                                        description: "Crashlytics notification option (true/false)",
                                        default_value: true,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :debug,
                                        env_name: "CRASHLYTICS_DEBUG",
                                        description: "Crashlytics debug option (true/false)",
                                        default_value: false,
-                                       is_string: false)
+                                       type: Boolean)
 
         ]
       end
