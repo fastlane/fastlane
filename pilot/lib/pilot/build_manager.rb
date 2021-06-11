@@ -18,7 +18,7 @@ module Pilot
       # see: https://github.com/fastlane/fastlane/issues/18767
       # We will do App Store Connect API login, if needed on start and set the token to use JWT auth in the future.
       # 'login' will happen only if token is not set and api-key or key-path is given
-      should_login_in_start = Spaceship::ConnectAPI.token.nil? && (options[:api_key_path] || options[:api_key])
+      should_login_in_start = true if Spaceship::ConnectAPI.token.nil? && (options[:api_key_path] || options[:api_key])
 
       start(options, should_login: should_login_in_start)
 
