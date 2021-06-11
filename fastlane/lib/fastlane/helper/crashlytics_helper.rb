@@ -47,9 +47,9 @@ module Fastlane
           command << params[:api_token]
           command << params[:build_secret]
           command << "-ipaPath '#{params[:ipa_path]}'"
-          command << "-emails '#{params[:emails]}'" if params[:emails]
+          command << "-emails '#{params[:emails].join(",").shellescape}'" if params[:emails]
           command << "-notesPath '#{params[:notes_path]}'" if params[:notes_path]
-          command << "-groupAliases '#{params[:groups]}'" if params[:groups]
+          command << "-groupAliases '#{params[:groups].join(",").shellescape}'" if params[:groups]
           command << "-notifications #{(params[:notifications] ? 'YES' : 'NO')}"
           command << "-debug #{(params[:debug] ? 'YES' : 'NO')}"
 
@@ -74,9 +74,9 @@ module Fastlane
           command << "-androidManifest #{File.expand_path(android_manifest_path).shellescape}"
 
           # Optional
-          command << "-betaDistributionEmails #{params[:emails].shellescape}" if params[:emails]
+          command << "-betaDistributionEmails #{params[:emails].join(",").shellescape}" if params[:emails]
           command << "-betaDistributionReleaseNotesFilePath #{File.expand_path(params[:notes_path]).shellescape}" if params[:notes_path]
-          command << "-betaDistributionGroupAliases #{params[:groups].shellescape}" if params[:groups]
+          command << "-betaDistributionGroupAliases #{params[:groups].join(",").shellescape}" if params[:groups]
           command << "-betaDistributionNotifications #{(params[:notifications] ? 'true' : 'false')}"
 
           return command

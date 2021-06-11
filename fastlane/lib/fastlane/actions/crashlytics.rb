@@ -2,9 +2,6 @@ module Fastlane
   module Actions
     class CrashlyticsAction < Action
       def self.run(params)
-        params[:groups] = params[:groups].join(",") if params[:groups].kind_of?(Array)
-        params[:emails] = params[:emails].join(",") if params[:emails].kind_of?(Array)
-
         params.values # to validate all inputs before looking for the ipa/apk
         tempfiles = []
 
@@ -137,12 +134,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :groups,
                                        env_name: "CRASHLYTICS_GROUPS",
                                        description: "The groups used for distribution, separated by commas",
-                                       skip_type_validation: true, # allows String, Array
+                                       type: Array,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :emails,
                                        env_name: "CRASHLYTICS_EMAILS",
                                        description: "Pass email addresses of testers, separated by commas",
-                                       skip_type_validation: true, # allows String, Array
+                                       type: Array,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :notifications,
                                        env_name: "CRASHLYTICS_NOTIFICATIONS",
