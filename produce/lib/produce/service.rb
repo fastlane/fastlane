@@ -1,6 +1,7 @@
 require 'spaceship'
 require_relative 'module'
 
+# rubocop:disable Metrics/ClassLength
 module Produce
   class Service
     def self.enable(options, args)
