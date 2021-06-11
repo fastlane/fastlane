@@ -1,7 +1,6 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     directory = "fl_spec_default_remote_branch"
-    repository = "https://github.com/seanmcneil/Empty.git"
 
     describe "Git Default Remote Branch Action" do
       it "generates the correct git command for retrieving default branch from remote" do
@@ -25,7 +24,7 @@ describe Fastlane do
             git_default_remote_branch
           end").runner.execute(:test)
 
-          expect(result).to eq("No remote default available")
+          expect(result).to be_nil
         end
       end
     end
@@ -50,7 +49,7 @@ describe Fastlane do
             git_default_remote_branch
           end").runner.execute(:test)
 
-          expect(result).to eq("No remote default available")
+          expect(result).to be_nil
         end
       end
     end
@@ -58,8 +57,6 @@ describe Fastlane do
     context "runs the command in a directory with a remote git repo" do
       it "Confirms that a default remote is found" do
         test_directory_path = Dir.mktmpdir(directory)
-
-        `git clone #{repository} #{test_directory_path}`
 
         Dir.chdir(test_directory_path) do
           expect(Fastlane::Actions).to receive(:sh)
@@ -79,11 +76,7 @@ describe Fastlane do
       it "Confirms that a default remote is found when on non-default branch" do
         test_directory_path = Dir.mktmpdir(directory)
 
-        `git clone #{repository} #{test_directory_path}`
-
         Dir.chdir(test_directory_path) do
-          `git checkout -b other`
-
           expect(Fastlane::Actions).to receive(:sh)
             .with("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false)
             .and_return("main")

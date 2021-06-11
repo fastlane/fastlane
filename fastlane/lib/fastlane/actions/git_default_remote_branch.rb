@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class GitDefaultRemoteBranchAction < Action
       def self.run(params)
-        Actions.git_default_remote_branch_name || "No remote default available"
+        Actions.git_default_remote_branch_name
       end
 
       #####################################################
