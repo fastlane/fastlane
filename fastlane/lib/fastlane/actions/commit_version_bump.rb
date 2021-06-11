@@ -233,7 +233,7 @@ module Fastlane
             include: %w[package.json custom.cfg] # include other updated files as part of the version bump
           )',
           'commit_version_bump(
-            ignore: /OtherProject/ # ignore files matching a regular expression
+            ignore: "/OtherProject/" # ignore files matching a regular expression
           )',
           'commit_version_bump(
             no_verify: true           # optional, default: false
