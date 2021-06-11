@@ -13,7 +13,10 @@ module Pilot
     def start(options, should_login: true)
       return if @config # to not login multiple times
       @config = options
-      login if should_login
+
+      # we will always start with App Store Connect API login if possible
+      # else fallback to 'should_login' param for 'apple_id' login
+      login if (config[:api_key] || config[:api_key_path]) || should_login
     end
 
     def login
