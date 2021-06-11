@@ -150,7 +150,7 @@ module Spaceship
       SFUniversalLinkApi = AppService.new_service("SFUNIVERSALLINK_API")
       VP9Decoder = AppService.new_service("VP9_DECODER")
 
-      # App Services 
+      # App Services
       MusicKit = AppService.new_service("MUSIC_KIT")
       ShazamKit = AppService.new_service("SHAZAM_KIT")
 
