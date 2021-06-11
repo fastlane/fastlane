@@ -14,12 +14,6 @@ module Pilot
       # Only need to login before upload if no apple_id was given
       # 'login' will be deferred until before waiting for build processing
       should_login_in_start = options[:apple_id].nil?
-
-      # see: https://github.com/fastlane/fastlane/issues/18767
-      # We will do App Store Connect API login, if needed on start and set the token to use JWT auth in the future.
-      # 'login' will happen only if token is not set and api-key or key-path is given
-      should_login_in_start = true if Spaceship::ConnectAPI.token.nil? && (options[:api_key_path] || options[:api_key])
-
       start(options, should_login: should_login_in_start)
 
       UI.user_error!("No ipa file given") unless config[:ipa]
@@ -372,6 +366,9 @@ module Pilot
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
+      # Ensure that user is authenticated
+      start(options)
+
       # Use JWT auth
       api_token = Spaceship::ConnectAPI.token
       unless api_token.nil?
