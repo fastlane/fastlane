@@ -47,9 +47,9 @@ module Fastlane
           command << params[:api_token]
           command << params[:build_secret]
           command << "-ipaPath '#{params[:ipa_path]}'"
-          command << "-emails '#{params[:emails].join(',').shellescape}'" if params[:emails]
+          command << "-emails '#{params[:emails].join(',')}'" if params[:emails]
           command << "-notesPath '#{params[:notes_path]}'" if params[:notes_path]
-          command << "-groupAliases '#{params[:groups].join(',').shellescape}'" if params[:groups]
+          command << "-groupAliases '#{params[:groups].join(',')}'" if params[:groups]
           command << "-notifications #{(params[:notifications] ? 'YES' : 'NO')}"
           command << "-debug #{(params[:debug] ? 'YES' : 'NO')}"
 
