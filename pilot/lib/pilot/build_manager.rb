@@ -366,6 +366,9 @@ module Pilot
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
+      # Ensure that user is authenticated
+      start(options)
+
       # Use JWT auth
       api_token = Spaceship::ConnectAPI.token
       unless api_token.nil?

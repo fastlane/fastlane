@@ -135,7 +135,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
                                        env_name: "INITIAL_BUILD_NUMBER",
                                        description: "sets the build number to given value if no build is in current train",
-                                       is_string: false),
+                                       skip_type_validation: true), # as we also allow integers, which we convert to strings anyway
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        short_option: "-a",
                                        env_name: "FASTLANE_APP_IDENTIFIER",
@@ -155,7 +155,7 @@ module Fastlane
                                        env_name: "APPSTORE_BUILD_NUMBER_LIVE_TEAM_ID",
                                        description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
-                                       is_string: false, # as we also allow integers, which we convert to strings anyway
+                                       skip_type_validation: true, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                        default_value_dynamic: true,
@@ -167,7 +167,7 @@ module Fastlane
                                        env_name: "APPSTORE_BUILD_NUMBER_LIVE",
                                        description: "Query the live version (ready-for-sale)",
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "LATEST_VERSION",
@@ -178,7 +178,6 @@ module Fastlane
                                        env_name: "APPSTORE_PLATFORM",
                                        description: "The platform to use (optional)",
                                        optional: true,
-                                       is_string: true,
                                        default_value: "ios",
                                        verify_block: proc do |value|
                                          UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include?(value)

@@ -97,7 +97,7 @@ module Deliver
         localised_options = LOCALISED_LIVE_VALUES
         non_localised_options = NON_LOCALISED_LIVE_VALUES
 
-        if v.nil?
+        if version.nil?
           UI.message("Couldn't find live version, editing the current version on App Store Connect instead")
           version = fetch_edit_app_store_version(app, platform)
           # we don't want to update the localised_options and non_localised_options
