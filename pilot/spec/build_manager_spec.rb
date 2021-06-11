@@ -534,6 +534,89 @@ describe "Build Manager" do
 
         fake_build_manager.upload(upload_options)
       end
+
+      shared_examples "performing the spaceship login for JWT auth by pilot" do
+        before(:each) do
+          expect(fake_build_manager).to(receive(:login))
+        end
+
+        it "performs the login using Manager.login" do
+          fake_build_manager.upload(upload_options)
+        end
+      end
+
+      shared_examples "skipping the spaceship login for JWT auth by pilot" do
+        before(:each) do
+          expect(fake_build_manager).not_to(receive(:login))
+        end
+
+        it "skips the login using Manager.login" do
+          fake_build_manager.upload(upload_options)
+        end
+      end
+
+      describe "what happens when spaceship token is nil" do
+        before(:each) do
+          allow(Spaceship::ConnectAPI).to receive(:token).and_return(nil)
+        end
+
+        context "when input options has NO api_key or api_key_path input" do
+          before(:each) do
+            upload_options[:api_key] = nil
+            upload_options[:api_key_path] = nil
+          end
+
+          it_behaves_like "skipping the spaceship login for JWT auth by pilot"
+        end
+
+        context "when input options has api_key input" do
+          before(:each) do
+            upload_options[:api_key] = "fake api key"
+          end
+
+          it_behaves_like "performing the spaceship login for JWT auth by pilot"
+        end
+
+        context "when input options has api_key_path input" do
+          before(:each) do
+            upload_options[:api_key_path] = "./spaceship/spec/connect_api/fixtures/asc_key.json"
+          end
+
+          it_behaves_like "performing the spaceship login for JWT auth by pilot"
+        end
+      end
+
+      describe "what happens when spaceship token is already set" do
+        before(:each) do
+          fake_api_key_json_path = "./spaceship/spec/connect_api/fixtures/asc_key.json"
+          allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
+        end
+
+        context "when input options has NO api_key or api_key_path input" do
+          before(:each) do
+            upload_options[:api_key] = nil
+            upload_options[:api_key_path] = nil
+          end
+
+          it_behaves_like "skipping the spaceship login for JWT auth by pilot"
+        end
+
+        context "when input options has api_key input" do
+          before(:each) do
+            upload_options[:api_key] = "fake api key"
+          end
+
+          it_behaves_like "skipping the spaceship login for JWT auth by pilot"
+        end
+
+        context "when input options has api_key_path input" do
+          before(:each) do
+            upload_options[:api_key_path] = "./spaceship/spec/connect_api/fixtures/asc_key.json"
+          end
+
+          it_behaves_like "skipping the spaceship login for JWT auth by pilot"
+        end
+      end
     end
   end
 
