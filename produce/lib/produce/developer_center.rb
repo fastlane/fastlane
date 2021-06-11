@@ -59,6 +59,22 @@ module Produce
       car_play_voip_calling_app: [SERVICE_ON, SERVICE_OFF],
       critical_alerts: [SERVICE_ON, SERVICE_OFF],
       hotspot_helper: [SERVICE_ON, SERVICE_OFF],
+      driver_kit: [SERVICE_ON, SERVICE_OFF],
+      driver_kit_endpoint_security: [SERVICE_ON, SERVICE_OFF],
+      driver_kit_family_hid_device: [SERVICE_ON, SERVICE_OFF],
+      driver_kit_family_networking: [SERVICE_ON, SERVICE_OFF],
+      driver_kit_family_serial: [SERVICE_ON, SERVICE_OFF],
+      driver_kit_hid_event_service: [SERVICE_ON, SERVICE_OFF],
+      driver_kit_transport_hid: [SERVICE_ON, SERVICE_OFF],
+      multitasking_camera_access: [SERVICE_ON, SERVICE_OFF],
+      sf_universal_link_api: [SERVICE_ON, SERVICE_OFF],
+      vp9_decoder: [SERVICE_ON, SERVICE_OFF],
+      music_kit: [SERVICE_ON, SERVICE_OFF],
+      shazam_kit: [SERVICE_ON, SERVICE_OFF],
+      communication_notifications: [SERVICE_ON, SERVICE_OFF],
+      group_activities: [SERVICE_ON, SERVICE_OFF],
+      health_kit_estimate_recalibration: [SERVICE_ON, SERVICE_OFF],
+      time_sensitive_notifications: [SERVICE_ON, SERVICE_OFF],
     }
 
     def run

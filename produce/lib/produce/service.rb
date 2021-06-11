@@ -41,7 +41,9 @@ module Produce
                       :extended_virtual_address_space, :file_provider_testing_mode, :fonts, :game_center, :health_kit, :hls_interstitial_preview, :home_kit, :hotspot,
                       :hotspot_helper, :in_app_purchase, :inter_app_audio, :low_latency_hls, :managed_associated_domains, :maps, :multipath, :network_extension,
                       :nfc_tag_reading, :passbook, :personal_vpn, :push_notification, :sign_in_with_apple, :siri_kit, :system_extension, :user_management, :vpn_configuration, :wallet,
-                      :wireless_accessory]
+                      :wireless_accessory, :driver_kit, :driver_kit_endpoint_security, :driver_kit_family_hid_device, :driver_kit_family_networking, :driver_kit_family_serial,
+                      :driver_kit_hid_event_service, :driver_kit_transport_hid, :multitasking_camera_access, :sf_universal_link_api, :vp9_decoder, :music_kit, :shazam_kit,
+                      :communication_notifications, :group_activities, :health_kit_estimate_recalibration, :time_sensitive_notifications]
       options.__hash__.select { |key, value| allowed_keys.include?(key) }
     end
 
@@ -495,6 +497,166 @@ module Produce
           app.update_service(Spaceship.app_service.wireless_accessory.on)
         else
           app.update_service(Spaceship.app_service.wireless_accessory.off)
+        end
+      end
+
+      if options.driver_kit
+        UI.message("\tDriverKit")
+
+        if on
+          app.update_service(Spaceship.app_service.driver_kit.on)
+        else
+          app.update_service(Spaceship.app_service.driver_kit.off)
+        end
+      end
+
+      if options.driver_kit_endpoint_security
+        UI.message("\tDriverKit Endpoint Security")
+
+        if on
+          app.update_service(Spaceship.app_service.driver_kit_endpoint_security.on)
+        else
+          app.update_service(Spaceship.app_service.driver_kit_endpoint_security.off)
+        end
+      end
+
+      if options.driver_kit_family_hid_device
+        UI.message("\tDriverKit Family HID Device")
+
+        if on
+          app.update_service(Spaceship.app_service.driver_kit_family_hid_device.on)
+        else
+          app.update_service(Spaceship.app_service.driver_kit_family_hid_device.off)
+        end
+      end
+
+      if options.driver_kit_family_networking
+        UI.message("\tDriverKit Family Networking")
+
+        if on
+          app.update_service(Spaceship.app_service.driver_kit_family_networking.on)
+        else
+          app.update_service(Spaceship.app_service.driver_kit_family_networking.off)
+        end
+      end
+
+      if options.driver_kit_family_serial
+        UI.message("\tDriverKit Family Serial")
+
+        if on
+          app.update_service(Spaceship.app_service.driver_kit_family_serial.on)
+        else
+          app.update_service(Spaceship.app_service.driver_kit_family_serial.off)
+        end
+      end
+
+      if options.driver_kit_hid_event_service
+        UI.message("\tDriverKit HID EventService")
+
+        if on
+          app.update_service(Spaceship.app_service.driver_kit_hid_event_service.on)
+        else
+          app.update_service(Spaceship.app_service.driver_kit_hid_event_service.off)
+        end
+      end
+
+      if options.driver_kit_transport_hid
+        UI.message("\tDriverKit Transport HID")
+
+        if on
+          app.update_service(Spaceship.app_service.driver_kit_transport_hid.on)
+        else
+          app.update_service(Spaceship.app_service.driver_kit_transport_hid.off)
+        end
+      end
+
+      if options.multitasking_camera_access
+        UI.message("\tMultitasking Camera Access")
+
+        if on
+          app.update_service(Spaceship.app_service.multitasking_camera_access.on)
+        else
+          app.update_service(Spaceship.app_service.multitasking_camera_access.off)
+        end
+      end
+
+      if options.sf_universal_link_api
+        UI.message("\tSFUniversalLink API")
+
+        if on
+          app.update_service(Spaceship.app_service.sf_universal_link_api.on)
+        else
+          app.update_service(Spaceship.app_service.sf_universal_link_api.off)
+        end
+      end
+
+      if options.vp9_decoder
+        UI.message("\tVP9 Decoder")
+
+        if on
+          app.update_service(Spaceship.app_service.vp9_decoder.on)
+        else
+          app.update_service(Spaceship.app_service.vp9_decoder.off)
+        end
+      end
+
+      if options.music_kit
+        UI.message("\tMusicKit")
+
+        if on
+          app.update_service(Spaceship.app_service.music_kit.on)
+        else
+          app.update_service(Spaceship.app_service.music_kit.off)
+        end
+      end
+
+      if options.shazam_kit
+        UI.message("\tShazamKit")
+
+        if on
+          app.update_service(Spaceship.app_service.shazam_kit.on)
+        else
+          app.update_service(Spaceship.app_service.shazam_kit.off)
+        end
+      end
+
+      if options.communication_notifications
+        UI.message("\tCommunication Notifications")
+
+        if on
+          app.update_service(Spaceship.app_service.communication_notifications.on)
+        else
+          app.update_service(Spaceship.app_service.communication_notifications.off)
+        end
+      end
+
+      if options.group_activities
+        UI.message("\tGroup Activities")
+
+        if on
+          app.update_service(Spaceship.app_service.group_activities.on)
+        else
+          app.update_service(Spaceship.app_service.group_activities.off)
+        end
+      end
+
+      if options.health_kit_estimate_recalibration
+        UI.message("\tHealthKit Estimate Recalibration")
+
+        if on
+          app.update_service(Spaceship.app_service.health_kit_estimate_recalibration.on)
+        else
+          app.update_service(Spaceship.app_service.health_kit_estimate_recalibration.off)
+        end
+      end
+
+      if options.time_sensitive_notifications
+        UI.message("\tTime Sensitive Notifications")
+
+        if on
+          app.update_service(Spaceship.app_service.time_sensitive_notifications.on)
+        else
+          app.update_service(Spaceship.app_service.time_sensitive_notifications.off)
         end
       end
 

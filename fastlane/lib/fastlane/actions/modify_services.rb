@@ -81,7 +81,23 @@ module Fastlane
           car_play_navigation_app: 'car_play_navigation_app',
           car_play_voip_calling_app: 'car_play_voip_calling_app',
           critical_alerts: 'critical_alerts',
-          hotspot_helper: 'hotspot_helper'
+          hotspot_helper: 'hotspot_helper',
+          driver_kit: 'driver_kit',
+          driver_kit_endpoint_security: 'driver_kit_endpoint_security',
+          driver_kit_family_hid_device: 'driver_kit_family_hid_device',
+          driver_kit_family_networking: 'driver_kit_family_networking',
+          driver_kit_family_serial: 'driver_kit_family_serial',
+          driver_kit_hid_event_service: 'driver_kit_hid_event_service',
+          driver_kit_transport_hid: 'driver_kit_transport_hid',
+          multitasking_camera_access: 'multitasking_camera_access',
+          sf_universal_link_api: 'sf_universal_link_api',
+          vp9_decoder: 'vp9_decoder',
+          music_kit: 'music_kit',
+          shazam_kit: 'shazam_kit',
+          communication_notifications: 'communication_notifications',
+          group_activities: 'group_activities',
+          health_kit_estimate_recalibration: 'health_kit_estimate_recalibration',
+          time_sensitive_notifications: 'time_sensitive_notifications'
         }
       end
 

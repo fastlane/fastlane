@@ -131,46 +131,62 @@ fastlane produce enable_services --help
 ```
 
 ```no-highlight
---access-wifi                      Enable Access Wifi                    
---app-attest                       Enable App Attest                   
---app-group                        Enable App Group                  
---apple-pay                        Enable Apple Pay                  
---associated-domains               Enable Associated Domains                           
---auto-fill-credential             Enable Auto Fill Credential                             
---class-kit                        Enable Class Kit                  
---cloud STRING                     Enable iCloud, suitable values are "xcode5_compatible" and "xcode6_compatible"                     
---custom-network-protocol          Enable Custom Network Protocol                                
---data-protection STRING           Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"                               
---extended-virtual-address-space   Enable Extended Virtual Address Space                                       
---game-center STRING               Enable Game Center, suitable values are "ios" and "macos                           
---health-kit                       Enable Health Kit                   
---hls-interstitial-preview         Enable Hls Interstitial Preview                                 
---home-kit                         Enable Home Kit                 
---hotspot                          Enable Hotspot                
---in-app-purchase                  Enable In App Purchase                        
---inter-app-audio                  Enable Inter App Audio                        
---low-latency-hls                  Enable Low Latency Hls                        
---managed-associated-domains       Enable Managed Associated Domains                                   
---maps                             Enable Maps             
---multipath                        Enable Multipath                  
---network-extension                Enable Network Extension                          
---nfc-tag-reading                  Enable NFC Tag Reading                        
---personal-vpn                     Enable Personal VPN                     
---passbook                         Enable Passbook (deprecated)                 
---push-notification                Enable Push Notification                          
---sign-in-with-apple               Enable Sign In With Apple                           
---siri-kit                         Enable Siri Kit                 
---system-extension                 Enable System Extension                         
---user-management                  Enable User Management                        
---vpn-configuration                Enable Vpn Configuration (deprecated)                          
---wallet                           Enable Wallet               
---wireless-accessory               Enable Wireless Accessory                           
---car-play-audio-app               Enable Car Play Audio App                           
---car-play-messaging-app           Enable Car Play Messaging App                               
---car-play-navigation-app          Enable Car Play Navigation App                                
---car-play-voip-calling-app        Enable Car Play Voip Calling App                                  
---critical-alerts                  Enable Critical Alerts                        
---hotspot-helper                   Enable Hotspot Helper                       
+--access-wifi                         Enable Access Wifi
+--app-attest                          Enable App Attest
+--app-group                           Enable App Group
+--apple-pay                           Enable Apple Pay
+--associated-domains                  Enable Associated Domains
+--auto-fill-credential                Enable Auto Fill Credential
+--class-kit                           Enable Class Kit
+--cloud STRING                        Enable iCloud, suitable values are "xcode5_compatible" and "xcode6_compatible"
+--custom-network-protocol             Enable Custom Network Protocol
+--data-protection STRING              Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"
+--extended-virtual-address-space      Enable Extended Virtual Address Space
+--game-center STRING                  Enable Game Center, suitable values are "ios" and "macos
+--health-kit                          Enable Health Kit
+--hls-interstitial-preview            Enable Hls Interstitial Preview
+--home-kit                            Enable Home Kit
+--hotspot                             Enable Hotspot
+--in-app-purchase                     Enable In App Purchase
+--inter-app-audio                     Enable Inter App Audio
+--low-latency-hls                     Enable Low Latency Hls
+--managed-associated-domains          Enable Managed Associated Domains
+--maps                                Enable Maps
+--multipath                           Enable Multipath
+--network-extension                   Enable Network Extension
+--nfc-tag-reading                     Enable NFC Tag Reading
+--personal-vpn                        Enable Personal VPN
+--passbook                            Enable Passbook (deprecated)
+--push-notification                   Enable Push Notification
+--sign-in-with-apple                  Enable Sign In With Apple
+--siri-kit                            Enable Siri Kit
+--system-extension                    Enable System Extension
+--user-management                     Enable User Management
+--vpn-configuration                   Enable Vpn Configuration (deprecated)
+--wallet                              Enable Wallet
+--wireless-accessory                  Enable Wireless Accessory
+--car-play-audio-app                  Enable Car Play Audio App
+--car-play-messaging-app              Enable Car Play Messaging App
+--car-play-navigation-app             Enable Car Play Navigation App
+--car-play-voip-calling-app           Enable Car Play Voip Calling App
+--critical-alerts                     Enable Critical Alerts
+--hotspot-helper                      Enable Hotspot Helper
+--driver-kit                          Enable DriverKit
+--driver-kit-endpoint-security        Enable DriverKit Endpoint Security
+--driver-kit-family-hid-device        Enable DriverKit Family HID Device
+--driver-kit-family-networking        Enable DriverKit Family Networking
+--driver-kit-family-serial            Enable DriverKit Family Serial
+--driver-kit-hid-event-service        Enable DriverKit HID EventService
+--driver-kit-transport-hid            Enable DriverKit Transport HID
+--multitasking-camera-access          Enable Multitasking Camera Access
+--sf-universal-link-api               Enable SFUniversalLink API
+--vp9-decoder                         Enable VP9 Decoder
+--music-kit                           Enable MusicKit
+--shazam-kit                          Enable ShazamKit
+--communication-notifications         Enable Communication Notifications
+--group-activities                    Enable Group Activities
+--health-kit-estimate-recalibration   Enable HealthKit Estimate Recalibration
+--time-sensitive-notifications        Enable Time Sensitive Notifications
 ```
 
 ```no-highlight
@@ -178,46 +194,62 @@ fastlane produce disable_services --help
 ```
 
 ```no-highlight
---access-wifi                      Disable Access Wifi                    
---app-attest                       Disable App Attest                   
---app-group                        Disable App Group                  
---apple-pay                        Disable Apple Pay                  
---associated-domains               Disable Associated Domains                           
---auto-fill-credential             Disable Auto Fill Credential                             
---class-kit                        Disable Class Kit                  
---cloud STRING                     Disable iCloud                     
---custom-network-protocol          Disable Custom Network Protocol                                
---data-protection STRING           Disable Data Protection                          
---extended-virtual-address-space   Disable Extended Virtual Address Space                                       q
---game-center STRING               Disable Game Center                        
---health-kit                       Disable Health Kit                   
---hls-interstitial-preview         Disable Hls Interstitial Preview                                 
---home-kit                         Disable Home Kit                 
---hotspot                          Disable Hotspot                
---in-app-purchase                  Disable In App Purchase                        
---inter-app-audio                  Disable Inter App Audio                        
---low-latency-hls                  Disable Low Latency Hls                        
---managed-associated-domains       Disable Managed Associated Domains                                   
---maps                             Disable Maps             
---multipath                        Disable Multipath                  
---network-extension                Disable Network Extension                          
---nfc-tag-reading                  Disable NFC Tag Reading                        
---personal-vpn                     Disable Personal VPN                     
---passbook                         Disable Passbook (deprecated)                 
---push-notification                Disable Push Notification                          
---sign-in-with-apple               Disable Sign In With Apple                           
---siri-kit                         Disable Siri Kit                 
---system-extension                 Disable System Extension                         
---user-management                  Disable User Management                        
---vpn-configuration                Disable Vpn Configuration (deprecated)                          
---wallet                           Disable Wallet               
---wireless-accessory               Disable Wireless Accessory                           
---car-play-audio-app               Disable Car Play Audio App                           
---car-play-messaging-app           Disable Car Play Messaging App                               
---car-play-navigation-app          Disable Car Play Navigation App                                
---car-play-voip-calling-app        Disable Car Play Voip Calling App                                  
---critical-alerts                  Disable Critical Alerts                        
---hotspot-helper                   Disable Hotspot Helper    
+--access-wifi                         Disable Access Wifi
+--app-attest                          Disable App Attest
+--app-group                           Disable App Group
+--apple-pay                           Disable Apple Pay
+--associated-domains                  Disable Associated Domains
+--auto-fill-credential                Disable Auto Fill Credential
+--class-kit                           Disable Class Kit
+--cloud STRING                        Disable iCloud
+--custom-network-protocol             Disable Custom Network Protocol
+--data-protection STRING              Disable Data Protection
+--extended-virtual-address-space      Disable Extended Virtual Address Space
+--game-center STRING                  Disable Game Center
+--health-kit                          Disable Health Kit
+--hls-interstitial-preview            Disable Hls Interstitial Preview
+--home-kit                            Disable Home Kit
+--hotspot                             Disable Hotspot
+--in-app-purchase                     Disable In App Purchase
+--inter-app-audio                     Disable Inter App Audio
+--low-latency-hls                     Disable Low Latency Hls
+--managed-associated-domains          Disable Managed Associated Domains
+--maps                                Disable Maps
+--multipath                           Disable Multipath
+--network-extension                   Disable Network Extension
+--nfc-tag-reading                     Disable NFC Tag Reading
+--personal-vpn                        Disable Personal VPN
+--passbook                            Disable Passbook (deprecated)
+--push-notification                   Disable Push Notification
+--sign-in-with-apple                  Disable Sign In With Apple
+--siri-kit                            Disable Siri Kit
+--system-extension                    Disable System Extension
+--user-management                     Disable User Management
+--vpn-configuration                   Disable Vpn Configuration (deprecated)
+--wallet                              Disable Wallet
+--wireless-accessory                  Disable Wireless Accessory
+--car-play-audio-app                  Disable Car Play Audio App
+--car-play-messaging-app              Disable Car Play Messaging App
+--car-play-navigation-app             Disable Car Play Navigation App
+--car-play-voip-calling-app           Disable Car Play Voip Calling App
+--critical-alerts                     Disable Critical Alerts
+--hotspot-helper                      Disable Hotspot Helper
+--driver-kit                          Disable DriverKit
+--driver-kit-endpoint-security        Disable DriverKit Endpoint Security
+--driver-kit-family-hid-device        Disable DriverKit Family HID Device
+--driver-kit-family-networking        Disable DriverKit Family Networking
+--driver-kit-family-serial            Disable DriverKit Family Serial
+--driver-kit-hid-event-service        Disable DriverKit HID EventService
+--driver-kit-transport-hid            Disable DriverKit Transport HID
+--multitasking-camera-access          Disable Multitasking Camera Access
+--sf-universal-link-api               Disable SFUniversalLink API
+--vp9-decoder                         Disable VP9 Decoder
+--music-kit                           Disable MusicKit
+--shazam-kit                          Disable ShazamKit
+--communication-notifications         Disable Communication Notifications
+--group-activities                    Disable Group Activities
+--health-kit-estimate-recalibration   Disable HealthKit Estimate Recalibration
+--time-sensitive-notifications        Disable Time Sensitive Notifications
 ```
 
 ## Creating Apple Pay merchants and associating them with an App ID
@@ -316,6 +348,22 @@ lane :release do
       vpn_configuration: "on",                  # Valid values: "on", "off" (deprecated)
       wallet: "on",                             # Valid values: "on", "off"
       wireless_accessory: "on",                 # Valid values: "on", "off"
+      driver_kit: "on",                         # Valid values: "on", "off"
+      driver_kit_endpoint_security: "on",       # Valid values: "on", "off"
+      driver_kit_family_hid_device: "on",       # Valid values: "on", "off"
+      driver_kit_family_networking: "on",       # Valid values: "on", "off"
+      driver_kit_family_serial: "on",           # Valid values: "on", "off"
+      driver_kit_hid_event_service: "on",       # Valid values: "on", "off"
+      driver_kit_transport_hid: "on",           # Valid values: "on", "off"
+      multitasking_camera_access: "on",         # Valid values: "on", "off"
+      sf_universal_link_api: "on",              # Valid values: "on", "off"
+      vp9_decoder: "on",                        # Valid values: "on", "off"
+      music_kit: "on",                          # Valid values: "on", "off"
+      shazam_kit: "on",                         # Valid values: "on", "off"
+      communication_notifications: "on",        # Valid values: "on", "off"
+      group_activities: "on",                   # Valid values: "on", "off"
+      health_kit_estimate_recalibration: "on",  # Valid values: "on", "off"
+      time_sensitive_notifications: "on",       # Valid values: "on", "off"
     }
   )
 
