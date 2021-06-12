@@ -247,9 +247,8 @@ module Match
         UI.success("Successfully deleted certificate")
       end
 
-      if self.files.count > 0
-        files_to_delete = delete_files!
-      end
+      files_to_delete = delete_files! if self.files.count > 0
+      files_to_delete ||= []
 
       self.encryption.encrypt_files if self.encryption
 
