@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class GitDefaultRemoteBranchAction < Action
       def self.run(params)
-        Actions.git_default_remote_branch_name
+        Actions.git_default_remote_branch_name(params[:remote_name])
       end
 
       #####################################################
@@ -18,7 +18,12 @@ module Fastlane
       end
 
       def self.available_options
-        []
+        [
+          FastlaneCore::ConfigItem.new(key: :remote_name,
+                                       env_name: "FL_REMOTE_REPOSITORY",
+                                       description: "The remote repository to check",
+                                       optional: true)
+        ]
       end
 
       def self.output
@@ -34,7 +39,10 @@ module Fastlane
       end
 
       def self.example_code
-        ['git_default_remote_branch']
+        [
+          'git_default_remote_branch',
+          'git_default_remote_branch(remote_name:"upstream") # Provide a remote name'
+        ]
       end
 
       def self.return_type
