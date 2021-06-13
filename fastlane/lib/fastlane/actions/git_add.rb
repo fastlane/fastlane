@@ -74,7 +74,7 @@ module Fastlane
           # 'git_add(path: "./version.txt")',
           'git_add(path: ["./version.txt", "./changelog.txt"])',
           # 'git_add(path: "./Frameworks/*", shell_escape: false)',
-          'git_add(path: ["*.h", "*.m"], shell_escape: false)',
+          'git_add(path: ["*.h", "*.m"], shell_escape: false)'
           # 'git_add(path: "./Frameworks/*", shell_escape: false)',
           # 'git_add(path: "*.txt", shell_escape: false)'
         ]
