@@ -13,7 +13,7 @@ describe Fastlane do
     end
 
     describe "Git Default Remote Branch Action with optional remote name" do
-      it "generates the correct git command for retrieving default branch from provided remote name" do
+      it "generates the correct git command for retrieving default branch using provided remote name" do
         result = Fastlane::FastFile.new.parse("lane :test do
             git_default_remote_branch(remote_name:'upstream')
           end").runner.execute(:test)
@@ -64,39 +64,18 @@ describe Fastlane do
       end
     end
 
-    context "runs the command in a directory with a remote git repo" do
+    context "runs the command with a remote git repo" do
       it "Confirms that a default remote is found" do
-        test_directory_path = Dir.mktmpdir(directory)
+        allow(Fastlane::Actions).to receive(:sh)
+          .with("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false)
+          .and_return("main")
+        allow(Fastlane::Actions).to receive(:git_branch).and_return(nil)
 
-        Dir.chdir(test_directory_path) do
-          expect(Fastlane::Actions).to receive(:sh)
-            .with("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false)
-            .and_return("main")
-
-          result = Fastlane::FastFile.new.parse("lane :test do
+        result = Fastlane::FastFile.new.parse("lane :test do
             git_default_remote_branch
           end").runner.execute(:test)
 
-          expect(result).to eq("main")
-        end
-      end
-    end
-
-    context "runs the command in a directory with a remote git repo on non-default branch" do
-      it "Confirms that a default remote is found when on non-default branch" do
-        test_directory_path = Dir.mktmpdir(directory)
-
-        Dir.chdir(test_directory_path) do
-          expect(Fastlane::Actions).to receive(:sh)
-            .with("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false)
-            .and_return("main")
-
-          result = Fastlane::FastFile.new.parse("lane :test do
-            git_default_remote_branch
-          end").runner.execute(:test)
-
-          expect(result).to eq("main")
-        end
+        expect(result).to eq("main")
       end
     end
 
