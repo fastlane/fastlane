@@ -22,7 +22,7 @@ module Produce
       associated_domains: [SERVICE_ON, SERVICE_OFF],
       auto_fill_credential: [SERVICE_ON, SERVICE_OFF],
       class_kit: [SERVICE_ON, SERVICE_OFF],
-      cloud: [SERVICE_XCODE_5, SERVICE_XCODE_6],
+      icloud: [SERVICE_XCODE_5, SERVICE_XCODE_6],
       custom_network_protocol: [SERVICE_ON, SERVICE_OFF],
       data_protection: [
         SERVICE_COMPLETE,
