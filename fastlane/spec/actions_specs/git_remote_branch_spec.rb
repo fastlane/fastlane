@@ -2,20 +2,20 @@ describe Fastlane do
   describe Fastlane::FastFile do
     directory = "fl_spec_default_remote_branch"
 
-    describe "Git Default Remote Branch Action" do
+    describe "Git Remote Branch Action" do
       it "generates the correct git command for retrieving default branch from remote" do
         result = Fastlane::FastFile.new.parse("lane :test do
-            git_default_remote_branch
+            git_remote_branch
           end").runner.execute(:test)
 
         expect(result).to eq("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'")
       end
     end
 
-    describe "Git Default Remote Branch Action with optional remote name" do
+    describe "Git Remote Branch Action with optional remote name" do
       it "generates the correct git command for retrieving default branch using provided remote name" do
         result = Fastlane::FastFile.new.parse("lane :test do
-            git_default_remote_branch(remote_name:'upstream')
+            git_remote_branch(remote_name:'upstream')
           end").runner.execute(:test)
 
         expect(result).to eq("git remote show upstream | grep 'HEAD branch' | sed 's/.*: //'")
@@ -31,7 +31,7 @@ describe Fastlane do
             .with("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false)
 
           result = Fastlane::FastFile.new.parse("lane :test do
-            git_default_remote_branch
+            git_remote_branch
           end").runner.execute(:test)
 
           expect(result).to be_nil
@@ -56,7 +56,7 @@ describe Fastlane do
             .with("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false)
 
           result = Fastlane::FastFile.new.parse("lane :test do
-            git_default_remote_branch
+            git_remote_branch
           end").runner.execute(:test)
 
           expect(result).to be_nil
@@ -72,7 +72,7 @@ describe Fastlane do
         allow(Fastlane::Actions).to receive(:git_branch).and_return(nil)
 
         result = Fastlane::FastFile.new.parse("lane :test do
-            git_default_remote_branch
+            git_remote_branch
           end").runner.execute(:test)
 
         expect(result).to eq("main")

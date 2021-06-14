@@ -1,8 +1,8 @@
 module Fastlane
   module Actions
-    class GitDefaultRemoteBranchAction < Action
+    class GitRemoteBranchAction < Action
       def self.run(params)
-        Actions.git_default_remote_branch_name(params[:remote_name])
+        Actions.git_remote_branch_name(params[:remote_name])
       end
 
       #####################################################
@@ -40,8 +40,8 @@ module Fastlane
 
       def self.example_code
         [
-          'git_default_remote_branch',
-          'git_default_remote_branch(remote_name:"upstream") # Provide a remote name'
+          'git_remote_branch # Query git for first available remote name',
+          'git_remote_branch(remote_name:"upstream") # Provide a remote name'
         ]
       end
 

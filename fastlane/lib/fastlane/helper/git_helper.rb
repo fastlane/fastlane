@@ -140,7 +140,7 @@ module Fastlane
     end
 
     # Returns the default git remote branch name
-    def self.git_default_remote_branch_name(remote_name)
+    def self.git_remote_branch_name(remote_name)
       # Rescues if not a git repo or no remote repo
       begin
         if remote_name
