@@ -14,9 +14,9 @@ module Pilot
       return if @config # to not login multiple times
       @config = options
 
-      # we will always start with App Store Connect API login if required and possible
+      # we will always start with App Store Connect API login 'if possible'
       # else fallback to 'should_login' param for 'apple_id' login
-      should_login_for_appstore_connect_api = Spaceship::ConnectAPI.token.nil? && (options[:api_key_path] || options[:api_key])
+      should_login_for_appstore_connect_api = (options[:api_key_path] || options[:api_key])
       login if should_login_for_appstore_connect_api || should_login
     end
 
