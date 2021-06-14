@@ -16,7 +16,7 @@ module Pilot
 
       # we will always start with App Store Connect API login 'if possible'
       # else fallback to 'should_login' param for 'apple_id' login
-      login if config[:api_key_path] || config[:api_key] || should_login
+      login if options[:api_key_path] || options[:api_key] || should_login
     end
 
     def login
