@@ -10,7 +10,6 @@ require_relative 'provisioning_profile'
 require_relative 'certificate'
 require_relative 'website_push'
 require_relative 'persons'
-require_relative 'update_bundle_request'
 
 module Spaceship
   # rubocop:disable Metrics/ClassLength
@@ -23,16 +22,6 @@ module Spaceship
 
     def self.hostname
       "https://developer.apple.com/services-account/#{PROTOCOL_VERSION}/"
-    end
-
-    def self.hostname_v1_api
-      "https://developer.apple.com/services-account/"
-    end
-
-    # A second client is needed for hostnames that do not require a protocol version to be appended
-    def initialize(cookie: nil, current_team_id: nil, csrf_tokens: nil, timeout: nil)
-      super(cookie: cookie, current_team_id: current_team_id, csrf_tokens: csrf_tokens, timeout: timeout)
-      @client_v1_api = build_client(self.class.hostname_v1_api)
     end
 
     def send_login_request(user, password)
@@ -149,18 +138,16 @@ module Spaceship
     end
 
     def update_service_for_app(app, service)
-      update_service(app, service)
-      details_for_app(app)
-    end
-
-    def update_service(app, service)
       ensure_csrf(Spaceship::Portal::App)
-      data = Spaceship::Portal::UpdateBundleRequest.new(app, service).to_hash_deep
-      params = data.to_json
-      headers = {}
-      headers['Content-Type'] = 'application/vnd.api+json'
-      headers['X-Requested-With'] = 'XMLHttpRequest'
-      request(:patch, "v1/bundleIds/#{app.app_id}", params, headers, false, @client_v1_api)
+
+      request(:post, service.service_uri, {
+        teamId: team_id,
+        displayId: app.app_id,
+        featureType: service.service_id,
+        featureValue: service.value
+      })
+
+      details_for_app(app)
     end
 
     def associate_groups_with_app(app, groups)
@@ -239,7 +226,7 @@ module Spaceship
       }
       params.merge!(ident_params)
       enable_services.each do |k, v|
-        params[v.service_id_legacy.to_sym] = v.value unless v.service_id_legacy.nil?
+        params[v.service_id.to_sym] = v.value
       end
       r = request(:post, "account/#{platform_slug(mac)}/identifiers/addAppId.action", params)
       parse_response(r, 'appId')

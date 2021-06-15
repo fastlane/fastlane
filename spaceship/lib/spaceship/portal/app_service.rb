@@ -4,156 +4,67 @@ module Spaceship
     class AppService
       # @return (String) The identifier used by the Dev Portal to represent this service
       # @example
-      #   "ACCESS_WIFI_INFORMATION"
+      #   "homeKit"
       attr_accessor :service_id
-
-      # @return (String) The identifier used by the Dev Portal LEGACY to represent this service
-      # @example
-      #   "AWEQ28MY3E"
-      attr_accessor :service_id_legacy
 
       # @return (Object) The current value for this service
       # @example
       #   false
       attr_accessor :value
 
-      # @return (Hash) The current capability_settings hash, if applicable, for this service
-      # @example
-      #   {
-      #      key: "DATA_PROTECTION_PERMISSION_LEVEL",
-      #      options:
-      #      [
-      #        {
-      #          key: "COMPLETE_PROTECTION"
-      #        }
-      #      ]
-      #    }
-      attr_accessor :capability_settings
-
-      # @return (String) The current capability_settings value, if applicable, for this service
-      # @example
-      #   "COMPLETE_PROTECTION"
-      attr_accessor :capability_settings_value
-
       # @return (String) The service URI for this service
       # @example
       #    "account/ios/identifiers/updateService.action"
       attr_accessor :service_uri
 
-      def initialize(service_id, service_id_legacy: nil, value: true, settings: nil, key: nil)
+      def initialize(service_id, value)
         @service_id = service_id
-        @service_id_legacy = service_id_legacy
         @value = value
-        @capability_settings_value = settings
-        @capability_settings = build_compatibility_settings(settings, key)
+
+        if @service_id == "push"
+          # Push notifications have a special URI
+          @service_uri = "account/ios/identifiers/updatePushService.action"
+        else
+          # Default service URI
+          @service_uri = "account/ios/identifiers/updateService.action"
+        end
       end
 
-      def self.new_service(id, service_id_legacy: nil, values: { on: true, off: false }, settings: nil, key: nil)
+      def self.new_service(id, values: { on: true, off: false })
         m = Module.new
         values.each do |k, v|
           m.define_singleton_method(k) do
-            AppService.new(id, service_id_legacy: service_id_legacy, value: v)
-          end
-        end
-        if settings
-          settings.each do |k, v|
-            m.define_singleton_method(k) do
-              AppService.new(id, service_id_legacy: service_id_legacy, settings: v, key: key)
-            end
+            AppService.new(id, v)
           end
         end
         return m
       end
 
-      # @return (Hash) Compatibility Service configuration for a key-settings combination
-      # @example
-      #   {
-      #      key: "DATA_PROTECTION_PERMISSION_LEVEL",
-      #      options:
-      #      [
-      #        {
-      #          key: "COMPLETE_PROTECTION"
-      #        }
-      #      ]
-      #    }
-      def build_compatibility_settings(settings, key)
-        if settings.nil? || key.nil?
-          return []
-        end
-        compatibility_settings = [{
-          key: key,
-          options: [
-            {
-              key: settings
-            }
-          ]
-        }]
-        return compatibility_settings
-      end
-
-      AccessWifi = AppService.new_service("ACCESS_WIFI_INFORMATION", service_id_legacy: "AWEQ28MY3E")
-      AppAttest = AppService.new_service("APP_ATTEST")
-      AppGroup = AppService.new_service("APP_GROUPS", service_id_legacy: "APG3427HIY")
-      ApplePay = AppService.new_service("APPLE_PAY", service_id_legacy: "OM633U5T5G")
-      AssociatedDomains = AppService.new_service("ASSOCIATED_DOMAINS", service_id_legacy: "SKC3T5S89Y")
-      AutoFillCredential = AppService.new_service("AUTOFILL_CREDENTIAL_PROVIDER", service_id_legacy: "CPEQ28MX4E")
-      ClassKit = AppService.new_service("CLASSKIT", service_id_legacy: "PKTJAN2017")
-      ICloud = AppService.new_service("ICLOUD", service_id_legacy: "iCloud", settings: { xcode6_compatible: "XCODE_6", xcode5_compatible: "XCODE_5" }, key: "ICLOUD_VERSION")
-      CommunicationNotifications = AppService.new_service("USERNOTIFICATIONS_COMMUNICATION")
-      CustomNetworkProtocol = AppService.new_service("NETWORK_CUSTOM_PROTOCOL")
-      DataProtection = AppService.new_service("DATA_PROTECTION", settings: { complete: "COMPLETE_PROTECTION", unless_open: "PROTECTED_UNLESS_OPEN", until_first_auth: "PROTECTED_UNTIL_FIRST_USER_AUTH" }, key: "DATA_PROTECTION_PERMISSION_LEVEL")
-      ExtendedVirtualAddressSpace = AppService.new_service("EXTENDED_VIRTUAL_ADDRESSING")
-      FamilyControls = AppService.new_service("FAMILY_CONTROLS")
-      FileProviderTestingMode = AppService.new_service("FILEPROVIDER_TESTINGMODE")
-      Fonts = AppService.new_service("FONT_INSTALLATION")
-      GameCenter = AppService.new_service("GAME_CENTER", service_id_legacy: "gameCenter", settings: { ios: "GAME_CENTER_IOS", macos: "GAME_CENTER_MACOS" }, key: "GAME_CENTER_SETTING")
-      GroupActivities = AppService.new_service("GROUP_ACTIVITIES")
-      HealthKit = AppService.new_service("HEALTHKIT", service_id_legacy: "HK421J6T7P")
-      HealthKitEstimateRecalibration = AppService.new_service("HEALTHKIT_RECALIBRATE_ESTIMATES")
-      HLSInterstitialPreview = AppService.new_service("HLS_INTERSTITIAL_PREVIEW")
-      HomeKit = AppService.new_service("HOMEKIT", service_id_legacy: "homeKit")
-      Hotspot = AppService.new_service("HOT_SPOT", service_id_legacy: "HSC639VEI8")
-      InAppPurchase = AppService.new_service("IN_APP_PURCHASE", service_id_legacy: "inAppPurchase")
-      InterAppAudio = AppService.new_service("INTER_APP_AUDIO", service_id_legacy: "IAD53UNK2F")
-      LowLatencyHLS = AppService.new_service("COREMEDIA_HLS_LOW_LATENCY")
-      ManagedAssociatedDomains = AppService.new_service("MDM_MANAGED_ASSOCIATED_DOMAINS")
-      Maps = AppService.new_service("MAPS")
-      Multipath = AppService.new_service("MULTIPATH", service_id_legacy: "MP49FN762P")
-      NetworkExtension = AppService.new_service("NETWORK_EXTENSIONS", service_id_legacy: "NWEXT04537")
-      NFCTagReading = AppService.new_service("NFC_TAG_READING", service_id_legacy: "NFCTRMAY17")
-      PersonalVPN = AppService.new_service("PERSONAL_VPN", service_id_legacy: "V66P55NK2I")
-      Passbook = AppService.new_service("pass", service_id_legacy: "passbook")
-      PushNotification = AppService.new_service("PUSH_NOTIFICATIONS", service_id_legacy: "push")
-      SignInWithApple = AppService.new_service("APPLE_ID_AUTH", settings: { on: "PRIMARY_APP_CONSENT" }, key: "APPLE_ID_AUTH_APP_CONSENT")
-      SiriKit = AppService.new_service("SIRIKIT", service_id_legacy: "SI015DKUHP")
-      SystemExtension = AppService.new_service("SYSTEM_EXTENSION_INSTALL")
-      TimeSensitiveNotifications = AppService.new_service("USERNOTIFICATIONS_TIMESENSITIVE")
-      UserManagement = AppService.new_service("USER_MANAGEMENT")
-      VPNConfiguration = AppService.new_service("V66P55NK2I", service_id_legacy: "V66P55NK2I")
-      Wallet = AppService.new_service("WALLET", service_id_legacy: "passbook")
-      WirelessAccessory = AppService.new_service("WIRELESS_ACCESSORY_CONFIGURATION", service_id_legacy: "WC421J6T7P")
-
-      # Additional Capabilities
-      CarPlayAudioApp = AppService.new_service("CARPLAY_PLAYABLE_CONTENT")
-      CarPlayMessagingApp = AppService.new_service("CARPLAY_MESSAGING")
-      CarPlayNavigationApp = AppService.new_service("CARPLAY_NAVIGATION")
-      CarPlayVoipCallingApp = AppService.new_service("CARPLAY_VOIP")
-      CriticalAlerts = AppService.new_service("CRITICAL_ALERTS")
-      HotspotHelper = AppService.new_service("HOTSPOT_HELPER_MANAGED")
-      DriverKit = AppService.new_service("DRIVERKIT")
-      DriverKitEndpointSecurity = AppService.new_service("DRIVERKIT_ENDPOINT_SECURITY")
-      DriverKitFamilyHIDDevice = AppService.new_service("DRIVERKIT_HID_DEVICE")
-      DriverKitFamilyNetworking = AppService.new_service("DRIVERKIT_NETWORKING")
-      DriverKitFamilySerial = AppService.new_service("DRIVERKIT_SERIAL")
-      DriverKitHIDEventService = AppService.new_service("DRIVERKIT_HID_EVENT_SERVICE")
-      DriverKitTransportHID = AppService.new_service("DRIVERKIT_HID")
-      MultitaskingCameraAccess = AppService.new_service("IPAD_CAMERA_MULTITASKING")
-      SFUniversalLinkApi = AppService.new_service("SFUNIVERSALLINK_API")
-      VP9Decoder = AppService.new_service("VP9_DECODER")
-
-      # App Services
-      MusicKit = AppService.new_service("MUSIC_KIT")
-      ShazamKit = AppService.new_service("SHAZAM_KIT")
+      AccessWifi = AppService.new_service("AWEQ28MY3E")
+      AppGroup = AppService.new_service("APG3427HIY")
+      ApplePay = AppService.new_service("OM633U5T5G")
+      AssociatedDomains = AppService.new_service("SKC3T5S89Y")
+      ClassKit = AppService.new_service("PKTJAN2017")
+      AutoFillCredential = AppService.new_service("CPEQ28MX4E")
+      DataProtection = AppService.new_service("dataProtection", values: { off: "", complete: "complete", unless_open: "unlessopen", until_first_auth: "untilfirstauth" })
+      GameCenter = AppService.new_service("gameCenter")
+      HealthKit = AppService.new_service("HK421J6T7P")
+      HomeKit = AppService.new_service("homeKit")
+      Hotspot = AppService.new_service("HSC639VEI8")
+      Cloud = AppService.new_service("iCloud")
+      CloudKit = AppService.new_service("cloudKitVersion", values: { xcode5_compatible: 1, cloud_kit: 2 })
+      InAppPurchase = AppService.new_service("inAppPurchase")
+      InterAppAudio = AppService.new_service("IAD53UNK2F")
+      Multipath = AppService.new_service("MP49FN762P")
+      NetworkExtension = AppService.new_service("NWEXT04537")
+      NFCTagReading = AppService.new_service("NFCTRMAY17")
+      PersonalVPN = AppService.new_service("V66P55NK2I")
+      Passbook = AppService.new_service("passbook")
+      PushNotification = AppService.new_service("push")
+      SiriKit = AppService.new_service("SI015DKUHP")
+      VPNConfiguration = AppService.new_service("V66P55NK2I")
+      Wallet = AppService.new_service("passbook")
+      WirelessAccessory = AppService.new_service("WC421J6T7P")
 
       constants.each do |c|
         name = c.to_s
@@ -169,7 +80,7 @@ module Spaceship
         self.class == other.class &&
           self.service_id == other.service_id &&
           self.value == other.value &&
-          self.capability_settings_value == other.capability_settings_value
+          self.service_uri == other.service_uri
       end
     end
   end

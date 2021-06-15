@@ -201,7 +201,7 @@ module Spaceship
     end
 
     def initialize(cookie: nil, current_team_id: nil, csrf_tokens: nil, timeout: nil)
-      @options = {
+      options = {
        request: {
           timeout:       (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i,
           open_timeout:  (ENV["SPACESHIP_TIMEOUT"] || timeout || 300).to_i
@@ -210,12 +210,8 @@ module Spaceship
       @current_team_id = current_team_id
       @csrf_tokens = csrf_tokens
       @cookie = cookie || HTTP::CookieJar.new
-      @client = build_client(self.class.hostname)
-    end
 
-    # @return (Faraday) Builds client based off of supplied hostname, global options, and global cookies.
-    def build_client(hostname)
-      client = Faraday.new(hostname, @options) do |c|
+      @client = Faraday.new(self.class.hostname, options) do |c|
         c.response(:json, content_type: /\bjson$/)
         c.response(:plist, content_type: /\bplist$/)
         c.use(:cookie_jar, jar: @cookie)
@@ -237,7 +233,6 @@ module Spaceship
           puts("To run spaceship through a local proxy, use SPACESHIP_DEBUG")
         end
       end
-      return client
     end
 
     #####################################################
@@ -712,7 +707,7 @@ module Spaceship
       @csrf_tokens || {}
     end
 
-    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, client = @client, &block)
+    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
       headers.merge!(csrf_tokens)
       headers['User-Agent'] = USER_AGENT
 
@@ -726,9 +721,9 @@ module Spaceship
       end
 
       response = if auto_paginate
-                   send_request_auto_paginate(method, url_or_path, params, headers, client, &block)
+                   send_request_auto_paginate(method, url_or_path, params, headers, &block)
                  else
-                   send_request(method, url_or_path, params, headers, client, &block)
+                   send_request(method, url_or_path, params, headers, &block)
                  end
 
       return response
@@ -840,8 +835,7 @@ module Spaceship
           body_to_log = "[non JSON body]"
         end
       end
-      params = params.nil? ? "{}" : params
-      params_to_log = (params.kind_of?(String)) ? JSON.parse(params) : Hash(params).dup # to also work with nil
+      params_to_log = Hash(params).dup # to also work with nil
       params_to_log.delete(:accountPassword) # Dev Portal
       params_to_log.delete(:theAccountPW) # iTC
       params_to_log = params_to_log.collect do |key, value|
@@ -884,9 +878,9 @@ module Spaceship
 
     # Actually sends the request to the remote server
     # Automatically retries the request up to 3 times if something goes wrong
-    def send_request(method, url_or_path, params, headers, client, &block)
+    def send_request(method, url_or_path, params, headers, &block)
       with_retry do
-        response = client.send(method, url_or_path, params, headers, &block)
+        response = @client.send(method, url_or_path, params, headers, &block)
         log_response(method, url_or_path, response, headers, &block)
 
         handle_error(response)
@@ -918,12 +912,12 @@ module Spaceship
       end
     end
 
-    def send_request_auto_paginate(method, url_or_path, params, headers, client, &block)
-      response = send_request(method, url_or_path, params, headers, client, &block)
+    def send_request_auto_paginate(method, url_or_path, params, headers, &block)
+      response = send_request(method, url_or_path, params, headers, &block)
       return response unless should_process_next_rel?(response)
       last_response = response
       while last_response.env.rels[:next]
-        last_response = send_request(method, last_response.env.rels[:next], params, headers, client, &block)
+        last_response = send_request(method, last_response.env.rels[:next], params, headers, &block)
         break unless should_process_next_rel?(last_response)
         response.body['data'].concat(last_response.body['data'])
       end

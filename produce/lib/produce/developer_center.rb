@@ -8,73 +8,37 @@ module Produce
     SERVICE_COMPLETE = "complete"
     SERVICE_UNLESS_OPEN = "unlessopen"
     SERVICE_UNTIL_FIRST_LAUNCH = "untilfirstauth"
-    SERVICE_XCODE_5 = "xcode5_compatible"
-    SERVICE_XCODE_6 = "xcode6_compatible"
-    SERVICE_GAME_CENTER_IOS = "ios"
-    SERVICE_GAME_CENTER_MACOS = "macos"
-    SERVICE_PRIMARY_APP_CONSENT = "on"
+    SERVICE_LEGACY = "legacy"
+    SERVICE_CLOUDKIT = "cloudkit"
 
     ALLOWED_SERVICES = {
       access_wifi: [SERVICE_ON, SERVICE_OFF],
-      app_attest: [SERVICE_ON, SERVICE_OFF],
       app_group: [SERVICE_ON, SERVICE_OFF],
       apple_pay: [SERVICE_ON, SERVICE_OFF],
       associated_domains: [SERVICE_ON, SERVICE_OFF],
       auto_fill_credential: [SERVICE_ON, SERVICE_OFF],
-      class_kit: [SERVICE_ON, SERVICE_OFF],
-      icloud: [SERVICE_XCODE_5, SERVICE_XCODE_6],
-      custom_network_protocol: [SERVICE_ON, SERVICE_OFF],
       data_protection: [
         SERVICE_COMPLETE,
         SERVICE_UNLESS_OPEN,
         SERVICE_UNTIL_FIRST_LAUNCH
       ],
-      extended_virtual_address_space: [SERVICE_ON, SERVICE_OFF],
-      game_center: [SERVICE_GAME_CENTER_IOS, SERVICE_GAME_CENTER_MACOS],
+      game_center: [SERVICE_ON, SERVICE_OFF],
       health_kit: [SERVICE_ON, SERVICE_OFF],
-      hls_interstitial_preview: [SERVICE_ON, SERVICE_OFF],
       home_kit: [SERVICE_ON, SERVICE_OFF],
       hotspot: [SERVICE_ON, SERVICE_OFF],
+      icloud: [SERVICE_LEGACY, SERVICE_CLOUDKIT],
       in_app_purchase: [SERVICE_ON, SERVICE_OFF],
       inter_app_audio: [SERVICE_ON, SERVICE_OFF],
-      low_latency_hls: [SERVICE_ON, SERVICE_OFF],
-      managed_associated_domains: [SERVICE_ON, SERVICE_OFF],
-      maps: [SERVICE_ON, SERVICE_OFF],
       multipath: [SERVICE_ON, SERVICE_OFF],
       network_extension: [SERVICE_ON, SERVICE_OFF],
       nfc_tag_reading: [SERVICE_ON, SERVICE_OFF],
       personal_vpn: [SERVICE_ON, SERVICE_OFF],
       passbook: [SERVICE_ON, SERVICE_OFF],
       push_notification: [SERVICE_ON, SERVICE_OFF],
-      sign_in_with_apple: [SERVICE_PRIMARY_APP_CONSENT],
       siri_kit: [SERVICE_ON, SERVICE_OFF],
-      system_extension: [SERVICE_ON, SERVICE_OFF],
-      user_management: [SERVICE_ON, SERVICE_OFF],
       vpn_configuration: [SERVICE_ON, SERVICE_OFF],
       wallet: [SERVICE_ON, SERVICE_OFF],
-      wireless_accessory: [SERVICE_ON, SERVICE_OFF],
-      car_play_audio_app: [SERVICE_ON, SERVICE_OFF],
-      car_play_messaging_app: [SERVICE_ON, SERVICE_OFF],
-      car_play_navigation_app: [SERVICE_ON, SERVICE_OFF],
-      car_play_voip_calling_app: [SERVICE_ON, SERVICE_OFF],
-      critical_alerts: [SERVICE_ON, SERVICE_OFF],
-      hotspot_helper: [SERVICE_ON, SERVICE_OFF],
-      driver_kit: [SERVICE_ON, SERVICE_OFF],
-      driver_kit_endpoint_security: [SERVICE_ON, SERVICE_OFF],
-      driver_kit_family_hid_device: [SERVICE_ON, SERVICE_OFF],
-      driver_kit_family_networking: [SERVICE_ON, SERVICE_OFF],
-      driver_kit_family_serial: [SERVICE_ON, SERVICE_OFF],
-      driver_kit_hid_event_service: [SERVICE_ON, SERVICE_OFF],
-      driver_kit_transport_hid: [SERVICE_ON, SERVICE_OFF],
-      multitasking_camera_access: [SERVICE_ON, SERVICE_OFF],
-      sf_universal_link_api: [SERVICE_ON, SERVICE_OFF],
-      vp9_decoder: [SERVICE_ON, SERVICE_OFF],
-      music_kit: [SERVICE_ON, SERVICE_OFF],
-      shazam_kit: [SERVICE_ON, SERVICE_OFF],
-      communication_notifications: [SERVICE_ON, SERVICE_OFF],
-      group_activities: [SERVICE_ON, SERVICE_OFF],
-      health_kit_estimate_recalibration: [SERVICE_ON, SERVICE_OFF],
-      time_sensitive_notifications: [SERVICE_ON, SERVICE_OFF],
+      wireless_accessory: [SERVICE_ON, SERVICE_OFF]
     }
 
     def run
@@ -132,24 +96,14 @@ module Produce
           when SERVICE_UNTIL_FIRST_LAUNCH
             enabled_clean_options[app_service.data_protection.untilfirstauth.service_id] = app_service.data_protection.untilfirstauth
           end
-        elsif k.to_sym == :cloud
+        elsif k.to_sym == :icloud
           case v
-          when SERVICE_XCODE_5
-            enabled_clean_options[app_service.cloud.xcode5_compatible.service_id] = app_service.cloud.xcode5_compatible
-          when SERVICE_XCODE_6
-            enabled_clean_options[app_service.cloud.xcode6_compatible.service_id] = app_service.cloud.xcode6_compatible
-          end
-        elsif k.to_sym == :game_center
-          case v
-          when SERVICE_GAME_CENTER_IOS
-            enabled_clean_options[app_service.game_center.ios.service_id] = app_service.game_center.ios
-          when SERVICE_GAME_CENTER_MACOS
-            enabled_clean_options[app_service.game_center.macos.service_id] = app_service.game_center.macos
-          end
-        elsif k.to_sym == :sign_in_with_apple
-          case v
-          when SERVICE_GAME_CENTER_IOS
-            enabled_clean_options[app_service.sign_in_with_apple.on.service_id] = app_service.sign_in_with_apple.on
+          when SERVICE_LEGACY
+            enabled_clean_options[app_service.cloud.on.service_id] = app_service.cloud.on
+            enabled_clean_options[app_service.cloud_kit.xcode5_compatible.service_id] = app_service.cloud_kit.xcode5_compatible
+          when SERVICE_CLOUDKIT
+            enabled_clean_options[app_service.cloud.on.service_id] = app_service.cloud.on
+            enabled_clean_options[app_service.cloud_kit.cloud_kit.service_id] = app_service.cloud_kit.cloud_kit
           end
         else
           if v == SERVICE_ON
