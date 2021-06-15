@@ -8,13 +8,9 @@ module Fastlane
           paths = params[:pathspec]
           success_message = "Successfully added from \"#{paths}\" 💾."
         elsif params[:path]
-          if params[:path].kind_of?(String)
-            paths = shell_escape(params[:path], should_escape)
-          elsif params[:path].kind_of?(Array)
-            paths = params[:path].map do |p|
-              shell_escape(p, should_escape)
-            end.join(' ')
-          end
+          paths = params[:path].map do |p|
+            shell_escape(p, should_escape)
+          end.join(' ')
           success_message = "Successfully added \"#{paths}\" 💾."
         else
           paths = "."
@@ -43,18 +39,17 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "The file(s) and path(s) you want to add",
-                                       is_string: false,
+                                       type: Array,
                                        conflicting_options: [:pathspec],
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :shell_escape,
                                        description: "Shell escapes paths (set to false if using wildcards or manually escaping spaces in :path)",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true,
                                        optional: true),
           # Deprecated
           FastlaneCore::ConfigItem.new(key: :pathspec,
                                        description: "The pathspec you want to add files from",
-                                       is_string: true,
                                        conflicting_options: [:path],
                                        optional: true,
                                        deprecated: "Use `--path` instead")
