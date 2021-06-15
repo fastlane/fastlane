@@ -35,7 +35,6 @@ module Fastlane
         service_object.__hash__ = {}
         Produce::DeveloperCenter::ALLOWED_SERVICES.keys.each do |service|
           name = self.services_mapping[service]
-          say "Module: #{name}"
           service_object.class.module_eval { attr_accessor :"#{name}" }
         end
         service_object
