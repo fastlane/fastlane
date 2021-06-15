@@ -138,7 +138,7 @@ fastlane produce enable_services --help
 --associated-domains                  Enable Associated Domains
 --auto-fill-credential                Enable Auto Fill Credential
 --class-kit                           Enable Class Kit
---cloud STRING                        Enable iCloud, suitable values are "xcode5_compatible" and "xcode6_compatible"
+--icloud STRING                        Enable iCloud, suitable values are "xcode5_compatible" and "xcode6_compatible"
 --custom-network-protocol             Enable Custom Network Protocol
 --data-protection STRING              Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"
 --extended-virtual-address-space      Enable Extended Virtual Address Space
@@ -201,7 +201,7 @@ fastlane produce disable_services --help
 --associated-domains                  Disable Associated Domains
 --auto-fill-credential                Disable Auto Fill Credential
 --class-kit                           Disable Class Kit
---cloud STRING                        Disable iCloud
+--icloud STRING                        Disable iCloud
 --custom-network-protocol             Disable Custom Network Protocol
 --data-protection STRING              Disable Data Protection
 --extended-virtual-address-space      Disable Extended Virtual Address Space

@@ -35,6 +35,7 @@ module Fastlane
         service_object.__hash__ = {}
         Produce::DeveloperCenter::ALLOWED_SERVICES.keys.each do |service|
           name = self.services_mapping[service]
+          say "Module: #{name}"
           service_object.class.module_eval { attr_accessor :"#{name}" }
         end
         service_object
@@ -49,7 +50,7 @@ module Fastlane
           associated_domains: 'associated_domains',
           auto_fill_credential: 'auto_fill_credential',
           class_kit: 'class_kit',
-          cloud: 'cloud',
+          icloud: 'icloud',
           custom_network_protocol: 'custom_network_protocol',
           data_protection: 'data_protection',
           extended_virtual_address_space: 'extended_virtual_address_space',
