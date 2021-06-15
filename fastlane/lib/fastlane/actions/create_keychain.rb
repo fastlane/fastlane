@@ -126,8 +126,8 @@ module Fastlane
                                        type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :timeout,
-                                       description: 'timeout interval in seconds',
-                                       type: Integer,
+                                       description: 'timeout interval in seconds. Set `false` if you want to specify "no time-out"',
+                                       skip_type_validation: true, # allow integers & Bool->`false` for "no timeout"
                                        default_value: 300),
           FastlaneCore::ConfigItem.new(key: :lock_when_sleeps,
                                        description: 'Lock keychain when the system sleeps',
