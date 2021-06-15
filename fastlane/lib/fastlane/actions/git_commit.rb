@@ -67,7 +67,7 @@ module Fastlane
 
       def self.example_code
         [
-          # 'git_commit(path: "./version.txt", message: "Version Bump")',
+          'git_commit(path: "./version.txt", message: "Version Bump")',
           'git_commit(path: ["./version.txt", "./changelog.txt"], message: "Version Bump")',
           'git_commit(path: ["./*.txt", "./*.md"], message: "Update documentation")',
           'git_commit(path: ["./*.txt", "./*.md"], message: "Update documentation", skip_git_hooks: true)'
