@@ -13,7 +13,6 @@ module Spaceship
       })
 
       module Type
-
         ACCESS_WIFI_INFORMATION = "ACCESS_WIFI_INFORMATION"
         APP_ATTEST = "APP_ATTEST"
         APP_GROUPS = "APP_GROUPS"

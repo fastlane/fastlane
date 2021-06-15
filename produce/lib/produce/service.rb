@@ -64,7 +64,7 @@ module Produce
     #      ]
     #    }]
     def build_settings_for(settings_key:, options_key:)
-      settings = [{
+      return [{
        key: settings_key,
        options: [ {
            key: options_key
@@ -73,6 +73,7 @@ module Produce
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
+    # rubocop:disable Require/MissingRequireStatement
     def update(on, options)
       updated = valid_services_for(options).count
 

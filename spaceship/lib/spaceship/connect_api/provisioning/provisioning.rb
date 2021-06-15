@@ -68,11 +68,16 @@ module Spaceship
                     type: "bundleIds",
                     id: bundle_id_id
                   }
+                },
+                capability: {
+                  data: {
+                    type: "capabilities",
+                    id: capability_type
+                  }
                 }
               }
             }
           }
-
           provisioning_request_client.post("bundleIdCapabilities", body)
         end
 
@@ -94,7 +99,7 @@ module Spaceship
               },
               relationships: {
                 bundleIdCapabilities: {
-                  data: [ 
+                  data: [
                     {
                       type: "bundleIdCapabilities",
                       attributes: {
@@ -109,13 +114,13 @@ module Spaceship
                             }
                         }
                       }
-                    },
+                    }
                   ]
                 }
               }
             }
           }
-          
+
           provisioning_request_client.patch("bundleIds/#{bundle_id_id}", body)
         end
 
