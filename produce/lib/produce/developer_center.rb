@@ -8,8 +8,8 @@ module Produce
     SERVICE_COMPLETE = "complete"
     SERVICE_UNLESS_OPEN = "unlessopen"
     SERVICE_UNTIL_FIRST_LAUNCH = "untilfirstauth"
-    SERVICE_XCODE_5 = "xcode5_compatible"
-    SERVICE_XCODE_6 = "xcode6_compatible"
+    SERVICE_LEGACY = "legacy"
+    SERVICE_CLOUDKIT = "cloudkit"
     SERVICE_GAME_CENTER_IOS = "ios"
     SERVICE_GAME_CENTER_MAC = "mac"
     SERVICE_PRIMARY_APP_CONSENT = "on"
@@ -22,7 +22,7 @@ module Produce
       associated_domains: [SERVICE_ON, SERVICE_OFF],
       auto_fill_credential: [SERVICE_ON, SERVICE_OFF],
       class_kit: [SERVICE_ON, SERVICE_OFF],
-      icloud: [SERVICE_XCODE_5, SERVICE_XCODE_6],
+      icloud: [SERVICE_LEGACY, SERVICE_CLOUDKIT],
       custom_network_protocol: [SERVICE_ON, SERVICE_OFF],
       data_protection: [
         SERVICE_COMPLETE,
