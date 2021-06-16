@@ -147,7 +147,7 @@ module Screengrab
           File.join(device_ext_storage, app_package_name, 'screengrab', locale, "images", "screenshots"),
           File.join(device_ext_storage, "Android", "data", app_package_name, 'files', 'screengrab', locale, "images", "screenshots")
         ]
-      end.flatten
+      end.flatten.map { |path| [path, false] }
     end
 
     def determine_internal_screenshots_paths(device_serial, app_package_name, locales)
@@ -162,16 +162,16 @@ module Screengrab
           "#{device_data}/data/#{app_package_name}/app_screengrab/#{locale}/images/screenshots",
           "#{device_data}/data/#{app_package_name}/screengrab/#{locale}/images/screenshots"
         ]
-      end.flatten
+      end.flatten.map { |path| [path, true] }
     end
 
     def clear_device_previous_screenshots(app_package_name, device_serial, device_screenshots_paths)
       UI.message('Cleaning screenshots on device')
 
-      device_screenshots_paths.each do |device_path|
-        if_device_path_exists(app_package_name, device_serial, device_path) do |path|
+      device_screenshots_paths.each do |(device_path, needs_run_as)|
+        if_device_path_exists(app_package_name, device_serial, device_path, needs_run_as) do |path|
           # Determine if path needs the run-as permission
-          run_as = use_adb_run_as?(path, device_serial) ? " run-as #{app_package_name.shellescape.shellescape}" : ""
+          run_as = needs_run_as ? " run-as #{app_package_name.shellescape.shellescape}" : ""
 
           run_adb_command("-s #{device_serial.shellescape} shell#{run_as} rm -rf #{path.shellescape.shellescape}",
                           print_all: true,
@@ -307,8 +307,8 @@ module Screengrab
       # This makes directory cleanup easier, as the temp directory will be removed when the block completes.
 
       Dir.mktmpdir do |tempdir|
-        device_screenshots_paths.each do |device_path|
-          if_device_path_exists(@config[:app_package_name], device_serial, device_path) do |path|
+        device_screenshots_paths.each do |(device_path, needs_run_as)|
+          if_device_path_exists(@config[:app_package_name], device_serial, device_path, needs_run_as) do |path|
             UI.message(path)
             next unless path.include?(locale)
             out = run_adb_command("-s #{device_serial.shellescape} pull #{path.shellescape} #{tempdir.shellescape}",
@@ -320,7 +320,7 @@ module Screengrab
               base = File.basename(path)
 
               # Determine if path needs the run-as permission
-              run_as = use_adb_run_as?(path, device_serial) ? " run-as #{@config[:app_package_name].shellescape.shellescape}" : ""
+              run_as = needs_run_as ? " run-as #{@config[:app_package_name].shellescape.shellescape}" : ""
 
               run_adb_command("-s #{device_serial.shellescape} shell#{run_as}  \"tar -cC #{dir} #{base}\" | tar -xv -f- -C #{tempdir}",
                               print_all: false,
@@ -386,9 +386,9 @@ module Screengrab
 
     # Some device commands fail if executed against a device path that does not exist, so this helper method
     # provides a way to conditionally execute a block only if the provided path exists on the device.
-    def if_device_path_exists(app_package_name, device_serial, device_path)
+    def if_device_path_exists(app_package_name, device_serial, device_path, needs_run_as)
       # Determine if path needs the run-as permission
-      run_as = use_adb_run_as?(device_path, device_serial) ? " run-as #{app_package_name.shellescape.shellescape}" : ""
+      run_as = needs_run_as ? " run-as #{app_package_name.shellescape.shellescape}" : ""
 
       return if run_adb_command("-s #{device_serial.shellescape} shell#{run_as} ls #{device_path.shellescape.shellescape}",
                                 print_all: false,
