@@ -1,4 +1,3 @@
-
 package tools.fastlane.screengrab.locale;
 
 import android.annotation.SuppressLint;
