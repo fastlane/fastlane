@@ -16,7 +16,7 @@ public final class LocaleUtil {
 
     private static final String TAG =  LocaleUtil.class.getSimpleName();
 
-    @SuppressWarnings({"JavaReflectionMemberAccess"})
+    @SuppressWarnings({"JavaReflectionMemberAccess", "deprecation", "RedundantSuppression"})
     @SuppressLint("PrivateApi")
     public static LocaleListCompat changeDeviceLocaleTo(LocaleListCompat locale) {
         if (locale == null) {

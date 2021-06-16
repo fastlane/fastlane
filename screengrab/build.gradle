@@ -8,7 +8,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.1'
+        classpath 'com.android.tools.build:gradle:4.1.3'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.20.0'
     }
 }
