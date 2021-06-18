@@ -21,7 +21,7 @@ module Spaceship
       attr_accessor :build_beta_detail
       attr_accessor :pre_release_version
       attr_accessor :individual_testers
-      
+
       attr_mapping({
         "version" => "version",
         "uploadedDate" => "uploaded_date",
