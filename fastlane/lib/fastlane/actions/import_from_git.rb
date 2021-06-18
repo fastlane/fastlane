@@ -40,7 +40,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        description: "The version to checkout on the repository. Optimistic match operator or multiple conditions can be used to select the latest version within constraints",
                                        default_value: nil,
-                                       is_string: false,
+                                       type: Array,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :cache_path,
                                        description: "The path to a directory where the repository should be cloned into. Defaults to `nil`, which causes the repository to be cloned on every call, to a temporary directory",
