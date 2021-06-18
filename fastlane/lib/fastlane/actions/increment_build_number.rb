@@ -66,11 +66,10 @@ module Fastlane
                                        env_name: "FL_BUILD_NUMBER_BUILD_NUMBER",
                                        description: "Change to a specific version. When you provide this parameter, Apple Generic Versioning does not have to be enabled",
                                        optional: true,
-                                       is_string: false),
+                                       skip_type_validation: true), # allow Integer, String
           FastlaneCore::ConfigItem.new(key: :skip_info_plist,
                                        env_name: "FL_BUILD_NUMBER_SKIP_INFO_PLIST",
                                        description: "Don't update Info.plist files when updating the build version",
-                                       is_string: false,
                                        type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
