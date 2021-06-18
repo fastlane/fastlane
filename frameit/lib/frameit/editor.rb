@@ -467,26 +467,24 @@ module Frameit
         # Get matching trim box:
         trim_box = trim_boxes[key]
 
-        # For side-by-side text images (e.g. stack_title is false) adjust the trim box based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain the text baseline:
-        unless stack_title
-          # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
-          # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
-          if trim_box.offset_y > top_vertical_trim_offset
-            # Increase the height of the trim box with the difference in vertical top offset:
-            trim_box.height += trim_box.offset_y - top_vertical_trim_offset
-            # Change the vertical top offset to match that of the others:
-            trim_box.offset_y = top_vertical_trim_offset
+        # Adjust the trim box based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain the text baseline:
+        # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
+        # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
+        if trim_box.offset_y > top_vertical_trim_offset
+          # Increase the height of the trim box with the difference in vertical top offset:
+          trim_box.height += trim_box.offset_y - top_vertical_trim_offset
+          # Change the vertical top offset to match that of the others:
+          trim_box.offset_y = top_vertical_trim_offset
 
-            UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box}\n")
-          end
+          UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box.json_string_format}")
+        end
 
-          # Check if the height needs to be adjusted to reach the bottom offset:
-          if (trim_box.offset_y + trim_box.height) < bottom_vertical_trim_offset
-            # Set the height of the trim box to the difference between vertical bottom and top offset:
-            trim_box.height = bottom_vertical_trim_offset - trim_box.offset_y
+        # Check if the height needs to be adjusted to reach the bottom offset:
+        if (trim_box.offset_y + trim_box.height) < bottom_vertical_trim_offset
+          # Set the height of the trim box to the difference between vertical bottom and top offset:
+          trim_box.height = bottom_vertical_trim_offset - trim_box.offset_y
 
-            UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box}\n")
-          end
+          UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box.json_string_format}")
         end
 
         # Crop image with (adjusted) trim box parameters in MiniMagick string format:

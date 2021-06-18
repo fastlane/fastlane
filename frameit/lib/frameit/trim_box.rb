@@ -31,5 +31,11 @@ module Frameit
       # Convert trim box parameters to string with syntax: "<width>x<height>+<offset_x>+<offset_y>":
       return "#{@width}x#{@height}+#{@offset_x}+#{@offset_y}"
     end
+
+    # Get the trimbox parameters in a human readable JSON string format
+    def json_string_format
+      # Create a JSON string from the trim box parameters:
+      return "{\"width\" : #{@width}, \"height\" : #{@height} , \"offset_x\" : #{@offset_x}, \"offset_y\" : #{@offset_y}}"
+    end
   end
 end
