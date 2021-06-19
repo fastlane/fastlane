@@ -290,6 +290,10 @@ module Deliver
           [1668, 2388],
           [2388, 1668]
         ],
+        ScreenSize::IOS_IPAD_PRO_12_9 => [
+          [2732, 2048],
+          [2048, 2732]
+        ],
         ScreenSize::IOS_IPAD_PRO => [
           [2732, 2048],
           [2048, 2732]

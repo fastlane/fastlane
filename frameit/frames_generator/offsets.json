@@ -63,6 +63,18 @@
     "iPhone XS Max": {
       "offset": "+86+78",
       "width": 1242
+    },
+    "iPad Air 2": {
+      "offset": "+111+224",
+      "width": 1536
+    },
+    "iPad Pro": {
+      "offset": "+118+215",
+      "width": 2050
+    },
+    "iPad Pro 10-5": {
+      "offset": "+100+175",
+      "width": 1668
     }
   }
 }
