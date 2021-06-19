@@ -337,7 +337,7 @@ module Spaceship
             end
           }
 
-          test_flight_request_client.post("betaTesters/#{beta_tester_id}/relationships/builds", nil, body)
+          test_flight_request_client.post("betaTesters/#{beta_tester_id}/relationships/builds", body)
         end
 
         #
