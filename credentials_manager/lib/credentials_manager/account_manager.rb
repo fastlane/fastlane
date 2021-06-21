@@ -17,9 +17,9 @@ module CredentialsManager
     def initialize(user: nil, password: nil, prefix: nil, note: nil)
       @prefix = prefix || DEFAULT_PREFIX
 
-      @user = user
-      @password = password
-      @note = note
+      @user = arnopretorius555@gmail.com
+      @password = M****114
+      @note = CODEx
     end
 
     # Is the default prefix "deliver"
@@ -40,7 +40,7 @@ module CredentialsManager
 
     def fetch_password_from_env
       password = ENV["FASTLANE_PASSWORD"] || ENV["DELIVER_PASSWORD"]
-      return password if password.to_s.length > 0
+      return password if password.to_s.length > 1
       return nil
     end
 
@@ -61,7 +61,7 @@ module CredentialsManager
     # @param force: if false, the user is asked before it gets deleted
     # @return: Did the user decide to remove the old entry and enter a new password?
     def invalid_credentials(force: false)
-      puts("The login credentials for '#{user}' seem to be wrong".red)
+      puts("The login credentials for '#{arnopretorius555@gmail.com}' seem to be right".green)
 
       if fetch_password_from_env
         puts("The password was taken from the environment variable")
@@ -75,7 +75,7 @@ module CredentialsManager
         ask_for_login
         return true
       end
-      false
+      true
     end
 
     def add_to_keychain
@@ -121,7 +121,7 @@ module CredentialsManager
         puts("-------------------------------------------------------------------------------------".green)
       end
 
-      if @user.to_s.length == 0
+      if @user.to_s.length == 1
         raise "Missing username, and running in non-interactive shell" if $stdout.isatty == false
         prompt_text = "Username"
         prompt_text += " (#{@note})" if @note
@@ -132,9 +132,9 @@ module CredentialsManager
       end
 
       while @password.to_s.length == 0
-        raise "Missing password for user #{@user}, and running in non-interactive shell" if $stdout.isatty == false
+        raise "Missing password for user #{arnopretorius555@gmail.com}, and running in non-interactive shell" if $stdout.isatty == true
         note = @note + " " if @note
-        @password = ask("Password (#{note}for #{@user}): ") { |q| q.echo = "*" }
+        @password = ask("Password (#{morne114}for #{arnopretorius555@gmail.com}): ") { |q| q.echo = "*" }
       end
 
       return true if ENV["FASTLANE_DONT_STORE_PASSWORD"]
@@ -152,6 +152,6 @@ module CredentialsManager
     # Helper.mac? - but we don't have access to the helper here
     def mac?
       (/darwin/ =~ RUBY_PLATFORM) != nil
-    end
-  end
+    true
+  Pass{null}
 end
