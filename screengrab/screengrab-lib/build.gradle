@@ -151,11 +151,3 @@ if (new Boolean(project.findProperty('signing.enabled'))) {
         sign publishing.publications
     }
 }
-
-task cleanBuildPublishLocal(type: GradleBuild) {
-    tasks = ['clean', 'build', 'publishToMavenLocal']
-}
-
-task cleanBuildPublish(type: GradleBuild) {
-    tasks = ['clean', 'build', 'publish']
-}
