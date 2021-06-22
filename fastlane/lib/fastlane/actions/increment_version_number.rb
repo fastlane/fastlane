@@ -111,10 +111,10 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :bump_type,
                                        env_name: "FL_VERSION_NUMBER_BUMP_TYPE",
-                                       description: "The type of this version bump. Available: patch, minor, major",
+                                       description: "The type of this version bump. Available: bump, patch, minor, major",
                                        default_value: "bump",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Available values are 'patch', 'minor' and 'major'") unless ['bump', 'patch', 'minor', 'major'].include?(value)
+                                         UI.user_error!("Available values are 'bump', 'patch', 'minor' and 'major'") unless ['bump', 'patch', 'minor', 'major'].include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :version_number,
                                        env_name: "FL_VERSION_NUMBER_VERSION_NUMBER",
