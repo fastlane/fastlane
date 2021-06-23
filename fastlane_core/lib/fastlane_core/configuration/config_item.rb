@@ -223,7 +223,7 @@ module FastlaneCore
 
       # Arrays can be an either be an array or string that gets split by comma in auto_convert_type
       if !value.kind_of?(Array) && !value.kind_of?(String)
-        UI.user_error!("'#{self.key}' value must be either `true` or `false`! Found #{value.class} instead.")
+        UI.user_error!("'#{self.key}' value must be either `Array` or `comma-separated String`! Found #{value.class} instead.")
       end
     end
 
