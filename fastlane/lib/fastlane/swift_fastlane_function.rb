@@ -31,7 +31,7 @@ module Fastlane
 
       # rubocop:disable Layout/LineLength
       # class instance?
-      @reserved_words = %w[associativity break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func guard if in infix init inout internal lazy let mutating nil operator override precedence private public repeat required return self static struct subscript super switch throws true try var weak where while willSet].to_set
+      @reserved_words = %w[actor associativity async await break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func guard if in infix init inout internal lazy let mutating nil operator override precedence private public repeat required return self static struct subscript super switch throws true try var weak where while willSet].to_set
       # rubocop:enable Layout/LineLength
     end
 
