@@ -68,7 +68,7 @@ Options for create:
   -y, --sku STRING     SKU Number (e.g. '1234') (PRODUCE_SKU)
   -j, --platform STRING The platform to use (optional) (PRODUCE_PLATFORM)
   -m, --language STRING Primary Language (e.g. 'English', 'German') (PRODUCE_LANGUAGE)
-  -c, --company_name STRING The name of your company. Only required if it's the first app you create (PRODUCE_COMPANY_NAME)
+  -c, --company_name STRING The name of your company. It's used to set company name on App Store Connect team's app pages. Only required if it's the first app you create (PRODUCE_COMPANY_NAME)
   -i, --skip_itc [VALUE] Skip the creation of the app on App Store Connect (PRODUCE_SKIP_ITC)
   -d, --skip_devcenter [VALUE] Skip the creation of the app on the Apple Developer Portal (PRODUCE_SKIP_DEVCENTER)
   -s, --itc_users ARRAY Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles (ITC_USERS)
