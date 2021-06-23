@@ -180,8 +180,8 @@ open class Snapshot: NSObject {
                 simulator = regex.stringByReplacingMatches(in: simulator, range: range, withTemplate: "")
 
                 let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
-                #if swift(<5.0)
-                    UIImagePNGRepresentation(image)?.write(to: path, options: .atomic)
+                #if swift(<4.2)
+                    try UIImagePNGRepresentation(image)?.write(to: path, options: .atomic)
                 #else
                     try image.pngData()?.write(to: path, options: .atomic)
                 #endif
