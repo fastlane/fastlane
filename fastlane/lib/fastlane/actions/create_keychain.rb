@@ -47,7 +47,10 @@ module Fastlane
         commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{keychain_path}", log: false) if params[:unlock]
 
         command = "security set-keychain-settings"
-        command << " -t #{params[:timeout]}" if params[:timeout]
+
+        # https://ss64.com/osx/security-keychain-settings.html
+        # omitting 'timeout' option to specify "no timeout" if required
+        command << " -t #{params[:timeout]}" if params[:timeout] > 0
         command << " -l" if params[:lock_when_sleeps]
         command << " -u" if params[:lock_after_timeout]
         command << " #{keychain_path}"
@@ -126,7 +129,7 @@ module Fastlane
                                        type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :timeout,
-                                       description: 'timeout interval in seconds',
+                                       description: 'timeout interval in seconds. Set `0` if you want to specify "no time-out"',
                                        type: Integer,
                                        default_value: 300),
           FastlaneCore::ConfigItem.new(key: :lock_when_sleeps,
