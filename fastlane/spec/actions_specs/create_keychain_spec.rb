@@ -150,7 +150,7 @@ describe Fastlane do
           expect(result[1]).to eq('security unlock-keychain -p testpassword ~/Library/Keychains/test.keychain')
 
           expect(result[2]).to start_with('security set-keychain-settings')
-          expect(result[2]).not_to include('-t 0')
+          expect(result[2]).to_not(include('-t'))
           expect(result[2]).to_not(include('-l'))
           expect(result[2]).to_not(include('-u'))
           expect(result[2]).to include('~/Library/Keychains/test.keychain')
