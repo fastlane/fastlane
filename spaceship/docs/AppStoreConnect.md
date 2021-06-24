@@ -137,82 +137,60 @@ v.set_rating({
 v.save!
 ```
 
-All available options:
+Available options:
 ```ruby
 ####
-# General app version metadata
+# General app store version metadata (app_store_version)
 ####
 
-attr_accessor :application
-attr_accessor :version
+attr_accessor :platform
+attr_accessor :version_string
+attr_accessor :app_store_state
+attr_accessor :store_icon
+attr_accessor :watch_store_icon
 attr_accessor :copyright
-attr_reader :app_status
-attr_accessor :is_live
-attr_accessor :primary_category
-attr_accessor :primary_first_sub_category
-attr_accessor :primary_second_sub_category
-attr_accessor :secondary_category
-attr_accessor :secondary_first_sub_category
-attr_accessor :secondary_second_sub_category
-attr_accessor :raw_status
-attr_accessor :can_reject_version
-attr_accessor :can_prepare_for_upload
-attr_accessor :can_send_version_live
-attr_accessor :release_on_approval
-attr_accessor :ratings_reset
-attr_accessor :can_beta_test
-attr_accessor :supports_apple_watch
-attr_accessor :app_icon_url
-attr_accessor :app_icon_original_name
-attr_accessor :watch_app_icon_url
-attr_accessor :watch_app_icon_original_name
-attr_accessor :version_id
+attr_accessor :release_type
+attr_accessor :earliest_release_date
+attr_accessor :uses_idfa
+attr_accessor :is_watch_only
+attr_accessor :downloadable
+attr_accessor :created_date
+attr_accessor :app_store_version_submission
+attr_accessor :app_store_version_phased_release
+attr_accessor :app_store_review_detail
+attr_accessor :app_store_version_localizations
 
 ####
-# Trade Representative Contact Information
+# App Review Information (app_store_review_detail)
 ####
 
-attr_accessor :trade_representative_trade_name
-attr_accessor :trade_representative_first_name
-attr_accessor :trade_representative_last_name
-attr_accessor :trade_representative_address_line_1
-attr_accessor :trade_representative_address_line_2
-attr_accessor :trade_representative_address_line_3
-attr_accessor :trade_representative_city_name
-attr_accessor :trade_representative_state
-attr_accessor :trade_representative_country
-attr_accessor :trade_representative_postal_code
-attr_accessor :trade_representative_phone_number
-attr_accessor :trade_representative_email
-attr_accessor :trade_representative_is_displayed_on_app_store
+attr_accessor :contact_first_name
+attr_accessor :contact_last_name
+attr_accessor :contact_phone
+attr_accessor :contact_email
+attr_accessor :demo_account_name
+attr_accessor :demo_account_password
+attr_accessor :demo_account_required
+attr_accessor :notes
+attr_accessor :app_store_review_attachments
 
 ####
-# App Review Information
+# Localized values (app_store_version_localization)
 ####
 
-attr_accessor :review_first_name
-attr_accessor :review_last_name
-attr_accessor :review_phone_number
-attr_accessor :review_email
-attr_accessor :review_demo_user
-attr_accessor :review_demo_password
-attr_accessor :review_notes
+attr_accessor :description
+attr_accessor :locale
+attr_accessor :keywords
+attr_accessor :marketing_url
+attr_accessor :promotional_text
+attr_accessor :support_url
+attr_accessor :whats_new
+attr_accessor :app_screenshot_sets
+attr_accessor :app_preview_sets
 
-####
-# Localized values
-# attr_reader, since you have to access using ["English"]
-####
-
-attr_accessor :languages
-attr_reader :keywords
-attr_reader :description
-attr_reader :release_notes
-attr_reader :support_url
-attr_reader :marketing_url
-attr_reader :screenshots
 ```
 
-**Important**: For a complete documentation with the return type, description and notes for each of the properties, check out [app_version.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_version.rb).
+**Important**: For a complete documentation with the return type, description and notes for each of the properties, check out [app_store_version.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/connect_api/models/app_store_version.rb) and other models.
 
 ### Select a build for review
 
