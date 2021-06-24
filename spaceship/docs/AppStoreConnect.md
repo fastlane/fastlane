@@ -76,6 +76,7 @@ app = Spaceship::ConnectAPI::App.create(name: "App Name",
 To update non version specific details, use the following code
 
 ```ruby
+app = Spaceship::Tunes::Application.find("com.krausefx.app")
 details = app.details
 details.name['en-US'] = "App Name"
 details.privacy_url['en-US'] = "https://fastlane.tools"
@@ -85,6 +86,7 @@ details.save!
 To change the price of the app (it's not necessary to call `save!` when updating the price)
 
 ```ruby
+app = Spaceship::Tunes::Application.find("com.krausefx.app")
 app.update_price_tier!("3")
 ```
 
@@ -253,6 +255,8 @@ To clarify:
 A build train contains all builds for a give `version number` (e.g. `0.9.21`). Within the build train you have *n* builds, each having a different `build number` (e.g. `99993`).
 
 ```ruby
+app = Spaceship::Tunes::Application.find("com.krausefx.app")
+
 # Access all build trains for an app
 app.all_build_train_numbers   # => ["0.9.21"]
 
@@ -343,6 +347,8 @@ testers = Spaceship::ConnectAPI::SandboxTester.create(
 ### App ratings & reviews
 
 ```ruby
+app = Spaceship::Tunes::Application.find("com.krausefx.app")
+
 # Get the rating summary for an application
 ratings = app.ratings # => Spaceship::Tunes::AppRatings
 
@@ -363,6 +369,8 @@ reviews = ratings.reviews("US") # => Array of hashes representing review data
 ### App Analytics
 
 ```ruby
+app = Spaceship::Tunes::Application.find("com.krausefx.app")
+
 # Start app analytics
 analytics = app.analytics                # => Spaceship::Tunes::AppAnalytics
 
