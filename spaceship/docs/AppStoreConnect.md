@@ -9,6 +9,7 @@
   * [Builds](#builds)
   * [Processing builds](#processing-builds)
   * [Submit app for App Store Review](#submit-app-for-app-store-review)
+  * [Release reviewed build](#release-reviewed-build)
   * [Testers](#testers)
   * [App ratings & reviews](#app-ratings--reviews)
   * [App Analytics](#app-analytics)
@@ -207,12 +208,34 @@ attr_accessor :app_preview_sets
 
 ### Select a build for review
 
+For a full list of available options, check out [submit_for_review.rb](https://github.com/fastlane/fastlane/blob/master/deliver/lib/deliver/submit_for_review.rb)
+
 ```ruby
 version = app.get_edit_app_store_version
+build = Spaceship::ConnectAPI::Build.all(app_id: app.id, platform: platform).first
+version.select_build(build_id: build.id)
+# Check out submit_for_review.rb to get an overview how to modify idfa, submission information
+# Submit for App Store Review
+version.create_app_store_version_submission
+```
 
-builds = version.candidate_builds
-version.select_build(builds.first)
-version.save!
+**Important**: For a complete example how to select a build for review, check out [submit_for_review.rb](https://github.com/fastlane/fastlane/blob/master/deliver/lib/deliver/submit_for_review.rb).
+
+
+### Release reviewed build
+
+```ruby
+version = app.get_pending_release_app_store_version
+unless version.nil?
+  Spaceship::ConnectAPI.post_app_store_version_release_request(app_store_version_id: version.id)
+end
+```
+
+or 
+
+```ruby
+version = app.get_pending_release_app_store_version
+version.create_app_store_version_release_request unless version.nil?
 ```
 
 ### Build Trains (TestFlight)
