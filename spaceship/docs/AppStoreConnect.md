@@ -284,7 +284,7 @@ build.submit_for_testflight_review!
 To also access those builds that are "stuck" at `Processing` at App Store Connect for a while:
 
 ```ruby
-app.all_processing_builds       # => Array of processing builds for this application
+Spaceship::ConnectAPI::Build.all(app_id: app.id, processing_states: "PROCESSING") # => Array of processing builds for this application
 ```
 
 ### Submit app for App Store Review
@@ -314,6 +314,8 @@ There are 3 types of testers:
 ```ruby
 # Find a tester based on the email address
 tester = Spaceship::TestFlight::Tester.find(app_id: "some_app_id", email: "felix@krausefx.com")
+
+tester = Spaceship::ConnectAPI::BetaTester.find(email: "felix@krausefx.com")
 
 # Creating new testers
 Spaceship::TestFlight::Tester.create_app_level_tester(
