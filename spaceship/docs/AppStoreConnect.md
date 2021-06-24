@@ -99,7 +99,10 @@ With _spaceship_ you can access the versions like this
 
 ```ruby
 app.get_live_app_store_version # the version that's currently available in the App Store
-app.get_edit_app_store_version # the version that's in `Prepare for Submission` mode
+app.get_edit_app_store_version # the version that's in `Prepare for Submission`, `Metadata Rejected`, `Rejected`, `Developer Rejcted`, `Waiting for Review`, `Invalid Binary` mode
+app.get_latest_app_store_version # the version that's the latest one
+app.get_pending_release_app_store_version # the version that's in `Pending Developer Release` or `Pending Apple Release` mode
+app.get_in_review_app_store_version # the version that is in `In Review` mode
 ```
 
 You can then go ahead and modify app metadata on the version objects:
