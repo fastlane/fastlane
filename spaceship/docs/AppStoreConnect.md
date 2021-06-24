@@ -5,11 +5,11 @@
   * [Applications](#applications)
   * [AppVersions](#appversions)
   * [Select a build for review](#select-a-build-for-review)
+  * [Submit app for App Store Review](#submit-app-for-app-store-review)
+  * [Release reviewed build](#release-reviewed-build)
   * [Build Trains (TestFlight)](#build-trains-testflight)
   * [Builds](#builds)
   * [Processing builds](#processing-builds)
-  * [Submit app for App Store Review](#submit-app-for-app-store-review)
-  * [Release reviewed build](#release-reviewed-build)
   * [Testers](#testers)
   * [App ratings & reviews](#app-ratings--reviews)
   * [App Analytics](#app-analytics)
@@ -214,12 +214,15 @@ For a full list of available options, check out [submit_for_review.rb](https://g
 version = app.get_edit_app_store_version
 build = Spaceship::ConnectAPI::Build.all(app_id: app.id, platform: platform).first
 version.select_build(build_id: build.id)
+```
+### Submit app for App Store Review
+
+```ruby
 # Check out submit_for_review.rb to get an overview how to modify idfa, submission information
-# Submit for App Store Review
 version.create_app_store_version_submission
 ```
 
-**Important**: For a complete example how to select a build for review, check out [submit_for_review.rb](https://github.com/fastlane/fastlane/blob/master/deliver/lib/deliver/submit_for_review.rb).
+**Important**: For a complete example how to prepare version for review and submit it for review check out [submit_for_review.rb](https://github.com/fastlane/fastlane/blob/master/deliver/lib/deliver/submit_for_review.rb).
 
 
 ### Release reviewed build
@@ -286,22 +289,6 @@ To also access those builds that are "stuck" at `Processing` at App Store Connec
 ```ruby
 Spaceship::ConnectAPI::Build.all(app_id: app.id, processing_states: "PROCESSING") # => Array of processing builds for this application
 ```
-
-### Submit app for App Store Review
-
-```ruby
-submission = app.create_submission
-
-# Set app submission information
-submission.content_rights_contains_third_party_content = false
-submission.content_rights_has_rights = true
-submission.add_id_info_uses_idfa = false
-
-# Finalize app submission
-submission.complete!
-```
-
-For a full list of available options, check out [app_submission.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_submission.rb).
 
 ### Testers
 
