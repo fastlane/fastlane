@@ -111,30 +111,43 @@ You can then go ahead and modify app metadata on the version objects:
 v = app.get_edit_app_store_version
 
 # Access information
-v.app_status        # => "Waiting for Review"
-v.version           # => "0.9.14"
+v.app_store_state         # => "Waiting for Review"
+v.version_string          # => "0.9.14"
+
+# Build is not always available in all app_store_state, e.g. not available in `Prepare for Submission`
+build_number = v.build.nil? ? nil : v.build.version
 
 # Update app metadata
-v.copyright = "#{Time.now.year} Felix Krause"
+copyright = "#{Time.now.year} Felix Krause"
+v.update(attributes: { "copyright": copyright })
 
 # Get a list of available languages for this app
-v.description.languages # => ["German", "English"]
+version = app.get_edit_app_store_version(includes: 'appStoreVersionSubmission,build,appStoreVersionLocalizations')
+localizations = version.appStoreVersionLocalizations
+
+localization = localizations.first
+localization.locale       # => "en-GB"
+localization.description  # => "App description"
 
 # Update localized app metadata
-v.description["en-US"] = "App Description"
+localization.update(attributes: { description: "New Description" })
 
 # set the app age rating
-v.set_rating({
-  'CARTOON_FANTASY_VIOLENCE' => 0,
-  'MATURE_SUGGESTIVE' => 2,
-  'UNRESTRICTED_WEB_ACCESS' => 0
+
+# fetch_age_rating_declaration with `fetch_live_app_info` or `fetch_edit_app_info`
+app_info = app.fetch_edit_app_info
+declaration = app_info.fetch_age_rating_declaration unless app_info.nil?
+
+# update age_rating_declaration
+declaration.update(attributes: {
+  "violenceCartoonOrFantasy": "NONE",
+  "matureOrSuggestiveThemes": "NONE",
+  "unrestrictedWebAccess": false
 })
 # Available values:
 # https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json
 # https://docs.fastlane.tools/actions/deliver/#reference (Open "View all available categories, languages, etc.")
 
-# Push the changes back to the server
-v.save!
 ```
 
 Available options:
