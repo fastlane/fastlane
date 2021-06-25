@@ -37,13 +37,15 @@ module Fastlane
       #####################################################
 
       def self.description
+        "This action will retrieve a list of each device registered with Apple"
+      end
+
+      def self.details
         [
           "This action will retrieve a list of names and UDIDs of each device registered with your Apple Certificate.",
           "This list is exactly the same as the list used to compare against what is/isn't registered in the `register_device/s` action."
         ].join("\n")
       end
-
-      def self.details; end
 
       def self.available_options
         user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
