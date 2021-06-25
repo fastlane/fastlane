@@ -20,7 +20,7 @@ module Fastlane
         end
 
         UI.message("Fetching list of currently registered devices...")
-        existing_devices = Spaceship::ConnectAPI::Device.all.map { |ed| { name: ed.name, udid: ed.udid }}
+        existing_devices = Spaceship::ConnectAPI::Device.all.map { |ed| { name: ed.name, udid: ed.udid } }
 
         UI.success("Successfully retrieved the following devices")
 
@@ -28,7 +28,7 @@ module Fastlane
           UI.message("UDID: #{ed[:udid]} | NAME: #{ed[:name]}")
         end
 
-        Actions.lane_context[SharedValues::FL_CHANGELOG] = existing_devices
+        Actions.lane_context[SharedValues::DEVICES_FOR_APPLE_CERTIFICATE] = existing_devices
         # sh "shellcommand ./path"
       end
 
@@ -37,25 +37,18 @@ module Fastlane
       #####################################################
 
       def self.description
-        "A short description with <= 80 characters of what this action does"
-      end
-
-      def self.details
         [
           "This action will retrieve a list of names and UDIDs of each device registered with your Apple Certificate.",
-          "This list is exactly the same as the list used to compare against what is/isn't registered in the `register_device/s` action.",
+          "This list is exactly the same as the list used to compare against what is/isn't registered in the `register_device/s` action."
         ].join("\n")
       end
 
+      def self.details; end
+
       def self.available_options
-        # Define all options your action supports.
         user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
-        puts "FOUND"
-        puts Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY]
-
-        # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :api_key_path,
                                        env_names: ["FL_RETRIEVE_DEVICES_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
@@ -97,7 +90,11 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-         [:ios, :mac].include?(platform)
+        [:ios, :mac].include?(platform)
+      end
+
+      def self.category
+        :misc
       end
     end
   end
