@@ -192,7 +192,6 @@ module Fastlane
                                        env_name: "FL_TESTFAIRY_UPLOAD_URL", # The name of the environment variable
                                        description: "API URL for TestFairy", # a short description of this parameter
                                        default_value: "https://upload.testfairy.com",
-                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :testers_groups,
                                        optional: true,
