@@ -30,7 +30,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_SETUP_TRAVIS_FORCE",
                                        description: "Force setup, even if not executed by travis",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false)
         ]
       end
