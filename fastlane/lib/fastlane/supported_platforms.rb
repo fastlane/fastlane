@@ -18,9 +18,14 @@ module Fastlane
       (@default + @extra).flatten
     end
 
+    
+    def self.supported?(platform)
+      return all.include?(platform.to_s.to_sym)
+    end
+
     # this will log a warning if the passed platform is not supported
     def self.verify!(platform)
-      unless all.include?(platform.to_s.to_sym)
+      unless supported?(platform.to_s.to_sym)
         UI.important("Platform '#{platform}' is not officially supported. Currently supported platforms are #{self.all}.")
       end
     end

@@ -195,7 +195,7 @@ module Fastlane
             ff = Fastlane::FastFile.new(FastlaneCore::FastlaneFolder.fastfile_path)
             UI.message("Available lanes:")
             ff.runner.available_lanes.each do |lane|
-              UI.message("- #{lane}")
+              UI.message("- #{lane.pretty_name}")
             end
             UI.important("Execute using `fastlane [lane_name]`")
           end

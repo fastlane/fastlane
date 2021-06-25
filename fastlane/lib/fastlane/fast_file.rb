@@ -9,11 +9,16 @@ module Fastlane
     # This is used to identify the platform in which the lane is in
     attr_accessor :current_platform
 
+    attr_accessor :current_namespace
+
     SharedValues = Fastlane::Actions::SharedValues
 
     # @return The runner which can be executed to trigger the given actions
     def initialize(path = nil)
       return unless (path || '').length > 0
+
+      @current_namespace = []
+
       UI.user_error!("Could not find Fastfile at path '#{path}'") unless File.exist?(path)
       @path = File.expand_path(path)
       content = File.read(path, encoding: "utf-8")
@@ -84,6 +89,7 @@ module Fastlane
       UI.user_error!("You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.") unless block
 
       self.runner.add_lane(Lane.new(platform: self.current_platform,
+                                   namespaces: self.current_namespace,
                                        block: block,
                                  description: desc_collection,
                                         name: lane_name,
@@ -97,6 +103,7 @@ module Fastlane
       UI.user_error!("You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.") unless block
 
       self.runner.add_lane(Lane.new(platform: self.current_platform,
+                                   namespaces: self.current_namespace,
                                        block: block,
                                  description: desc_collection,
                                         name: lane_name,
@@ -110,6 +117,7 @@ module Fastlane
       UI.user_error!("You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.") unless block
 
       self.runner.add_lane(Lane.new(platform: self.current_platform,
+                                   namespaces: self.current_namespace,
                                        block: block,
                                  description: desc_collection,
                                         name: lane_name,
@@ -128,6 +136,16 @@ module Fastlane
 
       self.current_platform = nil
     end
+
+    def namespace(namespace_name)
+      self.current_namespace << namespace_name
+
+      yield
+
+      self.current_namespace.pop
+      self.current_namespace
+    end
+    alias_method :group, :namespace
 
     # Is executed before each test run
     def before_all(&block)

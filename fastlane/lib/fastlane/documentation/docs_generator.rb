@@ -26,16 +26,17 @@ module Fastlane
       all_keys.unshift(nil) # because we want root elements on top. always! They have key nil
 
       all_keys.each do |platform|
-        lanes = ff.runner.lanes[platform]
+        lanes = ff.runner.available_lanes(platform)
 
-        if lanes.nil? || lanes.empty? || lanes.all? { |_, lane| lane.is_private }
+        if lanes.nil? || lanes.empty? || lanes.all? { |lane| lane.is_private }
           next
         end
 
         output << "## #{formatted_platform(platform)}" if platform
 
-        lanes.each do |lane_name, lane|
+        lanes.each do |lane|
           next if lane.is_private
+          lane_name = lane.name
           output << render(platform, lane_name, lane.description.join("\n\n"))
         end
 

@@ -3,6 +3,8 @@ module Fastlane
   class Lane
     attr_accessor :platform
 
+    attr_accessor :namespaces
+
     attr_accessor :name
 
     # @return [Array] An array containing the description of this lane
@@ -14,7 +16,7 @@ module Fastlane
     # @return [Boolean] Is that a private lane that can't be called from the CLI?
     attr_accessor :is_private
 
-    def initialize(platform: nil, name: nil, description: nil, block: nil, is_private: false)
+    def initialize(platform: nil, namespaces: nil, name: nil, description: nil, block: nil, is_private: false)
       UI.user_error!("description must be an array") unless description.kind_of?(Array)
       UI.user_error!("lane name must not contain any spaces") if name.to_s.include?(" ")
       UI.user_error!("lane name must start with :") unless name.kind_of?(Symbol)
@@ -22,6 +24,7 @@ module Fastlane
       self.class.verify_lane_name(name)
 
       self.platform = platform
+      self.namespaces = namespaces.clone.map(&:clone)
       self.name = name
       self.description = description
       self.block = block
@@ -35,7 +38,8 @@ module Fastlane
 
     # @return [String] The lane + name of the lane. If there is no platform, it will only be the lane name
     def pretty_name
-      [platform, name].reject(&:nil?).join(' ')
+      full_name = ((namespaces || []) + [name]).join(' ')
+      [platform, full_name].reject(&:nil?).join(' ')
     end
 
     class << self

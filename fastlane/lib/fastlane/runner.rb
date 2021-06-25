@@ -24,7 +24,10 @@ module Fastlane
       self.current_lane = lane.to_sym
       self.current_platform = (platform ? platform.to_sym : nil)
 
-      lane_obj = lanes.fetch(current_platform, {}).fetch(current_lane, nil)
+      namespace_and_lane = lane.split(' ').map(&:to_sym)
+      puts "lane: #{lane}"
+      puts "namespace_and_lane: #{namespace_and_lane}"
+      lane_obj = lanes.fetch(current_platform, {}).dig(*namespace_and_lane)
 
       UI.user_error!("Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes.join(', ')}") unless lane_obj
       UI.user_error!("You can't call the private lane '#{lane}' directly") if lane_obj.is_private
@@ -74,15 +77,33 @@ module Fastlane
 
     # @param filter_platform: Filter, to only show the lanes of a given platform
     # @return an array of lanes (platform lane_name) to print them out to the user
-    def available_lanes(filter_platform = nil)
+    def available_lanes(filter_platform = nil, namespaces: [])
       all = []
+
+      # require 'pp'
+      # pp lanes
+      
+      def find_all_lanes(lanes)
+        lanes.map do |k, v|
+          if v.kind_of?(Hash)
+            find_all_lanes(v)
+          else
+            v
+          end
+        end.flatten
+      end
+
       lanes.each do |platform, platform_lanes|
         next if filter_platform && filter_platform.to_s != platform.to_s # skip actions that don't match
 
-        platform_lanes.each do |lane_name, lane|
-          all << [platform, lane_name].reject(&:nil?).join(' ') unless lane.is_private
+        things = find_all_lanes(platform_lanes)
+
+        things.each do |lane|
+          # this did return string now its the lane
+          all << lane unless lane.is_private
         end
       end
+
       all
     end
 
@@ -311,11 +332,47 @@ module Fastlane
     def add_lane(lane, override = false)
       lanes[lane.platform] ||= {}
 
-      if !override && lanes[lane.platform][lane.name]
+      platform_lanes = lanes[lane.platform]
+
+      # def deep_set(hash, value, *keys)
+        
+      #   keys[0...-1].inject(hash) do |acc, h|
+      #     acc.public_send(:[], h)
+      #   end.public_send(:[]=, keys.last, value)
+      # end
+
+      # puts "fire"
+
+      keys = lane.namespaces + [lane.name]
+      
+      # hash = {}
+
+      # thing = keys[0...-1].inject(hash) do |r, e|
+      #   r[e] ||= {}
+      # end
+      # thing[keys.last] = lane
+
+      # pp hash
+
+      # puts "no fire"
+
+      # pp keys.inject([]) do |result, element|
+      #   result
+      # end
+
+      # keys = [lane.name]
+
+      
+
+      if !override && platform_lanes.dig(keys)
         UI.user_error!("Lane '#{lane.name}' was defined multiple times!")
       end
 
-      lanes[lane.platform][lane.name] = lane
+      keys[0...-1].inject(platform_lanes) do |r, e|
+        r[e] ||= {}
+      end[keys.last] = lane
+
+      # platform_lanes[lane.name] = lane
     end
 
     def set_before_each(platform, block)

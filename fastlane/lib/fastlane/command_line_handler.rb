@@ -6,6 +6,7 @@ module Fastlane
     def self.handle(args, options)
       lane_parameters = {} # the parameters we'll pass to the lane
       platform_lane_info = [] # the part that's responsible for the lane/platform definition
+
       args.each do |current|
         if current.include?(":") # that's a key/value which we want to pass to the lane
           key, value = current.split(":", 2)
@@ -19,12 +20,13 @@ module Fastlane
       end
 
       platform = nil
-      lane = platform_lane_info[1]
-      if lane
-        platform = platform_lane_info[0]
-      else
-        lane = platform_lane_info[0]
+      if SupportedPlatforms.supported?(platform_lane_info.first)
+        platform = platform_lane_info.shift
       end
+      lane = platform_lane_info.empty? ? nil : platform_lane_info.join(' ')
+
+      puts "platform: #{platform}"
+      puts "lane: #{lane}"
 
       dot_env = Helper.test? ? nil : options.env
 

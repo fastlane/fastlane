@@ -79,9 +79,9 @@ module Fastlane
       available = []
 
       # nil is the key for lanes that are not under a specific platform
-      lane_platforms = [nil] + Fastlane::SupportedPlatforms.all
+      lane_platforms = [platform]
       lane_platforms.each do |p|
-        available += ff.runner.lanes[p].to_a.reject { |lane| lane.last.is_private }
+        available += ff.runner.available_lanes(p).reject { |lane| lane.is_private }
       end
 
       if available.empty?
@@ -90,7 +90,7 @@ module Fastlane
 
       rows = []
       available.each_with_index do |lane, index|
-        rows << [index + 1, lane.last.pretty_name, lane.last.description.join("\n")]
+        rows << [index + 1, lane.pretty_name, lane.description.join("\n")]
       end
 
       rows << [0, "cancel", "No selection, exit fastlane!"]
@@ -111,16 +111,11 @@ module Fastlane
       i = UI.input("Which number would you like run?")
 
       i = i.to_i - 1
-      if i >= 0 && available[i]
-        selection = available[i].last.pretty_name
+      if i >= 0 && (lane = available[i])
+        selection = lane.pretty_name
         UI.important("Running lane `#{selection}`. Next time you can do this by directly typing `#{fastlane_command} #{selection}` 🚀.")
-        platform = selection.split(' ')[0]
-        lane_name = selection.split(' ')[1]
-
-        unless lane_name # no specific platform, just a root lane
-          lane_name = platform
-          platform = nil
-        end
+        platform = lane.platform
+        lane_name = (lane.namespaces + [lane.name]).join(' ')
 
         return platform, lane_name # yeah
       else
