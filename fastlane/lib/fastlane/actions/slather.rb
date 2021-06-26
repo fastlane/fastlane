@@ -271,7 +271,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :source_files,
                                        env_name: "FL_SLATHER_SOURCE_FILES",
                                        description: "A Dir.glob compatible pattern used to limit the lookup to specific source files. Ignored in gcov mode",
-                                       type: Array,
                                        skip_type_validation: true, # skipping validation for backwards compatibility with Boolean type
                                        default_value: false,
                                        optional: true),
