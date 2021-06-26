@@ -129,8 +129,8 @@ module Fastlane
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :add_keychain_to_search_list,
                                        env_name: "FL_SETUP_JENKINS_ADD_KEYCHAIN_TO_SEARCH_LIST",
-                                       description: "Add to keychain search list",
-                                       type: Symbol,
+                                       description: "Add to keychain search list, valid values are true, false, :add, and :replace",
+                                       skip_type_validation: true, # allow Boolean, Symbol
                                        default_value: :replace),
           FastlaneCore::ConfigItem.new(key: :set_default_keychain,
                                        env_name: "FL_SETUP_JENKINS_SET_DEFAULT_KEYCHAIN",
