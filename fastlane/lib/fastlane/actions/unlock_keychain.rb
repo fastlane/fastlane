@@ -81,7 +81,7 @@ module Fastlane
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :add_to_search_list,
                                        env_name: "FL_UNLOCK_KEYCHAIN_ADD_TO_SEARCH_LIST",
-                                       description: "Add to keychain search list",
+                                       description: "Add to keychain search list, valid values are true, false, :add, and :replace",
                                        skip_type_validation: true, # allow Boolean, Symbol
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :set_default,
