@@ -1956,7 +1956,7 @@ public func bundleInstall(binstubs: OptionalConfigValue<String?> = .fastlaneDefa
 
  - parameters:
    - androidHome: Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx
-   - buildToolsVersion: The Android build tools version to use, e.g. '23.0.2'
+   - buildToolsVersion: **DEPRECATED!** The Android build tools version to use, e.g. '23.0.2'
    - locales: A list of locales which should be used
    - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running screengrab
    - outputDirectory: The directory where to store the screenshots
@@ -1967,8 +1967,8 @@ public func bundleInstall(binstubs: OptionalConfigValue<String?> = .fastlaneDefa
    - useTestsInClasses: Only run tests in these Java classes
    - launchArguments: Additional launch arguments
    - testInstrumentationRunner: The fully qualified class name of your test instrumentation runner
-   - endingLocale: Return the device to this locale after running tests
-   - useAdbRoot: Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
+   - endingLocale: **DEPRECATED!** Return the device to this locale after running tests
+   - useAdbRoot: **DEPRECATED!** Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
    - appApkPath: The path to the APK for the app under test
    - testsApkPath: The path to the APK for the the tests bundle
    - specificDevice: Use the device or emulator with the given serial number or qualifier
@@ -3266,11 +3266,11 @@ public func createAppOnManagedPlayStore(jsonKey: OptionalConfigValue<String?> = 
    - platform: The platform to use (optional)
    - platforms: The platforms to use (optional)
    - language: Primary Language (e.g. 'en-US', 'fr-FR')
-   - companyName: The name of your company. Only required if it's the first app you create
+   - companyName: The name of your company. It's used to set company name on App Store Connect team's app pages. Only required if it's the first app you create
    - skipItc: Skip the creation of the app on App Store Connect
    - itcUsers: Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles
    - enabledFeatures: **DEPRECATED!** Please use `enable_services` instead - Array with Spaceship App Services
-   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), data_protection: (complete|unlessopen|untilfirstauth), game_center: (on|off), health_kit: (on|off), home_kit: (on|off), hotspot: (on|off), icloud: (legacy|cloudkit), in_app_purchase: (on|off), inter_app_audio: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), siri_kit: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off))
+   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_attest: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), class_kit: (on|off), icloud: (legacy|cloudkit), custom_network_protocol: (on|off), data_protection: (complete|unlessopen|untilfirstauth), extended_virtual_address_space: (on|off), family_controls: (on|off), file_provider_testing_mode: (on|off), fonts: (on|off), game_center: (ios|mac), health_kit: (on|off), hls_interstitial_preview: (on|off), home_kit: (on|off), hotspot: (on|off), in_app_purchase: (on|off), inter_app_audio: (on|off), low_latency_hls: (on|off), managed_associated_domains: (on|off), maps: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), sign_in_with_apple: (on), siri_kit: (on|off), system_extension: (on|off), user_management: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off), car_play_audio_app: (on|off), car_play_messaging_app: (on|off), car_play_navigation_app: (on|off), car_play_voip_calling_app: (on|off), critical_alerts: (on|off), hotspot_helper: (on|off), driver_kit: (on|off), driver_kit_endpoint_security: (on|off), driver_kit_family_hid_device: (on|off), driver_kit_family_networking: (on|off), driver_kit_family_serial: (on|off), driver_kit_hid_event_service: (on|off), driver_kit_transport_hid: (on|off), multitasking_camera_access: (on|off), sf_universal_link_api: (on|off), vp9_decoder: (on|off), music_kit: (on|off), shazam_kit: (on|off), communication_notifications: (on|off), group_activities: (on|off), health_kit_estimate_recalibration: (on|off), time_sensitive_notifications: (on|off))
    - skipDevcenter: Skip the creation of the app on the Apple Developer Portal
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
@@ -3355,7 +3355,7 @@ public func createAppOnline(username: String,
    - password: Password for the keychain
    - defaultKeychain: Should the newly created Keychain be the new system default keychain
    - unlock: Unlock keychain after create
-   - timeout: timeout interval in seconds
+   - timeout: timeout interval in seconds. Set `0` if you want to specify "no time-out"
    - lockWhenSleeps: Lock keychain when the system sleeps
    - lockAfterTimeout: Lock keychain after timeout interval
    - addToSearchList: Add keychain to search list
@@ -6391,7 +6391,7 @@ public func jazzy(config: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                            version: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                            platform: String = "ios",
                                                            initialBuildNumber: Int = 1,
-                                                           teamId: Any? = nil,
+                                                           teamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                            teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> Int
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
@@ -6402,7 +6402,7 @@ public func jazzy(config: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let versionArg = version.asRubyArgument(name: "version", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let initialBuildNumberArg = RubyCommand.Argument(name: "initial_build_number", value: initialBuildNumber, type: nil)
-    let teamIdArg = RubyCommand.Argument(name: "team_id", value: teamId, type: nil)
+    let teamIdArg = teamId.asRubyArgument(name: "team_id", type: nil)
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
@@ -6485,7 +6485,7 @@ public func mailgun(mailgunSandboxDomain: OptionalConfigValue<String?> = .fastla
                     ciBuildLink: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     templatePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     replyTo: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                    attachment: Any? = nil,
+                    attachment: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                     customPlaceholders: [String: Any] = [:])
 {
     let mailgunSandboxDomainArg = mailgunSandboxDomain.asRubyArgument(name: "mailgun_sandbox_domain", type: nil)
@@ -6502,7 +6502,7 @@ public func mailgun(mailgunSandboxDomain: OptionalConfigValue<String?> = .fastla
     let ciBuildLinkArg = ciBuildLink.asRubyArgument(name: "ci_build_link", type: nil)
     let templatePathArg = templatePath.asRubyArgument(name: "template_path", type: nil)
     let replyToArg = replyTo.asRubyArgument(name: "reply_to", type: nil)
-    let attachmentArg = RubyCommand.Argument(name: "attachment", value: attachment, type: nil)
+    let attachmentArg = attachment.asRubyArgument(name: "attachment", type: nil)
     let customPlaceholdersArg = RubyCommand.Argument(name: "custom_placeholders", value: customPlaceholders, type: nil)
     let array: [RubyCommand.Argument?] = [mailgunSandboxDomainArg,
                                           mailgunSandboxPostmasterArg,
@@ -6954,7 +6954,7 @@ public func minFastlaneVersion() {
  - parameters:
    - username: Your Apple ID Username
    - appIdentifier: App Identifier (Bundle ID, e.g. com.krausefx.app)
-   - services: Array with Spaceship App Services (e.g. access_wifi: (on|off)(:on|:off)(true|false), app_group: (on|off)(:on|:off)(true|false), apple_pay: (on|off)(:on|:off)(true|false), associated_domains: (on|off)(:on|:off)(true|false), auto_fill_credential: (on|off)(:on|:off)(true|false), data_protection: (complete|unlessopen|untilfirstauth)(:on|:off)(true|false), game_center: (on|off)(:on|:off)(true|false), health_kit: (on|off)(:on|:off)(true|false), home_kit: (on|off)(:on|:off)(true|false), hotspot: (on|off)(:on|:off)(true|false), icloud: (legacy|cloudkit)(:on|:off)(true|false), in_app_purchase: (on|off)(:on|:off)(true|false), inter_app_audio: (on|off)(:on|:off)(true|false), multipath: (on|off)(:on|:off)(true|false), network_extension: (on|off)(:on|:off)(true|false), nfc_tag_reading: (on|off)(:on|:off)(true|false), personal_vpn: (on|off)(:on|:off)(true|false), passbook: (on|off)(:on|:off)(true|false), push_notification: (on|off)(:on|:off)(true|false), siri_kit: (on|off)(:on|:off)(true|false), vpn_configuration: (on|off)(:on|:off)(true|false), wallet: (on|off)(:on|:off)(true|false), wireless_accessory: (on|off)(:on|:off)(true|false))
+   - services: Array with Spaceship App Services (e.g. access_wifi: (on|off)(:on|:off)(true|false), app_attest: (on|off)(:on|:off)(true|false), app_group: (on|off)(:on|:off)(true|false), apple_pay: (on|off)(:on|:off)(true|false), associated_domains: (on|off)(:on|:off)(true|false), auto_fill_credential: (on|off)(:on|:off)(true|false), class_kit: (on|off)(:on|:off)(true|false), icloud: (legacy|cloudkit)(:on|:off)(true|false), custom_network_protocol: (on|off)(:on|:off)(true|false), data_protection: (complete|unlessopen|untilfirstauth)(:on|:off)(true|false), extended_virtual_address_space: (on|off)(:on|:off)(true|false), family_controls: (on|off)(:on|:off)(true|false), file_provider_testing_mode: (on|off)(:on|:off)(true|false), fonts: (on|off)(:on|:off)(true|false), game_center: (ios|mac)(:on|:off)(true|false), health_kit: (on|off)(:on|:off)(true|false), hls_interstitial_preview: (on|off)(:on|:off)(true|false), home_kit: (on|off)(:on|:off)(true|false), hotspot: (on|off)(:on|:off)(true|false), in_app_purchase: (on|off)(:on|:off)(true|false), inter_app_audio: (on|off)(:on|:off)(true|false), low_latency_hls: (on|off)(:on|:off)(true|false), managed_associated_domains: (on|off)(:on|:off)(true|false), maps: (on|off)(:on|:off)(true|false), multipath: (on|off)(:on|:off)(true|false), network_extension: (on|off)(:on|:off)(true|false), nfc_tag_reading: (on|off)(:on|:off)(true|false), personal_vpn: (on|off)(:on|:off)(true|false), passbook: (on|off)(:on|:off)(true|false), push_notification: (on|off)(:on|:off)(true|false), sign_in_with_apple: (on)(:on|:off)(true|false), siri_kit: (on|off)(:on|:off)(true|false), system_extension: (on|off)(:on|:off)(true|false), user_management: (on|off)(:on|:off)(true|false), vpn_configuration: (on|off)(:on|:off)(true|false), wallet: (on|off)(:on|:off)(true|false), wireless_accessory: (on|off)(:on|:off)(true|false), car_play_audio_app: (on|off)(:on|:off)(true|false), car_play_messaging_app: (on|off)(:on|:off)(true|false), car_play_navigation_app: (on|off)(:on|:off)(true|false), car_play_voip_calling_app: (on|off)(:on|:off)(true|false), critical_alerts: (on|off)(:on|:off)(true|false), hotspot_helper: (on|off)(:on|:off)(true|false), driver_kit: (on|off)(:on|:off)(true|false), driver_kit_endpoint_security: (on|off)(:on|:off)(true|false), driver_kit_family_hid_device: (on|off)(:on|:off)(true|false), driver_kit_family_networking: (on|off)(:on|:off)(true|false), driver_kit_family_serial: (on|off)(:on|:off)(true|false), driver_kit_hid_event_service: (on|off)(:on|:off)(true|false), driver_kit_transport_hid: (on|off)(:on|:off)(true|false), multitasking_camera_access: (on|off)(:on|:off)(true|false), sf_universal_link_api: (on|off)(:on|:off)(true|false), vp9_decoder: (on|off)(:on|:off)(true|false), music_kit: (on|off)(:on|:off)(true|false), shazam_kit: (on|off)(:on|:off)(true|false), communication_notifications: (on|off)(:on|:off)(true|false), group_activities: (on|off)(:on|:off)(true|false), health_kit_estimate_recalibration: (on|off)(:on|:off)(true|false), time_sensitive_notifications: (on|off)(:on|:off)(true|false))
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
 
@@ -7176,8 +7176,8 @@ public func notify() {
 
  You can use this action to get the number of commits of this branch. This is useful if you want to set the build number to the number of commits. See `fastlane actions number_of_commits` for more details.
  */
-@discardableResult public func numberOfCommits(all: Any? = nil) -> Int {
-    let allArg = RubyCommand.Argument(name: "all", value: all, type: nil)
+@discardableResult public func numberOfCommits(all: OptionalConfigValue<Bool?> = .fastlaneDefault(nil)) -> Int {
+    let allArg = all.asRubyArgument(name: "all", type: nil)
     let array: [RubyCommand.Argument?] = [allArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -7192,7 +7192,7 @@ public func notify() {
  - parameters:
    - oclintPath: The path to oclint binary
    - compileCommands: The json compilation database, use xctool reporter 'json-compilation-database'
-   - selectReqex: Select all files matching this reqex
+   - selectReqex: **DEPRECATED!** Use `:select_regex` instead - Select all files matching this reqex
    - selectRegex: Select all files matching this regex
    - excludeRegex: Exclude all files matching this regex
    - reportType: The type of the report (default: html)
@@ -7214,19 +7214,19 @@ public func notify() {
  */
 public func oclint(oclintPath: String = "oclint",
                    compileCommands: String = "compile_commands.json",
-                   selectReqex: Any? = nil,
-                   selectRegex: Any? = nil,
-                   excludeRegex: Any? = nil,
+                   selectReqex: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                   selectRegex: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                   excludeRegex: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    reportType: String = "html",
                    reportPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    listEnabledRules: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    rc: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                   thresholds: Any? = nil,
-                   enableRules: Any? = nil,
-                   disableRules: Any? = nil,
-                   maxPriority1: Any? = nil,
-                   maxPriority2: Any? = nil,
-                   maxPriority3: Any? = nil,
+                   thresholds: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                   enableRules: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                   disableRules: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                   maxPriority1: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
+                   maxPriority2: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
+                   maxPriority3: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                    enableClangStaticAnalyzer: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    enableGlobalAnalysis: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    allowDuplicatedViolations: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7234,19 +7234,19 @@ public func oclint(oclintPath: String = "oclint",
 {
     let oclintPathArg = RubyCommand.Argument(name: "oclint_path", value: oclintPath, type: nil)
     let compileCommandsArg = RubyCommand.Argument(name: "compile_commands", value: compileCommands, type: nil)
-    let selectReqexArg = RubyCommand.Argument(name: "select_reqex", value: selectReqex, type: nil)
-    let selectRegexArg = RubyCommand.Argument(name: "select_regex", value: selectRegex, type: nil)
-    let excludeRegexArg = RubyCommand.Argument(name: "exclude_regex", value: excludeRegex, type: nil)
+    let selectReqexArg = selectReqex.asRubyArgument(name: "select_reqex", type: nil)
+    let selectRegexArg = selectRegex.asRubyArgument(name: "select_regex", type: nil)
+    let excludeRegexArg = excludeRegex.asRubyArgument(name: "exclude_regex", type: nil)
     let reportTypeArg = RubyCommand.Argument(name: "report_type", value: reportType, type: nil)
     let reportPathArg = reportPath.asRubyArgument(name: "report_path", type: nil)
     let listEnabledRulesArg = listEnabledRules.asRubyArgument(name: "list_enabled_rules", type: nil)
     let rcArg = rc.asRubyArgument(name: "rc", type: nil)
-    let thresholdsArg = RubyCommand.Argument(name: "thresholds", value: thresholds, type: nil)
-    let enableRulesArg = RubyCommand.Argument(name: "enable_rules", value: enableRules, type: nil)
-    let disableRulesArg = RubyCommand.Argument(name: "disable_rules", value: disableRules, type: nil)
-    let maxPriority1Arg = RubyCommand.Argument(name: "max_priority_1", value: maxPriority1, type: nil)
-    let maxPriority2Arg = RubyCommand.Argument(name: "max_priority_2", value: maxPriority2, type: nil)
-    let maxPriority3Arg = RubyCommand.Argument(name: "max_priority_3", value: maxPriority3, type: nil)
+    let thresholdsArg = thresholds.asRubyArgument(name: "thresholds", type: nil)
+    let enableRulesArg = enableRules.asRubyArgument(name: "enable_rules", type: nil)
+    let disableRulesArg = disableRules.asRubyArgument(name: "disable_rules", type: nil)
+    let maxPriority1Arg = maxPriority1.asRubyArgument(name: "max_priority_1", type: nil)
+    let maxPriority2Arg = maxPriority2.asRubyArgument(name: "max_priority_2", type: nil)
+    let maxPriority3Arg = maxPriority3.asRubyArgument(name: "max_priority_3", type: nil)
     let enableClangStaticAnalyzerArg = enableClangStaticAnalyzer.asRubyArgument(name: "enable_clang_static_analyzer", type: nil)
     let enableGlobalAnalysisArg = enableGlobalAnalysis.asRubyArgument(name: "enable_global_analysis", type: nil)
     let allowDuplicatedViolationsArg = allowDuplicatedViolations.asRubyArgument(name: "allow_duplicated_violations", type: nil)
@@ -7916,11 +7916,11 @@ public func println(message: OptionalConfigValue<String?> = .fastlaneDefault(nil
    - platform: The platform to use (optional)
    - platforms: The platforms to use (optional)
    - language: Primary Language (e.g. 'en-US', 'fr-FR')
-   - companyName: The name of your company. Only required if it's the first app you create
+   - companyName: The name of your company. It's used to set company name on App Store Connect team's app pages. Only required if it's the first app you create
    - skipItc: Skip the creation of the app on App Store Connect
    - itcUsers: Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles
    - enabledFeatures: **DEPRECATED!** Please use `enable_services` instead - Array with Spaceship App Services
-   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), data_protection: (complete|unlessopen|untilfirstauth), game_center: (on|off), health_kit: (on|off), home_kit: (on|off), hotspot: (on|off), icloud: (legacy|cloudkit), in_app_purchase: (on|off), inter_app_audio: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), siri_kit: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off))
+   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_attest: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), class_kit: (on|off), icloud: (legacy|cloudkit), custom_network_protocol: (on|off), data_protection: (complete|unlessopen|untilfirstauth), extended_virtual_address_space: (on|off), family_controls: (on|off), file_provider_testing_mode: (on|off), fonts: (on|off), game_center: (ios|mac), health_kit: (on|off), hls_interstitial_preview: (on|off), home_kit: (on|off), hotspot: (on|off), in_app_purchase: (on|off), inter_app_audio: (on|off), low_latency_hls: (on|off), managed_associated_domains: (on|off), maps: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), sign_in_with_apple: (on), siri_kit: (on|off), system_extension: (on|off), user_management: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off), car_play_audio_app: (on|off), car_play_messaging_app: (on|off), car_play_navigation_app: (on|off), car_play_voip_calling_app: (on|off), critical_alerts: (on|off), hotspot_helper: (on|off), driver_kit: (on|off), driver_kit_endpoint_security: (on|off), driver_kit_family_hid_device: (on|off), driver_kit_family_networking: (on|off), driver_kit_family_serial: (on|off), driver_kit_hid_event_service: (on|off), driver_kit_transport_hid: (on|off), multitasking_camera_access: (on|off), sf_universal_link_api: (on|off), vp9_decoder: (on|off), music_kit: (on|off), shazam_kit: (on|off), communication_notifications: (on|off), group_activities: (on|off), health_kit_estimate_recalibration: (on|off), time_sensitive_notifications: (on|off))
    - skipDevcenter: Skip the creation of the app on the Apple Developer Portal
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
@@ -8277,17 +8277,17 @@ public func registerDevices(devices: OptionalConfigValue<[String: Any]?> = .fast
  >- You have called the `ensure_git_status_clean` action prior to calling this action. This ensures that your repo started off in a clean state, so the only things that will get destroyed by this action are files that are created as a byproduct of the fastlane run.|
  >|
  */
-public func resetGitRepo(files: Any? = nil,
+public func resetGitRepo(files: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                          force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                          skipClean: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                          disregardGitignore: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                         exclude: Any? = nil)
+                         exclude: OptionalConfigValue<String?> = .fastlaneDefault(nil))
 {
-    let filesArg = RubyCommand.Argument(name: "files", value: files, type: nil)
+    let filesArg = files.asRubyArgument(name: "files", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let skipCleanArg = skipClean.asRubyArgument(name: "skip_clean", type: nil)
     let disregardGitignoreArg = disregardGitignore.asRubyArgument(name: "disregard_gitignore", type: nil)
-    let excludeArg = RubyCommand.Argument(name: "exclude", value: exclude, type: nil)
+    let excludeArg = exclude.asRubyArgument(name: "exclude", type: nil)
     let array: [RubyCommand.Argument?] = [filesArg,
                                           forceArg,
                                           skipCleanArg,
@@ -8340,13 +8340,13 @@ public func resetSimulatorContents(ios: OptionalConfigValue<[String]?> = .fastla
 public func resign(ipa: String,
                    signingIdentity: String,
                    entitlements: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                   provisioningProfile: Any,
+                   provisioningProfile: String,
                    version: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    displayName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    shortVersion: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    bundleVersion: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    bundleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                   useAppEntitlements: Any? = nil,
+                   useAppEntitlements: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                    keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil))
 {
     let ipaArg = RubyCommand.Argument(name: "ipa", value: ipa, type: nil)
@@ -8358,7 +8358,7 @@ public func resign(ipa: String,
     let shortVersionArg = shortVersion.asRubyArgument(name: "short_version", type: nil)
     let bundleVersionArg = bundleVersion.asRubyArgument(name: "bundle_version", type: nil)
     let bundleIdArg = bundleId.asRubyArgument(name: "bundle_id", type: nil)
-    let useAppEntitlementsArg = RubyCommand.Argument(name: "use_app_entitlements", value: useAppEntitlements, type: nil)
+    let useAppEntitlementsArg = useAppEntitlements.asRubyArgument(name: "use_app_entitlements", type: nil)
     let keychainPathArg = keychainPath.asRubyArgument(name: "keychain_path", type: nil)
     let array: [RubyCommand.Argument?] = [ipaArg,
                                           signingIdentityArg,
@@ -8848,7 +8848,7 @@ public func s3(ipa: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - text: Text to be spoken out loud (as string or array of strings)
    - mute: If say should be muted with text printed out
  */
-public func say(text: Any,
+public func say(text: [String],
                 mute: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let textArg = RubyCommand.Argument(name: "text", value: text, type: nil)
@@ -9203,7 +9203,7 @@ public func scp(username: String,
 
  - parameters:
    - androidHome: Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx
-   - buildToolsVersion: The Android build tools version to use, e.g. '23.0.2'
+   - buildToolsVersion: **DEPRECATED!** The Android build tools version to use, e.g. '23.0.2'
    - locales: A list of locales which should be used
    - clearPreviousScreenshots: Enabling this option will automatically clear previously generated screenshots before running screengrab
    - outputDirectory: The directory where to store the screenshots
@@ -9214,8 +9214,8 @@ public func scp(username: String,
    - useTestsInClasses: Only run tests in these Java classes
    - launchArguments: Additional launch arguments
    - testInstrumentationRunner: The fully qualified class name of your test instrumentation runner
-   - endingLocale: Return the device to this locale after running tests
-   - useAdbRoot: Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
+   - endingLocale: **DEPRECATED!** Return the device to this locale after running tests
+   - useAdbRoot: **DEPRECATED!** Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
    - appApkPath: The path to the APK for the app under test
    - testsApkPath: The path to the APK for the the tests bundle
    - specificDevice: Use the device or emulator with the given serial number or qualifier
@@ -9348,7 +9348,7 @@ public func setChangelog(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDef
                          username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                          version: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                          changelog: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                         teamId: Any? = nil,
+                         teamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                          teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                          platform: String = "ios")
 {
@@ -9358,7 +9358,7 @@ public func setChangelog(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDef
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
     let versionArg = version.asRubyArgument(name: "version", type: nil)
     let changelogArg = changelog.asRubyArgument(name: "changelog", type: nil)
-    let teamIdArg = RubyCommand.Argument(name: "team_id", value: teamId, type: nil)
+    let teamIdArg = teamId.asRubyArgument(name: "team_id", type: nil)
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
@@ -9453,7 +9453,7 @@ public func setChangelog(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDef
  */
 public func setInfoPlistValue(key: String,
                               subkey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                              value: Any,
+                              value: String,
                               path: String,
                               outputFileName: OptionalConfigValue<String?> = .fastlaneDefault(nil))
 {
@@ -9559,7 +9559,7 @@ public func setupCircleCi(force: OptionalConfigValue<Bool> = .fastlaneDefault(fa
  - parameters:
    - force: Force setup, even if not executed by Jenkins
    - unlockKeychain: Unlocks keychain
-   - addKeychainToSearchList: Add to keychain search list
+   - addKeychainToSearchList: Add to keychain search list, valid values are true, false, :add, and :replace
    - setDefaultKeychain: Set keychain as default
    - keychainPath: Path to keychain
    - keychainPassword: Keychain password
@@ -9583,7 +9583,7 @@ public func setupCircleCi(force: OptionalConfigValue<Bool> = .fastlaneDefault(fa
  */
 public func setupJenkins(force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                          unlockKeychain: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                         addKeychainToSearchList: Any = "replace",
+                         addKeychainToSearchList: String = "replace",
                          setDefaultKeychain: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                          keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                          keychainPassword: String,
@@ -9964,7 +9964,7 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
                     gutterJson: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     coberturaXml: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     sonarqubeXml: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                    llvmCov: Any? = nil,
+                    llvmCov: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     json: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     html: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     show: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -9996,7 +9996,7 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
     let gutterJsonArg = gutterJson.asRubyArgument(name: "gutter_json", type: nil)
     let coberturaXmlArg = coberturaXml.asRubyArgument(name: "cobertura_xml", type: nil)
     let sonarqubeXmlArg = sonarqubeXml.asRubyArgument(name: "sonarqube_xml", type: nil)
-    let llvmCovArg = RubyCommand.Argument(name: "llvm_cov", value: llvmCov, type: nil)
+    let llvmCovArg = llvmCov.asRubyArgument(name: "llvm_cov", type: nil)
     let jsonArg = json.asRubyArgument(name: "json", type: nil)
     let htmlArg = html.asRubyArgument(name: "html", type: nil)
     let showArg = show.asRubyArgument(name: "show", type: nil)
@@ -10519,7 +10519,7 @@ public func splunkmint(dsym: OptionalConfigValue<String?> = .fastlaneDefault(nil
    - verbose: Increase verbosity of informational output
  */
 public func spm(command: String = "build",
-                enableCodeCoverage: Any? = nil,
+                enableCodeCoverage: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                 buildPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                 packagePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                 xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -10530,7 +10530,7 @@ public func spm(command: String = "build",
                 verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let commandArg = RubyCommand.Argument(name: "command", value: command, type: nil)
-    let enableCodeCoverageArg = RubyCommand.Argument(name: "enable_code_coverage", value: enableCodeCoverage, type: nil)
+    let enableCodeCoverageArg = enableCodeCoverage.asRubyArgument(name: "enable_code_coverage", type: nil)
     let buildPathArg = buildPath.asRubyArgument(name: "build_path", type: nil)
     let packagePathArg = packagePath.asRubyArgument(name: "package_path", type: nil)
     let xcconfigArg = xcconfig.asRubyArgument(name: "xcconfig", type: nil)
@@ -11356,7 +11356,7 @@ public func typetalk() {
  - parameters:
    - path: Path to the keychain file
    - password: Keychain password
-   - addToSearchList: Add to keychain search list
+   - addToSearchList: Add to keychain search list, valid values are true, false, :add, and :replace
    - setDefault: Set as default keychain
 
  Unlocks the given keychain file and adds it to the keychain search list.
@@ -11392,7 +11392,7 @@ public func unlockKeychain(path: String = "login",
  Updates the App Group Identifiers in the given Entitlements file, so you can have app groups for the app store build and app groups for an enterprise build.
  */
 public func updateAppGroupIdentifiers(entitlementsFile: String,
-                                      appGroupIdentifiers: Any)
+                                      appGroupIdentifiers: [String])
 {
     let entitlementsFileArg = RubyCommand.Argument(name: "entitlements_file", value: entitlementsFile, type: nil)
     let appGroupIdentifiersArg = RubyCommand.Argument(name: "app_group_identifiers", value: appGroupIdentifiers, type: nil)
@@ -13151,4 +13151,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.127]
+// FastlaneRunnerAPIVersion [0.9.128]
