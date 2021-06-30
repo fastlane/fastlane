@@ -16,31 +16,35 @@ module Scan
       prevalidate
 
       # Detect the project
-      FastlaneCore::Project.detect_projects(config)
-      Scan.project = FastlaneCore::Project.new(config)
+      if Scan.config[:package_path]
 
-      # Go into the project's folder, as there might be a Snapfile there
-      imported_path = File.expand_path(Scan.scanfile_name)
-      Dir.chdir(File.expand_path("..", Scan.project.path)) do
-        config.load_configuration_file(Scan.scanfile_name) unless File.expand_path(Scan.scanfile_name) == imported_path
-      end
-
-      Scan.project.select_scheme
-
-      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
-      if devices.count > 0
-        detect_simulator(devices, '', '', '', nil)
       else
-        if Scan.project.ios?
-          # An iPhone 5s is a reasonably small and useful default for tests
-          detect_simulator(devices, 'iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
-        elsif Scan.project.tvos?
-          detect_simulator(devices, 'tvOS', 'TVOS_DEPLOYMENT_TARGET', 'Apple TV 1080p', 'TV')
-        end
-      end
-      detect_destination
+        FastlaneCore::Project.detect_projects(config)
+        Scan.project = FastlaneCore::Project.new(config)
 
-      default_derived_data
+        # Go into the project's folder, as there might be a Snapfile there
+        imported_path = File.expand_path(Scan.scanfile_name)
+        Dir.chdir(File.expand_path("..", Scan.project.path)) do
+          config.load_configuration_file(Scan.scanfile_name) unless File.expand_path(Scan.scanfile_name) == imported_path
+        end
+
+        Scan.project.select_scheme
+
+        devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
+        if devices.count > 0
+          detect_simulator(devices, '', '', '', nil)
+        else
+          if Scan.project.ios?
+            # An iPhone 5s is a reasonably small and useful default for tests
+            detect_simulator(devices, 'iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
+          elsif Scan.project.tvos?
+            detect_simulator(devices, 'tvOS', 'TVOS_DEPLOYMENT_TARGET', 'Apple TV 1080p', 'TV')
+          end
+        end
+        detect_destination
+
+        default_derived_data
+      end
 
       coerce_to_array_of_strings(:only_testing)
       coerce_to_array_of_strings(:skip_testing)
