@@ -68,7 +68,7 @@ module Fastlane
 
         apk_search_path = File.join(project_dir, '**', 'build', 'outputs', 'apk', '**', '*.apk')
         aab_search_path = File.join(project_dir, '**', 'build', 'outputs', 'bundle', '**', '*.aab')
-        output_json_search_path = File.join(project_dir, '**', 'build', 'outputs', 'apk', '**', 'output.json')
+        output_json_search_path = File.join(project_dir, '**', 'build', 'outputs', 'apk', '**', 'output-metadata.json')
         mapping_txt_search_path = File.join(project_dir, '**', 'build', 'outputs', 'mapping', '**', 'mapping.txt')
 
         # Our apk/aab is now built, but there might actually be multiple ones that were built if a flavor was not specified in a multi-flavor project (e.g. `assembleRelease`)
