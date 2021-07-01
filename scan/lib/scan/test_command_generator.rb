@@ -18,7 +18,7 @@ module Scan
       prefixes = ["set -o pipefail &&"]
 
       package_path = Scan.config[:package_path]
-      prefixes << "cd #{package_path} &&" if package_path && package_path != ""
+      prefixes << "cd #{package_path} &&" if package_path.to_s != ""
 
       prefixes
     end
@@ -27,7 +27,7 @@ module Scan
     # This will also include the scheme (if given)
     # @return [Array] The array with all the components to join
     def project_path_array
-      if Scan.config[:package_path]
+      unless Scan.config[:package_path].nil?
         params = []
         params << "-scheme #{Scan.config[:scheme]}" if Scan.config[:scheme]
         return params
@@ -185,15 +185,15 @@ module Scan
       ext = FastlaneCore::Helper.xcode_version.to_i >= 11 ? '.xcresult' : '.test_result'
       path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + attempt + ext
 
+      Scan.cache[:result_bundle_path] = path
+
       # The result bundle path will be in the package pack directory if specified
       delete_path = path
-      delete_path = File.join(Scan.config[:package_path], path) if Scan.config[:package_path] && Scan.config[:package_path] != ""
-
+      delete_path = File.join(Scan.config[:package_path], path) if Scan.config[:package_path].to_s != ""
       if File.directory?(delete_path)
         FileUtils.remove_dir(delete_path)
       end
-      Scan.cache[:result_bundle_path] = path
-
+      
       return path
     end
   end

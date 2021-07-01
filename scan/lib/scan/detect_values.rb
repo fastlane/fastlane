@@ -15,10 +15,8 @@ module Scan
 
       prevalidate
 
-      # Detect the project
-      if Scan.config[:package_path]
-
-      else
+      # Detect the project if not SPM package
+      if Scan.config[:package_path].nil?
         FastlaneCore::Project.detect_projects(config)
         Scan.project = FastlaneCore::Project.new(config)
 
@@ -29,22 +27,24 @@ module Scan
         end
 
         Scan.project.select_scheme
-
-        devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
-        if devices.count > 0
-          detect_simulator(devices, '', '', '', nil)
-        else
-          if Scan.project.ios?
-            # An iPhone 5s is a reasonably small and useful default for tests
-            detect_simulator(devices, 'iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
-          elsif Scan.project.tvos?
-            detect_simulator(devices, 'tvOS', 'TVOS_DEPLOYMENT_TARGET', 'Apple TV 1080p', 'TV')
-          end
-        end
-        detect_destination
-
-        default_derived_data
       end
+
+      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
+      if devices.count > 0
+        detect_simulator(devices, '', '', '', nil)
+      elsif Scan.project
+        if Scan.project.ios?
+          # An iPhone 5s is a reasonably small and useful default for tests
+          detect_simulator(devices, 'iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
+        elsif Scan.project.tvos?
+          detect_simulator(devices, 'tvOS', 'TVOS_DEPLOYMENT_TARGET', 'Apple TV 1080p', 'TV')
+        end
+      end
+
+      detect_destination
+
+      default_derived_data
+      
 
       coerce_to_array_of_strings(:only_testing)
       coerce_to_array_of_strings(:skip_testing)
@@ -76,6 +76,8 @@ module Scan
     end
 
     def self.default_derived_data
+      return unless Scan.project
+
       return unless Scan.config[:derived_data_path].to_s.empty?
       default_path = Scan.project.build_settings(key: "BUILT_PRODUCTS_DIR")
       # => /Users/.../Library/Developer/Xcode/DerivedData/app-bqrfaojicpsqnoglloisfftjhksc/Build/Products/Release-iphoneos
