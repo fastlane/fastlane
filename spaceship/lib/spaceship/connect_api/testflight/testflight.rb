@@ -191,7 +191,7 @@ module Spaceship
           test_flight_request_client.post("builds/#{build_id}/relationships/betaGroups", body)
         end
 
-        def delete_beta_groups_from_build(beta_group_ids: [], build_id: nil)
+        def delete_beta_groups_from_build(build_id: nil, beta_group_ids: [])
           body = {
             data: beta_group_ids.map do |id|
               {
