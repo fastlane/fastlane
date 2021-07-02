@@ -1159,6 +1159,112 @@ module Spaceship
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
           tunes_request_client.get("territories", params)
         end
+
+        #
+        # appClips
+        #
+
+        def get_app_clips(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("apps/#{app_id}/appClips", params)
+        end
+
+        #
+        # appClipVersions
+        #
+
+        def get_app_clip_versions(app_clip_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appClips/#{app_clip_id}/appClipVersions", params)
+        end
+
+        def get_app_clip_version_release_with_app_store_version(app_clip_version_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appClipVersions/#{app_clip_version_id}/relationships/releaseWithAppStoreVersion", params)
+        end
+
+        def get_app_clip_app_store_review_detail(app_clip_version_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appClipVersions/#{app_clip_version_id}/relationships/appClipAppStoreReviewDetail", params)
+        end
+
+        def patch_app_clip_version(app_clip_version_id:, attributes: {})
+          body = {
+            data: {
+              type: "appClipVersions",
+              id: app_clip_version_id,
+              attributes: attributes # invocationVerb - VIEW, OPEN, PLAY
+            }
+          }
+          tunes_request_client.patch("appClipVersions", body)
+        end
+
+        #
+        # appClipVersionLocalizations
+        #
+
+        def get_app_clip_version_localizations(app_clip_version_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appClipVersions/#{app_clip_version_id}/appClipVersionLocalizations", params)
+        end
+
+        def patch_app_clip_version_localization(app_clip_version_localization_id:, attributes: {})
+          body = {
+            data: {
+              type: "appClipVersionLocalizations",
+              id: app_clip_version_localization_id,
+              attributes: attributes # locale, subtitle
+            }
+          }
+          tunes_request_client.patch("appClipVersionLocalizations/#{app_clip_version_localization_id}", body)
+        end
+
+
+        #
+        # appClipHeaderImages
+        #
+        def get_app_clip_header_image(app_clip_header_image_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appClipHeaderImages/#{app_clip_header_image_id}", params)
+        end
+
+        def get_app_clip_header_images(app_clip_version_localization_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appClipVersionLocalizations/#{app_clip_version_localization_id}/appClipHeaderImage", params)
+        end
+
+        def post_app_clip_header_image(app_clip_version_localization_id:, attributes: {})
+          body = {
+            data: {
+              type: 'appClipHeaderImages',
+              attributes: attributes,
+              relationships: {
+                appClipVersionLocalization: {
+                  data: {
+                    type: 'appClipVersionLocalizations',
+                    id: app_clip_version_localization_id
+                  }
+                }
+              }
+            }
+          }
+          tunes_request_client.post("appClipHeaderImages", body)
+        end
+
+        def patch_app_clip_header_image(app_clip_header_image_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipHeaderImages",
+              id: app_clip_header_image_id,
+              attributes: attributes
+            }
+          }
+          tunes_request_client.patch("appClipHeaderImages/#{app_clip_header_image_id}", body)
+        end
+
+        def delete_app_clip_header_image(app_clip_header_image_id: nil)
+          tunes_request_client.delete("appClipHeaderImages/#{app_clip_header_image_id}")
+        end
       end
     end
   end
