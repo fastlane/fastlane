@@ -99,6 +99,12 @@ module Scan
         return pipe
       end
 
+      pipe = pipe_xcpretty(pipe)
+
+      return pipe
+    end
+
+    def pipe_xcpretty(pipe)
       formatter = []
       if (custom_formatter = Scan.config[:formatter])
         if custom_formatter.end_with?(".rb")

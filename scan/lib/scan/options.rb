@@ -203,11 +203,6 @@ module Scan
                                      description: "Should the HTML report be opened when tests are completed?",
                                      is_string: false,
                                      default_value: false),
-        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
-                                     env_name: "SCAN_DISABLE_XCPRETTY",
-                                     description: "Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table",
-                                     type: Boolean,
-                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :output_directory,
                                      short_option: "-o",
                                      env_name: "SCAN_OUTPUT_DIRECTORY",
@@ -252,16 +247,7 @@ module Scan
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
                                      type: Boolean),
-        FastlaneCore::ConfigItem.new(key: :formatter,
-                                     short_option: "-n",
-                                     env_name: "SCAN_FORMATTER",
-                                     description: "A custom xcpretty formatter to use",
-                                     optional: true),
-        FastlaneCore::ConfigItem.new(key: :xcpretty_args,
-                                     env_name: "SCAN_XCPRETTY_ARGS",
-                                     description: "Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')",
-                                     type: String,
-                                     optional: true),
+        
         FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                      short_option: "-j",
                                      env_name: "SCAN_DERIVED_DATA_PATH",
@@ -290,6 +276,33 @@ module Scan
                                      description: "Generate the json compilation database with clang naming convention (compile_commands.json)",
                                      is_string: false,
                                      default_value: false),
+
+        # formatter
+        FastlaneCore::ConfigItem.new(key: :xcodebuild_formatter,
+                                     env_names: ["SCAN_XCODEBUILD_FORMATTER", "FASTLANE_XCODEBUILD_FORMATTERS"],
+                                     description: "Define the formatter tools used for . Valid values are: xcpretty or xcbeauitfy (disables xcpretty during xcodebuild)",
+                                     optional: true,
+                                     default_value: "xcpretty",
+                                     verify_block: proc do |value|
+                                      UI.user_error!("Invalid xcodebuild formatter #{value}") unless ['xcpretty', 'xcbeautify'].include?(value)
+                                    end),
+
+        # xcpretty
+        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
+                                     env_name: "SCAN_DISABLE_XCPRETTY",
+                                     description: "Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table",
+                                     type: Boolean,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :formatter,
+                                     short_option: "-n",
+                                     env_name: "SCAN_FORMATTER",
+                                     description: "A custom xcpretty formatter to use",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_args,
+                                     env_name: "SCAN_XCPRETTY_ARGS",
+                                     description: "Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')",
+                                     type: String,
+                                     optional: true),
 
         # concurrency
         FastlaneCore::ConfigItem.new(key: :concurrent_workers,
