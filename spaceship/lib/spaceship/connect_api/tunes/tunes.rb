@@ -1238,6 +1238,9 @@ module Spaceship
           tunes_request_client.patch("appClipVersionLocalizations/#{app_clip_version_localization_id}", body)
         end
 
+        def delete_app_clip_version_localization(app_clip_version_localization_id:)
+          tunes_request_client.delete("appClipVersionLocalizations/#{app_clip_version_localization_id}")
+        end
 
         #
         # appClipHeaderImages

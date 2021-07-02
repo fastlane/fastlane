@@ -33,6 +33,11 @@ module Spaceship
         attributes = reverse_attr_mapping(attributes)
         client.patch_app_clip_version_localization(app_clip_version_localization_id: id, attributes: attributes)
       end
+
+      def delete!(client: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete!(app_clip_version_localization_id: id)
+      end
     end
   end
 end
