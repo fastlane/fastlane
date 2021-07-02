@@ -366,7 +366,7 @@ module Spaceship
           test_flight_request_client.post("builds/#{build_id}/relationships/individualTesters", body)
         end
 
-        def delete_beta_testers_from_build(beta_tester_ids: [], build_id: nil)
+        def delete_beta_testers_from_build(build_id: nil, beta_tester_ids: [])
           body = {
             data: beta_tester_ids.map do |id|
               {
