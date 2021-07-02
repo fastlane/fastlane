@@ -54,7 +54,7 @@ module Screengrab
       device_screenshots_paths = [
         determine_external_screenshots_path(device_serial, @config[:app_package_name], @config[:locales]),
         determine_internal_screenshots_paths(device_serial, @config[:app_package_name], @config[:locales])
-      ].flatten
+      ].flatten(1)
 
       # Root is needed to access device paths at /data
       if @config[:use_adb_root]
@@ -301,7 +301,7 @@ module Screengrab
       device_screenshots_paths = [
         determine_external_screenshots_path(device_serial, @config[:app_package_name], [locale]),
         determine_internal_screenshots_paths(device_serial, @config[:app_package_name], [locale])
-      ].flatten
+      ].flatten(1)
 
       # Make a temp directory into which to pull the screenshots before they are moved to their final location.
       # This makes directory cleanup easier, as the temp directory will be removed when the block completes.
