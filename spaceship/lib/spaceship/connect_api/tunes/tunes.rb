@@ -1208,6 +1208,25 @@ module Spaceship
           tunes_request_client.get("appClipVersions/#{app_clip_version_id}/appClipVersionLocalizations", params)
         end
 
+        def post_app_clip_version_localization(app_clip_version_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipVersionLocalizations",
+              attributes: attributes,
+              relationships: {
+                appClipVersion: {
+                  data: {
+                    type: "appClipVersions",
+                    id: app_clip_version_id
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("appClipVersionLocalizations", body)
+        end
+
         def patch_app_clip_version_localization(app_clip_version_localization_id:, attributes: {})
           body = {
             data: {

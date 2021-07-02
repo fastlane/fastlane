@@ -39,6 +39,11 @@ module Spaceship
         resps.flat_map(&:to_models)
       end
 
+      def create_app_store_version_localization(client: nil, attributes: nil)
+        client ||= Spaceship::ConnectAPI
+        client.post_app_clip_version_localization(app_clip_version_id: id, attributes: attributes).to_models.first
+      end
+
       def update(client: nil, attributes:)
         client ||= Spaceship::ConnectAPI
         client.patch_app_clip_version(app_clip_version_id: id, attributes: attributes)
