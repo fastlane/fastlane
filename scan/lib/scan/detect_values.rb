@@ -44,7 +44,6 @@ module Scan
       detect_destination
 
       default_derived_data
-      
 
       coerce_to_array_of_strings(:only_testing)
       coerce_to_array_of_strings(:skip_testing)
@@ -222,14 +221,18 @@ module Scan
         Scan.config[:destination] = ["platform=macOS,variant=Mac Catalyst"]
       elsif Scan.devices && Scan.devices.count > 0
         Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" }
-      elsif Scan.project.mac_app?
+      elsif Scan.project && Scan.project.mac_app?
         Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]
       end
     end
 
     # get deployment target version
     def self.get_deployment_target_version(deployment_target_key)
-      Scan.config[:deployment_target_version] || Scan.project.build_settings(key: deployment_target_key) || '0'
+      version = Scan.config[:deployment_target_version]
+      version ||= Scan.project.build_settings(key: deployment_target_key) if Scan.project
+      version ||= 0
+
+      return version
     end
   end
 end

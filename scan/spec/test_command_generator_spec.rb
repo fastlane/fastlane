@@ -191,48 +191,78 @@ describe Scan do
     end
 
     describe "Standard Example" do
-      before do
-        options = { project: "./scan/examples/standard/app.xcodeproj" }
-        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      describe "Xcode project" do
+        before do
+          options = { project: "./scan/examples/standard/app.xcodeproj" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        end
+
+        it "uses the correct build command with the example project with no additional parameters", requires_xcodebuild: true do
+          log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+          result = @test_command_generator.generate
+          expect(result).to start_with([
+                                         "set -o pipefail &&",
+                                         "env NSUnbufferedIO=YES xcodebuild",
+                                         "-scheme app",
+                                         "-project ./scan/examples/standard/app.xcodeproj",
+                                         "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                         "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         :build,
+                                         :test
+                                       ])
+        end
+
+        it "#project_path_array", requires_xcodebuild: true do
+          result = @test_command_generator.project_path_array
+          expect(result).to eq(["-scheme app", "-project ./scan/examples/standard/app.xcodeproj"])
+        end
+
+        it "#build_path", requires_xcodebuild: true do
+          result = @test_command_generator.build_path
+          regex = %r{Library/Developer/Xcode/Archives/\d\d\d\d\-\d\d\-\d\d}
+          expect(result).to match(regex)
+        end
+
+        it "#buildlog_path is used when provided", requires_xcodebuild: true do
+          options = { project: "./scan/examples/standard/app.xcodeproj", buildlog_path: "/tmp/my/path" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          result = @test_command_generator.xcodebuild_log_path
+          expect(result).to include("/tmp/my/path")
+        end
+
+        it "#buildlog_path is not used when not provided", requires_xcodebuild: true do
+          result = @test_command_generator.xcodebuild_log_path
+          expect(result.to_s).to include(File.expand_path("#{FastlaneCore::Helper.buildlog_path}/scan"))
+        end
       end
 
-      it "uses the correct build command with the example project with no additional parameters", requires_xcodebuild: true do
-        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+      describe "SPM package" do
+        before do
+          options = { package_path: "./scan/examples/package/", scheme: "package" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        end
 
-        result = @test_command_generator.generate
-        expect(result).to start_with([
-                                       "set -o pipefail &&",
-                                       "env NSUnbufferedIO=YES xcodebuild",
-                                       "-scheme app",
-                                       "-project ./scan/examples/standard/app.xcodeproj",
-                                       "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
-                                       "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                       :build,
-                                       :test
-                                     ])
-      end
+        it "uses the correct build command with the example package and scheme", requires_xcodebuild: true do
+          log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-      it "#project_path_array", requires_xcodebuild: true do
-        result = @test_command_generator.project_path_array
-        expect(result).to eq(["-scheme app", "-project ./scan/examples/standard/app.xcodeproj"])
-      end
+          result = @test_command_generator.generate
+          expect(result).to start_with([
+                                         "set -o pipefail &&",
+                                         "cd ./scan/examples/package/ &&",
+                                         "env NSUnbufferedIO=YES xcodebuild",
+                                         "-scheme package",
+                                         "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                         "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         :build,
+                                         :test
+                                       ])
+        end
 
-      it "#build_path", requires_xcodebuild: true do
-        result = @test_command_generator.build_path
-        regex = %r{Library/Developer/Xcode/Archives/\d\d\d\d\-\d\d\-\d\d}
-        expect(result).to match(regex)
-      end
-
-      it "#buildlog_path is used when provided", requires_xcodebuild: true do
-        options = { project: "./scan/examples/standard/app.xcodeproj", buildlog_path: "/tmp/my/path" }
-        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-        result = @test_command_generator.xcodebuild_log_path
-        expect(result).to include("/tmp/my/path")
-      end
-
-      it "#buildlog_path is not used when not provided", requires_xcodebuild: true do
-        result = @test_command_generator.xcodebuild_log_path
-        expect(result.to_s).to include(File.expand_path("#{FastlaneCore::Helper.buildlog_path}/scan"))
+        it "#project_path_array", requires_xcodebuild: true do
+          result = @test_command_generator.project_path_array
+          expect(result).to eq(["-scheme package"])
+        end
       end
     end
 

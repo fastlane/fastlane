@@ -147,10 +147,13 @@ module Scan
 
     # Store the raw file
     def xcodebuild_log_path
-      parts = [
-        Scan.config[:app_name] || (Scan.project && Scan.project.app_name),
-        Scan.config[:scheme]
-      ].compact
+      parts = []
+      if Scan.config[:app_name]
+        parts << Scan.config[:app_name]
+      elsif Scan.project
+        parts << Scan.project.app_name
+      end
+      parts << Scan.config[:scheme] if Scan.config[:scheme]
 
       file_name = "#{parts.join('-')}.log"
       containing = File.expand_path(Scan.config[:buildlog_path])
@@ -187,13 +190,11 @@ module Scan
 
       Scan.cache[:result_bundle_path] = path
 
-      # The result bundle path will be in the package pack directory if specified
+      # The result bundle path will be in the package path directory if specified
       delete_path = path
       delete_path = File.join(Scan.config[:package_path], path) if Scan.config[:package_path].to_s != ""
-      if File.directory?(delete_path)
-        FileUtils.remove_dir(delete_path)
-      end
-      
+      FileUtils.remove_dir(delete_path) if File.directory?(delete_path)
+
       return path
     end
   end
