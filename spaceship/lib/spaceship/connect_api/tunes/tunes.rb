@@ -1196,7 +1196,7 @@ module Spaceship
               attributes: attributes # invocationVerb - VIEW, OPEN, PLAY
             }
           }
-          tunes_request_client.patch("appClipVersions", body)
+          tunes_request_client.patch("appClipVersions/#{app_clip_version_id}", body)
         end
 
         #
