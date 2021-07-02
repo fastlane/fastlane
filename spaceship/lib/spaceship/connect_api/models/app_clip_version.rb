@@ -5,6 +5,12 @@ module Spaceship
     class AppClipVersion
       include Spaceship::ConnectAPI::Model
 
+      module InvocationVerb
+        OPEN = 'OPEN'
+        VIEW = 'VIEW'
+        PLAY = 'PLAY'
+      end
+
       attr_accessor :invocation_verb
 
       attr_mapping(
@@ -31,6 +37,11 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         resps = client.get_app_clip_app_store_review_detail(app_clip_version_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         resps.flat_map(&:to_models)
+      end
+
+      def update(client: nil, attributes:)
+        client ||= Spaceship::ConnectAPI
+        client.patch_app_clip_version(app_clip_version_id: id, attributes: attributes)
       end
     end
   end
