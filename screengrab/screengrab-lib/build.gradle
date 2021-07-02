@@ -1,7 +1,6 @@
 buildscript {
     repositories {
       mavenCentral()
-      jcenter()
     }
     dependencies {
     }
@@ -39,7 +38,7 @@ dependencies {
     implementation 'androidx.test:rules:1.3.0'
     implementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation 'androidx.test.uiautomator:uiautomator:2.2.0'
-    implementation 'com.jraska:falcon:2.1.1'
+    implementation 'com.jraska:falcon:2.2.0'
 }
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile){
