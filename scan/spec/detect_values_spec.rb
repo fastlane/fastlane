@@ -2,7 +2,7 @@ describe Scan do
   describe Scan::DetectValues do
     describe 'Xcode project' do
       describe 'detects FastlaneCore::Project' do
-        it 'with no :project or :package_path given' do
+        it 'with no :project or :package_path given', requires_xcodebuild: true do
           # Mocks input from detect_projects
           project = FastlaneCore::Project.new({
             project: "./scan/examples/standard/app.xcodeproj"
@@ -15,7 +15,7 @@ describe Scan do
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
         end
 
-        it 'with :project given' do
+        it 'with :project given', requires_xcodebuild: true do
           expect(FastlaneCore::Project).to receive(:detect_projects)
           expect(FastlaneCore::Project).to receive(:new).and_call_original
 
@@ -27,7 +27,7 @@ describe Scan do
 
     describe 'SPM package' do
       describe 'does not attempt to detect FastlaneCore::Project' do
-        it 'with :package_path given' do
+        it 'with :package_path given', requires_xcodebuild: true do
           expect(FastlaneCore::Project).to_not(receive(:detect_projects))
 
           options = { package_path: "./scan/examples/package/" }
