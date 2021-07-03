@@ -31,11 +31,6 @@ module Spaceship
         'appClipHeaderImages'
       end
 
-      def self.get(client: nil, app_clip_version_localization_id:)
-        client ||= Spaceship::ConnectAPI
-        client.get_app_clip_header_images(app_clip_version_localization_id: app_clip_version_localization_id).to_models.first
-      end
-
       def self.create(client: nil, app_clip_version_localization_id:, path:, wait_for_processing: true)
         client ||= Spaceship::ConnectAPI
 
@@ -53,7 +48,7 @@ module Spaceship
           header_image = client.post_app_clip_header_image(
             app_clip_version_localization_id: app_clip_version_localization_id,
             attributes: post_attributes
-          ).to_models.first
+          ).first
         rescue => error
           # Sometimes creating an image with the web session App Store Connect API
           # will result in a false failure. The response will return a 503 but the database
@@ -70,10 +65,10 @@ module Spaceship
           loop do
             # This error handling needs to be revised since any error occurred can reach here.
             # It should handle errors based on what status code is.
-            puts("Waiting for heder image to appear before uploading. This is unlikely to be recovered unless it's 503 error. error=\"#{error}\"")
+            puts("Waiting for image asset to appear before uploading. This is unlikely to be recovered unless it's 503 error. error=\"#{error}\"")
             sleep(30)
 
-            header_image = get(client: client, app_clip_version_localization_id: app_clip_version_localization_id)
+            header_image = client.get_app_clip_header_images(app_clip_version_localization_id: app_clip_version_localization_id).first
             break if header_image.awaiting_upload? && header_image.file_size == filesize
 
             time_diff = Time.now.to_i - time
@@ -98,7 +93,7 @@ module Spaceship
           header_image = Spaceship::ConnectAPI.patch_app_clip_header_image(
             app_clip_header_image_id: header_image.id,
             attributes: patch_attributes
-          ).to_models.first
+          ).first
         rescue => error
           puts("Failed to patch app screenshot. Update may have gone through so verifying") if Spaceship::Globals.verbose?
 
@@ -110,10 +105,10 @@ module Spaceship
         if wait_for_processing
           loop do
             if header_image.complete?
-              puts("Screenshot processing complete!") if Spaceship::Globals.verbose?
+              puts("Image asset processing complete!") if Spaceship::Globals.verbose?
               break
             elsif header_image.error?
-              messages = ["Error processing screenshot '#{header_image.file_name}'"] + header_image.error_messages
+              messages = ["Error processing image asset '#{header_image.file_name}'"] + header_image.error_messages
               raise messages.join(". ")
             end
 
@@ -122,7 +117,7 @@ module Spaceship
             puts("Waiting #{sleep_time} seconds before checking status of processing...") if Spaceship::Globals.verbose?
             sleep(sleep_time)
 
-            header_image = client.get_app_clip_header_image(app_clip_header_image_id: header_image.id).to_models.first
+            header_image = client.get_app_clip_header_image(app_clip_header_image_id: header_image.id).first
           end
         end
 

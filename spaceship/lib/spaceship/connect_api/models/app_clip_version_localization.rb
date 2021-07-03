@@ -31,7 +31,7 @@ module Spaceship
       def update(client: nil, attributes: nil)
         client ||= Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
-        client.patch_app_clip_version_localization(app_clip_version_localization_id: id, attributes: attributes)
+        client.patch_app_clip_version_localization(app_clip_version_localization_id: id, attributes: attributes).first
       end
 
       def delete!(client: nil)
