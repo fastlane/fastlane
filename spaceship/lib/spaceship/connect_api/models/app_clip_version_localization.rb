@@ -11,7 +11,7 @@ module Spaceship
       attr_mapping(
         'locale' => 'locale',
         'subtitle' => 'subtitle',
-        'appClipHeaderImage' => 'app_clip_header_image',
+        'appClipHeaderImage' => 'app_clip_header_image'
       )
 
       ESSENTIAL_INCLUDES = [
