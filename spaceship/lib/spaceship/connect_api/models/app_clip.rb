@@ -8,7 +8,7 @@ module Spaceship
       attr_accessor :bundle_id
 
       attr_mapping(
-        'bundleId' => 'bundle_id',
+        'bundleId' => 'bundle_id'
       )
 
       def self.type

@@ -1,4 +1,5 @@
 require_relative '../model'
+require_relative './app_clip_version_localization'
 
 module Spaceship
   class ConnectAPI
@@ -14,7 +15,7 @@ module Spaceship
       attr_accessor :invocation_verb
 
       attr_mapping(
-        'invocationVerb' => 'invocation_verb',
+        'invocationVerb' => 'invocation_verb'
       )
 
       def self.type

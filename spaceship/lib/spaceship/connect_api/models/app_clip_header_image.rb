@@ -1,4 +1,6 @@
+require_relative '../file_uploader'
 require_relative '../model'
+require 'spaceship/globals'
 
 module Spaceship
   class ConnectAPI
@@ -24,7 +26,7 @@ module Spaceship
         'assetType' => 'asset_type',
         'uploadOperations' => 'upload_operations',
         'assetDeliveryState' => 'asset_delivery_state',
-        'uploaded' => 'uploaded',
+        'uploaded' => 'uploaded'
       )
 
       def self.type
