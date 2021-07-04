@@ -181,7 +181,7 @@ module Fastlane
 
           # MISCELLANEOUS
           FastlaneCore::ConfigItem.new(key: :logformat, env_name: "FL_APPLEDOC_LOGFORMAT", description: "Log format [0-3]", type: Integer, optional: true),
-          FastlaneCore::ConfigItem.new(key: :verbose, env_name: "FL_APPLEDOC_VERBOSE", description: "Log verbosity level [0-6,xcode]", type: Integer, optional: true)
+          FastlaneCore::ConfigItem.new(key: :verbose, env_name: "FL_APPLEDOC_VERBOSE", description: "Log verbosity level [0-6,xcode]", skip_type_validation: true, optional: true) # allow Integer, String
         ]
       end
 
