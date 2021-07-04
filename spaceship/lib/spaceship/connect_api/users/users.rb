@@ -53,7 +53,7 @@ module Spaceship
         end
 
         # Invite new users to App Store Connect
-        def post_user_invitation(email: nil, first_name: nil, last_name: nil, roles: [], provisioning_allowed: nil, all_apps_visible: nil, visible_apps: [])
+        def post_user_invitation(email: nil, first_name: nil, last_name: nil, roles: [], provisioning_allowed: nil, all_apps_visible: nil, visible_app_ids: [])
           body = {
             data: {
               type: "userInvitations",
@@ -67,7 +67,7 @@ module Spaceship
               },
               relationships: {
                 visibleApps: {
-                  data: visible_apps.map do |id|
+                  data: visible_app_ids.map do |id|
                     {
                       id: id,
                       type: "apps"
