@@ -16,6 +16,8 @@ module Spaceship
       attr_accessor :email_vetting_required
       attr_accessor :notifications
 
+      attr_accessor :visible_apps
+
       attr_mapping({
         "username" => "username",
         "firstName" => "first_name",
@@ -27,8 +29,14 @@ module Spaceship
         "allAppsVisible" => "all_apps_visible",
         "provisioningAllowed" => "provisioning_allowed",
         "emailVettingRequired" => "email_vetting_required",
-        "notifications" => "notifications"
+        "notifications" => "notifications",
+
+        "visibleApps" => "visible_apps"
       })
+
+      ESSENTIAL_INCLUDES = [
+        "visibleApps"
+      ].join(",")
 
       def self.type
         return "users"

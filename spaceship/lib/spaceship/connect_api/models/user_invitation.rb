@@ -11,15 +11,23 @@ module Spaceship
       attr_accessor :all_apps_visible
       attr_accessor :provisioning_allowed
 
+      attr_accessor :visible_apps
+
       attr_mapping({
         "firstName" => "first_name",
         "lastName" => "last_name",
         "email" => "email",
         "roles" => "roles",
         "allAppsVisible" => "all_apps_visible",
-        "provisioningAllowed" => "provisioning_allowed"
+        "provisioningAllowed" => "provisioning_allowed",
+
+        "visibleApps" => "visible_apps"
       })
 
+      ESSENTIAL_INCLUDES = [
+        "visibleApps"
+      ].join(",")
+      
       module UserRole
         ADMIN = "ADMIN"
         FINANCE = "FINANCE"
