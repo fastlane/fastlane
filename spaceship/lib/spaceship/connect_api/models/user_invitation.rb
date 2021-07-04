@@ -27,7 +27,7 @@ module Spaceship
       ESSENTIAL_INCLUDES = [
         "visibleApps"
       ].join(",")
-      
+
       module UserRole
         ADMIN = "ADMIN"
         FINANCE = "FINANCE"

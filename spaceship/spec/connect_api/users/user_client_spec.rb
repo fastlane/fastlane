@@ -56,6 +56,32 @@ describe Spaceship::ConnectAPI::Users::Client do
           client.get_users
         end
       end
+
+      context 'get_user_visible_apps' do
+        let(:user_id) { "42" }
+        let(:path) { "users/#{user_id}/visibleApps" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_user_visible_apps(user_id: user_id)
+        end
+      end
+    end
+
+    describe "user_invitations" do
+      context 'get_user_invitation_visible_apps' do
+        let(:invitation_id) { "42" }
+        let(:path) { "userInvitations/#{invitation_id}/visibleApps" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_user_invitation_visible_apps(user_invitation_id: invitation_id)
+        end
+      end
     end
   end
 end

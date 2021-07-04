@@ -44,7 +44,8 @@ module Spaceship
 
         # Get app permissions for user
         def get_user_visible_apps(user_id: id)
-          users_request_client.get("users/#{user_id}/visibleApps")
+          params = users_request_client.build_params(filter: {}, includes: nil, limit: nil, sort: nil)
+          users_request_client.get("users/#{user_id}/visibleApps", params)
         end
 
         #
@@ -92,7 +93,8 @@ module Spaceship
 
         # Get all app permissions for invited user
         def get_user_invitation_visible_apps(user_invitation_id: id)
-          users_request_client.get("userInvitations/#{user_invitation_id}/visibleApps")
+          params = users_request_client.build_params(filter: {}, includes: nil, limit: nil, sort: nil)
+          users_request_client.get("userInvitations/#{user_invitation_id}/visibleApps", params)
         end
       end
     end
