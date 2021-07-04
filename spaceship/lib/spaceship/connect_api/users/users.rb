@@ -63,8 +63,17 @@ module Spaceship
                 lastName: last_name,
                 roles: roles,
                 provisioningAllowed: provisioning_allowed,
-                allAppsVisible: all_apps_visible,
-                visible_apps: visible_apps
+                allAppsVisible: all_apps_visible
+              },
+              relationships: {
+                visibleApps: {
+                  data: visible_apps.map do |id|
+                    {
+                      id: id,
+                      type: "apps"
+                    }
+                  end
+                }
               }
             }
           }
