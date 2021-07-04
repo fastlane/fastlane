@@ -46,14 +46,14 @@ module Spaceship
         # invitations (invited users)
         #
 
-        # Get all invited users (not yet accepted)
+        # Get all invited users
         def get_user_invitations(filter: {}, includes: nil, limit: nil, sort: nil)
           params = users_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
           users_request_client.get("userInvitations", params)
         end
 
         # Invite new users to App Store Connect
-        def post_user_invitation(email: nil, first_name: nil, last_name: nil, roles: [], provisioning_allowed: nil, all_apps_visible: nil)
+        def post_user_invitation(email: nil, first_name: nil, last_name: nil, roles: [], provisioning_allowed: nil, all_apps_visible: nil, visible_apps: [])
           body = {
             data: {
               type: "userInvitations",
@@ -63,7 +63,8 @@ module Spaceship
                 lastName: last_name,
                 roles: roles,
                 provisioningAllowed: provisioning_allowed,
-                allAppsVisible: all_apps_visible
+                allAppsVisible: all_apps_visible,
+                visible_apps: visible_apps
               }
             }
           }
