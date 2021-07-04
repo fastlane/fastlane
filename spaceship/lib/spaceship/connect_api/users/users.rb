@@ -75,6 +75,11 @@ module Spaceship
         def delete_user_invitation(user_invitation_id: nil)
           users_request_client.delete("userInvitations/#{user_invitation_id}")
         end
+
+        # Get all visible apps for invited user
+        def get_user_invitation_visible_apps(user_invitation_id: id)
+          users_request_client.get("userInvitations/#{user_invitation_id}/visibleApps")
+        end
       end
     end
   end

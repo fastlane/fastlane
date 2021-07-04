@@ -79,6 +79,13 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         client.delete_user_invitation(user_invitation_id: id)
       end
+
+      # Get visible apps for invited user
+      def fetch_visible_apps(client: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_user_invitation_visible_apps(user_invitation_id: id)
+        return resp.to_models.first
+      end
     end
   end
 end
