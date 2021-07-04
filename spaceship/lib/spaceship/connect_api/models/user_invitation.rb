@@ -89,7 +89,7 @@ module Spaceship
       def fetch_visible_apps(client: nil)
         client ||= Spaceship::ConnectAPI
         resp = client.get_user_invitation_visible_apps(user_invitation_id: id)
-        return resp.to_models.first
+        return resp.to_models
       end
     end
   end
