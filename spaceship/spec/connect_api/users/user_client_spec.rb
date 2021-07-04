@@ -73,7 +73,7 @@ describe Spaceship::ConnectAPI::Users::Client do
     describe "user_invitations" do
       context 'post_user_invitation' do
         let(:path) { "userInvitations" }
-        let(:attributes) { 
+        let(:attributes) {
           {
             email: "test@example.com",
             firstName: "Firstname",
@@ -81,7 +81,7 @@ describe Spaceship::ConnectAPI::Users::Client do
             roles: [],
             provisioningAllowed: true,
             allAppsVisible: false
-          } 
+          }
         }
         let(:visible_app_ids) { ["123", "456"] }
         let(:body) do
