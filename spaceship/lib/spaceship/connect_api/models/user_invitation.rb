@@ -61,7 +61,7 @@ module Spaceship
         return all(client: client, filter: { email: email }, includes: includes)
       end
 
-      def self.create(client: nil, email: nil, first_name: nil, last_name: nil, roles: [], provisioning_allowed: nil, all_apps_visible: nil)
+      def self.create(client: nil, email: nil, first_name: nil, last_name: nil, roles: [], provisioning_allowed: nil, all_apps_visible: nil, visible_apps: [])
         client ||= Spaceship::ConnectAPI
         resp = client.post_user_invitation(
           email: email,
@@ -69,7 +69,8 @@ module Spaceship
           last_name: last_name,
           roles: roles,
           provisioning_allowed: provisioning_allowed,
-          all_apps_visible: all_apps_visible
+          all_apps_visible: all_apps_visible,
+          visible_apps: visible_apps
         )
         return resp.to_models.first
       end
