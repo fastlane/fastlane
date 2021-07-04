@@ -42,6 +42,11 @@ module Spaceship
           users_request_client.post("users/#{user_id}/relationships/visibleApps", body)
         end
 
+        # Get app permissions for user
+        def get_user_visible_apps(user_id: id)
+          users_request_client.get("users/#{user_id}/visibleApps")
+        end
+
         #
         # invitations (invited users)
         #
@@ -85,7 +90,7 @@ module Spaceship
           users_request_client.delete("userInvitations/#{user_invitation_id}")
         end
 
-        # Get all visible apps for invited user
+        # Get all app permissions for invited user
         def get_user_invitation_visible_apps(user_invitation_id: id)
           users_request_client.get("userInvitations/#{user_invitation_id}/visibleApps")
         end
