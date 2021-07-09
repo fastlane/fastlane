@@ -205,6 +205,8 @@ module Spaceship
                     InHouse
                   when 'direct'
                     Direct # Mac-only
+                  when 'direct_kext'
+                    DirectKext # Mac-only
                   else
                     raise "Can't find class '#{attrs['distributionMethod']}'"
                   end
@@ -257,6 +259,7 @@ module Spaceship
         #  The value can be found by inspecting the Entitlements drop-down when creating/editing a
         #  provisioning profile in Developer Portal.
         # @return (ProvisioningProfile): The profile that was just created
+        # rubocop:disable Metrics/PerceivedComplexity
         def create!(name: nil, bundle_id: nil, certificate: nil, devices: [], mac: false, sub_platform: nil, template_name: nil)
           raise "Missing required parameter 'bundle_id'" if bundle_id.to_s.empty?
           raise "Missing required parameter 'certificate'. e.g. use `Spaceship::Portal::Certificate::Production.all.first`" if certificate.to_s.empty?
@@ -269,7 +272,7 @@ module Spaceship
           # Fill in sensible default values
           name ||= [bundle_id, self.pretty_type].join(' ')
 
-          if self == AppStore || self == InHouse || self == Direct
+          if self == AppStore || self == InHouse || self == Direct || self == DirectKext
             # Distribution Profiles MUST NOT have devices
             devices = []
           end
@@ -306,6 +309,7 @@ module Spaceship
 
           self.new(profile)
         end
+        # rubocop:enable Metrics/PerceivedComplexity
 
         # @return (Array) Returns all profiles registered for this account
         #  If you're calling this from a subclass (like AdHoc), this will
@@ -394,6 +398,13 @@ module Spaceship
         end
       end
 
+      # Represents a Mac Developer ID profile from the Dev Portal
+      class DirectKext < ProvisioningProfile
+        def self.type
+          'direct_kext'
+        end
+      end
+
       # Download the current provisioning profile. This will *not* store
       # the provisioning profile on the file system. Instead this method
       # will return the content of the profile.
@@ -433,6 +444,8 @@ module Spaceship
               self.certificates = [Spaceship::Portal::Certificate::MacDevelopment.all.first]
             elsif self.kind_of?(Direct)
               self.certificates = [Spaceship::Portal::Certificate::DeveloperIdApplication.all.first]
+            elsif self.kind_of?(DirectKext)
+              self.certificates = [Spaceship::Portal::Certificate::DeveloperIdKext.all.first]
             else
               self.certificates = [Spaceship::Portal::Certificate::MacAppDistribution.all.first]
             end

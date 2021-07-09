@@ -29,6 +29,9 @@ module Sigh
       when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT,
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
         "Direct"
+      when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT_KEXT,
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT_KEXT
+        "DirectKext"
       end
     end
   end

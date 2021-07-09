@@ -38,13 +38,15 @@ module Sigh
         profile_types = [
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE,
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT,
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT_KEXT
         ]
       when 'catalyst'
         profile_types = [
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE,
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT,
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT_KEXT
         ]
       when 'tvos'
         profile_types = [

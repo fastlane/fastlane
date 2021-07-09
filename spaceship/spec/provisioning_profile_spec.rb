@@ -238,6 +238,13 @@ describe Spaceship::ProvisioningProfile do
         Spaceship::ProvisioningProfile::Direct.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, mac: true, devices: fake_devices)
       end
 
+      it 'DirectKext (Mac) profile types have no devices' do
+        fake_devices = Spaceship::Device.all
+        expected_devices = []
+        expect(Spaceship::ProvisioningProfile::DirectKext.client).to receive(:create_provisioning_profile!).with('Delete Me', 'direct_kext', '2UMR2S6PAA', "XC5PH8DAAA", expected_devices, mac: true, sub_platform: nil, template_name: nil).and_return({})
+        Spaceship::ProvisioningProfile::DirectKext.create!(name: 'Delete Me', bundle_id: 'net.sunapps.1', certificate: certificate, mac: true, devices: fake_devices)
+      end
+
       it 'Development profile types have devices' do
         fake_devices = Spaceship::Device.all
         expected_devices = fake_devices.collect(&:id)
