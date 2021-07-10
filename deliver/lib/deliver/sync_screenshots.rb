@@ -79,8 +79,10 @@ module Deliver
       end
 
       local_screenshots = iterator.each_local_screenshot(screenshots_per_language).map do |localization, app_screenshot_set, screenshot, index|
-        UI.user_error!("Found #{localization.locale} has more than 10 screenshots for #{app_screenshot_set.screenshot_display_type}. "\
-                       "Make sure containts only necessary screenshots.") if index >= 10
+        if index >= 10
+          UI.user_error!("Found #{localization.locale} has more than 10 screenshots for #{app_screenshot_set.screenshot_display_type}. "\
+                         "Make sure containts only necessary screenshots.")
+        end
         ScreenshotComparable.create_from_local(screenshot: screenshot, app_screenshot_set: app_screenshot_set)
       end
 
@@ -104,8 +106,10 @@ module Deliver
       result = wait_for_complete(iterator)
       return if !result.processing? && result.screenshot_count == local_screenshots.count
 
-      UI.crash!("Retried uploading screenshots #{retries} but there are still failures of processing screenshots." \
-                "Check App Store Connect console to work out which screenshots processed unsuccessfully.") if retries.zero?
+      if retries.zero?
+        UI.crash!("Retried uploading screenshots #{retries} but there are still failures of processing screenshots." \
+                  "Check App Store Connect console to work out which screenshots processed unsuccessfully.")
+      end
 
       # retry with deleting failing screenshots
       result.failing_screenshots.each(&:delete!)
@@ -128,7 +132,7 @@ module Deliver
         return result unless result.processing?
 
         # sleep with exponential backoff
-        interval = 5 + (2 ** retry_count)
+        interval = 5 + (2**retry_count)
         UI.message("There are still incomplete screenshots. Will check the states again in #{interval} secs - #{state_counts}")
         sleep(interval)
         retry_count += 1
