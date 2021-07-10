@@ -164,7 +164,7 @@ module Deliver
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :beta_sync_screenshots,
                                      env_name: "DELIVER_BETA_SYNC_SCREENSHOTS",
-                                     description: "Sync screenshots with local ones. This is currently beta option.",
+                                     description: "Sync screenshots with local ones. This is currently beta option",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :submit_for_review,
