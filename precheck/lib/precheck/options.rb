@@ -90,19 +90,19 @@ module Precheck
                                      short_option: "-r",
                                      env_name: "PRECHECK_DEFAULT_RULE_LEVEL",
                                      description: "The default rule level unless otherwise configured",
-                                     is_string: false,
+                                     skip_type_validation: true, # allow String, Symbol
                                      default_value: RULE_LEVELS[:error]),
         FastlaneCore::ConfigItem.new(key: :include_in_app_purchases,
                                      short_option: "-i",
                                      env_name: "PRECHECK_INCLUDE_IN_APP_PURCHASES",
                                      description: "Should check in-app purchases?",
-                                     is_string: false,
+                                     type: Boolean,
                                      optional: true,
                                      default_value: true),
         FastlaneCore::ConfigItem.new(key: :use_live,
                                      env_name: "PRECHECK_USE_LIVE",
                                      description: "Should force check live app?",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false)
       ] + rules
     end
