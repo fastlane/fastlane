@@ -42,9 +42,9 @@ module Deliver
 
     def sync(screenshots)
       UI.important("Will begin uploading snapshots for '#{version.version_string}' on App Store Connect")
-      screenshots_per_language = screenshots.group_by(&:language)
 
       # enable localizations that will be used
+      screenshots_per_language = screenshots.group_by(&:language)
       enable_localizations(screenshots_per_language.keys)
 
       # create iterator
@@ -53,12 +53,10 @@ module Deliver
 
       # sync local screenshots with remote settings by deleting and uploading
       UI.message("Starting with the upload of screenshots...")
-      replace_screenshots(iterator, screenshots_per_language)
+      replace_screenshots(iterator, screenshots)
 
       # ensure screenshots within screenshot sets are sorted in right order
-      Helper.show_loading_indicator("Sorting screenshots uploaded...")
       sort_screenshots(iterator)
-      Helper.hide_loading_indicator
 
       UI.important('Screenshots are synced successfully!')
     end
@@ -73,12 +71,32 @@ module Deliver
       Helper.hide_loading_indicator
     end
 
-    def replace_screenshots(iterator, screenshots_per_language, retries = 3)
+    def replace_screenshots(iterator, screenshots, retries = 3)
+      # delete and upload screenshots to get App Store Connect in sync
+      do_replace_screenshots(iterator, screenshots, create_delete_worker, create_upload_worker)
+
+      # wait for screenshots to be processed on App Store Connect end and
+      # ensure the number of uploaded screenshots matches the one in local
+      result = wait_for_complete(iterator)
+      return if !result.processing? && result.screenshot_count == screenshots.count
+
+      if retries.zero?
+        UI.crash!("Retried uploading screenshots #{retries} but there are still failures of processing screenshots." \
+                  "Check App Store Connect console to work out which screenshots processed unsuccessfully.")
+      end
+
+      # retry with deleting failing screenshots
+      result.failing_screenshots.each(&:delete!)
+      replace_screenshots(iterator, screenshots, retries - 1)
+    end
+
+    # This is a testable method that focuses on figuring out what to update
+    def do_replace_screenshots(iterator, screenshots, delete_worker, upload_worker)
       remote_screenshots = iterator.each_app_screenshot.map do |localization, app_screenshot_set, app_screenshot|
         ScreenshotComparable.create_from_remote(app_screenshot: app_screenshot, locale: localization.locale)
       end
 
-      local_screenshots = iterator.each_local_screenshot(screenshots_per_language).map do |localization, app_screenshot_set, screenshot, index|
+      local_screenshots = iterator.each_local_screenshot(screenshots.group_by(&:language)).map do |localization, app_screenshot_set, screenshot, index|
         if index >= 10
           UI.user_error!("Found #{localization.locale} has more than 10 screenshots for #{app_screenshot_set.screenshot_display_type}. "\
                          "Make sure containts only necessary screenshots.")
@@ -92,28 +110,12 @@ module Deliver
       screenshots_to_upload = local_screenshots - remote_screenshots
 
       delete_jobs = screenshots_to_delete.map { |x| DeleteScreenshotJob.new(x.context[:app_screenshot], x.context[:locale]) }
-      delete_worker = create_delete_worker
       delete_worker.batch_enqueue(delete_jobs)
       delete_worker.start
 
       upload_jobs = screenshots_to_upload.map { |x| UploadScreenshotJob.new(x.context[:app_screenshot_set], x.context[:screenshot].path) }
-      upload_worker = create_upload_worker
       upload_worker.batch_enqueue(upload_jobs)
       upload_worker.start
-
-      # wait for screenshots to be processed on App Store Connect end and
-      # ensure the number of uploaded screenshots matches the one in local
-      result = wait_for_complete(iterator)
-      return if !result.processing? && result.screenshot_count == local_screenshots.count
-
-      if retries.zero?
-        UI.crash!("Retried uploading screenshots #{retries} but there are still failures of processing screenshots." \
-                  "Check App Store Connect console to work out which screenshots processed unsuccessfully.")
-      end
-
-      # retry with deleting failing screenshots
-      result.failing_screenshots.each(&:delete!)
-      replace_screenshots(iterator, screenshots_per_language, retries - 1)
     end
 
     def wait_for_complete(iterator)
@@ -142,19 +144,21 @@ module Deliver
     end
 
     def sort_screenshots(iterator)
+      Helper.show_loading_indicator("Sorting screenshots uploaded...")
       sort_worker = create_sort_worker
       sort_worker.batch_enqueue(iterator.each_app_screenshot_set.to_a.map { |_, set| set })
       sort_worker.start
-    end
-
-    def fetch_localizations
-      version.get_app_store_version_localizations
+      Helper.hide_loading_indicator
     end
 
     private
 
     def version
       @version ||= @app.get_edit_app_store_version(platform: @platform)
+    end
+
+    def fetch_localizations
+      version.get_app_store_version_localizations
     end
 
     def create_upload_worker

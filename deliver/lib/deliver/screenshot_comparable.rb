@@ -17,12 +17,9 @@ module Deliver
       raise ArgumentError unless screenshot.kind_of?(Deliver::AppScreenshot)
       raise ArgumentError unless app_screenshot_set.kind_of?(Spaceship::ConnectAPI::AppScreenshotSet)
 
-      bytes = File.binread(screenshot.path)
-      checksum = Digest::MD5.hexdigest(bytes)
-
       new(
         path: "#{screenshot.language}/#{File.basename(screenshot.path)}",
-        checksum: checksum,
+        checksum: calculate_checksum(screenshot.path),
         context: {
           screenshot: screenshot,
           app_screenshot_set: app_screenshot_set
@@ -42,6 +39,11 @@ module Deliver
           locale: locale
         }
       )
+    end
+
+    def self.calculate_checksum(path)
+      bytes = File.binread(path)
+      Digest::MD5.hexdigest(bytes)
     end
 
     def initialize(path:, checksum:, context:)
