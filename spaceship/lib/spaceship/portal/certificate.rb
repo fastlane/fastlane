@@ -147,7 +147,13 @@ module Spaceship
       class Passbook < Certificate; end
 
       # ApplePay certificate
-      class ApplePay < Certificate; end
+      # per the naming scheme found in this file, this class should be called `ApplePay`
+      # this seems to clash with spaceship/lib/spaceship/portal/app_service.rb somehow
+      # which is why `Certificate` was added here as a workaround
+      class ApplePayCertificate < Certificate; end
+
+      # ApplePay certificate for backward compatibility
+      class ApplePay < ApplePayCertificate; end
 
       # ApplePayMerchantIdentity certificate
       class ApplePayMerchantIdentity < Certificate; end
@@ -173,7 +179,7 @@ module Spaceship
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
         "E5D663CMZW" => VoipPush,
-        "4APLUP237T" => ApplePay,
+        "4APLUP237T" => ApplePayCertificate,
         "MD8Q2VRT6A" => ApplePayMerchantIdentity
       }
 
@@ -217,11 +223,28 @@ module Spaceship
           csr = OpenSSL::X509::Request.new
           csr.version = 0
           csr.subject = OpenSSL::X509::Name.new([
-                                                  ['CN', 'PEM', OpenSSL::ASN1::UTF8STRING]
+                                                  ['CN', 'spaceship', OpenSSL::ASN1::UTF8STRING]
                                                 ])
           csr.public_key = key.public_key
           csr.sign(key, OpenSSL::Digest::SHA1.new)
           return [csr, key]
+        end
+
+        def create_apple_pay_certificate_signing_request
+          OpenSSL::PKey::EC.send(:alias_method, :private?, :private_key?)
+
+          ec_domain_key = OpenSSL::PKey::EC.new('prime256v1')
+          ec_public = OpenSSL::PKey::EC.new('prime256v1')
+          ec_domain_key.generate_key
+          ec_public.public_key = ec_domain_key.public_key
+
+          csr = OpenSSL::X509::Request.new
+          csr.subject = OpenSSL::X509::Name.new([
+                                                  ['CN', 'spaceship', OpenSSL::ASN1::UTF8STRING]
+                                                ])
+          csr.public_key = ec_public
+          csr.sign(ec_domain_key, OpenSSL::Digest::SHA256.new)
+          return [csr, ec_domain_key]
         end
 
         # Create a new object based on a hash.
@@ -312,16 +335,27 @@ module Spaceship
 
           # look up the app_id by the bundle_id
           if bundle_id
-            app = portal_type.set_client(client).find(bundle_id)
-            raise "Could not find app with bundle id '#{bundle_id}'" unless app
-            app_id = app.app_id
+            if bundle_id.start_with?('merchant.') # ApplePay
+              merchant = Spaceship::Portal.merchant.find(bundle_id)
+              raise "Could not find merchant with bundle id '#{bundle_id}" unless merchant
+              merchant_id = merchant.merchant_id
+            else
+              app = portal_type.set_client(client).find(bundle_id)
+              raise "Could not find app with bundle id '#{bundle_id}'" unless app
+              app_id = app.app_id
+            end
           end
 
           # ensure csr is a OpenSSL::X509::Request
           csr = OpenSSL::X509::Request.new(csr) if csr.kind_of?(String)
 
           # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
-          response = client.create_certificate!(type, csr.to_pem, app_id, mac)
+          if type == '4APLUP237T' # = ApplePay
+            response = client.create_certificate_apple_pay!(type, csr.to_pem, merchant_id, mac)
+          else
+            response = client.create_certificate!(type, csr.to_pem, app_id, mac)
+          end
+
           # munge the response to make it work for the factory
           response['certificateTypeDisplayId'] = response['certificateType']['certificateTypeDisplayId']
           self.new(response)

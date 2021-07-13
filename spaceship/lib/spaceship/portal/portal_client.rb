@@ -589,13 +589,24 @@ module Spaceship
 
     def create_certificate!(type, csr, app_id = nil, mac = false)
       ensure_csrf(Spaceship::Portal::Certificate)
-
       r = request(:post, "account/#{platform_slug(mac)}/certificate/submitCertificateRequest.action", {
         teamId: team_id,
         type: type,
         csrContent: csr,
         appIdId: app_id, # optional
         specialIdentifierDisplayId: app_id, # For requesting Web Push certificates
+      })
+      parse_response(r, 'certRequest')
+    end
+
+    def create_certificate_apple_pay!(type, csr, merchant_id = nil, mac = false)
+      ensure_csrf(Spaceship::Portal::Certificate)
+      r = request(:post, "account/#{platform_slug(mac)}/certificate/submitCertificateRequest.action", {
+        teamId: team_id,
+        type: type,
+        csrContent: csr,
+        omcId: merchant_id, # this is different to `create_certificate!` above
+        specialIdentifierDisplayId: merchant_id
       })
       parse_response(r, 'certRequest')
     end
