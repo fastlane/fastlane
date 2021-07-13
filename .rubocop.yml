@@ -302,6 +302,7 @@ Lint/IsStringUsage:
     - 'fastlane/**/*'
     - 'gym/**/*'
     - 'match/**/*'
+    - 'precheck/**/*'
     - 'screengrab/**/*'
     - 'supply/**/*'
 
