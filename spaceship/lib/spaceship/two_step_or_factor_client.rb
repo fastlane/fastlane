@@ -1,5 +1,6 @@
 require_relative 'globals'
 require_relative 'tunes/tunes_client'
+require 'fastlane_core/ui/ui'
 
 module Spaceship
   class Client
@@ -90,6 +91,7 @@ module Spaceship
         # }
         if ex.to_s.include?("verification code") # to have a nicer output
           puts("Error: Incorrect verification code")
+          raise "Error: Incorrect verification code" unless UI.interactive?
           return handle_two_step_for_device(device_id)
         end
 
@@ -138,7 +140,7 @@ module Spaceship
         push_mode = push_mode_from_number(response.body["trustedPhoneNumbers"], phone_number)
         # don't request sms if no trusted devices and env default is the only trusted number,
         # code was automatically sent
-        should_request_code = !sms_automatically_sent(response)
+        should_request_code = !sms_automatically_sent(response) && (!ENV["SPACESHIP_2FA_SMS_CODE"] || ENV["SPACESHIP_2FA_SMS_CODE"].empty?)
         code_type = 'phone'
         body = request_two_factor_code_from_phone(phone_id, phone_number, code_length, push_mode, should_request_code)
       elsif sms_automatically_sent(response) # sms fallback, code was automatically sent
@@ -197,6 +199,7 @@ module Spaceship
 
         if ex.to_s.include?("verification code") # to have a nicer output
           puts("Error: Incorrect verification code")
+          raise "Error: Incorrect verification code" unless UI.interactive?
           depth += 1
           return handle_two_factor(response, depth)
         end
@@ -225,6 +228,7 @@ module Spaceship
 
     # extracted into its own method for testing
     def ask_for_2fa_code(text)
+      raise "This code should only run in interactive mode. You can set the environment variable `SPACESHIP_2FA_SMS_CODE`." unless UI.interactive?
       ask(text)
     end
 
@@ -331,7 +335,11 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
         puts("Successfully requested text message to #{phone_number}")
       end
 
-      code = ask_for_2fa_code("Please enter the #{code_length} digit code you received at #{phone_number}:")
+      if ENV["SPACESHIP_2FA_SMS_CODE"] && !ENV["SPACESHIP_2FA_SMS_CODE"].empty?
+        code = ENV["SPACESHIP_2FA_SMS_CODE"]
+      else
+        code = ask_for_2fa_code("Please enter the #{code_length} digit code you received at #{phone_number}:")
+      end
 
       return { "securityCode" => { "code" => code.to_s }, "phoneNumber" => { "id" => phone_id }, "mode" => push_mode }.to_json
     end
