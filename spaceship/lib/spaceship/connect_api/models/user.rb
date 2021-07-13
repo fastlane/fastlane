@@ -16,6 +16,8 @@ module Spaceship
       attr_accessor :email_vetting_required
       attr_accessor :notifications
 
+      attr_accessor :visible_apps
+
       attr_mapping({
         "username" => "username",
         "firstName" => "first_name",
@@ -27,8 +29,14 @@ module Spaceship
         "allAppsVisible" => "all_apps_visible",
         "provisioningAllowed" => "provisioning_allowed",
         "emailVettingRequired" => "email_vetting_required",
-        "notifications" => "notifications"
+        "notifications" => "notifications",
+
+        "visibleApps" => "visible_apps"
       })
+
+      ESSENTIAL_INCLUDES = [
+        "visibleApps"
+      ].join(",")
 
       def self.type
         return "users"
@@ -47,6 +55,12 @@ module Spaceship
       def self.find(client: nil, email: nil, includes: nil)
         client ||= Spaceship::ConnectAPI
         return all(client: client, filter: { email: email }, includes: includes)
+      end
+
+      def fetch_visible_apps(client: nil, limit: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_user_visible_apps(user_id: id, limit: limit)
+        return resp.to_models
       end
     end
   end
