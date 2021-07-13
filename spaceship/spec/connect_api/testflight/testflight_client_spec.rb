@@ -397,6 +397,30 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
+      context 'delete_beta_groups_from_build' do
+        let(:path) { "builds" }
+        let(:build_id) { "123" }
+        let(:beta_group_ids) { ["123", "456"] }
+        let(:body) do
+          {
+            data: beta_group_ids.map do |id|
+              {
+                type: "betaGroups",
+                id: id
+              }
+            end
+          }
+        end
+
+        it 'succeeds' do
+          url = "#{path}/#{build_id}/relationships/betaGroups"
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock).and_return(req_mock)
+          client.delete_beta_groups_from_build(build_id: build_id, beta_group_ids: beta_group_ids)
+        end
+      end
+
       context 'patch_beta_groups' do
         let(:path) { "betaGroups" }
         let(:beta_group_id) { "123" }
@@ -594,6 +618,54 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
           expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
           client.add_beta_tester_to_builds(beta_tester_id: beta_tester_id, build_ids: build_ids)
+        end
+      end
+
+      context 'add_beta_testers_to_build' do
+        let(:path) { "builds" }
+        let(:build_id) { "123" }
+        let(:beta_tester_ids) { ["123", "456"] }
+        let(:body) do
+          {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+        end
+
+        it 'succeeds' do
+          url = "#{path}/#{build_id}/relationships/individualTesters"
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.add_beta_testers_to_build(build_id: build_id, beta_tester_ids: beta_tester_ids)
+        end
+      end
+
+      context 'delete_beta_testers_from_build' do
+        let(:path) { "builds" }
+        let(:build_id) { "123" }
+        let(:beta_tester_ids) { ["123", "456"] }
+        let(:body) do
+          {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+        end
+
+        it 'succeeds' do
+          url = "#{path}/#{build_id}/relationships/individualTesters"
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock).and_return(req_mock)
+          client.delete_beta_testers_from_build(build_id: build_id, beta_tester_ids: beta_tester_ids)
         end
       end
     end
