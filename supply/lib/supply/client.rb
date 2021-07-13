@@ -162,7 +162,7 @@ module Supply
     def commit_current_edit!
       ensure_active_edit!
 
-      call_google_api { client.commit_edit(current_package_name, current_edit.id) }
+      call_google_api { client.commit_edit(package_name: current_package_name, edit_id: current_edit.id, changes_not_sent_for_review: true) }
 
       self.current_edit = nil
       self.current_package_name = nil
