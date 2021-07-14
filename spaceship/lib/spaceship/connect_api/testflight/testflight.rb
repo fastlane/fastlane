@@ -191,11 +191,13 @@ module Spaceship
           test_flight_request_client.post("builds/#{build_id}/relationships/betaGroups", body)
         end
 
-        def create_beta_group(app_id: nil, group_name: nil, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
+        def create_beta_group(app_id: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
           body = {
             data: {
               attributes: {
                 name: group_name,
+                isInternalGroup: is_internal_group,
+                hasAccessToAllBuilds: is_internal_group ? true : false,
                 publicLinkEnabled: public_link_enabled,
                 publicLinkLimit: public_link_limit,
                 publicLinkLimitEnabled: public_link_limit_enabled
@@ -204,12 +206,12 @@ module Spaceship
                 app: {
                   data: {
                     id: app_id,
-                    type: "apps"
-                  }
-                }
+                    type: "apps",
+                  },
+                },
               },
-              type: "betaGroups"
-            }
+              type: "betaGroups",
+            },
           }
           test_flight_request_client.post("betaGroups", body)
         end
