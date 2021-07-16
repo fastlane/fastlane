@@ -90,7 +90,7 @@ module Precheck
                                      short_option: "-r",
                                      env_name: "PRECHECK_DEFAULT_RULE_LEVEL",
                                      description: "The default rule level unless otherwise configured",
-                                     skip_type_validation: true, # allow String, Symbol
+                                     type: Symbol,
                                      default_value: RULE_LEVELS[:error]),
         FastlaneCore::ConfigItem.new(key: :include_in_app_purchases,
                                      short_option: "-i",
