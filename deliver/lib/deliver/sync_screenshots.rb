@@ -41,6 +41,12 @@ module Deliver
     end
 
     def sync(screenshots)
+      UI.important('This is currently a beta feature in fastlane. This may cause some errors on your environment.')
+
+      if ENV['FL_ENABLE_BETA_FEATURES'].nil?
+        UI.user_error!('Please set a value to "FL_ENABLE_BETA_FEATURE" environment variable if you acknowleage the risk and try this out.')
+      end
+
       UI.important("Will begin uploading snapshots for '#{version.version_string}' on App Store Connect")
 
       # enable localizations that will be used
