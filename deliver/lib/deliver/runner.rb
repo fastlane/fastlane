@@ -144,12 +144,14 @@ module Deliver
 
       # Commit
       upload_metadata.upload(options)
-      if options[:beta_sync_screenshots]
+
+      if options[:sync_screenshots]
         sync_screenshots = SyncScreenshots.new(app: Deliver.cache[:app], platform: Spaceship::ConnectAPI::Platform.map(options[:platform]))
         sync_screenshots.sync(screenshots)
       else
         upload_screenshots.upload(options, screenshots)
       end
+
       UploadPriceTier.new.upload(options)
     end
 

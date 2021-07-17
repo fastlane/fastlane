@@ -162,9 +162,10 @@ module Deliver
                                      description: "Clear all previously uploaded screenshots before uploading the new ones",
                                      type: Boolean,
                                      default_value: false),
-        FastlaneCore::ConfigItem.new(key: :beta_sync_screenshots,
-                                     env_name: "DELIVER_BETA_SYNC_SCREENSHOTS",
-                                     description: "Sync screenshots with local ones. This is currently beta option",
+        FastlaneCore::ConfigItem.new(key: :sync_screenshots,
+                                     env_name: "DELIVER_SYNC_SCREENSHOTS",
+                                     description: "Sync screenshots with local ones. This is currently beta option" \
+                                                  "so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :submit_for_review,
