@@ -162,7 +162,13 @@ module Supply
     def commit_current_edit!
       ensure_active_edit!
 
-      call_google_api { client.commit_edit(current_package_name, current_edit.id) }
+      call_google_api do
+        client.commit_edit(
+          current_package_name,
+          current_edit.id,
+          changes_not_sent_for_review: Supply.config[:changes_not_sent_for_review]
+        )
+      end
 
       self.current_edit = nil
       self.current_package_name = nil

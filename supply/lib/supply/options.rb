@@ -281,6 +281,11 @@ module Supply
                                          UI.user_error!("Version code '#{version_code}' is not an integer") if version_code == 0
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :changes_not_sent_for_review,
+                                     env_name: "SUPPLY_CHANGES_NOT_SENT_FOR_REVIEW",
+                                     description: "Indicates that the changes in this edit will not be reviewed until they are explicitly sent for review from the Google Play Console UI.",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :in_app_update_priority,
                                      env_name: "SUPPLY_IN_APP_UPDATE_PRIORITY",
                                      optional: true,
