@@ -324,6 +324,7 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
 
     # this is used in two places: after choosing a phone number and when a phone number is set via ENV var
     def request_two_factor_code_from_phone(phone_id, phone_number, code_length, push_mode = "sms", should_request_code = true)
+      puts("Running on updated fork verison")
       if should_request_code
         # Request code
         r = request(:put) do |req|
