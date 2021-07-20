@@ -198,8 +198,10 @@ module Spaceship
 
         if ex.to_s.include?("verification code") # to have a nicer output
           puts("Error: Incorrect verification code")
+          puts("Make sure that FASTLANE_2FA_CODE is set and run spaceauth again.")
           depth += 1
-          return handle_two_factor(response, depth)
+          # return handle_two_factor(response, depth)
+          raise ex
         end
 
         raise ex
