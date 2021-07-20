@@ -193,20 +193,16 @@ open class Snapshot: NSObject {
     }
 
     class func fixLandscapeOrientation(image: UIImage) -> UIImage {
-        #if os(watchOS)
-            return image
-        #else
-            if #available(iOS 10.0, *) {
-                let format = UIGraphicsImageRendererFormat()
-                format.scale = image.scale
-                let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
-                return renderer.image { context in
-                    image.draw(in: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
-                }
-            } else {
-                return image
+        if #available(iOS 10.0, *) {
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = image.scale
+            let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
+            return renderer.image { context in
+                image.draw(in: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
             }
-        #endif
+        } else {
+            return image
+        }
     }
 
     class func waitForLoadingIndicatorToDisappear(within timeout: TimeInterval) {
@@ -306,4 +302,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.27]
+// SnapshotHelperVersion [1.25]

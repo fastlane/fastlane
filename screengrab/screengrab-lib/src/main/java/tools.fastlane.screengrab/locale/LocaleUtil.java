@@ -1,9 +1,7 @@
 package tools.fastlane.screengrab.locale;
 
-import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.os.Build;
-import android.os.LocaleList;
 import android.util.Log;
 
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -15,20 +13,16 @@ public final class LocaleUtil {
 
     private static final String TAG =  LocaleUtil.class.getSimpleName();
 
-    @SuppressWarnings({"JavaReflectionMemberAccess", "deprecation", "RedundantSuppression"})
-    @SuppressLint("PrivateApi")
-    public static LocaleListCompat changeDeviceLocaleTo(LocaleListCompat locale) {
+    public static void changeDeviceLocaleTo(Locale locale) {
         if (locale == null) {
             Log.w(TAG, "Skipping setting device locale to null");
-            return null;
+            return;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            LocaleList.setDefault(locale.getLocaleList());
-        else
-            Locale.setDefault(locale.getLocale());
+
+        Locale.setDefault(locale);
 
         try {
-            Class<?> amnClass = Class.forName("android.app.ActivityManagerNative");
+            Class amnClass = Class.forName("android.app.ActivityManagerNative");
 
             Method methodGetDefault = amnClass.getMethod("getDefault");
             methodGetDefault.setAccessible(true);
@@ -41,38 +35,22 @@ public final class LocaleUtil {
 
             Method methodGetConfiguration = amnClass.getMethod("getConfiguration");
             methodGetConfiguration.setAccessible(true);
-            Configuration config = (Configuration) methodGetConfiguration.invoke(activityManagerNative);
+            Configuration config  = (Configuration) methodGetConfiguration.invoke(activityManagerNative);
 
             config.getClass().getField("userSetLocale").setBoolean(config, true);
-            LocaleListCompat ret;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                ret = new LocaleListCompat(config.getLocales());
-            } else {
-                ret = new LocaleListCompat(config.locale);
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                config.setLocales(locale.getLocaleList());
-            else
-                config.locale = locale.getLocale();
+            config.locale = locale;
 
-            config.setLayoutDirection(locale.getPreferredLocale());
+            config.setLayoutDirection(locale);
 
             Method updateConfigurationMethod = amnClass.getMethod("updateConfiguration", Configuration.class);
             updateConfigurationMethod.setAccessible(true);
             updateConfigurationMethod.invoke(activityManagerNative, config);
 
             Log.d(TAG, "Locale changed to " + locale);
-            return ret;
         } catch (Exception e) {
             Log.e(TAG, "Failed to change device locale to " + locale, e);
-            // ignore the error, it happens for example if run from Android Studio rather than Fastlane
-            return null;
+            throw new RuntimeException(e);
         }
-    }
-
-    @Deprecated
-    public static void changeDeviceLocaleTo(Locale locale) {
-        changeDeviceLocaleTo(new LocaleListCompat(locale));
     }
 
     public static String[] localePartsFrom(String localeString) {
@@ -80,7 +58,7 @@ public final class LocaleUtil {
             return null;
         }
 
-        String[] localeParts = localeString.split("[_\\-]");
+        String[] localeParts = localeString.split("_");
 
         if (localeParts.length < 1 || localeParts.length > 3) {
             return null;
@@ -101,12 +79,17 @@ public final class LocaleUtil {
         }
     }
 
-    public static Locale localeFromString(String locale) {
-        return localeFromParts(localePartsFrom(locale));
+    public static Locale getTestLocale() {
+        return localeFromInstrumentation("testLocale");
     }
 
-    public static String getTestLocale() {
-        return InstrumentationRegistry.getArguments().getString("testLocale");
+    public static Locale getEndingLocale() {
+        return localeFromInstrumentation("endingLocale");
+    }
+
+    private static Locale localeFromInstrumentation(String key) {
+        String localeString = InstrumentationRegistry.getArguments().getString(key);
+        return LocaleUtil.localeFromParts(LocaleUtil.localePartsFrom(localeString));
     }
 
     private LocaleUtil() {}

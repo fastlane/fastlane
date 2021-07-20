@@ -65,7 +65,7 @@ module Fastlane
                                        env_name: "FL_BADGE_DARK",
                                        description: "Adds a dark flavored badge ontop of your icon",
                                        optional: true,
-                                       type: Boolean,
+                                       is_string: false,
                                        verify_block: proc do |value|
                                          UI.user_error!("dark is only a flag and should always be true") unless value == true
                                        end),
@@ -80,19 +80,20 @@ module Fastlane
                                        env_name: "FL_BADGE_NO_BADGE",
                                        description: "Hides the beta badge",
                                        optional: true,
-                                       type: Boolean,
+                                       is_string: false,
                                        verify_block: proc do |value|
                                          UI.user_error!("no_badge is only a flag and should always be true") unless value == true
                                        end),
           FastlaneCore::ConfigItem.new(key: :shield,
                                        env_name: "FL_BADGE_SHIELD",
                                        description: "Add a shield to your app icon from shields.io",
-                                       optional: true),
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :alpha,
                                        env_name: "FL_BADGE_ALPHA",
                                        description: "Adds and alpha badge instead of the default beta one",
                                        optional: true,
-                                       type: Boolean,
+                                       is_string: false,
                                        verify_block: proc do |value|
                                          UI.user_error!("alpha is only a flag and should always be true") unless value == true
                                        end),
@@ -100,6 +101,7 @@ module Fastlane
                                        env_name: "FL_BADGE_PATH",
                                        description: "Sets the root path to look for AppIcons",
                                        optional: true,
+                                       is_string: true,
                                        default_value: '.',
                                        verify_block: proc do |value|
                                          UI.user_error!("path needs to be a valid directory") if Dir[value].empty?
@@ -108,31 +110,33 @@ module Fastlane
                                        env_name: "FL_BADGE_SHIELD_IO_TIMEOUT",
                                        description: "Set custom duration for the timeout of the shields.io request in seconds",
                                        optional: true,
-                                       type: Integer, # allow integers, strings both
+                                       is_string: false,
                                        verify_block: proc do |value|
                                          UI.user_error!("shield_io_timeout needs to be an integer > 0") if value.to_i < 1
                                        end),
           FastlaneCore::ConfigItem.new(key: :glob,
                                        env_name: "FL_BADGE_GLOB",
                                        description: "Glob pattern for finding image files",
-                                       optional: true),
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :alpha_channel,
                                        env_name: "FL_BADGE_ALPHA_CHANNEL",
                                        description: "Keeps/adds an alpha channel to the icon (useful for android icons)",
                                        optional: true,
-                                       type: Boolean,
+                                       is_string: false,
                                        verify_block: proc do |value|
                                          UI.user_error!("alpha_channel is only a flag and should always be true") unless value == true
                                        end),
           FastlaneCore::ConfigItem.new(key: :shield_gravity,
                                        env_name: "FL_BADGE_SHIELD_GRAVITY",
                                        description: "Position of shield on icon. Default: North - Choices include: NorthWest, North, NorthEast, West, Center, East, SouthWest, South, SouthEast",
-                                       optional: true),
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :shield_no_resize,
                                        env_name: "FL_BADGE_SHIELD_NO_RESIZE",
                                        description: "Shield image will no longer be resized to aspect fill the full icon. Instead it will only be shrunk to not exceed the icon graphic",
                                        optional: true,
-                                       type: Boolean,
+                                       is_string: false,
                                        verify_block: proc do |value|
                                          UI.user_error!("shield_no_resize is only a flag and should always be true") unless value == true
                                        end)

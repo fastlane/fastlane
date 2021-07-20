@@ -107,6 +107,7 @@ module Fastlane
                                        description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
                                        conflicting_options: [:api_bearer],
                                        sensitive: true,
+                                       is_string: true,
                                        code_gen_sensitive: true,
                                        default_value: ENV["GITHUB_API_TOKEN"],
                                        default_value_dynamic: true,
@@ -128,6 +129,7 @@ module Fastlane
                                        env_name: 'FL_COMMIT_GITHUB_FILE_PATH',
                                        description: 'The relative path to your file from project root e.g. assets/my_app.xcarchive',
                                        optional: false,
+                                       is_string: true,
                                        verify_block: proc do |value|
                                          value = File.expand_path(value)
                                          UI.user_error!("File not found at path '#{value}'") unless File.exist?(value)
@@ -140,7 +142,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :secure,
                                        env_name: "FL_COMMIT_GITHUB_FILE_SECURE",
                                        description: "Optionally disable secure requests (ssl_verify_peer)",
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: true,
                                        optional: true)
         ]

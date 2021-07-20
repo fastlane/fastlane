@@ -34,68 +34,104 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :all_modules,
-                                       env_name: 'FL_SOURCEDOCS_OUTPUT_ALL_MODULES',
-                                       description: 'Generate documentation for all modules in a Swift package',
-                                       type: Boolean,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :spm_module,
-                                       env_name: 'FL_SOURCEDOCS_SPM_MODULE',
-                                       description: 'Generate documentation for Swift Package Manager module',
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :module_name,
-                                       env_name: 'FL_SOURCEDOCS_MODULE_NAME',
-                                       description: 'Generate documentation for a Swift module',
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :link_beginning,
-                                       env_name: 'FL_SOURCEDOCS_LINK_BEGINNING',
-                                       description: 'The text to begin links with',
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :link_ending,
-                                       env_name: 'FL_SOURCEDOCS_LINK_ENDING',
-                                       description: 'The text to end links with (default: .md)',
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :output_folder,
-                                       env_name: 'FL_SOURCEDOCS_OUTPUT_FOLDER',
-                                       description: 'Output directory to clean (default: Documentation/Reference)',
-                                       optional: false),
-          FastlaneCore::ConfigItem.new(key: :min_acl,
-                                       env_name: 'FL_SOURCEDOCS_MIN_ACL',
-                                       description: 'Access level to include in documentation [private, fileprivate, internal, public, open] (default: public)',
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :module_name_path,
-                                       env_name: 'FL_SOURCEDOCS_MODULE_NAME_PATH',
-                                       description: 'Include the module name as part of the output folder path',
-                                       type: Boolean,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :clean,
-                                       env_name: 'FL_SOURCEDOCS_CLEAN',
-                                       description: 'Delete output folder before generating documentation',
-                                       type: Boolean,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :collapsible,
-                                       env_name: 'FL_SOURCEDOCS_COLLAPSIBLE',
-                                       description: 'Put methods, properties and enum cases inside collapsible blocks',
-                                       type: Boolean,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :table_of_contents,
-                                       env_name: 'FL_SOURCEDOCS_TABLE_OF_CONTENT',
-                                       description: 'Generate a table of contents with properties and methods for each type',
-                                       type: Boolean,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :reproducible,
-                                       env_name: 'FL_SOURCEDOCS_REPRODUCIBLE',
-                                       description: 'Generate documentation that is reproducible: only depends on the sources',
-                                       type: Boolean,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :scheme,
-                                       env_name: 'FL_SOURCEDOCS_SCHEME',
-                                       description: 'Create documentation for specific scheme',
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :sdk_platform,
-                                       env_name: 'FL_SOURCEDOCS_SDK_PlATFORM',
-                                       description: 'Create documentation for specific sdk platform',
-                                       optional: true)
+          FastlaneCore::ConfigItem.new(
+            key: :all_modules,
+            env_name: 'FL_SOURCEDOCS_OUTPUT_ALL_MODULES',
+            description: 'Generate documentation for all modules in a Swift package',
+            type: Boolean,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :spm_module,
+            env_name: 'FL_SOURCEDOCS_SPM_MODULE',
+            description: 'Generate documentation for Swift Package Manager module',
+            type: String,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :module_name,
+            env_name: 'FL_SOURCEDOCS_MODULE_NAME',
+            description: 'Generate documentation for a Swift module',
+            type: String,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :link_beginning,
+            env_name: 'FL_SOURCEDOCS_LINK_BEGINNING',
+            description: 'The text to begin links with',
+            type: String,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :link_ending,
+            env_name: 'FL_SOURCEDOCS_LINK_ENDING',
+            description: 'The text to end links with (default: .md)',
+            type: String,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :output_folder,
+            env_name: 'FL_SOURCEDOCS_OUTPUT_FOLDER',
+            description: 'Output directory to clean (default: Documentation/Reference)',
+            type: String,
+            optional: false
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :min_acl,
+            env_name: 'FL_SOURCEDOCS_MIN_ACL',
+            description: 'Access level to include in documentation [private, fileprivate, internal, public, open] (default: public)',
+            type: String,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :module_name_path,
+            env_name: 'FL_SOURCEDOCS_MODULE_NAME_PATH',
+            description: 'Include the module name as part of the output folder path',
+            type: Boolean,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :clean,
+            env_name: 'FL_SOURCEDOCS_CLEAN',
+            description: 'Delete output folder before generating documentation',
+            type: Boolean,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :collapsible,
+            env_name: 'FL_SOURCEDOCS_COLLAPSIBLE',
+            description: 'Put methods, properties and enum cases inside collapsible blocks',
+            type: Boolean,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :table_of_contents,
+            env_name: 'FL_SOURCEDOCS_TABLE_OF_CONTENT',
+            description: 'Generate a table of contents with properties and methods for each type',
+            type: Boolean,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :reproducible,
+            env_name: 'FL_SOURCEDOCS_REPRODUCIBLE',
+            description: 'Generate documentation that is reproducible: only depends on the sources',
+            type: Boolean,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :scheme,
+            env_name: 'FL_SOURCEDOCS_SCHEME',
+            description: 'Create documentation for specific scheme',
+            type: String,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :sdk_platform,
+            env_name: 'FL_SOURCEDOCS_SDK_PlATFORM',
+            description: 'Create documentation for specific sdk platform',
+            type: String,
+            optional: true
+          )
         ]
       end
 

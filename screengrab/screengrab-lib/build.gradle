@@ -1,18 +1,6 @@
-buildscript {
-    repositories {
-      mavenCentral()
-    }
-    dependencies {
-    }
+String lookupProperty(Project project, String gradlePropName, String envVarName) {
+    return project.hasProperty(gradlePropName) ? project.property(gradlePropName) : System.getenv()[envVarName]
 }
-
-plugins {
-    id "com.jfrog.bintray" version "1.8.4"
-    id "com.android.library"
-    id "maven-publish"
-    id "signing"
-}
-
 
 Object[] versionInfo = screengrabVersion(rootProject.file('version.properties'))
 String versionNameString = versionInfo[0] as String
@@ -23,8 +11,21 @@ if (propertiesFile.exists()) {
  properties.load(propertiesFile.newDataInputStream())
 }
 
+buildscript {
+    repositories {
+      mavenCentral()
+      jcenter()
+    }
+    dependencies {
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
 android {
-    compileSdkVersion 30
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 18
@@ -32,18 +33,12 @@ android {
 }
 
 dependencies {
-    implementation "androidx.annotation:annotation:1.2.0"
-    implementation 'androidx.test:core:1.3.0'
-    implementation 'androidx.test:runner:1.3.0'
-    implementation 'androidx.test:rules:1.3.0'
-    implementation 'androidx.test.espresso:espresso-core:3.3.0'
-    implementation 'androidx.test.uiautomator:uiautomator:2.2.0'
-    implementation 'com.jraska:falcon:2.2.0'
-}
-gradle.projectsEvaluated {
-    tasks.withType(JavaCompile){
-        options.compilerArgs << "-Xlint:deprecation"
-    }
+    api "androidx.annotation:annotation:1.1.0"
+    api 'androidx.test:runner:1.2.0'
+    api 'androidx.test:rules:1.2.0'
+    api 'androidx.test.espresso:espresso-core:3.2.0'
+    api 'androidx.test.uiautomator:uiautomator:2.2.0'
+    api 'com.jraska:falcon:2.1.1'
 }
 
 afterEvaluate {
@@ -140,13 +135,18 @@ afterEvaluate {
 
 /*
  * Requires the following settings in ~/.gradle/gradle.properties
- * signing.enabled=true
  * signing.keyId=516466E9 # last 8 digits of signing key (can get with `gpg -K`) 
  * signing.password=
  * signing.secretKeyRingFile=/Users/josh/.gnupg/secring.gpg # export with `gpg --keyring secring.gpg --export-secret-keys > ~/.gnupg/secring.gpg`
  */
-if (new Boolean(project.findProperty('signing.enabled'))) {
-    signing {
-        sign publishing.publications
-    }
+signing {
+    sign publishing.publications
+}
+
+task cleanBuildPublishLocal(type: GradleBuild) {
+    tasks = ['clean', 'build', 'publishToMavenLocal']
+}
+
+task cleanBuildPublish(type: GradleBuild) {
+    tasks = ['clean', 'build', 'publish']
 }

@@ -83,7 +83,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :zip,
                                        description: 'Enable compression of the archive',
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: true,
                                        optional: true,
                                        env_name: 'BACKUP_XCARCHIVE_ZIP'),
@@ -94,7 +94,7 @@ module Fastlane
                                        env_name: 'BACKUP_XCARCHIVE_ZIP_FILENAME'),
           FastlaneCore::ConfigItem.new(key: :versioned,
                                        description: 'Create a versioned (date and app version) subfolder where to put the archive',
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: true,
                                        optional: true,
                                        env_name: 'BACKUP_XCARCHIVE_VERSIONED')

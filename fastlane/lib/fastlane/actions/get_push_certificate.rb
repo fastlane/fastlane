@@ -55,7 +55,7 @@ module Fastlane
         @options << FastlaneCore::ConfigItem.new(key: :new_profile,
                                      description: "Block that is called if there is a new profile",
                                      optional: true,
-                                     type: :string_callback)
+                                     is_string: false)
         @options
       end
 

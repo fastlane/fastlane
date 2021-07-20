@@ -57,7 +57,7 @@ module Fastlane
                                        env_name: "CURRENT_BUILD_NUMBER_LIVE",
                                        description: "Query the live version (ready-for-sale)",
                                        optional: true,
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        short_option: "-a",
@@ -82,6 +82,7 @@ module Fastlane
                                        env_name: "APPSTORE_PLATFORM",
                                        description: "The platform to use (optional)",
                                        optional: true,
+                                       is_string: true,
                                        default_value: "ios",
                                        verify_block: proc do |value|
                                          UI.user_error!("The platform can only be ios, osx, or appletvos") unless %('osx', ios', 'appletvos').include?(value)
@@ -90,13 +91,13 @@ module Fastlane
                                        env_name: "INITIAL_BUILD_NUMBER",
                                        description: "sets the build number to given value if no build is in current train",
                                        default_value: 1,
-                                       skip_type_validation: true), # allow Integer, String
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        short_option: "-k",
                                        env_name: "LATEST_TESTFLIGHT_BUILD_NUMBER_TEAM_ID",
                                        description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
-                                       skip_type_validation: true, # allow Integer, String
+                                       is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                        default_value_dynamic: true),

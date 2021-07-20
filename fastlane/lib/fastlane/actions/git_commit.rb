@@ -2,7 +2,11 @@ module Fastlane
   module Actions
     class GitCommitAction < Action
       def self.run(params)
-        paths = params[:path].map(&:shellescape).join(' ')
+        if params[:path].kind_of?(String)
+          paths = params[:path].shellescape
+        else
+          paths = params[:path].map(&:shellescape).join(' ')
+        end
 
         skip_git_hooks = params[:skip_git_hooks] ? '--no-verify' : ''
 
@@ -34,7 +38,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "The file(s) or directory(ies) you want to commit. You can pass an array of multiple file-paths or fileglobs \"*.txt\" to commit all matching files. The files already staged but not specified and untracked files won't be committed",
-                                       type: Array),
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :message,
                                        description: "The commit message that should be used"),
           FastlaneCore::ConfigItem.new(key: :skip_git_hooks,

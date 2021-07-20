@@ -80,14 +80,6 @@ module Spaceship
         resp = client.post_bundle_id_capability(bundle_id_id: id, capability_type: capability_type, settings: settings)
         return resp.to_models.first
       end
-
-      def update_capability(capability_type, enabled: false, settings: [], client: nil)
-        raise "capability_type is required " if capability_type.nil?
-
-        client ||= Spaceship::ConnectAPI
-        resp = client.patch_bundle_id_capability(bundle_id_id: id, seed_id: seed_id, enabled: enabled, capability_type: capability_type, settings: settings)
-        return resp.to_models.first
-      end
     end
   end
 end

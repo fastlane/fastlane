@@ -65,17 +65,18 @@ module Fastlane
                                        description: "The flag whether to show uncommitted changes if the repo is dirty",
                                        optional: true,
                                        default_value: false,
-                                       type: Boolean),
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :show_diff,
                                        env_name: "FL_ENSURE_GIT_STATUS_CLEAN_SHOW_DIFF",
                                        description: "The flag whether to show the git diff if the repo is dirty",
                                        optional: true,
                                        default_value: false,
-                                       type: Boolean),
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :ignored,
                                        env_name: "FL_ENSURE_GIT_STATUS_CLEAN_IGNORED_FILE",
                                        description: "The flag whether to ignore file the git status if the repo is dirty",
-                                       optional: true)
+                                       optional: true,
+                                       is_string: true)
         ]
       end
 

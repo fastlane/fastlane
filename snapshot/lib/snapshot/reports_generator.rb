@@ -128,9 +128,7 @@ module Snapshot
         'Apple TV 4K (at 1080p)' => 'Apple TV 4K (at 1080p)',
         'Apple TV 4K' => 'Apple TV 4K',
         'Apple TV' => 'Apple TV',
-        'Mac' => 'Mac',
-        'Apple Watch Series 5 - 44mm' => 'Apple Watch Series 5 - 44mm',
-        'Apple Watch Series 6 - 44mm' => 'Apple Watch Series 6 - 44mm'
+        'Mac' => 'Mac'
       }
     end
 

@@ -131,24 +131,12 @@ module Fastlane
     # Returns the checked out git branch name or "HEAD" if you're in detached HEAD state
     def self.git_branch_name_using_HEAD
       # Rescues if not a git repo or no commits in a git repo
-      Actions.sh("git rev-parse --abbrev-ref HEAD", log: false).chomp
-    rescue => err
-      UI.verbose("Error getting git branch: #{err.message}")
-      nil
-    end
-
-    # Returns the default git remote branch name
-    def self.git_remote_branch_name(remote_name)
-      # Rescues if not a git repo or no remote repo
-      if remote_name
-        Actions.sh("git remote show #{remote_name} | grep 'HEAD branch' | sed 's/.*: //'", log: false).chomp
-      else
-        # Query git for the current remote head
-        Actions.sh("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false).chomp
+      begin
+        Actions.sh("git rev-parse --abbrev-ref HEAD", log: false).chomp
+      rescue => err
+        UI.verbose("Error getting git branch: #{err.message}")
+        nil
       end
-    rescue => err
-      UI.verbose("Error getting git default remote branch: #{err.message}")
-      nil
     end
 
     private_class_method

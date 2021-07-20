@@ -127,7 +127,7 @@ module Fastlane
                                        description: "Forces the commit, even if other files than the ones containing the version number have been modified",
                                        optional: true,
                                        default_value: false,
-                                       type: Boolean),
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :test_dirty_files,
                                        env_name: "FL_HG_COMMIT_TEST_DIRTY_FILES",
                                        description: "A list of dirty files passed in for testing",

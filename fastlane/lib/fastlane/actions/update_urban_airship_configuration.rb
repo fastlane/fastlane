@@ -58,6 +58,7 @@ module Fastlane
                                        description: "The production app secret"),
           FastlaneCore::ConfigItem.new(key: :detect_provisioning_mode,
                                        env_name: "URBAN_AIRSHIP_DETECT_PROVISIONING_MODE",
+                                       is_string: false,
                                        type: Boolean,
                                        optional: true,
                                        description: "Automatically detect provisioning mode")

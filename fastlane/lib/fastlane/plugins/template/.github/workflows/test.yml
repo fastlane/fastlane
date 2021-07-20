@@ -17,7 +17,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.5
+        ruby-version: 2.4
     - name: Install dependencies
       run: bundle check || bundle install --jobs=4 --retry=3 --path vendor/bundle
     - name: Run tests

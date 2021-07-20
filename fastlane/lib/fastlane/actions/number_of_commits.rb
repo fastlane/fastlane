@@ -42,7 +42,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :all,
                                        env_name: "FL_NUMBER_OF_COMMITS_ALL",
                                        optional: true,
-                                       type: Boolean,
+                                       is_string: false,
                                        description: "Returns number of all commits instead of current branch")
         ]
       end

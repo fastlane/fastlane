@@ -45,14 +45,7 @@ module Snapshot
         # on Mac we will always run on host machine, so should specify only platform
         return ["-destination 'platform=macOS'"] if devices.first.to_s =~ /^Mac/
 
-        case devices.first.to_s
-        when /^Apple TV/
-          os = 'tvOS'
-        when /^Apple Watch/
-          os = 'watchOS'
-        else
-          os = 'iOS'
-        end
+        os = devices.first.to_s =~ /^Apple TV/ ? "tvOS" : "iOS"
 
         os_version = Snapshot.config[:ios_version] || Snapshot::LatestOsVersion.version(os)
 
@@ -76,7 +69,7 @@ module Snapshot
         # Check each device to see if it is an iOS device
         all_ios = devices.map do |device|
           device = device.downcase
-          device.include?('iphone') || device.include?('ipad') || device.include?('ipod')
+          device.include?('iphone') || device.include?('ipad')
         end
         # Return true if all devices are iOS devices
         return true unless all_ios.include?(false)
@@ -85,15 +78,8 @@ module Snapshot
           device = device.downcase
           device.include?('apple tv')
         end
-        # Return true if all devices are tvOS devices
+        # Return true if all devices are iOS devices
         return true unless all_tvos.include?(false)
-
-        all_watchos = devices.map do |device|
-          device = device.downcase
-          device.include?('apple watch')
-        end
-        # Return true if all devices are watchOS devices
-        return true unless all_watchos.include?(false)
 
         # There should only be more than 1 device type if
         # it is iOS or tvOS, therefore, if there is more than 1

@@ -91,6 +91,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :notes,
                                      env_name: "TRYOUTS_NOTES",
                                      description: "Release notes",
+                                     is_string: true,
                                      optional: true),
           FastlaneCore::ConfigItem.new(key: :notes_path,
                                      env_name: "TRYOUTS_NOTES_PATH",
@@ -102,7 +103,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :notify,
                                      env_name: "TRYOUTS_NOTIFY",
                                      description: "Notify testers? 0 for no",
-                                     type: Integer,
+                                     is_string: false,
                                      default_value: 1),
           FastlaneCore::ConfigItem.new(key: :status,
                                      env_name: "TRYOUTS_STATUS",
@@ -111,7 +112,7 @@ module Fastlane
                                        available_options = ["1", "2"]
                                        UI.user_error!("'#{value}' is not a valid 'status' value. Available options are #{available_options.join(', ')}") unless available_options.include?(value.to_s)
                                      end,
-                                     type: Integer,
+                                     is_string: false,
                                      default_value: 2)
         ]
       end

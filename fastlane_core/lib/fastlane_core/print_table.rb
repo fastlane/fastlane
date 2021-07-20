@@ -36,11 +36,9 @@ module FastlaneCore
 
         params[:title] = title.green if title
 
-        unless FastlaneCore::Env.truthy?("FASTLANE_SKIP_ALL_LANE_SUMMARIES")
-          puts("")
-          puts(Terminal::Table.new(params))
-          puts("")
-        end
+        puts("")
+        puts(Terminal::Table.new(params))
+        puts("")
 
         return params
       end

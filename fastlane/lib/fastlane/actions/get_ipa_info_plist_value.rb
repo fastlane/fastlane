@@ -40,6 +40,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_GET_IPA_INFO_PLIST_VALUE_IPA",
                                        description: "Path to IPA",
+                                       is_string: true,
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        default_value_dynamic: true)
         ]

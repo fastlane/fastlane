@@ -50,7 +50,7 @@ aliases:
       command: | # see https://circleci.com/docs/2.0/testing-ios/#using-ruby
         if [ "${_RUBY_VERSION}" = "3.0" ]; then
           # See https://circleci.com/docs/2.0/testing-ios/#supported-xcode-versions
-          echo "Ruby 3.0 is not installed in macOS image based on Xcode 12.5.1"
+          echo "Ruby 3.0 is not installed in macOS image based on Xcode 12.4.0"
           ruby-install ruby 3.0
         fi
         echo "ruby-${_RUBY_VERSION}" > ~/.ruby-version
@@ -258,21 +258,21 @@ workflows:
   build:
     jobs:
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 11.7.0, Ruby 2.5)'
-          xcode_version: '11.7.0'
+          name: 'Execute tests on macOS (Xcode 10.2.1, Ruby 2.5)'
+          xcode_version: '10.2.1'
           ruby_version: '2.5'
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 11.7.0, Ruby 2.6)'
-          xcode_version: '11.7.0'
+          name: 'Execute tests on macOS (Xcode 11.4.0, Ruby 2.6)'
+          xcode_version: '11.4.0'
           ruby_version: '2.6'
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 12.5.1, Ruby 2.7)'
-          xcode_version: '12.5.1'
+          name: 'Execute tests on macOS (Xcode 12.4.0, Ruby 2.7)'
+          xcode_version: '12.4.0'
           ruby_version: '2.7'
           ruby_opt: -W:deprecated
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 12.5.1, Ruby 3.0)'
-          xcode_version: '12.5.1'
+          name: 'Execute tests on macOS (Xcode 12.4.0, Ruby 3.0)'
+          xcode_version: '12.4.0'
           ruby_version: '3.0'
           ruby_opt: -W:deprecated
       - tests_ubuntu:
@@ -280,7 +280,7 @@ workflows:
           ruby_version: 'fastlanetools/ci:0.3.0'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
-          xcode_version: '12.5.1'
+          xcode_version: '12.4.0'
           ruby_version: '2.7'
       - validate_documentation:
           name: 'Validate Documentation'

@@ -105,46 +105,71 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :platform,
-                                       env_name: 'FL_APPIUM_PLATFORM',
-                                       description: 'Appium platform name'),
-          FastlaneCore::ConfigItem.new(key: :spec_path,
-                                       env_name: 'FL_APPIUM_SPEC_PATH',
-                                       description: 'Path to Appium spec directory'),
-          FastlaneCore::ConfigItem.new(key: :app_path,
-                                       env_name: 'FL_APPIUM_APP_FILE_PATH',
-                                       description: 'Path to Appium target app file'),
-          FastlaneCore::ConfigItem.new(key: :invoke_appium_server,
-                                       env_name: 'FL_APPIUM_INVOKE_APPIUM_SERVER',
-                                       description: 'Use local Appium server with invoke automatically',
-                                       type: Boolean,
-                                       default_value: true,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :host,
-                                       env_name: 'FL_APPIUM_HOST',
-                                       description: 'Hostname of Appium server',
-                                       default_value: '0.0.0.0',
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :port,
-                                       env_name: 'FL_APPIUM_PORT',
-                                       description: 'HTTP port of Appium server',
-                                       type: Integer,
-                                       default_value: 4723,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :appium_path,
-                                       env_name: 'FL_APPIUM_EXECUTABLE_PATH',
-                                       description: 'Path to Appium executable',
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :caps,
-                                       env_name: 'FL_APPIUM_CAPS',
-                                       description: 'Hash of caps for Appium::Driver',
-                                       type: Hash,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :appium_lib,
-                                       env_name: 'FL_APPIUM_LIB',
-                                       description: 'Hash of appium_lib for Appium::Driver',
-                                       type: Hash,
-                                       optional: true)
+          FastlaneCore::ConfigItem.new(
+            key: :platform,
+            env_name: 'FL_APPIUM_PLATFORM',
+            description: 'Appium platform name',
+            is_string: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :spec_path,
+            env_name: 'FL_APPIUM_SPEC_PATH',
+            description: 'Path to Appium spec directory',
+            is_string: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :app_path,
+            env_name: 'FL_APPIUM_APP_FILE_PATH',
+            description: 'Path to Appium target app file',
+            is_string: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :invoke_appium_server,
+            env_name: 'FL_APPIUM_INVOKE_APPIUM_SERVER',
+            description: 'Use local Appium server with invoke automatically',
+            is_string: false,
+            default_value: true,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :host,
+            env_name: 'FL_APPIUM_HOST',
+            description: 'Hostname of Appium server',
+            is_string: true,
+            default_value: '0.0.0.0',
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :port,
+            env_name: 'FL_APPIUM_PORT',
+            description: 'HTTP port of Appium server',
+            is_string: false,
+            default_value: 4723,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :appium_path,
+            env_name: 'FL_APPIUM_EXECUTABLE_PATH',
+            description: 'Path to Appium executable',
+            is_string: true,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :caps,
+            env_name: 'FL_APPIUM_CAPS',
+            description: 'Hash of caps for Appium::Driver',
+            is_string: false,
+            type: Hash,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :appium_lib,
+            env_name: 'FL_APPIUM_LIB',
+            description: 'Hash of appium_lib for Appium::Driver',
+            is_string: false,
+            type: Hash,
+            optional: true
+          )
         ]
       end
 

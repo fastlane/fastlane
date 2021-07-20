@@ -27,7 +27,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_HG_PUSH_FORCE",
                                        description: "Force push to remote",
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :destination,
                                        env_name: "FL_HG_PUSH_DESTINATION",

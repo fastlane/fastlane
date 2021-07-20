@@ -253,7 +253,7 @@ module Fastlane
                                        env_name: "DOWNLOAD_DSYMS_TEAM_ID",
                                        description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
-                                       skip_type_validation: true, # as we also allow integers, which we convert to strings anyway
+                                       is_string: false, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                        default_value_dynamic: true,
@@ -286,7 +286,7 @@ module Fastlane
                                        env_name: "DOWNLOAD_DSYMS_BUILD_NUMBER",
                                        description: "The app build_number for dSYMs you wish to download",
                                        optional: true,
-                                       skip_type_validation: true), # as we also allow integers, which we convert to strings anyway
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :min_version,
                                        short_option: "-m",
                                        env_name: "DOWNLOAD_DSYMS_MIN_VERSION",
@@ -296,7 +296,8 @@ module Fastlane
                                        short_option: "-d",
                                        env_name: "DOWNLOAD_DSYMS_AFTER_UPLOADED_DATE",
                                        description: "The uploaded date after which you wish to download dSYMs",
-                                       optional: true),
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :output_directory,
                                        short_option: "-s",
                                        env_name: "DOWNLOAD_DSYMS_OUTPUT_DIRECTORY",

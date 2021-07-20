@@ -1,18 +1,15 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest package="tools.fastlane.localetester"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Allows storing screenshots on external storage, where it can be accessed by ADB -->
+    <uses-feature android:name="tools.fastlane.screengrab.cleanstatusbar"/>
+
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <!-- Allows changing locales -->
-    <uses-permission
-        android:name="android.permission.CHANGE_CONFIGURATION"
-        tools:ignore="ProtectedPermissions" />
-
-    <!-- Allows changing SystemUI demo mode -->
-    <uses-permission
-        android:name="android.permission.DUMP"
-        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.DUMP" tools:ignore="ProtectedPermissions" />
 
 </manifest>

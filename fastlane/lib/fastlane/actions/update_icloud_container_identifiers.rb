@@ -61,7 +61,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :icloud_container_identifiers,
                                        env_name: "FL_UPDATE_ICLOUD_CONTAINER_IDENTIFIERS_IDENTIFIERS",
                                        description: "An Array of unique identifiers for the iCloud containers. Eg. ['iCloud.com.test.testapp']",
-                                       type: Array)
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The parameter icloud_container_identifiers needs to be an Array.") unless value.kind_of?(Array)
+                                       end)
         ]
       end
 

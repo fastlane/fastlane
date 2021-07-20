@@ -12,24 +12,11 @@
 <details>
 <summary class="plugin-actions">Provided actions</summary>
 
-<table>
-  <theader>
-    <tr>
-      <th>Name</th>
-      <th>Category</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
+ Name | Category | Description
+------|----------|------------
 <%- @plugin.data[:actions].each do |action| -%>
-    <tr>
-      <td><strong><%= action.name %></strong></td>
-      <td><%= action.category || "-" %></td>
-      <td><%= action.description || action.details || "-" %></td>
-    </tr>
+  **<%= action.name %>** | <%= action.category || "-" %> | <%= action.description || action.details || "-" %>
 <%- end -%>
-</tbody>
-</table>
 
 </details>
 <% end %>
@@ -37,25 +24,12 @@
 <details>
 <summary class="score-details">Score details</summary>
 
-<table>
-  <theader>
-    <tr>
-      <th>Metric</th>
-      <th>Points</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
+ Metric | Points | Description
+--------|--------|-------------
 <%- @plugin.ratings.each do |current_rating| -%>
-    <tr>
-      <td><%= current_rating.key %></td>
-      <td><%= current_rating.value %></td>
-      <td><%= current_rating.description %></td>
-    </tr>
+<%= current_rating.key %> | <b><%= current_rating.value %></b> | <%= current_rating.description %>
 <%- end -%>
-</tbody>
-</table>
-
+ 
 </details>
 
 <p>

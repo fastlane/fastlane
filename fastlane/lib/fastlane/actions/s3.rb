@@ -52,7 +52,7 @@ module Fastlane
                                        description: "Upload relevant metadata for this build",
                                        optional: true,
                                        default_value: true,
-                                       type: Boolean),
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :plist_template_path,
                                        env_name: "",
                                        description: "plist template path",

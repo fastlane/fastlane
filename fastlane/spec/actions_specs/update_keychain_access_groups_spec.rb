@@ -32,6 +32,17 @@ describe Fastlane do
         end.to raise_error("Could not find entitlements file at path 'abc.#{File.join(test_path, entitlements_path)}'")
       end
 
+      it "throws an error when the identifiers are not in an array" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            update_keychain_access_groups(
+            entitlements_file: '#{File.join(test_path, entitlements_path)}',
+            identifiers: '#{new_keychain_access_groups}'
+          )
+          end").runner.execute(:test)
+        end.to raise_error('The parameter identifiers need to be an Array.')
+      end
+
       it "throws an error when the entitlements file is not parsable" do
         File.write(File.join(test_path, entitlements_path), '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>keychain-access-groups</key><array><string>keychain.access.gorups.</array></dict></plist>')
 

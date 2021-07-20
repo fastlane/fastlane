@@ -58,43 +58,15 @@ describe Pilot do
       end
 
       context "when passing 'should_login' value as FALSE" do
-        context "when input options has no 'api_key' or 'api_key_path' param" do
-          before(:each) do
-            expect(fake_manager).not_to receive(:login)
-          end
-
-          it "sets the 'config' variable value and doesn't call login" do
-            options = {}
-            fake_manager.start(options, should_login: false)
-
-            expect(fake_manager.instance_variable_get(:@config)).to eq(options)
-          end
+        before(:each) do
+          expect(fake_manager).not_to receive(:login)
         end
 
-        context "when input options has 'api_key' param" do
-          before(:each) do
-            expect(fake_manager).to receive(:login)
-          end
+        it "sets the 'config' variable value and doesn't call login" do
+          options = {}
+          fake_manager.start(options, should_login: false)
 
-          it "sets the 'config' variable value and calls login for appstore connect api token" do
-            options = { api_key: "fake_api_key" }
-            fake_manager.start(options, should_login: false)
-
-            expect(fake_manager.instance_variable_get(:@config)).to eq(options)
-          end
-        end
-
-        context "when input options has 'api_key_path' param" do
-          before(:each) do
-            expect(fake_manager).to receive(:login)
-          end
-
-          it "sets the 'config' variable value and calls login for appstore connect api token" do
-            options = { api_key_path: "fake api_key_path" }
-            fake_manager.start(options, should_login: false)
-
-            expect(fake_manager.instance_variable_get(:@config)).to eq(options)
-          end
+          expect(fake_manager.instance_variable_get(:@config)).to eq(options)
         end
       end
     end

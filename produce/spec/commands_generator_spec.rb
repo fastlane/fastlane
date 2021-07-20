@@ -37,12 +37,12 @@ describe Produce::CommandsGenerator do
 
   describe ":enable_services option handling" do
     it "can use the username short flag from tool options" do
-      stub_commander_runner_args(['enable_services', '-u', 'me@it.com', '--health-kit'])
+      stub_commander_runner_args(['enable_services', '-u', 'me@it.com', '--healthkit'])
 
       expected_options = FastlaneCore::Configuration.create(available_options, { username: 'me@it.com' })
 
       expect(Produce::Service).to receive(:enable) do |options, args|
-        expect(options.health_kit).to be(true)
+        expect(options.healthkit).to be(true)
         expect(args).to eq([])
       end
 
@@ -52,12 +52,12 @@ describe Produce::CommandsGenerator do
     end
 
     it "can use the app_identifier flag from tool options" do
-      stub_commander_runner_args(['enable_services', '--app_identifier', 'your.awesome.App', '--game-center=ios'])
+      stub_commander_runner_args(['enable_services', '--app_identifier', 'your.awesome.App', '--game-center'])
 
       expected_options = FastlaneCore::Configuration.create(available_options, { app_identifier: 'your.awesome.App' })
 
       expect(Produce::Service).to receive(:enable) do |options, args|
-        expect(options.game_center).to eq("ios")
+        expect(options.game_center).to be(true)
         expect(args).to eq([])
       end
 
@@ -69,12 +69,12 @@ describe Produce::CommandsGenerator do
 
   describe ":disable_services option handling" do
     it "can use the username short flag from tool options" do
-      stub_commander_runner_args(['disable_services', '-u', 'me@it.com', '--health-kit'])
+      stub_commander_runner_args(['disable_services', '-u', 'me@it.com', '--healthkit'])
 
       expected_options = FastlaneCore::Configuration.create(available_options, { username: 'me@it.com' })
 
       expect(Produce::Service).to receive(:disable) do |options, args|
-        expect(options.health_kit).to be(true)
+        expect(options.healthkit).to be(true)
         expect(args).to eq([])
       end
 

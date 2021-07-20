@@ -92,11 +92,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_SETUP_CI_FORCE",
                                        description: "Force setup, even if not executed by CI",
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :provider,
                                        env_name: "FL_SETUP_CI_PROVIDER",
                                        description: "CI provider. If none is set, the provider is detected automatically",
+                                       is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          value = value.to_s

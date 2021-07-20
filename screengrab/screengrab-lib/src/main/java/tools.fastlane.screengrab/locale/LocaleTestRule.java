@@ -6,32 +6,18 @@ import org.junit.runners.model.Statement;
 
 import java.util.Locale;
 
-import tools.fastlane.screengrab.Screengrab;
-
 public class LocaleTestRule implements TestRule {
 
     private final Locale testLocale;
-    private final String testLocaleString;
+    private final Locale endingLocale;
 
     public LocaleTestRule() {
-        this(LocaleUtil.getTestLocale());
+        this(LocaleUtil.getTestLocale(), LocaleUtil.getEndingLocale());
     }
 
-    public LocaleTestRule(String testLocale) {
-        this.testLocale = LocaleUtil.localeFromString(testLocale);
-        this.testLocaleString = testLocale;
-    }
-
-    @Deprecated
-    public LocaleTestRule(Locale testLocale) {
-        StringBuilder sb = new StringBuilder(testLocale.getLanguage());
-        String localeCountry = testLocale.getCountry();
-
-        if (localeCountry.length() != 0) {
-            sb.append("-").append(localeCountry);
-        }
-        this.testLocaleString = sb.toString();
+    public LocaleTestRule(Locale testLocale, Locale endingLocale) {
         this.testLocale = testLocale;
+        this.endingLocale = endingLocale;
     }
 
     @Override
@@ -39,16 +25,14 @@ public class LocaleTestRule implements TestRule {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                LocaleListCompat original = null;
                 try {
                     if (testLocale != null) {
-                        original = LocaleUtil.changeDeviceLocaleTo(new LocaleListCompat(testLocale));
-                        Screengrab.setLocale(testLocaleString);
+                        LocaleUtil.changeDeviceLocaleTo(testLocale);
                     }
                     base.evaluate();
                 } finally {
-                    if (original != null) {
-                        LocaleUtil.changeDeviceLocaleTo(original);
+                    if (endingLocale != null) {
+                        LocaleUtil.changeDeviceLocaleTo(endingLocale);
                     }
                 }
             }

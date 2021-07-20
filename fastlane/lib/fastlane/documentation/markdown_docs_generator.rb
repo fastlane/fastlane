@@ -175,7 +175,7 @@ module Fastlane
       mkdocs_yml_path = File.join(target_path, "mkdocs.yml")
       raise "Could not find mkdocs.yml in #{target_path}, make sure to point to the fastlane/docs repo" unless File.exist?(mkdocs_yml_path)
       mkdocs_yml = YAML.load_file(mkdocs_yml_path)
-      hidden_actions_array = mkdocs_yml["nav"].find { |p| !p["_Actions"].nil? }
+      hidden_actions_array = mkdocs_yml["pages"].find { |p| !p["_Actions"].nil? }
       hidden_actions_array["_Actions"] = all_actions_ref_yml
       File.write(mkdocs_yml_path, mkdocs_yml.to_yaml)
 

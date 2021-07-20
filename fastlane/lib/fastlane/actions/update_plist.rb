@@ -50,7 +50,7 @@ module Fastlane
                                        description: "Path to plist file",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :block,
-                                       type: :string_callback,
+                                       is_string: false,
                                        description: 'A block to process plist with custom logic')
 
         ]

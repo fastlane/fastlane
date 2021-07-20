@@ -51,22 +51,33 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :path,
-                                       env_name: 'FL_UPDATE_URL_SCHEMES_PATH',
-                                       description: 'The Plist file\'s path',
-                                       optional: false,
-                                       verify_block: proc do |path|
-                                         UI.user_error!("Could not find plist at path '#{path}'") unless File.exist?(path)
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :url_schemes,
-                                       env_name: "FL_UPDATE_URL_SCHEMES_SCHEMES",
-                                       description: 'The new URL schemes',
-                                       type: Array,
-                                       optional: true),
+          FastlaneCore::ConfigItem.new(
+            key: :path,
+            env_name: 'FL_UPDATE_URL_SCHEMES_PATH',
+            description: 'The Plist file\'s path',
+            is_string: true,
+            optional: false,
+            verify_block: proc do |path|
+              UI.user_error!("Could not find plist at path '#{path}'") unless File.exist?(path)
+            end
+          ),
+
+          FastlaneCore::ConfigItem.new(
+            key: :url_schemes,
+            env_name: "FL_UPDATE_URL_SCHEMES_SCHEMES",
+            description: 'The new URL schemes',
+            is_string: false,
+            optional: true,
+            verify_block: proc do |url_schemes|
+              string = "The URL schemes must be an array of strings, got '#{url_schemes}'."
+              verify_schemes!(url_schemes, string)
+            end
+          ),
+
           FastlaneCore::ConfigItem.new(key: :update_url_schemes,
-                                       description: "Block that is called to update schemes with current schemes passed in as parameter",
-                                       optional: true,
-                                       type: :string_callback)
+            description: "Block that is called to update schemes with current schemes passed in as parameter",
+            optional: true,
+            is_string: false)
         ]
       end
 

@@ -5,7 +5,7 @@ public protocol ScreengrabfileProtocol: class {
     /// Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx
     var androidHome: String? { get }
 
-    /// **DEPRECATED!** The Android build tools version to use, e.g. '23.0.2'
+    /// The Android build tools version to use, e.g. '23.0.2'
     var buildToolsVersion: String? { get }
 
     /// A list of locales which should be used
@@ -38,10 +38,10 @@ public protocol ScreengrabfileProtocol: class {
     /// The fully qualified class name of your test instrumentation runner
     var testInstrumentationRunner: String { get }
 
-    /// **DEPRECATED!** Return the device to this locale after running tests
+    /// Return the device to this locale after running tests
     var endingLocale: String { get }
 
-    /// **DEPRECATED!** Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
+    /// Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
     var useAdbRoot: Bool { get }
 
     /// The path to the APK for the app under test
@@ -96,4 +96,4 @@ public extension ScreengrabfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.73]
+// FastlaneRunnerAPIVersion [0.9.70]

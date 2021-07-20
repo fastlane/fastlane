@@ -41,7 +41,7 @@ module Fastlane
                                        env_name: "USE_HG_REVISION_NUMBER",
                                        description: "Use hg revision number instead of hash (ignored for non-hg repos)",
                                        optional: true,
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                        env_name: "XCODEPROJ_PATH",

@@ -22,6 +22,7 @@ module Fastlane
                                        env_name: "FL_CLEAN_COCOAPODS_CACHE_DEVELOPMENT",
                                        description: "Pod name to be removed from cache",
                                        optional: true,
+                                       is_string: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("You must specify pod name which should be removed from cache") if value.to_s.empty?
                                        end)

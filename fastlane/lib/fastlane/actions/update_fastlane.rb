@@ -122,12 +122,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :no_update,
                                        env_name: "FL_NO_UPDATE",
                                        description: "Don't update during this run. This is used internally",
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :nightly,
                                        env_name: "FL_UPDATE_FASTLANE_NIGHTLY",
                                        description: "Opt-in to install and use nightly fastlane builds",
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: false,
                                        deprecated: "Nightly builds are no longer being made available")
         ]

@@ -48,7 +48,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :enable_code_coverage,
                                        env_name: "FL_SPM_ENABLE_CODE_COVERAGE",
                                        description: "Enables code coverage for the generated Xcode project when using the 'generate-xcodeproj' and the 'test' command",
-                                       type: Boolean,
+                                       is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :build_path,
                                        env_name: "FL_SPM_BUILD_PATH",
@@ -74,7 +74,7 @@ module Fastlane
                                        env_name: "FL_SPM_DISABLE_SANDBOX",
                                        description: "Disable using the sandbox when executing subprocesses",
                                        optional: true,
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :xcpretty_output,
                                        env_name: "FL_SPM_XCPRETTY_OUTPUT",
@@ -92,7 +92,7 @@ module Fastlane
                                        short_option: "-v",
                                        env_name: "FL_SPM_VERBOSE",
                                        description: "Increase verbosity of informational output",
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: false)
         ]
       end

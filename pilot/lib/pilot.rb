@@ -1,3 +1,4 @@
+require 'pilot/features'
 require "pilot/options"
 require "pilot/manager"
 require "pilot/build_manager"

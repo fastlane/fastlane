@@ -3,7 +3,7 @@ module Fastlane
     class SayAction < Action
       def self.run(params)
         text = params[:text]
-        text = text.join(' ')
+        text = text.join(' ') if text.kind_of?(Array)
         text = text.tr("'", '"')
 
         if params[:mute]
@@ -23,11 +23,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :text,
                                        description: 'Text to be spoken out loud (as string or array of strings)',
                                        optional: false,
-                                       type: Array),
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :mute,
                                        env_name: "SAY_MUTE",
                                        description: 'If say should be muted with text printed out',
                                        optional: false,
+                                       is_string: false,
                                        type: Boolean,
                                        default_value: false)
         ]

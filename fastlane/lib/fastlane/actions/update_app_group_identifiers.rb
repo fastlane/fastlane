@@ -53,7 +53,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :app_group_identifiers,
                                        env_name: "FL_UPDATE_APP_GROUP_IDENTIFIER_APP_GROUP_IDENTIFIERS",
                                        description: "An Array of unique identifiers for the app groups. Eg. ['group.com.test.testapp']",
-                                       type: Array)
+                                       is_string: false,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The parameter app_group_identifiers need to be an Array.") unless value.kind_of?(Array)
+                                       end)
         ]
       end
 

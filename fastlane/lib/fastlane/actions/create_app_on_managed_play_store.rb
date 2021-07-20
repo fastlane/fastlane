@@ -52,85 +52,91 @@ module Fastlane
       def self.available_options
         [
           # Authorization
-          FastlaneCore::ConfigItem.new(key: :json_key,
-                                       env_name: "SUPPLY_JSON_KEY",
-                                       short_option: "-j",
-                                       conflicting_options: [:json_key_data],
-                                       optional: true, # optional until it is possible specify either json_key OR json_key_data are required
-                                       description: "The path to a file containing service account JSON, used to authenticate with Google",
-                                       code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Could not find service account json file at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
-                                         UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
-                                       end),
-          FastlaneCore::ConfigItem.new(key: :json_key_data,
-                                       env_name: "SUPPLY_JSON_KEY_DATA",
-                                       short_option: "-c",
-                                       conflicting_options: [:json_key],
-                                       optional: true,
-                                       description: "The raw service account JSON data used to authenticate with Google",
-                                       code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         begin
-                                           JSON.parse(value)
-                                         rescue JSON::ParserError
-                                           UI.user_error!("Could not parse service account json: JSON::ParseError")
-                                         end
-                                       end),
+          FastlaneCore::ConfigItem.new(
+            key: :json_key,
+            env_name: "SUPPLY_JSON_KEY",
+            short_option: "-j",
+            conflicting_options: [:json_key_data],
+            optional: true, # optional until it is possible specify either json_key OR json_key_data are required
+            description: "The path to a file containing service account JSON, used to authenticate with Google",
+            code_gen_sensitive: true,
+            default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
+            default_value_dynamic: true,
+            verify_block: proc do |value|
+              UI.user_error!("Could not find service account json file at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
+              UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
+            end
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :json_key_data,
+            env_name: "SUPPLY_JSON_KEY_DATA",
+            short_option: "-c",
+            conflicting_options: [:json_key],
+            optional: true,
+            description: "The raw service account JSON data used to authenticate with Google",
+            code_gen_sensitive: true,
+            default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
+            default_value_dynamic: true,
+            verify_block: proc do |value|
+              begin
+                JSON.parse(value)
+              rescue JSON::ParserError
+                UI.user_error!("Could not parse service account json: JSON::ParseError")
+              end
+            end
+          ),
           FastlaneCore::ConfigItem.new(key: :developer_account_id,
-                                       short_option: "-k",
-                                       env_name: "SUPPLY_DEVELOPER_ACCOUNT_ID",
-                                       description: "The ID of your Google Play Console account. Can be obtained from the URL when you log in (`https://play.google.com/apps/publish/?account=...` or when you 'Obtain private app publishing rights' (https://developers.google.com/android/work/play/custom-app-api/get-started#retrieve_the_developer_account_id)",
-                                       code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:developer_account_id),
-                                       default_value_dynamic: true),
+            short_option: "-k",
+            env_name: "SUPPLY_DEVELOPER_ACCOUNT_ID",
+            description: "The ID of your Google Play Console account. Can be obtained from the URL when you log in (`https://play.google.com/apps/publish/?account=...` or when you 'Obtain private app publishing rights' (https://developers.google.com/android/work/play/custom-app-api/get-started#retrieve_the_developer_account_id)",
+            code_gen_sensitive: true,
+            default_value: CredentialsManager::AppfileConfig.try_fetch_value(:developer_account_id),
+            default_value_dynamic: true),
           # APK
-          FastlaneCore::ConfigItem.new(key: :apk,
-                                       env_name: "SUPPLY_APK",
-                                       description: "Path to the APK file to upload",
-                                       short_option: "-b",
-                                       code_gen_sensitive: true,
-                                       default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-release.apk")].last,
-                                       default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("No value found for 'apk'") if value.to_s.length == 0
-                                         UI.user_error!("Could not find apk file at path '#{value}'") unless File.exist?(value)
-                                         UI.user_error!("apk file is not an apk") unless value.end_with?('.apk')
-                                       end),
+          FastlaneCore::ConfigItem.new(
+            key: :apk,
+            env_name: "SUPPLY_APK",
+            description: "Path to the APK file to upload",
+            short_option: "-b",
+            code_gen_sensitive: true,
+            default_value: Dir["*.apk"].last || Dir[File.join("app", "build", "outputs", "apk", "app-release.apk")].last,
+            default_value_dynamic: true,
+            verify_block: proc do |value|
+              UI.user_error!("No value found for 'apk'") if value.to_s.length == 0
+              UI.user_error!("Could not find apk file at path '#{value}'") unless File.exist?(value)
+              UI.user_error!("apk file is not an apk") unless value.end_with?('.apk')
+            end
+          ),
           # Title
           FastlaneCore::ConfigItem.new(key: :app_title,
-                                       env_name: "SUPPLY_APP_TITLE",
-                                       short_option: "-q",
-                                       description: "App Title"),
+            env_name: "SUPPLY_APP_TITLE",
+            short_option: "-q",
+            description: "App Title"),
           # Language
           FastlaneCore::ConfigItem.new(key: :language,
-                                       short_option: "-m",
-                                       env_name: "SUPPLY_LANGUAGE",
-                                       description: "Default app language (e.g. 'en_US')",
-                                       default_value: "en_US",
-                                       verify_block: proc do |language|
-                                         unless Supply::Languages::ALL_LANGUAGES.include?(language)
-                                           UI.user_error!("Please enter one of the available languages: #{Supply::Languages::ALL_LANGUAGES}")
-                                         end
-                                       end),
+            short_option: "-m",
+            env_name: "SUPPLY_LANGUAGE",
+            description: "Default app language (e.g. 'en_US')",
+            default_value: "en_US",
+            verify_block: proc do |language|
+              unless Supply::Languages::ALL_LANGUAGES.include?(language)
+                UI.user_error!("Please enter one of the available languages: #{Supply::Languages::ALL_LANGUAGES}")
+              end
+            end),
           # Google Play API
           FastlaneCore::ConfigItem.new(key: :root_url,
-                                       env_name: "SUPPLY_ROOT_URL",
-                                       description: "Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/",
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Could not parse URL '#{value}'") unless value =~ URI.regexp
-                                       end),
+            env_name: "SUPPLY_ROOT_URL",
+            description: "Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/",
+            optional: true,
+            verify_block: proc do |value|
+              UI.user_error!("Could not parse URL '#{value}'") unless value =~ URI.regexp
+            end),
           FastlaneCore::ConfigItem.new(key: :timeout,
-                                       env_name: "SUPPLY_TIMEOUT",
-                                       optional: true,
-                                       description: "Timeout for read, open, and send (in seconds)",
-                                       type: Integer,
-                                       default_value: 300)
+            env_name: "SUPPLY_TIMEOUT",
+            optional: true,
+            description: "Timeout for read, open, and send (in seconds)",
+            type: Integer,
+            default_value: 300)
         ]
       end
 

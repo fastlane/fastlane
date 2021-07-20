@@ -29,19 +29,27 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :set,
-                                       env_name: 'FL_ENVIRONMENT_VARIABLE_SET',
-                                       description: 'Set the environment variables named',
-                                       optional: true,
-                                       type: Hash),
-          FastlaneCore::ConfigItem.new(key: :get,
-                                       env_name: 'FL_ENVIRONMENT_VARIABLE_GET',
-                                       description: 'Get the environment variable named',
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :remove,
-                                       env_name: 'FL_ENVIRONMENT_VARIABLE_REMOVE',
-                                       description: 'Remove the environment variable named',
-                                       optional: true)
+          FastlaneCore::ConfigItem.new(
+            key: :set,
+            env_name: 'FL_ENVIRONMENT_VARIABLE_SET',
+            description: 'Set the environment variables named',
+            optional: true,
+            type: Hash
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :get,
+            env_name: 'FL_ENVIRONMENT_VARIABLE_GET',
+            description: 'Get the environment variable named',
+            optional: true,
+            is_string: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :remove,
+            env_name: 'FL_ENVIRONMENT_VARIABLE_REMOVE',
+            description: 'Remove the environment variable named',
+            optional: true,
+            is_string: true
+          )
         ]
       end
 

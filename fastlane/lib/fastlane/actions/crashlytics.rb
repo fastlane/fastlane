@@ -2,6 +2,9 @@ module Fastlane
   module Actions
     class CrashlyticsAction < Action
       def self.run(params)
+        params[:groups] = params[:groups].join(",") if params[:groups].kind_of?(Array)
+        params[:emails] = params[:emails].join(",") if params[:emails].kind_of?(Array)
+
         params.values # to validate all inputs before looking for the ipa/apk
         tempfiles = []
 
@@ -130,27 +133,28 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :notes,
                                        env_name: "CRASHLYTICS_NOTES",
                                        description: "The release notes as string - uses :notes_path under the hood",
-                                       optional: true),
+                                       optional: true,
+                                       is_string: true),
           FastlaneCore::ConfigItem.new(key: :groups,
                                        env_name: "CRASHLYTICS_GROUPS",
                                        description: "The groups used for distribution, separated by commas",
-                                       type: Array,
-                                       optional: true),
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :emails,
                                        env_name: "CRASHLYTICS_EMAILS",
                                        description: "Pass email addresses of testers, separated by commas",
-                                       type: Array,
-                                       optional: true),
+                                       optional: true,
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :notifications,
                                        env_name: "CRASHLYTICS_NOTIFICATIONS",
                                        description: "Crashlytics notification option (true/false)",
                                        default_value: true,
-                                       type: Boolean),
+                                       is_string: false),
           FastlaneCore::ConfigItem.new(key: :debug,
                                        env_name: "CRASHLYTICS_DEBUG",
                                        description: "Crashlytics debug option (true/false)",
                                        default_value: false,
-                                       type: Boolean)
+                                       is_string: false)
 
         ]
       end

@@ -19,14 +19,20 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :config,
-                                       env_name: 'FL_JAZZY_CONFIG',
-                                       description: 'Path to jazzy config file',
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :module_version,
-                                       env_name: 'FL_JAZZY_MODULE_VERSION',
-                                       description: 'Version string to use as part of the the default docs title and inside the docset',
-                                       optional: true)
+          FastlaneCore::ConfigItem.new(
+            key: :config,
+            env_name: 'FL_JAZZY_CONFIG',
+            description: 'Path to jazzy config file',
+            is_string: true,
+            optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :module_version,
+            env_name: 'FL_JAZZY_MODULE_VERSION',
+            description: 'Version string to use as part of the the default docs title and inside the docset',
+            is_string: true,
+            optional: true
+          )
         ]
       end
 

@@ -243,7 +243,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :integration_number,
                                        env_name: "FL_XCODE_SERVER_GET_ASSETS_INTEGRATION_NUMBER",
                                        description: "Optionally you can override which integration's assets should be downloaded. If not provided, the latest integration is used",
-                                       type: Integer,
+                                       is_string: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "FL_XCODE_SERVER_GET_ASSETS_USERNAME",
@@ -265,13 +265,13 @@ module Fastlane
                                        env_name: "FL_XCODE_SERVER_GET_ASSETS_KEEP_ALL_ASSETS",
                                        description: "Whether to keep all assets or let the script delete everything except for the .xcarchive",
                                        optional: true,
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :trust_self_signed_certs,
                                        env_name: "FL_XCODE_SERVER_GET_ASSETS_TRUST_SELF_SIGNED_CERTS",
                                        description: "Whether to trust self-signed certs on your Xcode Server",
                                        optional: true,
-                                       type: Boolean,
+                                       is_string: false,
                                        default_value: true)
         ]
       end
