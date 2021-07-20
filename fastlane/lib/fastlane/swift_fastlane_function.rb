@@ -31,7 +31,7 @@ module Fastlane
 
       # rubocop:disable Layout/LineLength
       # class instance?
-      @reserved_words = %w[associativity break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func guard if in infix init inout internal lazy let mutating nil operator override precedence private public repeat required return self static struct subscript super switch throws true try var weak where while willSet].to_set
+      @reserved_words = %w[actor associativity async await break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func guard if in infix init inout internal lazy let mutating nil operator override precedence private public repeat required return self static struct subscript super switch throws true try var weak where while willSet].to_set
       # rubocop:enable Layout/LineLength
     end
 
@@ -195,7 +195,7 @@ module Fastlane
         else
           if type == "((String) -> Void)?"
             "#{param}: #{type} = nil"
-          elsif optional && type.end_with?('?') && !type.start_with?('Any')
+          elsif optional && type.end_with?('?') && !type.start_with?('Any') || type.start_with?('Bool')
             "#{param}: OptionalConfigValue<#{type}> = .fastlaneDefault(#{default_value})"
           else
             "#{param}: #{type} = #{default_value}"
@@ -286,7 +286,7 @@ module Fastlane
         sanitized_name = sanitize_reserved_word(word: sanitized_name)
         type_string = type_override == :string_callback ? ".stringClosure" : "nil"
 
-        if !(type_override == :string_callback || !(is_optional && default_value.nil? && !type.start_with?('Any')))
+        if !(type_override == :string_callback || !(is_optional && default_value.nil? && !type.start_with?('Any') || type.start_with?('Bool')))
           { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = #{sanitized_name}.asRubyArgument(name: \"#{name}\", type: #{type_string})" }
         else
           { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}, type: #{type_string})" }
@@ -434,7 +434,7 @@ module Fastlane
 
         if type == "((String) -> Void)?"
           "#{param}: #{type} = nil"
-        elsif optional && type.end_with?('?') && !type.start_with?('Any')
+        elsif (optional && type.end_with?('?') && !type.start_with?('Any')) || type.start_with?('Bool')
           "#{param}: OptionalConfigValue<#{type}> = .fastlaneDefault(#{self.class_name.downcase}.#{static_var_for_parameter_name})"
         else
           "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"

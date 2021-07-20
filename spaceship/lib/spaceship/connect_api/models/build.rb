@@ -20,6 +20,7 @@ module Spaceship
       attr_accessor :beta_build_localizations
       attr_accessor :build_beta_detail
       attr_accessor :pre_release_version
+      attr_accessor :individual_testers
 
       attr_mapping({
         "version" => "version",
@@ -36,7 +37,8 @@ module Spaceship
         "betaBuildMetrics" => "beta_build_metrics",
         "betaBuildLocalizations" => "beta_build_localizations",
         "buildBetaDetail" => "build_beta_detail",
-        "preReleaseVersion" => "pre_release_version"
+        "preReleaseVersion" => "pre_release_version",
+        "individualTesters" => "individual_testers"
       })
 
       ESSENTIAL_INCLUDES = "app,buildBetaDetail,preReleaseVersion"

@@ -81,30 +81,27 @@ module Fastlane
                                        env_name: "FL_RESET_GIT_FILES",
                                        description: "Array of files the changes should be discarded. If not given, all files will be discarded",
                                        optional: true,
-                                       is_string: false,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass an array only") unless value.kind_of?(Array)
-                                       end),
+                                       type: Array),
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_RESET_GIT_FORCE",
                                        description: "Skip verifying of previously clean state of repo. Only recommended in combination with `files` option",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :skip_clean,
                                        env_name: "FL_RESET_GIT_SKIP_CLEAN",
                                        description: "Skip 'git clean' to avoid removing untracked files like `.env`",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :disregard_gitignore,
                                        env_name: "FL_RESET_GIT_DISREGARD_GITIGNORE",
                                        description: "Setting this to true will clean the whole repository, ignoring anything in your local .gitignore. Set this to true if you want the equivalent of a fresh clone, and for all untracked and ignore files to also be removed",
-                                       is_string: false,
+                                       type: Boolean,
                                        optional: true,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :exclude,
                                        env_name: "FL_RESET_GIT_EXCLUDE",
                                        description: "You can pass a string, or array of, file pattern(s) here which you want to have survive the cleaning process, and remain on disk, e.g. to leave the `artifacts` directory you would specify `exclude: 'artifacts'`. Make sure this pattern is also in your gitignore! See the gitignore documentation for info on patterns",
-                                       is_string: false,
+                                       skip_type_validation: true, # allows String, Array, Regex
                                        optional: true)
         ]
       end

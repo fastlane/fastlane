@@ -22,30 +22,30 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Satoshi Namai",
-                        "Jan Piotrowski",
-                        "Andrew McBurney",
-                        "Matthew Ellis",
-                        "Iulian Onofrei",
-                        "Kohki Miki",
-                        "Manu Wallner",
-                        "Daniel Jankowski",
-                        "Olivier Halligon",
-                        "Fumiya Nakamura",
-                        "Josh Holtz",
-                        "Danielle Tomlinson",
-                        "Helmut Januschka",
-                        "Jimmy Dee",
+  spec.authors       = ["Andrew McBurney",
                         "Maksym Grebenets",
-                        "Manish Rathi",
-                        "Jorge Revuelta H",
-                        "Aaron Brager",
-                        "Max Ott",
+                        "Iulian Onofrei",
+                        "Jimmy Dee",
+                        "Helmut Januschka",
                         "Luka Mirosevic",
                         "Joshua Liebowitz",
                         "Jérôme Lacoste",
+                        "Max Ott",
+                        "Daniel Jankowski",
+                        "Manu Wallner",
+                        "Kohki Miki",
+                        "Fumiya Nakamura",
+                        "Matthew Ellis",
+                        "Jan Piotrowski",
                         "Felix Krause",
+                        "Aaron Brager",
+                        "Manish Rathi",
+                        "Olivier Halligon",
+                        "Satoshi Namai",
+                        "Danielle Tomlinson",
+                        "Jorge Revuelta H",
                         "Roger Oba",
+                        "Josh Holtz",
                         "Stefan Natchev"]
 
   spec.email         = ["fastlane@krausefx.com"]
@@ -72,7 +72,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('terminal-table', '>= 1.4.5', '< 2.0.0') # Actions documentation
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
-  spec.add_dependency('addressable', '>= 2.3', '< 3.0.0') # Support for URI templates
+  spec.add_dependency('addressable', '>= 2.8', '< 3.0.0') # Support for URI templates
   spec.add_dependency('multipart-post', '~> 2.0.0') # Needed for uploading builds to appetize
   spec.add_dependency('word_wrap', '~> 1.0.0') # to add line breaks for tables with long strings
 

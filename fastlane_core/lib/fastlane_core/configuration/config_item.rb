@@ -216,6 +216,17 @@ module FastlaneCore
       end
     end
 
+    def ensure_array_type_passes_validation(value)
+      if @skip_type_validation
+        return
+      end
+
+      # Arrays can be an either be an array or string that gets split by comma in auto_convert_type
+      if !value.kind_of?(Array) && !value.kind_of?(String)
+        UI.user_error!("'#{self.key}' value must be either `Array` or `comma-separated String`! Found #{value.class} instead.")
+      end
+    end
+
     # Make sure, the value is valid (based on the verify block)
     # Raises an exception if the value is invalid
     def valid?(value)
@@ -225,6 +236,8 @@ module FastlaneCore
       # Verify that value is the type that we're expecting, if we are expecting a type
       if data_type == Fastlane::Boolean
         ensure_boolean_type_passes_validation(value)
+      elsif data_type == Array
+        ensure_array_type_passes_validation(value)
       else
         ensure_generic_type_passes_validation(value)
       end

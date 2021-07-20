@@ -68,12 +68,52 @@ module Spaceship
                     type: "bundleIds",
                     id: bundle_id_id
                   }
+                },
+                capability: {
+                  data: {
+                    type: "capabilities",
+                    id: capability_type
+                  }
+                }
+              }
+            }
+          }
+          provisioning_request_client.post("bundleIdCapabilities", body)
+        end
+
+        def patch_bundle_id_capability(bundle_id_id:, seed_id:, enabled: false, capability_type:, settings: [])
+          body = {
+            data: {
+              type: "bundleIds",
+              id: bundle_id_id,
+              attributes: {
+                teamId: seed_id
+              },
+              relationships: {
+                bundleIdCapabilities: {
+                  data: [
+                    {
+                      type: "bundleIdCapabilities",
+                      attributes: {
+                          enabled: enabled,
+                          settings: settings
+                      },
+                      relationships: {
+                        capability: {
+                          data: {
+                              type: "capabilities",
+                              id: capability_type
+                            }
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
           }
 
-          provisioning_request_client.post("bundleIdCapabilities", body)
+          provisioning_request_client.patch("bundleIds/#{bundle_id_id}", body)
         end
 
         def delete_bundle_id_capability(bundle_id_capability_id:)

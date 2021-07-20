@@ -33,7 +33,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :exclude_pattern,
                                        env_name: "FL_CLEAN_BUILD_ARTIFACTS_EXCLUDE_PATTERN",
                                        description: "Exclude all files from clearing that match the given Regex pattern: e.g. '.*\.mobileprovision'",
-                                       default_value: nil,
                                        optional: true)
         ]
       end

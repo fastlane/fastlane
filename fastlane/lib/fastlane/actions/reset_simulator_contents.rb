@@ -44,14 +44,12 @@ module Fastlane
                                        short_option: "-i",
                                        env_name: "FASTLANE_RESET_SIMULATOR_VERSIONS",
                                        description: "Which OS versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators",
-                                       is_string: false,
                                        optional: true,
                                        type: Array),
           FastlaneCore::ConfigItem.new(key: :os_versions,
                                        short_option: "-v",
                                        env_name: "FASTLANE_RESET_SIMULATOR_OS_VERSIONS",
                                        description: "Which OS versions of Simulators you want to reset content and settings, this does not remove/recreate the simulators",
-                                       is_string: false,
                                        optional: true,
                                        type: Array)
         ]

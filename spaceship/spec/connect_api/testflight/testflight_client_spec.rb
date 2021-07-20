@@ -572,6 +572,30 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
           client.delete_beta_testers_from_app(beta_tester_ids: beta_tester_ids, app_id: app_id)
         end
       end
+
+      context 'add_beta_tester_to_builds' do
+        let(:beta_tester_id) { "123" }
+        let(:build_ids) { ["1234", "5678"] }
+        let(:path) { "betaTesters/#{beta_tester_id}/relationships/builds" }
+        let(:body) do
+          {
+            data: build_ids.map do |id|
+              {
+                type: "builds",
+                id: id
+              }
+            end
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.add_beta_tester_to_builds(beta_tester_id: beta_tester_id, build_ids: build_ids)
+        end
+      end
     end
 
     describe "builds" do

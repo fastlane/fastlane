@@ -65,6 +65,8 @@ module Fastlane
 
             if config_item.data_type == Fastlane::Boolean
               config_item.ensure_boolean_type_passes_validation(value)
+            elsif config_item.data_type == Array
+              config_item.ensure_array_type_passes_validation(value)
             else
               config_item.ensure_generic_type_passes_validation(value)
             end
