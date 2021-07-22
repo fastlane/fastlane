@@ -1,3 +1,9 @@
+RSpec::Matchers.define(:shell_command) do |x|
+  match { |actual|
+    Fastlane::Actions.shell_command_from_args(*actual) == x
+  }
+end
+
 describe Fastlane do
   describe Fastlane::FastFile do
     before do
@@ -9,7 +15,7 @@ describe Fastlane do
 
     describe "zip" do
       it "generates a valid zip command" do
-        expect(Fastlane::Actions).to receive(:sh).with("zip -r #{File.expand_path(@path)}.zip archive.rb")
+        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -r #{File.expand_path(@path)}.zip archive.rb"))
 
         result = Fastlane::FastFile.new.parse("lane :test do
           zip(path: '#{@path}')
@@ -17,7 +23,7 @@ describe Fastlane do
       end
 
       it "generates a valid zip command without verbose output" do
-        expect(Fastlane::Actions).to receive(:sh).with("zip -rq #{File.expand_path(@path)}.zip archive.rb")
+        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -rq #{File.expand_path(@path)}.zip archive.rb"))
 
         result = Fastlane::FastFile.new.parse("lane :test do
           zip(path: '#{@path}', verbose: false)
@@ -50,7 +56,7 @@ describe Fastlane do
 
       it "encrypts the contents of the zip archive using a password" do
         password = "5O#RUKp0Zgop"
-        expect(Fastlane::Actions).to receive(:sh).with("zip -rq -P '#{password}' #{File.expand_path(@path)}.zip archive.rb")
+        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -rq -P '#{password}' #{File.expand_path(@path)}.zip archive.rb"))
 
         result = Fastlane::FastFile.new.parse("lane :test do
           zip(path: '#{@path}', verbose: false, password: '#{password}')
