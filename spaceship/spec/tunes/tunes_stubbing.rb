@@ -25,6 +25,10 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file('olympus_session.json'))
       stub_request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com").
         to_return(status: 200, body: { authServiceKey: 'e0abc' }.to_json, headers: { 'Content-Type' => 'application/json' })
+      stub_request(:post, "https://appstoreconnect.apple.com/olympus/v1/providerSwitchRequests").
+        with(body: "{\"data\":{\"type\":\"providerSwitchRequests\",\"relationships\":{\"provider\":{\"data\":{\"type\":\"providers\",\"id\":\"2222-3333-4444-5555\"}}}}}",
+              headers: { 'Content-Type' => 'application/json' }).
+        to_return(status: 200, body: "", headers: {})
 
       # Actual login
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
