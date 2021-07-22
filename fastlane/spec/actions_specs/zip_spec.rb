@@ -8,14 +8,15 @@ describe Fastlane do
   describe Fastlane::FastFile do
     before do
       allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-      @path = "./fastlane/spec/fixtures/actions/archive.rb"
-      @output_path_with_zip = "./fastlane/spec/fixtures/actions/archive_file.zip"
-      @output_path_without_zip = "./fastlane/spec/fixtures/actions/archive_file"
+      @fixtures_path = "./fastlane/spec/fixtures/actions/zip"
+      @path = @fixtures_path + "/file.txt"
+      @output_path_with_zip = @fixtures_path + "/archive_file.zip"
+      @output_path_without_zip = @fixtures_path + "/archive_file"
     end
 
     describe "zip" do
       it "generates a valid zip command" do
-        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -r #{File.expand_path(@path)}.zip archive.rb"))
+        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -r #{File.expand_path(@path)}.zip file.txt"))
 
         result = Fastlane::FastFile.new.parse("lane :test do
           zip(path: '#{@path}')
@@ -23,7 +24,7 @@ describe Fastlane do
       end
 
       it "generates a valid zip command without verbose output" do
-        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -rq #{File.expand_path(@path)}.zip archive.rb"))
+        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -rq #{File.expand_path(@path)}.zip file.txt"))
 
         result = Fastlane::FastFile.new.parse("lane :test do
           zip(path: '#{@path}', verbose: false)
@@ -56,7 +57,7 @@ describe Fastlane do
 
       it "encrypts the contents of the zip archive using a password" do
         password = "5O#RUKp0Zgop"
-        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -rq -P #{password.shellescape} #{File.expand_path(@path)}.zip archive.rb"))
+        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -rq -P #{password.shellescape} #{File.expand_path(@path)}.zip file.txt"))
 
         result = Fastlane::FastFile.new.parse("lane :test do
           zip(path: '#{@path}', verbose: false, password: '#{password}')
