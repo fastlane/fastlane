@@ -147,6 +147,7 @@ module Spaceship
       available_teams = teams.collect do |team|
         {
           team_id: (team["contentProvider"] || {})["contentProviderId"],
+          public_team_id: (team["contentProvider"] || {})["contentProviderPublicId"],
           team_name: (team["contentProvider"] || {})["name"]
         }
       end
@@ -161,10 +162,19 @@ module Spaceship
       end
 
       response = request(:post) do |req|
-        req.url("ra/v2/session/webSession")
+        req.url("https://appstoreconnect.apple.com/olympus/v1/providerSwitchRequests")
         req.body = {
-          contentProviderId: team_id,
-          dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
+          "data": {
+            "type": "providerSwitchRequests",
+            "relationships": {
+              "provider": {
+                "data": {
+                  "type": "providers",
+                  "id": result[:public_team_id]
+                }
+              }
+            }
+          }
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end

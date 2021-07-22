@@ -25,6 +25,10 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file('olympus_session.json'))
       stub_request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com").
         to_return(status: 200, body: { authServiceKey: 'e0abc' }.to_json, headers: { 'Content-Type' => 'application/json' })
+      stub_request(:post, "https://appstoreconnect.apple.com/olympus/v1/providerSwitchRequests").
+        with(body: "{\"data\":{\"type\":\"providerSwitchRequests\",\"relationships\":{\"provider\":{\"data\":{\"type\":\"providers\",\"id\":\"2222-3333-4444-5555\"}}}}}",
+              headers: { 'Content-Type' => 'application/json' }).
+        to_return(status: 200, body: "", headers: {})
 
       # Actual login
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
@@ -35,11 +39,6 @@ class TunesStubbing
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
         with(body: { "accountName" => "bad-username", "password" => "bad-password", "rememberMe" => true }.to_json).
         to_return(status: 401, body: '{}', headers: { 'Set-Cookie' => 'session=invalid' })
-
-      stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/v2/session/webSession").
-        with(body: "{\"contentProviderId\":\"5678\",\"dsId\":null}",
-              headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json' }).
-        to_return(status: 200, body: "", headers: {})
 
       # 2FA: Request security code to trusted phone
       [1, 2].each do |id|
