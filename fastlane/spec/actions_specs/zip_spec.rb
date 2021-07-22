@@ -56,7 +56,7 @@ describe Fastlane do
 
       it "encrypts the contents of the zip archive using a password" do
         password = "5O#RUKp0Zgop"
-        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -rq -P '#{password}' #{File.expand_path(@path)}.zip archive.rb"))
+        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -rq -P #{password.shellescape} #{File.expand_path(@path)}.zip archive.rb"))
 
         result = Fastlane::FastFile.new.parse("lane :test do
           zip(path: '#{@path}', verbose: false, password: '#{password}')

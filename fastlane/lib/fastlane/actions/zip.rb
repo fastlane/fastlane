@@ -1,35 +1,60 @@
 module Fastlane
   module Actions
     class ZipAction < Action
-      def self.run(params)
-        UI.message("Compressing #{params[:path]}...")
+      class Runner
+        attr_reader :output_path, :path, :verbose, :password, :symlinks
 
-        params[:output_path] ||= params[:path]
+        def initialize(params)
+          @output_path = File.expand_path(params[:output_path] || params[:path])
+          @path = params[:path]
+          @verbose = params[:verbose]
+          @password = params[:password]
+          @symlinks = params[:symlinks]
 
-        absolute_output_path = File.expand_path(params[:output_path])
-
-        # Appends ".zip" if path does not end in ".zip"
-        unless absolute_output_path.end_with?(".zip")
-          absolute_output_path += ".zip"
+          @output_path += ".zip" unless @output_path.end_with?(".zip")
         end
 
-        absolute_output_dir = File.expand_path("..", absolute_output_path)
-        FileUtils.mkdir_p(absolute_output_dir)
+        def run
+          UI.message("Compressing #{path}...")
 
-        Dir.chdir(File.expand_path("..", params[:path])) do # required to properly zip
-          zip_options = params[:verbose] ? "r" : "rq"
-          zip_options += "y" if params[:symlinks]
+          create_output_dir
+          run_zip_command
 
-          if params[:password]
-            password_option = "-P '#{params[:password]}'"
-            Actions.sh("zip -#{zip_options} #{password_option} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}")
-          else
-            Actions.sh("zip -#{zip_options} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}")
+          UI.success("Successfully generated zip file at path '#{output_path}'")
+          output_path
+        end
+
+        def create_output_dir
+          output_dir = File.expand_path("..", output_path)
+          FileUtils.mkdir_p(output_dir)
+        end
+
+        def run_zip_command
+          # The 'zip' command archives relative to the working directory, chdir to produce expected results relative to `path`
+          Dir.chdir(File.expand_path("..", path)) do
+            Actions.sh(zip_command)
           end
         end
 
-        UI.success("Successfully generated zip file at path '#{File.expand_path(absolute_output_path)}'")
-        return File.expand_path(absolute_output_path)
+        def zip_command
+          zip_options = verbose ? "r" : "rq"
+          zip_options += "y" if symlinks
+
+          command = ["zip", "-#{zip_options}"]
+
+          if password
+            command << "-P"
+            command << password
+          end
+
+          command << output_path
+          command << File.basename(path)
+
+          command
+        end
+      end
+      def self.run(params)
+        Runner.new(params).run
       end
 
       #####################################################
