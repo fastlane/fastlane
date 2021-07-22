@@ -36,7 +36,7 @@ class TunesStubbing
         with(body: { "accountName" => "bad-username", "password" => "bad-password", "rememberMe" => true }.to_json).
         to_return(status: 401, body: '{}', headers: { 'Set-Cookie' => 'session=invalid' })
 
-      stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/v1/session/webSession").
+      stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/v2/session/webSession").
         with(body: "{\"contentProviderId\":\"5678\",\"dsId\":null}",
               headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json' }).
         to_return(status: 200, body: "", headers: {})
