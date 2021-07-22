@@ -161,7 +161,7 @@ module Spaceship
       end
 
       response = request(:post) do |req|
-        req.url("ra/v1/session/webSession")
+        req.url("ra/v2/session/webSession")
         req.body = {
           contentProviderId: team_id,
           dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
