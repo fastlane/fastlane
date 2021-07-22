@@ -63,6 +63,14 @@ describe Fastlane do
           zip(path: '#{@path}', verbose: false, password: '#{password}')
         end").runner.execute(:test)
       end
+
+      it "archives a directory" do
+        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -r #{File.expand_path(@fixtures_path)}.zip zip"))
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          zip(path: '#{@fixtures_path}')
+        end").runner.execute(:test)
+      end
     end
   end
 end
