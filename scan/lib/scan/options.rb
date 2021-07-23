@@ -24,7 +24,6 @@ module Scan
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Workspace file not found at path '#{v}'") unless File.exist?(v)
                                        UI.user_error!("Workspace file invalid") unless File.directory?(v)
-                                       UI.user_error!("Workspace file is not a workspace, must end with .xcworkspace") unless v.include?(".xcworkspace")
                                      end),
         FastlaneCore::ConfigItem.new(key: :project,
                                      short_option: "-p",

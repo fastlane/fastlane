@@ -238,30 +238,61 @@ describe Scan do
       end
 
       describe "SPM package" do
-        before do
-          options = { package_path: "./scan/examples/package/", scheme: "package" }
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        describe "No workspace" do
+          before do
+            options = { package_path: "./scan/examples/package/", scheme: "package" }
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          end
+
+          it "uses the correct build command with the example package and scheme", requires_xcodebuild: true do
+            log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+            result = @test_command_generator.generate
+            expect(result).to start_with([
+                                          "set -o pipefail &&",
+                                          "cd ./scan/examples/package/ &&",
+                                          "env NSUnbufferedIO=YES xcodebuild",
+                                          "-scheme package",
+                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                          :build,
+                                          :test
+                                        ])
+          end
+
+          it "#project_path_array", requires_xcodebuild: true do
+            result = @test_command_generator.project_path_array
+            expect(result).to eq(["-scheme package"])
+          end
         end
 
-        it "uses the correct build command with the example package and scheme", requires_xcodebuild: true do
-          log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+        describe "With workspace" do
+          before do
+            options = { package_path: "./scan/examples/package/", scheme: "package", workspace: "." }
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          end
 
-          result = @test_command_generator.generate
-          expect(result).to start_with([
-                                         "set -o pipefail &&",
-                                         "cd ./scan/examples/package/ &&",
-                                         "env NSUnbufferedIO=YES xcodebuild",
-                                         "-scheme package",
-                                         "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
-                                         "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         :build,
-                                         :test
-                                       ])
-        end
+          it "uses the correct build command with the example package and scheme", requires_xcodebuild: true do
+            log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-        it "#project_path_array", requires_xcodebuild: true do
-          result = @test_command_generator.project_path_array
-          expect(result).to eq(["-scheme package"])
+            result = @test_command_generator.generate
+            expect(result).to start_with([
+                                          "set -o pipefail &&",
+                                          "cd ./scan/examples/package/ &&",
+                                          "env NSUnbufferedIO=YES xcodebuild",
+                                          "-scheme package",
+                                          "-workspace .",
+                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                          :build,
+                                          :test
+                                        ])
+          end
+
+          it "#project_path_array", requires_xcodebuild: true do
+            result = @test_command_generator.project_path_array
+            expect(result).to eq(["-scheme package", "-workspace ."])
+          end
         end
       end
     end

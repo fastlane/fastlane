@@ -29,7 +29,8 @@ module Scan
     def project_path_array
       unless Scan.config[:package_path].nil?
         params = []
-        params << "-scheme #{Scan.config[:scheme]}" if Scan.config[:scheme]
+        params << "-scheme #{Scan.config[:scheme].shellescape}" if Scan.config[:scheme]
+        params << "-workspace #{Scan.config[:workspace].shellescape}" if Scan.config[:workspace]
         return params
       end
 
