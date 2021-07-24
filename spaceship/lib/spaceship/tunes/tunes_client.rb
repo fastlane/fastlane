@@ -271,6 +271,7 @@ module Spaceship
         req.url("ra/apps/#{app_id}/details")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
 
       handle_itc_response(r.body)
@@ -319,6 +320,7 @@ module Spaceship
         req.url('ra/apps/create/v2')
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
 
       data = parse_response(r, 'data')
@@ -334,6 +336,7 @@ module Spaceship
           }
         }.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
 
       data = parse_response(r, 'data')
@@ -371,6 +374,7 @@ module Spaceship
           }
         }.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
 
       data = parse_response(r, 'data')
@@ -465,6 +469,7 @@ module Spaceship
           req.url("ra/apps/#{app_id}/platforms/ios/versions/#{version_id}")
           req.body = data.to_json
           req.headers['Content-Type'] = 'application/json'
+          req.headers['x-csrf-itc'] = 'itc'
         end
 
         handle_itc_response(r.body, flaky_api_call: true)
@@ -494,6 +499,7 @@ module Spaceship
         req.url("ra/users/itc/delete")
         req.body = payload.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
     end
 
@@ -528,6 +534,7 @@ module Spaceship
         req.url("ra/users/itc/create")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       handle_itc_response(r.body)
     end
@@ -559,6 +566,7 @@ module Spaceship
         req.url("ra/users/itc/#{member.user_id}/roles")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       handle_itc_response(r.body)
     end
@@ -583,6 +591,7 @@ module Spaceship
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
         req.headers['X-Requested-By'] = 'appstoreconnect.apple.com'
+        req.headers['x-csrf-itc'] = 'itc'
       end
 
       data = parse_response(r)
@@ -623,6 +632,7 @@ module Spaceship
         req.url("ra/apps/#{app_id}/pricing/intervals")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       handle_itc_response(r.body)
     end
@@ -749,6 +759,7 @@ module Spaceship
         req.url("ra/apps/#{app_id}/pricing/intervals")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       handle_itc_response(r.body)
       data = parse_response(r, 'data')
@@ -1008,6 +1019,7 @@ module Spaceship
         req.url("ra/apps/#{app_id}/testingTypes/#{testing_type}/trains/")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
 
       handle_itc_response(r.body)
@@ -1018,6 +1030,7 @@ module Spaceship
         req.url("ra/apps/#{app_id}/platforms/#{platform}/trains/#{train}/builds/#{build_number}/reject")
         req.body = {}.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       handle_itc_response(r.body)
     end
@@ -1067,6 +1080,7 @@ module Spaceship
         req.url(url)
         req.body = build_info.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       handle_itc_response(r.body)
     end
@@ -1137,6 +1151,7 @@ module Spaceship
 
         req.body = review_info.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       handle_itc_response(r.body)
     end
@@ -1147,6 +1162,7 @@ module Spaceship
       r = request(:get) do |req|
         req.url(url)
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       handle_itc_response(r.body)
 
@@ -1164,6 +1180,7 @@ module Spaceship
       r = request(:get) do |req|
         req.url("ra/apps/#{app_id}/versions/#{version}/submit/summary")
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
 
       handle_itc_response(r.body)
@@ -1178,6 +1195,7 @@ module Spaceship
         req.url("ra/apps/#{app_id}/versions/#{version}/submit/complete")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
 
       handle_itc_response(r.body)
@@ -1211,6 +1229,7 @@ module Spaceship
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/versions/#{version}/releaseToStore")
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
         req.body = app_id.to_s
       end
 
@@ -1229,6 +1248,7 @@ module Spaceship
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/versions/#{version}/phasedRelease/state/COMPLETE")
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
         req.body = app_id.to_s
       end
 
@@ -1296,6 +1316,7 @@ module Spaceship
           req.url("ra/apps/#{app_id}/iaps/family/#{family_id}/")
           req.body = data.to_json
           req.headers['Content-Type'] = 'application/json'
+          req.headers['x-csrf-itc'] = 'itc'
         end
         handle_itc_response(r.body)
       end
@@ -1308,6 +1329,7 @@ module Spaceship
           req.url("ra/apps/#{app_id}/iaps/#{purchase_id}")
           req.body = data.to_json
           req.headers['Content-Type'] = 'application/json'
+          req.headers['x-csrf-itc'] = 'itc'
         end
         handle_itc_response(r.body)
       end
@@ -1321,6 +1343,7 @@ module Spaceship
           pricing_data["subscriptions"] = pricing_intervals
           req.body = pricing_data.to_json
           req.headers['Content-Type'] = 'application/json'
+          req.headers['x-csrf-itc'] = 'itc'
         end
         handle_itc_response(r.body)
       end
@@ -1344,6 +1367,7 @@ module Spaceship
         req.url("ra/apps/#{app_id}/iaps/family/")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       handle_itc_response(r.body)
     end
@@ -1418,6 +1442,7 @@ module Spaceship
         req.url("ra/apps/#{app_id}/iaps")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       handle_itc_response(r.body)
     end
@@ -1465,6 +1490,7 @@ module Spaceship
           }
         }.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       response_object = parse_response(r, 'data')
       errors = response_object['sectionErrorKeys']
@@ -1484,6 +1510,7 @@ module Spaceship
           }
         end.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       true
     end
@@ -1520,6 +1547,7 @@ module Spaceship
         req.url(url)
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
       parse_response(r, 'data')
     end
@@ -1540,6 +1568,7 @@ module Spaceship
       r = request(:post) do |req|
         req.url("ra/apps/#{app_id}/versions/#{version}/reject")
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
         req.body = app_id.to_s
       end
 
@@ -1634,6 +1663,7 @@ module Spaceship
         req.url(url)
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['x-csrf-itc'] = 'itc'
       end
 
       data = parse_response(r, 'data')
