@@ -86,7 +86,8 @@ module Fastlane
                                        env_name: "FL_ZIP_PATH",
                                        description: "Path to the directory or file to be zipped",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Couldn't find file/folder at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                         path = File.expand_path(value)
+                                         UI.user_error!("Couldn't find file/folder at path '#{path}'") unless File.exist?(path)
                                        end),
           FastlaneCore::ConfigItem.new(key: :output_path,
                                        env_name: "FL_ZIP_OUTPUT_NAME",
