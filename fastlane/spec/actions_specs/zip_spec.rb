@@ -71,6 +71,22 @@ describe Fastlane do
           zip(path: '#{@fixtures_path}')
         end").runner.execute(:test)
       end
+
+      it "supports excluding specific files or directories" do
+        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -r #{File.expand_path(@fixtures_path)}.zip zip -x zip/.git/\\* zip/README.md"))
+
+        Fastlane::FastFile.new.parse("lane :test do
+          zip(path: '#{@fixtures_path}', exclude: ['.git/*', 'README.md'])
+        end").runner.execute(:test)
+      end
+
+      it "supports including specific files or directories" do
+        expect(Fastlane::Actions).to receive(:sh).with(shell_command("zip -r #{File.expand_path(@fixtures_path)}.zip zip -i zip/\\*\\*/\\*.rb"))
+
+        Fastlane::FastFile.new.parse("lane :test do
+          zip(path: '#{@fixtures_path}', include: ['**/*.rb'])
+        end").runner.execute(:test)
+      end
     end
   end
 end

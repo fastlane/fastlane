@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class ZipAction < Action
       class Runner
-        attr_reader :output_path, :path, :verbose, :password, :symlinks
+        attr_reader :output_path, :path, :verbose, :password, :symlinks, :include, :exclude
 
         def initialize(params)
           @output_path = File.expand_path(params[:output_path] || params[:path])
@@ -10,6 +10,8 @@ module Fastlane
           @verbose = params[:verbose]
           @password = params[:password]
           @symlinks = params[:symlinks]
+          @include = params[:include]
+          @exclude = params[:exclude]
 
           @output_path += ".zip" unless @output_path.end_with?(".zip")
         end
@@ -47,8 +49,21 @@ module Fastlane
             command << password
           end
 
+          # The zip command is executed from the paths **parent** directory, as a result we use just the basename, which is the file or folder within
+          basename = File.basename(path)
+
           command << output_path
-          command << File.basename(path)
+          command << basename
+
+          unless include.empty?
+            command << "-i"
+            command += include.map { |path| File.join(basename, path) }
+          end
+
+          unless exclude.empty?
+            command << "-x"
+            command += exclude.map { |path| File.join(basename, path) }
+          end
 
           command
         end
@@ -92,7 +107,19 @@ module Fastlane
                                        description: "Store symbolic links as such in the zip archive",
                                        optional: true,
                                        type: Boolean,
-                                       default_value: false)
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :include,
+                                       env_name: "FL_ZIP_INCLUDE",
+                                       description: "Array of paths or patterns to include",
+                                       optional: true,
+                                       type: Array,
+                                       default_value: []),
+          FastlaneCore::ConfigItem.new(key: :exclude,
+                                       env_name: "FL_ZIP_EXCLUDE",
+                                       description: "Array of paths or patterns to exclude",
+                                       optional: true,
+                                       type: Array,
+                                       default_value: [])
         ]
       end
 
@@ -113,6 +140,17 @@ module Fastlane
             output_path: "Latest.app.zip",
             verbose: false,
             symlinks: true
+          )',
+          'zip(
+            path: "./",
+            output_path: "Source Code.zip",
+            exclude: [".git/*"]
+          )',
+          'zip(
+            path: "./",
+            output_path: "Swift Code.zip",
+            include: ["**/*.swift"],
+            exclude: ["Package.swift", "vendor/*", "Pods/*"]
           )'
         ]
       end
