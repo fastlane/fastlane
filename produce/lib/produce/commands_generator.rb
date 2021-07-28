@@ -210,13 +210,15 @@ module Produce
           Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
 
           require 'produce/service'
+          require 'terminal-table'
+
           services = Produce::Service.available_services(options, args)
-          rows = services.map { |capabilities| [capabilities.name, capabilities.id, capabilities.description]  }
+          rows = services.map { |capabilities| [capabilities.name, capabilities.id, capabilities.description] }
           table = Terminal::Table.new(
             title: "Available Services",
             headings: ['Name', 'ID', 'Description'],
             rows: FastlaneCore::PrintTable.transform_output(rows),
-            style: {:all_separators => true}
+            style: { all_separators: true }
           )
           puts(table)
         end
