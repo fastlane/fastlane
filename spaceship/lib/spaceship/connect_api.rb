@@ -10,6 +10,7 @@ require 'spaceship/connect_api/tunes/tunes'
 
 require 'spaceship/connect_api/models/bundle_id_capability'
 require 'spaceship/connect_api/models/bundle_id'
+require 'spaceship/connect_api/models/capabilities'
 require 'spaceship/connect_api/models/certificate'
 require 'spaceship/connect_api/models/device'
 require 'spaceship/connect_api/models/profile'

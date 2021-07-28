@@ -78,6 +78,11 @@ class ConnectAPIStubbing
           to_return(status: 200, body: read_fixture_file('bundle_id.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
       end
 
+      def stub_available_bundle_id_capabilities
+        stub_request(:post, "https://developer.apple.com/services-account/v1/capabilities").
+          to_return(status: 200, body: read_fixture_file('capabilities.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
+      end
+
       def stub_certificates
         stub_request(:post, "https://developer.apple.com/services-account/v1/certificates").
           to_return(status: 200, body: read_fixture_file('certificates.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })

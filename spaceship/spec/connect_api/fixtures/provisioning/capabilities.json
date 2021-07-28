@@ -1,0 +1,83 @@
+{
+  "data" : [ {
+    "type" : "capabilities",
+    "id" : "ACCESS_WIFI_INFORMATION",
+    "attributes" : {
+      "supportsWildcard" : false,
+      "supportedSDKs" : [ {
+        "name" : "IOS",
+        "displayValue" : "iOS"
+      }, {
+        "name" : "WATCH_OS",
+        "displayValue" : "watchOS"
+      } ],
+      "distributionTypes" : [ {
+        "name" : "DEVELOPMENT",
+        "displayValue" : "Development"
+      }, {
+        "name" : "STORE",
+        "displayValue" : "App Store"
+      }, {
+        "name" : "AD_HOC",
+        "displayValue" : "Ad hoc"
+      } ],
+      "requestedCustomCapabilities" : null,
+      "bundleId" : null,
+      "enabledByDefault" : false,
+      "referenceType" : null,
+      "description" : "Access Wifi Information allows an app to obtain information about the currently connected WiFi network.",
+      "optional" : true,
+      "displaySupportedSDKs" : false,
+      "imageUrl" : "/assets/elements/icons/cip/capabilities/access-wifi.svg",
+      "name" : "Access WiFi Information",
+      "isPublic" : true,
+      "capabilityType" : "capability",
+      "responseId" : "7d4f0811-562e-445b-a6ea-826b22aa01d4"
+    },
+    "links" : {
+      "self" : "https://developer.apple.com:443/services-account/v1/capabilities/ACCESS_WIFI_INFORMATION"
+    }
+  },
+  {
+    "type" : "capabilities",
+    "id" : "APP_ATTEST",
+    "attributes" : {
+      "supportsWildcard" : false,
+      "supportedSDKs" : [ {
+        "name" : "TV_OS",
+        "displayValue" : "tvOS"
+      }, {
+        "name" : "IOS",
+        "displayValue" : "iOS"
+      }, {
+        "name" : "WATCH_OS",
+        "displayValue" : "watchOS"
+      } ],
+      "distributionTypes" : [ {
+        "name" : "DEVELOPMENT",
+        "displayValue" : "Development"
+      }, {
+        "name" : "STORE",
+        "displayValue" : "App Store"
+      }, {
+        "name" : "AD_HOC",
+        "displayValue" : "Ad hoc"
+      } ],
+      "requestedCustomCapabilities" : null,
+      "bundleId" : null,
+      "enabledByDefault" : false,
+      "referenceType" : null,
+      "description" : "App Attest allows you to verify that an iOS app connecting to your server is legitimate, by signing the app identity upon connection.",
+      "optional" : true,
+      "displaySupportedSDKs" : false,
+      "imageUrl" : "/assets/elements/icons/cip/capabilities/portal-appattest.svg",
+      "name" : "App Attest",
+      "isPublic" : true,
+      "capabilityType" : "capability",
+      "responseId" : "7d4f0811-562e-445b-a6ea-826b22aa01d4"
+    },
+    "links" : {
+      "self" : "https://developer.apple.com:443/services-account/v1/capabilities/APP_ATTEST"
+    }
+  } ]
+}
