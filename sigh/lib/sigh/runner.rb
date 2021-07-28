@@ -114,7 +114,7 @@ module Sigh
 
       # Take the provisioning profile name into account
       results = filter_profiles_by_name(results) if Sigh.config[:provisioning_name].to_s.length > 0
-      return results if Sigh.config[:skip_certificate_verification] || !Helper.mac?
+      return results if Sigh.config[:skip_certificate_verification]
 
       UI.message("Verifying certificates...")
       return results.find_all do |current_profile|

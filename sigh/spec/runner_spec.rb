@@ -73,12 +73,13 @@ describe Sigh do
         end
 
         it "on mac without skip verification" do
+          expect(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+
           sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
 
-          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: false }
+          options = { app_identifier: "com.krausefx.app" }
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-          expect(Sigh::Helper).to receive(:mac?).and_return(true)
           expect(FastlaneCore::CertChecker).to receive(:installed?).with(anything).and_return(true)
 
           profiles = fake_runner.fetch_profiles
@@ -86,12 +87,13 @@ describe Sigh do
         end
 
         it "on non-mac without skip verification" do
+          expect(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
           sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
 
-          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: false }
+          options = { app_identifier: "com.krausefx.app" }
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-          expect(Sigh::Helper).to receive(:mac?).and_return(false)
           expect(FastlaneCore::CertChecker).not_to receive(:installed?).with(anything)
 
           profiles = fake_runner.fetch_profiles
@@ -101,12 +103,13 @@ describe Sigh do
 
       context "unsuccessfully" do
         it "on mac without skip verification" do
+          expect(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+
           sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
 
           options = { app_identifier: "com.krausefx.app", skip_certificate_verification: false }
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-          expect(Sigh::Helper).to receive(:mac?).and_return(true)
           expect(FastlaneCore::CertChecker).to receive(:installed?).with(anything).and_return(false)
 
           profiles = fake_runner.fetch_profiles
