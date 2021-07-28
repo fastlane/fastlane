@@ -8,6 +8,9 @@ public protocol ScanfileProtocol: class {
     /// Path to the project file
     var project: String? { get }
 
+    /// Path to the Swift Package
+    var packagePath: String? { get }
+
     /// The project's scheme. Make sure it's marked as `Shared`
     var scheme: String? { get }
 
@@ -219,6 +222,7 @@ public protocol ScanfileProtocol: class {
 public extension ScanfileProtocol {
     var workspace: String? { return nil }
     var project: String? { return nil }
+    var packagePath: String? { return nil }
     var scheme: String? { return nil }
     var device: String? { return nil }
     var devices: [String]? { return nil }
@@ -292,4 +296,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.84]
+// FastlaneRunnerAPIVersion [0.9.85]
