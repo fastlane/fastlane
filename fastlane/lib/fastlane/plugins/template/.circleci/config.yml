@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-       - image: circleci/ruby:2.4.2
+       - image: circleci/ruby:2.5
 
     working_directory: ~/repo
 

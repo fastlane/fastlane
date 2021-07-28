@@ -27,18 +27,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :serial,
                                        env_name: "FL_ANDROID_SERIAL",
                                        description: "Android serial of the device to use for this command",
-                                       is_string: true,
                                        default_value: ""),
           FastlaneCore::ConfigItem.new(key: :command,
                                        env_name: "FL_ADB_COMMAND",
                                        description: "All commands you want to pass to the adb command, e.g. `kill-server`",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :adb_path,
                                        env_name: "FL_ADB_PATH",
                                        optional: true,
                                        description: "The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT, ANDROID_HOME or ANDROID_SDK environment variable is set)",
-                                       is_string: true,
                                        default_value: "adb")
         ]
       end

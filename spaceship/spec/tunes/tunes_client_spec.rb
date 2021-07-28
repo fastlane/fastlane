@@ -113,8 +113,8 @@ describe Spaceship::TunesClient do
       let(:user_details_data) do
         {
           'associatedAccounts' => [
-            { 'contentProvider' => { 'name' => 'Tom', 'contentProviderId' => 1234 } },
-            { 'contentProvider' => { 'name' => 'Harry', 'contentProviderId' => 5678 } }
+            { 'contentProvider' => { 'name' => 'Tom', 'contentProviderId' => 1234, 'contentProviderPublicId' => '1111-2222-3333-4444' } },
+            { 'contentProvider' => { 'name' => 'Harry', 'contentProviderId' => 5678, 'contentProviderPublicId' => '2222-3333-4444-5555' } }
           ],
           'sessionToken' => { 'contentProviderId' => 1234 }
         }

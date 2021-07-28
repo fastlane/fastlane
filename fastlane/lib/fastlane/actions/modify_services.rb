@@ -142,7 +142,6 @@ module Fastlane
                                        display_in_shell: false,
                                        env_name: "PRODUCE_ENABLE_SERVICES",
                                        description: "Array with Spaceship App Services (e.g. #{allowed_services_description})",
-                                       is_string: false,
                                        type: Hash,
                                        default_value: {},
                                        verify_block: proc do |value|

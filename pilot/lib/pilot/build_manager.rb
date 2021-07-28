@@ -105,8 +105,10 @@ module Pilot
         app_version: app_version,
         build_version: app_build,
         poll_interval: config[:wait_processing_interval],
+        timeout_duration: config[:wait_processing_timeout_duration],
         return_when_build_appears: return_when_build_appears,
-        return_spaceship_testflight_build: false
+        return_spaceship_testflight_build: false,
+        select_latest: config[:distribute_only]
       )
 
       unless latest_build.app_version == app_version && latest_build.version == app_build
@@ -365,6 +367,7 @@ module Pilot
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
       # Use JWT auth
+      api_token = Spaceship::ConnectAPI.token
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
         return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)

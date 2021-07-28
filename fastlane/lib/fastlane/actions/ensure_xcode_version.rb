@@ -85,7 +85,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_ENSURE_XCODE_VERSION",
                                        description: "Xcode version to verify that is selected",
-                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :strict,
                                        description: "Should the version be verified strictly (all 3 version numbers), or matching only the given version numbers (i.e. `11.3` == `11.3.x`)",
@@ -109,7 +108,7 @@ module Fastlane
 
       def self.example_code
         [
-          'ensure_xcode_version(version: "7.2")'
+          'ensure_xcode_version(version: "12.5")'
         ]
       end
 

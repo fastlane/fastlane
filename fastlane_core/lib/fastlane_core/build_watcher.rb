@@ -11,7 +11,7 @@ module FastlaneCore
 
     class << self
       # @return The build we waited for. This method will always return a build
-      def wait_for_build_processing_to_be_complete(app_id: nil, platform: nil, train_version: nil, app_version: nil, build_version: nil, poll_interval: 10, strict_build_watch: false, return_when_build_appears: false, return_spaceship_testflight_build: true, select_latest: false)
+      def wait_for_build_processing_to_be_complete(app_id: nil, platform: nil, train_version: nil, app_version: nil, build_version: nil, poll_interval: 10, timeout_duration: nil, strict_build_watch: false, return_when_build_appears: false, return_spaceship_testflight_build: true, select_latest: false)
         # Warn about train_version being removed in the future
         if train_version
           UI.deprecated(":train_version is no longer a used argument on FastlaneCore::BuildWatcher. Please use :app_version instead.")
@@ -25,6 +25,12 @@ module FastlaneCore
 
         platform = Spaceship::ConnectAPI::Platform.map(platform) if platform
         UI.message("Waiting for processing on... app_id: #{app_id}, app_version: #{app_version}, build_version: #{build_version}, platform: #{platform}")
+
+        build_watching_start_time = Time.new
+        unless timeout_duration.nil?
+          end_time = build_watching_start_time + timeout_duration
+          UI.message("Will timeout watching build after #{timeout_duration} seconds around #{end_time}...")
+        end
 
         showed_info = false
         loop do
@@ -56,6 +62,9 @@ module FastlaneCore
             end
           end
 
+          # Before next poll, force stop build watching, if we exceeded the 'timeout_duration' waiting time
+          force_stop_build_watching_if_required(start_time: build_watching_start_time, timeout_duration: timeout_duration)
+
           sleep(poll_interval)
         end
       end
@@ -83,8 +92,8 @@ module FastlaneCore
 
         if versions.empty?
           if select_latest
-            UI.message("Watched build version should not be present when there is no app version to watch") unless watched_build_version.nil?
-            UI.message("Searching for the latest build")
+            message = watched_build_version.nil? ? "Searching for the latest build" : "Searching for the latest build with build number: #{watched_build_version}"
+            UI.message(message)
             versions = [nil]
           else
             raise BuildWatcherError.new, "There is no app version to watch"
@@ -143,6 +152,20 @@ module FastlaneCore
           UI.success("Successfully finished processing the build #{build.app_version} - #{build.version} for #{build.platform}")
         else
           UI.message("Waiting for the build to show up in the build list - this may take a few minutes (check your email for processing issues if this continues)")
+        end
+      end
+
+      def force_stop_build_watching_if_required(start_time: nil, timeout_duration: nil)
+        return if start_time.nil? || timeout_duration.nil? # keep watching build for App Store Connect processing
+
+        current_time = Time.new
+        end_time = start_time + timeout_duration
+        pending_duration = end_time - current_time
+
+        if current_time > end_time
+          UI.crash!("FastlaneCore::BuildWatcher exceeded the '#{timeout_duration.to_i}' seconds, Stopping now!")
+        else
+          UI.verbose("Will timeout watching build after pending #{pending_duration.to_i} seconds around #{end_time}...")
         end
       end
     end

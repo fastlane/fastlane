@@ -17,7 +17,7 @@ module Deliver
       return if options[:skip_screenshots]
       return if options[:edit_live]
 
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       version = app.get_edit_app_store_version(platform: platform)

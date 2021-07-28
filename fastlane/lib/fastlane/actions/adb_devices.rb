@@ -27,7 +27,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :adb_path,
                                        env_name: "FL_ADB_PATH",
                                        description: "The path to your `adb` binary (can be left blank if the ANDROID_SDK_ROOT environment variable is set)",
-                                       is_string: true,
                                        optional: true,
                                        default_value: "adb")
         ]

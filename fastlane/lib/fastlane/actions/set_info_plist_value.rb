@@ -53,7 +53,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :value,
                                        env_name: "FL_SET_INFO_PLIST_PARAM_VALUE",
                                        description: "Value to setup",
-                                       is_string: false,
+                                       skip_type_validation: true, # allow String, Hash
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_SET_INFO_PLIST_PATH",

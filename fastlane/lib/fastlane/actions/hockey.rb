@@ -226,19 +226,13 @@ module Fastlane
                                        description: "Path to your symbols file. For iOS and Mac provide path to app.dSYM.zip. For Android provide path to mappings.txt file",
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
                                        default_value_dynamic: true,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         # validation is done in the action
-                                       end),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :create_update,
                                        env_name: "FL_HOCKEY_CREATE_UPDATE",
                                        description: "Set true if you want to create then update your app as opposed to just upload it."\
                                          " You will need the 'public_identifier', 'bundle_version' and 'bundle_short_version'",
-                                       is_string: false,
-                                       default_value: false,
-                                       verify_block: proc do |value|
-                                         # validation is done in the action
-                                       end),
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :notes,
                                        env_name: "FL_HOCKEY_NOTES",
                                        description: "Beta Notes",
@@ -307,7 +301,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :upload_dsym_only,
                                       env_name: "FL_HOCKEY_UPLOAD_DSYM_ONLY",
                                       description: "Flag to upload only the dSYM file to hockey app",
-                                      is_string: false,
+                                      type: Boolean,
                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :owner_id,
                                       env_name: "FL_HOCKEY_OWNER_ID",
@@ -328,12 +322,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :bypass_cdn,
                                       env_name: "FL_HOCKEY_BYPASS_CDN",
                                       description: "Flag to bypass Hockey CDN when it uploads successfully but reports error",
-                                      is_string: false,
+                                      type: Boolean,
                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :dsa_signature,
                                       env_name: "FL_HOCKEY_DSA_SIGNATURE",
                                       description: "DSA signature for sparkle updates for macOS",
-                                      is_string: true,
                                       default_value: "",
                                       optional: true)
         ]

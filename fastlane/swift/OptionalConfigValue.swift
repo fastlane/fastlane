@@ -23,38 +23,6 @@ public enum OptionalConfigValue<T> {
     }
 }
 
-extension Optional: ExpressibleByIntegerLiteral where Wrapped: ExpressibleByIntegerLiteral {
-    public typealias IntegerLiteralType = Wrapped.IntegerLiteralType
-
-    public init(integerLiteral value: Wrapped.IntegerLiteralType) {
-        self = .some(.init(integerLiteral: value))
-    }
-}
-
-extension Optional: ExpressibleByUnicodeScalarLiteral where Wrapped: ExpressibleByUnicodeScalarLiteral {
-    public typealias UnicodeScalarLiteralType = Wrapped.UnicodeScalarLiteralType
-
-    public init(unicodeScalarLiteral value: Wrapped.UnicodeScalarLiteralType) {
-        self = .some(.init(unicodeScalarLiteral: value))
-    }
-}
-
-extension Optional: ExpressibleByExtendedGraphemeClusterLiteral where Wrapped: ExpressibleByStringLiteral {
-    public typealias ExtendedGraphemeClusterLiteralType = Wrapped.ExtendedGraphemeClusterLiteralType
-
-    public init(extendedGraphemeClusterLiteral value: Wrapped.ExtendedGraphemeClusterLiteralType) {
-        self = .some(.init(extendedGraphemeClusterLiteral: value))
-    }
-}
-
-extension Optional: ExpressibleByStringLiteral where Wrapped: ExpressibleByStringLiteral {
-    public typealias StringLiteralType = Wrapped.StringLiteralType
-
-    public init(stringLiteral value: Wrapped.StringLiteralType) {
-        self = .some(.init(stringLiteral: value))
-    }
-}
-
 extension OptionalConfigValue: ExpressibleByUnicodeScalarLiteral where T == String? {
     public typealias UnicodeScalarLiteralType = String
 
@@ -78,6 +46,8 @@ extension OptionalConfigValue: ExpressibleByStringLiteral where T == String? {
         self = .userDefined(value)
     }
 }
+
+extension OptionalConfigValue: ExpressibleByStringInterpolation where T == String? {}
 
 extension OptionalConfigValue: ExpressibleByNilLiteral {
     public init(nilLiteral _: ()) {

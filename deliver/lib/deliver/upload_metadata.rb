@@ -82,7 +82,7 @@ module Deliver
     def upload(options)
       return if options[:skip_metadata]
 
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
 
@@ -97,7 +97,7 @@ module Deliver
         localised_options = LOCALISED_LIVE_VALUES
         non_localised_options = NON_LOCALISED_LIVE_VALUES
 
-        if v.nil?
+        if version.nil?
           UI.message("Couldn't find live version, editing the current version on App Store Connect instead")
           version = fetch_edit_app_store_version(app, platform)
           # we don't want to update the localised_options and non_localised_options
@@ -342,7 +342,7 @@ module Deliver
 
       set_review_information(version, options)
       set_review_attachment_file(version, options)
-      set_app_rating(version, options)
+      set_app_rating(app_info, options)
     end
 
     # rubocop:enable Metrics/PerceivedComplexity
@@ -642,7 +642,7 @@ module Deliver
       end
     end
 
-    def set_app_rating(version, options)
+    def set_app_rating(app_info, options)
       return unless options[:app_rating_config_path]
 
       require 'json'
@@ -675,9 +675,23 @@ module Deliver
         has_mapped_values = true
         UI.deprecated("Age rating '#{k}' from iTunesConnect has been deprecated. Please replace with '#{v}'")
       end
-      UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
 
-      age_rating_declaration = version.fetch_age_rating_declaration
+      # Handle App Store Connect deprecation/migrations of keys/values if possible
+      attributes, deprecation_messages, errors = Spaceship::ConnectAPI::AgeRatingDeclaration.map_deprecation_if_possible(attributes)
+      deprecation_messages.each do |message|
+        UI.deprecated(message)
+      end
+
+      unless errors.empty?
+        errors.each do |error|
+          UI.error(error)
+        end
+        UI.user_error!("There are Age Rating deprecation errors that cannot be solved automatically... Please apply any fixes and try again")
+      end
+
+      UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values || !deprecation_messages.empty?
+
+      age_rating_declaration = app_info.fetch_age_rating_declaration
       age_rating_declaration.update(attributes: attributes)
     end
   end

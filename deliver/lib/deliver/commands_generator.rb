@@ -168,7 +168,7 @@ module Deliver
           return 0 unless res
 
           require 'deliver/setup'
-          app = options[:app]
+          app = Deliver.cache[:app]
           platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
           v = app.get_latest_app_store_version(platform: platform)
           if options[:app_version].to_s.length > 0

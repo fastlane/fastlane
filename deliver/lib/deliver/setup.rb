@@ -39,7 +39,7 @@ module Deliver
     # This method takes care of creating a new 'deliver' folder, containing the app metadata
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       v = app.get_latest_app_store_version(platform: platform)

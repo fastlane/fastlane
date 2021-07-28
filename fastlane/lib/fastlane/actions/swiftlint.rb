@@ -11,8 +11,20 @@ module Fastlane
           UI.user_error!("Your version of swiftlint (#{version}) does not support autocorrect mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
         end
 
+        # See 'Breaking' section release notes here: https://github.com/realm/SwiftLint/releases/tag/0.43.0
+        if params[:mode] == :autocorrect && version >= Gem::Version.new('0.43.0')
+          UI.deprecated("Your version of swiftlint (#{version}) has deprecated autocorrect mode, please start using fix mode in input param")
+          UI.important("For now, switching swiftlint mode `from :autocorrect to :fix` for you 😇")
+          params[:mode] = :fix
+        elsif params[:mode] == :fix && version < Gem::Version.new('0.43.0')
+          UI.important("Your version of swiftlint (#{version}) does not support fix mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
+          UI.important("For now, switching swiftlint mode `from :fix to :autocorrect` for you 😇")
+          params[:mode] = :autocorrect
+        end
+
+        mode_format = params[:mode] == :fix ? "--" : ""
         command = (params[:executable] || "swiftlint").dup
-        command << " #{params[:mode]}"
+        command << " #{mode_format}#{params[:mode]}"
         command << optional_flags(params)
 
         if params[:files]
@@ -55,7 +67,7 @@ module Fastlane
       end
 
       def self.supported_no_cache_option(params)
-        if params[:mode] == :autocorrect || params[:mode] == :lint
+        if [:autocorrect, :fix, :lint].include?(params[:mode])
           return " --no-cache"
         else
           return ""
@@ -89,14 +101,13 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :mode,
                                        env_name: "FL_SWIFTLINT_MODE",
-                                       description: "SwiftLint mode: :lint, :autocorrect or :analyze",
-                                       is_string: false,
+                                       description: "SwiftLint mode: :lint, :fix, :autocorrect or :analyze",
+                                       type: Symbol,
                                        default_value: :lint,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_SWIFTLINT_PATH",
                                        description: "Specify path to lint",
-                                       is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find path '#{File.expand_path(value)}'") unless File.exist?(value)
@@ -113,20 +124,18 @@ module Fastlane
                                        env_name: "FL_SWIFTLINT_STRICT",
                                        description: 'Fail on warnings? (true/false)',
                                        default_value: false,
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :files,
                                        env_name: "FL_SWIFTLINT_FILES",
                                        description: 'List of files to process',
-                                       is_string: false,
+                                       type: Array,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :ignore_exit_status,
                                        env_name: "FL_SWIFTLINT_IGNORE_EXIT_STATUS",
                                        description: "Ignore the exit status of the SwiftLint command, so that serious violations \
                                                     don't fail the build (true/false)",
                                        default_value: false,
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :raise_if_swiftlint_error,
@@ -134,14 +143,12 @@ module Fastlane
                                        description: "Raises an error if swiftlint fails, so you can fail CI/CD jobs if necessary \
                                                     (true/false)",
                                        default_value: false,
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :reporter,
                                        env_name: "FL_SWIFTLINT_REPORTER",
                                        description: "Choose output reporter. Available: xcode, json, csv, checkstyle, codeclimate, \
                                                      junit, html, emoji, sonarqube, markdown, github-actions-logging",
-                                       is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          available = ['xcode', 'json', 'csv', 'checkstyle', 'codeclimate', 'junit', 'html', 'emoji', 'sonarqube', 'markdown', 'github-actions-logging']
@@ -151,32 +158,27 @@ module Fastlane
                                        env_name: "FL_SWIFTLINT_QUIET",
                                        description: "Don't print status logs like 'Linting <file>' & 'Done linting'",
                                        default_value: false,
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :executable,
                                        env_name: "FL_SWIFTLINT_EXECUTABLE",
                                        description: "Path to the `swiftlint` executable on your machine",
-                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :format,
                                        env_name: "FL_SWIFTLINT_FORMAT",
                                        description: "Format code when mode is :autocorrect",
                                        default_value: false,
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :no_cache,
                                        env_name: "FL_SWIFTLINT_NO_CACHE",
                                        description: "Ignore the cache when mode is :autocorrect or :lint",
                                        default_value: false,
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :compiler_log_path,
                                        env_name: "FL_SWIFTLINT_COMPILER_LOG_PATH",
                                        description: "Compiler log path when mode is :analyze",
-                                       is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find compiler_log_path '#{File.expand_path(value)}'") unless File.exist?(value)

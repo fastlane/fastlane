@@ -13,6 +13,9 @@ module Match
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
         self.team_id = team_id
+      elsif !Spaceship::ConnectAPI.token.nil?
+        UI.message("Using existing authorization token for App Store Connect API")
+        self.team_id = team_id
       else
         # We'll try to manually fetch the password
         # to tell the user that a password is optional

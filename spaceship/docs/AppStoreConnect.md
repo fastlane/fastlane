@@ -5,10 +5,11 @@
   * [Applications](#applications)
   * [AppVersions](#appversions)
   * [Select a build for review](#select-a-build-for-review)
+  * [Submit app for App Store Review](#submit-app-for-app-store-review)
+  * [Release reviewed build](#release-reviewed-build)
   * [Build Trains (TestFlight)](#build-trains-testflight)
   * [Builds](#builds)
   * [Processing builds](#processing-builds)
-  * [Submit app for App Store Review](#submit-app-for-app-store-review)
   * [Testers](#testers)
   * [App ratings & reviews](#app-ratings--reviews)
   * [App Analytics](#app-analytics)
@@ -75,6 +76,7 @@ app = Spaceship::ConnectAPI::App.create(name: "App Name",
 To update non version specific details, use the following code
 
 ```ruby
+app = Spaceship::Tunes::Application.find("com.krausefx.app")
 details = app.details
 details.name['en-US'] = "App Name"
 details.privacy_url['en-US'] = "https://fastlane.tools"
@@ -84,6 +86,7 @@ details.save!
 To change the price of the app (it's not necessary to call `save!` when updating the price)
 
 ```ruby
+app = Spaceship::Tunes::Application.find("com.krausefx.app")
 app.update_price_tier!("3")
 ```
 
@@ -99,7 +102,10 @@ With _spaceship_ you can access the versions like this
 
 ```ruby
 app.get_live_app_store_version # the version that's currently available in the App Store
-app.get_edit_app_store_version # the version that's in `Prepare for Submission` mode
+app.get_edit_app_store_version # the version that's in `Prepare for Submission`, `Metadata Rejected`, `Rejected`, `Developer Rejcted`, `Waiting for Review`, `Invalid Binary` mode
+app.get_latest_app_store_version # the version that's the latest one
+app.get_pending_release_app_store_version # the version that's in `Pending Developer Release` or `Pending Apple Release` mode
+app.get_in_review_app_store_version # the version that is in `In Review` mode
 ```
 
 You can then go ahead and modify app metadata on the version objects:
@@ -108,117 +114,133 @@ You can then go ahead and modify app metadata on the version objects:
 v = app.get_edit_app_store_version
 
 # Access information
-v.app_status        # => "Waiting for Review"
-v.version           # => "0.9.14"
+v.app_store_state         # => "Waiting for Review"
+v.version_string          # => "0.9.14"
+
+# Build is not always available in all app_store_state, e.g. not available in `Prepare for Submission`
+build_number = v.build.nil? ? nil : v.build.version
 
 # Update app metadata
-v.copyright = "#{Time.now.year} Felix Krause"
+copyright = "#{Time.now.year} Felix Krause"
+v.update(attributes: { "copyright": copyright })
 
 # Get a list of available languages for this app
-v.description.languages # => ["German", "English"]
+version = app.get_edit_app_store_version(includes: 'appStoreVersionSubmission,build,appStoreVersionLocalizations')
+localizations = version.appStoreVersionLocalizations
+
+localization = localizations.first
+localization.locale       # => "en-GB"
+localization.description  # => "App description"
 
 # Update localized app metadata
-v.description["en-US"] = "App Description"
+localization.update(attributes: { description: "New Description" })
 
 # set the app age rating
-v.set_rating({
-  'CARTOON_FANTASY_VIOLENCE' => 0,
-  'MATURE_SUGGESTIVE' => 2,
-  'UNRESTRICTED_WEB_ACCESS' => 0
+
+# fetch_age_rating_declaration with `fetch_live_app_info` or `fetch_edit_app_info`
+app_info = app.fetch_edit_app_info
+declaration = app_info.fetch_age_rating_declaration unless app_info.nil?
+
+# update age_rating_declaration
+declaration.update(attributes: {
+  "violenceCartoonOrFantasy": "NONE",
+  "matureOrSuggestiveThemes": "NONE",
+  "unrestrictedWebAccess": false
 })
 # Available values:
 # https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json
 # https://docs.fastlane.tools/actions/deliver/#reference (Open "View all available categories, languages, etc.")
 
-# Push the changes back to the server
-v.save!
 ```
 
-All available options:
+Available options:
 ```ruby
 ####
-# General app version metadata
+# General app store version metadata (app_store_version)
 ####
 
-attr_accessor :application
-attr_accessor :version
+attr_accessor :platform
+attr_accessor :version_string
+attr_accessor :app_store_state
+attr_accessor :store_icon
+attr_accessor :watch_store_icon
 attr_accessor :copyright
-attr_reader :app_status
-attr_accessor :is_live
-attr_accessor :primary_category
-attr_accessor :primary_first_sub_category
-attr_accessor :primary_second_sub_category
-attr_accessor :secondary_category
-attr_accessor :secondary_first_sub_category
-attr_accessor :secondary_second_sub_category
-attr_accessor :raw_status
-attr_accessor :can_reject_version
-attr_accessor :can_prepare_for_upload
-attr_accessor :can_send_version_live
-attr_accessor :release_on_approval
-attr_accessor :ratings_reset
-attr_accessor :can_beta_test
-attr_accessor :supports_apple_watch
-attr_accessor :app_icon_url
-attr_accessor :app_icon_original_name
-attr_accessor :watch_app_icon_url
-attr_accessor :watch_app_icon_original_name
-attr_accessor :version_id
+attr_accessor :release_type
+attr_accessor :earliest_release_date
+attr_accessor :uses_idfa
+attr_accessor :is_watch_only
+attr_accessor :downloadable
+attr_accessor :created_date
+attr_accessor :app_store_version_submission
+attr_accessor :app_store_version_phased_release
+attr_accessor :app_store_review_detail
+attr_accessor :app_store_version_localizations
 
 ####
-# Trade Representative Contact Information
+# App Review Information (app_store_review_detail)
 ####
 
-attr_accessor :trade_representative_trade_name
-attr_accessor :trade_representative_first_name
-attr_accessor :trade_representative_last_name
-attr_accessor :trade_representative_address_line_1
-attr_accessor :trade_representative_address_line_2
-attr_accessor :trade_representative_address_line_3
-attr_accessor :trade_representative_city_name
-attr_accessor :trade_representative_state
-attr_accessor :trade_representative_country
-attr_accessor :trade_representative_postal_code
-attr_accessor :trade_representative_phone_number
-attr_accessor :trade_representative_email
-attr_accessor :trade_representative_is_displayed_on_app_store
+attr_accessor :contact_first_name
+attr_accessor :contact_last_name
+attr_accessor :contact_phone
+attr_accessor :contact_email
+attr_accessor :demo_account_name
+attr_accessor :demo_account_password
+attr_accessor :demo_account_required
+attr_accessor :notes
+attr_accessor :app_store_review_attachments
 
 ####
-# App Review Information
+# Localized values (app_store_version_localization)
 ####
 
-attr_accessor :review_first_name
-attr_accessor :review_last_name
-attr_accessor :review_phone_number
-attr_accessor :review_email
-attr_accessor :review_demo_user
-attr_accessor :review_demo_password
-attr_accessor :review_notes
+attr_accessor :description
+attr_accessor :locale
+attr_accessor :keywords
+attr_accessor :marketing_url
+attr_accessor :promotional_text
+attr_accessor :support_url
+attr_accessor :whats_new
+attr_accessor :app_screenshot_sets
+attr_accessor :app_preview_sets
 
-####
-# Localized values
-# attr_reader, since you have to access using ["English"]
-####
-
-attr_accessor :languages
-attr_reader :keywords
-attr_reader :description
-attr_reader :release_notes
-attr_reader :support_url
-attr_reader :marketing_url
-attr_reader :screenshots
 ```
 
-**Important**: For a complete documentation with the return type, description and notes for each of the properties, check out [app_version.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_version.rb).
+**Important**: For a complete documentation with the return type, description and notes for each of the properties, check out [app_store_version.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/connect_api/models/app_store_version.rb) and other models.
 
 ### Select a build for review
 
+For a full list of available options, check out [submit_for_review.rb](https://github.com/fastlane/fastlane/blob/master/deliver/lib/deliver/submit_for_review.rb)
+
 ```ruby
 version = app.get_edit_app_store_version
+build = Spaceship::ConnectAPI::Build.all(app_id: app.id, platform: platform).first
+version.select_build(build_id: build.id)
+```
+### Submit app for App Store Review
 
-builds = version.candidate_builds
-version.select_build(builds.first)
-version.save!
+```ruby
+# Check out submit_for_review.rb to get an overview how to modify idfa, submission information
+version.create_app_store_version_submission
+```
+
+**Important**: For a complete example how to prepare version for review and submit it for review check out [submit_for_review.rb](https://github.com/fastlane/fastlane/blob/master/deliver/lib/deliver/submit_for_review.rb).
+
+
+### Release reviewed build
+
+```ruby
+version = app.get_pending_release_app_store_version
+unless version.nil?
+  Spaceship::ConnectAPI.post_app_store_version_release_request(app_store_version_id: version.id)
+end
+```
+
+or 
+
+```ruby
+version = app.get_pending_release_app_store_version
+version.create_app_store_version_release_request unless version.nil?
 ```
 
 ### Build Trains (TestFlight)
@@ -233,6 +255,8 @@ To clarify:
 A build train contains all builds for a give `version number` (e.g. `0.9.21`). Within the build train you have *n* builds, each having a different `build number` (e.g. `99993`).
 
 ```ruby
+app = Spaceship::Tunes::Application.find("com.krausefx.app")
+
 # Access all build trains for an app
 app.all_build_train_numbers   # => ["0.9.21"]
 
@@ -267,24 +291,8 @@ build.submit_for_testflight_review!
 To also access those builds that are "stuck" at `Processing` at App Store Connect for a while:
 
 ```ruby
-app.all_processing_builds       # => Array of processing builds for this application
+Spaceship::ConnectAPI::Build.all(app_id: app.id, processing_states: "PROCESSING") # => Array of processing builds for this application
 ```
-
-### Submit app for App Store Review
-
-```ruby
-submission = app.create_submission
-
-# Set app submission information
-submission.content_rights_contains_third_party_content = false
-submission.content_rights_has_rights = true
-submission.add_id_info_uses_idfa = false
-
-# Finalize app submission
-submission.complete!
-```
-
-For a full list of available options, check out [app_submission.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/tunes/app_submission.rb).
 
 ### Testers
 
@@ -297,6 +305,8 @@ There are 3 types of testers:
 ```ruby
 # Find a tester based on the email address
 tester = Spaceship::TestFlight::Tester.find(app_id: "some_app_id", email: "felix@krausefx.com")
+
+tester = Spaceship::ConnectAPI::BetaTester.find(email: "felix@krausefx.com")
 
 # Creating new testers
 Spaceship::TestFlight::Tester.create_app_level_tester(
@@ -311,27 +321,34 @@ Right now, _spaceship_ can't modify or create internal testers.
 
 ```ruby
 # Load all sandbox testers
-testers = Spaceship::Tunes::SandboxTester.all
+testers = Spaceship::ConnectAPI::SandboxTester.all
+
+# Delete sandbox testers
+testers.each do |tester|
+  if UI.confirm("Delete #{tester.email}?")
+    tester.delete!
+  end
+end
 
 # Create a sandbox tester
-testers = Spaceship::Tunes::SandboxTester.create!(
-  email: 'sandbox@test.com', # required
-  password: 'Passwordtest1', # required. Must contain >=8 characters, >=1 uppercase, >=1 lowercase, >=1 numeric.
-  country: 'US', # optional, defaults to 'US'
-  first_name: 'Steve', # optional, defaults to 'Test'
-  last_name: 'Brule', # optional, defaults to 'Test'
+testers = Spaceship::ConnectAPI::SandboxTester.create(
+  first_name: "Test", # required
+  last_name: "Three", # required
+  email: "sandbox@test.com", # required
+  password: "Passwordtest1", # required. Must contain >=8 characters, >=1 uppercase, >=1 lowercase, >=1 numeric.
+  confirm_password: "Passwordtest1", # required
+  secret_question: "Question", # required. Must contain >=6 characters
+  secret_answer: "Answer", # required. Must contain >=6 characters
+  birth_date: "1980-03-01", # required
+  app_store_territory: "USA" # required
 )
-
-# Delete sandbox testers by email
-Spaceship::Tunes::SandboxTester.delete!(['sandbox@test.com', 'sandbox2@test.com'])
-
-# Delete all sandbox testers
-Spaceship::Tunes::SandboxTester.delete_all!
 ```
 
 ### App ratings & reviews
 
 ```ruby
+app = Spaceship::Tunes::Application.find("com.krausefx.app")
+
 # Get the rating summary for an application
 ratings = app.ratings # => Spaceship::Tunes::AppRatings
 
@@ -352,6 +369,8 @@ reviews = ratings.reviews("US") # => Array of hashes representing review data
 ### App Analytics
 
 ```ruby
+app = Spaceship::Tunes::Application.find("com.krausefx.app")
+
 # Start app analytics
 analytics = app.analytics                # => Spaceship::Tunes::AppAnalytics
 

@@ -327,6 +327,19 @@ module Spaceship
           test_flight_request_client.delete("apps/#{app_id}/relationships/betaTesters", nil, body)
         end
 
+        def add_beta_tester_to_builds(beta_tester_id: nil, build_ids: [])
+          body = {
+            data: build_ids.map do |id|
+              {
+                type: "builds",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.post("betaTesters/#{beta_tester_id}/relationships/builds", body)
+        end
+
         #
         # betaTesterMetrics
         #

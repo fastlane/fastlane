@@ -14,8 +14,12 @@ module Fastlane
         require 'sigh'
         require 'credentials_manager/appfile_config'
 
+        # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
+        unless values[:api_key_path]
+          values[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        end
+
         Sigh.config = values # we already have the finished config
-        Sigh.config[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
 
         path = Sigh::Manager.start
 

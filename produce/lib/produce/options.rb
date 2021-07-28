@@ -77,7 +77,7 @@ module Produce
         FastlaneCore::ConfigItem.new(key: :company_name,
                                      short_option: "-c",
                                      env_name: "PRODUCE_COMPANY_NAME",
-                                     description: "The name of your company. Only required if it's the first app you create",
+                                     description: "The name of your company. It's used to set company name on App Store Connect team's app pages. Only required if it's the first app you create",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_itc,
                                      short_option: "-i",
