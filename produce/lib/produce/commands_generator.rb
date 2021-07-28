@@ -3,6 +3,7 @@ require 'commander'
 require 'fastlane/version'
 require 'fastlane_core/ui/help_formatter'
 require 'fastlane_core/configuration/config_item'
+require 'fastlane_core/print_table'
 require_relative 'module'
 require_relative 'manager'
 require_relative 'options'
@@ -193,6 +194,31 @@ module Produce
 
           require 'produce/service'
           Produce::Service.disable(options, args)
+        end
+      end
+
+      command :available_services do |c|
+        c.syntax = 'fastlane produce available_services -a APP_IDENTIFIER'
+        c.description = 'Displays a list of allowed Application Services for a specific app.'
+        c.example('Check Available Services', 'fastlane produce available_services -a com.example.app')
+
+        FastlaneCore::CommanderGenerator.new.generate(Produce::Options.available_options, command: c)
+
+        c.action do |args, options|
+          # Filter the options so that we can still build the configuration
+          allowed_keys = Produce::Options.available_options.collect(&:key)
+          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
+
+          require 'produce/service'
+          services = Produce::Service.available_services(options, args)
+          rows = services.map { |capabilities| [capabilities.name, capabilities.id, capabilities.description]  }
+          table = Terminal::Table.new(
+            title: "Available Services",
+            headings: ['Name', 'ID', 'Description'],
+            rows: FastlaneCore::PrintTable.transform_output(rows),
+            style: {:all_separators => true}
+          )
+          puts(table)
         end
       end
 
