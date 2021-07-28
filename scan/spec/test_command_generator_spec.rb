@@ -249,15 +249,15 @@ describe Scan do
 
             result = @test_command_generator.generate
             expect(result).to start_with([
-                                          "set -o pipefail &&",
-                                          "cd ./scan/examples/package/ &&",
-                                          "env NSUnbufferedIO=YES xcodebuild",
-                                          "-scheme package",
-                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
-                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                          :build,
-                                          :test
-                                        ])
+                                           "set -o pipefail &&",
+                                           "cd ./scan/examples/package/ &&",
+                                           "env NSUnbufferedIO=YES xcodebuild",
+                                           "-scheme package",
+                                           "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                           "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                           :build,
+                                           :test
+                                         ])
           end
 
           it "#project_path_array", requires_xcodebuild: true do
@@ -277,16 +277,16 @@ describe Scan do
 
             result = @test_command_generator.generate
             expect(result).to start_with([
-                                          "set -o pipefail &&",
-                                          "cd ./scan/examples/package/ &&",
-                                          "env NSUnbufferedIO=YES xcodebuild",
-                                          "-scheme package",
-                                          "-workspace .",
-                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
-                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                          :build,
-                                          :test
-                                        ])
+                                           "set -o pipefail &&",
+                                           "cd ./scan/examples/package/ &&",
+                                           "env NSUnbufferedIO=YES xcodebuild",
+                                           "-scheme package",
+                                           "-workspace .",
+                                           "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                           "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                           :build,
+                                           :test
+                                         ])
           end
 
           it "#project_path_array", requires_xcodebuild: true do
