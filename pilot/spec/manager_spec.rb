@@ -9,6 +9,13 @@ describe Pilot do
       JSON.parse(File.read(fake_api_key_json_path), { symbolize_names: true })
     end
 
+    let(:fake_app_id) { "fake app_id" }
+    let(:fake_app) { "fake app" }
+    let(:fake_app_identifier) { "fake app_identifier" }
+    let(:fake_ipa) { "fake ipa" }
+    let(:fake_username) { "fake username" }
+    let(:fake_app_platform) { "ios" }
+
     describe "what happens on 'start'" do
       context "when 'config' variable is already set" do
         before(:each) do
@@ -162,6 +169,323 @@ describe Pilot do
           end
 
           it_behaves_like "performing the spaceship login using username and password by pilot"
+        end
+      end
+    end
+
+    describe "what happens on fetching the 'app'" do
+      context "when 'app_id' variable is already set" do
+        before(:each) do
+          allow(Spaceship::ConnectAPI::App)
+            .to receive(:get)
+            .with({:app_id => fake_app_id})
+            .and_return(fake_app)
+
+          fake_manager.instance_variable_set(:@app_id, fake_app_id)
+        end
+
+        it "uses the existing 'app_id' value" do
+          app_result = fake_manager.app
+
+          expect(fake_manager.instance_variable_get(:@app_id)).to eq(fake_app_id)
+          expect(app_result).to eq(fake_app)
+        end
+      end
+
+      context "when 'app_id' variable is not set" do
+        before(:each) do
+          allow(fake_manager)
+            .to receive(:fetch_app_id)
+            .and_return(fake_app_id)
+
+          allow(Spaceship::ConnectAPI::App)
+            .to receive(:get)
+            .with({:app_id => fake_app_id})
+            .and_return(fake_app)
+
+          expect(fake_manager).to receive(:fetch_app_id)
+        end
+
+        it "tries to find the app ID automatically" do
+          app_result = fake_manager.app
+
+          expect(app_result).to eq(fake_app)
+        end
+      end
+
+      context "when 'app' variable is not set" do
+        context "when Spaceship retuns a valid 'app' object" do
+          before(:each) do
+            allow(fake_manager)
+              .to receive(:fetch_app_id)
+              .and_return(fake_app_id)
+
+            allow(Spaceship::ConnectAPI::App)
+              .to receive(:get)
+              .with({:app_id => fake_app_id})
+              .and_return(fake_app)
+
+            expect(fake_manager).to receive(:fetch_app_id)
+          end
+
+          it "retuns the Spaceship app object" do
+            app_result = fake_manager.app
+
+            expect(app_result).to eq(fake_app)
+          end
+        end
+
+        context "when Spaceship failed to return a valid 'app' object" do
+          before(:each) do
+            fake_manager.instance_variable_set(:@config, { apple_id: fake_app_id })
+
+            allow(fake_manager)
+              .to receive(:fetch_app_id)
+              .and_return(fake_app_id)
+
+            allow(Spaceship::ConnectAPI::App)
+              .to receive(:get)
+              .with({:app_id => fake_app_id})
+              .and_return(nil)
+
+            expect(fake_manager).to receive(:fetch_app_id)
+          end
+
+          it "raises the 'Could not find app' exception" do
+            expect(UI).to receive(:user_error!).with("Could not find app with #{fake_app_id}")
+
+            fake_manager.app
+          end
+        end
+      end
+    end
+
+    describe "what happens on fetching the 'app_id'" do
+      context "when 'app_id' variable is already set" do
+        before(:each) do
+          fake_manager.instance_variable_set(:@app_id, fake_app_id)
+        end
+
+        it "uses the existing 'app_id' value" do
+          fetch_app_id_result = fake_manager.fetch_app_id
+
+          expect(fake_manager.instance_variable_get(:@app_id)).to eq(fake_app_id)
+          expect(fetch_app_id_result).to eq(fake_app_id)
+        end
+      end
+
+      context "when 'app_id' variable is not set but config has apple_id" do
+        before(:each) do
+          fake_manager.instance_variable_set(:@config, { apple_id: fake_app_id })
+        end
+
+        it "uses the config apple_id for 'app_id' value" do
+          fetch_app_id_result = fake_manager.fetch_app_id
+
+          expect(fake_manager.instance_variable_get(:@app_id)).to eq(fake_app_id)
+          expect(fetch_app_id_result).to eq(fake_app_id)
+        end
+      end
+
+      context "when 'app_id' variable is not set, config does not has apple_id and failed to find app_identifier" do
+        before(:each) do
+          fake_manager.instance_variable_set(:@config, { apple_id: nil })
+
+          allow(fake_manager)
+            .to receive(:fetch_app_identifier)
+            .and_return(nil)
+        end
+
+        it "asks user to enter the app ID manually" do
+          expect(UI)
+            .to receive(:input)
+            .with("Could not automatically find the app ID, please enter it here (e.g. 956814360): ")
+            .and_return(fake_app_id)
+
+          fetch_app_id_result = fake_manager.fetch_app_id
+
+          expect(fetch_app_id_result).to eq(fake_app_id)
+        end
+      end
+
+      context "when 'app_id' variable is not set, config does not has apple_id but found the app_identifier" do
+        before(:each) do
+          fake_manager.instance_variable_set(:@config, { apple_id: nil })
+
+          allow(fake_manager)
+            .to receive(:fetch_app_identifier)
+            .and_return(fake_app_identifier)
+        end
+
+        context "when Spaceship failed to find the 'app' object using the app_identifier" do
+          before(:each) do
+            RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
+            fake_manager.instance_variable_set(:@config, { username: fake_username })
+
+            allow(Spaceship::ConnectAPI::App)
+              .to receive(:find)
+              .with(fake_app_identifier)
+              .and_return(nil)
+          end
+
+          after(:each) do
+            RSpec::Mocks.configuration.allow_message_expectations_on_nil = false
+          end
+
+          it "raises the 'Could not find app' exception" do
+            allow(nil).to receive(:id).and_return(fake_app_id)
+            expect(UI).to receive(:user_error!).with("Couldn't find app '#{fake_app_identifier}' on the account of '#{fake_username}' on App Store Connect")
+
+            fake_manager.fetch_app_id
+          end
+        end
+
+        context "when Spaceship found the 'app' object using the app_identifier" do
+          before(:each) do
+            allow(Spaceship::ConnectAPI::App)
+              .to receive(:find)
+              .with(fake_app_identifier)
+              .and_return(OpenStruct.new(id: fake_app_id))
+          end
+
+          it "uses the Spaceship app id for 'app_id' value" do
+            fetch_app_id_result = fake_manager.fetch_app_id
+
+            expect(fake_manager.instance_variable_get(:@app_id)).to eq(fake_app_id)
+            expect(fetch_app_id_result).to eq(fake_app_id)
+          end
+        end
+      end
+    end
+
+    describe "what happens on fetching the 'app_identifier'" do
+      before(:each) do
+        expect(UI).to receive(:verbose).with("App identifier (#{fake_app_identifier})")
+      end
+
+      context "when config has 'app_identifier' variable" do
+        before(:each) do
+          fake_manager.instance_variable_set(:@config, { app_identifier: fake_app_identifier })
+        end
+
+        it "uses the config 'app_identifier' value" do
+          fetch_app_identifier_result = fake_manager.fetch_app_identifier
+
+          expect(fetch_app_identifier_result).to eq(fake_app_identifier)
+        end
+      end
+
+      context "when config does not has 'app_identifier' but has 'ipa' path variable" do
+        before(:each) do
+          fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
+
+          allow(FastlaneCore::IpaFileAnalyser)
+            .to receive(:fetch_app_identifier)
+            .with(fake_ipa)
+            .and_return(fake_app_identifier)
+        end
+
+        it "uses the FastlaneCore::IpaFileAnalyser with 'ipa' path to find the 'app_identifier' value" do
+          fetch_app_identifier_result = fake_manager.fetch_app_identifier
+
+          expect(fetch_app_identifier_result).to eq(fake_app_identifier)
+        end
+      end
+
+      context "when FastlaneCore::IpaFileAnalyser failed to fetch the 'app_identifier' variable" do
+        before(:each) do
+          fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
+
+          allow(FastlaneCore::IpaFileAnalyser)
+            .to receive(:fetch_app_identifier)
+            .with(fake_ipa)
+            .and_return(nil)
+        end
+
+        it "asks user to enter the app's bundle identifier manually" do
+          expect(UI).to receive(:input).with("Please enter the app's bundle identifier: ").and_return(fake_app_identifier)
+
+          fetch_app_identifier_result = fake_manager.fetch_app_identifier
+
+          expect(fetch_app_identifier_result).to eq(fake_app_identifier)
+        end
+      end
+    end
+
+    describe "what happens on fetching the 'app_platform'" do
+      context "when config has 'app_platform' variable" do
+        before(:each) do
+          expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
+          fake_manager.instance_variable_set(:@config, { app_platform: fake_app_platform })
+        end
+
+        it "uses the config 'app_platform' value" do
+          fetch_app_platform_result = fake_manager.fetch_app_platform
+
+          expect(fetch_app_platform_result).to eq(fake_app_platform)
+        end
+      end
+
+      context "when config does not has 'app_platform' but has 'ipa' path variable" do
+        before(:each) do
+          expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
+          fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
+
+          allow(FastlaneCore::IpaFileAnalyser)
+            .to receive(:fetch_app_platform)
+            .with(fake_ipa)
+            .and_return(fake_app_platform)
+        end
+
+        it "uses the FastlaneCore::IpaFileAnalyser with 'ipa' path to find the 'app_platform' value" do
+          fetch_app_platform_result = fake_manager.fetch_app_platform
+
+          expect(fetch_app_platform_result).to eq(fake_app_platform)
+        end
+      end
+
+      context "when FastlaneCore::IpaFileAnalyser failed to fetch the 'app_platform' variable" do
+        before(:each) do
+          expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
+          fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
+
+          allow(FastlaneCore::IpaFileAnalyser)
+            .to receive(:fetch_app_platform)
+            .with(fake_ipa)
+            .and_return(nil)
+        end
+
+        it "asks user to enter the app's platform manually" do
+          expect(UI).to receive(:input).with("Please enter the app's platform (appletvos, ios, osx): ").and_return(fake_app_platform)
+
+          fetch_app_platform_result = fake_manager.fetch_app_platform
+
+          expect(fetch_app_platform_result).to eq(fake_app_platform)
+        end
+      end
+
+      context "when user entered an invalid 'app_platform' manually" do
+        let(:invalid_app_platform) { "invalid platform" }
+
+        before(:each) do
+          expect(UI).to receive(:verbose).with("App Platform (#{invalid_app_platform})")
+          fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
+
+          allow(FastlaneCore::IpaFileAnalyser)
+            .to receive(:fetch_app_platform)
+            .with(fake_ipa)
+            .and_return(nil)
+
+          allow(UI)
+            .to receive(:input)
+            .with("Please enter the app's platform (appletvos, ios, osx): ")
+            .and_return(invalid_app_platform)
+        end
+
+        it "raises the 'invalid platform' exception" do
+          expect(UI).to receive(:user_error!).with("App Platform must be ios, appletvos, or osx")
+
+          fake_manager.fetch_app_platform
         end
       end
     end
