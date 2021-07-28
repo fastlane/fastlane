@@ -2771,7 +2771,7 @@ public func chatwork(apiToken: String,
                                                      teamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                      teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                      platform: String = "ios",
-                                                     defaultRuleLevel: Any = "error",
+                                                     defaultRuleLevel: String = "error",
                                                      includeInAppPurchases: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                                                      useLive: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                      negativeAppleSentiment: Any? = nil,
@@ -8467,6 +8467,7 @@ public func rubyVersion() {
  - parameters:
    - workspace: Path to the workspace file
    - project: Path to the project file
+   - packagePath: Path to the Swift Package
    - scheme: The project's scheme. Make sure it's marked as `Shared`
    - device: The name of the simulator type you want to run tests on (e.g. 'iPhone 6')
    - devices: Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])
@@ -8541,6 +8542,7 @@ public func rubyVersion() {
  */
 public func runTests(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      project: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                     packagePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      scheme: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      device: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      devices: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -8613,6 +8615,7 @@ public func runTests(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
+    let packagePathArg = packagePath.asRubyArgument(name: "package_path", type: nil)
     let schemeArg = scheme.asRubyArgument(name: "scheme", type: nil)
     let deviceArg = device.asRubyArgument(name: "device", type: nil)
     let devicesArg = devices.asRubyArgument(name: "devices", type: nil)
@@ -8684,6 +8687,7 @@ public func runTests(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
+                                          packagePathArg,
                                           schemeArg,
                                           deviceArg,
                                           devicesArg,
@@ -8868,6 +8872,7 @@ public func say(text: [String],
  - parameters:
    - workspace: Path to the workspace file
    - project: Path to the project file
+   - packagePath: Path to the Swift Package
    - scheme: The project's scheme. Make sure it's marked as `Shared`
    - device: The name of the simulator type you want to run tests on (e.g. 'iPhone 6')
    - devices: Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])
@@ -8942,6 +8947,7 @@ public func say(text: [String],
  */
 public func scan(workspace: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.workspace),
                  project: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.project),
+                 packagePath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.packagePath),
                  scheme: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.scheme),
                  device: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.device),
                  devices: OptionalConfigValue<[String]?> = .fastlaneDefault(scanfile.devices),
@@ -9014,6 +9020,7 @@ public func scan(workspace: OptionalConfigValue<String?> = .fastlaneDefault(scan
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
+    let packagePathArg = packagePath.asRubyArgument(name: "package_path", type: nil)
     let schemeArg = scheme.asRubyArgument(name: "scheme", type: nil)
     let deviceArg = device.asRubyArgument(name: "device", type: nil)
     let devicesArg = devices.asRubyArgument(name: "devices", type: nil)
@@ -9085,6 +9092,7 @@ public func scan(workspace: OptionalConfigValue<String?> = .fastlaneDefault(scan
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
+                                          packagePathArg,
                                           schemeArg,
                                           deviceArg,
                                           devicesArg,
@@ -10629,6 +10637,7 @@ public func ssh(username: String,
    - timeout: Timeout for read, open, and send (in seconds)
    - deactivateOnPromote: **DEPRECATED!** Google Play does this automatically now - When promoting to a new track, deactivate the binary in the origin track
    - versionCodesToRetain: An array of version codes to retain when publishing a new APK
+   - changesNotSentForReview: Indicates that the changes in this edit will not be reviewed until they are explicitly sent for review from the Google Play Console UI
    - inAppUpdatePriority: In-app update priority for all the newly added apks in the release. Can take values between [0,5]
    - obbMainReferencesVersion: References version of 'main' expansion file
    - obbMainFileSize: Size of 'main' expansion file in bytes
@@ -10668,6 +10677,7 @@ public func supply(packageName: String,
                    timeout: Int = 300,
                    deactivateOnPromote: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                    versionCodesToRetain: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                   changesNotSentForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    inAppUpdatePriority: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                    obbMainReferencesVersion: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    obbMainFileSize: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -10705,6 +10715,7 @@ public func supply(packageName: String,
     let timeoutArg = RubyCommand.Argument(name: "timeout", value: timeout, type: nil)
     let deactivateOnPromoteArg = deactivateOnPromote.asRubyArgument(name: "deactivate_on_promote", type: nil)
     let versionCodesToRetainArg = versionCodesToRetain.asRubyArgument(name: "version_codes_to_retain", type: nil)
+    let changesNotSentForReviewArg = changesNotSentForReview.asRubyArgument(name: "changes_not_sent_for_review", type: nil)
     let inAppUpdatePriorityArg = inAppUpdatePriority.asRubyArgument(name: "in_app_update_priority", type: nil)
     let obbMainReferencesVersionArg = obbMainReferencesVersion.asRubyArgument(name: "obb_main_references_version", type: nil)
     let obbMainFileSizeArg = obbMainFileSize.asRubyArgument(name: "obb_main_file_size", type: nil)
@@ -10741,6 +10752,7 @@ public func supply(packageName: String,
                                           timeoutArg,
                                           deactivateOnPromoteArg,
                                           versionCodesToRetainArg,
+                                          changesNotSentForReviewArg,
                                           inAppUpdatePriorityArg,
                                           obbMainReferencesVersionArg,
                                           obbMainFileSizeArg,
@@ -12245,6 +12257,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
    - timeout: Timeout for read, open, and send (in seconds)
    - deactivateOnPromote: **DEPRECATED!** Google Play does this automatically now - When promoting to a new track, deactivate the binary in the origin track
    - versionCodesToRetain: An array of version codes to retain when publishing a new APK
+   - changesNotSentForReview: Indicates that the changes in this edit will not be reviewed until they are explicitly sent for review from the Google Play Console UI
    - inAppUpdatePriority: In-app update priority for all the newly added apks in the release. Can take values between [0,5]
    - obbMainReferencesVersion: References version of 'main' expansion file
    - obbMainFileSize: Size of 'main' expansion file in bytes
@@ -12284,6 +12297,7 @@ public func uploadToPlayStore(packageName: String,
                               timeout: Int = 300,
                               deactivateOnPromote: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                               versionCodesToRetain: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                              changesNotSentForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                               inAppUpdatePriority: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                               obbMainReferencesVersion: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               obbMainFileSize: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -12321,6 +12335,7 @@ public func uploadToPlayStore(packageName: String,
     let timeoutArg = RubyCommand.Argument(name: "timeout", value: timeout, type: nil)
     let deactivateOnPromoteArg = deactivateOnPromote.asRubyArgument(name: "deactivate_on_promote", type: nil)
     let versionCodesToRetainArg = versionCodesToRetain.asRubyArgument(name: "version_codes_to_retain", type: nil)
+    let changesNotSentForReviewArg = changesNotSentForReview.asRubyArgument(name: "changes_not_sent_for_review", type: nil)
     let inAppUpdatePriorityArg = inAppUpdatePriority.asRubyArgument(name: "in_app_update_priority", type: nil)
     let obbMainReferencesVersionArg = obbMainReferencesVersion.asRubyArgument(name: "obb_main_references_version", type: nil)
     let obbMainFileSizeArg = obbMainFileSize.asRubyArgument(name: "obb_main_file_size", type: nil)
@@ -12357,6 +12372,7 @@ public func uploadToPlayStore(packageName: String,
                                           timeoutArg,
                                           deactivateOnPromoteArg,
                                           versionCodesToRetainArg,
+                                          changesNotSentForReviewArg,
                                           inAppUpdatePriorityArg,
                                           obbMainReferencesVersionArg,
                                           obbMainFileSizeArg,
@@ -13151,4 +13167,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.129]
+// FastlaneRunnerAPIVersion [0.9.130]
