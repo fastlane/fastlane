@@ -178,7 +178,7 @@ describe Pilot do
         before(:each) do
           allow(Spaceship::ConnectAPI::App)
             .to receive(:get)
-            .with({:app_id => fake_app_id})
+            .with({ app_id: fake_app_id })
             .and_return(fake_app)
 
           fake_manager.instance_variable_set(:@app_id, fake_app_id)
@@ -200,7 +200,7 @@ describe Pilot do
 
           allow(Spaceship::ConnectAPI::App)
             .to receive(:get)
-            .with({:app_id => fake_app_id})
+            .with({ app_id: fake_app_id })
             .and_return(fake_app)
 
           expect(fake_manager).to receive(:fetch_app_id)
@@ -222,7 +222,7 @@ describe Pilot do
 
             allow(Spaceship::ConnectAPI::App)
               .to receive(:get)
-              .with({:app_id => fake_app_id})
+              .with({ app_id: fake_app_id })
               .and_return(fake_app)
 
             expect(fake_manager).to receive(:fetch_app_id)
@@ -245,7 +245,7 @@ describe Pilot do
 
             allow(Spaceship::ConnectAPI::App)
               .to receive(:get)
-              .with({:app_id => fake_app_id})
+              .with({ app_id: fake_app_id })
               .and_return(nil)
 
             expect(fake_manager).to receive(:fetch_app_id)
