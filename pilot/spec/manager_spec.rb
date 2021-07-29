@@ -13,8 +13,6 @@ describe Pilot do
     let(:fake_app) { "fake app" }
     let(:fake_app_identifier) { "fake app_identifier" }
     let(:fake_ipa) { "fake ipa" }
-    let(:fake_username) { "fake username" }
-    let(:fake_app_platform) { "ios" }
 
     describe "what happens on 'start'" do
       context "when 'config' variable is already set" do
@@ -309,6 +307,8 @@ describe Pilot do
       end
 
       context "when 'app_id' variable is not set, config does not has apple_id but found the app_identifier" do
+        let(:fake_username) { "fake username" }
+
         before(:each) do
           fake_manager.instance_variable_set(:@config, { apple_id: nil })
 
@@ -413,6 +413,8 @@ describe Pilot do
     end
 
     describe "what happens on fetching the 'app_platform'" do
+      let(:fake_app_platform) { "ios" }
+
       context "when config has 'app_platform' variable" do
         before(:each) do
           expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
@@ -461,6 +463,26 @@ describe Pilot do
           fetch_app_platform_result = fake_manager.fetch_app_platform
 
           expect(fetch_app_platform_result).to eq(fake_app_platform)
+        end
+      end
+
+      context "when FastlaneCore::IpaFileAnalyser failed to fetch the 'app_platform' variable and its not required to enter manually" do
+        before(:each) do
+          expect(UI).not_to receive(:verbose).with("App Platform (#{fake_app_platform})")
+          fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
+
+          allow(FastlaneCore::IpaFileAnalyser)
+            .to receive(:fetch_app_platform)
+            .with(fake_ipa)
+            .and_return(nil)
+        end
+
+        it "does not ask user to enter the app's platform manually" do
+          expect(UI).not_to receive(:input).with("Please enter the app's platform (appletvos, ios, osx): ")
+
+          fetch_app_platform_result = fake_manager.fetch_app_platform(required: false)
+
+          expect(fetch_app_platform_result).to eq(nil)
         end
       end
 
