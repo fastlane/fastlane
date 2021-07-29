@@ -41,14 +41,19 @@ module FastlaneCore
         command = "security set-key-partition-list"
         command << " -S apple-tool:,apple:,codesign:"
         command << " -s" # This is a needed in Catalina to prevent "security: SecKeychainItemCopyAccess: A missing value was detected."
+        password_start = command.length
         command << " -k #{keychain_password.to_s.shellescape}"
+        password_end = command.length
         command << " #{keychain_path.shellescape}"
         command << " 1> /dev/null" # always disable stdout. This can be very verbose, and leak potentially sensitive info
 
         # Showing loading indicator as this can take some time if a lot of keys installed
         Helper.show_loading_indicator("Setting key partition list... (this can take a minute if there are a lot of keys installed)")
 
-        UI.command(command) if output
+        # Strip keychain password from command output
+        sensitive_command = command.dup
+        sensitive_command[password_start, password_end - password_start] = " -k ********"
+        UI.command(sensitive_command) if output
         Open3.popen3(command) do |stdin, stdout, stderr, thrd|
           unless thrd.value.success?
             err = stderr.read.to_s.strip
