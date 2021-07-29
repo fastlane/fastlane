@@ -134,7 +134,7 @@ describe Fastlane do
           issuer_id: issuer_id,
           key: File.binread(fake_api_key_p8_path),
           is_key_content_base64: false,
-          duration: 1200,
+          duration: 500,
           in_house: false
         }
 
