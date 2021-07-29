@@ -8,13 +8,17 @@ module FastlaneCore
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
       command = "security import #{path.shellescape} -k '#{keychain_path.shellescape}'"
+      password_start = command.length
       command << " -P #{certificate_password.shellescape}"
+      password_end = command.length
       command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym` (before Sierra)
       command << " -T /usr/bin/security"
       command << " -T /usr/bin/productbuild" # to not be asked for permission when using an installer cert for macOS
       command << " 1> /dev/null" unless output
 
-      UI.command(command) if output
+      sensitive_command = command.dup
+      sensitive_command[password_start, password_end - password_start] = " -P ********"
+      UI.command(sensitive_command) if output
       Open3.popen3(command) do |stdin, stdout, stderr, thrd|
         UI.command_output(stdout.read.to_s) if output
 
