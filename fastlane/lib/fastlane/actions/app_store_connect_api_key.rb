@@ -80,7 +80,7 @@ module Fastlane
                                        env_name: "APP_STORE_CONNECT_API_KEY_DURATION",
                                        description: "The token session duration",
                                        optional: true,
-                                       default_value: Spaceship::ConnectAPI::Token::MAX_TOKEN_DURATION,
+                                       default_value: Spaceship::ConnectAPI::Token::DEFAULT_TOKEN_DURATION,
                                        type: Integer,
                                        verify_block: proc do |value|
                                          UI.user_error!("The duration can't be more than 1200 (20 minutes) and the value entered was '#{value}'") unless value <= 1200
