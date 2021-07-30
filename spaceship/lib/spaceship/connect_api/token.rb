@@ -13,6 +13,7 @@ module Spaceship
     class Token
       # maximum expiration supported by AppStore (20 minutes)
       MAX_TOKEN_DURATION = 1200
+      DEFAULT_TOKEN_DURATION = 500
 
       attr_reader :key_id
       attr_reader :issuer_id
@@ -80,7 +81,7 @@ module Spaceship
         @duration = duration
         @in_house = in_house
 
-        @duration ||= MAX_TOKEN_DURATION
+        @duration ||= DEFAULT_TOKEN_DURATION
         @duration = @duration.to_i if @duration
 
         refresh!
