@@ -41,6 +41,7 @@ module Spaceship
     attr_accessor :logger
 
     attr_accessor :csrf_tokens
+    attr_accessor :additional_headers
 
     attr_accessor :provider
 
@@ -717,8 +718,13 @@ module Spaceship
       @csrf_tokens || {}
     end
 
+    def additional_headers
+      @additional_headers || {}
+    end
+
     def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
       headers.merge!(csrf_tokens)
+      headers.merge!(additional_headers)
       headers['User-Agent'] = USER_AGENT
 
       # Before encoding the parameters, log them
