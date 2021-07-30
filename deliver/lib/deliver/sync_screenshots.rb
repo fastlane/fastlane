@@ -43,7 +43,7 @@ module Deliver
     def sync(screenshots)
       UI.important('This is currently a beta feature in fastlane. This may cause some errors on your environment.')
 
-      if FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS')
+      unless FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS')
         UI.user_error!('Please set a value to "FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS" environment variable ' \
                        'if you acknowleage the risk and try this out.')
       end
