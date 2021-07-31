@@ -324,7 +324,8 @@ module Deliver
       is_3rd_gen = [
         "iPad Pro (12.9-inch) (3rd generation)", # default simulator name has this
         "iPad Pro (12.9-inch) (4th generation)", # default simulator name has this
-        "ipadPro129" # downloaded screenshots name has this
+        "ipadPro129", # downloaded screenshots name has this,
+        "3GEN" # downloaded screenshots name from App Store Connect API has this
       ].any? { |key| filename.include?(key) }
       if is_3rd_gen
         if screen_size == ScreenSize::IOS_IPAD_PRO
