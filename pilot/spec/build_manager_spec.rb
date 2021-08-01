@@ -702,8 +702,8 @@ describe "Build Manager" do
         it "prints the processing and processed both builds" do
           expect(FastlaneCore::PrintTable).to receive(:transform_output).with([["1.0.0", "1234"]]).and_return([])
           expect(FastlaneCore::PrintTable).to receive(:transform_output).with([["1.1.0", "12345", 100]]).and_return([])
-          expect(Terminal::Table).to receive(:new).with({ :headings=>["Version #", "Build #"], :rows=>[], :title=>"\e[32m#{fake_app_name} Processing Builds\e[0m" }).and_return("fake Terminal::Table fake_processing_builds")
-          expect(Terminal::Table).to receive(:new).with({ :headings=>["Version #", "Build #", "Installs"], :rows=>[], :title=>"\e[32m#{fake_app_name} Builds\e[0m" }).and_return("fake Terminal::Table fake_processed_builds")
+          expect(Terminal::Table).to receive(:new).with({ headings: ["Version #", "Build #"], rows: [], title: "\e[32m#{fake_app_name} Processing Builds\e[0m" }).and_return("fake Terminal::Table fake_processing_builds")
+          expect(Terminal::Table).to receive(:new).with({ headings: ["Version #", "Build #", "Installs"], rows: [], title: "\e[32m#{fake_app_name} Builds\e[0m" }).and_return("fake Terminal::Table fake_processed_builds")
           expect(STDOUT).to receive(:puts).with("fake Terminal::Table fake_processing_builds")
           expect(STDOUT).to receive(:puts).with("fake Terminal::Table fake_processed_builds")
 
