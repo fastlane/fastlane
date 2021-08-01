@@ -7,6 +7,7 @@ module Fastlane
         cmd = ['pod cache clean']
 
         cmd << params[:name].to_s if params[:name]
+        cmd << '--allow-root' if params[:allow_root]
         cmd << '--all'
 
         Actions.sh(cmd.join(' '))
