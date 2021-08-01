@@ -46,13 +46,13 @@ module Spaceship
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def self.all(client: nil, filter: {}, includes: ESSENTIAL_INCLUDES, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_users(filter: filter, includes: includes).all_pages
         return resps.flat_map(&:to_models)
       end
 
-      def self.find(client: nil, email: nil, includes: nil)
+      def self.find(client: nil, email: nil, includes: ESSENTIAL_INCLUDES)
         client ||= Spaceship::ConnectAPI
         return all(client: client, filter: { email: email }, includes: includes)
       end
