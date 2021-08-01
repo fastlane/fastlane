@@ -24,7 +24,12 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("You must specify pod name which should be removed from cache") if value.to_s.empty?
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :allow_root,
+                                       env_name: "FL_CLEAN_COCOAPODS_CACHE_ALLOW_ROOT",
+                                       description: "Allows CocoaPods to run as root",
+                                       type: Boolean,
+                                       default_value: false)
         ]
       end
 
