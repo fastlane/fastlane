@@ -673,8 +673,7 @@ describe "Build Manager" do
         before(:each) do
           fake_build_manager.instance_variable_set(:@config, input_options_without_app_identifier)
           allow(fake_build_manager).to receive(:start).with(input_options_without_app_identifier)
-          allow(Terminal::Table).to receive(:new).and_return("fake Terminal::Table")
-          expect(STDOUT).to receive(:puts).with("fake Terminal::Table").exactly(2).times
+          allow(Terminal::Table).to receive(:new).and_return("")
         end
 
         it "asks the user to enter the app_identifier manually" do
@@ -704,8 +703,6 @@ describe "Build Manager" do
           expect(FastlaneCore::PrintTable).to receive(:transform_output).with([["1.1.0", "12345", 100]]).and_return([])
           expect(Terminal::Table).to receive(:new).with({ headings: ["Version #", "Build #"], rows: [], title: "\e[32m#{fake_app_name} Processing Builds\e[0m" }).and_return("fake Terminal::Table fake_processing_builds")
           expect(Terminal::Table).to receive(:new).with({ headings: ["Version #", "Build #", "Installs"], rows: [], title: "\e[32m#{fake_app_name} Builds\e[0m" }).and_return("fake Terminal::Table fake_processed_builds")
-          expect(STDOUT).to receive(:puts).with("fake Terminal::Table fake_processing_builds")
-          expect(STDOUT).to receive(:puts).with("fake Terminal::Table fake_processed_builds")
 
           fake_build_manager.list(input_options_with_app_identifier)
         end
