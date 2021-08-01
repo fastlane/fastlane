@@ -25,6 +25,7 @@ module Fastlane
           cmd << "--without #{params[:without]}" if params[:without]
           cmd << "--with #{params[:with]}" if params[:with]
           cmd << "--frozen" if params[:frozen]
+          cmd << "--redownload" if params[:redownload]
 
           return sh(cmd.join(' '))
         else
@@ -151,6 +152,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :frozen,
                                        env_name: "FL_BUNDLE_INSTALL_FROZEN",
                                        description: "Don't allow the Gemfile.lock to be updated after install",
+                                       type: Boolean,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :redownload,
+                                       env_name: "FL_BUNDLE_INSTALL_REDOWNLOAD",
+                                       description: "Force download every gem, even if the required versions are already available locally",
                                        type: Boolean,
                                        default_value: false)
         ]
