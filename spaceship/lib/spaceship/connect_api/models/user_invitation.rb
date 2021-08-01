@@ -86,7 +86,7 @@ module Spaceship
       end
 
       # Get visible apps for invited user
-      def fetch_visible_apps(client: nil, limit: nil)
+      def get_visible_apps(client: nil, limit: nil)
         client ||= Spaceship::ConnectAPI
         resp = client.get_user_invitation_visible_apps(user_invitation_id: id, limit: limit)
         return resp.to_models
