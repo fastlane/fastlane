@@ -649,4 +649,67 @@ describe "Build Manager" do
       expect(transporter.instance_variable_get(:@provider_short_name)).to eq(selected_team_id)
     end
   end
+
+  describe "#list" do
+    let(:fake_build_manager) { Pilot::BuildManager.new }
+    let(:fake_app_identifier) { "fake app_identifier" }
+    let(:fake_app_name) { "fake app_name" }
+
+    describe "what happens when listing the builds" do
+      let(:fake_processing_builds) { [ double("fake processing_build", cf_build_short_version_string: "1.0.0", cf_build_version: "1234") ] }
+      let(:fake_processed_builds) { [ double("fake processed_build", app_version: "1.1.0", version: "12345", beta_build_metrics: [ double("fake processed_build 1 metrics", install_count: 100) ]) ] }
+      let(:fake_app) { double("fake app", get_build_deliveries: fake_processing_builds, get_builds: fake_processed_builds, name: fake_app_name) }
+
+      before(:each) do
+        expect(fake_build_manager).to receive(:app).and_return(fake_app).exactly(4).times
+        expect(fake_app).to receive(:get_build_deliveries)
+        expect(fake_app).to receive(:get_builds).with(includes: "betaBuildMetrics,preReleaseVersion", sort: "-uploadedDate")
+        expect(fake_app).to receive(:name)
+      end
+
+      context "when apple_id and app_identifier both are not set" do
+        let(:input_options_without_app_identifier) { {} }
+
+        before(:each) do
+          fake_build_manager.instance_variable_set(:@config, input_options_without_app_identifier)
+          allow(fake_build_manager).to receive(:start).with(input_options_without_app_identifier)
+          allow(Terminal::Table).to receive(:new).and_return("fake Terminal::Table")
+          expect(STDOUT).to receive(:puts).with("fake Terminal::Table").exactly(2).times
+        end
+
+        it "asks the user to enter the app_identifier manually" do
+          expect(UI).to receive(:input).with("App Identifier: ")
+
+          fake_build_manager.list(input_options_without_app_identifier)
+        end
+
+        it "sets the user entered app_identifier into input_options" do
+          allow(UI).to receive(:input).and_return(fake_app_identifier)
+
+          fake_build_manager.list(input_options_without_app_identifier)
+          expect(input_options_without_app_identifier).to eq({ app_identifier: fake_app_identifier })
+        end
+      end
+
+      context "when app_identifier is set" do
+        let(:input_options_with_app_identifier) { { app_identifier: fake_app_identifier } }
+
+        before(:each) do
+          fake_build_manager.instance_variable_set(:@config, input_options_with_app_identifier)
+          allow(fake_build_manager).to receive(:start).with(input_options_with_app_identifier)
+        end
+
+        it "prints the processing and processed both builds" do
+          expect(FastlaneCore::PrintTable).to receive(:transform_output).with([["1.0.0", "1234"]]).and_return([])
+          expect(FastlaneCore::PrintTable).to receive(:transform_output).with([["1.1.0", "12345", 100]]).and_return([])
+          expect(Terminal::Table).to receive(:new).with({ :headings=>["Version #", "Build #"], :rows=>[], :title=>"\e[32m#{fake_app_name} Processing Builds\e[0m" }).and_return("fake Terminal::Table fake_processing_builds")
+          expect(Terminal::Table).to receive(:new).with({ :headings=>["Version #", "Build #", "Installs"], :rows=>[], :title=>"\e[32m#{fake_app_name} Builds\e[0m" }).and_return("fake Terminal::Table fake_processed_builds")
+          expect(STDOUT).to receive(:puts).with("fake Terminal::Table fake_processing_builds")
+          expect(STDOUT).to receive(:puts).with("fake Terminal::Table fake_processed_builds")
+
+          fake_build_manager.list(input_options_with_app_identifier)
+        end
+      end
+    end
+  end
 end
