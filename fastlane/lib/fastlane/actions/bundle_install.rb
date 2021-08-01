@@ -24,6 +24,7 @@ module Fastlane
           cmd << "--trust-policy" if params[:trust_policy]
           cmd << "--without #{params[:without]}" if params[:without]
           cmd << "--with #{params[:with]}" if params[:with]
+          cmd << "--frozen" if params[:frozen]
 
           return sh(cmd.join(' '))
         else
@@ -146,7 +147,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :with,
                                        env_name: "FL_BUNDLE_INSTALL_WITH",
                                        description: "Include gems that are part of the specified named group",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :frozen,
+                                       env_name: "FL_BUNDLE_INSTALL_FROZEN",
+                                       description: "Don't allow the Gemfile.lock to be updated after install",
+                                       type: Boolean,
+                                       default_value: false)
         ]
       end
     end
