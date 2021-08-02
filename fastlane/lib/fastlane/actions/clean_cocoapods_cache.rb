@@ -7,6 +7,7 @@ module Fastlane
         cmd = ['pod cache clean']
 
         cmd << params[:name].to_s if params[:name]
+        cmd << '--silent' if params[:silent]
         cmd << '--allow-root' if params[:allow_root]
         cmd << '--all'
 
@@ -26,6 +27,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("You must specify pod name which should be removed from cache") if value.to_s.empty?
                                        end),
+          FastlaneCore::ConfigItem.new(key: :silent,
+                                       env_name: "FL_CLEAN_COCOAPODS_CACHE_SILENT",
+                                       description: "Show nothing",
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :allow_root,
                                        env_name: "FL_CLEAN_COCOAPODS_CACHE_ALLOW_ROOT",
                                        description: "Allows CocoaPods to run as root",
