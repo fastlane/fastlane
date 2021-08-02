@@ -56,6 +56,81 @@ describe Spaceship::ConnectAPI::Users::Client do
           client.get_users
         end
       end
+
+      context 'get_user_visible_apps' do
+        let(:user_id) { "42" }
+        let(:path) { "users/#{user_id}/visibleApps" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_user_visible_apps(user_id: user_id)
+        end
+      end
+    end
+
+    describe "user_invitations" do
+      context 'post_user_invitation' do
+        let(:path) { "userInvitations" }
+        let(:attributes) {
+          {
+            email: "test@example.com",
+            firstName: "Firstname",
+            lastName: "Lastname",
+            roles: [],
+            provisioningAllowed: true,
+            allAppsVisible: false
+          }
+        }
+        let(:visible_app_ids) { ["123", "456"] }
+        let(:body) do
+          {
+            data: {
+              type: "userInvitations",
+              attributes: attributes,
+              relationships: {
+                visibleApps: {
+                  data: visible_app_ids.map do |id|
+                    {
+                      id: id,
+                      type: "apps"
+                    }
+                  end
+                }
+              }
+            }
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.post_user_invitation(
+            email: "test@example.com",
+            first_name: "Firstname",
+            last_name: "Lastname",
+            roles: [],
+            provisioning_allowed: true,
+            all_apps_visible: false,
+            visible_app_ids: ["123", "456"]
+          )
+        end
+      end
+
+      context 'get_user_invitation_visible_apps' do
+        let(:invitation_id) { "42" }
+        let(:path) { "userInvitations/#{invitation_id}/visibleApps" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_user_invitation_visible_apps(user_invitation_id: invitation_id)
+        end
+      end
     end
   end
 end
