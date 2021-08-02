@@ -71,6 +71,50 @@ describe "Build Manager" do
     end
   end
 
+  describe ".check_for_changelog_or_whats_new!" do
+    let(:fake_build_manager) { Pilot::BuildManager.new }
+    let(:fake_changelog) { "fake changelog" }
+    let(:input_options) { { distribute_external: true } }
+
+    describe "what happens when changelog is not given and distribute_external is true" do
+      before(:each) do
+        allow(fake_build_manager).to receive(:has_changelog_or_whats_new?).with(input_options).and_return(false)
+      end
+
+      context "when UI.interactive? is possible" do
+        before(:each) do
+          allow(UI).to receive(:interactive?).and_return(true)
+        end
+
+        it "asks the user to enter the changelog" do
+          expect(UI).to receive(:input).with("No changelog provided for new build. You can provide a changelog using the `changelog` option. For now, please provide a changelog here:")
+
+          fake_build_manager.check_for_changelog_or_whats_new!(input_options)
+        end
+
+        it "sets the user entered changelog into input_options" do
+          allow(UI).to receive(:input).and_return(fake_changelog)
+
+          fake_build_manager.check_for_changelog_or_whats_new!(input_options)
+
+          expect(input_options).to eq({ distribute_external: true, changelog: fake_changelog })
+        end
+      end
+
+      context "when UI.interactive? is not possible" do
+        before(:each) do
+          allow(UI).to receive(:interactive?).and_return(false)
+        end
+
+        it "raises an exception with message either disable `distribute_external` or provide a changelog using the `changelog` option" do
+          expect(UI).to receive(:user_error!).with("No changelog provided for new build. Please either disable `distribute_external` or provide a changelog using the `changelog` option")
+
+          fake_build_manager.check_for_changelog_or_whats_new!(input_options)
+        end
+      end
+    end
+  end
+
   describe "distribute submits the build for review" do
     let(:mock_base_client) { "fake api base client" }
     let(:fake_build_manager) { Pilot::BuildManager.new }
