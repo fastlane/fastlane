@@ -211,7 +211,7 @@ module Spaceship
               attributes: {
                 name: group_name,
                 isInternalGroup: is_internal_group,
-                hasAccessToAllBuilds: is_internal_group ? true : false,
+                hasAccessToAllBuilds: is_internal_group ? true : false, # Undocumented of 2021-08-02 in ASC API docs and ASC Open API spec. This is the default behavior on App Store Connect and does work with both Apple ID and API Token
                 publicLinkEnabled: public_link_enabled,
                 publicLinkLimit: public_link_limit,
                 publicLinkLimitEnabled: public_link_limit_enabled
