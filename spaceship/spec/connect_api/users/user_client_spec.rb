@@ -100,6 +100,54 @@ describe Spaceship::ConnectAPI::Users::Client do
         end
       end
 
+      context 'replace_user_visible_apps' do
+        let(:user_id) { "123" }
+        let(:path) { "users/#{user_id}/relationships/visibleApps" }
+        let(:app_ids) { ["456", "789"] }
+        let(:body) do
+          {
+            data: app_ids.map do |app_id|
+              {
+                type: "apps",
+                id: app_id
+              }
+            end
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:patch).and_yield(req_mock).and_return(req_mock)
+          client.replace_user_visible_apps(user_id: user_id, app_ids: app_ids)
+        end
+      end
+
+      context 'remove_user_visible_apps' do
+        let(:user_id) { "123" }
+        let(:path) { "users/#{user_id}/relationships/visibleApps" }
+        let(:app_ids) { ["456", "789"] }
+        let(:body) do
+          {
+            data: app_ids.map do |app_id|
+              {
+                type: "apps",
+                id: app_id
+              }
+            end
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock).and_return(req_mock)
+          client.remove_user_visible_apps(user_id: user_id, app_ids: app_ids)
+        end
+      end
+
       context 'get_user_visible_apps' do
         let(:user_id) { "42" }
         let(:path) { "users/#{user_id}/visibleApps" }
