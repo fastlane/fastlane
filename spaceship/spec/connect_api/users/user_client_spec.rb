@@ -45,6 +45,14 @@ describe Spaceship::ConnectAPI::Users::Client do
       return req_mock
     end
 
+    def test_request(url)
+      req_mock = double
+      expect(req_mock).to receive(:url).with(url)
+      allow(req_mock).to receive(:status)
+
+      return req_mock
+    end
+
     describe "users" do
       context 'get_users' do
         let(:path) { "users" }
@@ -54,6 +62,41 @@ describe Spaceship::ConnectAPI::Users::Client do
           req_mock = test_request_params(path, params)
           expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
           client.get_users
+        end
+      end
+
+      context 'delete_user' do
+        let(:user_id) { "123" }
+        let(:path) { "users/#{user_id}" }
+
+        it 'succeeds' do
+          req_mock = test_request(path)
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock).and_return(req_mock)
+          client.delete_user(user_id: user_id)
+        end
+      end
+
+      context 'add_user_visible_apps' do
+        let(:user_id) { "123" }
+        let(:path) { "users/#{user_id}/relationships/visibleApps" }
+        let(:app_ids) { ["456", "789"] }
+        let(:body) do
+          {
+            data: app_ids.map do |app_id|
+              {
+                type: "apps",
+                id: app_id
+              }
+            end
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.add_user_visible_apps(user_id: user_id, app_ids: ["456", "789"])
         end
       end
 
@@ -71,6 +114,17 @@ describe Spaceship::ConnectAPI::Users::Client do
     end
 
     describe "user_invitations" do
+      context 'get_user_invitations' do
+        let(:path) { "userInvitations" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_user_invitations
+        end
+      end
+
       context 'post_user_invitation' do
         let(:path) { "userInvitations" }
         let(:attributes) {
@@ -117,6 +171,17 @@ describe Spaceship::ConnectAPI::Users::Client do
             all_apps_visible: false,
             visible_app_ids: ["123", "456"]
           )
+        end
+      end
+
+      context 'delete_user_invitation' do
+        let(:invitation_id) { "123" }
+        let(:path) { "userInvitations/#{invitation_id}" }
+
+        it 'succeeds' do
+          req_mock = test_request(path)
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock).and_return(req_mock)
+          client.delete_user_invitation(user_invitation_id: invitation_id)
         end
       end
 
