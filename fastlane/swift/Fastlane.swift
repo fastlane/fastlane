@@ -204,7 +204,7 @@ public func appStoreConnectApiKey(keyId: String,
                                   keyFilepath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   keyContent: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   isKeyContentBase64: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                                  duration: Int = 1200,
+                                  duration: Int = 500,
                                   inHouse: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                   setSpaceshipToken: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
@@ -1888,6 +1888,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - trustPolicy: Sets level of security when dealing with signed gems. Accepts `LowSecurity`, `MediumSecurity` and `HighSecurity` as values
    - without: Exclude gems that are part of the specified named group
    - with: Include gems that are part of the specified named group
+   - frozen: Don't allow the Gemfile.lock to be updated after install
+   - redownload: Force download every gem, even if the required versions are already available locally
  */
 public func bundleInstall(binstubs: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                           clean: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -1906,7 +1908,9 @@ public func bundleInstall(binstubs: OptionalConfigValue<String?> = .fastlaneDefa
                           standalone: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                           trustPolicy: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                           without: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                          with: OptionalConfigValue<String?> = .fastlaneDefault(nil))
+                          with: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                          frozen: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                          redownload: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let binstubsArg = binstubs.asRubyArgument(name: "binstubs", type: nil)
     let cleanArg = clean.asRubyArgument(name: "clean", type: nil)
@@ -1926,6 +1930,8 @@ public func bundleInstall(binstubs: OptionalConfigValue<String?> = .fastlaneDefa
     let trustPolicyArg = trustPolicy.asRubyArgument(name: "trust_policy", type: nil)
     let withoutArg = without.asRubyArgument(name: "without", type: nil)
     let withArg = with.asRubyArgument(name: "with", type: nil)
+    let frozenArg = frozen.asRubyArgument(name: "frozen", type: nil)
+    let redownloadArg = redownload.asRubyArgument(name: "redownload", type: nil)
     let array: [RubyCommand.Argument?] = [binstubsArg,
                                           cleanArg,
                                           fullIndexArg,
@@ -1943,7 +1949,9 @@ public func bundleInstall(binstubs: OptionalConfigValue<String?> = .fastlaneDefa
                                           standaloneArg,
                                           trustPolicyArg,
                                           withoutArg,
-                                          withArg]
+                                          withArg,
+                                          frozenArg,
+                                          redownloadArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -2854,11 +2862,29 @@ public func cleanBuildArtifacts(excludePattern: OptionalConfigValue<String?> = .
 /**
  Remove the cache for pods
 
- - parameter name: Pod name to be removed from cache
+ - parameters:
+   - name: Pod name to be removed from cache
+   - noAnsi: Show output without ANSI codes
+   - verbose: Show more debugging information
+   - silent: Show nothing
+   - allowRoot: Allows CocoaPods to run as root
  */
-public func cleanCocoapodsCache(name: OptionalConfigValue<String?> = .fastlaneDefault(nil)) {
+public func cleanCocoapodsCache(name: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                noAnsi: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                silent: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                allowRoot: OptionalConfigValue<Bool> = .fastlaneDefault(false))
+{
     let nameArg = name.asRubyArgument(name: "name", type: nil)
-    let array: [RubyCommand.Argument?] = [nameArg]
+    let noAnsiArg = noAnsi.asRubyArgument(name: "no_ansi", type: nil)
+    let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
+    let silentArg = silent.asRubyArgument(name: "silent", type: nil)
+    let allowRootArg = allowRoot.asRubyArgument(name: "allow_root", type: nil)
+    let array: [RubyCommand.Argument?] = [nameArg,
+                                          noAnsiArg,
+                                          verboseArg,
+                                          silentArg,
+                                          allowRootArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -12973,7 +12999,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode-12.5.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-13.beta.4.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13087,6 +13113,8 @@ public func xcversion(version: String) {
    - verbose: Enable verbose output of zipped file
    - password: Encrypt the contents of the zip archive using a password
    - symlinks: Store symbolic links as such in the zip archive
+   - include: Array of paths or patterns to include
+   - exclude: Array of paths or patterns to exclude
 
  - returns: The path to the output zip file
  */
@@ -13094,18 +13122,24 @@ public func xcversion(version: String) {
                                    outputPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                    verbose: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                                    password: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                                   symlinks: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
+                                   symlinks: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                   include: [String] = [],
+                                   exclude: [String] = []) -> String
 {
     let pathArg = RubyCommand.Argument(name: "path", value: path, type: nil)
     let outputPathArg = outputPath.asRubyArgument(name: "output_path", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let passwordArg = password.asRubyArgument(name: "password", type: nil)
     let symlinksArg = symlinks.asRubyArgument(name: "symlinks", type: nil)
+    let includeArg = RubyCommand.Argument(name: "include", value: include, type: nil)
+    let excludeArg = RubyCommand.Argument(name: "exclude", value: exclude, type: nil)
     let array: [RubyCommand.Argument?] = [pathArg,
                                           outputPathArg,
                                           verboseArg,
                                           passwordArg,
-                                          symlinksArg]
+                                          symlinksArg,
+                                          includeArg,
+                                          excludeArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -13167,4 +13201,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.130]
+// FastlaneRunnerAPIVersion [0.9.131]
