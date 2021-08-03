@@ -96,7 +96,7 @@ describe Spaceship::ConnectAPI::Users::Client do
           req_mock = test_request_body(url, body)
 
           expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
-          client.add_user_visible_apps(user_id: user_id, app_ids: ["456", "789"])
+          client.add_user_visible_apps(user_id: user_id, app_ids: app_ids)
         end
       end
 
