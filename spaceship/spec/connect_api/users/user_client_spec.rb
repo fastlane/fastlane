@@ -76,7 +76,7 @@ describe Spaceship::ConnectAPI::Users::Client do
         end
       end
 
-      context 'add_user_visible_apps' do
+      context 'post_user_visible_apps' do
         let(:user_id) { "123" }
         let(:path) { "users/#{user_id}/relationships/visibleApps" }
         let(:app_ids) { ["456", "789"] }
@@ -96,11 +96,11 @@ describe Spaceship::ConnectAPI::Users::Client do
           req_mock = test_request_body(url, body)
 
           expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
-          client.add_user_visible_apps(user_id: user_id, app_ids: app_ids)
+          client.post_user_visible_apps(user_id: user_id, app_ids: app_ids)
         end
       end
 
-      context 'replace_user_visible_apps' do
+      context 'patch_user_visible_apps' do
         let(:user_id) { "123" }
         let(:path) { "users/#{user_id}/relationships/visibleApps" }
         let(:app_ids) { ["456", "789"] }
@@ -120,11 +120,11 @@ describe Spaceship::ConnectAPI::Users::Client do
           req_mock = test_request_body(url, body)
 
           expect(client).to receive(:request).with(:patch).and_yield(req_mock).and_return(req_mock)
-          client.replace_user_visible_apps(user_id: user_id, app_ids: app_ids)
+          client.patch_user_visible_apps(user_id: user_id, app_ids: app_ids)
         end
       end
 
-      context 'remove_user_visible_apps' do
+      context 'delete_user_visible_apps' do
         let(:user_id) { "123" }
         let(:path) { "users/#{user_id}/relationships/visibleApps" }
         let(:app_ids) { ["456", "789"] }
@@ -144,7 +144,7 @@ describe Spaceship::ConnectAPI::Users::Client do
           req_mock = test_request_body(url, body)
 
           expect(client).to receive(:request).with(:delete).and_yield(req_mock).and_return(req_mock)
-          client.remove_user_visible_apps(user_id: user_id, app_ids: app_ids)
+          client.delete_user_visible_apps(user_id: user_id, app_ids: app_ids)
         end
       end
 
