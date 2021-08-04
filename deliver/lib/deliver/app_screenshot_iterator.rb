@@ -85,8 +85,8 @@ module Deliver
           app_screenshot_set ||= localization.create_app_screenshot_set(attributes: { screenshotDisplayType: display_type })
 
           # iterate over screenshots per display size with index
-          screenshots.each do |screenshot|
-            yield(localization, app_screenshot_set, screenshot)
+          screenshots.each.with_index do |screenshot, index|
+            yield(localization, app_screenshot_set, screenshot, index)
           end
         end
       end
