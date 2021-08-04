@@ -393,7 +393,7 @@ module Spaceship
           is_internal_group: is_internal_group,
           public_link_enabled: public_link_enabled,
           public_link_limit: public_link_limit,
-          public_link_limit_enabled: public_link_limit_enabled,
+          public_link_limit_enabled: public_link_limit_enabled
         ).all_pages
         return resps.flat_map(&:to_models).first
       end

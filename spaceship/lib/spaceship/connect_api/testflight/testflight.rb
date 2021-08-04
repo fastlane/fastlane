@@ -204,7 +204,6 @@ module Spaceship
           test_flight_request_client.delete("builds/#{build_id}/relationships/betaGroups", nil, body)
         end
 
-
         def create_beta_group(app_id: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
           body = {
             data: {
