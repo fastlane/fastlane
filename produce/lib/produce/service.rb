@@ -52,9 +52,7 @@ module Produce
 
       UI.success("[DevCenter] App found '#{bundle_id.name}'")
       UI.message("Fetching available services")
-      services = Spaceship::ConnectAPI::Capabilities.all
-      UI.success("Fetched!")
-      services
+      return Spaceship::ConnectAPI::Capabilities.all
     end
 
     def valid_services_for(options)
