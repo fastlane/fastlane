@@ -66,6 +66,14 @@ describe Fastlane do
         end").runner.execute(:test)
       end
 
+      it "archives a directory with shell escaped path" do
+        expect(Fastlane::Actions).to receive(:sh).with(["zip", "-r", "#{File.expand_path('output\\(\\)_path')}.zip", "zip"])
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          zip(path: '#{@fixtures_path}', output_path: 'output()_path')
+        end").runner.execute(:test)
+      end
+
       it "supports excluding specific files or directories" do
         expect(Fastlane::Actions).to receive(:sh).with(["zip", "-r", "#{File.expand_path(@fixtures_path)}.zip", "zip", "-x", "zip/.git/*", "zip/README.md"])
 
