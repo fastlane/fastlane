@@ -29,7 +29,12 @@ module Spaceship
         end
 
         # Add app permissions for user
+        # @deprecated Use {#post_user_visible_apps} instead.
         def add_user_visible_apps(user_id: nil, app_ids: nil)
+          post_user_visible_apps(user_id: user_id, app_ids: app_ids)
+        end
+
+        def post_user_visible_apps(user_id: nil, app_ids: nil)
           body = {
             data: app_ids.map do |app_id|
               {
@@ -43,7 +48,7 @@ module Spaceship
         end
 
         # Replace app permissions for user
-        def replace_user_visible_apps(user_id: nil, app_ids: nil)
+        def patch_user_visible_apps(user_id: nil, app_ids: nil)
           body = {
             data: app_ids.map do |app_id|
               {
@@ -57,7 +62,7 @@ module Spaceship
         end
 
         # Remove app permissions for user
-        def remove_user_visible_apps(user_id: nil, app_ids: nil)
+        def delete_user_visible_apps(user_id: nil, app_ids: nil)
           body = {
             data: app_ids.map do |app_id|
               {
