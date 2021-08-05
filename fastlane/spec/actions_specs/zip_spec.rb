@@ -67,10 +67,12 @@ describe Fastlane do
       end
 
       it "archives a directory with shell escaped path" do
-        expect(Fastlane::Actions).to receive(:sh).with(["zip", "-r", "#{File.expand_path('output\\(\\)_path')}.zip", "zip"])
+        allow(File).to receive(:exist?).and_return(true)
+        allow(File).to receive(:expand_path).and_return("..")
+        expect(Fastlane::Actions).to receive(:sh).with(["zip", "-r", "#{File.expand_path('output\\(\\)_path')}.zip", "escaped\\(\\)_input_folder_path"])
 
-        result = Fastlane::FastFile.new.parse("lane :test do
-          zip(path: '#{@fixtures_path}', output_path: 'output()_path')
+        Fastlane::FastFile.new.parse("lane :test do
+          zip(path: 'fake/escaped()_input_folder_path', output_path: 'output()_path')
         end").runner.execute(:test)
       end
 
