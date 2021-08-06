@@ -421,6 +421,20 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
+      context 'get_build_ids_for_beta_group' do
+        let(:path) { "betaGroups" }
+        let(:beta_group_id) { "123" }
+
+        it 'succeeds' do
+          url = "#{path}/#{beta_group_id}/relationships/builds"
+          params = {}
+          req_mock = test_request_params(url, params)
+
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_build_ids_for_beta_group(group_id: beta_group_id)
+        end
+      end
+
       context 'patch_beta_groups' do
         let(:path) { "betaGroups" }
         let(:beta_group_id) { "123" }
