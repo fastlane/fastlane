@@ -661,6 +661,7 @@ public func appledoc(input: [String],
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
+   - syncScreenshots: Sync screenshots with local ones. This is currently beta optionso set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
    - automaticRelease: Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
@@ -731,6 +732,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                      skipAppVersionUpdate: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      overwriteScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                     syncScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      submitForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      rejectIfPossible: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      automaticRelease: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
@@ -794,6 +796,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
     let skipAppVersionUpdateArg = skipAppVersionUpdate.asRubyArgument(name: "skip_app_version_update", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let overwriteScreenshotsArg = overwriteScreenshots.asRubyArgument(name: "overwrite_screenshots", type: nil)
+    let syncScreenshotsArg = syncScreenshots.asRubyArgument(name: "sync_screenshots", type: nil)
     let submitForReviewArg = submitForReview.asRubyArgument(name: "submit_for_review", type: nil)
     let rejectIfPossibleArg = rejectIfPossible.asRubyArgument(name: "reject_if_possible", type: nil)
     let automaticReleaseArg = automaticRelease.asRubyArgument(name: "automatic_release", type: nil)
@@ -856,6 +859,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                                           skipAppVersionUpdateArg,
                                           forceArg,
                                           overwriteScreenshotsArg,
+                                          syncScreenshotsArg,
                                           submitForReviewArg,
                                           rejectIfPossibleArg,
                                           automaticReleaseArg,
@@ -3668,6 +3672,7 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
+   - syncScreenshots: Sync screenshots with local ones. This is currently beta optionso set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
    - automaticRelease: Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
@@ -3738,6 +3743,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                     skipAppVersionUpdate: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.skipAppVersionUpdate),
                     force: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.force),
                     overwriteScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.overwriteScreenshots),
+                    syncScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.syncScreenshots),
                     submitForReview: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.submitForReview),
                     rejectIfPossible: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.rejectIfPossible),
                     automaticRelease: OptionalConfigValue<Bool?> = .fastlaneDefault(deliverfile.automaticRelease),
@@ -3801,6 +3807,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
     let skipAppVersionUpdateArg = skipAppVersionUpdate.asRubyArgument(name: "skip_app_version_update", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let overwriteScreenshotsArg = overwriteScreenshots.asRubyArgument(name: "overwrite_screenshots", type: nil)
+    let syncScreenshotsArg = syncScreenshots.asRubyArgument(name: "sync_screenshots", type: nil)
     let submitForReviewArg = submitForReview.asRubyArgument(name: "submit_for_review", type: nil)
     let rejectIfPossibleArg = rejectIfPossible.asRubyArgument(name: "reject_if_possible", type: nil)
     let automaticReleaseArg = automaticRelease.asRubyArgument(name: "automatic_release", type: nil)
@@ -3863,6 +3870,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                                           skipAppVersionUpdateArg,
                                           forceArg,
                                           overwriteScreenshotsArg,
+                                          syncScreenshotsArg,
                                           submitForReviewArg,
                                           rejectIfPossibleArg,
                                           automaticReleaseArg,
@@ -12004,6 +12012,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
+   - syncScreenshots: Sync screenshots with local ones. This is currently beta optionso set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
    - automaticRelease: Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
@@ -12074,6 +12083,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                              skipAppVersionUpdate: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              overwriteScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                             syncScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              submitForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              rejectIfPossible: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              automaticRelease: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
@@ -12137,6 +12147,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
     let skipAppVersionUpdateArg = skipAppVersionUpdate.asRubyArgument(name: "skip_app_version_update", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let overwriteScreenshotsArg = overwriteScreenshots.asRubyArgument(name: "overwrite_screenshots", type: nil)
+    let syncScreenshotsArg = syncScreenshots.asRubyArgument(name: "sync_screenshots", type: nil)
     let submitForReviewArg = submitForReview.asRubyArgument(name: "submit_for_review", type: nil)
     let rejectIfPossibleArg = rejectIfPossible.asRubyArgument(name: "reject_if_possible", type: nil)
     let automaticReleaseArg = automaticRelease.asRubyArgument(name: "automatic_release", type: nil)
@@ -12199,6 +12210,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                                           skipAppVersionUpdateArg,
                                           forceArg,
                                           overwriteScreenshotsArg,
+                                          syncScreenshotsArg,
                                           submitForReviewArg,
                                           rejectIfPossibleArg,
                                           automaticReleaseArg,
@@ -13201,4 +13213,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.131]
+// FastlaneRunnerAPIVersion [0.9.132]
