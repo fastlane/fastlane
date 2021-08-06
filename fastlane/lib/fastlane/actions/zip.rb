@@ -52,8 +52,8 @@ module Fastlane
           # The zip command is executed from the paths **parent** directory, as a result we use just the basename, which is the file or folder within
           basename = File.basename(path)
 
-          command << output_path
-          command << basename
+          command << output_path.shellescape
+          command << basename.shellescape
 
           unless include.empty?
             command << "-i"
@@ -68,6 +68,7 @@ module Fastlane
           command
         end
       end
+
       def self.run(params)
         Runner.new(params).run
       end
