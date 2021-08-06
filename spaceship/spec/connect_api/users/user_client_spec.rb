@@ -76,7 +76,7 @@ describe Spaceship::ConnectAPI::Users::Client do
         end
       end
 
-      context 'add_user_visible_apps' do
+      context 'post_user_visible_apps' do
         let(:user_id) { "123" }
         let(:path) { "users/#{user_id}/relationships/visibleApps" }
         let(:app_ids) { ["456", "789"] }
@@ -96,7 +96,55 @@ describe Spaceship::ConnectAPI::Users::Client do
           req_mock = test_request_body(url, body)
 
           expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
-          client.add_user_visible_apps(user_id: user_id, app_ids: ["456", "789"])
+          client.post_user_visible_apps(user_id: user_id, app_ids: app_ids)
+        end
+      end
+
+      context 'patch_user_visible_apps' do
+        let(:user_id) { "123" }
+        let(:path) { "users/#{user_id}/relationships/visibleApps" }
+        let(:app_ids) { ["456", "789"] }
+        let(:body) do
+          {
+            data: app_ids.map do |app_id|
+              {
+                type: "apps",
+                id: app_id
+              }
+            end
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:patch).and_yield(req_mock).and_return(req_mock)
+          client.patch_user_visible_apps(user_id: user_id, app_ids: app_ids)
+        end
+      end
+
+      context 'delete_user_visible_apps' do
+        let(:user_id) { "123" }
+        let(:path) { "users/#{user_id}/relationships/visibleApps" }
+        let(:app_ids) { ["456", "789"] }
+        let(:body) do
+          {
+            data: app_ids.map do |app_id|
+              {
+                type: "apps",
+                id: app_id
+              }
+            end
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock).and_return(req_mock)
+          client.delete_user_visible_apps(user_id: user_id, app_ids: app_ids)
         end
       end
 
