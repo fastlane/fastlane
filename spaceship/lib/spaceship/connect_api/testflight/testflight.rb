@@ -251,9 +251,7 @@ module Spaceship
           test_flight_request_client.get("betaGroups/#{group_id}/builds")
         end
 
-        def get_build_ids_for_beta_group(group_id: nil)
-          raise "group_id is nil" if group_id.nil?
-
+        def get_build_ids_for_beta_group(group_id:)
           test_flight_request_client.get("betaGroups/#{group_id}/relationships/builds", {})
         end
 
