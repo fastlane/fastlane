@@ -34,7 +34,7 @@ module Fastlane
         def run_zip_command
           # The 'zip' command archives relative to the working directory, chdir to produce expected results relative to `path`
           Dir.chdir(File.expand_path("..", path)) do
-            Actions.sh(zip_command)
+            Actions.sh(*zip_command)
           end
         end
 
@@ -52,8 +52,8 @@ module Fastlane
           # The zip command is executed from the paths **parent** directory, as a result we use just the basename, which is the file or folder within
           basename = File.basename(path)
 
-          command << output_path.shellescape
-          command << basename.shellescape
+          command << output_path
+          command << basename
 
           unless include.empty?
             command << "-i"

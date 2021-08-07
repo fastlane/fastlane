@@ -55,6 +55,11 @@ describe Fastlane::Actions do
         expect_command("ls -la /tmp")
         Fastlane::Actions.sh(["ls -la", "/tmp"])
       end
+
+      it "does not automatically escape array arguments from older fastlane syntax" do
+        expect_command('git log --oneline')
+        Fastlane::Actions.sh(["git", "log --oneline"])
+      end
     end
 
     context "with a postfix block" do
