@@ -12,7 +12,7 @@ public protocol PrecheckfileProtocol: class {
     var appIdentifier: String { get }
 
     /// Your Apple ID Username
-    var username: String { get }
+    var username: String? { get }
 
     /// The ID of your App Store Connect team if you're in multiple teams
     var teamId: String? { get }
@@ -40,7 +40,7 @@ public extension PrecheckfileProtocol {
     var apiKeyPath: String? { return nil }
     var apiKey: [String: Any]? { return nil }
     var appIdentifier: String { return "" }
-    var username: String { return "" }
+    var username: String? { return nil }
     var teamId: String? { return nil }
     var teamName: String? { return nil }
     var platform: String { return "ios" }
@@ -52,4 +52,4 @@ public extension PrecheckfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.57]
+// FastlaneRunnerAPIVersion [0.9.75]

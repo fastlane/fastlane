@@ -14,6 +14,7 @@ module Snapshot
     attr_accessor :app_identifier
     attr_accessor :disable_slide_to_type
     attr_accessor :override_status_bar
+    attr_accessor :override_status_bar_arguments
 
     # xcode 8
     attr_accessor :number_of_retries
@@ -47,6 +48,7 @@ module Snapshot
       @concurrent_simulators = snapshot_config[:concurrent_simulators]
       @disable_slide_to_type = snapshot_config[:disable_slide_to_type]
       @override_status_bar = snapshot_config[:override_status_bar]
+      @override_status_bar_arguments = snapshot_config[:override_status_bar_arguments]
 
       launch_arguments = Array(snapshot_config[:launch_arguments])
       # if more than 1 set of arguments, use a tuple with an index

@@ -45,7 +45,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :include_commit_body,
                                        description: "Include the commit body along with the summary",
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true)
         ]
       end

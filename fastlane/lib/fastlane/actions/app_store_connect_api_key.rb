@@ -1,4 +1,5 @@
 require 'base64'
+require 'spaceship'
 
 module Fastlane
   module Actions
@@ -29,13 +30,17 @@ module Fastlane
         key = {
           key_id: key_id,
           issuer_id: issuer_id,
-          key: key_content || File.binread(key_filepath),
+          key: key_content || File.binread(File.expand_path(key_filepath)),
           is_key_content_base64: is_key_content_base64,
           duration: duration,
           in_house: in_house
         }
 
         Actions.lane_context.set_sensitive(SharedValues::APP_STORE_CONNECT_API_KEY, key)
+
+        # Creates Spaceship API Key session
+        # User does not need to pass the token into any actions because of this
+        Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(**key) if options[:set_spaceship_token]
 
         return key
       end
@@ -58,7 +63,7 @@ module Fastlane
                                        optional: true,
                                        conflicting_options: [:key_content],
                                        verify_block: proc do |value|
-                                         UI.user_error!("Couldn't find key p8 file at path '#{value}'") unless File.exist?(value)
+                                         UI.user_error!("Couldn't find key p8 file at path '#{value}'") unless File.exist?(File.expand_path(value))
                                        end),
           FastlaneCore::ConfigItem.new(key: :key_content,
                                        env_name: "APP_STORE_CONNECT_API_KEY_KEY",
@@ -75,7 +80,7 @@ module Fastlane
                                        env_name: "APP_STORE_CONNECT_API_KEY_DURATION",
                                        description: "The token session duration",
                                        optional: true,
-                                       default_value: Spaceship::ConnectAPI::Token::MAX_TOKEN_DURATION,
+                                       default_value: Spaceship::ConnectAPI::Token::DEFAULT_TOKEN_DURATION,
                                        type: Integer,
                                        verify_block: proc do |value|
                                          UI.user_error!("The duration can't be more than 1200 (20 minutes) and the value entered was '#{value}'") unless value <= 1200
@@ -83,8 +88,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :in_house,
                                        env_name: "APP_STORE_CONNECT_API_KEY_IN_HOUSE",
                                        description: "Is App Store or Enterprise (in house) team? App Store Connect API cannot determine this on its own (yet)",
-                                       optional: true,
-                                       type: Boolean)
+                                       type: Boolean,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :set_spaceship_token,
+                                       env_name: "APP_STORE_CONNECT_API_KEY_SET_SPACESHIP_TOKEN",
+                                       description: "Authorizes all Spaceship::ConnectAPI requests by automatically setting Spaceship::ConnectAPI.token",
+                                       type: Boolean,
+                                       default_value: true)
         ]
       end
 
@@ -99,7 +109,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        true
+        [:ios, :mac, :tvos].include?(platform)
       end
 
       def self.details

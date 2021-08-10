@@ -1,6 +1,7 @@
 require 'commander'
 
 require 'fastlane_core/configuration/configuration'
+require 'fastlane_core/ui/help_formatter'
 require_relative 'module'
 require_relative 'manager'
 require_relative 'options'
@@ -28,7 +29,7 @@ module Gym
       program :help, "Author", "Felix Krause <gym@krausefx.com>"
       program :help, "Website", "https://fastlane.tools"
       program :help, "Documentation", "https://docs.fastlane.tools/actions/gym/"
-      program :help_formatter, :compact
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option("--verbose") { FastlaneCore::Globals.verbose = true }
 

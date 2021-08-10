@@ -51,7 +51,7 @@ struct RubyCommand: RubyCommandable {
                 if type == .stringClosure {
                     return "{\"name\" : \"\(name)\", \"value\" : \"ignored_for_closure\"\(typeJson)}"
                 } else if let array = someValue as? [String] {
-                    return "{\"name\" : \"\(name)\", \"value\" : \"\(array.joined(separator: ","))\"\(typeJson)}"
+                    return "{\"name\" : \"\(name)\", \"value\" : \(array)\(typeJson)}"
                 } else if let hash = someValue as? [String: Any] {
                     let jsonData = try! JSONSerialization.data(withJSONObject: hash, options: [])
                     let jsonString = String(data: jsonData, encoding: .utf8)!

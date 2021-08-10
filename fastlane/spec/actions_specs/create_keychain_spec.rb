@@ -134,6 +134,28 @@ describe Fastlane do
           expect(result[2]).to include('~/Library/Keychains/test.keychain')
         end
 
+        it "works with 'timeout: 0' to specify 'no timeout', skips -t param" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            create_keychain ({
+              name: 'test.keychain',
+              password: 'testpassword',
+              unlock: true,
+              timeout: 0
+            })
+          end").runner.execute(:test)
+
+          expect(result.size).to eq(4)
+          expect(result[0]).to eq('security create-keychain -p testpassword ~/Library/Keychains/test.keychain')
+
+          expect(result[1]).to eq('security unlock-keychain -p testpassword ~/Library/Keychains/test.keychain')
+
+          expect(result[2]).to start_with('security set-keychain-settings')
+          expect(result[2]).to_not(include('-t'))
+          expect(result[2]).to_not(include('-l'))
+          expect(result[2]).to_not(include('-u'))
+          expect(result[2]).to include('~/Library/Keychains/test.keychain')
+        end
+
         it "works with all params" do
           result = Fastlane::FastFile.new.parse("lane :test do
             create_keychain ({

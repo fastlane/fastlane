@@ -2,14 +2,15 @@ describe Fastlane do
   describe Fastlane::FastFile do
     before do
       allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-      @path = "./fastlane/spec/fixtures/actions/archive.rb"
-      @output_path_with_zip = "./fastlane/spec/fixtures/actions/archive_file.zip"
-      @output_path_without_zip = "./fastlane/spec/fixtures/actions/archive_file"
+      @fixtures_path = "./fastlane/spec/fixtures/actions/zip"
+      @path = @fixtures_path + "/file.txt"
+      @output_path_with_zip = @fixtures_path + "/archive_file.zip"
+      @output_path_without_zip = @fixtures_path + "/archive_file"
     end
 
     describe "zip" do
       it "generates a valid zip command" do
-        expect(Fastlane::Actions).to receive(:sh).with("zip -r #{File.expand_path(@path)}.zip archive.rb")
+        expect(Fastlane::Actions).to receive(:sh).with("zip", "-r", "#{File.expand_path(@path)}.zip", "file.txt")
 
         result = Fastlane::FastFile.new.parse("lane :test do
           zip(path: '#{@path}')
@@ -17,7 +18,7 @@ describe Fastlane do
       end
 
       it "generates a valid zip command without verbose output" do
-        expect(Fastlane::Actions).to receive(:sh).with("zip -rq #{File.expand_path(@path)}.zip archive.rb")
+        expect(Fastlane::Actions).to receive(:sh).with("zip", "-rq", "#{File.expand_path(@path)}.zip", "file.txt")
 
         result = Fastlane::FastFile.new.parse("lane :test do
           zip(path: '#{@path}', verbose: false)
@@ -50,10 +51,52 @@ describe Fastlane do
 
       it "encrypts the contents of the zip archive using a password" do
         password = "5O#RUKp0Zgop"
-        expect(Fastlane::Actions).to receive(:sh).with("zip -rq -P '#{password}' #{File.expand_path(@path)}.zip archive.rb")
+        expect(Fastlane::Actions).to receive(:sh).with("zip", "-rq", "-P", password, "#{File.expand_path(@path)}.zip", "file.txt")
 
         result = Fastlane::FastFile.new.parse("lane :test do
           zip(path: '#{@path}', verbose: false, password: '#{password}')
+        end").runner.execute(:test)
+      end
+
+      it "archives a directory" do
+        expect(Fastlane::Actions).to receive(:sh).with("zip", "-r", "#{File.expand_path(@fixtures_path)}.zip", "zip")
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          zip(path: '#{@fixtures_path}')
+        end").runner.execute(:test)
+      end
+
+      it "invokes Actions.sh in a way which escapes arguments" do
+        path_basename = "My Folder (New)"
+        path = File.expand_path(File.join(@fixtures_path, path_basename))
+        output_path = File.expand_path(File.join(@fixtures_path, "My Folder (New).zip"))
+        password = "#Test Password"
+        exclude_pattern = path_basename + "/**/*.md"
+
+        expect(Fastlane::Actions).to receive(:sh).with('zip', '-r', '-P', password, output_path, path_basename, '-x', exclude_pattern).and_call_original
+
+        # With sh_helper, this is the best way to check the **escaped** shell output is to check the command it prints.
+        # Actions.sh will only escape inputs in some conditions, and its tricky to make sure that it was invoked in a way that did escape it.
+        expect(Fastlane::UI).to receive(:command).with("zip -r -P #{password.shellescape} #{output_path.shellescape} #{path_basename.shellescape} -x #{exclude_pattern.shellescape}")
+
+        Fastlane::FastFile.new.parse("lane :test do
+          zip(path: '#{path}', output_path: '#{output_path}', password: '#{password}', exclude: ['**/*.md'])
+        end").runner.execute(:test)
+      end
+
+      it "supports excluding specific files or directories" do
+        expect(Fastlane::Actions).to receive(:sh).with("zip", "-r", "#{File.expand_path(@fixtures_path)}.zip", "zip", "-x", "zip/.git/*", "zip/README.md")
+
+        Fastlane::FastFile.new.parse("lane :test do
+          zip(path: '#{@fixtures_path}', exclude: ['.git/*', 'README.md'])
+        end").runner.execute(:test)
+      end
+
+      it "supports including specific files or directories" do
+        expect(Fastlane::Actions).to receive(:sh).with("zip", "-r", "#{File.expand_path(@fixtures_path)}.zip", "zip", "-i", "zip/**/*.rb")
+
+        Fastlane::FastFile.new.parse("lane :test do
+          zip(path: '#{@fixtures_path}', include: ['**/*.rb'])
         end").runner.execute(:test)
       end
     end

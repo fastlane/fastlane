@@ -24,6 +24,9 @@ module Spaceship
       super
 
       @du_client = DUClient.new
+
+      # Used by most WebObjects requests starting in July 2021
+      @additional_headers = { 'x-csrf-itc': 'itc' }
     end
 
     class << self

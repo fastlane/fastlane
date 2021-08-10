@@ -13,6 +13,7 @@ module Spaceship
     class Token
       # maximum expiration supported by AppStore (20 minutes)
       MAX_TOKEN_DURATION = 1200
+      DEFAULT_TOKEN_DURATION = 500
 
       attr_reader :key_id
       attr_reader :issuer_id
@@ -24,6 +25,12 @@ module Spaceship
       # There is no way to determine if the team associated with this
       # key is for App Store or Enterprise so this is the temporary workaround
       attr_accessor :in_house
+
+      def self.from(hash: nil, filepath: nil)
+        api_token ||= self.create(**hash) if hash
+        api_token ||= self.from_json_file(filepath) if filepath
+        return api_token
+      end
 
       def self.from_json_file(filepath)
         json = JSON.parse(File.read(filepath), { symbolize_names: true })
@@ -60,19 +67,21 @@ module Spaceship
           key_id: key_id,
           issuer_id: issuer_id,
           key: OpenSSL::PKey::EC.new(key),
+          key_raw: key,
           duration: duration,
           in_house: in_house
         )
       end
 
-      def initialize(key_id: nil, issuer_id: nil, key: nil, duration: nil, in_house: nil)
+      def initialize(key_id: nil, issuer_id: nil, key: nil, key_raw: nil, duration: nil, in_house: nil)
         @key_id = key_id
         @key = key
+        @key_raw = key_raw
         @issuer_id = issuer_id
         @duration = duration
         @in_house = in_house
 
-        @duration ||= MAX_TOKEN_DURATION
+        @duration ||= DEFAULT_TOKEN_DURATION
         @duration = @duration.to_i if @duration
 
         refresh!
@@ -96,6 +105,10 @@ module Spaceship
 
       def expired?
         @expiration < Time.now
+      end
+
+      def write_key_to_file(path)
+        File.open(path, 'w') { |f| f.write(@key_raw) }
       end
     end
   end

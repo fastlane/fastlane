@@ -104,7 +104,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :sources,
                                        description: "The sources of repos you want the pod spec to lint with, separated by commas",
                                        optional: true,
-                                       is_string: false,
                                        type: Array,
                                        verify_block: proc do |value|
                                          UI.user_error!("Sources must be an array.") unless value.kind_of?(Array)
@@ -113,7 +112,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :swift_version,
                                        description: "The SWIFT_VERSION that should be used to lint the spec. This takes precedence over a .swift-version file",
                                        optional: true,
-                                       is_string: true,
                                        env_name: "FL_POD_PUSH_SWIFT_VERSION"),
           FastlaneCore::ConfigItem.new(key: :skip_import_validation,
                                        description: "Lint skips validating that the pod can be imported",

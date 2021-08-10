@@ -17,6 +17,16 @@ describe Fastlane do
 
         expect(result).to match_array([])
       end
+
+      it "calls AdbHelper for loading all the devices" do
+        expect_any_instance_of(Fastlane::Helper::AdbHelper).to receive(:load_all_devices).and_return([1, 2, 3])
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          adb_devices
+        end").runner.execute(:test)
+
+        expect(result).to match_array([1, 2, 3])
+      end
     end
   end
 end

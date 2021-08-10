@@ -82,7 +82,7 @@ module Deliver
     #
     # @param root [String] A directory path
     # @param ignore_validation [String] Set false not to raise the error when finding invalid folder name
-    # @return [Array<AppScreenshot>] The list of AppScreenshot that exist under given `root` directory
+    # @return [Array<Deliver::AppScreenshot>] The list of AppScreenshot that exist under given `root` directory
     def self.load_app_screenshots(root, ignore_validation)
       screenshots = language_folders(root, ignore_validation, true).flat_map do |language_folder|
         paths = if language_folder.framed_file_paths.count > 0

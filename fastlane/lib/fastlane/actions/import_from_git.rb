@@ -24,7 +24,7 @@ module Fastlane
           # `conflicting_options`, `verify_block`) are completely ignored.
           FastlaneCore::ConfigItem.new(key: :url,
                                        description: "The URL of the repository to import the Fastfile from",
-                                       default_value: nil),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :branch,
                                        description: "The branch or tag to check-out on the repository",
                                        default_value: 'HEAD',
@@ -39,12 +39,10 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :version,
                                        description: "The version to checkout on the repository. Optimistic match operator or multiple conditions can be used to select the latest version within constraints",
-                                       default_value: nil,
-                                       is_string: false,
+                                       type: Array,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :cache_path,
-                                       description: "The path to a directory where the repository should be cloned into. This is ignored if `version` is not specified. Defaults to `nil`, which causes the repository to be cloned on every call, to a temporary directory",
-                                       default_value: nil,
+                                       description: "The path to a directory where the repository should be cloned into. Defaults to `nil`, which causes the repository to be cloned on every call, to a temporary directory",
                                        optional: true)
         ]
       end
@@ -61,14 +59,14 @@ module Fastlane
         [
           'import_from_git(
             url: "git@github.com:fastlane/fastlane.git", # The URL of the repository to import the Fastfile from.
-            branch: "HEAD", # The branch to checkout on the repository
-            path: "fastlane/Fastfile", # The path of the Fastfile in the repository
+            branch: "HEAD", # The branch to checkout on the repository.
+            path: "fastlane/Fastfile", # The path of the Fastfile in the repository.
             version: "~> 1.0.0" # The version to checkout on the repository. Optimistic match operator can be used to select the latest version within constraints.
           )',
           'import_from_git(
             url: "git@github.com:fastlane/fastlane.git", # The URL of the repository to import the Fastfile from.
-            branch: "HEAD", # The branch to checkout on the repository
-            path: "fastlane/Fastfile", # The path of the Fastfile in the repository
+            branch: "HEAD", # The branch to checkout on the repository.
+            path: "fastlane/Fastfile", # The path of the Fastfile in the repository.
             version: [">= 1.1.0", "< 2.0.0"], # The version to checkout on the repository. Multiple conditions can be used to select the latest version within constraints.
             cache_path: "~/.cache/fastlane/imported" # A directory in which the repository will be added, which means that it will not be cloned again on subsequent calls.
           )'

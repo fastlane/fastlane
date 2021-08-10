@@ -10,6 +10,7 @@ require_relative 'submit_for_review'
 require_relative 'upload_price_tier'
 require_relative 'upload_metadata'
 require_relative 'upload_screenshots'
+require_relative 'sync_screenshots'
 require_relative 'detect_values'
 
 module Deliver
@@ -26,22 +27,22 @@ module Deliver
     end
 
     def login
-      if api_token
+      if (api_token = Spaceship::ConnectAPI::Token.from(hash: options[:api_key], filepath: options[:api_key_path]))
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
+      elsif !Spaceship::ConnectAPI.token.nil?
+        UI.message("Using existing authorization token for App Store Connect API")
       else
+        # Username is now optional since addition of App Store Connect API Key
+        # Force asking for username to prompt user if not already set
+        options.fetch(:username, force_ask: true)
+
         # Team selection passed though FASTLANE_TEAM_ID and FASTLANE_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
         UI.message("Login to App Store Connect (#{options[:username]})")
         Spaceship::ConnectAPI.login(options[:username], nil, use_portal: false, use_tunes: true)
         UI.message("Login successful")
       end
-    end
-
-    def api_token
-      @api_token ||= Spaceship::ConnectAPI::Token.create(**options[:api_key]) if options[:api_key]
-      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(options[:api_key_path]) if options[:api_key_path]
-      return @api_token
     end
 
     def run
@@ -114,7 +115,7 @@ module Deliver
       app_version = options[:app_version]
       UI.message("Making sure the latest version on App Store Connect matches '#{app_version}'...")
 
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       changed = app.ensure_version!(app_version, platform: platform)
@@ -143,7 +144,14 @@ module Deliver
 
       # Commit
       upload_metadata.upload(options)
-      upload_screenshots.upload(options, screenshots)
+
+      if options[:sync_screenshots]
+        sync_screenshots = SyncScreenshots.new(app: Deliver.cache[:app], platform: Spaceship::ConnectAPI::Platform.map(options[:platform]))
+        sync_screenshots.sync(screenshots)
+      else
+        upload_screenshots.upload(options, screenshots)
+      end
+
       UploadPriceTier.new.upload(options)
     end
 
@@ -163,14 +171,14 @@ module Deliver
 
       if upload_ipa
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
-          app_id: options[:app].id,
+          app_id: Deliver.cache[:app].id,
           ipa_path: options[:ipa],
           package_path: "/tmp",
           platform: options[:platform]
         )
       elsif upload_pkg
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
-          app_id: options[:app].id,
+          app_id: Deliver.cache[:app].id,
           pkg_path: options[:pkg],
           package_path: "/tmp",
           platform: options[:platform]
@@ -187,7 +195,7 @@ module Deliver
     end
 
     def reject_version_if_possible
-      app = options[:app]
+      app = Deliver.cache[:app]
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       if app.reject_version_if_possible!(platform: platform)
         UI.success("Successfully rejected previous version!")
@@ -206,6 +214,7 @@ module Deliver
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team
       # Use JWT auth
+      api_token = Spaceship::ConnectAPI.token
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
         return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)

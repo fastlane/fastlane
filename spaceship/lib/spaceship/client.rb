@@ -41,6 +41,7 @@ module Spaceship
     attr_accessor :logger
 
     attr_accessor :csrf_tokens
+    attr_accessor :additional_headers
 
     attr_accessor :provider
 
@@ -147,6 +148,7 @@ module Spaceship
       available_teams = teams.collect do |team|
         {
           team_id: (team["contentProvider"] || {})["contentProviderId"],
+          public_team_id: (team["contentProvider"] || {})["contentProviderPublicId"],
           team_name: (team["contentProvider"] || {})["name"]
         }
       end
@@ -161,10 +163,19 @@ module Spaceship
       end
 
       response = request(:post) do |req|
-        req.url("ra/v1/session/webSession")
+        req.url("https://appstoreconnect.apple.com/olympus/v1/providerSwitchRequests")
         req.body = {
-          contentProviderId: team_id,
-          dsId: user_detail_data.ds_id # https://github.com/fastlane/fastlane/issues/6711
+          "data": {
+            "type": "providerSwitchRequests",
+            "relationships": {
+              "provider": {
+                "data": {
+                  "type": "providers",
+                  "id": result[:public_team_id]
+                }
+              }
+            }
+          }
         }.to_json
         req.headers['Content-Type'] = 'application/json'
       end
@@ -707,8 +718,13 @@ module Spaceship
       @csrf_tokens || {}
     end
 
+    def additional_headers
+      @additional_headers || {}
+    end
+
     def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
       headers.merge!(csrf_tokens)
+      headers.merge!(additional_headers)
       headers['User-Agent'] = USER_AGENT
 
       # Before encoding the parameters, log them

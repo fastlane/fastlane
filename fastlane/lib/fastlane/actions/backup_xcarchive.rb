@@ -40,7 +40,7 @@ module Fastlane
                        end
 
             # Create zip
-            Actions.sh(%(cd "#{xcarchive_folder}" && zip -r -X "#{zip_file}" "#{xcarchive_file}" > /dev/null))
+            Actions.sh(%(cd "#{xcarchive_folder}" && zip -r -X -y "#{zip_file}" "#{xcarchive_file}" > /dev/null))
 
             # Moved to its final destination
             FileUtils.mv(zip_file, full_destination)
@@ -83,7 +83,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :zip,
                                        description: 'Enable compression of the archive',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true,
                                        optional: true,
                                        env_name: 'BACKUP_XCARCHIVE_ZIP'),
@@ -94,7 +94,7 @@ module Fastlane
                                        env_name: 'BACKUP_XCARCHIVE_ZIP_FILENAME'),
           FastlaneCore::ConfigItem.new(key: :versioned,
                                        description: 'Create a versioned (date and app version) subfolder where to put the archive',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true,
                                        optional: true,
                                        env_name: 'BACKUP_XCARCHIVE_VERSIONED')

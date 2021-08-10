@@ -28,9 +28,9 @@ module Match
         self.working_directory = working_directory
       end
 
-      def encrypt_files
+      def encrypt_files(password: nil)
         files = []
-        password = fetch_password!
+        password ||= fetch_password!
         iterate(self.working_directory) do |current|
           files << current
           encrypt_specific_file(path: current, password: password)

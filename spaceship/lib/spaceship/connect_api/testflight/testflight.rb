@@ -191,6 +191,19 @@ module Spaceship
           test_flight_request_client.post("builds/#{build_id}/relationships/betaGroups", body)
         end
 
+        def delete_beta_groups_from_build(build_id: nil, beta_group_ids: [])
+          body = {
+            data: beta_group_ids.map do |id|
+              {
+                type: "betaGroups",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.delete("builds/#{build_id}/relationships/betaGroups", nil, body)
+        end
+
         def create_beta_group(app_id: nil, group_name: nil, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
           body = {
             data: {
@@ -325,6 +338,45 @@ module Spaceship
           }
 
           test_flight_request_client.delete("apps/#{app_id}/relationships/betaTesters", nil, body)
+        end
+
+        def add_beta_tester_to_builds(beta_tester_id: nil, build_ids: [])
+          body = {
+            data: build_ids.map do |id|
+              {
+                type: "builds",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.post("betaTesters/#{beta_tester_id}/relationships/builds", body)
+        end
+
+        def add_beta_testers_to_build(build_id: nil, beta_tester_ids: [])
+          body = {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.post("builds/#{build_id}/relationships/individualTesters", body)
+        end
+
+        def delete_beta_testers_from_build(build_id: nil, beta_tester_ids: [])
+          body = {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.delete("builds/#{build_id}/relationships/individualTesters", nil, body)
         end
 
         #

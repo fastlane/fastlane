@@ -71,8 +71,9 @@ module Frameit
     def download_file(path, txt: "file")
       require 'uri'
       require 'excon'
+      require 'addressable/uri'
 
-      url = File.join(HOST_URL, Frameit.frames_version, URI.escape(path))
+      url = File.join(HOST_URL, Frameit.frames_version, Addressable::URI.encode(path))
       UI.message("Downloading #{txt} from '#{url}' ...")
       body = Excon.get(url).body
       raise body if body.include?("<Error>")

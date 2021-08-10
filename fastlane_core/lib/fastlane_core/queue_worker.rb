@@ -16,12 +16,12 @@ module FastlaneCore
       @queue = Queue.new
     end
 
-    # @param job (Object) - An arbitary object that keeps parameters
+    # @param job (Object) - An arbitrary object that keeps parameters
     def enqueue(job)
       @queue.push(job)
     end
 
-    # @param jobs (Array<Object>) - An array of arbitary object that keeps parameters
+    # @param jobs (Array<Object>) - An array of arbitrary object that keeps parameters
     def batch_enqueue(jobs)
       raise(ArgumentError, "Enqueue Array instead of #{jobs.class}") unless jobs.kind_of?(Array)
       jobs.each { |job| enqueue(job) }

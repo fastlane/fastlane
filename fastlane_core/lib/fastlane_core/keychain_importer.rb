@@ -7,14 +7,17 @@ module FastlaneCore
     def self.import_file(path, keychain_path, keychain_password: nil, certificate_password: "", skip_set_partition_list: false, output: FastlaneCore::Globals.verbose?)
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
+      password_part = " -P #{certificate_password.shellescape}"
+
       command = "security import #{path.shellescape} -k '#{keychain_path.shellescape}'"
-      command << " -P #{certificate_password.shellescape}"
+      command << password_part
       command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym` (before Sierra)
       command << " -T /usr/bin/security"
       command << " -T /usr/bin/productbuild" # to not be asked for permission when using an installer cert for macOS
       command << " 1> /dev/null" unless output
 
-      UI.command(command) if output
+      sensitive_command = command.gsub(password_part, " -P ********")
+      UI.command(sensitive_command) if output
       Open3.popen3(command) do |stdin, stdout, stderr, thrd|
         UI.command_output(stdout.read.to_s) if output
 
@@ -38,17 +41,21 @@ module FastlaneCore
       # When security supports partition lists, also add the partition IDs
       # See https://openradar.appspot.com/28524119
       if Helper.backticks('security -h | grep set-key-partition-list', print: false).length > 0
+        password_part = " -k #{keychain_password.to_s.shellescape}"
+
         command = "security set-key-partition-list"
         command << " -S apple-tool:,apple:,codesign:"
         command << " -s" # This is a needed in Catalina to prevent "security: SecKeychainItemCopyAccess: A missing value was detected."
-        command << " -k #{keychain_password.to_s.shellescape}"
+        command << password_part
         command << " #{keychain_path.shellescape}"
         command << " 1> /dev/null" # always disable stdout. This can be very verbose, and leak potentially sensitive info
 
         # Showing loading indicator as this can take some time if a lot of keys installed
         Helper.show_loading_indicator("Setting key partition list... (this can take a minute if there are a lot of keys installed)")
 
-        UI.command(command) if output
+        # Strip keychain password from command output
+        sensitive_command = command.gsub(password_part, " -k ********")
+        UI.command(sensitive_command) if output
         Open3.popen3(command) do |stdin, stdout, stderr, thrd|
           unless thrd.value.success?
             err = stderr.read.to_s.strip

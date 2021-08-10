@@ -15,13 +15,25 @@ module Scan
     end
 
     def prefix
-      ["set -o pipefail &&"]
+      prefixes = ["set -o pipefail &&"]
+
+      package_path = Scan.config[:package_path]
+      prefixes << "cd #{package_path} &&" if package_path.to_s != ""
+
+      prefixes
     end
 
     # Path to the project or workspace as parameter
     # This will also include the scheme (if given)
     # @return [Array] The array with all the components to join
     def project_path_array
+      unless Scan.config[:package_path].nil?
+        params = []
+        params << "-scheme #{Scan.config[:scheme].shellescape}" if Scan.config[:scheme]
+        params << "-workspace #{Scan.config[:workspace].shellescape}" if Scan.config[:workspace]
+        return params
+      end
+
       proj = Scan.project.xcodebuild_parameters
       return proj if proj.count > 0
       UI.user_error!("No project/workspace found")
@@ -33,7 +45,7 @@ module Scan
       options = []
       options += project_path_array unless config[:xctestrun]
       options << "-sdk '#{config[:sdk]}'" if config[:sdk]
-      options << destination # generated in `detect_values`
+      options << destination if destination # generated in `detect_values`
       options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
       if config[:derived_data_path] && !options.include?("-derivedDataPath #{config[:derived_data_path].shellescape}")
         options << "-derivedDataPath #{config[:derived_data_path].shellescape}"
@@ -136,7 +148,15 @@ module Scan
 
     # Store the raw file
     def xcodebuild_log_path
-      file_name = "#{Scan.config[:app_name] || Scan.project.app_name}-#{Scan.config[:scheme]}.log"
+      parts = []
+      if Scan.config[:app_name]
+        parts << Scan.config[:app_name]
+      elsif Scan.project
+        parts << Scan.project.app_name
+      end
+      parts << Scan.config[:scheme] if Scan.config[:scheme]
+
+      file_name = "#{parts.join('-')}.log"
       containing = File.expand_path(Scan.config[:buildlog_path])
       FileUtils.mkdir_p(containing)
 
@@ -162,16 +182,21 @@ module Scan
       Scan.cache[:build_path]
     end
 
+    # The path to the result bundle
     def result_bundle_path
-      unless Scan.cache[:result_bundle_path]
-        ext = FastlaneCore::Helper.xcode_version.to_i >= 11 ? '.xcresult' : '.test_result'
-        path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + ext
-        if File.directory?(path)
-          FileUtils.remove_dir(path)
-        end
-        Scan.cache[:result_bundle_path] = path
-      end
-      return Scan.cache[:result_bundle_path]
+      retry_count = Scan.cache[:retry_attempt] || 0
+      attempt = retry_count > 0 ? "-#{retry_count}" : ""
+      ext = FastlaneCore::Helper.xcode_version.to_i >= 11 ? '.xcresult' : '.test_result'
+      path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + attempt + ext
+
+      Scan.cache[:result_bundle_path] = path
+
+      # The result bundle path will be in the package path directory if specified
+      delete_path = path
+      delete_path = File.join(Scan.config[:package_path], path) if Scan.config[:package_path].to_s != ""
+      FileUtils.remove_dir(delete_path) if File.directory?(delete_path)
+
+      return path
     end
   end
 end
