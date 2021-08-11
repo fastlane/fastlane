@@ -753,4 +753,60 @@ describe "Build Manager" do
       end
     end
   end
+
+  describe "#update_build_beta_details" do
+    let(:fake_build_manager) { Pilot::BuildManager.new }
+    let(:fake_build_id) { "fake build_id" }
+    let(:fake_auto_notify) { "fake auto_notify" }
+
+    describe "what happens when updating the beta build details" do
+      context "when build_beta_detail has info" do
+        let(:fake_build_beta_detail) { double("fake build_beta_detail", id: fake_build_id) }
+        let(:fake_build) { double("fake build", build_beta_detail: fake_build_beta_detail) }
+
+        context "when auto_notify_enabled is set" do
+          let(:fake_info) do
+            { auto_notify_enabled: fake_auto_notify }
+          end
+
+          it "patches the beta build details using Spaceship" do
+            expect(Spaceship::ConnectAPI).to receive(:patch_build_beta_details).with({
+              build_beta_details_id: fake_build_id,
+              attributes: { autoNotifyEnabled: fake_auto_notify }
+            })
+
+            fake_build_manager.send(:update_build_beta_details, fake_build, fake_info)
+          end
+        end
+
+        context "when auto_notify_enabled is not set" do
+          let(:fake_info) do
+            { foo: "fake foo" }
+          end
+
+          it "patches the beta build details using Spaceship" do
+            expect(Spaceship::ConnectAPI).to receive(:patch_build_beta_details).with({
+              build_beta_details_id: fake_build_id,
+              attributes: {}
+            })
+
+            fake_build_manager.send(:update_build_beta_details, fake_build, fake_info)
+          end
+        end
+      end
+
+      context "when build_beta_detail is nil and auto_notify_enabled is set" do
+        let(:fake_build) { double("fake build", build_beta_detail: nil) }
+        let(:fake_info) do
+          { auto_notify_enabled: fake_auto_notify }
+        end
+
+        it "logs the warning message 'Unable to auto notify testers'" do
+          expect(UI).to receive(:important).with("Unable to auto notify testers as the build did not include beta detail information - this is likely a temporary issue on TestFlight.")
+
+          fake_build_manager.send(:update_build_beta_details, fake_build, fake_info)
+        end
+      end
+    end
+  end
 end
