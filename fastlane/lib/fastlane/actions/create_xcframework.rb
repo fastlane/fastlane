@@ -65,14 +65,32 @@ module Fastlane
           Utility for packaging multiple build configurations of a given library
           or framework into a single xcframework.
 
-          If you want to package several frameworks just provide an array containing
-          the list of frameworks to be packaged using the :frameworks parameter.
+          If you want to package several frameworks just provide one of:
 
-          If you want to package several libraries with their corresponding headers
-          provide a hash containing the library as the key and the directory containing
-          its headers as the value (or an empty string if there are no headers associated
-          with the provided library).
+            * An array containing the list of frameworks using the :frameworks parameter
+              (if they have no associated dSYMs):
+                ['FrameworkA.framework', 'FrameworkB.framework']
 
+            * A hash containing the list of list of frameworks with their dSYMs using
+              the :frameworks_with_dsyms parameter:
+                {
+                  'FrameworkA.framework' => {},
+                  'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' }
+                }
+
+          If you want to package several libraries just provide one of:
+
+            * An array containing the list of libreries using the :libraries parameter
+              (if they have no associated headers or dSYMs):
+                ['LibraryA.so', 'LibraryB.so']
+
+            * A hash containing the list of list of libraries with their headers and
+              dSYMs using the :libraries_with_headers_or_dsyms parameter:
+                {
+                  'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' },
+                  'LibraryB.so' => { headers: 'headers' }
+                }
+                
           Finally specify the location of the xcframework to be generated using the :output
           parameter.
         DETAILS
