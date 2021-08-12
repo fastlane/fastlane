@@ -43,7 +43,7 @@ module Fastlane
       end
 
       def self.check_artifact_info(artifact_info)
-        UI.user_error!("Headers and dSYMs information should be a hash") unless artifact_info.kind_of? Hash
+        UI.user_error!("Headers and dSYMs information should be a hash") unless artifact_info.kind_of?(Hash)
         UI.user_error!("#{artifact_info[:headers]} doesn't exist or is not a directory") if artifact_info[:headers] && !File.directory?(artifact_info[:headers])
         UI.user_error!("#{artifact_info[:dsyms]} doesn't seem to be a dSYM archive") if artifact_info[:dsyms] && !File.directory?(artifact_info[:dsyms])
       end
@@ -78,7 +78,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :frameworks,
                                        env_name: "FL_CREATE_XCFRAMEWORK_FRAMEWORKS",
-                                       description: "Frameworks to add to the target xcframework",
+                                       description: "Frameworks to add to the target xcframework with their corresponding dSYMs (as an Array or Hash)",
                                        is_string: false,
                                        optional: true,
                                        conflicting_options: [:libraries],
@@ -97,7 +97,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :libraries,
                                        env_name: "FL_CREATE_XCFRAMEWORK_LIBRARIES",
-                                       description: "Libraries to add to the target xcframework, with their corresponding headers",
+                                       description: "Libraries to add to the target xcframework, with their corresponding headers and dSYMs (as an Array or Hash)",
                                        is_string: false,
                                        optional: true,
                                        conflicting_options: [:frameworks],
@@ -138,7 +138,9 @@ module Fastlane
       def self.example_code
         [
           "create_xcframework(frameworks: ['FrameworkA.framework', 'FrameworkB.framework'], output: 'UniversalFramework.xcframework')",
-          "create_xcframework(libraries: { 'LibraryA.so' => '', 'LibraryB.so' => 'LibraryBHeaders'}, output: 'UniversalFramework.xcframework')"
+          "create_xcframework(frameworks: {'FrameworkA.framework' => {}, 'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' } }, output: 'UniversalFramework.xcframework')",
+          "create_xcframework(libraries: ['LibraryA.so', 'LibraryB.so'], output: 'UniversalFramework.xcframework')",
+          "create_xcframework(libraries: { 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' }, 'LibraryB.so' => { headers: 'LibraryBHeaders' } }, output: 'UniversalFramework.xcframework')"
         ]
       end
 
