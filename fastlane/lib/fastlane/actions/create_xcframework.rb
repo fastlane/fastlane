@@ -42,6 +42,12 @@ module Fastlane
         artifact_info.map { |type, file| [PARAMETERS_TO_OPTIONS[type], "\"#{file}\""] }.flatten
       end
 
+      def self.check_artifact_info(artifact_info)
+        UI.user_error!("Headers and dSYMs information should be a hash") unless artifact_info.kind_of? Hash
+        UI.user_error!("#{artifact_info[:headers]} doesn't exist or is not a directory") if artifact_info[:headers] && !File.directory?(artifact_info[:headers])
+        UI.user_error!("#{artifact_info[:dsyms]} doesn't seem to be a dSYM archive") if artifact_info[:dsyms] && !File.directory?(artifact_info[:dsyms])
+      end
+
       #####################################################
       # @!group Documentation
       #####################################################
@@ -83,7 +89,7 @@ module Fastlane
                                              UI.user_error!("#{framework} doesn't end with '.framework'. Is this really a framework?") unless framework.end_with?('.framework')
                                              UI.user_error!("Couldn't find framework at #{framework}") unless File.exist?(framework)
                                              UI.user_error!("#{framework} doesn't seem to be a framework") unless File.directory?(framework)
-                                             UI.user_error!("#{framework_info[:dsyms]} doesn't seem to be a dSYM archive") if framework_info[:dsyms] && !File.directory?(framework_info[:dsyms])
+                                             check_artifact_info(framework_info)
                                            end
                                          else
                                            UI.user_error!("frameworks should be an Array (['FrameworkA.framework', 'FrameworkB.framework']) or a Hash ({'FrameworkA.framework' => {}, 'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' } })")
@@ -100,8 +106,7 @@ module Fastlane
                                          when Array, Hash
                                            normalized_artifact_info(value, [:headers, :dsyms]).each do |library, library_info|
                                              UI.user_error!("Couldn't find library at #{library}") unless File.exist?(library)
-                                             UI.user_error!("#{library_info[:headers]} doesn't exist or is not a directory") if library_info[:headers] && !File.directory?(library_info[:headers])
-                                             UI.user_error!("#{library_info[:dsyms]} doesn't seem to be a dSYM archive") if library_info[:dsyms] && !File.directory?(library_info[:dsyms])
+                                             check_artifact_info(library_info)
                                            end
                                          else
                                            UI.user_error!("libraries should be an Array (['LibraryA.so', 'LibraryB.so']) or a Hash ({ 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' }, 'LibraryB.so' => { headers: 'headers' } })")
