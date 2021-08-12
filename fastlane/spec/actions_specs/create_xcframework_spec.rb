@@ -6,30 +6,95 @@ describe Fastlane do
         allow(File).to receive(:directory?).and_call_original
       end
 
-      it "requires to either provide :frameworks or :libraries" do
+      it "requires to either provide :frameworks, :frameworks_with_dsyms, :libraries or :libraries_with_headers_or_dsyms" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             create_xcframework(
               output: 'UniversalFramework.xcframework'
             )
           end").runner.execute(:test)
-        end.to raise_error("Please provide either :frameworks or :libraries to be packaged into the xcframework")
+        end.to raise_error("Please provide either :frameworks, :frameworks_with_dsyms, :libraries or :libraries_with_headers_or_dsyms to be packaged into the xcframework")
       end
 
-      it "forbids to provide both :frameworks and :libraries" do
-        allow(File).to receive(:exist?).with('FrameworkA.framework').and_return(true)
-        allow(File).to receive(:directory?).with('FrameworkA.framework').and_return(true)
-        allow(File).to receive(:exist?).with('LibraryA.so').and_return(true)
+      context "when trying to use more than one list of artifacts" do
+        before(:each) do
+          allow(File).to receive(:exist?).with('FrameworkA.framework').and_return(true)
+          allow(File).to receive(:directory?).with('FrameworkA.framework').and_return(true)
+          allow(File).to receive(:exist?).with('LibraryA.so').and_return(true)
+          allow(File).to receive(:directory?).with('libraryA.so.dSYM').and_return(true)
+        end
 
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            create_xcframework(
-              frameworks: ['FrameworkA.framework'],
-              libraries: ['LibraryA.so'],
-              output: 'UniversalFramework.xcframework'
-            )
-          end").runner.execute(:test)
-        end.to raise_error("Unresolved conflict between options: 'frameworks' and 'libraries'")
+        it "forbids to provide both :frameworks and :frameworks_with_dsyms" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              create_xcframework(
+                frameworks: ['FrameworkA.framework'],
+                frameworks_with_dsyms: { 'FrameworkA.framework' => { dysm: 'FrameworkA.framework.dSYM' } },
+                output: 'UniversalFramework.xcframework'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unresolved conflict between options: 'frameworks' and 'frameworks_with_dsyms'")
+        end
+
+        it "forbids to provide both :frameworks and :libraries" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              create_xcframework(
+                frameworks: ['FrameworkA.framework'],
+                libraries: ['LibraryA.so'],
+                output: 'UniversalFramework.xcframework'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unresolved conflict between options: 'frameworks' and 'libraries'")
+        end
+
+        it "forbids to provide both :frameworks and :libraries_with_headers_or_dsyms" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              create_xcframework(
+                frameworks: ['FrameworkA.framework'],
+                libraries_with_headers_or_dsyms: { 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' } },
+                output: 'UniversalFramework.xcframework'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unresolved conflict between options: 'frameworks' and 'libraries_with_headers_or_dsyms'")
+        end
+
+        it "forbids to provide both :frameworks_with_dsyms and :libraries" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              create_xcframework(
+                frameworks_with_dsyms: { 'FrameworkA.framework' => { dysm: 'FrameworkA.framework.dSYM' } },
+                libraries: ['LibraryA.so'],
+                output: 'UniversalFramework.xcframework'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unresolved conflict between options: 'frameworks_with_dsyms' and 'libraries'")
+        end
+
+        it "forbids to provide both :frameworks_with_dsyms and :libraries_with_headers_or_dsyms" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              create_xcframework(
+                frameworks_with_dsyms: { 'FrameworkA.framework' => { dysm: 'FrameworkA.framework.dSYM' } },
+                libraries_with_headers_or_dsyms: { 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' } },
+                output: 'UniversalFramework.xcframework'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unresolved conflict between options: 'frameworks_with_dsyms' and 'libraries_with_headers_or_dsyms'")
+        end
+
+        it "forbids to provide both :libraries and :libraries_with_headers_or_dsyms" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              create_xcframework(
+                libraries: ['LibraryA.so'],
+                libraries_with_headers_or_dsyms: { 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' } },
+                output: 'UniversalFramework.xcframework'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Unresolved conflict between options: 'libraries' and 'libraries_with_headers_or_dsyms'")
+        end
       end
 
       context "when packaging frameworks" do
@@ -84,7 +149,7 @@ describe Fastlane do
                 it "should work properly for public frameworks" do
                   result = Fastlane::FastFile.new.parse("lane :test do
                     create_xcframework(
-                      frameworks: {'FrameworkA.framework' => {}, 'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' } },
+                      frameworks_with_dsyms: {'FrameworkA.framework' => {}, 'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' } },
                       output: 'UniversalFramework.xcframework'
                     )
                   end").runner.execute(:test)
@@ -97,7 +162,7 @@ describe Fastlane do
                 it "should work properly for internal frameworks" do
                   result = Fastlane::FastFile.new.parse("lane :test do
                     create_xcframework(
-                      frameworks: {'FrameworkA.framework' => {}, 'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' } },
+                      frameworks_with_dsyms: {'FrameworkA.framework' => {}, 'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' } },
                       output: 'UniversalFramework.xcframework',
                       allow_internal_distribution: true
                     )
@@ -115,7 +180,7 @@ describe Fastlane do
                   expect do
                     Fastlane::FastFile.new.parse("lane :test do
                       create_xcframework(
-                        frameworks: {'FrameworkA.framework' => {}, 'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' } },
+                        frameworks_with_dsyms: {'FrameworkA.framework' => {}, 'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' } },
                         output: 'UniversalFramework.xcframework'
                       )
                     end").runner.execute(:test)
@@ -126,11 +191,22 @@ describe Fastlane do
           end
 
           context "and are not directories" do
-            it "should fail due to wrong framework" do
+            it "should fail due to wrong framework when provided as an Array" do
               expect do
                 Fastlane::FastFile.new.parse("lane :test do
                   create_xcframework(
                     frameworks: ['FrameworkA.framework', 'FrameworkB.framework'],
+                    output: 'UniversalFramework.xcframework'
+                  )
+                end").runner.execute(:test)
+              end.to raise_error("FrameworkA.framework doesn't seem to be a framework")
+            end
+
+            it "should fail due to wrong framework when provided as a Hash" do
+              expect do
+                Fastlane::FastFile.new.parse("lane :test do
+                  create_xcframework(
+                    frameworks_with_dsyms: {'FrameworkA.framework' => {}, 'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' } },
                     output: 'UniversalFramework.xcframework'
                   )
                 end").runner.execute(:test)
@@ -221,7 +297,7 @@ describe Fastlane do
               it "should work properly for public frameworks" do
                 result = Fastlane::FastFile.new.parse("lane :test do
                   create_xcframework(
-                    libraries: { 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' }, 'LibraryB.so' => { headers: 'headers' } },
+                    libraries_with_headers_or_dsyms: { 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' }, 'LibraryB.so' => { headers: 'headers' } },
                     output: 'UniversalFramework.xcframework'
                   )
                 end").runner.execute(:test)
@@ -234,7 +310,7 @@ describe Fastlane do
               it "should work properly for internal frameworks" do
                 result = Fastlane::FastFile.new.parse("lane :test do
                   create_xcframework(
-                    libraries: { 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' }, 'LibraryB.so' => { headers: 'headers' } },
+                    libraries_with_headers_or_dsyms: { 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' }, 'LibraryB.so' => { headers: 'headers' } },
                     output: 'UniversalFramework.xcframework',
                     allow_internal_distribution: true
                   )
@@ -256,7 +332,7 @@ describe Fastlane do
                 expect do
                   Fastlane::FastFile.new.parse("lane :test do
                     create_xcframework(
-                      libraries: { 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' }, 'LibraryB.so' => { headers: 'headers' } },
+                      libraries_with_headers_or_dsyms: { 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' }, 'LibraryB.so' => { headers: 'headers' } },
                       output: 'UniversalFramework.xcframework'
                     )
                   end").runner.execute(:test)
@@ -273,7 +349,7 @@ describe Fastlane do
                 expect do
                   Fastlane::FastFile.new.parse("lane :test do
                     create_xcframework(
-                      libraries: { 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' }, 'LibraryB.so' => { headers: 'headers' } },
+                      libraries_with_headers_or_dsyms: { 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' }, 'LibraryB.so' => { headers: 'headers' } },
                       output: 'UniversalFramework.xcframework'
                     )
                   end").runner.execute(:test)

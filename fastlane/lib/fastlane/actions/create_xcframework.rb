@@ -8,10 +8,14 @@ module Fastlane
       PARAMETERS_TO_OPTIONS = { headers: '-headers', dsyms: '-debug-symbols' }
 
       def self.run(params)
-        artifacts = normalized_artifact_info(params[:frameworks], [:dsyms]) || normalized_artifact_info(params[:libraries], [:headers, :dsyms])
-        UI.user_error!("Please provide either :frameworks or :libraries to be packaged into the xcframework") unless artifacts
+        artifacts = normalized_artifact_info(params[:frameworks], [:dsyms]) ||
+                    normalized_artifact_info(params[:frameworks_with_dsyms], [:dsyms]) ||
+                    normalized_artifact_info(params[:libraries], [:headers, :dsyms]) ||
+                    normalized_artifact_info(params[:libraries_with_headers_or_dsyms], [:headers, :dsyms])
 
-        artifacts_type = params[:frameworks] ? '-framework' : '-library'
+        UI.user_error!("Please provide either :frameworks, :frameworks_with_dsyms, :libraries or :libraries_with_headers_or_dsyms to be packaged into the xcframework") unless artifacts
+
+        artifacts_type = params[:frameworks] || params[:frameworks_with_dsyms] ? '-framework' : '-library'
         create_command = ['xcodebuild', '-create-xcframework']
         create_command << artifacts.map { |artifact, artifact_info| [artifacts_type, "\"#{artifact}\""] + artifact_info_as_options(artifact_info) }.flatten
         create_command << ['-output', "\"#{params[:output]}\""]
@@ -27,14 +31,14 @@ module Fastlane
         sh(create_command)
       end
 
-      def self.normalized_artifact_info(artifact_info, valid_info)
-        case artifact_info
+      def self.normalized_artifact_info(artifacts_with_info, valid_info)
+        case artifacts_with_info
         when Array
-          artifact_info.map { |artifact| [artifact, {}] }.to_h
+          artifacts_with_info.map { |artifact| [artifact, {}] }.to_h
         when Hash
-          artifact_info.transform_values { |artifact_info| artifact_info.transform_keys { |key| key.to_sym }.slice(*valid_info) }
+          artifacts_with_info.transform_values { |artifact_info| artifact_info.transform_keys(&:to_sym).slice(*valid_info) }
         else
-          artifact_info
+          artifacts_with_info
         end
       end
 
@@ -78,38 +82,54 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :frameworks,
                                        env_name: "FL_CREATE_XCFRAMEWORK_FRAMEWORKS",
-                                       description: "Frameworks to add to the target xcframework with their corresponding dSYMs (as an Array or Hash)",
-                                       is_string: false,
+                                       description: "Frameworks (without dSYMs) to add to the target xcframework",
+                                       type: Array,
                                        optional: true,
-                                       conflicting_options: [:libraries],
+                                       conflicting_options: [:frameworks_with_dsyms, :libraries, :libraries_with_headers_or_dsyms],
                                        verify_block: proc do |value|
-                                         case value
-                                         when Array, Hash
-                                           normalized_artifact_info(value, [:dsyms]).each do |framework, framework_info|
-                                             UI.user_error!("#{framework} doesn't end with '.framework'. Is this really a framework?") unless framework.end_with?('.framework')
-                                             UI.user_error!("Couldn't find framework at #{framework}") unless File.exist?(framework)
-                                             UI.user_error!("#{framework} doesn't seem to be a framework") unless File.directory?(framework)
-                                             check_artifact_info(framework_info)
-                                           end
-                                         else
-                                           UI.user_error!("frameworks should be an Array (['FrameworkA.framework', 'FrameworkB.framework']) or a Hash ({'FrameworkA.framework' => {}, 'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' } })")
+                                         normalized_artifact_info(value, [:dsyms]).each do |framework, framework_info|
+                                           UI.user_error!("#{framework} doesn't end with '.framework'. Is this really a framework?") unless framework.end_with?('.framework')
+                                           UI.user_error!("Couldn't find framework at #{framework}") unless File.exist?(framework)
+                                           UI.user_error!("#{framework} doesn't seem to be a framework") unless File.directory?(framework)
+                                           check_artifact_info(framework_info)
+                                         end
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :frameworks_with_dsyms,
+                                       env_name: "FL_CREATE_XCFRAMEWORK_FRAMEWORKS_WITH_DSYMS",
+                                       description: "Frameworks (with dSYMs) to add to the target xcframework",
+                                       type: Hash,
+                                       optional: true,
+                                       conflicting_options: [:frameworks, :libraries, :libraries_with_headers_or_dsyms],
+                                       verify_block: proc do |value|
+                                         normalized_artifact_info(value, [:dsyms]).each do |framework, framework_info|
+                                           UI.user_error!("#{framework} doesn't end with '.framework'. Is this really a framework?") unless framework.end_with?('.framework')
+                                           UI.user_error!("Couldn't find framework at #{framework}") unless File.exist?(framework)
+                                           UI.user_error!("#{framework} doesn't seem to be a framework") unless File.directory?(framework)
+                                           check_artifact_info(framework_info)
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :libraries,
                                        env_name: "FL_CREATE_XCFRAMEWORK_LIBRARIES",
-                                       description: "Libraries to add to the target xcframework, with their corresponding headers and dSYMs (as an Array or Hash)",
-                                       is_string: false,
+                                       description: "Libraries (without headers or dSYMs) to add to the target xcframework",
+                                       type: Array,
                                        optional: true,
-                                       conflicting_options: [:frameworks],
+                                       conflicting_options: [:frameworks, :frameworks_with_dsyms, :libraries_with_headers_or_dsyms],
                                        verify_block: proc do |value|
-                                         case value
-                                         when Array, Hash
-                                           normalized_artifact_info(value, [:headers, :dsyms]).each do |library, library_info|
-                                             UI.user_error!("Couldn't find library at #{library}") unless File.exist?(library)
-                                             check_artifact_info(library_info)
-                                           end
-                                         else
-                                           UI.user_error!("libraries should be an Array (['LibraryA.so', 'LibraryB.so']) or a Hash ({ 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' }, 'LibraryB.so' => { headers: 'headers' } })")
+                                         normalized_artifact_info(value, [:headers, :dsyms]).each do |library, library_info|
+                                           UI.user_error!("Couldn't find library at #{library}") unless File.exist?(library)
+                                           check_artifact_info(library_info)
+                                         end
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :libraries_with_headers_or_dsyms,
+                                       env_name: "FL_CREATE_XCFRAMEWORK_LIBRARIES_WITH_HEADERS_OR_DSYMS",
+                                       description: "Libraries (with headers or dSYMs) to add to the target xcframework",
+                                       type: Hash,
+                                       optional: true,
+                                       conflicting_options: [:frameworks, :frameworks_with_dsyms, :libraries],
+                                       verify_block: proc do |value|
+                                         normalized_artifact_info(value, [:headers, :dsyms]).each do |library, library_info|
+                                           UI.user_error!("Couldn't find library at #{library}") unless File.exist?(library)
+                                           check_artifact_info(library_info)
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :output,
