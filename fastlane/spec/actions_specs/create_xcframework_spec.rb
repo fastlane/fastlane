@@ -119,7 +119,7 @@ describe Fastlane do
                         output: 'UniversalFramework.xcframework'
                       )
                     end").runner.execute(:test)
-                  end.to raise_error("FrameworkB.framework.dSYM doesn't exist or is not a directory")
+                  end.to raise_error("FrameworkB.framework.dSYM doesn't seem to be a dSYM archive")
                 end
               end
             end

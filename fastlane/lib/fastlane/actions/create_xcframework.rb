@@ -5,12 +5,15 @@ module Fastlane
     end
 
     class CreateXcframeworkAction < Action
-      def self.run(params)
-        UI.user_error!("Please provide either :frameworks or :libraries to be packaged into the xcframework") unless params[:frameworks] || params[:libraries]
+      PARAMETERS_TO_OPTIONS = { headers: '-headers', dsyms: '-debug-symbols' }
 
+      def self.run(params)
+        artifacts = normalized_artifact_info(params[:frameworks], [:dsyms]) || normalized_artifact_info(params[:libraries], [:headers, :dsyms])
+        UI.user_error!("Please provide either :frameworks or :libraries to be packaged into the xcframework") unless artifacts
+
+        artifacts_type = params[:frameworks] ? '-framework' : '-library'
         create_command = ['xcodebuild', '-create-xcframework']
-        create_command << params[:frameworks].map { |framework| ['-framework', "\"#{framework}\""] }.flatten if params[:frameworks]
-        create_command << params[:libraries].map { |library, headers| ['-library', "\"#{library}\""] + (headers.empty? ? [] : ['-headers', "\"#{headers}\""]) } if params[:libraries]
+        create_command << artifacts.map { |artifact, artifact_info| [artifacts_type, "\"#{artifact}\""] + artifact_info_as_options(artifact_info) }.flatten
         create_command << ['-output', "\"#{params[:output]}\""]
         create_command << ['-allow-internal-distribution'] if params[:allow_internal_distribution]
 
@@ -22,6 +25,21 @@ module Fastlane
         Actions.lane_context[SharedValues::XCFRAMEWORK_PATH] = params[:output]
 
         sh(create_command)
+      end
+
+      def self.normalized_artifact_info(artifact_info, valid_info)
+        case artifact_info
+        when Array
+          artifact_info.map { |artifact| [artifact, {}] }.to_h
+        when Hash
+          artifact_info.transform_values { |artifact_info| artifact_info.transform_keys { |key| key.to_sym }.slice(*valid_info) }
+        else
+          artifact_info
+        end
+      end
+
+      def self.artifact_info_as_options(artifact_info)
+        artifact_info.map { |type, file| [PARAMETERS_TO_OPTIONS[type], "\"#{file}\""] }.flatten
       end
 
       #####################################################
@@ -55,14 +73,20 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :frameworks,
                                        env_name: "FL_CREATE_XCFRAMEWORK_FRAMEWORKS",
                                        description: "Frameworks to add to the target xcframework",
-                                       type: Array,
+                                       is_string: false,
                                        optional: true,
                                        conflicting_options: [:libraries],
                                        verify_block: proc do |value|
-                                         value.each do |framework|
-                                           UI.user_error!("#{framework} doesn't end with '.framework'. Is this really a framework?") unless framework.end_with?('.framework')
-                                           UI.user_error!("Couldn't find framework at #{framework}") unless File.exist?(framework)
-                                           UI.user_error!("#{framework} doesn't seem to be a framework") unless File.directory?(framework)
+                                         case value
+                                         when Array, Hash
+                                           normalized_artifact_info(value, [:dsyms]).each do |framework, framework_info|
+                                             UI.user_error!("#{framework} doesn't end with '.framework'. Is this really a framework?") unless framework.end_with?('.framework')
+                                             UI.user_error!("Couldn't find framework at #{framework}") unless File.exist?(framework)
+                                             UI.user_error!("#{framework} doesn't seem to be a framework") unless File.directory?(framework)
+                                             UI.user_error!("#{framework_info[:dsyms]} doesn't seem to be a dSYM archive") if framework_info[:dsyms] && !File.directory?(framework_info[:dsyms])
+                                           end
+                                         else
+                                           UI.user_error!("frameworks should be an Array (['FrameworkA.framework', 'FrameworkB.framework']) or a Hash ({'FrameworkA.framework' => {}, 'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' } })")
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :libraries,
