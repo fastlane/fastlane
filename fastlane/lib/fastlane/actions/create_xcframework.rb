@@ -92,13 +92,19 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :libraries,
                                        env_name: "FL_CREATE_XCFRAMEWORK_LIBRARIES",
                                        description: "Libraries to add to the target xcframework, with their corresponding headers",
-                                       type: Hash,
+                                       is_string: false,
                                        optional: true,
                                        conflicting_options: [:frameworks],
                                        verify_block: proc do |value|
-                                         value.each do |library, headers|
-                                           UI.user_error!("Couldn't find library at #{library}") unless File.exist?(library)
-                                           UI.user_error!("#{headers} doesn't exist or is not a directory") unless headers.empty? || File.directory?(headers)
+                                         case value
+                                         when Array, Hash
+                                           normalized_artifact_info(value, [:headers, :dsyms]).each do |library, library_info|
+                                             UI.user_error!("Couldn't find library at #{library}") unless File.exist?(library)
+                                             UI.user_error!("#{library_info[:headers]} doesn't exist or is not a directory") if library_info[:headers] && !File.directory?(library_info[:headers])
+                                             UI.user_error!("#{library_info[:dsyms]} doesn't seem to be a dSYM archive") if library_info[:dsyms] && !File.directory?(library_info[:dsyms])
+                                           end
+                                         else
+                                           UI.user_error!("libraries should be an Array (['LibraryA.so', 'LibraryB.so']) or a Hash ({ 'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' }, 'LibraryB.so' => { headers: 'headers' } })")
                                          end
                                        end),
           FastlaneCore::ConfigItem.new(key: :output,

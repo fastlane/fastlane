@@ -25,7 +25,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             create_xcframework(
               frameworks: ['FrameworkA.framework'],
-              libraries: { 'LibraryA.so' => '' },
+              libraries: ['LibraryA.so'],
               output: 'UniversalFramework.xcframework'
             )
           end").runner.execute(:test)
@@ -277,7 +277,7 @@ describe Fastlane do
                       output: 'UniversalFramework.xcframework'
                     )
                   end").runner.execute(:test)
-                end.to raise_error("libraryA.so.dSYM doesn't exist or is not a directory")
+                end.to raise_error("libraryA.so.dSYM doesn't seem to be a dSYM archive")
               end
             end
           end
