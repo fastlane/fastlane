@@ -90,7 +90,7 @@ module Fastlane
                   'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' },
                   'LibraryB.so' => { headers: 'headers' }
                 }
-                
+
           Finally specify the location of the xcframework to be generated using the :output
           parameter.
         DETAILS
