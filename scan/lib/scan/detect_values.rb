@@ -15,22 +15,24 @@ module Scan
 
       prevalidate
 
-      # Detect the project
-      FastlaneCore::Project.detect_projects(config)
-      Scan.project = FastlaneCore::Project.new(config)
+      # Detect the project if not SPM package
+      if Scan.config[:package_path].nil?
+        FastlaneCore::Project.detect_projects(config)
+        Scan.project = FastlaneCore::Project.new(config)
 
-      # Go into the project's folder, as there might be a Snapfile there
-      imported_path = File.expand_path(Scan.scanfile_name)
-      Dir.chdir(File.expand_path("..", Scan.project.path)) do
-        config.load_configuration_file(Scan.scanfile_name) unless File.expand_path(Scan.scanfile_name) == imported_path
+        # Go into the project's folder, as there might be a Snapfile there
+        imported_path = File.expand_path(Scan.scanfile_name)
+        Dir.chdir(File.expand_path("..", Scan.project.path)) do
+          config.load_configuration_file(Scan.scanfile_name) unless File.expand_path(Scan.scanfile_name) == imported_path
+        end
+
+        Scan.project.select_scheme
       end
-
-      Scan.project.select_scheme
 
       devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
       if devices.count > 0
         detect_simulator(devices, '', '', '', nil)
-      else
+      elsif Scan.project
         if Scan.project.ios?
           # An iPhone 5s is a reasonably small and useful default for tests
           detect_simulator(devices, 'iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
@@ -38,6 +40,7 @@ module Scan
           detect_simulator(devices, 'tvOS', 'TVOS_DEPLOYMENT_TARGET', 'Apple TV 1080p', 'TV')
         end
       end
+
       detect_destination
 
       default_derived_data
@@ -72,6 +75,8 @@ module Scan
     end
 
     def self.default_derived_data
+      return unless Scan.project
+
       return unless Scan.config[:derived_data_path].to_s.empty?
       default_path = Scan.project.build_settings(key: "BUILT_PRODUCTS_DIR")
       # => /Users/.../Library/Developer/Xcode/DerivedData/app-bqrfaojicpsqnoglloisfftjhksc/Build/Products/Release-iphoneos
@@ -162,7 +167,10 @@ module Scan
               filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)
             end
           ).tap do |array|
-            UI.error("Ignoring '#{device_string}', couldn’t find matching simulator") if array.empty?
+            if array.empty?
+              UI.test_failure!("No device found with name '#{device_string}'") if Scan.config[:ensure_devices_found]
+              UI.error("Ignoring '#{device_string}', couldn’t find matching simulator")
+            end
           end
         end
 
@@ -213,14 +221,18 @@ module Scan
         Scan.config[:destination] = ["platform=macOS,variant=Mac Catalyst"]
       elsif Scan.devices && Scan.devices.count > 0
         Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" }
-      elsif Scan.project.mac_app?
+      elsif Scan.project && Scan.project.mac_app?
         Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]
       end
     end
 
     # get deployment target version
     def self.get_deployment_target_version(deployment_target_key)
-      Scan.config[:deployment_target_version] || Scan.project.build_settings(key: deployment_target_key) || '0'
+      version = Scan.config[:deployment_target_version]
+      version ||= Scan.project.build_settings(key: deployment_target_key) if Scan.project
+      version ||= 0
+
+      return version
     end
   end
 end

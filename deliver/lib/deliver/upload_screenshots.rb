@@ -1,23 +1,23 @@
+require 'fastlane_core'
 require 'spaceship/tunes/tunes'
 require 'digest/md5'
 
 require_relative 'app_screenshot'
 require_relative 'module'
 require_relative 'loader'
-require_relative 'queue_worker'
 require_relative 'app_screenshot_iterator'
 
 module Deliver
   # upload screenshots to App Store Connect
   class UploadScreenshots
-    DeleteScreenshotJob = Struct.new(:app_screenshot, :localization, :app_screenshot_set)
+    DeleteScreenshotSetJob = Struct.new(:app_screenshot_set, :localization)
     UploadScreenshotJob = Struct.new(:app_screenshot_set, :path)
 
     def upload(options, screenshots)
       return if options[:skip_screenshots]
       return if options[:edit_live]
 
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       version = app.get_edit_app_store_version(platform: platform)
@@ -67,12 +67,12 @@ module Deliver
     def delete_screenshots(localizations, screenshots_per_language, tries: 5)
       tries -= 1
 
-      worker = QueueWorker.new do |job|
+      worker = FastlaneCore::QueueWorker.new do |job|
         start_time = Time.now
-        target = "#{job.localization.locale} #{job.app_screenshot_set.screenshot_display_type} #{job.app_screenshot.id}"
+        target = "#{job.localization.locale} #{job.app_screenshot_set.screenshot_display_type}"
         begin
           UI.verbose("Deleting '#{target}'")
-          job.app_screenshot.delete!
+          job.app_screenshot_set.delete!
           UI.message("Deleted '#{target}' -  (#{Time.now - start_time} secs)")
         rescue => error
           UI.error("Failed to delete screenshot #{target} - (#{Time.now - start_time} secs)")
@@ -81,12 +81,12 @@ module Deliver
       end
 
       iterator = AppScreenshotIterator.new(localizations)
-      iterator.each_app_screenshot do |localization, app_screenshot_set, app_screenshot|
+      iterator.each_app_screenshot_set do |localization, app_screenshot_set|
         # Only delete screenshots if trying to upload
         next unless screenshots_per_language.keys.include?(localization.locale)
 
-        UI.verbose("Queued delete sceeenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{app_screenshot.id}")
-        worker.enqueue(DeleteScreenshotJob.new(app_screenshot, localization, app_screenshot_set))
+        UI.verbose("Queued delete sceeenshot set job for #{localization.locale} #{app_screenshot_set.screenshot_display_type}")
+        worker.enqueue(DeleteScreenshotSetJob.new(app_screenshot_set, localization))
       end
 
       worker.start
@@ -113,7 +113,7 @@ module Deliver
       tries -= 1
 
       # Upload screenshots
-      worker = QueueWorker.new do |job|
+      worker = FastlaneCore::QueueWorker.new do |job|
         begin
           UI.verbose("Uploading '#{job.path}'...")
           start_time = Time.now
@@ -231,12 +231,13 @@ module Deliver
     end
 
     def sort_screenshots(localizations)
+      require 'naturally'
       iterator = AppScreenshotIterator.new(localizations)
 
       # Re-order screenshots within app_screenshot_set
-      worker = QueueWorker.new do |app_screenshot_set|
+      worker = FastlaneCore::QueueWorker.new do |app_screenshot_set|
         original_ids = app_screenshot_set.app_screenshots.map(&:id)
-        sorted_ids = app_screenshot_set.app_screenshots.sort_by(&:file_name).map(&:id)
+        sorted_ids = Naturally.sort(app_screenshot_set.app_screenshots, by: :file_name).map(&:id)
         if original_ids != sorted_ids
           app_screenshot_set.reorder_screenshots(app_screenshot_ids: sorted_ids)
         end

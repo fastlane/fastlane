@@ -1,35 +1,76 @@
 module Fastlane
   module Actions
     class ZipAction < Action
-      def self.run(params)
-        UI.message("Compressing #{params[:path]}...")
+      class Runner
+        attr_reader :output_path, :path, :verbose, :password, :symlinks, :include, :exclude
 
-        params[:output_path] ||= params[:path]
+        def initialize(params)
+          @output_path = File.expand_path(params[:output_path] || params[:path])
+          @path = params[:path]
+          @verbose = params[:verbose]
+          @password = params[:password]
+          @symlinks = params[:symlinks]
+          @include = params[:include]
+          @exclude = params[:exclude]
 
-        absolute_output_path = File.expand_path(params[:output_path])
-
-        # Appends ".zip" if path does not end in ".zip"
-        unless absolute_output_path.end_with?(".zip")
-          absolute_output_path += ".zip"
+          @output_path += ".zip" unless @output_path.end_with?(".zip")
         end
 
-        absolute_output_dir = File.expand_path("..", absolute_output_path)
-        FileUtils.mkdir_p(absolute_output_dir)
+        def run
+          UI.message("Compressing #{path}...")
 
-        Dir.chdir(File.expand_path("..", params[:path])) do # required to properly zip
-          zip_options = params[:verbose] ? "r" : "rq"
-          zip_options += "y" if params[:symlinks]
+          create_output_dir
+          run_zip_command
 
-          if params[:password]
-            password_option = "-P '#{params[:password]}'"
-            Actions.sh("zip -#{zip_options} #{password_option} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}")
-          else
-            Actions.sh("zip -#{zip_options} #{absolute_output_path.shellescape} #{File.basename(params[:path]).shellescape}")
+          UI.success("Successfully generated zip file at path '#{output_path}'")
+          output_path
+        end
+
+        def create_output_dir
+          output_dir = File.expand_path("..", output_path)
+          FileUtils.mkdir_p(output_dir)
+        end
+
+        def run_zip_command
+          # The 'zip' command archives relative to the working directory, chdir to produce expected results relative to `path`
+          Dir.chdir(File.expand_path("..", path)) do
+            Actions.sh(*zip_command)
           end
         end
 
-        UI.success("Successfully generated zip file at path '#{File.expand_path(absolute_output_path)}'")
-        return File.expand_path(absolute_output_path)
+        def zip_command
+          zip_options = verbose ? "r" : "rq"
+          zip_options += "y" if symlinks
+
+          command = ["zip", "-#{zip_options}"]
+
+          if password
+            command << "-P"
+            command << password
+          end
+
+          # The zip command is executed from the paths **parent** directory, as a result we use just the basename, which is the file or folder within
+          basename = File.basename(path)
+
+          command << output_path
+          command << basename
+
+          unless include.empty?
+            command << "-i"
+            command += include.map { |path| File.join(basename, path) }
+          end
+
+          unless exclude.empty?
+            command << "-x"
+            command += exclude.map { |path| File.join(basename, path) }
+          end
+
+          command
+        end
+      end
+
+      def self.run(params)
+        Runner.new(params).run
       end
 
       #####################################################
@@ -46,7 +87,8 @@ module Fastlane
                                        env_name: "FL_ZIP_PATH",
                                        description: "Path to the directory or file to be zipped",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Couldn't find file/folder at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                         path = File.expand_path(value)
+                                         UI.user_error!("Couldn't find file/folder at path '#{path}'") unless File.exist?(path)
                                        end),
           FastlaneCore::ConfigItem.new(key: :output_path,
                                        env_name: "FL_ZIP_OUTPUT_NAME",
@@ -67,7 +109,19 @@ module Fastlane
                                        description: "Store symbolic links as such in the zip archive",
                                        optional: true,
                                        type: Boolean,
-                                       default_value: false)
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :include,
+                                       env_name: "FL_ZIP_INCLUDE",
+                                       description: "Array of paths or patterns to include",
+                                       optional: true,
+                                       type: Array,
+                                       default_value: []),
+          FastlaneCore::ConfigItem.new(key: :exclude,
+                                       env_name: "FL_ZIP_EXCLUDE",
+                                       description: "Array of paths or patterns to exclude",
+                                       optional: true,
+                                       type: Array,
+                                       default_value: [])
         ]
       end
 
@@ -88,6 +142,17 @@ module Fastlane
             output_path: "Latest.app.zip",
             verbose: false,
             symlinks: true
+          )',
+          'zip(
+            path: "./",
+            output_path: "Source Code.zip",
+            exclude: [".git/*"]
+          )',
+          'zip(
+            path: "./",
+            output_path: "Swift Code.zip",
+            include: ["**/*.swift"],
+            exclude: ["Package.swift", "vendor/*", "Pods/*"]
           )'
         ]
       end

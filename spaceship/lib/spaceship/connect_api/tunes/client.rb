@@ -11,6 +11,9 @@ module Spaceship
 
           super(cookie: cookie, current_team_id: current_team_id, token: token, another_client: another_client)
 
+          # Used by most iris requests starting in July 2021
+          @additional_headers = { 'x-csrf-itc': '[asc-ui]' } if another_client
+
           self.extend(Spaceship::ConnectAPI::Tunes::API)
           self.tunes_request_client = self
         end

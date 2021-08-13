@@ -10,6 +10,7 @@ class String
     end
   end
   Colored::EXTRAS.keys.each do |extra|
+    next if extra == 'clear'
     define_method(extra) do
       self # do nothing with the string, but return it
     end

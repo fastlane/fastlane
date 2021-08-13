@@ -166,7 +166,7 @@ describe FastlaneCore do
     describe "Valid Standard Project" do
       before do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
-        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+        @project = FastlaneCore::Project.new(options)
       end
 
       it "#path" do
@@ -220,7 +220,7 @@ describe FastlaneCore do
           workspace: "./fastlane_core/spec/fixtures/projects/cocoapods/Example.xcworkspace",
           scheme: "Example"
         }
-        @workspace = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+        @workspace = FastlaneCore::Project.new(options)
       end
 
       it "#schemes returns all schemes" do
@@ -235,7 +235,7 @@ describe FastlaneCore do
     describe "Mac Project" do
       before do
         options = { project: "./fastlane_core/spec/fixtures/projects/Mac.xcodeproj" }
-        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+        @project = FastlaneCore::Project.new(options)
       end
 
       it "#mac?", requires_xcode: true do
@@ -258,7 +258,7 @@ describe FastlaneCore do
     describe "TVOS Project" do
       before do
         options = { project: "./fastlane_core/spec/fixtures/projects/ExampleTVOS.xcodeproj" }
-        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+        @project = FastlaneCore::Project.new(options)
       end
 
       it "#mac?", requires_xcode: true do
@@ -281,7 +281,7 @@ describe FastlaneCore do
     describe "Cross-Platform Project" do
       before do
         options = { project: "./fastlane_core/spec/fixtures/projects/Cross-Platform.xcodeproj" }
-        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+        @project = FastlaneCore::Project.new(options)
       end
 
       it "supported_platforms", requires_xcode: true do
@@ -311,7 +311,7 @@ describe FastlaneCore do
           workspace: "./fastlane_core/spec/fixtures/projects/workspace_schemes/WorkspaceSchemes.xcworkspace",
           scheme: "WorkspaceSchemesScheme"
         }
-        @workspace = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+        @workspace = FastlaneCore::Project.new(options)
       end
 
       it "#schemes returns all schemes" do
@@ -326,21 +326,21 @@ describe FastlaneCore do
     describe "build_settings() can handle empty lines" do
       it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos on Xcode >= 8.3" do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
-        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+        @project = FastlaneCore::Project.new(options)
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2> /dev/null"
-        expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: false }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+        expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
       end
 
       it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos on Xcode < 8.3" do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
-        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+        @project = FastlaneCore::Project.new(options)
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(false)
-        command = "xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2> /dev/null"
-        expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: false }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
+        command = "xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+        expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
       end
     end
@@ -348,7 +348,7 @@ describe FastlaneCore do
     describe "Build Settings with default configuration" do
       before do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
-        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+        @project = FastlaneCore::Project.new(options)
       end
 
       it "IPHONEOS_DEPLOYMENT_TARGET should be 9.0", requires_xcode: true do
@@ -366,7 +366,7 @@ describe FastlaneCore do
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           configuration: "SpecialConfiguration"
         }
-        @project = FastlaneCore::Project.new(options, xcodebuild_list_silent: true, xcodebuild_suppress_stderr: true)
+        @project = FastlaneCore::Project.new(options)
       end
 
       it "IPHONEOS_DEPLOYMENT_TARGET should be 9.0", requires_xcode: true do
@@ -464,21 +464,6 @@ describe FastlaneCore do
         expect do
           FastlaneCore::Project.run_command(cmd, timeout: 0.2, retries: 3)
         end.to raise_error(Timeout::Error)
-      end
-    end
-
-    describe 'xcodebuild_suppress_stderr option', requires_xcode: true do
-      it 'generates an xcodebuild -showBuildSettings command without stderr redirection by default' do
-        project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
-        expect(project.build_xcodebuild_showbuildsettings_command).not_to(match(%r{2> /dev/null}))
-      end
-
-      it 'generates an xcodebuild -showBuildSettings command that redirects stderr to /dev/null', requires_xcode: true do
-        project = FastlaneCore::Project.new(
-          { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" },
-          xcodebuild_suppress_stderr: true
-        )
-        expect(project.build_xcodebuild_showbuildsettings_command).to match(%r{2> /dev/null})
       end
     end
 
@@ -586,6 +571,20 @@ describe FastlaneCore do
         })
         command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
         expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
+
+      it 'generates even if given options do not support skip_package_dependencies_resolution' do
+        config = FastlaneCore::Configuration.create(
+          [
+            FastlaneCore::ConfigItem.new(key: :workspace, optional: true),
+            FastlaneCore::ConfigItem.new(key: :project, optional: true)
+          ], {
+            project: './fastlane_core/spec/fixtures/projects/Example.xcodeproj'
+          }
+        )
+        project = FastlaneCore::Project.new(config)
+        expect(project.build_xcodebuild_resolvepackagedependencies_command).to_not(be_nil)
+        expect { project.build_xcodebuild_resolvepackagedependencies_command }.to_not(raise_error)
       end
     end
 

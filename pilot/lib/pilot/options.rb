@@ -11,7 +11,7 @@ module Pilot
 
       [
         FastlaneCore::ConfigItem.new(key: :api_key_path,
-                                     env_name: "PILOT_API_KEY_PATH",
+                                     env_names: ["PILOT_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
                                      description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                      optional: true,
                                      conflicting_options: [:username],
@@ -19,7 +19,7 @@ module Pilot
                                        UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :api_key,
-                                     env_name: "PILOT_API_KEY",
+                                     env_names: ["PILOT_API_KEY", "APP_STORE_CONNECT_API_KEY"],
                                      description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                      type: Hash,
                                      optional: true,
@@ -31,6 +31,7 @@ module Pilot
                                      short_option: "-u",
                                      env_name: "PILOT_USERNAME",
                                      description: "Your Apple ID Username",
+                                     optional: true,
                                      default_value: user,
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
@@ -88,7 +89,7 @@ module Pilot
                                      type: Boolean,
                                      env_name: "DEMO_ACCOUNT_REQUIRED",
                                      description: "Do you need a demo account when Apple does review?",
-                                     default_value: false),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :beta_app_review_info,
                                      type: Hash,
                                      env_name: "PILOT_BETA_APP_REVIEW_INFO",
@@ -177,13 +178,13 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :distribute_external,
                                      is_string: false,
                                      env_name: "PILOT_DISTRIBUTE_EXTERNAL",
-                                     description: "Should the build be distributed to external testers?",
+                                     description: "Should the build be distributed to external testers? If set to true, use of `groups` option is required",
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :notify_external_testers,
                                     is_string: false,
                                     env_name: "PILOT_NOTIFY_EXTERNAL_TESTERS",
-                                    description: "Should notify external testers?",
-                                    default_value: true),
+                                    description: "Should notify external testers? (Not setting a value will use App Store Connect's default which is to notify)",
+                                    optional: true),
         FastlaneCore::ConfigItem.new(key: :app_version,
                                      env_name: "PILOT_APP_VERSION",
                                      description: "The version number of the application build to distribute. If the version number is not specified, then the most recent build uploaded to TestFlight will be distributed. If specified, the most recent build for the version number will be distributed",
@@ -226,7 +227,7 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :groups,
                                      short_option: "-g",
                                      env_name: "PILOT_GROUPS",
-                                     description: "Associate tester to one group or more by group name / group id. E.g. `-g \"Team 1\",\"Team 2\"`",
+                                     description: "Associate tester to one group or more by group name / group id. E.g. `-g \"Team 1\",\"Team 2\"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups ",
                                      optional: true,
                                      type: Array,
                                      verify_block: proc do |value|
@@ -268,12 +269,12 @@ module Pilot
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
-        # rubocop:disable Metrics/LineLength
+        # rubocop:disable Layout/LineLength
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "PILOT_ITC_PROVIDER",
                                      description: "The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
                                      optional: true),
-        # rubocop:enable Metrics/LineLength
+        # rubocop:enable Layout/LineLength
 
         # waiting and uploaded build
         FastlaneCore::ConfigItem.new(key: :wait_processing_interval,
@@ -281,6 +282,14 @@ module Pilot
                                      env_name: "PILOT_WAIT_PROCESSING_INTERVAL",
                                      description: "Interval in seconds to wait for App Store Connect processing",
                                      default_value: 30,
+                                     type: Integer,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :wait_processing_timeout_duration,
+                                     env_name: "PILOT_WAIT_PROCESSING_TIMEOUT_DURATION",
+                                     description: "Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception",
+                                     optional: true,
                                      type: Integer,
                                      verify_block: proc do |value|
                                        UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0

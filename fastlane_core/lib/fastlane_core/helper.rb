@@ -74,8 +74,8 @@ module FastlaneCore
       return true if self.is_circle_ci?
 
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO'].each do |current|
-        return true if ENV.key?(current)
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO', 'BUDDY'].each do |current|
+        return true if FastlaneCore::Env.truthy?(current)
       end
       return false
     end
@@ -167,11 +167,23 @@ module FastlaneCore
       @xcode_version
     end
 
-    # @return true if Xcode version is higher than 8.3
+    # @return true if installed Xcode version is 'greater than or equal to' the input parameter version
     def self.xcode_at_least?(version)
-      FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
-      v = xcode_version
-      Gem::Version.new(v) >= Gem::Version.new(version)
+      installed_xcode_version = xcode_version
+      UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if installed_xcode_version.nil?
+      Gem::Version.new(installed_xcode_version) >= Gem::Version.new(version)
+    end
+
+    # Swift
+    #
+
+    # @return Swift version
+    def self.swift_version
+      if system("which swift > /dev/null 2>&1")
+        output = `swift --version`
+        return output.split("\n").first.match(/version ([0-9.]+)/).captures.first
+      end
+      return nil
     end
 
     # iTMSTransporter
@@ -368,8 +380,37 @@ module FastlaneCore
 
     # checks if a given path is an executable file
     def self.executable?(cmd_path)
-      # no executable files on Windows, so existing is enough there
-      cmd_path && !File.directory?(cmd_path) && (File.executable?(cmd_path) || (self.windows? && File.exist?(cmd_path)))
+      if !cmd_path || File.directory?(cmd_path)
+        return false
+      end
+
+      return File.exist?(get_executable_path(cmd_path))
+    end
+
+    # returns the path of the executable with the correct extension on Windows
+    def self.get_executable_path(cmd_path)
+      cmd_path = localize_file_path(cmd_path)
+
+      if self.windows?
+        # PATHEXT contains the list of file extensions that Windows considers executable, semicolon separated.
+        # e.g. ".COM;.EXE;.BAT;.CMD"
+        exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : []
+
+        # no executable files on Windows, so existing is enough there
+        # also check if command + ext is present
+        exts.each do |ext|
+          executable_path = "#{cmd_path}#{ext.downcase}"
+          return executable_path if File.exist?(executable_path)
+        end
+      end
+
+      return cmd_path
+    end
+
+    # returns the path with the platform-specific path separator (`/` on UNIX, `\` on Windows)
+    def self.localize_file_path(path)
+      # change `/` to `\` on Windows
+      return self.windows? ? path.gsub('/', '\\') : path
     end
 
     # checks if given file is a valid json file
@@ -425,20 +466,35 @@ module FastlaneCore
       UI.current.log
     end
 
-    def self.ask_password(message: "Passphrase: ", confirm: nil)
+    def self.ask_password(message: "Passphrase: ", confirm: nil, confirmation_message: "Type passphrase again: ")
       raise "This code should only run in interactive mode" unless UI.interactive?
 
       loop do
         password = UI.password(message)
         if confirm
-          password2 = UI.password("Type passphrase again: ")
+          password2 = UI.password(confirmation_message)
           if password == password2
             return password
           end
         else
           return password
         end
-        UI.error("Passphrases differ. Try again")
+        UI.error("Your entries do not match. Please try again")
+      end
+    end
+
+    # URI.open added by `require 'open-uri'` is not available in Ruby 2.4. This helper lets you open a URI
+    # by choosing appropriate interface to do so depending on Ruby version. This helper is subject to be removed
+    # when fastlane drops Ruby 2.4 support.
+    def self.open_uri(*rest, &block)
+      require 'open-uri'
+
+      if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.5')
+        dup = rest.dup
+        uri = dup.shift
+        URI.parse(uri).open(*dup, &block)
+      else
+        URI.open(*rest, &block)
       end
     end
   end

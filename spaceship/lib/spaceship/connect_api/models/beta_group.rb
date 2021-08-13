@@ -12,6 +12,7 @@ module Spaceship
       attr_accessor :public_link_limit_enabled
       attr_accessor :public_link_limit
       attr_accessor :public_link
+      attr_accessor :beta_testers
 
       attr_mapping({
         "name" => "name",
@@ -21,7 +22,8 @@ module Spaceship
         "publicLinkId" => "public_link_id",
         "publicLinkLimitEnabled" => "public_link_limit_enabled",
         "publicLinkLimit" => "public_link_limit",
-        "publicLink" => "public_link"
+        "publicLink" => "public_link",
+        "betaTesters" => "beta_testers"
       })
 
       def self.type
@@ -36,6 +38,20 @@ module Spaceship
       def post_bulk_beta_tester_assignments(client: nil, beta_testers: nil)
         client ||= Spaceship::ConnectAPI
         return client.post_bulk_beta_tester_assignments(beta_group_id: id, beta_testers: beta_testers)
+      end
+
+      def add_beta_testers(client: nil, beta_tester_ids:)
+        client ||= Spaceship::ConnectAPI
+        return client.add_beta_tester_to_group(beta_group_id: id, beta_tester_ids: beta_tester_ids)
+      end
+
+      def update(client: nil, attributes: nil)
+        return if attributes.empty?
+
+        client ||= Spaceship::ConnectAPI
+
+        attributes = reverse_attr_mapping(attributes)
+        return client.patch_group(group_id: id, attributes: attributes).first
       end
 
       def delete!

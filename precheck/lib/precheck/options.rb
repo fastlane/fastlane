@@ -26,7 +26,7 @@ module Precheck
 
       [
         FastlaneCore::ConfigItem.new(key: :api_key_path,
-                                     env_name: "PRECHECK_API_KEY_PATH",
+                                     env_names: ["PRECHECK_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
                                      description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                      optional: true,
                                      conflicting_options: [:username],
@@ -34,7 +34,7 @@ module Precheck
                                        UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :api_key,
-                                     env_name: "PRECHECK_API_KEY",
+                                     env_names: ["PRECHECK_API_KEY", "APP_STORE_CONNECT_API_KEY"],
                                      description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                      type: Hash,
                                      optional: true,
@@ -52,6 +52,7 @@ module Precheck
                                      short_option: "-u",
                                      env_name: "PRECHECK_USERNAME",
                                      description: "Your Apple ID Username",
+                                     optional: true,
                                      default_value: user,
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :team_id,
@@ -89,19 +90,19 @@ module Precheck
                                      short_option: "-r",
                                      env_name: "PRECHECK_DEFAULT_RULE_LEVEL",
                                      description: "The default rule level unless otherwise configured",
-                                     is_string: false,
+                                     type: Symbol,
                                      default_value: RULE_LEVELS[:error]),
         FastlaneCore::ConfigItem.new(key: :include_in_app_purchases,
                                      short_option: "-i",
                                      env_name: "PRECHECK_INCLUDE_IN_APP_PURCHASES",
                                      description: "Should check in-app purchases?",
-                                     is_string: false,
+                                     type: Boolean,
                                      optional: true,
                                      default_value: true),
         FastlaneCore::ConfigItem.new(key: :use_live,
                                      env_name: "PRECHECK_USE_LIVE",
                                      description: "Should force check live app?",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false)
       ] + rules
     end

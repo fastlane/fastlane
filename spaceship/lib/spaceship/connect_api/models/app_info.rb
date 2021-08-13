@@ -82,6 +82,16 @@ module Spaceship
       end
 
       #
+      # Age Rating Declaration
+      #
+
+      def fetch_age_rating_declaration(client: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_age_rating_declaration(app_info_id: id)
+        return resp.to_models.first
+      end
+
+      #
       # App Info Localizations
       #
 

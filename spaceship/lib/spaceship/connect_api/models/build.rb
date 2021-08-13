@@ -17,8 +17,10 @@ module Spaceship
       attr_accessor :app
       attr_accessor :beta_app_review_submission
       attr_accessor :beta_build_metrics
+      attr_accessor :beta_build_localizations
       attr_accessor :build_beta_detail
       attr_accessor :pre_release_version
+      attr_accessor :individual_testers
 
       attr_mapping({
         "version" => "version",
@@ -33,8 +35,10 @@ module Spaceship
         "app" => "app",
         "betaAppReviewSubmission" => "beta_app_review_submission",
         "betaBuildMetrics" => "beta_build_metrics",
+        "betaBuildLocalizations" => "beta_build_localizations",
         "buildBetaDetail" => "build_beta_detail",
-        "preReleaseVersion" => "pre_release_version"
+        "preReleaseVersion" => "pre_release_version",
+        "individualTesters" => "individual_testers"
       })
 
       ESSENTIAL_INCLUDES = "app,buildBetaDetail,preReleaseVersion"
@@ -85,6 +89,11 @@ module Spaceship
       def ready_for_beta_submission?
         raise "No build_beta_detail included" unless build_beta_detail
         return build_beta_detail.ready_for_beta_submission?
+      end
+
+      def missing_export_compliance?
+        raise "No build_beta_detail included" unless build_beta_detail
+        return build_beta_detail.missing_export_compliance?
       end
 
       # This is here temporarily until the removal of Spaceship::TestFlight

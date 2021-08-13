@@ -13,6 +13,7 @@ module Spaceship
       attr_accessor :apps
       attr_accessor :beta_groups
       attr_accessor :beta_tester_metrics
+      attr_accessor :builds
 
       attr_mapping({
         "firstName" => "first_name",
@@ -23,7 +24,8 @@ module Spaceship
 
         "apps" => "apps",
         "betaGroups" => "beta_groups",
-        "betaTesterMetrics" => "beta_tester_metrics"
+        "betaTesterMetrics" => "beta_tester_metrics",
+        "builds" => "builds"
       })
 
       def self.type

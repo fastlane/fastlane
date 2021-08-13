@@ -24,18 +24,29 @@ module Scan
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Workspace file not found at path '#{v}'") unless File.exist?(v)
                                        UI.user_error!("Workspace file invalid") unless File.directory?(v)
-                                       UI.user_error!("Workspace file is not a workspace, must end with .xcworkspace") unless v.include?(".xcworkspace")
                                      end),
         FastlaneCore::ConfigItem.new(key: :project,
                                      short_option: "-p",
                                      optional: true,
                                      env_name: "SCAN_PROJECT",
                                      description: "Path to the project file",
+                                     conflicting_options: [:package_path],
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Project file not found at path '#{v}'") unless File.exist?(v)
                                        UI.user_error!("Project file invalid") unless File.directory?(v)
                                        UI.user_error!("Project file is not a project file, must end with .xcodeproj") unless v.include?(".xcodeproj")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :package_path,
+                                     short_option: "-P",
+                                     optional: true,
+                                     env_name: "SCAN_PACKAGE_PATH",
+                                     description: "Path to the Swift Package",
+                                     conflicting_options: [:project],
+                                     verify_block: proc do |value|
+                                       v = File.expand_path(value.to_s)
+                                       UI.user_error!("Package path not found at path '#{v}'") unless File.exist?(v)
+                                       UI.user_error!("Package path invalid") unless File.directory?(v)
                                      end),
         FastlaneCore::ConfigItem.new(key: :scheme,
                                      short_option: "-s",
@@ -66,6 +77,11 @@ module Scan
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_detect_devices,
                                      description: "Should skip auto detecting of devices if none were specified",
+                                     default_value: false,
+                                     type: Boolean,
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :ensure_devices_found,
+                                     description: "Should fail if devices not found",
                                      default_value: false,
                                      type: Boolean,
                                      optional: true),
@@ -269,6 +285,11 @@ module Scan
                                      optional: true,
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :output_xctestrun,
+                                     type: Boolean,
+                                     env_name: "SCAN_OUTPUT_XCTESTRUN",
+                                     description: "Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?",
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :result_bundle,
                                      short_option: "-z",
                                      env_name: "SCAN_RESULT_BUNDLE",
@@ -462,11 +483,16 @@ module Scan
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :use_system_scm,
-                                     env_name: "SCAN_USE_SYSTEM_SCM",
-                                     description: "Lets xcodebuild use system's scm configuration",
-                                     optional: true,
-                                     type: Boolean,
-                                     default_value: false)
+                                    env_name: "SCAN_USE_SYSTEM_SCM",
+                                    description: "Lets xcodebuild use system's scm configuration",
+                                    optional: true,
+                                    type: Boolean,
+                                    default_value: false),
+        FastlaneCore::ConfigItem.new(key: :number_of_retries,
+                                    env_name: 'SCAN_NUMBER_OF_RETRIES',
+                                    description: "The number of times a test can fail before scan should stop retrying",
+                                    type: Integer,
+                                    default_value: 0)
 
       ]
     end

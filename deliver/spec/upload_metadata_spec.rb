@@ -80,7 +80,12 @@ describe Deliver::UploadMetadata do
           notes: "This is a note" }
       end
 
-      it "set review information" do
+      it "skips review information with empty app_review_information" do
+        expect(FastlaneCore::UI).not_to receive(:message).with("Uploading app review information to App Store Connect")
+        uploader.send("set_review_information", version, { app_review_information: {} })
+      end
+
+      it "successfully set review information" do
         expect(version).to receive(:fetch_app_store_review_detail).and_return(app_store_review_detail)
         expect(app_store_review_detail).to receive(:update).with(attributes: {
           "contact_first_name" => app_review_information[:first_name],
@@ -92,6 +97,8 @@ describe Deliver::UploadMetadata do
           "demo_account_required" => true,
           "notes" => app_review_information[:notes]
         })
+
+        expect(FastlaneCore::UI).to receive(:message).with("Uploading app review information to App Store Connect")
 
         uploader.send("set_review_information", version, options)
       end
@@ -221,6 +228,8 @@ describe Deliver::UploadMetadata do
 
     context "#upload" do
       before do
+        allow(Deliver).to receive(:cache).and_return({ app: app })
+
         allow(uploader).to receive(:set_review_information)
         allow(uploader).to receive(:set_review_attachment_file)
         allow(uploader).to receive(:set_app_rating)
@@ -242,7 +251,6 @@ describe Deliver::UploadMetadata do
       context "normal metadata" do
         it "saves metadata" do
           options = {
-              app: app,
               platform: "ios",
               metadata_path: metadata_path,
               name: { "en-US" => "App name" },
@@ -274,7 +282,6 @@ describe Deliver::UploadMetadata do
       context "with auto_release_date" do
         it 'with date' do
           options = {
-              app: app,
               platform: "ios",
               metadata_path: metadata_path,
               auto_release_date: 1_595_395_800_000
@@ -298,7 +305,6 @@ describe Deliver::UploadMetadata do
       context "with phased_release" do
         it 'with true' do
           options = {
-              app: app,
               platform: "ios",
               metadata_path: metadata_path,
               phased_release: true,
@@ -329,7 +335,6 @@ describe Deliver::UploadMetadata do
 
         it 'with false' do
           options = {
-              app: app,
               platform: "ios",
               metadata_path: metadata_path,
               phased_release: false
@@ -358,7 +363,6 @@ describe Deliver::UploadMetadata do
       context "with reset_ratings" do
         it 'with true' do
           options = {
-              app: app,
               platform: "ios",
               metadata_path: metadata_path,
               reset_ratings: true
@@ -384,7 +388,6 @@ describe Deliver::UploadMetadata do
 
         it 'with false' do
           options = {
-              app: app,
               platform: "ios",
               metadata_path: metadata_path,
               reset_ratings: false

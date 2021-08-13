@@ -17,9 +17,11 @@ module Spaceship
         # ageRatingDeclarations
         #
 
-        def get_age_rating_declaration(app_store_version_id: nil)
+        def get_age_rating_declaration(app_info_id: nil, app_store_version_id: nil)
+          raise "Keyword 'app_store_version_id' is deprecated and 'app_info_id' is required" if app_store_version_id || app_info_id.nil?
+
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("appStoreVersions/#{app_store_version_id}/ageRatingDeclaration", params)
+          tunes_request_client.get("appInfos/#{app_info_id}/ageRatingDeclaration", params)
         end
 
         def patch_age_rating_declaration(age_rating_declaration_id: nil, attributes: nil)
@@ -381,6 +383,11 @@ module Spaceship
           tunes_request_client.post("appPreviewSets", body)
         end
 
+        def delete_app_preview_set(app_preview_set_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("appPreviewSets/#{app_preview_set_id}", params)
+        end
+
         def patch_app_preview_set_previews(app_preview_set_id: nil, app_preview_ids: nil)
           app_preview_ids ||= []
 
@@ -513,6 +520,11 @@ module Spaceship
           }
 
           tunes_request_client.patch("appScreenshotSets/#{app_screenshot_set_id}/relationships/appScreenshots", body)
+        end
+
+        def delete_app_screenshot_set(app_screenshot_set_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("appScreenshotSets/#{app_screenshot_set_id}", params)
         end
 
         #
@@ -755,6 +767,11 @@ module Spaceship
         def get_app_store_version_localizations(app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
           tunes_request_client.get("appStoreVersions/#{app_store_version_id}/appStoreVersionLocalizations", params)
+        end
+
+        def get_app_store_version_localization(app_store_version_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.get("appStoreVersionLocalizations/#{app_store_version_localization_id}", params)
         end
 
         def post_app_store_version_localization(app_store_version_id: nil, attributes: {})

@@ -157,13 +157,12 @@ module Fastlane
                                        description: "Release note for distribution page"),
           FastlaneCore::ConfigItem.new(key: :disable_notify,
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false,
                                        env_name: "DEPLOYGATE_DISABLE_NOTIFY",
                                        description: "Disables Push notification emails"),
           FastlaneCore::ConfigItem.new(key: :distribution_name,
                                        optional: true,
-                                       is_string: true,
                                        env_name: "DEPLOYGATE_DISTRIBUTION_NAME",
                                        description: "Target Distribution Name")
         ]

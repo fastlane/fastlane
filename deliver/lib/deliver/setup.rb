@@ -1,4 +1,3 @@
-require 'open-uri'
 require 'spaceship/tunes/tunes'
 
 require_relative 'module'
@@ -40,13 +39,13 @@ module Deliver
     # This method takes care of creating a new 'deliver' folder, containing the app metadata
     # and screenshots folders
     def generate_deliver_file(deliver_path, options)
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       v = app.get_latest_app_store_version(platform: platform)
 
       metadata_path = options[:metadata_path] || File.join(deliver_path, 'metadata')
-      generate_metadata_files(app, v, metadata_path)
+      generate_metadata_files(app, v, metadata_path, options)
 
       # Generate the final Deliverfile here
       return File.read(deliverfile_path)
@@ -60,9 +59,14 @@ module Deliver
       end
     end
 
-    def generate_metadata_files(app, version, path)
+    def generate_metadata_files(app, version, path, options)
       # App info localizations
-      app_info = app.fetch_live_app_info || app.fetch_edit_app_info
+      if options[:use_live_version]
+        app_info = app.fetch_live_app_info
+        UI.user_error!("The option `use_live_version` was set to `true`, however no live app was found on App Store Connect.") unless app_info
+      else
+        app_info = app.fetch_edit_app_info || app.fetch_live_app_info
+      end
       app_info_localizations = app_info.get_app_info_localizations
       app_info_localizations.each do |localization|
         language = localization.locale

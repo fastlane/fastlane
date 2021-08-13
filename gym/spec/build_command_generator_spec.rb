@@ -6,7 +6,7 @@ describe Gym do
   end
 
   before(:each) do
-    @project.options.values.delete(:use_system_scm)
+    @project.options.delete(:use_system_scm)
     allow(Gym).to receive(:project).and_return(@project)
   end
 

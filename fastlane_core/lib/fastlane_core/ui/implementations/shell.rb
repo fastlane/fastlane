@@ -69,7 +69,7 @@ module FastlaneCore
     end
 
     def command_output(message)
-      actual = (message.split("\r").last || "") # as clearing the line will remove the `>` and the time stamp
+      actual = (encode_as_utf_8_if_possible(message).split("\r").last || "") # as clearing the line will remove the `>` and the time stamp
       actual.split("\n").each do |msg|
         if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_OUTPUT_FORMAT")
           log.info(msg)
@@ -145,10 +145,24 @@ module FastlaneCore
     def password(message)
       verify_interactive!(message)
 
-      ask("#{format_string}#{message.to_s.yellow}") { |q| q.echo = "*" }
+      ask("#{format_string}#{message.to_s.yellow}") do |q|
+        q.whitespace = :chomp
+        q.echo = "*"
+      end
     end
 
     private
+
+    def encode_as_utf_8_if_possible(message)
+      return message if message.valid_encoding?
+
+      # genstrings outputs UTF-16, so we should try to use this encoding if it turns out to be valid
+      test_message = message.dup
+      return message.encode(Encoding::UTF_8, Encoding::UTF_16) if test_message.force_encoding(Encoding::UTF_16).valid_encoding?
+
+      # replace any invalid with empty string
+      message.encode(Encoding::UTF_8, invalid: :replace)
+    end
 
     def verify_interactive!(message)
       return if interactive?

@@ -12,7 +12,11 @@ module Fastlane
           config[:screenshots_path] ||= Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] if Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
           config[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] if Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
           config[:pkg] ||= Actions.lane_context[SharedValues::PKG_OUTPUT_PATH] if Actions.lane_context[SharedValues::PKG_OUTPUT_PATH]
-          config[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+
+          # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
+          unless config[:api_key_path]
+            config[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+          end
 
           return config if Helper.test?
           Deliver::Runner.new(config).run

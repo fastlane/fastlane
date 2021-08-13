@@ -10,7 +10,12 @@ module Fastlane
         require 'match'
 
         params.load_configuration_file("Matchfile")
-        params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+
+        # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
+        unless params[:api_key_path]
+          params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        end
+
         Match::Runner.new.run(params)
 
         define_profile_type(params)

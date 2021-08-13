@@ -57,7 +57,7 @@ module Sigh
 
         # App Store Connect API
         FastlaneCore::ConfigItem.new(key: :api_key_path,
-                                     env_name: "SIGH_API_KEY_PATH",
+                                     env_names: ["SIGH_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
                                      description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                      optional: true,
                                      conflicting_options: [:api_key],
@@ -65,7 +65,7 @@ module Sigh
                                        UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :api_key,
-                                     env_name: "SIGH_API_KEY",
+                                     env_names: ["SIGH_API_KEY", "APP_STORE_CONNECT_API_KEY"],
                                      description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                      type: Hash,
                                      optional: true,
@@ -77,6 +77,7 @@ module Sigh
                                      short_option: "-u",
                                      env_name: "SIGH_USERNAME",
                                      description: "Your Apple ID Username",
+                                     optional: true,
                                      default_value: user,
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :team_id,
@@ -148,7 +149,8 @@ module Sigh
                                      env_name: "SIGH_SKIP_CERTIFICATE_VERIFICATION",
                                      description: "Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine",
                                      is_string: false,
-                                     default_value: false),
+                                     default_value: !FastlaneCore::Helper.mac?,
+                                     default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :platform,
                                      short_option: '-p',
                                      env_name: "SIGH_PLATFORM",

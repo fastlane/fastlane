@@ -71,6 +71,7 @@ describe Fastlane do
           validate_play_store_json_key
           update_fastlane
           s3
+          match_nuke
         )
       end
 

@@ -98,7 +98,7 @@ module Fastlane
                                        description: 'The Display Name of your app',
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :block,
-                                       is_string: false,
+                                       type: :string_callback,
                                        description: 'A block to process plist with custom logic',
                                        optional: true)
 

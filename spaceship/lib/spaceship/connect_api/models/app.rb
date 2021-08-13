@@ -203,7 +203,7 @@ module Spaceship
       # @return (Bool) Was something changed?
       def ensure_version!(version_string, platform: nil, client: nil)
         client ||= Spaceship::ConnectAPI
-        app_store_version = get_edit_app_store_version(platform: platform)
+        app_store_version = get_edit_app_store_version(client: client, platform: platform)
 
         if app_store_version
           if version_string != app_store_version.version_string
@@ -385,11 +385,12 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def create_beta_group(client: nil, group_name: nil, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
+      def create_beta_group(client: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
         client ||= Spaceship::ConnectAPI
         resps = client.create_beta_group(
           app_id: id,
           group_name: group_name,
+          is_internal_group: is_internal_group,
           public_link_enabled: public_link_enabled,
           public_link_limit: public_link_limit,
           public_link_limit_enabled: public_link_limit_enabled
@@ -421,6 +422,13 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         user_ids.each do |user_id|
           client.add_user_visible_apps(user_id: user_id, app_ids: [id])
+        end
+      end
+
+      def remove_users(client: nil, user_ids: nil)
+        client ||= Spaceship::ConnectAPI
+        user_ids.each do |user_id|
+          client.delete_user_visible_apps(user_id: user_id, app_ids: [id])
         end
       end
     end

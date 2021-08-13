@@ -16,7 +16,18 @@ end
 task(:test_all) do
   formatter = "--format progress"
   formatter += " -r rspec_junit_formatter --format RspecJunitFormatter -o #{ENV['CIRCLE_TEST_REPORTS']}/rspec/fastlane-junit-results.xml" if ENV["CIRCLE_TEST_REPORTS"]
-  sh("rspec --pattern ./**/*_spec.rb #{formatter}")
+  command = "rspec --pattern ./**/*_spec.rb #{formatter}"
+
+  # To move Ruby 3.0 or next major version migration going forward, we want to keep monitoring deprecation warnings
+  if Gem.win_platform?
+    # Windows would not work with /bin/bash so skip collecting warnings
+    sh(command)
+  else
+    # Mix stderr into stdout to let handle `tee` it and then collect warnings by filtering stdout out
+    command += " 2>&1 | tee >(grep 'warning:' > #{File.join(ENV['CIRCLE_TEST_REPORTS'], 'ruby_warnings.txt')})" if ENV["CIRCLE_TEST_REPORTS"]
+    # tee >(...) occurs syntax error with `sh` helper which uses /bin/sh by default.
+    sh("/bin/bash -o pipefail -c \"#{command}\"")
+  end
 end
 
 # Overwrite the default rake task
@@ -42,7 +53,7 @@ task(:generate_team_table) do
     content << "<tr>" if counter % number_of_rows == 0
     content << "<td id='#{github_user_id}'>"
     content << "<a href='#{github_profile_url}'>"
-    content << "<img src='#{github_profile_url}.png?size=140'>"
+    content << "<img src='#{github_profile_url}.png' width='140px;'>"
     content << "</a>"
     if user_content['twitter']
       content << "<h4 align='center'><a href='https://twitter.com/#{user_content['twitter']}'>#{github_user_name}</a></h4>"

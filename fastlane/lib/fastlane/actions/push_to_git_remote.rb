@@ -3,8 +3,12 @@ module Fastlane
     # Push local changes to the remote branch
     class PushToGitRemoteAction < Action
       def self.run(params)
+        # Find the local git branch using HEAD or fallback to CI's ENV git branch if you're in detached HEAD state
+        local_git_branch = Actions.git_branch_name_using_HEAD
+        local_git_branch = Actions.git_branch unless local_git_branch && local_git_branch != "HEAD"
+
         local_branch = params[:local_branch]
-        local_branch ||= Actions.git_branch.gsub(%r{#{params[:remote]}\/}, '') if Actions.git_branch
+        local_branch ||= local_git_branch.gsub(%r{#{params[:remote]}\/}, '') if local_git_branch
         UI.user_error!('Failed to get the current branch.') unless local_branch
 
         remote_branch = params[:remote_branch] || local_branch
@@ -33,10 +37,9 @@ module Fastlane
         command << '--set-upstream' if params[:set_upstream]
 
         # optionally add the --push_options components
-        params[:push_options].each { |push_option| command << "--push-option=#{push_option}" }
+        params[:push_options].each { |push_option| command << "--push-option=#{push_option}" } if params[:push_options]
 
         # execute our command
-        Actions.sh('pwd')
         return command.join(' ') if Helper.test?
 
         Actions.sh(command.join(' '))

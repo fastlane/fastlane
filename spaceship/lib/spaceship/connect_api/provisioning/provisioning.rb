@@ -27,13 +27,115 @@ module Spaceship
           provisioning_request_client.get("bundleIds/#{bundle_id_id}", params)
         end
 
+        def post_bundle_id(name:, platform:, identifier:, seed_id:)
+          attributes = {
+            name: name,
+            platform: platform,
+            identifier: identifier,
+            seedId: seed_id
+          }
+
+          body = {
+            data: {
+              attributes: attributes,
+              type: "bundleIds"
+            }
+          }
+
+          provisioning_request_client.post("bundleIds", body)
+        end
+
+        #
+        # bundleIdCapability
+        #
+
+        def get_bundle_id_capabilities(bundle_id_id:, includes: nil, limit: nil, sort: nil)
+          params = provisioning_request_client.build_params(filter: nil, includes: includes, limit: limit, sort: sort)
+          provisioning_request_client.get("bundleIds/#{bundle_id_id}/bundleIdCapabilities", params)
+        end
+
+        def get_available_bundle_id_capabilities(bundle_id_id:)
+          params = provisioning_request_client.build_params(filter: { bundleId: bundle_id_id })
+          provisioning_request_client.get("capabilities", params)
+        end
+
+        def post_bundle_id_capability(bundle_id_id:, capability_type:, settings: [])
+          body = {
+            data: {
+              attributes: {
+                capabilityType: capability_type,
+                settings: settings
+              },
+              type: "bundleIdCapabilities",
+              relationships: {
+                bundleId: {
+                  data: {
+                    type: "bundleIds",
+                    id: bundle_id_id
+                  }
+                },
+                capability: {
+                  data: {
+                    type: "capabilities",
+                    id: capability_type
+                  }
+                }
+              }
+            }
+          }
+          provisioning_request_client.post("bundleIdCapabilities", body)
+        end
+
+        def patch_bundle_id_capability(bundle_id_id:, seed_id:, enabled: false, capability_type:, settings: [])
+          body = {
+            data: {
+              type: "bundleIds",
+              id: bundle_id_id,
+              attributes: {
+                teamId: seed_id
+              },
+              relationships: {
+                bundleIdCapabilities: {
+                  data: [
+                    {
+                      type: "bundleIdCapabilities",
+                      attributes: {
+                          enabled: enabled,
+                          settings: settings
+                      },
+                      relationships: {
+                        capability: {
+                          data: {
+                              type: "capabilities",
+                              id: capability_type
+                            }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+
+          provisioning_request_client.patch("bundleIds/#{bundle_id_id}", body)
+        end
+
+        def delete_bundle_id_capability(bundle_id_capability_id:)
+          provisioning_request_client.delete("bundleIdCapabilities/#{bundle_id_capability_id}")
+        end
+
         #
         # certificates
         #
 
-        def get_certificates(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_certificates(profile_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = provisioning_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          provisioning_request_client.get("certificates", params)
+          if profile_id.nil?
+            provisioning_request_client.get("certificates", params)
+          else
+            provisioning_request_client.get("profiles/#{profile_id}/certificates", params)
+          end
         end
 
         def get_certificate(certificate_id: nil, includes: nil)

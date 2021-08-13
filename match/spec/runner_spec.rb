@@ -18,6 +18,8 @@ describe Match do
         before do
           allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
           allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+          stub_const('ENV', { "MATCH_PASSWORD" => '2"QAHg@v(Qp{=*n^' })
         end
 
         it "creates a new profile and certificate if it doesn't exist yet", requires_security: true do

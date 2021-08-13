@@ -205,7 +205,7 @@ module Fastlane
                                        env_name: "FASTLANE_ITC_TEAM_ID",
                                        description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
-                                       is_string: false, # as we also allow integers, which we convert to strings anyway
+                                       skip_type_validation: true, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                        default_value_dynamic: true),
@@ -221,7 +221,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :json_path,
                                        env_name: "UPLOAD_APP_PRIVACY_DETAILS_TO_APP_STORE_JSON_PATH",
                                        description: "Path to the app usage data JSON",
-                                       is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Could not find JSON file at path '#{File.expand_path(value)}'") unless File.exist?(value)

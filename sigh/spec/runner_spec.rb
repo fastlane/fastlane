@@ -72,10 +72,12 @@ describe Sigh do
           expect(profiles.size).to eq(1)
         end
 
-        it "without skip verification" do
+        it "on mac without skip verification" do
+          expect(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+
           sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
 
-          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: false }
+          options = { app_identifier: "com.krausefx.app" }
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
           expect(FastlaneCore::CertChecker).to receive(:installed?).with(anything).and_return(true)
@@ -83,10 +85,26 @@ describe Sigh do
           profiles = fake_runner.fetch_profiles
           expect(profiles.size).to eq(1)
         end
+
+        it "on non-mac without skip verification" do
+          expect(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
+
+          options = { app_identifier: "com.krausefx.app" }
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+          expect(FastlaneCore::CertChecker).not_to receive(:installed?).with(anything)
+
+          profiles = fake_runner.fetch_profiles
+          expect(profiles.size).to eq(1)
+        end
       end
 
       context "unsuccessfully" do
-        it "without skip verification" do
+        it "on mac without skip verification" do
+          expect(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+
           sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
 
           options = { app_identifier: "com.krausefx.app", skip_certificate_verification: false }

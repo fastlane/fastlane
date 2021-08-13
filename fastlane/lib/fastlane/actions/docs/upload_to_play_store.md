@@ -138,7 +138,7 @@ Inside of a given locale directory is a folder called `images`. Here you can sup
 - `promoGraphic`
 - `tvBanner`
 
-You can also supply screenshots by creating directories within the `images` directory with the following names, containing PNGs or JPEGs (image names are irrelevant):
+You can also supply screenshots by creating directories within the `images` directory with the following names, containing PNGs or JPEGs:
 
 - `phoneScreenshots/`
 - `sevenInchScreenshots/` (7-inch tablets)
@@ -146,6 +146,7 @@ You can also supply screenshots by creating directories within the `images` dire
 - `tvScreenshots/`
 - `wearScreenshots/`
 
+You may name images anything you like, but screenshots will appear in the Play Store in alphanumerical filename order.
 Note that these will replace the current images and screenshots on the play store listing, not add to them.
 
 ## Changelogs (What's new)

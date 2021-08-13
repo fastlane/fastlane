@@ -17,7 +17,7 @@ describe Deliver::AppScreenshotValidator do
       described_class.validate(screenshot, errors_to_collect)
 
       expect(errors_to_collect).to satisfy("be the same as \"#{error_types.join(', ')}\"") do |errors|
-        errors.all? { |error| error_types.any? { |error_type| error.type == error_type } }
+        errors.all? { |error| error_types.any?(error.type) }
       end
 
       expect(errors_to_collect).not_to be_empty
