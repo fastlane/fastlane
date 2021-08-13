@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 _fastlane_complete() {
-  local word completions
+  local word completions file
   word="$1"
 
   # look for Fastfile either in this directory or fastlane/ then grab the lane names
@@ -11,10 +11,12 @@ _fastlane_complete() {
     file="fastlane/Fastfile"
   elif [[ -e ".fastlane/Fastfile" ]] then
     file=".fastlane/Fastfile"
+  else
+    return 1
   fi
 
   # parse 'beta' out of 'lane :beta do', etc
-  completions=`cat $file | grep "^\s*lane \:" | awk -F ':' '{print $2}' | awk -F ' ' '{print $1}'`
+  completions="$(sed -En 's/^\s*lane\s+:(\S+).*$/\1/p' "$file")"
   completions="$completions
 update_fastlane"
 
