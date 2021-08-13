@@ -80,7 +80,7 @@ module Fastlane
 
           If you want to package several libraries just provide one of:
 
-            * An array containing the list of libreries using the :libraries parameter
+            * An array containing the list of libraries using the :libraries parameter
               (if they have no associated headers or dSYMs):
                 ['LibraryA.so', 'LibraryB.so']
 
