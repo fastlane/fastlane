@@ -71,8 +71,8 @@ module Fastlane
               (if they have no associated dSYMs):
                 ['FrameworkA.framework', 'FrameworkB.framework']
 
-            * A hash containing the list of list of frameworks with their dSYMs using
-              the :frameworks_with_dsyms parameter:
+            * A hash containing the list of frameworks with their dSYMs using the
+              :frameworks_with_dsyms parameter:
                 {
                   'FrameworkA.framework' => {},
                   'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' }
@@ -84,8 +84,8 @@ module Fastlane
               (if they have no associated headers or dSYMs):
                 ['LibraryA.so', 'LibraryB.so']
 
-            * A hash containing the list of list of libraries with their headers and
-              dSYMs using the :libraries_with_headers_or_dsyms parameter:
+            * A hash containing the list of libraries with their headers and dSYMs
+              using the :libraries_with_headers_or_dsyms parameter:
                 {
                   'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' },
                   'LibraryB.so' => { headers: 'headers' }
