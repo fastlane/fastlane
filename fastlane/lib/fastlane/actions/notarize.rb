@@ -253,7 +253,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :use_notarytool,
                                        env_name: 'FL_NOTARIZE_USE_NOTARYTOOL',
                                        description: 'Whether to `xcrun notarytool` or `xcrun altool`',
-                                       default_value: Helper.xcode_at_least?("13.0"), # Notary tool added in Xcode 13
+                                       default_value: Helper.mac? && Helper.xcode_at_least?("13.0"), # Notary tool added in Xcode 13
                                        default_value_dynamic: true,
                                        type: Boolean),
           FastlaneCore::ConfigItem.new(key: :try_early_stapling,
