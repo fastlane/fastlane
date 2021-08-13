@@ -36,6 +36,7 @@ module Fastlane
         when Array
           artifacts_with_info.map { |artifact| [artifact, {}] }.to_h
         when Hash
+          # Convert keys of artifact info to symbols ('dsyms' to :dsyms) and only keep keys we are interested in
           artifacts_with_info.transform_values { |artifact_info| artifact_info.transform_keys(&:to_sym).slice(*valid_info) }
         else
           artifacts_with_info
