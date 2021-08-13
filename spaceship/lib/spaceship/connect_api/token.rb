@@ -21,6 +21,8 @@ module Spaceship
       attr_reader :duration
       attr_reader :expiration
 
+      attr_reader :key_raw
+
       # Temporary attribute not needed to create the JWT text
       # There is no way to determine if the team associated with this
       # key is for App Store or Enterprise so this is the temporary workaround
