@@ -76,6 +76,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency('multipart-post', '~> 2.0.0') # Needed for uploading builds to appetize
   spec.add_dependency('word_wrap', '~> 1.0.0') # to add line breaks for tables with long strings
 
+  spec.add_dependency('optparse', '~> 0.1.1') # Used to parse options with Commander
+
   # TTY dependencies
   spec.add_dependency('tty-screen', '>= 0.6.3', '< 1.0.0') # detect the terminal width
   spec.add_dependency('tty-spinner', '>= 0.8.0', '< 1.0.0') # loading indicators

@@ -45,38 +45,29 @@ module Commander
     #  This broke somewhere between Ruby 2.5 and Ruby 2.6
     #
     # Solution:
-    #  Proper solution is to set `parser.require_exact = true` but this only available on `optparse` version 0.1.1 
-    #  which isn't on RubyGems.
+    #  Proper solution is to set `parser.require_exact = true` but this only available on `optparse` version 0.1.1
+    #  which is not used by Commander.
     #  `require_exact` will prevent OptionParser from assuming `-e` is the same as `--env STRING`
     #  Even if it was on RubyGems, it would require Commander to allow this option to be set on OptionParser
     #
-    # Work Around:
-    #  Rescuing OptionParser::MissingArgument allows `-e` to be passed and will ignore the error raised by
-    #  OptionParser assuming that the user meant `--env`.
-    #
-    # This work around was made on 2021-05-27
+    # This work around was made on 2021-08-13
     #
     # When fixed:
     #  This method implementation overrides one provided by Commander::Runner already. Just delete this method
-    #  so the existing one can be used.
+    #  so the existing one can be used
     def parse_global_options
       parser = options.inject(OptionParser.new) do |options, option|
         options.on(*option[:args], &global_option_proc(option[:switches], &option[:proc]))
       end
 
-      # This is the actual solution but is only in version 0.1.1 of optparse (which isn't released on RubyGems)
-      if parser.respond_to?(:require_exact=)
-        parser.require_exact = true
-      end
+      # This is the actual solution but is only in version 0.1.1 of optparse and its not in Commander
+      # This is the only change from Commanders implmentation of parse_global_options
+      parser.require_exact = true
 
       options = @args.dup
       begin
         parser.parse!(options)
       rescue OptionParser::InvalidOption => e
-        # Remove the offending args and retry.
-        options = options.reject { |o| e.args.include?(o) }
-        retry
-      rescue OptionParser::MissingArgument => e
         # Remove the offending args and retry.
         options = options.reject { |o| e.args.include?(o) }
         retry
