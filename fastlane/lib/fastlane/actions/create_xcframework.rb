@@ -37,7 +37,7 @@ module Fastlane
           artifacts_with_info.map { |artifact| [artifact, {}] }.to_h
         when Hash
           # Convert keys of artifact info to symbols ('dsyms' to :dsyms) and only keep keys we are interested in
-          # For example with valid_info = [:dsyms] 
+          # For example with valid_info = [:dsyms]
           #  { 'FrameworkA.framework' => { 'dsyms' => 'FrameworkA.framework.dSYM', 'foo' => bar } }
           # gets converted to
           #  { 'FrameworkA.framework' => { dsyms: 'FrameworkA.framework.dSYM' } }
