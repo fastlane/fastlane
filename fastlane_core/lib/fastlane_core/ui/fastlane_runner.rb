@@ -34,6 +34,46 @@ module Commander
 
     attr_accessor :collector
 
+    # Temporary work around for issues mentioned in https://github.com/fastlane/fastlane/pull/18760
+    # Code taken from https://github.com/commander-rb/commander/blob/40d06bfbc54906d0de7c72ac73f4e9188c9ca294/lib/commander/runner.rb#L372-L385
+    #
+    # Problem:
+    #  `optparse` is guessing that command option `-e` is referring to global option `--env` (because it starts with an e).
+    #  This is raising OptionParser::MissingArgument error because `--env` takes a string argument.
+    #  A command of `-e --verbose` works because `--verbose` is seen as the argument.
+    #  A command of `--verbose -e` doesn't work because no argument after `-e` so MissingArgument is raised again.
+    #  This broke somewhere between Ruby 2.5 and Ruby 2.6
+    #
+    # Solution:
+    #  Proper solution is to set `parser.require_exact = true` but this only available on `optparse` version 0.1.1
+    #  which is not used by Commander.
+    #  `require_exact` will prevent OptionParser from assuming `-e` is the same as `--env STRING`
+    #  Even if it was on RubyGems, it would require Commander to allow this option to be set on OptionParser
+    #
+    # This work around was made on 2021-08-13
+    #
+    # When fixed:
+    #  This method implementation overrides one provided by Commander::Runner already. Just delete this method
+    #  so the existing one can be used
+    def parse_global_options
+      parser = options.inject(OptionParser.new) do |options, option|
+        options.on(*option[:args], &global_option_proc(option[:switches], &option[:proc]))
+      end
+
+      # This is the actual solution but is only in version 0.1.1 of optparse and its not in Commander
+      # This is the only change from Commanders implementation of parse_global_options
+      parser.require_exact = true
+
+      options = @args.dup
+      begin
+        parser.parse!(options)
+      rescue OptionParser::InvalidOption => e
+        # Remove the offending args and retry.
+        options = options.reject { |o| e.args.include?(o) }
+        retry
+      end
+    end
+
     def run!
       require_program(:version, :description)
       trap('INT') { abort(program(:int_message)) } if program(:int_message)
@@ -47,6 +87,7 @@ module Commander
         say(version)
         return
       end
+
       parse_global_options
       remove_global_options(options, @args)
 
