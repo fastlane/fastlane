@@ -61,7 +61,7 @@ module Commander
       end
 
       # This is the actual solution but is only in version 0.1.1 of optparse and its not in Commander
-      # This is the only change from Commanders implmentation of parse_global_options
+      # This is the only change from Commanders implementation of parse_global_options
       parser.require_exact = true
 
       options = @args.dup
