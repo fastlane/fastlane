@@ -184,6 +184,7 @@ module Supply
               changes_not_sent_for_review: true
             )
           else
+            puts e.to_s
             raise
           end
         end
