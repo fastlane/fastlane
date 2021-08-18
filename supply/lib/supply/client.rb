@@ -170,7 +170,7 @@ module Supply
             changes_not_sent_for_review: Supply.config[:changes_not_sent_for_review]
           )
         rescue Google::Apis::ClientError => e
-          if !Supply.config[:rescue_changes_not_sent_for_review]
+          unless Supply.config[:rescue_changes_not_sent_for_review]
             raise
           end
 
@@ -185,7 +185,7 @@ module Supply
           else
             message = e.body
           end
-          
+
           if message.include?("The query parameter changesNotSentForReview must not be set")
             client.commit_edit(
               current_package_name,
