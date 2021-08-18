@@ -138,7 +138,7 @@ module Fastlane
       # Generate actions.md
       template = File.join(Fastlane::ROOT, "lib/assets/Actions.md.erb")
       result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
-      File.write(File.join(docs_dir, "actions.md"), result)
+      File.write(File.join(docs_dir, "actions.md"), result, mode: "wt")
 
       # Generate actions sub pages (e.g. actions/slather.md, actions/scan.md)
       all_actions_ref_yml = []
@@ -166,7 +166,7 @@ module Fastlane
         result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
         file_name = File.join("actions", "#{action.action_name}.md")
-        File.write(File.join(docs_dir, file_name), result)
+        File.write(File.join(docs_dir, file_name), result, mode: "wt")
 
         all_actions_ref_yml << { action.action_name => file_name }
       end
@@ -177,7 +177,7 @@ module Fastlane
       mkdocs_yml = YAML.load_file(mkdocs_yml_path)
       hidden_actions_array = mkdocs_yml["nav"].find { |p| !p["_Actions"].nil? }
       hidden_actions_array["_Actions"] = all_actions_ref_yml
-      File.write(mkdocs_yml_path, mkdocs_yml.to_yaml)
+      File.write(mkdocs_yml_path, mkdocs_yml.to_yaml, mode: "wt")
 
       # Copy over the assets from the `actions/docs/assets` directory
       Dir[File.join(custom_action_docs_path, "assets", "*")].each do |current_asset_path|
