@@ -16,10 +16,9 @@ _fastlane_complete() {
   fi
 
   # parse 'beta' out of 'lane :beta do', etc
-  completions="$(sed -En 's/^[ 	]*lane +:([^ ]+).*$/\1/p' "$file")"
-  completions="$completions
-update_fastlane"
+  completions="$(sed -En 's/^[ 	]*lane +:([^ 	]+).*$/\1/p' "$file")"
+  completions="$completions update_fastlane"
 
-  reply=( "${(ps:\n:)completions}" )
+  reply=( "${=completions}" )
 }
 
