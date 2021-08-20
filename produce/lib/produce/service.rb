@@ -97,7 +97,7 @@ module Produce
         bundle_id.update_capability(ACCESS_WIFI_INFORMATION, enabled: on)
       end
 
-      if options.access_wifi
+      if options.app_attest
         UI.message("\tApp Attest")
         bundle_id.update_capability(APP_ATTEST, enabled: on)
       end
