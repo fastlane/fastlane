@@ -290,7 +290,7 @@ module Supply
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :rescue_changes_not_sent_for_review,
                                      env_name: "SUPPLY_RESCUE_CHANGES_NOT_SENT_FOR_REVIEW",
-                                     description: "Catches changesNotSentForReview errors when an edit is committed and retries with the configuration that the error message recommended",
+                                     description: "Catches changes_not_sent_for_review errors when an edit is committed and retries with the configuration that the error message recommended",
                                      type: Boolean,
                                      default_value: true),
         FastlaneCore::ConfigItem.new(key: :in_app_update_priority,
