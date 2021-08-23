@@ -33,6 +33,7 @@ describe Fastlane do
 
             result = Fastlane::FastFile.new.parse("lane :test do
               notarize(
+                use_notarytool: true,
                 package: '#{package.path}',
                 bundle_id: '#{bundle_id}',
                 username: '#{username}',
@@ -49,6 +50,7 @@ describe Fastlane do
             expect do
               result = Fastlane::FastFile.new.parse("lane :test do
                 notarize(
+                  use_notarytool: true,
                   package: '#{package.path}',
                   bundle_id: '#{bundle_id}',
                   username: '#{username}',
