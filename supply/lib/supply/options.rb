@@ -1,3 +1,5 @@
+# rubocop:disable Metrics/ClassLength
+
 require 'fastlane_core/configuration/config_item'
 require 'credentials_manager/appfile_config'
 
@@ -286,6 +288,11 @@ module Supply
                                      description: "Indicates that the changes in this edit will not be reviewed until they are explicitly sent for review from the Google Play Console UI",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :rescue_changes_not_sent_for_review,
+                                     env_name: "SUPPLY_RESCUE_CHANGES_NOT_SENT_FOR_REVIEW",
+                                     description: "Catches changes_not_sent_for_review errors when an edit is committed and retries with the configuration that the error message recommended",
+                                     type: Boolean,
+                                     default_value: true),
         FastlaneCore::ConfigItem.new(key: :in_app_update_priority,
                                      env_name: "SUPPLY_IN_APP_UPDATE_PRIORITY",
                                      optional: true,

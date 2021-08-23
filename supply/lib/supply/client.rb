@@ -163,11 +163,44 @@ module Supply
       ensure_active_edit!
 
       call_google_api do
-        client.commit_edit(
-          current_package_name,
-          current_edit.id,
-          changes_not_sent_for_review: Supply.config[:changes_not_sent_for_review]
-        )
+        begin
+          client.commit_edit(
+            current_package_name,
+            current_edit.id,
+            changes_not_sent_for_review: Supply.config[:changes_not_sent_for_review]
+          )
+        rescue Google::Apis::ClientError => e
+          unless Supply.config[:rescue_changes_not_sent_for_review]
+            raise
+          end
+
+          error = begin
+                    JSON.parse(e.body)
+                  rescue
+                    nil
+                  end
+
+          if error
+            message = error["error"] && error["error"]["message"]
+          else
+            message = e.body
+          end
+
+          if message.include?("The query parameter changesNotSentForReview must not be set")
+            client.commit_edit(
+              current_package_name,
+              current_edit.id
+            )
+          elsif message.include?("Please set the query parameter changesNotSentForReview to true")
+            client.commit_edit(
+              current_package_name,
+              current_edit.id,
+              changes_not_sent_for_review: true
+            )
+          else
+            raise
+          end
+        end
       end
 
       self.current_edit = nil
