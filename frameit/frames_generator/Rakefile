@@ -75,6 +75,7 @@ IPAD_MINI_VERSION = "2019"
 IPAD_RENAMING_SCHEME = {
   'iPad Pro 11' => 'iPad Pro (11-inch)',
   'iPad Pro 13' => "iPad Pro (12.9-inch) (#{IPAD_PRO_12_9_VERSION})",
+  'iPad Pro' => 'iPad Pro', # don't rename the iPad Pro 1st or 2nd gen from the 'legacy' folder
   'iPad Air' => "iPad Air (#{IPAD_AIR_VERSION})",
   'iPad Mini' => "iPad Mini (#{IPAD_MINI_VERSION})",
   'iPad' => 'iPad 10.2' # must be the last one so that only 'iPad' without any version will be renamed to 10.2
