@@ -3504,37 +3504,63 @@ public func createPullRequest(apiToken: OptionalConfigValue<String?> = .fastlane
  Package multiple build configs of a library/framework into a single xcframework
 
  - parameters:
-   - frameworks: Frameworks to add to the target xcframework
-   - libraries: Libraries to add to the target xcframework, with their corresponding headers
+   - frameworks: Frameworks (without dSYMs) to add to the target xcframework
+   - frameworksWithDsyms: Frameworks (with dSYMs) to add to the target xcframework
+   - libraries: Libraries (without headers or dSYMs) to add to the target xcframework
+   - librariesWithHeadersOrDsyms: Libraries (with headers or dSYMs) to add to the target xcframework
    - output: The path to write the xcframework to
    - allowInternalDistribution: Specifies that the created xcframework contains information not suitable for public distribution
 
  Utility for packaging multiple build configurations of a given library
  or framework into a single xcframework.
 
- If you want to package several frameworks just provide an array containing
- the list of frameworks to be packaged using the :frameworks parameter.
+ If you want to package several frameworks just provide one of:
 
- If you want to package several libraries with their corresponding headers
- provide a hash containing the library as the key and the directory containing
- its headers as the value (or an empty string if there are no headers associated
- with the provided library).
+   * An array containing the list of frameworks using the :frameworks parameter
+     (if they have no associated dSYMs):
+       ['FrameworkA.framework', 'FrameworkB.framework']
+
+   * A hash containing the list of frameworks with their dSYMs using the
+     :frameworks_with_dsyms parameter:
+       {
+         'FrameworkA.framework' => {},
+         'FrameworkB.framework' => { dsyms: 'FrameworkB.framework.dSYM' }
+       }
+
+ If you want to package several libraries just provide one of:
+
+   * An array containing the list of libraries using the :libraries parameter
+     (if they have no associated headers or dSYMs):
+       ['LibraryA.so', 'LibraryB.so']
+
+   * A hash containing the list of libraries with their headers and dSYMs
+     using the :libraries_with_headers_or_dsyms parameter:
+       {
+         'LibraryA.so' => { dsyms: 'libraryA.so.dSYM' },
+         'LibraryB.so' => { headers: 'headers' }
+       }
 
  Finally specify the location of the xcframework to be generated using the :output
  parameter.
 
  */
 public func createXcframework(frameworks: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
-                              libraries: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                              frameworksWithDsyms: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                              libraries: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                              librariesWithHeadersOrDsyms: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                               output: String,
                               allowInternalDistribution: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let frameworksArg = frameworks.asRubyArgument(name: "frameworks", type: nil)
+    let frameworksWithDsymsArg = frameworksWithDsyms.asRubyArgument(name: "frameworks_with_dsyms", type: nil)
     let librariesArg = libraries.asRubyArgument(name: "libraries", type: nil)
+    let librariesWithHeadersOrDsymsArg = librariesWithHeadersOrDsyms.asRubyArgument(name: "libraries_with_headers_or_dsyms", type: nil)
     let outputArg = RubyCommand.Argument(name: "output", value: output, type: nil)
     let allowInternalDistributionArg = allowInternalDistribution.asRubyArgument(name: "allow_internal_distribution", type: nil)
     let array: [RubyCommand.Argument?] = [frameworksArg,
+                                          frameworksWithDsymsArg,
                                           librariesArg,
+                                          librariesWithHeadersOrDsymsArg,
                                           outputArg,
                                           allowInternalDistributionArg]
     let args: [RubyCommand.Argument] = array
@@ -7103,6 +7129,7 @@ public func nexusUpload(file: String,
 
  - parameters:
    - package: Path to package to notarize, e.g. .app bundle or disk image
+   - useNotarytool: Whether to `xcrun notarytool` or `xcrun altool`
    - tryEarlyStapling: Whether to try early stapling while the notarization request is in progress
    - bundleId: Bundle identifier to uniquely identify the package
    - username: Apple ID username
@@ -7112,6 +7139,7 @@ public func nexusUpload(file: String,
    - apiKeyPath: Path to AppStore Connect API key
  */
 public func notarize(package: String,
+                     useNotarytool: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                      tryEarlyStapling: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      bundleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -7121,6 +7149,7 @@ public func notarize(package: String,
                      apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil))
 {
     let packageArg = RubyCommand.Argument(name: "package", value: package, type: nil)
+    let useNotarytoolArg = useNotarytool.asRubyArgument(name: "use_notarytool", type: nil)
     let tryEarlyStaplingArg = tryEarlyStapling.asRubyArgument(name: "try_early_stapling", type: nil)
     let bundleIdArg = bundleId.asRubyArgument(name: "bundle_id", type: nil)
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
@@ -7129,6 +7158,7 @@ public func notarize(package: String,
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let array: [RubyCommand.Argument?] = [packageArg,
+                                          useNotarytoolArg,
                                           tryEarlyStaplingArg,
                                           bundleIdArg,
                                           usernameArg,
@@ -10672,6 +10702,7 @@ public func ssh(username: String,
    - deactivateOnPromote: **DEPRECATED!** Google Play does this automatically now - When promoting to a new track, deactivate the binary in the origin track
    - versionCodesToRetain: An array of version codes to retain when publishing a new APK
    - changesNotSentForReview: Indicates that the changes in this edit will not be reviewed until they are explicitly sent for review from the Google Play Console UI
+   - rescueChangesNotSentForReview: Catches changes_not_sent_for_review errors when an edit is committed and retries with the configuration that the error message recommended
    - inAppUpdatePriority: In-app update priority for all the newly added apks in the release. Can take values between [0,5]
    - obbMainReferencesVersion: References version of 'main' expansion file
    - obbMainFileSize: Size of 'main' expansion file in bytes
@@ -10712,6 +10743,7 @@ public func supply(packageName: String,
                    deactivateOnPromote: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                    versionCodesToRetain: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                    changesNotSentForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                   rescueChangesNotSentForReview: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                    inAppUpdatePriority: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                    obbMainReferencesVersion: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    obbMainFileSize: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -10750,6 +10782,7 @@ public func supply(packageName: String,
     let deactivateOnPromoteArg = deactivateOnPromote.asRubyArgument(name: "deactivate_on_promote", type: nil)
     let versionCodesToRetainArg = versionCodesToRetain.asRubyArgument(name: "version_codes_to_retain", type: nil)
     let changesNotSentForReviewArg = changesNotSentForReview.asRubyArgument(name: "changes_not_sent_for_review", type: nil)
+    let rescueChangesNotSentForReviewArg = rescueChangesNotSentForReview.asRubyArgument(name: "rescue_changes_not_sent_for_review", type: nil)
     let inAppUpdatePriorityArg = inAppUpdatePriority.asRubyArgument(name: "in_app_update_priority", type: nil)
     let obbMainReferencesVersionArg = obbMainReferencesVersion.asRubyArgument(name: "obb_main_references_version", type: nil)
     let obbMainFileSizeArg = obbMainFileSize.asRubyArgument(name: "obb_main_file_size", type: nil)
@@ -10787,6 +10820,7 @@ public func supply(packageName: String,
                                           deactivateOnPromoteArg,
                                           versionCodesToRetainArg,
                                           changesNotSentForReviewArg,
+                                          rescueChangesNotSentForReviewArg,
                                           inAppUpdatePriorityArg,
                                           obbMainReferencesVersionArg,
                                           obbMainFileSizeArg,
@@ -12296,6 +12330,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
    - deactivateOnPromote: **DEPRECATED!** Google Play does this automatically now - When promoting to a new track, deactivate the binary in the origin track
    - versionCodesToRetain: An array of version codes to retain when publishing a new APK
    - changesNotSentForReview: Indicates that the changes in this edit will not be reviewed until they are explicitly sent for review from the Google Play Console UI
+   - rescueChangesNotSentForReview: Catches changes_not_sent_for_review errors when an edit is committed and retries with the configuration that the error message recommended
    - inAppUpdatePriority: In-app update priority for all the newly added apks in the release. Can take values between [0,5]
    - obbMainReferencesVersion: References version of 'main' expansion file
    - obbMainFileSize: Size of 'main' expansion file in bytes
@@ -12336,6 +12371,7 @@ public func uploadToPlayStore(packageName: String,
                               deactivateOnPromote: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                               versionCodesToRetain: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                               changesNotSentForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                              rescueChangesNotSentForReview: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                               inAppUpdatePriority: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                               obbMainReferencesVersion: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               obbMainFileSize: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -12374,6 +12410,7 @@ public func uploadToPlayStore(packageName: String,
     let deactivateOnPromoteArg = deactivateOnPromote.asRubyArgument(name: "deactivate_on_promote", type: nil)
     let versionCodesToRetainArg = versionCodesToRetain.asRubyArgument(name: "version_codes_to_retain", type: nil)
     let changesNotSentForReviewArg = changesNotSentForReview.asRubyArgument(name: "changes_not_sent_for_review", type: nil)
+    let rescueChangesNotSentForReviewArg = rescueChangesNotSentForReview.asRubyArgument(name: "rescue_changes_not_sent_for_review", type: nil)
     let inAppUpdatePriorityArg = inAppUpdatePriority.asRubyArgument(name: "in_app_update_priority", type: nil)
     let obbMainReferencesVersionArg = obbMainReferencesVersion.asRubyArgument(name: "obb_main_references_version", type: nil)
     let obbMainFileSizeArg = obbMainFileSize.asRubyArgument(name: "obb_main_file_size", type: nil)
@@ -12411,6 +12448,7 @@ public func uploadToPlayStore(packageName: String,
                                           deactivateOnPromoteArg,
                                           versionCodesToRetainArg,
                                           changesNotSentForReviewArg,
+                                          rescueChangesNotSentForReviewArg,
                                           inAppUpdatePriorityArg,
                                           obbMainReferencesVersionArg,
                                           obbMainFileSizeArg,
@@ -13213,4 +13251,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.132]
+// FastlaneRunnerAPIVersion [0.9.133]
