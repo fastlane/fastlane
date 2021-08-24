@@ -208,7 +208,13 @@ module Spaceship
       # Overridden from Spaceship::Client
       def handle_error(response)
         body = response.body.empty? ? {} : response.body
-        body = JSON.parse(body) if body.kind_of?(String)
+
+        # Setting body nil if invalid JSON which can happen if 502
+        begin
+          body = JSON.parse(body) if body.kind_of?(String)
+        rescue
+          nil
+        end
 
         case response.status.to_i
         when 401
@@ -220,6 +226,14 @@ module Spaceship
             raise ProgramLicenseAgreementUpdated, format_errors(response)
           else
             raise AccessForbiddenError, format_errors(response)
+          end
+        when 502
+          # Issue - https://github.com/fastlane/fastlane/issues/19264
+          # This 502 with "Could not process this request" body sometimes
+          # work and sometimes doesn't
+          # Usually retrying once or twice will solve the issue
+          if body && body.include?("Could not process this request")
+            raise BadGatewayError, "Could not process this request"
           end
         end
       end
