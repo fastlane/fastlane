@@ -191,12 +191,12 @@ module Match
             UI.verbose("Certificate '#{File.basename(cert_path)}' is already installed on this machine")
           else
             Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
-          end
 
-          # Import the private key
-          # there seems to be no good way to check if it's already installed - so just install it
-          # Key will only be added to the partition list if it isn't already installed
-          Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+            # Import the private key
+            # there seems to be no good way to check if it's already installed - so just install it
+            # Key will only be added to the partition list if it isn't already installed
+            Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+          end
         else
           UI.message("Skipping installation of certificate as it would not work on this operating system.")
         end
