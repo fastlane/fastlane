@@ -53,6 +53,10 @@ module Spaceship
         return internal_build_state == InternalState::READY_FOR_BETA_TESTING
       end
 
+      def processed?
+        return internal_build_state != InternalState::PROCESSING && external_build_state != ExternalState::PROCESSING
+      end
+
       def ready_for_beta_submission?
         return external_build_state == ExternalState::READY_FOR_BETA_SUBMISSION
       end

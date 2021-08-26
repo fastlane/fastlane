@@ -13,6 +13,7 @@ describe Pilot do
     let(:fake_app) { "fake app" }
     let(:fake_app_identifier) { "fake app_identifier" }
     let(:fake_ipa) { "fake ipa" }
+    let(:fake_pkg) { "fake pkg" }
 
     describe "what happens on 'start'" do
       context "when 'config' variable is already set" do
@@ -392,6 +393,23 @@ describe Pilot do
         end
       end
 
+      context "when config does not has 'app_identifier' but has 'pkg' path variable" do
+        before(:each) do
+          fake_manager.instance_variable_set(:@config, { pkg: fake_pkg })
+
+          allow(FastlaneCore::PkgFileAnalyser)
+            .to receive(:fetch_app_identifier)
+            .with(fake_pkg)
+            .and_return(fake_app_identifier)
+        end
+
+        it "uses the FastlaneCore::PkgFileAnalyser with 'pkg' path to find the 'app_identifier' value" do
+          fetch_app_identifier_result = fake_manager.fetch_app_identifier
+
+          expect(fetch_app_identifier_result).to eq(fake_app_identifier)
+        end
+      end
+
       context "when FastlaneCore::IpaFileAnalyser failed to fetch the 'app_identifier' variable" do
         before(:each) do
           fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
@@ -413,76 +431,147 @@ describe Pilot do
     end
 
     describe "what happens on fetching the 'app_platform'" do
-      let(:fake_app_platform) { "ios" }
-
       context "when config has 'app_platform' variable" do
-        before(:each) do
-          expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
-          fake_manager.instance_variable_set(:@config, { app_platform: fake_app_platform })
+        context "ios" do
+          let(:fake_app_platform) { "ios" }
+
+          before(:each) do
+            expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
+            fake_manager.instance_variable_set(:@config, { app_platform: fake_app_platform })
+          end
+
+          it "uses the config 'app_platform' value" do
+            fetch_app_platform_result = fake_manager.fetch_app_platform
+
+            expect(fetch_app_platform_result).to eq(fake_app_platform)
+          end
         end
 
-        it "uses the config 'app_platform' value" do
-          fetch_app_platform_result = fake_manager.fetch_app_platform
+        context "osx" do
+          let(:fake_app_platform) { "osx" }
 
-          expect(fetch_app_platform_result).to eq(fake_app_platform)
+          before(:each) do
+            expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
+            fake_manager.instance_variable_set(:@config, { app_platform: fake_app_platform })
+          end
+
+          it "uses the config 'app_platform' value" do
+            fetch_app_platform_result = fake_manager.fetch_app_platform
+
+            expect(fetch_app_platform_result).to eq(fake_app_platform)
+          end
         end
       end
 
-      context "when config does not has 'app_platform' but has 'ipa' path variable" do
-        before(:each) do
-          expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
-          fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
+      context "when config does not have 'app_platform'" do
+        context "but has 'ipa' path variable" do
+          let(:fake_app_platform) { "ios" }
 
-          allow(FastlaneCore::IpaFileAnalyser)
-            .to receive(:fetch_app_platform)
-            .with(fake_ipa)
-            .and_return(fake_app_platform)
+          before(:each) do
+            expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
+            fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
+
+            allow(FastlaneCore::IpaFileAnalyser)
+              .to receive(:fetch_app_platform)
+              .with(fake_ipa)
+              .and_return(fake_app_platform)
+          end
+
+          it "uses the FastlaneCore::IpaFileAnalyser with 'ipa' path to find the 'app_platform' value" do
+            fetch_app_platform_result = fake_manager.fetch_app_platform
+
+            expect(fetch_app_platform_result).to eq(fake_app_platform)
+          end
         end
 
-        it "uses the FastlaneCore::IpaFileAnalyser with 'ipa' path to find the 'app_platform' value" do
-          fetch_app_platform_result = fake_manager.fetch_app_platform
+        context "but has 'pkg' path variable" do
+          let(:fake_app_platform) { "osx" }
 
-          expect(fetch_app_platform_result).to eq(fake_app_platform)
+          before(:each) do
+            expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
+            fake_manager.instance_variable_set(:@config, { pkg: fake_pkg })
+
+            allow(FastlaneCore::PkgFileAnalyser)
+              .to receive(:fetch_app_platform)
+              .with(fake_pkg)
+              .and_return(fake_app_platform)
+          end
+
+          it "uses the FastlaneCore::PkgFileAnalyser with 'pkg' path to find the 'app_platform' value" do
+            fetch_app_platform_result = fake_manager.fetch_app_platform
+
+            expect(fetch_app_platform_result).to eq(fake_app_platform)
+          end
         end
       end
 
       context "when FastlaneCore::IpaFileAnalyser failed to fetch the 'app_platform' variable" do
-        before(:each) do
-          expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
-          fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
+        context "ios" do
+          let(:fake_app_platform) { "ios" }
 
-          allow(FastlaneCore::IpaFileAnalyser)
-            .to receive(:fetch_app_platform)
-            .with(fake_ipa)
-            .and_return(nil)
+          before(:each) do
+            expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
+            fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
+
+            allow(FastlaneCore::IpaFileAnalyser)
+              .to receive(:fetch_app_platform)
+              .with(fake_ipa)
+              .and_return(nil)
+          end
+
+          it "asks user to enter the app's platform manually" do
+            expect(UI).to receive(:input).with("Please enter the app's platform (appletvos, ios, osx): ").and_return(fake_app_platform)
+
+            fetch_app_platform_result = fake_manager.fetch_app_platform
+
+            expect(fetch_app_platform_result).to eq(fake_app_platform)
+          end
         end
 
-        it "asks user to enter the app's platform manually" do
-          expect(UI).to receive(:input).with("Please enter the app's platform (appletvos, ios, osx): ").and_return(fake_app_platform)
+        context "osx" do
+          let(:fake_app_platform) { "osx" }
 
-          fetch_app_platform_result = fake_manager.fetch_app_platform
+          before(:each) do
+            expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
+            fake_manager.instance_variable_set(:@config, { pkg: fake_pkg })
 
-          expect(fetch_app_platform_result).to eq(fake_app_platform)
+            allow(FastlaneCore::PkgFileAnalyser)
+              .to receive(:fetch_app_platform)
+              .with(fake_pkg)
+              .and_return(nil)
+          end
+
+          it "asks user to enter the app's platform manually" do
+            expect(UI).to receive(:input).with("Please enter the app's platform (appletvos, ios, osx): ").and_return(fake_app_platform)
+
+            fetch_app_platform_result = fake_manager.fetch_app_platform
+
+            expect(fetch_app_platform_result).to eq(fake_app_platform)
+          end
         end
       end
 
       context "when FastlaneCore::IpaFileAnalyser failed to fetch the 'app_platform' variable and its not required to enter manually" do
-        before(:each) do
-          expect(UI).not_to receive(:verbose).with("App Platform (#{fake_app_platform})")
-          fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
+        context "ios" do
+          let(:fake_app_platform) { "ios" }
 
-          allow(FastlaneCore::IpaFileAnalyser)
-            .to receive(:fetch_app_platform)
-            .with(fake_ipa)
-            .and_return(nil)
-        end
+          before(:each) do
+            expect(UI).not_to receive(:verbose).with("App Platform (#{fake_app_platform})")
+            fake_manager.instance_variable_set(:@config, { ipa: fake_ipa })
 
-        it "does not ask user to enter the app's platform manually" do
-          expect(UI).not_to receive(:input).with("Please enter the app's platform (appletvos, ios, osx): ")
+            allow(FastlaneCore::IpaFileAnalyser)
+              .to receive(:fetch_app_platform)
+              .with(fake_ipa)
+              .and_return(nil)
+          end
 
-          fetch_app_platform_result = fake_manager.fetch_app_platform(required: false)
+          it "does not ask user to enter the app's platform manually" do
+            expect(UI).not_to receive(:input).with("Please enter the app's platform (appletvos, ios, osx): ")
 
-          expect(fetch_app_platform_result).to eq(nil)
+            fetch_app_platform_result = fake_manager.fetch_app_platform(required: false)
+
+            expect(fetch_app_platform_result).to eq(nil)
+          end
         end
       end
 

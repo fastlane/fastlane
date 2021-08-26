@@ -13,6 +13,8 @@ module Fastlane
         unless distribute_only
           values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
           values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
+          values[:pkg] ||= Actions.lane_context[SharedValues::PKG_OUTPUT_PATH]
+          values[:pkg] = File.expand_path(values[:pkg]) if values[:pkg]
         end
 
         # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
@@ -117,7 +119,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios].include?(platform)
+        [:ios, :mac].include?(platform)
       end
     end
   end

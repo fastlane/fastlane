@@ -73,7 +73,8 @@ module Pilot
 
     def fetch_app_identifier
       result = config[:app_identifier]
-      result ||= FastlaneCore::IpaFileAnalyser.fetch_app_identifier(config[:ipa])
+      result ||= FastlaneCore::IpaFileAnalyser.fetch_app_identifier(config[:ipa]) if config[:ipa]
+      result ||= FastlaneCore::PkgFileAnalyser.fetch_app_identifier(config[:pkg]) if config[:pkg]
       result ||= UI.input("Please enter the app's bundle identifier: ")
       UI.verbose("App identifier (#{result})")
       return result
@@ -82,6 +83,7 @@ module Pilot
     def fetch_app_platform(required: true)
       result = config[:app_platform]
       result ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(config[:ipa]) if config[:ipa]
+      result ||= FastlaneCore::PkgFileAnalyser.fetch_app_platform(config[:pkg]) if config[:pkg]
       if required
         result ||= UI.input("Please enter the app's platform (appletvos, ios, osx): ")
         UI.user_error!("App Platform must be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include?(result)
