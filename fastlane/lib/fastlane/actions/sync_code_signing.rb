@@ -82,7 +82,7 @@ module Fastlane
       def self.output
         [
           ['MATCH_PROVISIONING_PROFILE_MAPPING', 'The match provisioning profile mapping'],
-          ['SIGH_PROFILE_TYPE', 'The profile type, can be appstore, adhoc, development, enterprise']
+          ['SIGH_PROFILE_TYPE', 'The profile type, can be app-store, ad-hoc, development, enterprise, can be used in `build_app` as a default value for `export_method`']
         ]
       end
 
