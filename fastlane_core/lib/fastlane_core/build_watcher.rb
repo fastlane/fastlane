@@ -11,7 +11,7 @@ module FastlaneCore
 
     class << self
       # @return The build we waited for. This method will always return a build
-      def wait_for_build_processing_to_be_complete(app_id: nil, platform: nil, train_version: nil, app_version: nil, build_version: nil, poll_interval: 10, timeout_duration: nil, strict_build_watch: false, return_when_build_appears: false, return_spaceship_testflight_build: true, select_latest: false)
+      def wait_for_build_processing_to_be_complete(app_id: nil, platform: nil, train_version: nil, app_version: nil, build_version: nil, poll_interval: 10, timeout_duration: nil, strict_build_watch: false, return_when_build_appears: false, return_spaceship_testflight_build: true, select_latest: false, wait_for_build_beta_detail_processing: false)
         # Warn about train_version being removed in the future
         if train_version
           UI.deprecated(":train_version is no longer a used argument on FastlaneCore::BuildWatcher. Please use :app_version instead.")
@@ -41,13 +41,13 @@ module FastlaneCore
             showed_info = true
           end
 
-          report_status(build: matched_build)
+          report_status(build: matched_build, wait_for_build_beta_detail_processing: wait_for_build_beta_detail_processing)
 
           # Processing of builds by AppStoreConnect can be a very time consuming task and will
           # block the worker running this task until it is completed. In some cases,
           # having a build resource appear in AppStoreConnect (matched_build) may be enough (i.e. setting a changelog)
           # so here we may choose to skip the full processing of the build if return_when_build_appears is true
-          if matched_build && (return_when_build_appears || matched_build.processed?)
+          if matched_build && (return_when_build_appears || processed?(build: matched_build, wait_for_build_beta_detail_processing: wait_for_build_beta_detail_processing))
 
             if !app_version.nil? && app_version != app_version_queried
               UI.important("App version is #{app_version} but build was found while querying #{app_version_queried}")
@@ -145,10 +145,29 @@ module FastlaneCore
         return nil
       end
 
-      def report_status(build: nil)
-        if build && !build.processed?
+      def processed?(build: nil, wait_for_build_beta_detail_processing: false)
+        return false unless build
+
+        is_processed = build.processed?
+
+        # App Store Connect API has multiple build processing states
+        # builds have one processing status
+        # buildBetaDetails have two processing statues (internal and external testing)
+        #
+        # If set, this method will only return true if all three statuses are complete
+        if wait_for_build_beta_detail_processing
+          is_processed &&= build.build_beta_detail.processed?
+        end
+
+        return is_processed
+      end
+
+      def report_status(build: nil, wait_for_build_beta_detail_processing: false)
+        is_processed = processed?(build: build, wait_for_build_beta_detail_processing: wait_for_build_beta_detail_processing)
+
+        if build && !is_processed
           UI.message("Waiting for App Store Connect to finish processing the new build (#{build.app_version} - #{build.version}) for #{build.platform}")
-        elsif build && build.processed?
+        elsif build && is_processed
           UI.success("Successfully finished processing the build #{build.app_version} - #{build.version} for #{build.platform}")
         else
           UI.message("Waiting for the build to show up in the build list - this may take a few minutes (check your email for processing issues if this continues)")

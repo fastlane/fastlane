@@ -16,7 +16,7 @@ module Pilot
       should_login_in_start = options[:apple_id].nil?
       start(options, should_login: should_login_in_start)
 
-      UI.user_error!("No ipa file given") unless config[:ipa]
+      UI.user_error!("No ipa or pkg file given") if config[:ipa].nil? && config[:pkg].nil?
 
       check_for_changelog_or_whats_new!(options)
 
@@ -25,10 +25,17 @@ module Pilot
       dir = Dir.mktmpdir
 
       platform = fetch_app_platform
-      package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_app_id,
+      if options[:ipa]
+        package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_app_id,
                                                                       ipa_path: options[:ipa],
                                                                   package_path: dir,
                                                                       platform: platform)
+      else
+        package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(app_id: fetch_app_id,
+                                                                        pkg_path: options[:pkg],
+                                                                    package_path: dir,
+                                                                        platform: platform)
+      end
 
       transporter = transporter_for_selected_team(options)
       result = transporter.upload(package_path: package_path)
@@ -94,6 +101,9 @@ module Pilot
       if config[:ipa]
         app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
         app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
+      elsif config[:pkg]
+        app_version = FastlaneCore::PkgFileAnalyser.fetch_app_version(config[:pkg])
+        app_build = FastlaneCore::PkgFileAnalyser.fetch_app_build(config[:pkg])
       else
         app_version = config[:app_version]
         app_build = config[:build_number]
@@ -108,7 +118,8 @@ module Pilot
         timeout_duration: config[:wait_processing_timeout_duration],
         return_when_build_appears: return_when_build_appears,
         return_spaceship_testflight_build: false,
-        select_latest: config[:distribute_only]
+        select_latest: config[:distribute_only],
+        wait_for_build_beta_detail_processing: true
       )
 
       unless latest_build.app_version == app_version && latest_build.version == app_build

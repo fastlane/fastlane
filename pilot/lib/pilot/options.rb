@@ -48,7 +48,6 @@ module Pilot
                                      env_name: "PILOT_PLATFORM",
                                      description: "The platform to use (optional)",
                                      optional: true,
-                                     default_value: 'ios',
                                      verify_block: proc do |value|
                                        UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include?(value)
                                      end),
@@ -82,6 +81,26 @@ module Pilot
                                        value = File.expand_path(value)
                                        UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with?(".ipa")
+                                     end,
+                                     conflicting_options: [:pkg],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'ipa' and '#{value.key}' options in one run.")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :pkg,
+                                     short_option: "-P",
+                                     optional: true,
+                                     env_name: "PILOT_PKG",
+                                     description: "Path to your pkg file",
+                                     code_gen_sensitive: true,
+                                     default_value: Dir["*.pkg"].sort_by { |x| File.mtime(x) }.last,
+                                     default_value_dynamic: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not find pkg file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                       UI.user_error!("'#{value}' doesn't seem to be a pkg file") unless value.end_with?(".pkg")
+                                     end,
+                                     conflicting_options: [:ipa],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'pkg' and '#{value.key}' options in one run.")
                                      end),
 
         # app review info

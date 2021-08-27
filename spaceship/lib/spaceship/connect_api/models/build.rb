@@ -86,6 +86,10 @@ module Spaceship
         return build_beta_detail.nil? == false && build_beta_detail.ready_for_internal_testing?
       end
 
+      def ready_for_external_testing?
+        return build_beta_detail.nil? == false && build_beta_detail.ready_for_external_testing?
+      end
+
       def ready_for_beta_submission?
         raise "No build_beta_detail included" unless build_beta_detail
         return build_beta_detail.ready_for_beta_submission?
