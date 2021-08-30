@@ -30,7 +30,7 @@ module Match
       UI.important("You can now run `fastlane match development`, `fastlane match adhoc`, `fastlane match enterprise` and `fastlane match appstore`")
       UI.message("On the first run for each environment it will create the provisioning profiles and")
       UI.message("certificates for you. From then on, it will automatically import the existing profiles.")
-      UI.message("For more information visit https://docs.fastlane.tools/actions/match/")
+      UI.message("For more information visit https://docs.fastlane.tools/generated/actions/match/")
     end
 
     def storage_options

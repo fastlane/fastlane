@@ -3,7 +3,7 @@
 //
 // For a list of all available actions, check out
 //
-//     https://docs.fastlane.tools/actions
+//     https://docs.fastlane.tools/generated/actions
 //
 
 import Foundation

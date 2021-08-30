@@ -2599,7 +2599,7 @@ public func carthage(command: String = "bootstrap",
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - platform: Set the provisioning profile's platform (ios, macos, tvos)
 
- **Important**: It is recommended to use [match](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
+ **Important**: It is recommended to use [match](https://docs.fastlane.tools/generated/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
  Use this action to download the latest code signing identity.
  */
 public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -3112,7 +3112,7 @@ public func cocoapods(repoUpdate: OptionalConfigValue<Bool> = .fastlaneDefault(f
  >|
  Then commits those files to the repo.
  Customize the message with the `:message` option. It defaults to 'Version Bump'.
- If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [clean_build_artifacts](https://docs.fastlane.tools/actions/clean_build_artifacts/) action to clean those temporary files up before running this action.
+ If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [clean_build_artifacts](https://docs.fastlane.tools/generated/actions/clean_build_artifacts/) action to clean those temporary files up before running this action.
  */
 public func commitVersionBump(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               xcodeproj: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -3309,7 +3309,7 @@ public func createAppOnManagedPlayStore(jsonKey: OptionalConfigValue<String?> = 
 
  Create new apps on App Store Connect and Apple Developer Portal via _produce_.
  If the app already exists, `create_app_online` will not do anything.
- For more information about _produce_, visit its documentation page: [https://docs.fastlane.tools/actions/produce/](https://docs.fastlane.tools/actions/produce/).
+ For more information about _produce_, visit its documentation page: [https://docs.fastlane.tools/generated/actions/produce/](https://docs.fastlane.tools/generated/actions/produce/).
  */
 public func createAppOnline(username: String,
                             appIdentifier: String,
@@ -4157,7 +4157,7 @@ public func downloadDsyms(username: String,
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - timeout: Timeout for read, open, and send (in seconds)
 
- More information: https://docs.fastlane.tools/actions/download_from_play_store/
+ More information: https://docs.fastlane.tools/generated/actions/download_from_play_store/
  */
 public func downloadFromPlayStore(packageName: String,
                                   versionName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -4499,7 +4499,7 @@ public func flock(message: String,
    - usePlatform: Choose a platform, the valid options are IOS, ANDROID and ANY (default is either general platform defined in the fastfile or IOS to ensure backward compatibility)
    - path: The path to the directory containing the screenshots
 
- Uses [frameit](https://docs.fastlane.tools/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.
+ Uses [frameit](https://docs.fastlane.tools/generated/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.
  You can add background and titles to the framed screenshots as well.
  */
 public func frameScreenshots(white: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
@@ -4583,7 +4583,7 @@ public func frameScreenshots(white: OptionalConfigValue<Bool?> = .fastlaneDefaul
    - usePlatform: Choose a platform, the valid options are IOS, ANDROID and ANY (default is either general platform defined in the fastfile or IOS to ensure backward compatibility)
    - path: The path to the directory containing the screenshots
 
- Uses [frameit](https://docs.fastlane.tools/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.
+ Uses [frameit](https://docs.fastlane.tools/generated/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.
  You can add background and titles to the framed screenshots as well.
  */
 public func frameit(white: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
@@ -4721,7 +4721,7 @@ public func getBuildNumberRepository(useHgRevisionNumber: OptionalConfigValue<Bo
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - platform: Set the provisioning profile's platform (ios, macos, tvos)
 
- **Important**: It is recommended to use [match](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
+ **Important**: It is recommended to use [match](https://docs.fastlane.tools/generated/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your certificates. Use _cert_ directly only if you want full control over what's going on and know more about codesigning.
  Use this action to download the latest code signing identity.
  */
 public func getCertificates(development: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -4913,7 +4913,7 @@ public func getGithubRelease(url: String,
  If you haven't done so before, start by following the first two steps of Googles ["Get started with custom app publishing"](https://developers.google.com/android/work/play/custom-app-api/get-started) -> ["Preliminary setup"](https://developers.google.com/android/work/play/custom-app-api/get-started#preliminary_setup) instructions:
  "[Enable the Google Play Custom App Publishing API](https://developers.google.com/android/work/play/custom-app-api/get-started#enable_the_google_play_custom_app_publishing_api)" and "[Create a service account](https://developers.google.com/android/work/play/custom-app-api/get-started#create_a_service_account)".
  You need the "service account's private key file" to continue.
- Run the action and supply the "private key file" to it as the `json_key` parameter. The command will output a URL to visit. After logging in you are redirected to a page that outputs your "Developer Account ID" - take note of that, you will need it to be able to use [`create_app_on_managed_play_store`](https://docs.fastlane.tools/actions/create_app_on_managed_play_store/).
+ Run the action and supply the "private key file" to it as the `json_key` parameter. The command will output a URL to visit. After logging in you are redirected to a page that outputs your "Developer Account ID" - take note of that, you will need it to be able to use [`create_app_on_managed_play_store`](https://docs.fastlane.tools/generated/actions/create_app_on_managed_play_store/).
  */
 public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                 jsonKeyData: OptionalConfigValue<String?> = .fastlaneDefault(nil))
@@ -4959,7 +4959,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
 
  - returns: The UUID of the profile sigh just fetched/generated
 
- **Note**: It is recommended to use [match](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use _sigh_ directly only if you want full control over what's going on and know more about codesigning.
+ **Note**: It is recommended to use [match](https://docs.fastlane.tools/generated/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use _sigh_ directly only if you want full control over what's going on and know more about codesigning.
  */
 @discardableResult public func getProvisioningProfile(adhoc: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                       developerId: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -5375,7 +5375,7 @@ public func githubApi(serverUrl: String = "https://api.github.com",
 
  - returns: Array of strings representing the release names for the given Google Play track
 
- More information: [https://docs.fastlane.tools/actions/supply/](https://docs.fastlane.tools/actions/supply/)
+ More information: [https://docs.fastlane.tools/generated/actions/supply/](https://docs.fastlane.tools/generated/actions/supply/)
  */
 public func googlePlayTrackReleaseNames(packageName: String,
                                         track: String = "production",
@@ -5424,7 +5424,7 @@ public func googlePlayTrackReleaseNames(packageName: String,
 
  - returns: Array of integers representing the version codes for the given Google Play track
 
- More information: [https://docs.fastlane.tools/actions/supply/](https://docs.fastlane.tools/actions/supply/)
+ More information: [https://docs.fastlane.tools/generated/actions/supply/](https://docs.fastlane.tools/generated/actions/supply/)
  */
 public func googlePlayTrackVersionCodes(packageName: String,
                                         track: String = "production",
@@ -5753,7 +5753,7 @@ public func hgAddTag(tag: String) {
    - testDirtyFiles: A list of dirty files passed in for testing
    - testExpectedFiles: A list of expected changed files passed in for testing
 
- The mercurial equivalent of the [commit_version_bump](https://docs.fastlane.tools/actions/commit_version_bump/) git action. Like the git version, it is useful in conjunction with [`increment_build_number`](https://docs.fastlane.tools/actions/increment_build_number/).
+ The mercurial equivalent of the [commit_version_bump](https://docs.fastlane.tools/generated/actions/commit_version_bump/) git action. Like the git version, it is useful in conjunction with [`increment_build_number`](https://docs.fastlane.tools/generated/actions/increment_build_number/).
  It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:|
  |
  >- All `.plist` files|
@@ -5761,7 +5761,7 @@ public func hgAddTag(tag: String) {
  >|
  Then commits those files to the repo.
  Customize the message with the `:message` option, defaults to 'Version Bump'
- If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [clean_build_artifacts](https://docs.fastlane.tools/actions/clean_build_artifacts/) action to clean those temporary files up before running this action.
+ If you have other uncommitted changes in your repo, this action will fail. If you started off in a clean repo, and used the _ipa_ and or _sigh_ actions, then you can use the [clean_build_artifacts](https://docs.fastlane.tools/generated/actions/clean_build_artifacts/) action to clean those temporary files up before running this action.
  */
 public func hgCommitVersionBump(message: String = "Version Bump",
                                 xcodeproj: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -5789,7 +5789,7 @@ public func hgCommitVersionBump(message: String = "Version Bump",
 /**
  Raises an exception if there are uncommitted hg changes
 
- Along the same lines as the [ensure_git_status_clean](https://docs.fastlane.tools/actions/ensure_git_status_clean/) action, this is a sanity check to ensure the working mercurial repo is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block.
+ Along the same lines as the [ensure_git_status_clean](https://docs.fastlane.tools/generated/actions/ensure_git_status_clean/) action, this is a sanity check to ensure the working mercurial repo is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block.
  */
 public func hgEnsureCleanStatus() {
     let args: [RubyCommand.Argument] = []
@@ -5804,7 +5804,7 @@ public func hgEnsureCleanStatus() {
    - force: Force push to remote
    - destination: The destination to push to
 
- The mercurial equivalent of [push_to_git_remote](https://docs.fastlane.tools/actions/push_to_git_remote/). Pushes your local commits to a remote mercurial repo. Useful when local changes such as adding a version bump commit or adding a tag are part of your lane’s actions.
+ The mercurial equivalent of [push_to_git_remote](https://docs.fastlane.tools/generated/actions/push_to_git_remote/). Pushes your local commits to a remote mercurial repo. Useful when local changes such as adding a version bump commit or adding a tag are part of your lane’s actions.
  */
 public func hgPush(force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    destination: String = "")
@@ -6659,7 +6659,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - verbose: Print out extra information and all commands
 
- More information: https://docs.fastlane.tools/actions/match/
+ More information: https://docs.fastlane.tools/generated/actions/match/
  */
 public func match(type: String = matchfile.type,
                   additionalCertTypes: OptionalConfigValue<[String]?> = .fastlaneDefault(matchfile.additionalCertTypes),
@@ -6854,7 +6854,7 @@ public func match(type: String = matchfile.type,
  Don't worry, apps that are already available in the App Store / TestFlight will still work.
  Builds distributed via Ad Hoc or Enterprise will be disabled after nuking your account, so you'll have to re-upload a new build.
  After clearing your account you'll start from a clean state, and you can run match to generate your certificates and profiles again.
- More information: https://docs.fastlane.tools/actions/match/
+ More information: https://docs.fastlane.tools/generated/actions/match/
  */
 public func matchNuke(type: String = "development",
                       additionalCertTypes: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -7018,7 +7018,7 @@ public func minFastlaneVersion() {
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
 
- The options are the same as `:enable_services` in the [produce action](https://docs.fastlane.tools/actions/produce/#parameters_1)
+ The options are the same as `:enable_services` in the [produce action](https://docs.fastlane.tools/generated/actions/produce/#parameters_1)
  */
 public func modifyServices(username: String,
                            appIdentifier: String,
@@ -7539,7 +7539,7 @@ public func pem(development: OptionalConfigValue<Bool> = .fastlaneDefault(false)
    - waitForUploadedBuild: **DEPRECATED!** No longer needed with the transition over to the App Store Connect API - Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used
    - rejectBuildWaitingForReview: Expire previous if it's 'waiting for review'
 
- More details can be found on https://docs.fastlane.tools/actions/pilot/.
+ More details can be found on https://docs.fastlane.tools/generated/actions/pilot/.
  This integration will only do the TestFlight upload.
  */
 public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -7993,7 +7993,7 @@ public func println(message: OptionalConfigValue<String?> = .fastlaneDefault(nil
 
  Create new apps on App Store Connect and Apple Developer Portal via _produce_.
  If the app already exists, `create_app_online` will not do anything.
- For more information about _produce_, visit its documentation page: [https://docs.fastlane.tools/actions/produce/](https://docs.fastlane.tools/actions/produce/).
+ For more information about _produce_, visit its documentation page: [https://docs.fastlane.tools/generated/actions/produce/](https://docs.fastlane.tools/generated/actions/produce/).
  */
 public func produce(username: String,
                     appIdentifier: String,
@@ -8590,7 +8590,7 @@ public func rubyVersion() {
    - slackIconUrl: Overrides the webhook's image property if slack_use_webhook_configured_username_and_icon is false
    - skipSlack: Don't publish to slack, even when an URL is given
    - slackOnlyOnFailure: Only post on Slack if the tests fail
-   - slackDefaultPayloads: Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack
+   - slackDefaultPayloads: Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/generated/actions/slack
    - destination: Use only if you're a pro, use the other options instead
    - catalystPlatform: Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
@@ -8602,7 +8602,7 @@ public func rubyVersion() {
    - numberOfRetries: The number of times a test can fail before scan should stop retrying
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
- More information: https://docs.fastlane.tools/actions/scan/
+ More information: https://docs.fastlane.tools/generated/actions/scan/
  */
 public func runTests(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      project: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -8995,7 +8995,7 @@ public func say(text: [String],
    - slackIconUrl: Overrides the webhook's image property if slack_use_webhook_configured_username_and_icon is false
    - skipSlack: Don't publish to slack, even when an URL is given
    - slackOnlyOnFailure: Only post on Slack if the tests fail
-   - slackDefaultPayloads: Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack
+   - slackDefaultPayloads: Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/generated/actions/slack
    - destination: Use only if you're a pro, use the other options instead
    - catalystPlatform: Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
@@ -9007,7 +9007,7 @@ public func say(text: [String],
    - numberOfRetries: The number of times a test can fail before scan should stop retrying
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
- More information: https://docs.fastlane.tools/actions/scan/
+ More information: https://docs.fastlane.tools/generated/actions/scan/
  */
 public func scan(workspace: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.workspace),
                  project: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.project),
@@ -9650,7 +9650,7 @@ public func setupCircleCi(force: OptionalConfigValue<Bool> = .fastlaneDefault(fa
  >|
  This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory.
  The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), the selected keychain will be automatically unlocked and the selected code signing identity will be used.
- [Match](https://docs.fastlane.tools/actions/match/) will be also set up to use the unlocked keychain and set in read-only mode, if its environment variables were not yet defined.
+ [Match](https://docs.fastlane.tools/generated/actions/match/) will be also set up to use the unlocked keychain and set in read-only mode, if its environment variables were not yet defined.
  By default this action will only work when _fastlane_ is executed on a CI system.
  */
 public func setupJenkins(force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -9774,7 +9774,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
 
  - returns: The UUID of the profile sigh just fetched/generated
 
- **Note**: It is recommended to use [match](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use _sigh_ directly only if you want full control over what's going on and know more about codesigning.
+ **Note**: It is recommended to use [match](https://docs.fastlane.tools/generated/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use _sigh_ directly only if you want full control over what's going on and know more about codesigning.
  */
 @discardableResult public func sigh(adhoc: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                     developerId: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -10349,7 +10349,7 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
  - returns: The exit code of the sonar-scanner binary
 
  See [http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner](http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) for details.
- It can process unit test results if formatted as junit report as shown in [xctest](https://docs.fastlane.tools/actions/xctest/) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by the [slather](https://docs.fastlane.tools/actions/slather/) action.
+ It can process unit test results if formatted as junit report as shown in [xctest](https://docs.fastlane.tools/generated/actions/xctest/) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by the [slather](https://docs.fastlane.tools/generated/actions/slather/) action.
  */
 public func sonar(projectConfigurationPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   projectKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -10710,7 +10710,7 @@ public func ssh(username: String,
    - obbPatchFileSize: Size of 'patch' expansion file in bytes
    - ackBundleInstallationWarning: Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 150MB
 
- More information: https://docs.fastlane.tools/actions/supply/
+ More information: https://docs.fastlane.tools/generated/actions/supply/
  */
 public func supply(packageName: String,
                    versionName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -10952,7 +10952,7 @@ public func swiftlint(mode: String = "lint",
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - verbose: Print out extra information and all commands
 
- More information: https://docs.fastlane.tools/actions/match/
+ More information: https://docs.fastlane.tools/generated/actions/match/
  */
 public func syncCodeSigning(type: String = "development",
                             additionalCertTypes: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -11221,7 +11221,7 @@ public func testfairy(apiKey: String,
    - waitForUploadedBuild: **DEPRECATED!** No longer needed with the transition over to the App Store Connect API - Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used
    - rejectBuildWaitingForReview: Expire previous if it's 'waiting for review'
 
- More details can be found on https://docs.fastlane.tools/actions/pilot/.
+ More details can be found on https://docs.fastlane.tools/generated/actions/pilot/.
  This integration will only do the TestFlight upload.
  */
 public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -12338,7 +12338,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
    - obbPatchFileSize: Size of 'patch' expansion file in bytes
    - ackBundleInstallationWarning: Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 150MB
 
- More information: https://docs.fastlane.tools/actions/supply/
+ More information: https://docs.fastlane.tools/generated/actions/supply/
  */
 public func uploadToPlayStore(packageName: String,
                               versionName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -12478,7 +12478,7 @@ public func uploadToPlayStore(packageName: String,
 
  - returns: Returns a string containing the download URL for the uploaded APK/AAB (or array of strings if multiple were uploaded).
 
- More information: https://docs.fastlane.tools/actions/upload_to_play_store_internal_app_sharing/
+ More information: https://docs.fastlane.tools/generated/actions/upload_to_play_store_internal_app_sharing/
  */
 public func uploadToPlayStoreInternalAppSharing(packageName: String,
                                                 jsonKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -12557,7 +12557,7 @@ public func uploadToPlayStoreInternalAppSharing(packageName: String,
    - waitForUploadedBuild: **DEPRECATED!** No longer needed with the transition over to the App Store Connect API - Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used
    - rejectBuildWaitingForReview: Expire previous if it's 'waiting for review'
 
- More details can be found on https://docs.fastlane.tools/actions/pilot/.
+ More details can be found on https://docs.fastlane.tools/generated/actions/pilot/.
  This integration will only do the TestFlight upload.
  */
 public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -12979,7 +12979,7 @@ public func xcodeSelect() {
 /**
  Use the `xcodebuild` command to build and sign your app
 
- **Note**: `xcodebuild` is a complex command, so it is recommended to use [_gym_](https://docs.fastlane.tools/actions/gym/) for building your ipa file and [_scan_](https://docs.fastlane.tools/actions/scan/) for testing your app instead.
+ **Note**: `xcodebuild` is a complex command, so it is recommended to use [_gym_](https://docs.fastlane.tools/generated/actions/gym/) for building your ipa file and [_scan_](https://docs.fastlane.tools/generated/actions/scan/) for testing your app instead.
  */
 public func xcodebuild() {
     let args: [RubyCommand.Argument] = []
@@ -13129,7 +13129,7 @@ public func xctest() {
 
  You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [Homebrew](http://brew.sh).
  It is recommended to store the build configuration in the `.xctool-args` file.
- More information: [https://docs.fastlane.tools/actions/xctool/](https://docs.fastlane.tools/actions/xctool/).
+ More information: [https://docs.fastlane.tools/generated/actions/xctool/](https://docs.fastlane.tools/generated/actions/xctool/).
  */
 public func xctool() {
     let args: [RubyCommand.Argument] = []

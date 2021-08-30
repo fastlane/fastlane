@@ -22,7 +22,7 @@ module PEM
       program :description, 'CLI for \'PEM\' - Automatically generate and renew your push notification profiles'
       program :help, 'Author', 'Felix Krause <pem@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/pem/'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/generated/actions/pem/'
       program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }

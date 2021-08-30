@@ -75,7 +75,7 @@ profile.download
 
 Before _spaceship_, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With spaceship it is possible to directly access the underlying APIs using a simple HTTP client only.
 
-Using spaceship, the execution time of [_sigh_](https://docs.fastlane.tools/actions/sigh/) was reduced from over 1 minute to less than 5 seconds.
+Using spaceship, the execution time of [_sigh_](https://docs.fastlane.tools/generated/actions/sigh/) was reduced from over 1 minute to less than 5 seconds.
 
 ![assets/SpaceshipRecording.gif](assets/SpaceshipRecording.gif)
 

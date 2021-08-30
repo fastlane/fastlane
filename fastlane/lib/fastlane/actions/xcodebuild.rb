@@ -392,7 +392,7 @@ module Fastlane
       end
 
       def self.details
-        "**Note**: `xcodebuild` is a complex command, so it is recommended to use [_gym_](https://docs.fastlane.tools/actions/gym/) for building your ipa file and [_scan_](https://docs.fastlane.tools/actions/scan/) for testing your app instead."
+        "**Note**: `xcodebuild` is a complex command, so it is recommended to use [_gym_](https://docs.fastlane.tools/generated/actions/gym/) for building your ipa file and [_scan_](https://docs.fastlane.tools/generated/actions/scan/) for testing your app instead."
       end
 
       def self.author
@@ -585,7 +585,7 @@ module Fastlane
 
     class XctestAction < Action
       def self.run(params)
-        UI.important("Have you seen the new 'scan' tool to run tests? https://docs.fastlane.tools/actions/scan/")
+        UI.important("Have you seen the new 'scan' tool to run tests? https://docs.fastlane.tools/generated/actions/scan/")
         params_hash = params || {}
         params_hash[:build] = true
         params_hash[:test] = true

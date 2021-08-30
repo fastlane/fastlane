@@ -23,7 +23,7 @@ module Sigh
       program :description, 'CLI for \'sigh\' - Because you would rather spend your time building stuff than fighting provisioning'
       program :help, 'Author', 'Felix Krause <sigh@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/sigh/'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/generated/actions/sigh/'
       program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }

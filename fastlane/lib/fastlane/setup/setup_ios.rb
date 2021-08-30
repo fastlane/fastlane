@@ -244,13 +244,13 @@ module Fastlane
       if self.is_swift_fastfile
         append_lane(["func customLane() {",
                      "desc(\"Description of what the lane does\")",
-                     "\t// add actions here: https://docs.fastlane.tools/actions",
+                     "\t// add actions here: https://docs.fastlane.tools/generated/actions",
                      "}"])
         self.lane_to_mention = "custom" # lane is part of the notation
       else
         append_lane(["desc \"Description of what the lane does\"",
                      "lane :custom_lane do",
-                     "  # add actions here: https://docs.fastlane.tools/actions",
+                     "  # add actions here: https://docs.fastlane.tools/generated/actions",
                      "end"])
         self.lane_to_mention = "custom_lane"
       end

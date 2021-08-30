@@ -379,7 +379,7 @@ apple_id(ENV['PRODUCE_APPLE_ID'])
 
 This will tell _deliver_, which `App ID` to use, since the app is not yet available in the App Store.
 
-You'll still have to fill out the remaining information (like screenshots, app description and pricing). You can use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload your app metadata using a CLI
+You'll still have to fill out the remaining information (like screenshots, app description and pricing). You can use [_deliver_](https://docs.fastlane.tools/generated/actions/deliver/) to upload your app metadata using a CLI
 
 ## How is my password stored?
 

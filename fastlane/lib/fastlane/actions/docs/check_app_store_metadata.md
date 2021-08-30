@@ -72,7 +72,7 @@ custom_text(data: ["chrome", "webos"],
 
 ### Use with [_fastlane_](https://fastlane.tools)
 
-_precheck_ is fully integrated with [_deliver_](https://docs.fastlane.tools/actions/deliver/) another [_fastlane_](https://fastlane.tools) tool.
+_precheck_ is fully integrated with [_deliver_](https://docs.fastlane.tools/generated/actions/deliver/) another [_fastlane_](https://fastlane.tools) tool.
 
 Update your `Fastfile` to contain the following code:
 

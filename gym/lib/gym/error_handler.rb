@@ -15,7 +15,7 @@ module Gym
         when /Your build settings specify a provisioning profile with the UUID/
           print("Invalid code signing settings")
           print("Your project defines a provisioning profile which doesn't exist on your local machine")
-          print("You can use sigh (https://docs.fastlane.tools/actions/sigh/) to download and install the provisioning profile")
+          print("You can use sigh (https://docs.fastlane.tools/generated/actions/sigh/) to download and install the provisioning profile")
           print("Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/")
         when /Provisioning profile does not match bundle identifier/
           print("Invalid code signing settings")
@@ -26,12 +26,12 @@ module Gym
         when /provisioning profiles matching the bundle identifier .(.*)./ # the . around the (.*) are for the strange "
           print("You don't have the provisioning profile for '#{$1}' installed on the local machine")
           print("Make sure you have the profile on this computer and it's properly installed")
-          print("You can use sigh (https://docs.fastlane.tools/actions/sigh/) to download and install the provisioning profile")
+          print("You can use sigh (https://docs.fastlane.tools/generated/actions/sigh/) to download and install the provisioning profile")
           print("Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/")
         when /matching the bundle identifier .(.*). were found/ # the . around the (.*) are for the strange "
           print("You don't have a provisioning profile for the bundle identifier '#{$1}' installed on the local machine")
           print("Make sure you have the profile on this computer and it's properly installed")
-          print("You can use sigh (https://docs.fastlane.tools/actions/sigh/) to download and install the provisioning profile")
+          print("You can use sigh (https://docs.fastlane.tools/generated/actions/sigh/) to download and install the provisioning profile")
           print("Follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/")
 
         # Insert more code signing specific errors here
@@ -98,7 +98,7 @@ module Gym
         when /requires a provisioning profile/
           print("No provisioning profile provided")
           print("Make sure to pass a valid provisioning for each required target")
-          print("Check out the docs on how to fix this: https://docs.fastlane.tools/actions/gym/#export-options")
+          print("Check out the docs on how to fix this: https://docs.fastlane.tools/generated/actions/gym/#export-options")
         # insert more specific code signing errors here
         when /Codesign check fails/
           print("A general code signing error occurred. Make sure you passed a valid")

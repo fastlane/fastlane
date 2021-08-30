@@ -68,7 +68,7 @@ module Fastlane
           puts("==========================================\n".deprecated)
         end
 
-        puts("More information can be found on https://docs.fastlane.tools/actions/#{filter}")
+        puts("More information can be found on https://docs.fastlane.tools/generated/actions/#{filter}")
         puts("")
       else
         puts("Couldn't find action for the given filter.".red)

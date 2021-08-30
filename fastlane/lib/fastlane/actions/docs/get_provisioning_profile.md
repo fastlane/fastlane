@@ -28,7 +28,7 @@ _sigh_ can create, renew, download and repair provisioning profiles (with one co
 - Support for **multiple Teams**
 - Support for **Enterprise Profiles**
 
-To automate iOS Push profiles you can use [_pem_](https://docs.fastlane.tools/actions/pem/).
+To automate iOS Push profiles you can use [_pem_](https://docs.fastlane.tools/generated/actions/pem/).
 
 
 ### Why not let Xcode do the work?
@@ -44,7 +44,7 @@ See _sigh_ in action:
 
 # Usage
 
-**Note**: It is recommended to use [_match_](https://docs.fastlane.tools/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use _sigh_ directly only if you want full control over what's going on and know more about codesigning.
+**Note**: It is recommended to use [_match_](https://docs.fastlane.tools/generated/actions/match/) according to the [codesigning.guide](https://codesigning.guide) for generating and maintaining your provisioning profiles. Use _sigh_ directly only if you want full control over what's going on and know more about codesigning.
 
 ```no-highlight
 fastlane sigh
@@ -133,7 +133,7 @@ fastlane action sigh
 
 ### Use with [_fastlane_](https://fastlane.tools)
 
-_sigh_ becomes really interesting when used in [_fastlane_](https://fastlane.tools) in combination with [_cert_](https://docs.fastlane.tools/actions/cert/).
+_sigh_ becomes really interesting when used in [_fastlane_](https://fastlane.tools) in combination with [_cert_](https://docs.fastlane.tools/generated/actions/cert/).
 
 Update your `Fastfile` to contain the following code:
 
@@ -196,7 +196,7 @@ fastlane sigh manage -p "iOS\ ?Team Provisioning Profile:"
 
 Run `fastlane action sigh` to get a list of all available environment variables.
 
-If you're using [_cert_](https://docs.fastlane.tools/actions/cert/) in combination with [_fastlane_](https://fastlane.tools) the signing certificate will automatically be selected for you. (make sure to run _cert_ before _sigh_)
+If you're using [_cert_](https://docs.fastlane.tools/generated/actions/cert/) in combination with [_fastlane_](https://fastlane.tools) the signing certificate will automatically be selected for you. (make sure to run _cert_ before _sigh_)
 
 # How does it work?
 
@@ -216,7 +216,7 @@ It will show you `mobileprovision` files like this:
 
 ## App Identifier couldn't be found
 
-If you also want to create a new App Identifier on the Apple Developer Portal, check out [_produce_](https://docs.fastlane.tools/actions/produce/), which does exactly that.
+If you also want to create a new App Identifier on the Apple Developer Portal, check out [_produce_](https://docs.fastlane.tools/generated/actions/produce/), which does exactly that.
 
 ## What happens to my Xcode managed profiles?
 

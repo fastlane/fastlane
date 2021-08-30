@@ -10,7 +10,7 @@
 </h4>
 <hr />
 
-_snapshot_ generates localized iOS, tvOS, and watchOS screenshots for different device types and languages for the App Store and can be uploaded using ([_deliver_](https://docs.fastlane.tools/actions/deliver/)).
+_snapshot_ generates localized iOS, tvOS, and watchOS screenshots for different device types and languages for the App Store and can be uploaded using ([_deliver_](https://docs.fastlane.tools/generated/actions/deliver/)).
 
 You have to manually create 20 (languages) x 6 (devices) x 5 (screenshots) = **600 screenshots**.
 
@@ -20,7 +20,7 @@ It's hard to get everything right!
 - No loading indicators
 - Same content / screens
 - [Clean Status Bar](#use-a-clean-status-bar)
-- Uploading screenshots ([_deliver_](https://docs.fastlane.tools/actions/deliver/) is your friend)
+- Uploading screenshots ([_deliver_](https://docs.fastlane.tools/generated/actions/deliver/) is your friend)
 
 More information about [creating perfect screenshots](https://krausefx.com/blog/creating-perfect-app-store-screenshots-of-your-ios-app).
 
@@ -44,7 +44,7 @@ _snapshot_ runs completely in the background - you can do something else, while 
 - Take screenshots in multiple device simulators concurrently to cut down execution time (Xcode 9 only)
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
-- Integrates with [_fastlane_](https://fastlane.tools) and [_deliver_](https://docs.fastlane.tools/actions/deliver/)
+- Integrates with [_fastlane_](https://fastlane.tools) and [_deliver_](https://docs.fastlane.tools/generated/actions/deliver/)
 - Generates a beautiful web page, which shows all screenshots on all devices. This is perfect to send to QA or the marketing team
 - _snapshot_ automatically waits for network requests to be finished before taking a screenshot (we don't want loading images in the App Store screenshots)
 
@@ -321,7 +321,7 @@ Radar [23062925](https://openradar.appspot.com/radar?id=5056366381105152) has be
 
 ## Frame the screenshots
 
-If you want to add frames around the screenshots and even put a title on top, check out [_frameit_](https://docs.fastlane.tools/actions/frameit/).
+If you want to add frames around the screenshots and even put a title on top, check out [_frameit_](https://docs.fastlane.tools/generated/actions/frameit/).
 
 ## Available language codes
 ```ruby

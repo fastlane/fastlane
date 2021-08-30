@@ -26,7 +26,7 @@ module Screengrab
       program :description, 'CLI for \'screengrab\' - Automate taking localized screenshots of your Android app on emulators or real devices'
       program :help, 'Authors', 'Andrea Falcone <asfalcone@google.com>, Michael Furtak <mfurtak@google.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/screengrab/'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/generated/actions/screengrab/'
       program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }

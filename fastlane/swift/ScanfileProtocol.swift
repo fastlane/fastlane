@@ -185,7 +185,7 @@ public protocol ScanfileProtocol: class {
     /// Only post on Slack if the tests fail
     var slackOnlyOnFailure: Bool { get }
 
-    /// Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack
+    /// Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/generated/actions/slack
     var slackDefaultPayloads: [String]? { get }
 
     /// Use only if you're a pro, use the other options instead

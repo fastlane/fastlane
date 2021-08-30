@@ -46,7 +46,7 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://docs.fastlane.tools/actions/scan/"
+        "More information: https://docs.fastlane.tools/generated/actions/scan/"
       end
 
       def self.author

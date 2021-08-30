@@ -149,7 +149,7 @@ declaration.update(attributes: {
 })
 # Available values:
 # https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json
-# https://docs.fastlane.tools/actions/deliver/#reference (Open "View all available categories, languages, etc.")
+# https://docs.fastlane.tools/generated/actions/deliver/#reference (Open "View all available categories, languages, etc.")
 
 ```
 

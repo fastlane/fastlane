@@ -21,7 +21,7 @@ module Fastlane
       end
 
       def self.details
-        "Along the same lines as the [ensure_git_status_clean](https://docs.fastlane.tools/actions/ensure_git_status_clean/) action, this is a sanity check to ensure the working mercurial repo is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block."
+        "Along the same lines as the [ensure_git_status_clean](https://docs.fastlane.tools/generated/actions/ensure_git_status_clean/) action, this is a sanity check to ensure the working mercurial repo is clean. Especially useful to put at the beginning of your Fastfile in the `before_all` block."
       end
 
       def self.output

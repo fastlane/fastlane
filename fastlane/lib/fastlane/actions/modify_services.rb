@@ -116,7 +116,7 @@ module Fastlane
 
       def self.details
         [
-          "The options are the same as `:enable_services` in the [produce action](https://docs.fastlane.tools/actions/produce/#parameters_1)"
+          "The options are the same as `:enable_services` in the [produce action](https://docs.fastlane.tools/generated/actions/produce/#parameters_1)"
         ].join("\n")
       end
 

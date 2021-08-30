@@ -48,7 +48,7 @@ module Deliver
       program :description, Deliver::DESCRIPTION
       program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/deliver/'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/generated/actions/deliver/'
       program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }

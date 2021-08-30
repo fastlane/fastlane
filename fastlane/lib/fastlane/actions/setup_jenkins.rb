@@ -107,7 +107,7 @@ module Fastlane
           list,
           "This action helps with Jenkins integration. Creates own derived data for each job. All build results like IPA files and archives will be stored in the `./output` directory.",
           "The action also works with [Keychains and Provisioning Profiles Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Keychains+and+Provisioning+Profiles+Plugin), the selected keychain will be automatically unlocked and the selected code signing identity will be used.",
-          "[Match](https://docs.fastlane.tools/actions/match/) will be also set up to use the unlocked keychain and set in read-only mode, if its environment variables were not yet defined.",
+          "[Match](https://docs.fastlane.tools/generated/actions/match/) will be also set up to use the unlocked keychain and set in read-only mode, if its environment variables were not yet defined.",
           "By default this action will only work when _fastlane_ is executed on a CI system."
         ].join("\n")
       end

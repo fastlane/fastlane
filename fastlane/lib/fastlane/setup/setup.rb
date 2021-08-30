@@ -322,7 +322,7 @@ module Fastlane
       UI.header("How to customize your Fastfile")
       UI.message("Use a text editor of your choice to open the newly created Fastfile and take a look")
       UI.message("You can now edit the available lanes and actions to customize the setup to fit your needs")
-      UI.message("To get a list of all the available actions, open " + "https://docs.fastlane.tools/actions".cyan)
+      UI.message("To get a list of all the available actions, open " + "https://docs.fastlane.tools/generated/actions".cyan)
       continue_with_enter
     end
 

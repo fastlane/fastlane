@@ -20,7 +20,7 @@ module Snapshot
         UI.error("Found old snapshot configuration file 'snapshot.js'")
         UI.error("You updated to snapshot 1.0 which now uses UI Automation")
         UI.error("Please follow the migration guide: https://github.com/fastlane/fastlane/blob/master/snapshot/MigrationGuide.md")
-        UI.error("And read the updated documentation: https://docs.fastlane.tools/actions/snapshot/")
+        UI.error("And read the updated documentation: https://docs.fastlane.tools/generated/actions/snapshot/")
         sleep(3) # to be sure the user sees this, as compiling clears the screen
       end
 
@@ -126,7 +126,7 @@ module Snapshot
         UI.error("Your Snapshot Helper file is missing, please place a copy")
         UI.error("in your project directory")
         UI.message("More information about Snapshot setup can be found here:")
-        UI.message("https://docs.fastlane.tools/actions/snapshot/#quick-start")
+        UI.message("https://docs.fastlane.tools/generated/actions/snapshot/#quick-start")
         UI.user_error!("Please add a Snapshot Helper file to your project")
         return
       end

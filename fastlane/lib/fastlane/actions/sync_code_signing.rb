@@ -71,7 +71,7 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://docs.fastlane.tools/actions/match/"
+        "More information: https://docs.fastlane.tools/generated/actions/match/"
       end
 
       def self.available_options

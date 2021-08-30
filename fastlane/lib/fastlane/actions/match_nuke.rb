@@ -27,7 +27,7 @@ module Fastlane
           "Don't worry, apps that are already available in the App Store / TestFlight will still work.",
           "Builds distributed via Ad Hoc or Enterprise will be disabled after nuking your account, so you'll have to re-upload a new build.",
           "After clearing your account you'll start from a clean state, and you can run match to generate your certificates and profiles again.",
-          "More information: https://docs.fastlane.tools/actions/match/"
+          "More information: https://docs.fastlane.tools/generated/actions/match/"
         ].join("\n")
       end
 

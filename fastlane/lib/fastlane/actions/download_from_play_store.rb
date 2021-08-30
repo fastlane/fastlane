@@ -20,7 +20,7 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://docs.fastlane.tools/actions/download_from_play_store/"
+        "More information: https://docs.fastlane.tools/generated/actions/download_from_play_store/"
       end
 
       def self.available_options

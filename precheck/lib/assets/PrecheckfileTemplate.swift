@@ -1,5 +1,5 @@
 // For more information about this configuration visit
-// https://docs.fastlane.tools/actions/precheck/#precheckfile
+// https://docs.fastlane.tools/generated/actions/precheck/#precheckfile
 
 // In general, you can use the options available
 // fastlane precheck --help

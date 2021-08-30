@@ -434,7 +434,7 @@ module Scan
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :slack_default_payloads,
                                      env_name: "SCAN_SLACK_DEFAULT_PAYLOADS",
-                                     description: "Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack",
+                                     description: "Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/generated/actions/slack",
                                      optional: true,
                                      type: Array),
 

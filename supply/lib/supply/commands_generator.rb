@@ -19,7 +19,7 @@ module Supply
       program :description, Supply::DESCRIPTION
       program :help, 'Author', 'Felix Krause <supply@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/supply/'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/generated/actions/supply/'
       program :help_formatter, FastlaneCore::HelpFormatter
 
       always_trace!

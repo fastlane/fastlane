@@ -53,7 +53,7 @@ module Fastlane
       def self.details
         [
           "See [http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner](http://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) for details.",
-          "It can process unit test results if formatted as junit report as shown in [xctest](https://docs.fastlane.tools/actions/xctest/) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by the [slather](https://docs.fastlane.tools/actions/slather/) action."
+          "It can process unit test results if formatted as junit report as shown in [xctest](https://docs.fastlane.tools/generated/actions/xctest/) action. It can also integrate coverage reports in Cobertura format, which can be transformed into by the [slather](https://docs.fastlane.tools/generated/actions/slather/) action."
         ].join("\n")
       end
 

@@ -230,7 +230,7 @@ _pilot_ uses the iTunes [Transporter](https://help.apple.com/itc/transporteruser
 DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" pilot ...
 ```
 
-If you are using _pilot_ via the [fastlane action](https://docs.fastlane.tools/actions#pilot), add the following to your `Fastfile`
+If you are using _pilot_ via the [fastlane action](https://docs.fastlane.tools/generated/actions#pilot), add the following to your `Fastfile`
 
 ```no-highlight
 ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV"

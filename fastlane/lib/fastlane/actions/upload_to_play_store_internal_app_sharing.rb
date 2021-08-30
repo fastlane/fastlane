@@ -41,7 +41,7 @@ module Fastlane
       end
 
       def self.details
-        "More information: https://docs.fastlane.tools/actions/upload_to_play_store_internal_app_sharing/"
+        "More information: https://docs.fastlane.tools/generated/actions/upload_to_play_store_internal_app_sharing/"
       end
 
       def self.available_options

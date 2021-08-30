@@ -6,7 +6,7 @@ Originally _deliver_ was designed to be "The Continuous Delivery tool for iOS". 
 
 ### What do I have to do to get my setup working again?
 
-In general, check out the latest documentation for the [Deliverfile](https://docs.fastlane.tools/actions/deliver/).
+In general, check out the latest documentation for the [Deliverfile](https://docs.fastlane.tools/generated/actions/deliver/).
 
 With 1.0 the app will not be submitted to Review by default. You can use the `fastlane deliver --submit_for_review` to submit after the upload.
 
@@ -43,23 +43,23 @@ From     | To              | Note
 `title`  | `name` | requires `name({ "en-US" => "App name" })`
 `changelog` | `release_notes`
 `keywords` |   | requires a simple string instead of arrays
-`ratings_config_path` | `app_rating_config_path` | [New Format](https://docs.fastlane.tools/actions/deliver/#editing-the-deliverfile)
-`submit_further_information` | `submission_information` | [New Format](https://docs.fastlane.tools/actions/deliver/#editing-the-deliverfile)
+`ratings_config_path` | `app_rating_config_path` | [New Format](https://docs.fastlane.tools/generated/actions/deliver/#editing-the-deliverfile)
+`submit_further_information` | `submission_information` | [New Format](https://docs.fastlane.tools/generated/actions/deliver/#editing-the-deliverfile)
 
 **The following commands have been removed:**
 
 Removed                   | Use instead
 --------------------------|------------------------------------------------------------
-`deliver testflight` | [_pilot_](https://docs.fastlane.tools/actions/pilot/)
-`testflight` | [_pilot_](https://docs.fastlane.tools/actions/pilot/)
+`deliver testflight` | [_pilot_](https://docs.fastlane.tools/generated/actions/pilot/)
+`testflight` | [_pilot_](https://docs.fastlane.tools/generated/actions/pilot/)
 
 **The following codes/values have been changed:**
 
 Changed                   | &nbsp;
 --------------------------|------------------------
-Language Codes | [Reference.md](https://docs.fastlane.tools/actions/deliver/#reference)
-Age Rating | [Reference.md](https://docs.fastlane.tools/actions/deliver/#reference)
-App Categories | [Reference.md](https://docs.fastlane.tools/actions/deliver/#reference)
+Language Codes | [Reference.md](https://docs.fastlane.tools/generated/actions/deliver/#reference)
+Age Rating | [Reference.md](https://docs.fastlane.tools/generated/actions/deliver/#reference)
+App Categories | [Reference.md](https://docs.fastlane.tools/generated/actions/deliver/#reference)
 
 ### What's different now? :recycle: 
 
@@ -70,7 +70,7 @@ App Categories | [Reference.md](https://docs.fastlane.tools/actions/deliver/#ref
 - Removed a lot of legacy code. Did you know _deliver_ is now one year old? A lot of things have changed since then
 - Improved the selection of the newly uploaded build and waiting for processing to be finished, which is possible thanks to _spaceship_
 - Updating the app metadata and uploading of the screenshots now happen using _spaceship_ instead of the iTunes Transporter, which means changes will immediately visible after running _deliver_ :sparkles: 
-- Removed the `deliver beta` and `testflight` commands, as there is now a dedicated tool called [_pilot_](https://docs.fastlane.tools/actions/pilot/)
+- Removed the `deliver beta` and `testflight` commands, as there is now a dedicated tool called [_pilot_](https://docs.fastlane.tools/generated/actions/pilot/)
 - All parameters are now in the config system, which means you can pass values using the `Deliverfile`, from within your `Fastfile` or as command line parameter
 
 <img width="500" alt="screenshot 2015-09-26 21 57 15" src="https://cloud.githubusercontent.com/assets/869950/10121297/c6ea1c7a-6499-11e5-8d2b-301f86faacf0.png">

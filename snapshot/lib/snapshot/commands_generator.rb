@@ -22,7 +22,7 @@ module Snapshot
       program :description, 'CLI for \'snapshot\' - Automate taking localized screenshots of your iOS app on every device'
       program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/snapshot/'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/generated/actions/snapshot/'
       program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }

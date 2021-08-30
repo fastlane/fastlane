@@ -19,7 +19,7 @@ module Fastlane
       end
 
       def self.details
-        "The mercurial equivalent of [push_to_git_remote](https://docs.fastlane.tools/actions/push_to_git_remote/). Pushes your local commits to a remote mercurial repo. Useful when local changes such as adding a version bump commit or adding a tag are part of your lane’s actions."
+        "The mercurial equivalent of [push_to_git_remote](https://docs.fastlane.tools/generated/actions/push_to_git_remote/). Pushes your local commits to a remote mercurial repo. Useful when local changes such as adding a version bump commit or adding a tag are part of your lane’s actions."
       end
 
       def self.available_options

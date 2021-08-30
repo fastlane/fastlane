@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class XctoolAction < Action
       def self.run(params)
-        UI.important("Have you seen the new 'scan' tool to run tests? https://docs.fastlane.tools/actions/scan/")
+        UI.important("Have you seen the new 'scan' tool to run tests? https://docs.fastlane.tools/generated/actions/scan/")
         unless Helper.test?
           UI.user_error!("xctool not installed, please install using `brew install xctool`") if `which xctool`.length == 0
         end
@@ -20,7 +20,7 @@ module Fastlane
         [
           "You can run any `xctool` action. This will require having [xctool](https://github.com/facebook/xctool) installed through [Homebrew](http://brew.sh).",
           "It is recommended to store the build configuration in the `.xctool-args` file.",
-          "More information: [https://docs.fastlane.tools/actions/xctool/](https://docs.fastlane.tools/actions/xctool/)."
+          "More information: [https://docs.fastlane.tools/generated/actions/xctool/](https://docs.fastlane.tools/generated/actions/xctool/)."
         ].join("\n")
       end
 

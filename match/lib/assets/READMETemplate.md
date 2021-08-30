@@ -1,4 +1,4 @@
-## [fastlane match](https://docs.fastlane.tools/actions/match/)
+## [fastlane match](https://docs.fastlane.tools/generated/actions/match/)
 
 This repository contains all your certificates and provisioning profiles needed to build and sign your applications. They are encrypted using OpenSSL via a passphrase.
 
@@ -42,7 +42,7 @@ fastlane match development
 fastlane match enterprise
 ```
 
-For more information open [fastlane match git repo](https://docs.fastlane.tools/actions/match/)
+For more information open [fastlane match git repo](https://docs.fastlane.tools/generated/actions/match/)
 
 ### Content
 
@@ -56,4 +56,4 @@ This directory contains all provisioning profiles
 
 ---
 
-For more information open [fastlane match git repo](https://docs.fastlane.tools/actions/match/)
+For more information open [fastlane match git repo](https://docs.fastlane.tools/generated/actions/match/)

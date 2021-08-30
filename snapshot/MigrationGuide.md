@@ -29,4 +29,4 @@ How to migrate:
 
 - Update to the new version using `gem update snapshot`
 - Delete `snapshot.js`, `SnapshotHelper.js` and `Snapfile` and any other files you were using
-- Follow the [Quick Start Guide](https://docs.fastlane.tools/actions/snapshot/#quick-start)
+- Follow the [Quick Start Guide](https://docs.fastlane.tools/generated/actions/snapshot/#quick-start)

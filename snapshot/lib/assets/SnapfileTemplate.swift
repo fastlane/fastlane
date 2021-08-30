@@ -34,7 +34,7 @@ class Snapshotfile: SnapshotfileProtocol {
     // var project: String? { return "./Project.xcodeproj" }
     // var workspace: String? { return "./Project.xcworkspace" }
 
-    // Arguments to pass to the app on launch. See https://docs.fastlane.tools/actions/snapshot/#launch-arguments
+    // Arguments to pass to the app on launch. See https://docs.fastlane.tools/generated/actions/snapshot/#launch-arguments
     // var launchArguments: [String] { return ["-favColor red"] }
 
     // For more information about all available options run

@@ -1,5 +1,5 @@
 <h3 align="center">
-  <a href="https://docs.fastlane.tools/actions/supply/">
+  <a href="https://docs.fastlane.tools/generated/actions/supply/">
     <img src="https://raw.githubusercontent.com/fastlane/fastlane/master/fastlane/assets/fastlane.png" width="100" />
     <br />
     fastlane
@@ -9,9 +9,9 @@
 ------
 
 <p align="center">
-  <a href="https://docs.fastlane.tools/actions/supply/">
+  <a href="https://docs.fastlane.tools/generated/actions/supply/">
     <img src="https://raw.githubusercontent.com/fastlane/fastlane/master/supply/assets/supply.png" height="110">
   </a>
 </p>
 
-<h3 align="center">The <i>supply</i> docs were moved to <a href='https://docs.fastlane.tools/actions/supply/'>docs.fastlane.tools</a></h3>
+<h3 align="center">The <i>supply</i> docs were moved to <a href='https://docs.fastlane.tools/generated/actions/supply/'>docs.fastlane.tools</a></h3>

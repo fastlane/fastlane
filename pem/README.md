@@ -1,5 +1,5 @@
 <h3 align="center">
-  <a href="https://docs.fastlane.tools/actions/pem/">
+  <a href="https://docs.fastlane.tools/generated/actions/pem/">
     <img src="https://raw.githubusercontent.com/fastlane/fastlane/master/fastlane/assets/fastlane.png" width="100" />
     <br />
     fastlane
@@ -9,9 +9,9 @@
 ------
 
 <p align="center">
-  <a href="https://docs.fastlane.tools/actions/pem/">
+  <a href="https://docs.fastlane.tools/generated/actions/pem/">
     <img src="https://raw.githubusercontent.com/fastlane/fastlane/master/pem/assets/pem.png" height="110">
   </a>
 </p>
 
-<h3 align="center">The <i>pem</i> docs were moved to <a href='https://docs.fastlane.tools/actions/pem/'>docs.fastlane.tools</a></h3>
+<h3 align="center">The <i>pem</i> docs were moved to <a href='https://docs.fastlane.tools/generated/actions/pem/'>docs.fastlane.tools</a></h3>

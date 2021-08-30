@@ -297,7 +297,7 @@ module Deliver
           has_mapped_values = true
           UI.deprecated("Category '#{k}' from iTunesConnect has been deprecated. Please replace with '#{v}'")
         end
-        UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
+        UI.deprecated("You can find more info at https://docs.fastlane.tools/generated/actions/deliver/#reference") if has_mapped_values
 
         app_info.update_categories(category_id_map: category_id_map)
       end
@@ -689,7 +689,7 @@ module Deliver
         UI.user_error!("There are Age Rating deprecation errors that cannot be solved automatically... Please apply any fixes and try again")
       end
 
-      UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values || !deprecation_messages.empty?
+      UI.deprecated("You can find more info at https://docs.fastlane.tools/generated/actions/deliver/#reference") if has_mapped_values || !deprecation_messages.empty?
 
       age_rating_declaration = app_info.fetch_age_rating_declaration
       age_rating_declaration.update(attributes: attributes)

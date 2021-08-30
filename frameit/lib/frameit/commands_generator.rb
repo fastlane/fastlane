@@ -27,7 +27,7 @@ module Frameit
       program :description, 'Quickly put your screenshots into the right device frames'
       program :help, 'Author', 'Felix Krause <frameit@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
-      program :help, 'Documentation', 'https://docs.fastlane.tools/actions/frameit/'
+      program :help, 'Documentation', 'https://docs.fastlane.tools/generated/actions/frameit/'
       program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
