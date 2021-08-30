@@ -14,7 +14,7 @@ Since errors are inevitable, _fastlane_ should show empathy and provide a sugges
 
 _fastlane_ saw a lot of early growth through a wide number of actions that meet a variety of needs. Actions can trigger built-in _fastlane_ tools, talk to external tools and services, and more. However, with more than 170 built-in actions, further growth here will make _fastlane_ harder to understand and get started with. Another consideration is that actions which ship with _fastlane_ represent a maintenance cost for the _fastlane_ core team.
 
-With these challenges in mind, [_fastlane_ plugin system](https://fabric.io/blog/introducing-fastlane-plugins/) allows anyone to develop, share, and use new actions built and maintained by the awesome _fastlane_ community. If you have an idea for a new _fastlane_ action, [create it as a plugin](https://docs.fastlane.tools/plugins/create-plugin/) and it’ll be automatically listed in the [_fastlane_ plugin registry](https://docs.fastlane.tools/plugins/available-plugins). The most impactful and commonly used plugins could be adopted into _fastlane_ in the future.
+With these challenges in mind, [_fastlane_ plugin system](https://fabric.io/blog/introducing-fastlane-plugins/) allows anyone to develop, share, and use new actions built and maintained by the awesome _fastlane_ community. If you have an idea for a new _fastlane_ action, [create it as a plugin](https://docs.fastlane.tools/plugins/create-plugin/) and it’ll be automatically listed in the [_fastlane_ plugin registry](https://docs.fastlane.tools/generated/available-plugins). The most impactful and commonly used plugins could be adopted into _fastlane_ in the future.
 
 ## _fastlane_ Tool Responsibilities
 

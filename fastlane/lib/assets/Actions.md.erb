@@ -22,13 +22,13 @@ You can import another `Fastfile` by using the `import` action. This is useful i
 import './path/to/other/Fastfile'
 ```
 
-For _fastlane_ plugins, check out the [available plugins](/plugins/available-plugins/) page.
+For _fastlane_ plugins, check out the [available plugins](/generated/available-plugins/) page.
 If you want to create your own action, check out the [local actions](/create-action/#local-actions) page.
 
 <%- @categories.each do |category, actions| -%>
 - [<%= category %>](#<%= category.gsub(" ", "-").downcase %>)
 <%- end -%>
-- [Plugins](/plugins/available-plugins/)
+- [Plugins](/generated/available-plugins/)
 
 <%- @categories.each do |category, actions| %>
 # <%= category %>
