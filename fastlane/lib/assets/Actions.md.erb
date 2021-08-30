@@ -36,7 +36,7 @@ If you want to create your own action, check out the [local actions](/create-act
 Action | Description | Supported Platforms
 ---|---|---
 <%- actions.sort.to_h.each do |_number_of_launches, action| -%>
-<%- link = "/actions/#{action.action_name}/" -%>
+<%- link = "/generated/actions/#{action.action_name}/" -%>
 <a href="<%= link %>"><%= action.action_name %></a> | <%= action.description %> | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
 <%- end %><%# End of actions.sort... %>
 
