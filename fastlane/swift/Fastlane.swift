@@ -7508,6 +7508,7 @@ public func pem(development: OptionalConfigValue<Bool> = .fastlaneDefault(false)
    - appPlatform: The platform to use (optional)
    - appleId: Apple ID property in the App Information section in App Store Connect
    - ipa: Path to the ipa file to upload
+   - pkg: Path to your pkg file
    - demoAccountRequired: Do you need a demo account when Apple does review?
    - betaAppReviewInfo: Beta app review information for contact info and demo account
    - localizedAppInfo: Localized beta app test info for description, feedback email, marketing url, and privacy policy
@@ -7546,9 +7547,10 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                   apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                   username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   appIdentifier: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                  appPlatform: String = "ios",
+                  appPlatform: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   appleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   ipa: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                  pkg: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   demoAccountRequired: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                   betaAppReviewInfo: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                   localizedAppInfo: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -7584,9 +7586,10 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
     let appIdentifierArg = appIdentifier.asRubyArgument(name: "app_identifier", type: nil)
-    let appPlatformArg = RubyCommand.Argument(name: "app_platform", value: appPlatform, type: nil)
+    let appPlatformArg = appPlatform.asRubyArgument(name: "app_platform", type: nil)
     let appleIdArg = appleId.asRubyArgument(name: "apple_id", type: nil)
     let ipaArg = ipa.asRubyArgument(name: "ipa", type: nil)
+    let pkgArg = pkg.asRubyArgument(name: "pkg", type: nil)
     let demoAccountRequiredArg = demoAccountRequired.asRubyArgument(name: "demo_account_required", type: nil)
     let betaAppReviewInfoArg = betaAppReviewInfo.asRubyArgument(name: "beta_app_review_info", type: nil)
     let localizedAppInfoArg = localizedAppInfo.asRubyArgument(name: "localized_app_info", type: nil)
@@ -7624,6 +7627,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                                           appPlatformArg,
                                           appleIdArg,
                                           ipaArg,
+                                          pkgArg,
                                           demoAccountRequiredArg,
                                           betaAppReviewInfoArg,
                                           localizedAppInfoArg,
@@ -11190,6 +11194,7 @@ public func testfairy(apiKey: String,
    - appPlatform: The platform to use (optional)
    - appleId: Apple ID property in the App Information section in App Store Connect
    - ipa: Path to the ipa file to upload
+   - pkg: Path to your pkg file
    - demoAccountRequired: Do you need a demo account when Apple does review?
    - betaAppReviewInfo: Beta app review information for contact info and demo account
    - localizedAppInfo: Localized beta app test info for description, feedback email, marketing url, and privacy policy
@@ -11228,9 +11233,10 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                        apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                        username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                        appIdentifier: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                       appPlatform: String = "ios",
+                       appPlatform: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                        appleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                        ipa: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                       pkg: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                        demoAccountRequired: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                        betaAppReviewInfo: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                        localizedAppInfo: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -11266,9 +11272,10 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
     let appIdentifierArg = appIdentifier.asRubyArgument(name: "app_identifier", type: nil)
-    let appPlatformArg = RubyCommand.Argument(name: "app_platform", value: appPlatform, type: nil)
+    let appPlatformArg = appPlatform.asRubyArgument(name: "app_platform", type: nil)
     let appleIdArg = appleId.asRubyArgument(name: "apple_id", type: nil)
     let ipaArg = ipa.asRubyArgument(name: "ipa", type: nil)
+    let pkgArg = pkg.asRubyArgument(name: "pkg", type: nil)
     let demoAccountRequiredArg = demoAccountRequired.asRubyArgument(name: "demo_account_required", type: nil)
     let betaAppReviewInfoArg = betaAppReviewInfo.asRubyArgument(name: "beta_app_review_info", type: nil)
     let localizedAppInfoArg = localizedAppInfo.asRubyArgument(name: "localized_app_info", type: nil)
@@ -11306,6 +11313,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                                           appPlatformArg,
                                           appleIdArg,
                                           ipaArg,
+                                          pkgArg,
                                           demoAccountRequiredArg,
                                           betaAppReviewInfoArg,
                                           localizedAppInfoArg,
@@ -12526,6 +12534,7 @@ public func uploadToPlayStoreInternalAppSharing(packageName: String,
    - appPlatform: The platform to use (optional)
    - appleId: Apple ID property in the App Information section in App Store Connect
    - ipa: Path to the ipa file to upload
+   - pkg: Path to your pkg file
    - demoAccountRequired: Do you need a demo account when Apple does review?
    - betaAppReviewInfo: Beta app review information for contact info and demo account
    - localizedAppInfo: Localized beta app test info for description, feedback email, marketing url, and privacy policy
@@ -12564,9 +12573,10 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                                username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                appIdentifier: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                               appPlatform: String = "ios",
+                               appPlatform: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                appleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                ipa: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                               pkg: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                demoAccountRequired: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                betaAppReviewInfo: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                                localizedAppInfo: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -12602,9 +12612,10 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
     let appIdentifierArg = appIdentifier.asRubyArgument(name: "app_identifier", type: nil)
-    let appPlatformArg = RubyCommand.Argument(name: "app_platform", value: appPlatform, type: nil)
+    let appPlatformArg = appPlatform.asRubyArgument(name: "app_platform", type: nil)
     let appleIdArg = appleId.asRubyArgument(name: "apple_id", type: nil)
     let ipaArg = ipa.asRubyArgument(name: "ipa", type: nil)
+    let pkgArg = pkg.asRubyArgument(name: "pkg", type: nil)
     let demoAccountRequiredArg = demoAccountRequired.asRubyArgument(name: "demo_account_required", type: nil)
     let betaAppReviewInfoArg = betaAppReviewInfo.asRubyArgument(name: "beta_app_review_info", type: nil)
     let localizedAppInfoArg = localizedAppInfo.asRubyArgument(name: "localized_app_info", type: nil)
@@ -12642,6 +12653,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                           appPlatformArg,
                                           appleIdArg,
                                           ipaArg,
+                                          pkgArg,
                                           demoAccountRequiredArg,
                                           betaAppReviewInfoArg,
                                           localizedAppInfoArg,
@@ -13049,7 +13061,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode-13.beta.4.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-beta.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13251,4 +13263,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.133]
+// FastlaneRunnerAPIVersion [0.9.134]
