@@ -535,8 +535,8 @@ describe Pilot do
             expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
             fake_manager.instance_variable_set(:@config, { pkg: fake_pkg })
 
-            allow(FastlaneCore::PkgFileAnalyser)
-              .to receive(:fetch_app_platform)
+            allow_any_instance_of(FastlaneCore::PkgFileAnalyser)
+              .to receive(:fetch_app_platform_not_real)
               .with(fake_pkg)
               .and_return(nil)
           end
