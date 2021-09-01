@@ -490,11 +490,6 @@ describe Pilot do
           before(:each) do
             expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
             fake_manager.instance_variable_set(:@config, { pkg: fake_pkg })
-
-            allow(FastlaneCore::PkgFileAnalyser)
-              .to receive(:fetch_app_platform)
-              .with(fake_pkg)
-              .and_return(fake_app_platform)
           end
 
           it "uses the FastlaneCore::PkgFileAnalyser with 'pkg' path to find the 'app_platform' value" do
@@ -535,7 +530,7 @@ describe Pilot do
             expect(UI).to receive(:verbose).with("App Platform (#{fake_app_platform})")
             fake_manager.instance_variable_set(:@config, { pkg: fake_pkg })
 
-            allow_any_instance_of(FastlaneCore::PkgFileAnalyser)
+            allow(FastlaneCore::PkgFileAnalyser)
               .to receive(:fetch_app_platform)
               .with(fake_pkg)
               .and_return(nil)
