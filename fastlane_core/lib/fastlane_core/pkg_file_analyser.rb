@@ -10,6 +10,11 @@ module FastlaneCore
       return nil
     end
 
+    # Fetches the app platform from the given pkg file.
+    def self.fetch_app_platform(path)
+      return "osx"
+    end
+
     # Fetches the app version from the given pkg file.
     def self.fetch_app_version(path)
       xml = self.fetch_distribution_xml_file(path)
