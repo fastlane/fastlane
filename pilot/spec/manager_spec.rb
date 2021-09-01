@@ -536,7 +536,7 @@ describe Pilot do
             fake_manager.instance_variable_set(:@config, { pkg: fake_pkg })
 
             allow_any_instance_of(FastlaneCore::PkgFileAnalyser)
-              .to receive(:fetch_app_platform_not_real)
+              .to receive(:fetch_app_platform)
               .with(fake_pkg)
               .and_return(nil)
           end
