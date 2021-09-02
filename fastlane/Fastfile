@@ -477,10 +477,11 @@ def clone_docs(debug: false)
   else
     require 'tmpdir'
     git_url = ENV['FASTLANE_DOCS_GIT_URL'] || "https://github.com/fastlane/docs"
+    git_branch = ENV['FASTLANE_DOCS_GIT_BRANCH'] || "master"
 
     Dir.mktmpdir("fl_clone") do |tmp_dir|
       Dir.chdir(tmp_dir) do
-        sh("git clone #{git_url} --depth=1")
+        sh("git clone #{git_url} --branch #{git_branch} --depth=1")
         Dir.chdir("docs") do
           yield
         end
