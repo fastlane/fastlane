@@ -343,7 +343,7 @@ module Match
             [
               Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV
             ]
-          when :mac, :catalyst
+          when :macos, :catalyst
             [
               Spaceship::ConnectAPI::Device::DeviceClass::MAC
             ]
