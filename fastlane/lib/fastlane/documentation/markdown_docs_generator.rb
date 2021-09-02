@@ -135,6 +135,7 @@ module Fastlane
       FileUtils.mkdir_p(target_path)
       docs_dir = File.join(target_path, "docs")
       generated_actions_dir = File.join("generated", "actions")
+      FileUtils.mkdir_p(File.join(docs_dir, generated_actions_dir))
 
       # Generate actions.md
       template = File.join(Fastlane::ROOT, "lib/assets/Actions.md.erb")
