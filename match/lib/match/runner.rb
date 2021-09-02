@@ -243,13 +243,14 @@ module Match
       force = params[:force]
 
       if params[:force_for_new_devices] && !params[:readonly]
-        if prov_type != :appstore && !params[:force]
+        prov_types_without_devices = [:appstore, :developer_id]
+        if !prov_types_without_devices.include?(prov_type) && !params[:force]
           force = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym)
         else
           # App Store provisioning profiles don't contain device identifiers and
           # thus shouldn't be renewed if the device count has changed.
-          UI.important("Warning: `force_for_new_devices` is set but is ignored for App Store provisioning profiles.")
-          UI.important("You can safely stop specifying `force_for_new_devices` when running Match for type 'appstore'.")
+          UI.important("Warning: `force_for_new_devices` is set but is ignored for App Store & Developer ID provisioning profiles.")
+          UI.important("You can safely stop specifying `force_for_new_devices` when running Match for type 'appstore' or 'developer_id'.")
         end
       end
 

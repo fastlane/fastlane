@@ -239,7 +239,7 @@ module Match
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force_for_new_devices,
                                      env_name: "MATCH_FORCE_FOR_NEW_DEVICES",
-                                     description: "Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile type 'appstore'",
+                                     description: "Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_confirmation,
