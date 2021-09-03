@@ -254,6 +254,24 @@ module Match
         end
       end
 
+      if params[:include_all_certificates]
+        certificate_id = nil
+
+        if params[:force_for_new_certificates] && !params[:readonly]
+          if prov_type == :development && !params[:force]
+            force = certificate_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym)
+          else
+            # All other (not development) provisioning profiles don't contain
+            # multiple certificates, thus shouldn't be renewed
+            # if the certificates  count has changed.
+            UI.important("Warning: `force_for_new_certificates` is set but is ignored for non-'development' provisioning profiles.")
+            UI.important("You can safely stop specifying `force_for_new_certificates` when running Match for '#{prov_type}' provisioning profiles.")
+          end
+        end
+      else
+        UI.important("You specified 'force_for_new_certificates: true', but new certificates will not be added, cause 'include_all_certificates' is 'false'") if params[:force_for_new_certificates]
+      end
+
       if profile.nil? || force
         if params[:readonly]
           UI.error("No matching provisioning profiles found for '#{profile_file}'")
@@ -364,6 +382,47 @@ module Match
         return portal_device_count != profile_device_count
       end
       return false
+    end
+
+    def certificate_count_different?(profile: nil, keychain_path: nil, platform: nil)
+      return false unless profile
+
+      parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
+      uuid = parsed["UUID"]
+
+      all_profiles = Spaceship::ConnectAPI::Profile.all(includes: "certificates")
+      portal_profile = all_profiles.detect { |i| i.uuid == uuid }
+
+      return false unless portal_profile
+
+      profile_certs_count = portal_profile.fetch_all_certificates.count
+
+      certificate_types =
+        case platform
+        when :ios, :tvos
+          [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT,
+            Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT
+          ]
+        when :macos, :catalyst
+          [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT,
+            Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DEVELOPMENT
+          ]
+        else
+          []
+        end
+
+      certificates = Spaceship::ConnectAPI::Certificate.all
+      unless certificate_types.empty?
+        certificates = certificates.select do |certificate|
+          certificate_types.include?(certificate.certificateType) && certificate.valid?
+        end
+      end
+
+      portal_certs_count = certificates.size
+
+      return portal_certs_count != profile_certs_count
     end
   end
 end
