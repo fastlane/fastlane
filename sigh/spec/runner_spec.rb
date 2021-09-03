@@ -169,6 +169,15 @@ describe Sigh do
         certificates_to_use = fake_runner.certificates_to_use
         expect(certificates_to_use.size).to eq(1)
       end
+
+      it "list certificates found when there're multiple certificates and in development" do
+        options = { include_all_certificates: true, development: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+        sigh_stub_spaceship_connect
+
+        certificates_to_use = fake_runner.certificates_to_use
+        expect(certificates_to_use.size).to eq(2)
+      end
     end
 
     describe "#profile_type_pretty_type" do
