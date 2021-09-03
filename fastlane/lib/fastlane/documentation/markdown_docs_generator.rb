@@ -167,10 +167,14 @@ module Fastlane
         template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
         result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
+        # Actions get placed in "generated/actions" directory
         file_name = File.join(generated_actions_dir, "#{action.action_name}.md")
         File.write(File.join(docs_dir, file_name), result)
 
-        all_actions_ref_yml << { action.action_name => file_name }
+        # The action pages when published get moved to the "actions" directory
+        # The mkdocs.yml file needs to reference the "actions" directory (not the "generated/actions" directory)
+        published_file_name = File.join("actions", "#{action.action_name}.md")
+        all_actions_ref_yml << { action.action_name => published_file_name }
       end
 
       # Modify the mkdocs.yml to list all the actions
