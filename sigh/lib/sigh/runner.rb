@@ -311,7 +311,7 @@ module Sigh
 
       # verify certificates
       if Helper.mac?
-        unless Sigh.config[:skip_certificate_verification]
+        unless Sigh.config[:skip_certificate_verification] || Sigh.config[:include_all_certificates]
           certificates = certificates.find_all do |c|
             file = Tempfile.new('cert')
             raw_data = Base64.decode64(c.certificate_content)
