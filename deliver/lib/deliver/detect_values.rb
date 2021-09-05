@@ -10,6 +10,8 @@ require_relative 'languages'
 module Deliver
   class DetectValues
     def run!(options, skip_params = {})
+      Deliver.cache = {}
+
       find_platform(options)
       find_app_identifier(options)
       find_app(options)
@@ -46,9 +48,9 @@ module Deliver
         app = Spaceship::ConnectAPI::App.get(app_id: app_id)
       end
 
-      if app
-        options[:app] = app
-      else
+      Deliver.cache[:app] = app
+
+      unless app
         UI.user_error!("Could not find app with app identifier '#{options[:app_identifier]}' in your App Store Connect account (#{options[:username]} - Team: #{Spaceship::Tunes.client.team_id})")
       end
     end

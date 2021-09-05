@@ -65,7 +65,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "MATCH_APP_IDENTIFIER",
-                                     description: "The bundle identifier(s) of your app (comma-separated)",
+                                     description: "The bundle identifier(s) of your app (comma-separated string or array of strings)",
                                      type: Array, # we actually allow String and Array here
                                      skip_type_validation: true,
                                      code_gen_sensitive: true,
@@ -74,7 +74,7 @@ module Match
 
         # App Store Connect API
         FastlaneCore::ConfigItem.new(key: :api_key_path,
-                                     env_name: "SIGH_API_KEY_PATH",
+                                     env_names: ["SIGH_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
                                      description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                      optional: true,
                                      conflicting_options: [:api_key],
@@ -82,7 +82,7 @@ module Match
                                        UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :api_key,
-                                     env_name: "SIGH_API_KEY",
+                                     env_names: ["SIGH_API_KEY", "APP_STORE_CONNECT_API_KEY"],
                                      description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
                                      type: Hash,
                                      optional: true,
@@ -207,6 +207,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :s3_secret_access_key,
                                      env_name: "MATCH_S3_SECRET_ACCESS_KEY",
                                      description: "S3 secret access key",
+                                     sensitive: true,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :s3_bucket,
                                      env_name: "MATCH_S3_BUCKET",
@@ -227,7 +228,7 @@ module Match
                                      short_option: "-p",
                                      env_name: "MATCH_KEYCHAIN_PASSWORD",
                                      sensitive: true,
-                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
+                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password",
                                      optional: true),
 
         # settings
@@ -238,7 +239,7 @@ module Match
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :force_for_new_devices,
                                      env_name: "MATCH_FORCE_FOR_NEW_DEVICES",
-                                     description: "Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile type 'appstore'",
+                                     description: "Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_confirmation,
@@ -280,6 +281,12 @@ module Match
         FastlaneCore::ConfigItem.new(key: :fail_on_name_taken,
                                      env_name: "MATCH_FAIL_ON_NAME_TAKEN",
                                      description: "Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first",
+                                     optional: true,
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_certificate_matching,
+                                     env_name: "MATCH_SKIP_CERTIFICATE_MATCHING",
+                                     description: "Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action",
                                      optional: true,
                                      type: Boolean,
                                      default_value: false),

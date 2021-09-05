@@ -23,7 +23,7 @@ init:
 # cloning the repository happens here
 
 install:
-  - set PATH=C:\Ruby24-x64\bin;%PATH%
+  - set PATH=C:\Ruby26-x64\bin;%PATH%
   - bundle install
   # iconv
   - appveyor DownloadFile
@@ -46,4 +46,7 @@ before_test:
 build: off
 
 test_script:
+  # Uncomment the first line and comment the second one to debug failing tests
+  # on Windows (some tests might fail with this).
+  # - cmd /V /C "set DEBUG=1 && bundle exec fastlane execute_tests"
   - bundle exec fastlane execute_tests

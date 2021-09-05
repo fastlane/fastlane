@@ -17,9 +17,11 @@ module Spaceship
         # ageRatingDeclarations
         #
 
-        def get_age_rating_declaration(app_store_version_id: nil)
+        def get_age_rating_declaration(app_info_id: nil, app_store_version_id: nil)
+          raise "Keyword 'app_store_version_id' is deprecated and 'app_info_id' is required" if app_store_version_id || app_info_id.nil?
+
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("appStoreVersions/#{app_store_version_id}/ageRatingDeclaration", params)
+          tunes_request_client.get("appInfos/#{app_info_id}/ageRatingDeclaration", params)
         end
 
         def patch_age_rating_declaration(age_rating_declaration_id: nil, attributes: nil)
@@ -201,6 +203,109 @@ module Spaceship
         end
 
         #
+        # appDataUsage
+        #
+
+        def get_app_data_usages(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("apps/#{app_id}/dataUsages", params)
+        end
+
+        def post_app_data_usage(app_id:, app_data_usage_category_id: nil, app_data_usage_protection_id: nil, app_data_usage_purpose_id: nil)
+          raise "app_id is required " if app_id.nil?
+
+          relationships = {
+            app: {
+              data: {
+                type: "apps",
+                id: app_id
+              }
+            }
+          }
+
+          if app_data_usage_category_id
+            relationships[:category] = {
+              data: {
+                type: "appDataUsageCategories",
+                id: app_data_usage_category_id
+              }
+            }
+          end
+
+          if app_data_usage_protection_id
+            relationships[:dataProtection] = {
+              data: {
+                type: "appDataUsageDataProtections",
+                id: app_data_usage_protection_id
+              }
+            }
+          end
+
+          if app_data_usage_purpose_id
+            relationships[:purpose] = {
+              data: {
+                type: "appDataUsagePurposes",
+                id: app_data_usage_purpose_id
+              }
+            }
+          end
+
+          body = {
+            data: {
+              type: "appDataUsages",
+              relationships: relationships
+            }
+          }
+
+          tunes_request_client.post("appDataUsages", body)
+        end
+
+        def delete_app_data_usage(app_data_usage_id: nil)
+          tunes_request_client.delete("appDataUsages/#{app_data_usage_id}")
+        end
+
+        #
+        # appDataUsageCategory
+        #
+
+        def get_app_data_usage_categories(filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appDataUsageCategories", params)
+        end
+
+        #
+        # appDataUsagePurpose
+        #
+
+        def get_app_data_usage_purposes(filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appDataUsagePurposes", params)
+        end
+
+        #
+        # appDataUsagesPublishState
+        #
+
+        def get_app_data_usages_publish_state(app_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.get("apps/#{app_id}/dataUsagePublishState", params)
+        end
+
+        def patch_app_data_usages_publish_state(app_data_usages_publish_state_id: nil, published: nil)
+          body = {
+            data: {
+              type: "appDataUsagesPublishState",
+              id: app_data_usages_publish_state_id,
+              attributes: {
+                published: published
+              }
+            }
+          }
+
+          tunes_request_client.patch("appDataUsagesPublishState/#{app_data_usages_publish_state_id}", body)
+        end
+
+        #
         # appPreview
         #
 
@@ -276,6 +381,11 @@ module Spaceship
           }
 
           tunes_request_client.post("appPreviewSets", body)
+        end
+
+        def delete_app_preview_set(app_preview_set_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("appPreviewSets/#{app_preview_set_id}", params)
         end
 
         def patch_app_preview_set_previews(app_preview_set_id: nil, app_preview_ids: nil)
@@ -410,6 +520,11 @@ module Spaceship
           }
 
           tunes_request_client.patch("appScreenshotSets/#{app_screenshot_set_id}/relationships/appScreenshots", body)
+        end
+
+        def delete_app_screenshot_set(app_screenshot_set_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("appScreenshotSets/#{app_screenshot_set_id}", params)
         end
 
         #
@@ -654,6 +769,11 @@ module Spaceship
           tunes_request_client.get("appStoreVersions/#{app_store_version_id}/appStoreVersionLocalizations", params)
         end
 
+        def get_app_store_version_localization(app_store_version_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.get("appStoreVersionLocalizations/#{app_store_version_localization_id}", params)
+        end
+
         def post_app_store_version_localization(app_store_version_id: nil, attributes: {})
           body = {
             data: {
@@ -888,6 +1008,77 @@ module Spaceship
           }
 
           tunes_request_client.post("appStoreVersionReleaseRequests", body)
+        end
+
+        #
+        # customAppUsers
+        #
+
+        def get_custom_app_users(app_id: nil, filter: nil, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("apps/#{app_id}/customAppUsers", params)
+        end
+
+        def post_custom_app_user(app_id: nil, apple_id: nil)
+          body = {
+              data: {
+                  type: "customAppUsers",
+                  attributes: {
+                    appleId: apple_id
+                  },
+                  relationships: {
+                      app: {
+                          data: {
+                              type: "apps",
+                              id: app_id
+                          }
+                      }
+                  }
+              }
+          }
+
+          tunes_request_client.post("customAppUsers", body)
+        end
+
+        def delete_custom_app_user(custom_app_user_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("customAppUsers/#{custom_app_user_id}", params)
+        end
+
+        #
+        # customOrganizationUsers
+        #
+
+        def get_custom_app_organization(app_id: nil, filter: nil, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("apps/#{app_id}/customAppOrganizations", params)
+        end
+
+        def post_custom_app_organization(app_id: nil, device_enrollment_program_id: nil, name: nil)
+          body = {
+              data: {
+                  type: "customAppOrganizations",
+                  attributes: {
+                    deviceEnrollmentProgramId: device_enrollment_program_id,
+                    name: name
+                  },
+                  relationships: {
+                      app: {
+                          data: {
+                              type: "apps",
+                              id: app_id
+                          }
+                      }
+                  }
+              }
+          }
+
+          tunes_request_client.post("customAppOrganizations", body)
+        end
+
+        def delete_custom_app_organization(custom_app_organization_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("customAppOrganizations/#{custom_app_organization_id}", params)
         end
 
         #

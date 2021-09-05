@@ -1,5 +1,5 @@
 // ScanfileProtocol.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 public protocol ScanfileProtocol: class {
     /// Path to the workspace file
@@ -7,6 +7,9 @@ public protocol ScanfileProtocol: class {
 
     /// Path to the project file
     var project: String? { get }
+
+    /// Path to the Swift Package
+    var packagePath: String? { get }
 
     /// The project's scheme. Make sure it's marked as `Shared`
     var scheme: String? { get }
@@ -19,6 +22,9 @@ public protocol ScanfileProtocol: class {
 
     /// Should skip auto detecting of devices if none were specified
     var skipDetectDevices: Bool { get }
+
+    /// Should fail if devices not found
+    var ensureDevicesFound: Bool { get }
 
     /// Enabling this option will automatically killall Simulator processes before the run
     var forceQuitSimulator: Bool { get }
@@ -110,6 +116,9 @@ public protocol ScanfileProtocol: class {
     /// Should zip the derived data build products and place in output path?
     var shouldZipBuildProducts: Bool { get }
 
+    /// Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
+    var outputXctestrun: Bool { get }
+
     /// Should an Xcode result bundle be generated in the output directory
     var resultBundle: Bool { get }
 
@@ -176,8 +185,14 @@ public protocol ScanfileProtocol: class {
     /// Only post on Slack if the tests fail
     var slackOnlyOnFailure: Bool { get }
 
+    /// Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack
+    var slackDefaultPayloads: [String]? { get }
+
     /// Use only if you're a pro, use the other options instead
     var destination: String? { get }
+
+    /// Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
+    var catalystPlatform: String? { get }
 
     /// **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
     var customReportFileName: String? { get }
@@ -188,6 +203,18 @@ public protocol ScanfileProtocol: class {
     /// Sets a custom path for Swift Package Manager dependencies
     var clonedSourcePackagesPath: String? { get }
 
+    /// Skips resolution of Swift Package Manager dependencies
+    var skipPackageDependenciesResolution: Bool { get }
+
+    /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+    var disablePackageAutomaticUpdates: Bool { get }
+
+    /// Lets xcodebuild use system's scm configuration
+    var useSystemScm: Bool { get }
+
+    /// The number of times a test can fail before scan should stop retrying
+    var numberOfRetries: Int { get }
+
     /// Should this step stop the build if the tests fail? Set this to false if you're using trainer
     var failBuild: Bool { get }
 }
@@ -195,10 +222,12 @@ public protocol ScanfileProtocol: class {
 public extension ScanfileProtocol {
     var workspace: String? { return nil }
     var project: String? { return nil }
+    var packagePath: String? { return nil }
     var scheme: String? { return nil }
     var device: String? { return nil }
     var devices: [String]? { return nil }
     var skipDetectDevices: Bool { return false }
+    var ensureDevicesFound: Bool { return false }
     var forceQuitSimulator: Bool { return false }
     var resetSimulator: Bool { return false }
     var disableSlideToType: Bool { return true }
@@ -229,6 +258,7 @@ public extension ScanfileProtocol {
     var xcprettyArgs: String? { return nil }
     var derivedDataPath: String? { return nil }
     var shouldZipBuildProducts: Bool { return false }
+    var outputXctestrun: Bool { return false }
     var resultBundle: Bool { return false }
     var useClangReportName: Bool { return false }
     var concurrentWorkers: Int? { return nil }
@@ -251,13 +281,19 @@ public extension ScanfileProtocol {
     var slackIconUrl: String { return "https://fastlane.tools/assets/img/fastlane_icon.png" }
     var skipSlack: Bool { return false }
     var slackOnlyOnFailure: Bool { return false }
+    var slackDefaultPayloads: [String]? { return nil }
     var destination: String? { return nil }
+    var catalystPlatform: String? { return nil }
     var customReportFileName: String? { return nil }
     var xcodebuildCommand: String { return "env NSUnbufferedIO=YES xcodebuild" }
     var clonedSourcePackagesPath: String? { return nil }
+    var skipPackageDependenciesResolution: Bool { return false }
+    var disablePackageAutomaticUpdates: Bool { return false }
+    var useSystemScm: Bool { return false }
+    var numberOfRetries: Int { return 0 }
     var failBuild: Bool { return true }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.53]
+// FastlaneRunnerAPIVersion [0.9.90]

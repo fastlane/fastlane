@@ -18,8 +18,9 @@ module Spaceship
       # API
       #
 
-      def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI.delete_app_store_version_submission(app_store_version_submission_id: id)
+      def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_app_store_version_submission(app_store_version_submission_id: id)
       end
     end
   end

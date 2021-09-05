@@ -5,7 +5,7 @@ module Fastlane
       PLATFORM_NAME = :PLATFORM_NAME
       ENVIRONMENT = :ENVIRONMENT
 
-      # A slighly decorated hash that will store and fetch sensitive data
+      # A slightly decorated hash that will store and fetch sensitive data
       # but not display it while iterating keys and values
       class LaneContextValues < Hash
         def initialize
@@ -87,13 +87,13 @@ module Fastlane
     end
 
     # returns a list of official integrations
-    # rubocop:disable Style/AccessorMethodName
+    # rubocop:disable Naming/AccessorMethodName
     def self.get_all_official_actions
       Dir[File.expand_path('*.rb', File.dirname(__FILE__))].collect do |file|
         File.basename(file).gsub('.rb', '').to_sym
       end
     end
-    # rubocop:enable Style/AccessorMethodName
+    # rubocop:enable Naming/AccessorMethodName
 
     # Returns the class ref to the action based on the action name
     # Returns nil if the action is not available

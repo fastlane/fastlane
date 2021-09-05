@@ -1,3 +1,5 @@
+# rubocop:disable Metrics/ClassLength
+
 require 'fastlane_core/configuration/config_item'
 require 'credentials_manager/appfile_config'
 
@@ -49,7 +51,7 @@ module Supply
                                      end),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
-                                     description: "The percentage of the user fraction when uploading to the rollout track",
+                                     description: "The percentage of the user fraction when uploading to the rollout track (setting to 1 will complete the rollout)",
                                      optional: true,
                                      verify_block: proc do |value|
                                        min = 0.0
@@ -223,7 +225,7 @@ module Supply
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :mapping,
                                      env_name: "SUPPLY_MAPPING",
-                                     description: "Path to the mapping file to upload",
+                                     description: "Path to the mapping file to upload (mapping.txt or native-debug-symbols.zip alike)",
                                      short_option: "-d",
                                      conflicting_options: [:mapping_paths],
                                      optional: true,
@@ -235,7 +237,7 @@ module Supply
                                      conflicting_options: [:mapping],
                                      optional: true,
                                      type: Array,
-                                     description: "An array of paths to mapping files to upload",
+                                     description: "An array of paths to mapping files to upload (mapping.txt or native-debug-symbols.zip alike)",
                                      short_option: "-s",
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
@@ -281,6 +283,16 @@ module Supply
                                          UI.user_error!("Version code '#{version_code}' is not an integer") if version_code == 0
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :changes_not_sent_for_review,
+                                     env_name: "SUPPLY_CHANGES_NOT_SENT_FOR_REVIEW",
+                                     description: "Indicates that the changes in this edit will not be reviewed until they are explicitly sent for review from the Google Play Console UI",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :rescue_changes_not_sent_for_review,
+                                     env_name: "SUPPLY_RESCUE_CHANGES_NOT_SENT_FOR_REVIEW",
+                                     description: "Catches changes_not_sent_for_review errors when an edit is committed and retries with the configuration that the error message recommended",
+                                     type: Boolean,
+                                     default_value: true),
         FastlaneCore::ConfigItem.new(key: :in_app_update_priority,
                                      env_name: "SUPPLY_IN_APP_UPDATE_PRIORITY",
                                      optional: true,

@@ -216,11 +216,26 @@ module Spaceship
           test_flight_request_client.post("builds/#{build_id}/relationships/individualTesters", body)
         end
 
-        def create_beta_group(app_id: nil, group_name: nil, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
+        def delete_beta_groups_from_build(build_id: nil, beta_group_ids: [])
+          body = {
+            data: beta_group_ids.map do |id|
+              {
+                type: "betaGroups",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.delete("builds/#{build_id}/relationships/betaGroups", nil, body)
+        end
+
+        def create_beta_group(app_id: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
           body = {
             data: {
               attributes: {
                 name: group_name,
+                isInternalGroup: is_internal_group,
+                hasAccessToAllBuilds: is_internal_group ? true : false, # Undocumented of 2021-08-02 in ASC API docs and ASC Open API spec. This is the default behavior on App Store Connect and does work with both Apple ID and API Token
                 publicLinkEnabled: public_link_enabled,
                 publicLinkLimit: public_link_limit,
                 publicLinkLimitEnabled: public_link_limit_enabled
@@ -230,13 +245,37 @@ module Spaceship
                   data: {
                     id: app_id,
                     type: "apps"
-                  }
-                }
+                  },
+                },
               },
+              type: "betaGroups",
+            },
+          }
+          test_flight_request_client.post("betaGroups", body)
+        end
+
+        def patch_group(group_id: nil, attributes: {})
+          body = {
+            data: {
+              attributes: attributes,
+              id: group_id,
               type: "betaGroups"
             }
           }
-          test_flight_request_client.post("betaGroups", body)
+
+          test_flight_request_client.patch("betaGroups/#{group_id}", body)
+        end
+
+        def delete_beta_group(group_id: nil)
+          raise "group_id is nil" if group_id.nil?
+
+          test_flight_request_client.delete("betaGroups/#{group_id}")
+        end
+
+        def get_builds_for_beta_group(group_id: nil)
+          raise "group_id is nil" if group_id.nil?
+
+          test_flight_request_client.get("betaGroups/#{group_id}/builds")
         end
 
         #
@@ -276,6 +315,19 @@ module Spaceship
           test_flight_request_client.post("bulkBetaTesterAssignments", body)
         end
 
+        def add_beta_tester_to_group(beta_group_id: nil, beta_tester_ids: nil)
+          beta_tester_ids || []
+          body = {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+          test_flight_request_client.post("betaGroups/#{beta_group_id}/relationships/betaTesters", body)
+        end
+
         def delete_beta_tester_from_apps(beta_tester_id: nil, app_ids: [])
           body = {
             data: app_ids.map do |id|
@@ -313,6 +365,45 @@ module Spaceship
           }
 
           test_flight_request_client.delete("apps/#{app_id}/relationships/betaTesters", nil, body)
+        end
+
+        def add_beta_tester_to_builds(beta_tester_id: nil, build_ids: [])
+          body = {
+            data: build_ids.map do |id|
+              {
+                type: "builds",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.post("betaTesters/#{beta_tester_id}/relationships/builds", body)
+        end
+
+        def add_beta_testers_to_build(build_id: nil, beta_tester_ids: [])
+          body = {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.post("builds/#{build_id}/relationships/individualTesters", body)
+        end
+
+        def delete_beta_testers_from_build(build_id: nil, beta_tester_ids: [])
+          body = {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.delete("builds/#{build_id}/relationships/individualTesters", nil, body)
         end
 
         #

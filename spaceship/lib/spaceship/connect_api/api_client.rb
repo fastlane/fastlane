@@ -150,19 +150,30 @@ module Spaceship
 
       protected
 
+      class TimeoutRetryError < StandardError
+        def initialize(msg)
+          super
+        end
+      end
+
       def with_asc_retry(tries = 5, &_block)
         tries = 1 if Object.const_defined?("SpecHelper")
+
         response = yield
 
         status = response.status if response
 
         if [500, 504].include?(status)
           msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
-          raise msg
+          raise TimeoutRetryError, msg
         end
 
         return response
-      rescue => error
+      rescue UnauthorizedAccessError => error
+        # Catch unathorized access and re-raising
+        # There is no need to try again
+        raise error
+      rescue TimeoutRetryError => error
         tries -= 1
         puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
@@ -185,16 +196,49 @@ module Spaceship
 
         raise UnexpectedResponse, response.body['error'] if response.body['error']
 
-        raise UnexpectedResponse, handle_errors(response) if response.body['errors']
+        raise UnexpectedResponse, format_errors(response) if response.body['errors']
 
         raise UnexpectedResponse, "Temporary App Store Connect error: #{response.body}" if response.body['statusCode'] == 'ERROR'
 
         store_csrf_tokens(response)
 
-        return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, client: self)
+        return Spaceship::ConnectAPI::Response.new(body: response.body, status: response.status, headers: response.headers, client: self)
       end
 
-      def handle_errors(response)
+      # Overridden from Spaceship::Client
+      def handle_error(response)
+        body = response.body.empty? ? {} : response.body
+
+        # Setting body nil if invalid JSON which can happen if 502
+        begin
+          body = JSON.parse(body) if body.kind_of?(String)
+        rescue
+          nil
+        end
+
+        case response.status.to_i
+        when 401
+          raise UnauthorizedAccessError, format_errors(response)
+        when 403
+          error = (body['errors'] || []).first || {}
+          error_code = error['code']
+          if error_code == "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
+            raise ProgramLicenseAgreementUpdated, format_errors(response)
+          else
+            raise AccessForbiddenError, format_errors(response)
+          end
+        when 502
+          # Issue - https://github.com/fastlane/fastlane/issues/19264
+          # This 502 with "Could not process this request" body sometimes
+          # work and sometimes doesn't
+          # Usually retrying once or twice will solve the issue
+          if body && body.include?("Could not process this request")
+            raise BadGatewayError, "Could not process this request"
+          end
+        end
+      end
+
+      def format_errors(response)
         # Example error format
         # {
         # "errors":[
@@ -238,8 +282,39 @@ module Spaceship
         # ]
         # }
 
-        return response.body['errors'].map do |error|
-          messages = [[error['title'], error['detail']].compact.join(" - ")]
+        # Detail is missing in this response making debugging super hard
+        # {"errors" =>
+        #   [
+        #     {
+        #       "id"=>"80ea6cff-0043-4543-9cd1-3e26b0fce383",
+        #       "status"=>"409",
+        #       "code"=>"ENTITY_ERROR.RELATIONSHIP.INVALID",
+        #       "title"=>"The provided entity includes a relationship with an invalid value",
+        #       "source"=>{
+        #         "pointer"=>"/data/relationships/primarySubcategoryOne"
+        #       }
+        #     }
+        #   ]
+        # }
+
+        # Membership expired
+        # {
+        #   "errors" : [
+        #     {
+        #       "id" : "UUID",
+        #       "status" : "403",
+        #       "code" : "FORBIDDEN_ERROR",
+        #       "title" : "This request is forbidden for security reasons",
+        #       "detail" : "Team ID: 'ID' is not associated with an active membership. To check your teams membership status, sign in your account on the developer website. https://developer.apple.com/account/"
+        #     }
+        #   ]
+        # }
+
+        body = response.body.empty? ? {} : response.body
+        body = JSON.parse(body) if body.kind_of?(String)
+
+        formatted_errors = (body['errors'] || []).map do |error|
+          messages = [[error['title'], error['detail'], error.dig("source", "pointer")].compact.join(" - ")]
 
           meta = error["meta"] || {}
           associated_errors = meta["associatedErrors"] || {}
@@ -248,6 +323,12 @@ module Spaceship
             [[associated_error["title"], associated_error["detail"]].compact.join(" - ")]
           end
         end.flatten.join("\n")
+
+        if formatted_errors.empty?
+          formatted_errors << "Unknown error"
+        end
+
+        return formatted_errors
       end
 
       private

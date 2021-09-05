@@ -43,11 +43,11 @@ describe FastlaneCore do
       end
 
       it "works a custom gem name" do
-        expect(FastlaneCore::UpdateChecker.update_command(gem_name: "gym")).to eq("sudo gem install gym")
+        expect(FastlaneCore::UpdateChecker.update_command(gem_name: "gym")).to eq("gem install gym")
       end
 
       it "works with system ruby" do
-        expect(FastlaneCore::UpdateChecker.update_command).to eq("sudo gem install fastlane")
+        expect(FastlaneCore::UpdateChecker.update_command).to eq("gem install fastlane")
       end
 
       it "works with bundler" do

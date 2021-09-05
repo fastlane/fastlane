@@ -243,12 +243,16 @@ module Gym
     # Moves over the binary and dsym file to the output directory
     # @return (String) The path to the resulting pkg file
     def move_pkg
-      FileUtils.mv(PackageCommandGenerator.pkg_path, File.expand_path(Gym.config[:output_directory]), force: true)
-      pkg_path = File.expand_path(File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.pkg_path)))
+      binary_path = File.expand_path(File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.binary_path)))
+      if File.exist?(binary_path)
+        UI.important(" Removing #{File.basename(binary_path)}") if FastlaneCore::Globals.verbose?
+        FileUtils.rm_rf(binary_path)
+      end
+      FileUtils.mv(PackageCommandGenerator.binary_path, File.expand_path(Gym.config[:output_directory]), force: true)
 
       UI.success("Successfully exported and signed the pkg file:")
-      UI.message(pkg_path)
-      pkg_path
+      UI.message(binary_path)
+      binary_path
     end
 
     # copys framework from temp folder:
@@ -273,6 +277,13 @@ module Gym
     def copy_mac_app
       exe_name = Gym.project.build_settings(key: "EXECUTABLE_NAME")
       app_path = File.join(BuildCommandGenerator.archive_path, "Products/Applications/#{exe_name}.app")
+
+      unless File.exist?(app_path)
+        # Apparently the `EXECUTABLE_NAME` is not correct. This can happen when building a workspace which has a project
+        # earlier in the build order that has a different `EXECUTABLE_NAME` than the app. Try to find the last `.app` as
+        # a fallback for this situation.
+        app_path = Dir[File.join(BuildCommandGenerator.archive_path, "Products", "Applications", "*.app")].last
+      end
 
       UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless File.exist?(app_path)
 

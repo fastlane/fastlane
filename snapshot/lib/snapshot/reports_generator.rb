@@ -84,6 +84,10 @@ module Snapshot
       {
         # snapshot in Xcode 9 saves screenshots with the SIMULATOR_DEVICE_NAME
         # which includes spaces
+        'iPhone 12 Pro Max' => "iPhone 12 Pro Max",
+        'iPhone 12 Pro' => "iPhone 12 Pro",
+        'iPhone 12 mini' => "iPhone 12 mini",
+        'iPhone 12' => "iPhone 12",
         'iPhone 11 Pro Max' => "iPhone 11 Pro Max",
         'iPhone 11 Pro' => "iPhone 11 Pro",
         'iPhone 11' => "iPhone 11",
@@ -124,7 +128,9 @@ module Snapshot
         'Apple TV 4K (at 1080p)' => 'Apple TV 4K (at 1080p)',
         'Apple TV 4K' => 'Apple TV 4K',
         'Apple TV' => 'Apple TV',
-        'Mac' => 'Mac'
+        'Mac' => 'Mac',
+        'Apple Watch Series 5 - 44mm' => 'Apple Watch Series 5 - 44mm',
+        'Apple Watch Series 6 - 44mm' => 'Apple Watch Series 6 - 44mm'
       }
     end
 

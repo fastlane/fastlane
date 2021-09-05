@@ -4,6 +4,7 @@
 # because of
 # `incompatible encoding regexp match (UTF-8 regexp with ASCII-8BIT string) (Encoding::CompatibilityError)`
 
+require 'addressable/uri'
 require 'tempfile'
 require 'xcodeproj'
 
@@ -66,43 +67,48 @@ module Gym
         if path
           # Try to find IPA file in the output directory, used when app thinning was not set
           Gym.cache[:ipa_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
-          FileUtils.mv(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:ipa_path]).downcase).zero?
+          FileUtils.mv(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp?(File.expand_path(Gym.cache[:ipa_path]).downcase)
         elsif Dir.exist?(apps_path)
           # Try to find "generic" IPA file inside "Apps" folder, used when app thinning was set
           files = Dir[File.join(apps_path, "*.ipa")]
           # Generic IPA file doesn't have suffix so its name is the shortest
           path = files.min_by(&:length)
           Gym.cache[:ipa_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.ipa")
-          FileUtils.cp(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:ipa_path]).downcase).zero?
+          FileUtils.cp(path, Gym.cache[:ipa_path]) unless File.expand_path(path).casecmp?(File.expand_path(Gym.cache[:ipa_path]).downcase)
         else
-          ErrorHandler.handle_empty_archive unless path
+          ErrorHandler.handle_empty_ipa unless path
         end
 
         Gym.cache[:ipa_path]
       end
 
-      def pkg_path
-        path = Gym.cache[:pkg_path]
+      def binary_path
+        path = Gym.cache[:binary_path]
         return path if path
 
         path = Dir[File.join(temporary_output_path, "*.pkg")].last
-        # We need to process generic PKG
+        app_path = Dir[File.join(temporary_output_path, "*.app")].last
+        # We need to process generic PKG or APP
         if path
           # Try to find PKG file in the output directory, used when app thinning was not set
-          Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
-          FileUtils.mv(path, Gym.cache[:pkg_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:pkg_path]).downcase).zero?
+          Gym.cache[:binary_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
+          FileUtils.mv(path, Gym.cache[:binary_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:binary_path]).downcase).zero?
         elsif Dir.exist?(apps_path)
           # Try to find "generic" PKG file inside "Apps" folder, used when app thinning was set
           files = Dir[File.join(apps_path, "*.pkg")]
           # Generic PKG file doesn't have suffix so its name is the shortest
           path = files.min_by(&:length)
-          Gym.cache[:pkg_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
-          FileUtils.cp(path, Gym.cache[:pkg_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:pkg_path]).downcase).zero?
+          Gym.cache[:binary_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.pkg")
+          FileUtils.cp(path, Gym.cache[:binary_path]) unless File.expand_path(path).casecmp(File.expand_path(Gym.cache[:binary_path]).downcase).zero?
+        elsif app_path
+          # Try to find .app file in the output directory. This is used when macOS is set and .app is being generated.
+          Gym.cache[:binary_path] = File.join(temporary_output_path, "#{Gym.config[:output_name]}.app")
+          FileUtils.mv(app_path, Gym.cache[:binary_path]) unless File.expand_path(app_path).casecmp(File.expand_path(Gym.cache[:binary_path]).downcase).zero?
         else
-          ErrorHandler.handle_empty_archive unless path
+          ErrorHandler.handle_empty_pkg unless path
         end
 
-        Gym.cache[:pkg_path]
+        Gym.cache[:binary_path]
       end
 
       # The path the the dsym file for this app. Might be nil
@@ -149,12 +155,12 @@ module Gym
 
       def normalize_export_options(hash)
         # Normalize some values
-        hash[:onDemandResourcesAssetPacksBaseURL] = URI.escape(hash[:onDemandResourcesAssetPacksBaseURL]) if hash[:onDemandResourcesAssetPacksBaseURL]
+        hash[:onDemandResourcesAssetPacksBaseURL] = Addressable::URI.encode(hash[:onDemandResourcesAssetPacksBaseURL]) if hash[:onDemandResourcesAssetPacksBaseURL]
         if hash[:manifest]
-          hash[:manifest][:appURL] = URI.escape(hash[:manifest][:appURL]) if hash[:manifest][:appURL]
-          hash[:manifest][:displayImageURL] = URI.escape(hash[:manifest][:displayImageURL]) if hash[:manifest][:displayImageURL]
-          hash[:manifest][:fullSizeImageURL] = URI.escape(hash[:manifest][:fullSizeImageURL]) if hash[:manifest][:fullSizeImageURL]
-          hash[:manifest][:assetPackManifestURL] = URI.escape(hash[:manifest][:assetPackManifestURL]) if hash[:manifest][:assetPackManifestURL]
+          hash[:manifest][:appURL] = Addressable::URI.encode(hash[:manifest][:appURL]) if hash[:manifest][:appURL]
+          hash[:manifest][:displayImageURL] = Addressable::URI.encode(hash[:manifest][:displayImageURL]) if hash[:manifest][:displayImageURL]
+          hash[:manifest][:fullSizeImageURL] = Addressable::URI.encode(hash[:manifest][:fullSizeImageURL]) if hash[:manifest][:fullSizeImageURL]
+          hash[:manifest][:assetPackManifestURL] = Addressable::URI.encode(hash[:manifest][:assetPackManifestURL]) if hash[:manifest][:assetPackManifestURL]
         end
         hash
       end

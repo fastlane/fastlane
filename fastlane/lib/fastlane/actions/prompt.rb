@@ -67,15 +67,14 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :boolean,
                                        description: "Is that a boolean question (yes/no)? This will add (y/n) at the end",
                                        default_value: false,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :secure_text,
                                        description: "Is that a secure text (yes/no)?",
                                        default_value: false,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :multi_line_end_keyword,
                                        description: "Enable multi-line inputs by providing an end text (e.g. 'END') which will stop the user input",
-                                       optional: true,
-                                       is_string: true)
+                                       optional: true)
         ]
       end
 

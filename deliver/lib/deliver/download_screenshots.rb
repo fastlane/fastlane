@@ -1,6 +1,5 @@
 require_relative 'module'
 require 'spaceship'
-require 'open-uri'
 
 module Deliver
   class DownloadScreenshots
@@ -14,7 +13,7 @@ module Deliver
     end
 
     def self.download(options, folder_path)
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       if options[:use_live_version]
@@ -68,7 +67,7 @@ module Deliver
           end
 
           path = File.join(containing_folder, file_name)
-          File.binwrite(path, open(url).read)
+          File.binwrite(path, FastlaneCore::Helper.open_uri(url).read)
         end
       end
     end

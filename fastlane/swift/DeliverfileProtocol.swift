@@ -1,5 +1,5 @@
 // DeliverfileProtocol.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 public protocol DeliverfileProtocol: class {
     /// Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
@@ -9,7 +9,7 @@ public protocol DeliverfileProtocol: class {
     var apiKey: [String: Any]? { get }
 
     /// Your Apple ID Username
-    var username: String { get }
+    var username: String? { get }
 
     /// The bundle identifier of your app
     var appIdentifier: String? { get }
@@ -53,11 +53,14 @@ public protocol DeliverfileProtocol: class {
     /// Don’t create or update the app version that is being prepared for submission
     var skipAppVersionUpdate: Bool { get }
 
-    /// Skip the HTML report file verification
+    /// Skip verification of HTML preview file
     var force: Bool { get }
 
     /// Clear all previously uploaded screenshots before uploading the new ones
     var overwriteScreenshots: Bool { get }
+
+    /// Sync screenshots with local ones. This is currently beta optionso set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
+    var syncScreenshots: Bool { get }
 
     /// Submit the new version for Review after uploading everything
     var submitForReview: Bool { get }
@@ -66,7 +69,7 @@ public protocol DeliverfileProtocol: class {
     var rejectIfPossible: Bool { get }
 
     /// Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
-    var automaticRelease: Bool { get }
+    var automaticRelease: Bool? { get }
 
     /// Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)
     var autoReleaseDate: Int? { get }
@@ -78,7 +81,7 @@ public protocol DeliverfileProtocol: class {
     var resetRatings: Bool { get }
 
     /// The price tier of this application
-    var priceTier: String? { get }
+    var priceTier: Int? { get }
 
     /// Path to the app rating's config
     var appRatingConfigPath: String? { get }
@@ -137,7 +140,7 @@ public protocol DeliverfileProtocol: class {
     /// Metadata: The english name of the secondary second sub category (e.g. `Educational`, `Puzzle`)
     var secondarySecondSubCategory: String? { get }
 
-    /// Metadata: A hash containing the trade representative contact information
+    /// **DEPRECATED!** This is no longer used by App Store Connect - Metadata: A hash containing the trade representative contact information
     var tradeRepresentativeContactInformation: [String: Any]? { get }
 
     /// Metadata: A hash containing the review information
@@ -147,10 +150,10 @@ public protocol DeliverfileProtocol: class {
     var appReviewAttachmentFile: String? { get }
 
     /// Metadata: The localised app description
-    var description: String? { get }
+    var description: [String: Any]? { get }
 
     /// Metadata: The localised app name
-    var name: String? { get }
+    var name: [String: Any]? { get }
 
     /// Metadata: The localised app subtitle
     var subtitle: [String: Any]? { get }
@@ -162,19 +165,19 @@ public protocol DeliverfileProtocol: class {
     var promotionalText: [String: Any]? { get }
 
     /// Metadata: Localised release notes for this version
-    var releaseNotes: String? { get }
+    var releaseNotes: [String: Any]? { get }
 
     /// Metadata: Localised privacy url
-    var privacyUrl: String? { get }
+    var privacyUrl: [String: Any]? { get }
 
     /// Metadata: Localised Apple TV privacy policy text
-    var appleTvPrivacyPolicy: String? { get }
+    var appleTvPrivacyPolicy: [String: Any]? { get }
 
     /// Metadata: Localised support url
-    var supportUrl: String? { get }
+    var supportUrl: [String: Any]? { get }
 
     /// Metadata: Localised marketing url
-    var marketingUrl: String? { get }
+    var marketingUrl: [String: Any]? { get }
 
     /// Metadata: List of languages to activate
     var languages: [String]? { get }
@@ -186,13 +189,13 @@ public protocol DeliverfileProtocol: class {
     var precheckIncludeInAppPurchases: Bool { get }
 
     /// The (spaceship) app ID of the app you want to use/modify
-    var app: String { get }
+    var app: Int? { get }
 }
 
 public extension DeliverfileProtocol {
     var apiKeyPath: String? { return nil }
     var apiKey: [String: Any]? { return nil }
-    var username: String { return "" }
+    var username: String? { return nil }
     var appIdentifier: String? { return nil }
     var appVersion: String? { return nil }
     var ipa: String? { return nil }
@@ -209,13 +212,14 @@ public extension DeliverfileProtocol {
     var skipAppVersionUpdate: Bool { return false }
     var force: Bool { return false }
     var overwriteScreenshots: Bool { return false }
+    var syncScreenshots: Bool { return false }
     var submitForReview: Bool { return false }
     var rejectIfPossible: Bool { return false }
-    var automaticRelease: Bool { return false }
+    var automaticRelease: Bool? { return nil }
     var autoReleaseDate: Int? { return nil }
     var phasedRelease: Bool { return false }
     var resetRatings: Bool { return false }
-    var priceTier: String? { return nil }
+    var priceTier: Int? { return nil }
     var appRatingConfigPath: String? { return nil }
     var submissionInformation: [String: Any]? { return nil }
     var teamId: String? { return nil }
@@ -238,22 +242,22 @@ public extension DeliverfileProtocol {
     var tradeRepresentativeContactInformation: [String: Any]? { return nil }
     var appReviewInformation: [String: Any]? { return nil }
     var appReviewAttachmentFile: String? { return nil }
-    var description: String? { return nil }
-    var name: String? { return nil }
+    var description: [String: Any]? { return nil }
+    var name: [String: Any]? { return nil }
     var subtitle: [String: Any]? { return nil }
     var keywords: [String: Any]? { return nil }
     var promotionalText: [String: Any]? { return nil }
-    var releaseNotes: String? { return nil }
-    var privacyUrl: String? { return nil }
-    var appleTvPrivacyPolicy: String? { return nil }
-    var supportUrl: String? { return nil }
-    var marketingUrl: String? { return nil }
+    var releaseNotes: [String: Any]? { return nil }
+    var privacyUrl: [String: Any]? { return nil }
+    var appleTvPrivacyPolicy: [String: Any]? { return nil }
+    var supportUrl: [String: Any]? { return nil }
+    var marketingUrl: [String: Any]? { return nil }
     var languages: [String]? { return nil }
     var ignoreLanguageDirectoryValidation: Bool { return false }
     var precheckIncludeInAppPurchases: Bool { return true }
-    var app: String { return "" }
+    var app: Int? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.45]
+// FastlaneRunnerAPIVersion [0.9.82]

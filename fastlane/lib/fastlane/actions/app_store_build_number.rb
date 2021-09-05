@@ -27,9 +27,20 @@ module Fastlane
 
       def self.get_build_number(params)
         # Prompts select team if multiple teams and none specified
-        UI.message("Login to App Store Connect (#{params[:username]})")
-        Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true, tunes_team_id: params[:team_id], team_name: params[:team_name])
-        UI.message("Login successful")
+        if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
+          UI.message("Creating authorization token for App Store Connect API")
+          Spaceship::ConnectAPI.token = api_token
+        elsif !Spaceship::ConnectAPI.token.nil?
+          UI.message("Using existing authorization token for App Store Connect API")
+        else
+          # Username is now optional since addition of App Store Connect API Key
+          # Force asking for username to prompt user if not already set
+          params.fetch(:username, force_ask: true)
+
+          UI.message("Login to App Store Connect (#{params[:username]})")
+          Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true, tunes_team_id: params[:team_id], team_name: params[:team_name])
+          UI.message("Login successful")
+        end
 
         platform = Spaceship::ConnectAPI::Platform.map(params[:platform])
 
@@ -104,10 +115,27 @@ module Fastlane
         user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
         [
+          FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                       env_names: ["APPSTORE_BUILD_NUMBER_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
+                                       description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                       optional: true,
+                                       conflicting_options: [:api_key],
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :api_key,
+                                       env_names: ["APPSTORE_BUILD_NUMBER_API_KEY", "APP_STORE_CONNECT_API_KEY"],
+                                       description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                       type: Hash,
+                                       default_value: Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY],
+                                       default_value_dynamic: true,
+                                       optional: true,
+                                       sensitive: true,
+                                       conflicting_options: [:api_key_path]),
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
                                        env_name: "INITIAL_BUILD_NUMBER",
                                        description: "sets the build number to given value if no build is in current train",
-                                       is_string: false),
+                                       skip_type_validation: true), # as we also allow integers, which we convert to strings anyway
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        short_option: "-a",
                                        env_name: "FASTLANE_APP_IDENTIFIER",
@@ -119,6 +147,7 @@ module Fastlane
                                        short_option: "-u",
                                        env_name: "ITUNESCONNECT_USER",
                                        description: "Your Apple ID Username",
+                                       optional: true,
                                        default_value: user,
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :team_id,
@@ -126,7 +155,7 @@ module Fastlane
                                        env_name: "APPSTORE_BUILD_NUMBER_LIVE_TEAM_ID",
                                        description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
-                                       is_string: false, # as we also allow integers, which we convert to strings anyway
+                                       skip_type_validation: true, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                        default_value_dynamic: true,
@@ -138,7 +167,7 @@ module Fastlane
                                        env_name: "APPSTORE_BUILD_NUMBER_LIVE",
                                        description: "Query the live version (ready-for-sale)",
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "LATEST_VERSION",
@@ -149,7 +178,6 @@ module Fastlane
                                        env_name: "APPSTORE_PLATFORM",
                                        description: "The platform to use (optional)",
                                        optional: true,
-                                       is_string: true,
                                        default_value: "ios",
                                        verify_block: proc do |value|
                                          UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include?(value)
@@ -193,6 +221,14 @@ module Fastlane
             live: false,
             app_identifier: "app.identifier",
             version: "1.2.9"
+          )',
+          'api_key = app_store_connect_api_key(
+            key_id: "MyKeyID12345",
+            issuer_id: "00000000-0000-0000-0000-000000000000",
+            key_filepath: "./AuthKey.p8"
+          )
+          build_num = app_store_build_number(
+            api_key: api_key
           )'
         ]
       end

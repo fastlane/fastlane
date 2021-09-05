@@ -1,5 +1,5 @@
 // MainProcess.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 //
 //  ** NOTE **
@@ -56,6 +56,8 @@ class MainProcess {
                 print(stdout)
                 self.timeBetweenPrints = Int(self.lastPrintDate.timeIntervalSinceNow)
             }
+
+            // swiftformat:disable:next redundantSelf
             _ = Runner.waitWithPolling(self.timeBetweenPrints, toEventually: { $0 > 5 }, timeout: 10)
             thread.start()
         #endif

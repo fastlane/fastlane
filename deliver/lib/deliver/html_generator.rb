@@ -50,12 +50,12 @@ module Deliver
       @export_path = export_path
 
       @app_name = (options[:name]['en-US'] || options[:name].values.first) if options[:name]
-      @app_name ||= options[:app].name
+      @app_name ||= Deliver.cache[:app].name
 
       @languages = options[:description].keys if options[:description]
       @languages ||= begin
         platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
-        version = options[:app].get_edit_app_store_version(platform: platform)
+        version = Deliver.cache[:app].get_edit_app_store_version(platform: platform)
 
         version.get_app_store_version_localizations.collect(&:locale)
       end

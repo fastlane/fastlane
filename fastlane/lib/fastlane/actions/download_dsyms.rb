@@ -39,13 +39,8 @@ module Fastlane
         # Set version if it is latest
         if version == 'latest'
           # Try to grab the edit version first, else fallback to live version
-          UI.message("Looking for latest version...")
-          latest_version = app.get_edit_app_store_version(platform: platform) || app.get_live_app_store_version(platform: platform)
-
-          UI.user_error!("Could not find latest version for your app, please try setting a specific version") if latest_version.nil?
-
-          latest_build = get_latest_build!(app_id: app.id, version: latest_version.version_string, platform: platform)
-
+          UI.message("Looking for latest build...")
+          latest_build = get_latest_build!(app_id: app.id, platform: platform)
           version = latest_build.app_version
           build_number = latest_build.version
         elsif version == 'live'
@@ -57,11 +52,6 @@ module Fastlane
           # No need to search for candidates, because released App Store version should only have one build
           version = live_version.version_string
           build_number = live_version.build.version
-        end
-
-        # Remove leading zeros from version string (eg. 1.02 -> 1.2)
-        if version
-          version = version.split(".").map(&:to_i).join(".")
         end
 
         # Make sure output_directory has a slash on the end
@@ -161,14 +151,14 @@ module Fastlane
       end
       # rubocop:enable Metrics/PerceivedComplexity
 
-      def self.get_latest_build!(app_id: nil, version: nil, platform: nil)
+      def self.get_latest_build!(app_id: nil, platform: nil)
         filter = { app: app_id }
-        filter["preReleaseVersion.version"] = version
         filter["preReleaseVersion.platform"] = platform
         latest_build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion").first
 
         if latest_build.nil?
-          UI.user_error!("Could not find latest build for version #{version}")
+          UI.user_error!("Could not find any build for platform #{platform}") if platform
+          UI.user_error!("Could not find any build")
         end
 
         return latest_build
@@ -263,7 +253,7 @@ module Fastlane
                                        env_name: "DOWNLOAD_DSYMS_TEAM_ID",
                                        description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
-                                       is_string: false, # as we also allow integers, which we convert to strings anyway
+                                       skip_type_validation: true, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                        default_value_dynamic: true,
@@ -285,7 +275,6 @@ module Fastlane
                                        short_option: "-p",
                                        env_name: "DOWNLOAD_DSYMS_PLATFORM",
                                        description: "The app platform for dSYMs you wish to download (ios, appletvos)",
-                                       optional: true,
                                        default_value: :ios),
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
@@ -297,7 +286,7 @@ module Fastlane
                                        env_name: "DOWNLOAD_DSYMS_BUILD_NUMBER",
                                        description: "The app build_number for dSYMs you wish to download",
                                        optional: true,
-                                       is_string: false),
+                                       skip_type_validation: true), # as we also allow integers, which we convert to strings anyway
           FastlaneCore::ConfigItem.new(key: :min_version,
                                        short_option: "-m",
                                        env_name: "DOWNLOAD_DSYMS_MIN_VERSION",
@@ -307,8 +296,7 @@ module Fastlane
                                        short_option: "-d",
                                        env_name: "DOWNLOAD_DSYMS_AFTER_UPLOADED_DATE",
                                        description: "The uploaded date after which you wish to download dSYMs",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :output_directory,
                                        short_option: "-s",
                                        env_name: "DOWNLOAD_DSYMS_OUTPUT_DIRECTORY",

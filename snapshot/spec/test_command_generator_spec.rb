@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 describe Snapshot do
   describe Snapshot::TestCommandGenerator do
     let(:os_version) { "9.3" }
@@ -10,10 +12,11 @@ describe Snapshot do
     let(:iphone4s_9_0) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 4s", os_version: '9.0', udid: "4444", state: "Don't Care", is_simulator: true) }
     let(:ipad_air_9_1) { FastlaneCore::DeviceManager::Device.new(name: "iPad Air", os_version: '9.1', udid: "12345", state: "Don't Care", is_simulator: true) }
     let(:appleTV) { FastlaneCore::DeviceManager::Device.new(name: "Apple TV 1080p", os_version: os_version, udid: "22222", state: "Don't Care", is_simulator: true) }
+    let(:appleWatch6_44mm_7_4) { FastlaneCore::DeviceManager::Device.new(name: "Apple Watch Series 6 - 44mm", os_version: '7.4', udid: "5555544", state: "Don't Care", is_simulator: true) }
 
     before do
       allow(Snapshot::LatestOsVersion).to receive(:version).and_return(os_version)
-      allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone6_9_0, iphone6_9_3, iphone6_9_2, appleTV, iphone6_9_3_2, iphone6_10_1, iphone6s_10_1, iphone4s_9_0, ipad_air_9_1])
+      allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone6_9_0, iphone6_9_3, iphone6_9_2, appleTV, iphone6_9_3_2, iphone6_10_1, iphone6s_10_1, iphone4s_9_0, ipad_air_9_1, appleWatch6_44mm_7_4])
       fake_out_xcode_project_loading
     end
 
@@ -35,7 +38,7 @@ describe Snapshot do
         @test_command_generator = Snapshot::TestCommandGenerator.new
       end
       it "returns true with only iOS devices" do
-        devices = ["iPhone 8", "iPad Air 2", "iPhone X", "iPhone 8 plus"]
+        devices = ["iPhone 8", "iPad Air 2", "iPhone X", "iPhone 8 plus", "iPod touch (7th generation)"]
         result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
         expect(result).to be(true)
       end
@@ -46,14 +49,38 @@ describe Snapshot do
         expect(result).to be(true)
       end
 
-      it "returns false with mixed device OS" do
-        devices = ["Apple TV 1080p", "iPad Air 2", "iPhone 8"]
+      it "returns true with only Apple Watch devices" do
+        devices = ["Apple Watch Series 6 - 44mm"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(true)
+      end
+
+      it "returns false with mixed device OS of Apple TV and iPhone" do
+        devices = ["Apple TV 1080p", "iPhone 8"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(false)
+      end
+
+      it "returns false with mixed device OS of Apple Watch and iPhone" do
+        devices = ["Apple Watch Series 6 - 44mm", "iPhone 8"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(false)
+      end
+
+      it "returns false with mixed device OS of Apple TV and iPad" do
+        devices = ["Apple TV 1080p", "iPad Air 2"]
+        result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
+        expect(result).to be(false)
+      end
+
+      it "returns false with mixed device OS of Apple TV and iPod" do
+        devices = ["Apple TV 1080p", "iPod touch (7th generation)"]
         result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
         expect(result).to be(false)
       end
 
       it "returns true with custom named iOS devices" do
-        devices = ["11.0 - iPhone X", "11.0 - iPad Air 2"]
+        devices = ["11.0 - iPhone X", "11.0 - iPad Air 2", "13.0 - iPod touch"]
         result = Snapshot::TestCommandGenerator.verify_devices_share_os(devices)
         expect(result).to be(true)
       end
@@ -105,11 +132,11 @@ describe Snapshot do
 
         expect(FastlaneCore::CommandExecutor).
           to receive(:execute).
-          with(command: "xcrun simctl spawn 33333 log collect --output /tmp/scan_results/de-DE/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null", print_all: false, print_command: true)
+          with(command: %r{xcrun simctl spawn 33333 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/de-DE/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null}, print_all: false, print_command: true)
 
         expect(FastlaneCore::CommandExecutor).
           to receive(:execute).
-          with(command: "xcrun simctl spawn 98765 log collect --output /tmp/scan_results/en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null", print_all: false, print_command: true)
+          with(command: %r{xcrun simctl spawn 98765 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null}, print_all: false, print_command: true)
 
         Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPhone 6 (10.1)"], "de-DE", nil, 0)
         Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPhone 6s (10.1)"], "en-US", nil, 0)
@@ -178,6 +205,7 @@ describe Snapshot do
               "-derivedDataPath /tmp/path/to/snapshot_derived",
               "-destination 'platform=iOS Simulator,name=#{name},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
               :build,
               :test,
               "| tee /path/to/logs",
@@ -207,6 +235,7 @@ describe Snapshot do
               "-only-testing:TestBundle/TestSuite/Screenshots",
               "-destination 'platform=iOS Simulator,name=#{name},OS=#{ios}'",
               "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
               :build,
               :test,
               "| tee /path/to/logs",
@@ -235,6 +264,36 @@ describe Snapshot do
               "-derivedDataPath /tmp/path/to/snapshot_derived",
               "-destination 'platform=tvOS Simulator,name=#{name},OS=#{os}'",
               "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
+              :build,
+              :test,
+              "| tee /path/to/logs",
+              "| xcpretty "
+            ]
+          )
+        end
+
+        it "uses the default parameters on watchOS too", requires_xcode: true do
+          configure(options.merge(devices: ["Apple Watch Series 6 - 44mm"]))
+          expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
+          command = Snapshot::TestCommandGenerator.generate(
+            devices: ["Apple Watch Series 6 - 44mm"],
+            language: "en",
+            locale: nil,
+            log_path: '/path/to/logs'
+          )
+          name = command.join('').match(/name=(.+?),/)[1]
+          os = command.join('').match(/OS=(\d+.\d+)/)[1]
+          expect(command).to eq(
+            [
+              "set -o pipefail &&",
+              "xcodebuild",
+              "-scheme ExampleUITests",
+              "-project ./snapshot/example/Example.xcodeproj",
+              "-derivedDataPath /tmp/path/to/snapshot_derived",
+              "-destination 'platform=watchOS Simulator,name=#{name},OS=#{os}'",
+              "FASTLANE_SNAPSHOT=YES",
+              "FASTLANE_LANGUAGE=en",
               :build,
               :test,
               "| tee /path/to/logs",
@@ -245,20 +304,24 @@ describe Snapshot do
       end
 
       context 'fixed derivedDataPath' do
+        let(:temp) { Dir.mktmpdir }
+
         before do
-          configure(options.merge(derived_data_path: 'fake/derived/path'))
+          configure(options.merge(derived_data_path: temp))
         end
 
         it 'uses the fixed derivedDataPath if given', requires_xcode: true do
           expect(Dir).not_to(receive(:mktmpdir))
           command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
-          expect(command.join('')).to include("-derivedDataPath fake/derived/path")
+          expect(command.join('')).to include("-derivedDataPath #{temp}")
         end
       end
 
       context 'test-without-building' do
+        let(:temp) { Dir.mktmpdir }
+
         before do
-          configure(options.merge(derived_data_path: 'fake/derived/path', test_without_building: true))
+          configure(options.merge(derived_data_path: temp, test_without_building: true))
         end
 
         it 'uses the "test-without-building" command and not the default "build test"', requires_xcode: true do
@@ -367,6 +430,7 @@ describe Snapshot do
             "-derivedDataPath /tmp/path/to/snapshot_derived",
             "-destination 'platform=macOS'",
             "FASTLANE_SNAPSHOT=YES",
+            "FASTLANE_LANGUAGE=en",
             :build,
             :test,
             "| tee /path/to/logs",

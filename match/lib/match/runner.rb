@@ -139,9 +139,8 @@ module Match
     # rubocop:enable Metrics/PerceivedComplexity
 
     def api_token(params)
-      @api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
-      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
-      return @api_token
+      api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path])
+      return api_token
     end
 
     # Used when creating a new certificate or profile
@@ -192,12 +191,12 @@ module Match
             UI.verbose("Certificate '#{File.basename(cert_path)}' is already installed on this machine")
           else
             Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
-          end
 
-          # Import the private key
-          # there seems to be no good way to check if it's already installed - so just install it
-          # Key will only be added to the partition list if it isn't already installed
-          Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+            # Import the private key
+            # there seems to be no good way to check if it's already installed - so just install it
+            # Key will only be added to the partition list if it isn't already installed
+            Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+          end
         else
           UI.message("Skipping installation of certificate as it would not work on this operating system.")
         end
@@ -244,13 +243,14 @@ module Match
       force = params[:force]
 
       if params[:force_for_new_devices] && !params[:readonly]
-        if prov_type != :appstore && !params[:force]
+        prov_types_without_devices = [:appstore, :developer_id]
+        if !prov_types_without_devices.include?(prov_type) && !params[:force]
           force = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym)
         else
           # App Store provisioning profiles don't contain device identifiers and
           # thus shouldn't be renewed if the device count has changed.
-          UI.important("Warning: `force_for_new_devices` is set but is ignored for App Store provisioning profiles.")
-          UI.important("You can safely stop specifying `force_for_new_devices` when running Match for type 'appstore'.")
+          UI.important("Warning: `force_for_new_devices` is set but is ignored for App Store & Developer ID provisioning profiles.")
+          UI.important("You can safely stop specifying `force_for_new_devices` when running Match for type 'appstore' or 'developer_id'.")
         end
       end
 
@@ -344,7 +344,7 @@ module Match
             [
               Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV
             ]
-          when :mac, :catalyst
+          when :macos, :catalyst
             [
               Spaceship::ConnectAPI::Device::DeviceClass::MAC
             ]
@@ -355,7 +355,7 @@ module Match
         devices = Spaceship::ConnectAPI::Device.all
         unless device_classes.empty?
           devices = devices.select do |device|
-            device_classes.include?(device.device_class)
+            device_classes.include?(device.device_class) && device.enabled?
           end
         end
 

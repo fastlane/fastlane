@@ -76,6 +76,7 @@ describe Scan do
   describe Scan::TestCommandGenerator do
     before(:each) do
       @test_command_generator = Scan::TestCommandGenerator.new
+      @project.options.delete(:use_system_scm)
     end
 
     it "raises an exception when project path wasn't found" do
@@ -159,49 +160,140 @@ describe Scan do
       expect(result.last).to include("| xcpretty -f 'custom-formatter.rb'")
     end
 
+    it "uses system scm", requires_xcodebuild: true do
+      options = { project: "./scan/examples/standard/app.xcodeproj", use_system_scm: true }
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      result = @test_command_generator.generate
+      expect(result).to include("-scmProvider system").once
+    end
+
+    it "uses system scm via project options", requires_xcodebuild: true do
+      options = { project: "./scan/examples/standard/app.xcodeproj" }
+      @project.options[:use_system_scm] = true
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      result = @test_command_generator.generate
+      expect(result).to include("-scmProvider system").once
+    end
+
+    it "uses system scm options exactly once", requires_xcodebuild: true do
+      options = { project: "./scan/examples/standard/app.xcodeproj", use_system_scm: true }
+      @project.options[:use_system_scm] = true
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      result = @test_command_generator.generate
+      expect(result).to include("-scmProvider system").once
+    end
+
+    it "defaults to Xcode scm when option is not provided", requires_xcodebuild: true do
+      options = { project: "./scan/examples/standard/app.xcodeproj" }
+      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      result = @test_command_generator.generate
+      expect(result).to_not(include("-scmProvider system"))
+    end
+
     describe "Standard Example" do
-      before do
-        options = { project: "./scan/examples/standard/app.xcodeproj" }
-        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      describe "Xcode project" do
+        before do
+          options = { project: "./scan/examples/standard/app.xcodeproj" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        end
+
+        it "uses the correct build command with the example project with no additional parameters", requires_xcodebuild: true do
+          log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+          result = @test_command_generator.generate
+          expect(result).to start_with([
+                                         "set -o pipefail &&",
+                                         "env NSUnbufferedIO=YES xcodebuild",
+                                         "-scheme app",
+                                         "-project ./scan/examples/standard/app.xcodeproj",
+                                         "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                         "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         :build,
+                                         :test
+                                       ])
+        end
+
+        it "#project_path_array", requires_xcodebuild: true do
+          result = @test_command_generator.project_path_array
+          expect(result).to eq(["-scheme app", "-project ./scan/examples/standard/app.xcodeproj"])
+        end
+
+        it "#build_path", requires_xcodebuild: true do
+          result = @test_command_generator.build_path
+          regex = %r{Library/Developer/Xcode/Archives/\d\d\d\d\-\d\d\-\d\d}
+          expect(result).to match(regex)
+        end
+
+        it "#buildlog_path is used when provided", requires_xcodebuild: true do
+          options = { project: "./scan/examples/standard/app.xcodeproj", buildlog_path: "/tmp/my/path" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          result = @test_command_generator.xcodebuild_log_path
+          expect(result).to include("/tmp/my/path")
+        end
+
+        it "#buildlog_path is not used when not provided", requires_xcodebuild: true do
+          result = @test_command_generator.xcodebuild_log_path
+          expect(result.to_s).to include(File.expand_path("#{FastlaneCore::Helper.buildlog_path}/scan"))
+        end
       end
 
-      it "uses the correct build command with the example project with no additional parameters", requires_xcodebuild: true do
-        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+      describe "SPM package" do
+        describe "No workspace" do
+          before do
+            options = { package_path: "./scan/examples/package/", scheme: "package" }
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          end
 
-        result = @test_command_generator.generate
-        expect(result).to start_with([
-                                       "set -o pipefail &&",
-                                       "env NSUnbufferedIO=YES xcodebuild",
-                                       "-scheme app",
-                                       "-project ./scan/examples/standard/app.xcodeproj",
-                                       "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
-                                       "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                       :build,
-                                       :test
-                                     ])
-      end
+          it "uses the correct build command with the example package and scheme", requires_xcodebuild: true do
+            log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-      it "#project_path_array", requires_xcodebuild: true do
-        result = @test_command_generator.project_path_array
-        expect(result).to eq(["-scheme app", "-project ./scan/examples/standard/app.xcodeproj"])
-      end
+            result = @test_command_generator.generate
+            expect(result).to start_with([
+                                           "set -o pipefail &&",
+                                           "cd ./scan/examples/package/ &&",
+                                           "env NSUnbufferedIO=YES xcodebuild",
+                                           "-scheme package",
+                                           "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                           "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                           :build,
+                                           :test
+                                         ])
+          end
 
-      it "#build_path", requires_xcodebuild: true do
-        result = @test_command_generator.build_path
-        regex = %r{Library/Developer/Xcode/Archives/\d\d\d\d\-\d\d\-\d\d}
-        expect(result).to match(regex)
-      end
+          it "#project_path_array", requires_xcodebuild: true do
+            result = @test_command_generator.project_path_array
+            expect(result).to eq(["-scheme package"])
+          end
+        end
 
-      it "#buildlog_path is used when provided", requires_xcodebuild: true do
-        options = { project: "./scan/examples/standard/app.xcodeproj", buildlog_path: "/tmp/my/path" }
-        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-        result = @test_command_generator.xcodebuild_log_path
-        expect(result).to include("/tmp/my/path")
-      end
+        describe "With workspace" do
+          before do
+            options = { package_path: "./scan/examples/package/", scheme: "package", workspace: "." }
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          end
 
-      it "#buildlog_path is not used when not provided", requires_xcodebuild: true do
-        result = @test_command_generator.xcodebuild_log_path
-        expect(result.to_s).to include(File.expand_path("#{FastlaneCore::Helper.buildlog_path}/scan"))
+          it "uses the correct build command with the example package and scheme", requires_xcodebuild: true do
+            log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+            result = @test_command_generator.generate
+            expect(result).to start_with([
+                                           "set -o pipefail &&",
+                                           "cd ./scan/examples/package/ &&",
+                                           "env NSUnbufferedIO=YES xcodebuild",
+                                           "-scheme package",
+                                           "-workspace .",
+                                           "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                           "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                           :build,
+                                           :test
+                                         ])
+          end
+
+          it "#project_path_array", requires_xcodebuild: true do
+            result = @test_command_generator.project_path_array
+            expect(result).to eq(["-scheme package", "-workspace ."])
+          end
+        end
       end
     end
 
@@ -283,11 +375,11 @@ describe Scan do
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: "xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
+            with(command: %r{xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null}, print_all: false, print_command: true)
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: "xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null", print_all: false, print_command: true)
+            with(command: %r{xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null}, print_all: false, print_command: true)
 
           mock_test_result_parser = Object.new
           allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)

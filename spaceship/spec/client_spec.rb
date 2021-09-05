@@ -109,6 +109,14 @@ describe Spaceship::Client do
         subject.req_home
       end.to raise_error(Spaceship::ProgramLicenseAgreementUpdated)
     end
+
+    it "raises Spaceship::TooManyRequestsError" do
+      stub_client_request(Spaceship::TooManyRequestsError.new({}), 6, 429, "Program License Agreement")
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::Client::TooManyRequestsError)
+    end
   end
 
   describe 'retry' do

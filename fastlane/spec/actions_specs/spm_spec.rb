@@ -74,6 +74,14 @@ describe Fastlane do
         expect(result).to eq("swift package generate-xcodeproj")
       end
 
+      it "skips --enable-code-coverage if command is not generate-xcode-proj or test" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          spm(command: 'build', enable_code_coverage: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("swift build")
+      end
+
       it "sets the command to resolve" do
         result = Fastlane::FastFile.new.parse("lane :test do
           spm(command: 'resolve')
@@ -155,6 +163,28 @@ describe Fastlane do
               spm
             end").runner.execute(:test)
           end.not_to(raise_error)
+        end
+
+        it "sets --enable-code-coverage to true for test" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            spm(
+              command: 'test',
+              enable_code_coverage: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swift test --enable-code-coverage")
+        end
+
+        it "sets --enable-code-coverage to false for test" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            spm(
+              command: 'test',
+              enable_code_coverage: false
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swift test")
         end
       end
 
@@ -272,6 +302,28 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq("swift package generate-xcodeproj --xcconfig-overrides Package.xcconfig")
+        end
+
+        it "sets --enable-code-coverage to true for generate-xcodeproj" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            spm(
+              command: 'generate-xcodeproj',
+              enable_code_coverage: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swift package generate-xcodeproj --enable-code-coverage")
+        end
+
+        it "sets --enable-code-coverage to false for generate-xcodeproj" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            spm(
+              command: 'generate-xcodeproj',
+              enable_code_coverage: false
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swift package generate-xcodeproj")
         end
 
         it "adds --verbose and xcpretty options correctly as well" do

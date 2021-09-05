@@ -104,7 +104,7 @@ deliver(
 
 ## More options
 
-<details>
+<details markdown="1">
 <summary>View all available options and their valid values</summary>
 
 ## Available options
@@ -288,7 +288,7 @@ reset_ratings(false)
 ##### app_rating_config_path
 You can set the app age ratings using _deliver_. You'll have to create and store a `JSON` configuration file. Copy the [template](https://github.com/fastlane/fastlane/blob/master/deliver/assets/example_rating_config.json) to your project folder and pass the path to the `JSON` file using the `app_rating_config_path` option.
 
-The keys/values on the top allow values from 0-2, and the items on the bottom allow only 0 or 1. More information in [#reference](#reference).
+The keys/values on the top allow one of 3 strings: "NONE", "INFREQUENT_OR_MILD" or "FREQUENT_OR_INTENSE", and the items on the bottom allow false or true. More information in [#reference](#reference).
 
 
 ## Metadata
@@ -439,6 +439,10 @@ Use the `submission_information` parameter for additional submission specifiers,
 fastlane deliver submit_build --build_number 830 --submission_information "{\"export_compliance_uses_encryption\": false, \"add_id_info_uses_idfa\": false }"
 ```
 
+### App Privacy Details
+
+Starting on December 8, 2020, Apple announced that developers are required to provide app privacy details that will help users understand an app's privacy practies. _deliver_ does not allow for updating of this information but this can be done with the _upload_app_privacy_details_to_app_store_ action. More information on [Uploading App Privacy Details](https://docs.fastlane.tools/uploading-app-privacy-details)
+
 # Credentials
 
 A detailed description about how your credentials are handled is available in a [credentials_manager](https://github.com/fastlane/fastlane/tree/master/credentials_manager).
@@ -493,7 +497,7 @@ Key | Editable While Live | Directory | Filename | Deprecated Filename
 
 ## Reference
 
-<details>
+<details markdown="1">
 <summary>View all available categories, etc.</summary>
 
 ### Available Categories
@@ -587,9 +591,9 @@ Key | Editable While Live | Directory | Filename | Deprecated Filename
 
 **Values**
 
-- 0: None
-- 1: Infrequent/Mild
-- 2: Frequent/Intense
+- 0: None (Legacy value, use `NONE` instead)
+- 1: Infrequent/Mild (Legacy value, use `INFREQUENT_OR_MILD` instead)
+- 2: Frequent/Intense (Legacy value, use `FREQUENT_OR_INTENSE`instead)
 
 - `NONE`
 - `INFREQUENT_OR_MILD`
@@ -597,24 +601,43 @@ Key | Editable While Live | Directory | Filename | Deprecated Filename
 
 **Keys**
 
-- `violenceCartoonOrFantasy`
-- `violenceRealistic`
-- `violenceRealisticProlongedGraphicOrSadistic`
-- `profanityOrCrudeHumor`
-- `matureOrSuggestiveThemes`
-- `horrorOrFearThemes`
-- `medicalOrTreatmentInformation`
-- `alcoholTobaccoOrDrugUseOrReferences`
-- `gamblingSimulated`
-- `sexualContentOrNudity`
-- `sexualContentGraphicAndNudity`
+- 'alcoholTobaccoOrDrugUseOrReferences'
+- 'contests'
+- 'gamblingSimulated'
+- 'medicalOrTreatmentInformation'
+- 'profanityOrCrudeHumor'
+
+- 'sexualContentGraphicAndNudity'
+- 'sexualContentOrNudity'
+- 'horrorOrFearThemes'
+- 'matureOrSuggestiveThemes'
+- 'unrestrictedWebAccess'
+- 'violenceCartoonOrFantasy'
+- 'violenceRealisticProlongedGraphicOrSadistic'
+- 'violenceRealistic'
+- 'kidsAgeBand'
 
 #### Boolean
 
 **Keys**
 
+- `gambling`
+- 'seventeenPlus'
 - `unrestrictedWebAccess`
-- `gamblingAndContests`
+
+#### Kids Age
+
+**Values**
+
+- `FIVE_AND_UNDER`
+- `SIX_TO_EIGHT`
+- `NINE_TO_ELEVEN`
+- `null`
+
+**Keys**
+
+- `kidsAgeBand`
+
 </details>
 
 <br />

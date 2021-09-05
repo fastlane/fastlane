@@ -23,7 +23,7 @@ module Fastlane
       def take_off
         before_import_time = Time.now
 
-        if !ENV["FASTLANE_DISABLE_ANIMATION"]
+        if ENV["FASTLANE_DISABLE_ANIMATION"].nil?
           # Usually in the fastlane code base we use
           #
           #   Helper.show_loading_indicator
@@ -70,6 +70,9 @@ module Fastlane
 
         # Disabling colors if environment variable set
         require 'fastlane_core/ui/disable_colors' if FastlaneCore::Helper.colors_disabled?
+
+        # Set interactive environment variable for spaceship (which can't require fastlane_core)
+        ENV["FASTLANE_IS_INTERACTIVE"] = FastlaneCore::UI.interactive?.to_s
 
         ARGV.unshift("spaceship") if ARGV.first == "spaceauth"
         tool_name = ARGV.first ? ARGV.first.downcase : nil
@@ -123,9 +126,9 @@ module Fastlane
       end
 
       # Since loading dotenv should respect additional environments passed using
-      # --env, we must extrat the arguments out of ARGV and process them before
+      # --env, we must extract the arguments out of ARGV and process them before
       # calling into commander. This is required since the ENV must be configured
-      # before running any other commands in order to correclty respect variables
+      # before running any other commands in order to correctly respect variables
       # like FASTLANE_HIDE_CHANGELOG and FASTLANE_DISABLE_COLORS
       def load_dot_env
         env_cl_param = lambda do

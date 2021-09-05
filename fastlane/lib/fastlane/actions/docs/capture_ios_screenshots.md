@@ -2,7 +2,7 @@
   <img src="/img/actions/snapshot.png" width="250">
 </p>
 
-###### Automate taking localized screenshots of your iOS and tvOS apps on every device
+###### Automate taking localized screenshots of your iOS, tvOS, and watchOS apps on every device
 
 <hr />
 <h4 align="center">
@@ -10,7 +10,7 @@
 </h4>
 <hr />
 
-_snapshot_ generates localized iOS and tvOS screenshots for different device types and languages for the App Store and can be uploaded using ([_deliver_](https://docs.fastlane.tools/actions/deliver/)).
+_snapshot_ generates localized iOS, tvOS, and watchOS screenshots for different device types and languages for the App Store and can be uploaded using ([_deliver_](https://docs.fastlane.tools/actions/deliver/)).
 
 You have to manually create 20 (languages) x 6 (devices) x 5 (screenshots) = **600 screenshots**.
 
@@ -106,7 +106,7 @@ app.launch()
 
 ```objective-c
 XCUIApplication *app = [[XCUIApplication alloc] init];
-[Snapshot setupSnapshot:app];
+[Snapshot setupSnapshot:app waitForAnimations:NO];
 [app launch];
 ```
 
@@ -282,6 +282,10 @@ launch_arguments([
 ])
 ```
 
+## Xcode Environment Variables
+
+_snapshot_ includes `FASTLANE_SNAPSHOT=YES` and `FASTLANE_LANGUAGE=<language>` as arguments when executing `xcodebuild`. This means you may use these environment variables in a custom build phase run script to do any additional configuration.
+
 # How does it work?
 
 The easiest solution would be to just render the UIWindow into a file. That's not possible because UI Tests don't run on a main thread. So _snapshot_ uses a different approach:
@@ -328,7 +332,7 @@ To get more information about language and locale codes please read [Internation
 
 ## Use a clean status bar
 
-You can set `override_status_bar` to `true` to set the status bar to Tuesday January 9th at 9:41AM with full battery and reception.
+You can set `override_status_bar` to `true` to set the status bar to Tuesday January 9th at 9:41AM with full battery and reception. If you need more granular customization, to set a Carrier name for example, also set `override_status_bar_arguments` to the specific arguments to be passed to the `xcrun simctl status_bar override` command. Run `xcrun simctl status_bar --help` to see the options available.
 
 ## Editing the `Snapfile`
 

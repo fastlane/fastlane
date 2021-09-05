@@ -91,9 +91,8 @@ module Match
     end
 
     def api_token(params)
-      @api_token ||= Spaceship::ConnectAPI::Token.create(params[:api_key]) if params[:api_key]
-      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(params[:api_key_path]) if params[:api_key_path]
-      return @api_token
+      api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path])
+      return api_token
     end
 
     def ensure_parameters_are_valid(params)

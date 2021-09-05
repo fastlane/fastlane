@@ -1,3 +1,6 @@
+require 'fastlane_core'
+require 'spaceship'
+
 require_relative 'module'
 
 module Deliver
@@ -79,7 +82,7 @@ module Deliver
     def upload(options)
       return if options[:skip_metadata]
 
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
 
@@ -94,7 +97,7 @@ module Deliver
         localised_options = LOCALISED_LIVE_VALUES
         non_localised_options = NON_LOCALISED_LIVE_VALUES
 
-        if v.nil?
+        if version.nil?
           UI.message("Couldn't find live version, editing the current version on App Store Connect instead")
           version = fetch_edit_app_store_version(app, platform)
           # we don't want to update the localised_options and non_localised_options
@@ -197,22 +200,26 @@ module Deliver
       sleep(1)
 
       # Update app store version localizations
-      app_store_version_localizations.each do |app_store_version_localization|
+      store_version_worker = FastlaneCore::QueueWorker.new do |app_store_version_localization|
         attributes = localized_version_attributes_by_locale[app_store_version_localization.locale]
         if attributes
           UI.message("Uploading metadata to App Store Connect for localized version '#{app_store_version_localization.locale}'")
           app_store_version_localization.update(attributes: attributes)
         end
       end
+      store_version_worker.batch_enqueue(app_store_version_localizations)
+      store_version_worker.start
 
       # Update app info localizations
-      app_info_localizations.each do |app_info_localization|
+      app_info_worker = FastlaneCore::QueueWorker.new do |app_info_localization|
         attributes = localized_info_attributes_by_locale[app_info_localization.locale]
         if attributes
           UI.message("Uploading metadata to App Store Connect for localized info '#{app_info_localization.locale}'")
           app_info_localization.update(attributes: attributes)
         end
       end
+      app_info_worker.batch_enqueue(app_info_localizations)
+      app_info_worker.start
 
       # Update categories
       app_info = fetch_edit_app_info(app)
@@ -335,7 +342,7 @@ module Deliver
 
       set_review_information(version, options)
       set_review_attachment_file(version, options)
-      set_app_rating(version, options)
+      set_app_rating(app_info, options)
     end
 
     # rubocop:enable Metrics/PerceivedComplexity
@@ -370,9 +377,7 @@ module Deliver
       # Check folder list (an empty folder signifies a language is required)
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
-        language = File.basename(lang_folder)
-        enabled_languages << language unless enabled_languages.include?(language)
+        enabled_languages << lang_folder.basename unless enabled_languages.include?(lang_folder.basename)
       end
 
       return unless enabled_languages.include?("default")
@@ -411,10 +416,7 @@ module Deliver
       # Check folder list (an empty folder signifies a language is required)
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        next unless File.directory?(lang_folder) # We don't want to read txt as they are non localised
-
-        language = File.basename(lang_folder)
-        enabled_languages << language unless enabled_languages.include?(language)
+        enabled_languages << lang_folder.basename unless enabled_languages.include?(lang_folder.basename)
       end
 
       # Mapping to strings because :default symbol can be passed in
@@ -525,14 +527,13 @@ module Deliver
       # Load localised data
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
-        language = File.basename(lang_folder)
         (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
-          path = File.join(lang_folder, "#{key}.txt")
+          path = File.join(lang_folder.path, "#{key}.txt")
           next unless File.exist?(path)
 
           UI.message("Loading '#{path}'...")
           options[key] ||= {}
-          options[key][language] ||= File.read(path)
+          options[key][lang_folder.basename] ||= File.read(path)
         end
       end
 
@@ -591,9 +592,10 @@ module Deliver
     end
 
     def set_review_information(version, options)
-      return unless options[:app_review_information]
       info = options[:app_review_information]
-      info = info.collect { |k, v| [k.to_sym, v] }.to_h
+      return if info.nil? || info.empty?
+
+      info = info.transform_keys(&:to_sym)
       UI.user_error!("`app_review_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
 
       attributes = {}
@@ -640,7 +642,7 @@ module Deliver
       end
     end
 
-    def set_app_rating(version, options)
+    def set_app_rating(app_info, options)
       return unless options[:app_rating_config_path]
 
       require 'json'
@@ -673,9 +675,23 @@ module Deliver
         has_mapped_values = true
         UI.deprecated("Age rating '#{k}' from iTunesConnect has been deprecated. Please replace with '#{v}'")
       end
-      UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values
 
-      age_rating_declaration = version.fetch_age_rating_declaration
+      # Handle App Store Connect deprecation/migrations of keys/values if possible
+      attributes, deprecation_messages, errors = Spaceship::ConnectAPI::AgeRatingDeclaration.map_deprecation_if_possible(attributes)
+      deprecation_messages.each do |message|
+        UI.deprecated(message)
+      end
+
+      unless errors.empty?
+        errors.each do |error|
+          UI.error(error)
+        end
+        UI.user_error!("There are Age Rating deprecation errors that cannot be solved automatically... Please apply any fixes and try again")
+      end
+
+      UI.deprecated("You can find more info at https://docs.fastlane.tools/actions/deliver/#reference") if has_mapped_values || !deprecation_messages.empty?
+
+      age_rating_declaration = app_info.fetch_age_rating_declaration
       age_rating_declaration.update(attributes: attributes)
     end
   end

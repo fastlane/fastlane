@@ -17,10 +17,16 @@ module Sigh
                                          hide_keys: [:output_path],
                                              title: "Summary for sigh #{Fastlane::VERSION}")
 
-      if api_token
+      if (api_token = Spaceship::ConnectAPI::Token.from(hash: Sigh.config[:api_key], filepath: Sigh.config[:api_key_path]))
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
+      elsif !Spaceship::ConnectAPI.token.nil?
+        UI.message("Using existing authorization token for App Store Connect API")
       else
+        # Username is now optional since addition of App Store Connect API Key
+        # Force asking for username to prompt user if not already set
+        Sigh.config.fetch(:username, force_ask: true)
+
         # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
         # Prompts select team if multiple teams and none specified
         UI.message("Starting login with user '#{Sigh.config[:username]}'")
@@ -57,12 +63,6 @@ module Sigh
       end
 
       return download_profile(profile)
-    end
-
-    def api_token
-      @api_token ||= Spaceship::ConnectAPI::Token.create(Sigh.config[:api_key]) if Sigh.config[:api_key]
-      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(Sigh.config[:api_key_path]) if Sigh.config[:api_key_path]
-      return @api_token
     end
 
     # The kind of provisioning profile we're interested in
@@ -139,7 +139,7 @@ module Sigh
           # Skip certificates that failed to download
           next unless current_cert[:downloaded]
           file = Tempfile.new('cert')
-          file.write(current_cert[:downloaded])
+          file.write(current_cert[:downloaded].force_encoding('UTF-8'))
           file.close
           if FastlaneCore::CertChecker.installed?(file.path)
             installed = true
@@ -282,7 +282,7 @@ module Sigh
                          [Spaceship::ConnectAPI::Device::DeviceClass::MAC]
                        end
 
-      if api_token
+      if Spaceship::ConnectAPI.token
         return Spaceship::ConnectAPI::Device.all.select do |device|
           device_classes.include?(device.device_class)
         end
@@ -303,7 +303,7 @@ module Sigh
         end
 
         if Sigh.config[:cert_owner_name]
-          next unless c.owner_name.strip == Sigh.config[:cert_owner_name].strip
+          next unless c.display_name.strip == Sigh.config[:cert_owner_name].strip
         end
 
         true
@@ -315,7 +315,7 @@ module Sigh
           certificates = certificates.find_all do |c|
             file = Tempfile.new('cert')
             raw_data = Base64.decode64(c.certificate_content)
-            file.write(raw_data)
+            file.write(raw_data.force_encoding("UTF-8"))
             file.close
 
             FastlaneCore::CertChecker.installed?(file.path)
@@ -327,7 +327,7 @@ module Sigh
         UI.important("Found more than one code signing identity. Choosing the first one. Check out `fastlane sigh --help` to see all available options.")
         UI.important("Available Code Signing Identities for current filters:")
         certificates.each do |c|
-          str = ["\t- Name:", c.owner_name, "- ID:", c.id + " - Expires", c.expires.strftime("%d/%m/%Y")].join(" ")
+          str = ["\t- Name:", c.display_name, "- ID:", c.id + " - Expires", Time.parse(c.expiration_date).strftime("%Y-%m-%d")].join(" ")
           UI.message(str.green)
         end
       end

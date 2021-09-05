@@ -13,16 +13,23 @@ module Fastlane
         unless distribute_only
           values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
           values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
+          values[:pkg] ||= Actions.lane_context[SharedValues::PKG_OUTPUT_PATH]
+          values[:pkg] = File.expand_path(values[:pkg]) if values[:pkg]
         end
 
-        if values[:api_key_path].nil?
+        # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
+        unless values[:api_key_path]
           values[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
         end
 
         return values if Helper.test?
 
         if distribute_only
-          Pilot::BuildManager.new.distribute(values) # we already have the finished config
+          build_manager = Pilot::BuildManager.new
+          build_manager.start(values, should_login: true)
+
+          build_manager.wait_for_build_processing_to_be_complete(false) unless values[:skip_waiting_for_build_processing]
+          build_manager.distribute(values) # we already have the finished config
         else
           Pilot::BuildManager.new.upload(values) # we already have the finished config
         end
@@ -112,7 +119,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios].include?(platform)
+        [:ios, :mac, :tvos].include?(platform)
       end
     end
   end

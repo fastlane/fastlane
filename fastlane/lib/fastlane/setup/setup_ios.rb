@@ -147,9 +147,9 @@ module Fastlane
                 increment_build_number_if_applicable,
                 "\tbuildApp(#{project_prefix}scheme: \"#{self.scheme}\")"]
         if include_metadata
-          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\")"
+          lane << "\tuploadToAppStore(username: \"#{self.user}\", appIdentifier: \"#{self.app_identifier}\")"
         else
-          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipScreenshots: true, skipMetadata: true)"
+          lane << "\tuploadToAppStore(username: \"#{self.user}\", appIdentifier: \"#{self.app_identifier}\", skipScreenshots: true, skipMetadata: true)"
         end
         lane << "}"
       else
@@ -219,7 +219,7 @@ module Fastlane
                 "\tcaptureScreenshots(#{project_prefix}scheme: \"#{ui_testing_scheme}\")"]
 
         if automatic_upload
-          lane << "\tuploadToAppStore(username: \"#{self.user}\", app: \"#{self.app_identifier}\", skipBinaryUpload: true, skipMetadata: true)"
+          lane << "\tuploadToAppStore(username: \"#{self.user}\", appIdentifier: \"#{self.app_identifier}\", skipBinaryUpload: true, skipMetadata: true)"
         end
         lane << "}"
       else

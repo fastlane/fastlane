@@ -17,8 +17,8 @@ module Gym
       final_mapping = (primary_mapping || {}).dup # for verbose output at the end of the method
       secondary_mapping ||= self.detect_project_profile_mapping # default to Xcode project
 
-      final_mapping = Hash[final_mapping.map { |k, v| [k.to_sym, v] }]
-      secondary_mapping = Hash[secondary_mapping.map { |k, v| [k.to_sym, v] }]
+      final_mapping = final_mapping.transform_keys(&:to_sym)
+      secondary_mapping = secondary_mapping.transform_keys(&:to_sym)
 
       # Now it's time to merge the (potentially) existing mapping
       #   (e.g. coming from `provisioningProfiles` of the `export_options` or from previous match calls)
@@ -142,7 +142,7 @@ module Gym
               next unless specified_configuration == build_configuration.name
 
               # Catalyst apps will have some build settings that will have a configuration
-              # that is specfic for macos so going to do our best to capture those
+              # that is specific for macos so going to do our best to capture those
               #
               # There are other platform filters besides "[sdk=macosx*]" that we could use but
               # this is the default that Xcode will use so this will also be our default

@@ -89,7 +89,7 @@ module Snapshot
         log_path: xcodebuild_log_path(language: language, locale: locale)
       )
 
-      devices.each { |device_type| override_status_bar(device_type) } if launcher_config.override_status_bar
+      devices.each { |device_type| override_status_bar(device_type, launcher_config.override_status_bar_arguments) } if launcher_config.override_status_bar
 
       UI.important("Running snapshot on: #{devices.join(', ')}")
 

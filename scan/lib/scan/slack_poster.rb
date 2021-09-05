@@ -1,5 +1,6 @@
 require 'fastlane/action'
 require 'fastlane/actions/slack'
+require 'fastlane_core/configuration/configuration'
 
 require_relative 'module'
 
@@ -43,7 +44,7 @@ module Scan
         }
       end
 
-      Fastlane::Actions::SlackAction.run({
+      options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
         message: "#{Scan.config[:app_name] || Scan.project.app_name} Tests:\n#{Scan.config[:slack_message]}",
         channel: channel,
         slack_url: Scan.config[:slack_url].to_s,
@@ -51,10 +52,12 @@ module Scan
         username: username,
         icon_url: icon_url,
         payload: {},
+        default_payloads: Scan.config[:slack_default_payloads],
         attachment_properties: {
           fields: fields
         }
       })
+      Fastlane::Actions::SlackAction.run(options)
     end
   end
 end

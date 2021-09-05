@@ -1,5 +1,41 @@
 describe Scan do
   describe Scan::DetectValues do
+    describe 'Xcode project' do
+      describe 'detects FastlaneCore::Project' do
+        it 'with no :project or :package_path given', requires_xcodebuild: true do
+          # Mocks input from detect_projects
+          project = FastlaneCore::Project.new({
+            project: "./scan/examples/standard/app.xcodeproj"
+          })
+
+          expect(FastlaneCore::Project).to receive(:detect_projects)
+          expect(FastlaneCore::Project).to receive(:new).and_return(project)
+
+          options = {}
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        end
+
+        it 'with :project given', requires_xcodebuild: true do
+          expect(FastlaneCore::Project).to receive(:detect_projects)
+          expect(FastlaneCore::Project).to receive(:new).and_call_original
+
+          options = { project: "./scan/examples/standard/app.xcodeproj" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        end
+      end
+    end
+
+    describe 'SPM package' do
+      describe 'does not attempt to detect FastlaneCore::Project' do
+        it 'with :package_path given', requires_xcodebuild: true do
+          expect(FastlaneCore::Project).to_not(receive(:detect_projects))
+
+          options = { package_path: "./scan/examples/package/" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        end
+      end
+    end
+
     describe 'Xcode config handling' do
       before do
         options = { project: "./scan/examples/standard/app.xcodeproj" }
@@ -12,6 +48,30 @@ describe Scan do
       it "fetches the path from the Xcode config", requires_xcodebuild: true do
         derived_data = Scan.config[:derived_data_path]
         expect(derived_data).to match(File.expand_path("./scan/examples/standard/"))
+      end
+    end
+
+    describe "#detect_destination" do
+      it "ios", requires_xcodebuild: true do
+        options = { project: "./scan/examples/standard/app.xcodeproj" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        expect(Scan.config[:destination].first).to match(/platform=iOS/)
+      end
+
+      context "catalyst" do
+        it "ios", requires_xcodebuild: true do
+          options = { project: "./scan/examples/standard/app.xcodeproj" }
+          expect_any_instance_of(FastlaneCore::Project).to receive(:supports_mac_catalyst?).and_return(true)
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.config[:destination].first).to match(/platform=iOS/)
+        end
+
+        it "mac", requires_xcodebuild: true do
+          options = { project: "./scan/examples/standard/app.xcodeproj", catalyst_platform: "macos" }
+          expect_any_instance_of(FastlaneCore::Project).to receive(:supports_mac_catalyst?).and_return(true)
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.config[:destination].first).to match(/platform=macOS,variant=Mac Catalyst/)
+        end
       end
     end
 

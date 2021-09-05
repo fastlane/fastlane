@@ -49,7 +49,8 @@ module Fastlane
           # Escape channel's name to guarantee it is a valid URL resource.
           # First of all we verify that the value is not already escaped,
           # escaping an escaped value will produce a wrong channel name.
-          escaped_channel = URI.unescape(channel) == channel ? URI.escape(channel) : channel
+          require 'addressable/uri'
+          escaped_channel = Addressable::URI.encode(channel) == channel ? Addressable::URI.encode(channel) : channel
           if user?(channel)
             params = { 'message' => message, 'message_format' => message_format }
             json_headers = { 'Content-Type' => 'application/json',
@@ -116,14 +117,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :custom_color,
                                        env_name: "FL_HIPCHAT_CUSTOM_COLOR",
                                        description: "Specify a custom color, this overrides the success boolean. Can be one of 'yellow', 'red', 'green', 'purple', 'gray', or 'random'",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :success,
                                        env_name: "FL_HIPCHAT_SUCCESS",
                                        description: "Was this build successful? (true/false)",
                                        optional: true,
                                        default_value: true,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "HIPCHAT_API_VERSION",
                                        description: "Version of the Hipchat API. Must be 1 or 2",
@@ -138,7 +138,7 @@ module Fastlane
                                        description: "Should the people in the room be notified? (true/false)",
                                        default_value: false,
                                        optional: true,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :api_host,
                                        env_name: "HIPCHAT_API_HOST",
                                        description: "The host of the HipChat-Server API",
@@ -160,7 +160,7 @@ module Fastlane
                                        description: "Should html formatted messages include a preformatted header? (true/false)",
                                        default_value: true,
                                        optional: true,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :from,
                                        env_name: "FL_HIPCHAT_FROM",
                                        description: "Name the message will appear to be sent from",

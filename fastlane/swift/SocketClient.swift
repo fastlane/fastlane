@@ -1,5 +1,5 @@
 // SocketClient.swift
-// Copyright (c) 2020 FastlaneTools
+// Copyright (c) 2021 FastlaneTools
 
 //
 //  ** NOTE **
@@ -29,7 +29,7 @@ class SocketClient: NSObject {
     }
 
     static let connectTimeoutSeconds = 2
-    static let defaultCommandTimeoutSeconds = 10_800 // 3 hours
+    static let defaultCommandTimeoutSeconds = 10800 // 3 hours
     static let doneToken = "done" // TODO: remove these
     static let cancelToken = "cancelFastlaneRun"
 
@@ -302,7 +302,8 @@ extension SocketClient: StreamDelegate {
                 self.closeSession(sendAbort: false)
             }
 
-        case let .failure(failureInformation):
+        case let .failure(failureInformation, failureClass, failureMessage):
+            LaneFile.fastfileInstance?.onError(currentLane: ArgumentProcessor(args: CommandLine.arguments).currentLane, errorInfo: failureInformation.joined(), errorClass: failureClass, errorMessage: failureMessage)
             socketDelegate?.commandExecuted(serverResponse: .serverError) {
                 $0.writeSemaphore.signal()
                 self.handleFailure(message: failureInformation)

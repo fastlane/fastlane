@@ -237,7 +237,7 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 **Notes**
 
 - These `.strings` files **MUST** be utf-8 (UTF-8) or utf-16 encoded (UTF-16 BE with BOM). They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
-- You **MUST** provide a background if you want titles. _frameit_ will not add the tiles if a background is not specified.
+- You **MUST** provide a background if you want titles. _frameit_ will not add the titles if a background is not specified.
 
 ### Screenshot orientation
 
@@ -332,7 +332,24 @@ Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS scre
 
 ## Use a clean status bar
 
-You can set `override_status_bar` to `true` in snapshot to set the status bar to Tuesday January 9th at 9:41AM with full battery and reception.
+You can set `override_status_bar` to `true` in snapshot to set the status bar to Tuesday January 9th at 9:41AM with full battery and reception. If you need more granular customization, to set a Carrier name for example, also set `override_status_bar_arguments` to the specific arguments to be passed to the `xcrun simctl status_bar override` command. Run `xcrun simctl status_bar --help` to see the options available.
+
+### Examples
+
+```ruby
+# Sets the time to 9:41AM with full battery and reception, with the default carrier name: Carrier
+capture_ios_screenshots(
+	override_status_bar: true
+)
+```
+
+```ruby
+# Set the time to 9:41AM, battery at 75% and charging, on the TELUS LTE network
+capture_ios_screenshots(
+	override_status_bar: true,
+	override_status_bar_arguments: "--time 9:41 --dataNetwork lte --cellularMode active --cellularBars 4 --batteryState charging --batteryLevel 75 --operatorName TELUS"
+)
+```
 
 ## Gray artifacts around text
 
@@ -345,5 +362,5 @@ brew install imagemagick
 
 ## Uninstall
 
-- `sudo gem uninstall fastlane`
+- `gem uninstall fastlane`
 - `rm -rf ~/.frameit`

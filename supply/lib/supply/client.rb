@@ -162,7 +162,46 @@ module Supply
     def commit_current_edit!
       ensure_active_edit!
 
-      call_google_api { client.commit_edit(current_package_name, current_edit.id) }
+      call_google_api do
+        begin
+          client.commit_edit(
+            current_package_name,
+            current_edit.id,
+            changes_not_sent_for_review: Supply.config[:changes_not_sent_for_review]
+          )
+        rescue Google::Apis::ClientError => e
+          unless Supply.config[:rescue_changes_not_sent_for_review]
+            raise
+          end
+
+          error = begin
+                    JSON.parse(e.body)
+                  rescue
+                    nil
+                  end
+
+          if error
+            message = error["error"] && error["error"]["message"]
+          else
+            message = e.body
+          end
+
+          if message.include?("The query parameter changesNotSentForReview must not be set")
+            client.commit_edit(
+              current_package_name,
+              current_edit.id
+            )
+          elsif message.include?("Please set the query parameter changesNotSentForReview to true")
+            client.commit_edit(
+              current_package_name,
+              current_edit.id,
+              changes_not_sent_for_review: true
+            )
+          else
+            raise
+          end
+        end
+      end
 
       self.current_edit = nil
       self.current_package_name = nil
@@ -279,13 +318,13 @@ module Supply
     def update_listing_for_language(language: nil, title: nil, short_description: nil, full_description: nil, video: nil)
       ensure_active_edit!
 
-      listing = AndroidPublisher::Listing.new({
+      listing = AndroidPublisher::Listing.new(
         language: language,
         title: title,
         full_description: full_description,
         short_description: short_description,
         video: video
-      })
+      )
 
       call_google_api do
         client.update_edit_listing(
@@ -327,12 +366,14 @@ module Supply
     def upload_mapping(path_to_mapping, apk_version_code)
       ensure_active_edit!
 
+      extension = File.extname(path_to_mapping).downcase
+
       call_google_api do
         client.upload_edit_deobfuscationfile(
           current_package_name,
           current_edit.id,
           apk_version_code,
-          "proguard",
+          extension == ".zip" ? "nativeCode" : "proguard",
           upload_source: path_to_mapping,
           content_type: "application/octet-stream"
         )

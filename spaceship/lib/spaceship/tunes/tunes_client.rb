@@ -24,6 +24,9 @@ module Spaceship
       super
 
       @du_client = DUClient.new
+
+      # Used by most WebObjects requests starting in July 2021
+      @additional_headers = { 'x-csrf-itc': 'itc' }
     end
 
     class << self
@@ -579,10 +582,10 @@ module Spaceship
       }
 
       r = request(:post) do |req|
-        req.url("https://analytics.itunes.apple.com/analytics/api/v1/data/time-series")
+        req.url("https://appstoreconnect.apple.com/analytics/api/v1/data/time-series")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
-        req.headers['X-Requested-By'] = 'analytics.itunes.apple.com'
+        req.headers['X-Requested-By'] = 'appstoreconnect.apple.com'
       end
 
       data = parse_response(r)
@@ -704,9 +707,9 @@ module Spaceship
     #     ...
     # }, {
     # ...
-    def pricing_tiers
+    def pricing_tiers(app_id)
       @pricing_tiers ||= begin
-        r = request(:get, 'ra/apps/pricing/matrix')
+        r = request(:get, "ra/apps/#{app_id}/iaps/pricing/matrix")
         data = parse_response(r, 'data')['pricingTiers']
         data.map { |tier| Spaceship::Tunes::PricingTier.factory(tier) }
       end

@@ -9,7 +9,7 @@ module Deliver
 
       price_tier = options[:price_tier].to_s
 
-      app = options[:app]
+      app = Deliver.cache[:app]
 
       attributes = {}
       territory_ids = []

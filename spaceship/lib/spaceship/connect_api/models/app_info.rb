@@ -24,6 +24,7 @@ module Spaceship
         IN_REVIEW = "IN_REVIEW"
         WAITING_FOR_REVIEW = "WAITING_FOR_REVIEW"
         DEVELOPER_REJECTED = "DEVELOPER_REJECTED"
+        DEVELOPER_REMOVED_FROM_SALE = "DEVELOPER_REMOVED_FROM_SALE"
         REJECTED = "REJECTED"
         PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
         METADATA_REJECTED = "METADATA_REJECTED"
@@ -65,29 +66,44 @@ module Spaceship
       # API
       #
 
-      def update(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI.patch_app_info(app_info_id: id).first
+      def update(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        client.patch_app_info(app_info_id: id).first
       end
 
-      def update_categories(category_id_map: nil)
-        Spaceship::ConnectAPI.patch_app_info_categories(app_info_id: id, category_id_map: category_id_map).first
+      def update_categories(client: nil, category_id_map: nil)
+        client ||= Spaceship::ConnectAPI
+        client.patch_app_info_categories(app_info_id: id, category_id_map: category_id_map).first
       end
 
-      def delete!(filter: {}, includes: nil, limit: nil, sort: nil)
-        Spaceship::ConnectAPI.delete_app_info(app_info_id: id)
+      def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_app_info(app_info_id: id)
+      end
+
+      #
+      # Age Rating Declaration
+      #
+
+      def fetch_age_rating_declaration(client: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_age_rating_declaration(app_info_id: id)
+        return resp.to_models.first
       end
 
       #
       # App Info Localizations
       #
 
-      def create_app_info_localization(attributes: nil)
-        resp = Spaceship::ConnectAPI.post_app_info_localization(app_info_id: id, attributes: attributes)
+      def create_app_info_localization(client: nil, attributes: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.post_app_info_localization(app_info_id: id, attributes: attributes)
         return resp.to_models.first
       end
 
-      def get_app_info_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
-        resp = Spaceship::ConnectAPI.get_app_info_localizations(app_info_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
+      def get_app_info_localizations(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_app_info_localizations(app_info_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       end
     end

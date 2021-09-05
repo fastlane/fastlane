@@ -135,16 +135,16 @@ The output will look like this:
 
 ### Add a new tester
 
-To add a new tester to both your App Store Connect account and to your app (if given), use the `pilot add` command. This will create a new tester (if necessary) or add an existing tester to the app to test.
+To add a new tester to your App Store Connect account and to associate it to at least one testing group of your app, use the `pilot add` command. This will create a new tester (if necessary) or add an existing tester to the app to test.
 
 ```no-highlight
-fastlane pilot add email@invite.com
+fastlane pilot add email@invite.com -g group-1,group-2
 ```
 
 Additionally you can specify the app identifier (if necessary):
 
 ```no-highlight
-fastlane pilot add email@email.com -a com.krausefx.app
+fastlane pilot add email@email.com -a com.krausefx.app -g group-1,group-2
 ```
 
 ### Add an existing tester to a build
@@ -184,10 +184,16 @@ The resulting output will look like this:
 
 ### Remove a tester
 
-This command will only remove external beta testers.
+This command will remove beta tester from app (from all internal and external groups)
 
 ```no-highlight
 fastlane pilot remove felix@krausefx.com
+```
+
+You can also use `groups` option to remove the tester from the groups specified:
+
+```no-highlight
+fastlane pilot remove felix@krausefx.com -g group-1,group-2
 ```
 
 ### Export testers
@@ -229,7 +235,7 @@ fastlane pilot upload --verbose
 
 ## Firewall Issues
 
-_pilot_ uses the iTunes Transporter to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocol from the command line using
+_pilot_ uses the iTunes [Transporter](https://help.apple.com/itc/transporteruserguide/#/apdATD1E1288-D1E1A1303-D1E1288A1126) to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocol from the command line using
 
 ```no-highlight
 DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" pilot ...
@@ -241,6 +247,10 @@ If you are using _pilot_ via the [fastlane action](https://docs.fastlane.tools/a
 ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV"
 pilot...
 ```
+
+Note, however, that Apple recommends you don’t specify the `-t transport` and instead allow Transporter to use automatic transport discovery to determine the best transport mode for your packages. For this reason, if the `t` option is passed, we will raise a warning.
+
+Also note that `-t` is not the only additional parameter that can be used. The string specified in the `DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS` environment variable will be forwarded to Transporter. For all the available options, check [Apple's Transporter User Guide](https://help.apple.com/itc/transporteruserguide/#/apdATD1E1288-D1E1A1303-D1E1288A1126).
 
 ## Credentials Issues
 

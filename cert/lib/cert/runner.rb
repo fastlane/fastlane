@@ -20,20 +20,20 @@ module Cert
     end
 
     def login
-      if api_token
+      if (api_token = Spaceship::ConnectAPI::Token.from(hash: Cert.config[:api_key], filepath: Cert.config[:api_key_path]))
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
+      elsif !Spaceship::ConnectAPI.token.nil?
+        UI.message("Using existing authorization token for App Store Connect API")
       else
+        # Username is now optional since addition of App Store Connect API Key
+        # Force asking for username to prompt user if not already set
+        Cert.config.fetch(:username, force_ask: true)
+
         UI.message("Starting login with user '#{Cert.config[:username]}'")
         Spaceship::ConnectAPI.login(Cert.config[:username], nil, use_portal: true, use_tunes: false)
         UI.message("Successfully logged in")
       end
-    end
-
-    def api_token
-      @api_token ||= Spaceship::ConnectAPI::Token.create(Cert.config[:api_key]) if Cert.config[:api_key]
-      @api_token ||= Spaceship::ConnectAPI::Token.from_json_file(Cert.config[:api_key_path]) if Cert.config[:api_key_path]
-      return @api_token
     end
 
     def run
@@ -190,7 +190,7 @@ module Cert
       begin
         certificate = Spaceship::ConnectAPI::Certificate.create(
           certificate_type: certificate_type,
-          csr_content: csr
+          csr_content: csr.to_pem
         )
       rescue => ex
         type_name = (Cert.config[:development] ? "Development" : "Distribution")
@@ -232,7 +232,7 @@ module Cert
       cert_name = "#{cert_name}.cer" unless File.extname(cert_name) == ".cer"
       path = File.expand_path(File.join(Cert.config[:output_path], cert_name))
       raw_data = Base64.decode64(certificate.certificate_content)
-      File.write(path, raw_data)
+      File.write(path, raw_data.force_encoding("UTF-8"))
       return path
     end
   end
