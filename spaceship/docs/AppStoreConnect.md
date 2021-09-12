@@ -236,7 +236,7 @@ unless version.nil?
 end
 ```
 
-or 
+or
 
 ```ruby
 version = app.get_pending_release_app_store_version
@@ -417,7 +417,7 @@ all_identifiers = Spaceship::ConnectAPI::BundleId.all
 # Find a specific identifier based on the bundle identifier
 bundle_id = Spaceship::ConnectAPI::BundleId.find("com.krausefx.app")
 
-# Access information about the bundle identifer
+# Access information about the bundle identifier
 bundle_id.name
 bundle_id.platform
 bundle_id.identifier
@@ -441,7 +441,7 @@ capabilities = bundle_id.get_capabilities
 bundle_id.create_capability(capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::MAPS)
 
 # Create a new capability with known bundle identifier id
-bundle_id_capability = Spaceship::ConnectAPI::BundleIdCapability.create(bundle_id_id: "123456789", 
+bundle_id_capability = Spaceship::ConnectAPI::BundleIdCapability.create(bundle_id_id: "123456789",
                                                                         capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::MAPS)
 
 # Delete an capability from bundle identifier
