@@ -112,7 +112,7 @@ module Spaceship
 
       # @deprecated
       def fetch_age_rating_declaration(client: nil)
-        raise 'AppStoreVersion no longer as AgeRatingDelcaration as of App Store Connect API 1.3 - Use AppInfo instead'
+        raise 'AppStoreVersion no longer as AgeRatingDeclaration as of App Store Connect API 1.3 - Use AppInfo instead'
       end
 
       #
