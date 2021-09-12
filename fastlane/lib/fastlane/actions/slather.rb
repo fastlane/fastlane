@@ -9,6 +9,7 @@ module Fastlane
           jenkins: '--jenkins',
           buildkite: '--buildkite',
           teamcity: '--teamcity',
+          github: '--github',
 
           coveralls: '--coveralls',
           simple_output: '--simple-output',
@@ -154,6 +155,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :input_format,
                                        env_name: "FL_SLATHER_INPUT_FORMAT", # The name of the environment variable
                                        description: "The input format that slather should look for",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :github,
+                                       env_name: "FL_SLATHER_GITHUB_ENABLED", # The name of the environment variable
+                                       description: "Tell slather that it is running on Github Actions",
+                                       type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :buildkite,
                                        env_name: "FL_SLATHER_BUILDKITE_ENABLED", # The name of the environment variable
