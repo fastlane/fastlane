@@ -156,10 +156,7 @@ module FastlaneCore
         #
         # If set, this method will only return true if all three statuses are complete
         if wait_for_build_beta_detail_processing
-          if build.build_beta_detail.nil?
-            is_processed = false
-          else
-            is_processed &&= build.build_beta_detail.processed?
+          is_processed &&= (build&.build_beta_detail.processed? || false)
           end
         end
 
