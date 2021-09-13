@@ -411,8 +411,8 @@ lane :update_docs do |options|
     plugin_scores_cache_path = File.expand_path("./plugin_scores_cache.yml")
     docs_path = generate_markdown_docs(target_path: ".")
     yml_path = File.expand_path("./mkdocs.yml")
-    actions_md_path = File.expand_path(File.join(docs_path, "docs/actions.md"))
-    action_docs = Dir[File.join(docs_path, "docs", "actions", "*")].collect do |current|
+    actions_md_path = File.expand_path(File.join(docs_path, "docs/generated/actions.md"))
+    action_docs = Dir[File.join(docs_path, "docs", "generated", "actions", "*")].collect do |current|
       File.expand_path(current) # to make sure we commit the change
     end
 
