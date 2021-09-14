@@ -22,7 +22,7 @@ module Deliver
                                      end),
         FastlaneCore::ConfigItem.new(key: :api_key,
                                      env_names: ["DELIVER_API_KEY", "APP_STORE_CONNECT_API_KEY"],
-                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)",
                                      type: Hash,
                                      optional: true,
                                      sensitive: true,
