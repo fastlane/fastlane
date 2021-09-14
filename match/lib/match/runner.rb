@@ -255,6 +255,7 @@ module Match
       end
 
       if params[:include_all_certificates]
+        # Clearing specified certificate id which will prevent a profile being created with only one certificate
         certificate_id = nil
 
         if params[:force_for_new_certificates] && !params[:readonly]
