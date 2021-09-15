@@ -8,7 +8,12 @@ module Fastlane
         try_early_stapling = params[:try_early_stapling]
         print_log = params[:print_log]
         verbose = params[:verbose]
-        api_key_path = params[:api_key_path]
+
+        # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
+        unless params[:api_key_path]
+          params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        end
+        api_key = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path])
 
         use_notarytool = params[:use_notarytool]
 
@@ -33,20 +38,18 @@ module Fastlane
         UI.user_error!('Could not read bundle identifier, provide as a parameter') unless bundle_id
 
         if use_notarytool
-          notarytool(params, package_path, bundle_id, try_early_stapling, print_log, verbose, api_key_path, compressed_package_path)
+          notarytool(params, package_path, bundle_id, try_early_stapling, print_log, verbose, api_key, compressed_package_path)
         else
-          altool(params, package_path, bundle_id, try_early_stapling, print_log, verbose, api_key_path, compressed_package_path)
+          altool(params, package_path, bundle_id, try_early_stapling, print_log, verbose, api_key, compressed_package_path)
         end
       end
 
-      def self.notarytool(params, package_path, bundle_id, try_early_stapling, print_log, verbose, api_key_path, compressed_package_path)
+      def self.notarytool(params, package_path, bundle_id, try_early_stapling, print_log, verbose, api_key, compressed_package_path)
         temp_file = nil
 
         # Create authorization part of command with either API Key or Apple ID
         auth_parts = []
-        if api_key_path
-          api_key = Spaceship::ConnectAPI::Token.from_json_file(api_key_path)
-
+        if api_key
           # Writes key contents to temporary file for command
           require 'tempfile'
           temp_file = Tempfile.new
@@ -99,14 +102,14 @@ module Fastlane
         temp_file.delete if temp_file
       end
 
-      def self.altool(params, package_path, bundle_id, try_early_stapling, print_log, verbose, api_key_path, compressed_package_path)
+      def self.altool(params, package_path, bundle_id, try_early_stapling, print_log, verbose, api_key, compressed_package_path)
         UI.message('Uploading package to notarization service, might take a while')
 
         notarization_upload_command = "xcrun altool --notarize-app -t osx -f \"#{compressed_package_path || package_path}\" --primary-bundle-id #{bundle_id} --output-format xml"
 
         notarization_info = {}
-        with_notarize_authenticator(params, api_key_path) do |notarize_authenticator|
-          notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider] && api_key_path.nil?
+        with_notarize_authenticator(params, api_key) do |notarize_authenticator|
+          notarization_upload_command << " --asc-provider \"#{params[:asc_provider]}\"" if params[:asc_provider] && api_key.nil?
 
           notarization_upload_response = Actions.sh(
             notarize_authenticator.call(notarization_upload_command),
@@ -200,11 +203,10 @@ module Fastlane
         )
       end
 
-      def self.with_notarize_authenticator(params, api_key_path)
-        if api_key_path
+      def self.with_notarize_authenticator(params, api_key)
+        if api_key
           # From xcrun altool for --apiKey:
           # This option will search the following directories in sequence for a private key file with the name of 'AuthKey_<api_key>.p8':  './private_keys', '~/private_keys', '~/.private_keys', and '~/.appstoreconnect/private_keys'.
-          api_key = Spaceship::ConnectAPI::Token.from_json_file(api_key_path)
           api_key_folder_path = File.expand_path('~/.appstoreconnect/private_keys')
           api_key_file_path = File.join(api_key_folder_path, "AuthKey_#{api_key.key_id}.p8")
           directory_exists = File.directory?(api_key_folder_path)
@@ -271,7 +273,7 @@ module Fastlane
                                        description: 'Apple ID username',
                                        default_value: username,
                                        optional: true,
-                                       conflicting_options: [:api_key_path],
+                                       conflicting_options: [:api_key_path, :api_key],
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :asc_provider,
                                        env_name: 'FL_NOTARIZE_ASC_PROVIDER',
@@ -291,13 +293,20 @@ module Fastlane
                                        default_value: false,
                                        type: Boolean),
           FastlaneCore::ConfigItem.new(key: :api_key_path,
-                                       env_name: 'FL_NOTARIZE_API_KEY_PATH',
-                                       description: 'Path to AppStore Connect API key',
+                                       env_names: ['FL_NOTARIZE_API_KEY_PATH', "APP_STORE_CONNECT_API_KEY_PATH"],
+                                       description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
                                        optional: true,
-                                       conflicting_options: [:username],
+                                       conflicting_options: [:username, :api_key],
                                        verify_block: proc do |value|
                                          UI.user_error!("API Key not found at '#{value}'") unless File.exist?(value)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :api_key,
+                                       env_names: ['FL_NOTARIZE_API_KEY', "APP_STORE_CONNECT_API_KEY"],
+                                       description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)",
+                                       optional: true,
+                                       conflicting_options: [:username, :api_key_path],
+                                       sensitive: true,
+                                       type: Hash)
         ]
       end
 
