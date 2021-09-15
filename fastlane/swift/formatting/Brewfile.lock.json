@@ -51,11 +51,11 @@
         "macOS": "11.5.2"
       },
       "monterey": {
-        "HOMEBREW_VERSION": "3.2.6-34-g6bb3699",
+        "HOMEBREW_VERSION": "3.2.12-9-gb19fcef",
         "HOMEBREW_PREFIX": "/usr/local",
-        "Homebrew/homebrew-core": "b7523de28df0f0f819ff2c49c84611eec19f5455",
-        "CLT": "13.0.0.0.1.1626155413",
-        "Xcode": "13.0",
+        "Homebrew/homebrew-core": "e79d8126370187be3bd7be6bdbffacf803732113",
+        "CLT": "13.0.0.0.1.1628499445",
+        "Xcode": "12.5.1",
         "macOS": "12.0"
       }
     }

@@ -7136,17 +7136,19 @@ public func nexusUpload(file: String,
    - ascProvider: Provider short name for accounts associated with multiple providers
    - printLog: Whether to print notarization log file, listing issues on failure and warnings on success
    - verbose: Whether to log requests
-   - apiKeyPath: Path to AppStore Connect API key
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
  */
 public func notarize(package: String,
-                     useNotarytool: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                     useNotarytool: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      tryEarlyStapling: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      bundleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      ascProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      printLog: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil))
+                     apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                     apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil))
 {
     let packageArg = RubyCommand.Argument(name: "package", value: package, type: nil)
     let useNotarytoolArg = useNotarytool.asRubyArgument(name: "use_notarytool", type: nil)
@@ -7157,6 +7159,7 @@ public func notarize(package: String,
     let printLogArg = printLog.asRubyArgument(name: "print_log", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
+    let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let array: [RubyCommand.Argument?] = [packageArg,
                                           useNotarytoolArg,
                                           tryEarlyStaplingArg,
@@ -7165,7 +7168,8 @@ public func notarize(package: String,
                                           ascProviderArg,
                                           printLogArg,
                                           verboseArg,
-                                          apiKeyPathArg]
+                                          apiKeyPathArg,
+                                          apiKeyArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -9994,6 +9998,7 @@ public func slackTrainStart(distance: Int = 5,
    - scheme: Scheme to use when calling slather
    - configuration: Configuration to use when calling slather (since slather-2.4.1)
    - inputFormat: The input format that slather should look for
+   - github: Tell slather that it is running on Github Actions
    - buildkite: Tell slather that it is running on Buildkite
    - teamcity: Tell slather that it is running on TeamCity
    - jenkins: Tell slather that it is running on Jenkins
@@ -10029,6 +10034,7 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
                     scheme: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     configuration: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     inputFormat: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                    github: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     buildkite: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     teamcity: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     jenkins: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
@@ -10061,6 +10067,7 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
     let schemeArg = scheme.asRubyArgument(name: "scheme", type: nil)
     let configurationArg = configuration.asRubyArgument(name: "configuration", type: nil)
     let inputFormatArg = inputFormat.asRubyArgument(name: "input_format", type: nil)
+    let githubArg = github.asRubyArgument(name: "github", type: nil)
     let buildkiteArg = buildkite.asRubyArgument(name: "buildkite", type: nil)
     let teamcityArg = teamcity.asRubyArgument(name: "teamcity", type: nil)
     let jenkinsArg = jenkins.asRubyArgument(name: "jenkins", type: nil)
@@ -10092,6 +10099,7 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
                                           schemeArg,
                                           configurationArg,
                                           inputFormatArg,
+                                          githubArg,
                                           buildkiteArg,
                                           teamcityArg,
                                           jenkinsArg,
@@ -13061,7 +13069,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode-beta.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-12.5.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13263,4 +13271,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.135]
+// FastlaneRunnerAPIVersion [0.9.136]
