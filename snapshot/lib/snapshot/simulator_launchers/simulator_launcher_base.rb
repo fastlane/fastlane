@@ -116,7 +116,8 @@ module Snapshot
       device_udid = TestCommandGenerator.device_udid(device_type)
 
       UI.message("Launch Simulator #{device_type}")
-      Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+      # Boot the simulator and wait for it to finish booting
+      Helper.backticks("xcrun simctl bootstatus #{device_udid} -b &> /dev/null")
 
       UI.message("Overriding Status Bar")
 
