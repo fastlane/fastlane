@@ -63,19 +63,46 @@ describe FastlaneCore::BuildWatcher do
       expect(found_build).to eq(ready_build)
     end
 
-    it 'waits when a build is still processing' do
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return([processing_build])
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
-      expect(FastlaneCore::BuildWatcher).to receive(:sleep)
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return([ready_build])
-      expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
+    context 'waits when a build is still processing' do
+      it 'when wait_for_build_beta_detail_processing is false' do
+        expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return([processing_build])
+        expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
+        expect(FastlaneCore::BuildWatcher).to receive(:sleep)
+        expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return([ready_build])
+        expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
 
-      expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: #{ready_build.app_version}, build_version: #{ready_build.version}, platform: #{ready_build.platform}")
-      expect(UI).to receive(:message).with("Waiting for App Store Connect to finish processing the new build (1.0 - 1) for #{ready_build.platform}")
-      expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version} for #{ready_build.platform}")
-      found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false)
+        expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: #{ready_build.app_version}, build_version: #{ready_build.version}, platform: #{ready_build.platform}")
+        expect(UI).to receive(:message).with("Waiting for App Store Connect to finish processing the new build (1.0 - 1) for #{ready_build.platform}")
+        expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version} for #{ready_build.platform}")
+        found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false)
 
-      expect(found_build).to eq(ready_build)
+        expect(found_build).to eq(ready_build)
+      end
+
+      it 'when wait_for_build_beta_detail_processing is true' do
+        build_beta_detail_processing = double(processed?: false)
+        build_beta_detail_processed = double(processed?: true)
+
+        expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return([processing_build])
+        expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
+        expect(FastlaneCore::BuildWatcher).to receive(:sleep)
+
+        expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return([ready_build])
+        expect(ready_build).to receive(:build_beta_detail).and_return(build_beta_detail_processing).twice
+        expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
+        expect(FastlaneCore::BuildWatcher).to receive(:sleep)
+
+        expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return([ready_build])
+        expect(ready_build).to receive(:build_beta_detail).and_return(build_beta_detail_processed).twice
+        expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
+
+        expect(UI).to receive(:message).with("Waiting for processing on... app_id: some-app-id, app_version: #{ready_build.app_version}, build_version: #{ready_build.version}, platform: #{ready_build.platform}")
+        expect(UI).to receive(:message).with("Waiting for App Store Connect to finish processing the new build (1.0 - 1) for #{ready_build.platform}").twice
+        expect(UI).to receive(:success).with("Successfully finished processing the build #{ready_build.app_version} - #{ready_build.version} for #{ready_build.platform}")
+        found_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: 'some-app-id', platform: :ios, train_version: '1.0', build_version: '1', return_spaceship_testflight_build: false, wait_for_build_beta_detail_processing: true)
+
+        expect(found_build).to eq(ready_build)
+      end
     end
 
     it 'waits when the build disappears' do
