@@ -13,6 +13,8 @@ module Supply
       apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
       upload_mapping(apk_version_codes)
 
+      track_to_update = Supply.config[:track]
+
       apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
 
       if !apk_version_codes.empty?
@@ -23,13 +25,14 @@ module Supply
       else
         # Only promote or rollout if we don't have version codes
         if Supply.config[:track_promote_to]
+          track_to_update = Supply.config[:track_promote_to]
           promote_track
         elsif !Supply.config[:rollout].nil? && Supply.config[:track].to_s != ""
           update_rollout
         end
       end
 
-      perform_upload_meta(apk_version_codes)
+      perform_upload_meta(apk_version_codes, track_to_update)
 
       if Supply.config[:validate_only]
         UI.message("Validating all changes with Google Play...")
@@ -70,7 +73,7 @@ module Supply
       end
     end
 
-    def perform_upload_meta(version_codes)
+    def perform_upload_meta(version_codes, track_name)
       if (!Supply.config[:skip_upload_metadata] || !Supply.config[:skip_upload_images] || !Supply.config[:skip_upload_changelogs] || !Supply.config[:skip_upload_screenshots]) && metadata_path
         # Use version code from config if version codes is empty and no nil or empty string
         version_codes = [Supply.config[:version_code]] if version_codes.empty?
@@ -81,7 +84,7 @@ module Supply
         version_codes.each do |version_code|
           UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
-          track, release = fetch_track_and_release!(Supply.config[:track], version_code)
+          track, release = fetch_track_and_release!(track_name, version_code)
           UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
           UI.user_error!("Could not find release for version code '#{version_code}' to update changelog") unless release
 
@@ -98,7 +101,7 @@ module Supply
             release_notes << upload_changelog(language, version_code) unless Supply.config[:skip_upload_changelogs]
           end
 
-          upload_changelogs(release_notes, release, track) unless release_notes.empty?
+          upload_changelogs(release_notes, release, track, track_name) unless release_notes.empty?
         end
       end
     end
@@ -239,9 +242,9 @@ module Supply
       )
     end
 
-    def upload_changelogs(release_notes, release, track)
+    def upload_changelogs(release_notes, release, track, track_name)
       release.release_notes = release_notes
-      client.upload_changelogs(track, Supply.config[:track])
+      client.upload_changelogs(track, track_name)
     end
 
     def upload_metadata(language, listing)
