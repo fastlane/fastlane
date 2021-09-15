@@ -17,4 +17,4 @@ public class Precheckfile: PrecheckfileProtocol {
     // during the `init` process, and you won't see this message
 }
 
-// Generated with fastlane 2.193.1
+// Generated with fastlane 2.194.0
