@@ -12,6 +12,7 @@ require_relative 'storage'
 require_relative 'encryption'
 
 module Match
+  # rubocop:disable Metrics/ClassLength
   class Runner
     attr_accessor :files_to_commit
     attr_accessor :spaceship
@@ -448,4 +449,5 @@ module Match
       return portal_certs_count != profile_certs_count
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
