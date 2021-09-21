@@ -32,7 +32,7 @@ module Fastlane
       def self.example_code
         [
           'commit = last_git_commit
-          pilot(changelog: changelog[:message]) # message of commit
+          pilot(changelog: commit[:message]) # message of commit
           author = commit[:author] # author of the commit
           author_email = commit[:author_email] # email of the author of the commit
           hash = commit[:commit_hash] # long sha of commit
