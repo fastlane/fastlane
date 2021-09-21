@@ -258,8 +258,21 @@ module Fastlane
             # ...
 
             properties: {
-              "versionCode" => 100,
-              "versionName" => "1.0.0",
+              "exampleNumber" => 100,
+              "exampleString" => "1.0.0",
+              # ...
+            }
+          )
+          ```
+
+          You can use this to change the version code and name of your app:
+          ```ruby
+          gradle(
+            # ...
+
+            properties: {
+              "android.injected.version.code" => 100,
+              "android.injected.version.name" => "1.0.0",
               # ...
             }
           )
