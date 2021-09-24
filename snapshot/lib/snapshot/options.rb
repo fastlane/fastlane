@@ -123,7 +123,7 @@ module Snapshot
                                      type: Boolean),
         FastlaneCore::ConfigItem.new(key: :override_status_bar,
                                      env_name: 'SNAPSHOT_OVERRIDE_STATUS_BAR',
-                                     description: "Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception",
+                                     description: "Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception (Adjust 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable if override status bar is not working. Might be because simulator is not fully booted. Defaults to 10 seconds)",
                                      default_value: false,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :override_status_bar_arguments,
