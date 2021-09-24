@@ -12,6 +12,7 @@ require_relative 'storage'
 require_relative 'encryption'
 
 module Match
+  # rubocop:disable Metrics/ClassLength
   class Runner
     attr_accessor :files_to_commit
     attr_accessor :spaceship
@@ -242,16 +243,14 @@ module Match
       profile = profiles.last
       force = params[:force]
 
-      if params[:force_for_new_devices] && !params[:readonly]
-        prov_types_without_devices = [:appstore, :developer_id]
-        if !prov_types_without_devices.include?(prov_type) && !params[:force]
-          force = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym)
-        else
-          # App Store provisioning profiles don't contain device identifiers and
-          # thus shouldn't be renewed if the device count has changed.
-          UI.important("Warning: `force_for_new_devices` is set but is ignored for App Store & Developer ID provisioning profiles.")
-          UI.important("You can safely stop specifying `force_for_new_devices` when running Match for type 'appstore' or 'developer_id'.")
-        end
+      if params[:force_for_new_devices]
+        force = should_force_include_all_devices(params: params, prov_type: prov_type, profile: profile, keychain_path: keychain_path) unless force
+      end
+
+      if params[:include_all_certificates]
+        # Clearing specified certificate id which will prevent a profile being created with only one certificate
+        certificate_id = nil
+        force = should_force_include_all_certificates(params: params, prov_type: prov_type, profile: profile, keychain_path: keychain_path) unless force
       end
 
       if profile.nil? || force
@@ -319,6 +318,24 @@ module Match
     end
     # rubocop:enable Metrics/PerceivedComplexity
 
+    def should_force_include_all_devices(params: nil, prov_type: nil, profile: nil, keychain_path: nil)
+      return false unless params[:force_for_new_devices] && !params[:readonly]
+
+      force = false
+
+      prov_types_without_devices = [:appstore, :developer_id]
+      if !prov_types_without_devices.include?(prov_type) && !params[:force]
+        force = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym)
+      else
+        # App Store provisioning profiles don't contain device identifiers and
+        # thus shouldn't be renewed if the device count has changed.
+        UI.important("Warning: `force_for_new_devices` is set but is ignored for App Store & Developer ID provisioning profiles.")
+        UI.important("You can safely stop specifying `force_for_new_devices` when running Match for type 'appstore' or 'developer_id'.")
+      end
+
+      return force
+    end
+
     def device_count_different?(profile: nil, keychain_path: nil, platform: nil)
       return false unless profile
 
@@ -365,5 +382,72 @@ module Match
       end
       return false
     end
+
+    def should_force_include_all_certificates(params: nil, prov_type: nil, profile: nil, keychain_path: nil)
+      unless params[:include_all_certificates]
+        if params[:force_for_new_certificates]
+          UI.important("You specified 'force_for_new_certificates: true', but new certificates will not be added, cause 'include_all_certificates' is 'false'")
+        end
+        return false
+      end
+
+      force = false
+
+      if params[:force_for_new_certificates] && !params[:readonly]
+        if prov_type == :development && !params[:force]
+          force = certificate_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym)
+        else
+          # All other (not development) provisioning profiles don't contain
+          # multiple certificates, thus shouldn't be renewed
+          # if the certificates  count has changed.
+          UI.important("Warning: `force_for_new_certificates` is set but is ignored for non-'development' provisioning profiles.")
+          UI.important("You can safely stop specifying `force_for_new_certificates` when running Match for '#{prov_type}' provisioning profiles.")
+        end
+      end
+
+      return force
+    end
+
+    def certificate_count_different?(profile: nil, keychain_path: nil, platform: nil)
+      return false unless profile
+
+      parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
+      uuid = parsed["UUID"]
+
+      all_profiles = Spaceship::ConnectAPI::Profile.all(includes: "certificates")
+      portal_profile = all_profiles.detect { |i| i.uuid == uuid }
+
+      return false unless portal_profile
+
+      profile_certs_count = portal_profile.fetch_all_certificates.count
+
+      certificate_types =
+        case platform
+        when :ios, :tvos
+          [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT,
+            Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT
+          ]
+        when :macos, :catalyst
+          [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT,
+            Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DEVELOPMENT
+          ]
+        else
+          []
+        end
+
+      certificates = Spaceship::ConnectAPI::Certificate.all
+      unless certificate_types.empty?
+        certificates = certificates.select do |certificate|
+          certificate_types.include?(certificate.certificateType) && certificate.valid?
+        end
+      end
+
+      portal_certs_count = certificates.size
+
+      return portal_certs_count != profile_certs_count
+    end
   end
+  # rubocop:enable Metrics/ClassLength
 end

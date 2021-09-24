@@ -114,7 +114,7 @@ module Sigh
 
       # Take the provisioning profile name into account
       results = filter_profiles_by_name(results) if Sigh.config[:provisioning_name].to_s.length > 0
-      return results if Sigh.config[:skip_certificate_verification]
+      return results if Sigh.config[:skip_certificate_verification] || Sigh.config[:include_all_certificates]
 
       UI.message("Verifying certificates...")
       return results.find_all do |current_profile|
@@ -311,7 +311,7 @@ module Sigh
 
       # verify certificates
       if Helper.mac?
-        unless Sigh.config[:skip_certificate_verification]
+        unless Sigh.config[:skip_certificate_verification] || Sigh.config[:include_all_certificates]
           certificates = certificates.find_all do |c|
             file = Tempfile.new('cert')
             raw_data = Base64.decode64(c.certificate_content)
