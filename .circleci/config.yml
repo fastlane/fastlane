@@ -48,11 +48,6 @@ aliases:
     run:
       name: Set Ruby version
       command: | # see https://circleci.com/docs/2.0/testing-ios/#using-ruby
-        if [ "${_RUBY_VERSION}" = "3.0" ]; then
-          # See https://circleci.com/docs/2.0/testing-ios/#supported-xcode-versions
-          echo "Ruby 3.0 is not installed in macOS image based on Xcode 12.5.1"
-          ruby-install ruby 3.0
-        fi
         echo "ruby-${_RUBY_VERSION}" > ~/.ruby-version
         echo 'chruby ruby-${_RUBY_VERSION}' >> ~/.bash_profile
 
