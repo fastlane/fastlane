@@ -2084,7 +2084,7 @@ public func captureAndroidScreenshots(androidHome: OptionalConfigValue<String?> 
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
    - headless: Enabling this option will prevent displaying the simulator window
-   - overrideStatusBar: Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception
+   - overrideStatusBar: Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception (Adjust 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable if override status bar is not working. Might be because simulator is not fully booted. Defaults to 10 seconds)
    - overrideStatusBarArguments: Fully customize the status bar by setting each option here. See `xcrun simctl status_bar --help`
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
@@ -2289,7 +2289,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
    - headless: Enabling this option will prevent displaying the simulator window
-   - overrideStatusBar: Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception
+   - overrideStatusBar: Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception (Adjust 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable if override status bar is not working. Might be because simulator is not fully booted. Defaults to 10 seconds)
    - overrideStatusBarArguments: Fully customize the status bar by setting each option here. See `xcrun simctl status_bar --help`
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
@@ -3172,67 +3172,6 @@ public func copyArtifacts(keepOriginal: OptionalConfigValue<Bool> = .fastlaneDef
         .filter { $0?.value != nil }
         .compactMap { $0 }
     let command = RubyCommand(commandID: "", methodName: "copy_artifacts", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
- Refer to [Firebase App Distribution](https://appdistro.page.link/fastlane-repo)
-
- - parameters:
-   - ipaPath: Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action
-   - apkPath: Path to your APK file
-   - crashlyticsPath: Path to the submit binary in the Crashlytics bundle (iOS) or `crashlytics-devtools.jar` file (Android)
-   - apiToken: Crashlytics API Key
-   - buildSecret: Crashlytics Build Secret
-   - notesPath: Path to the release notes
-   - notes: The release notes as string - uses :notes_path under the hood
-   - groups: The groups used for distribution, separated by commas
-   - emails: Pass email addresses of testers, separated by commas
-   - notifications: Crashlytics notification option (true/false)
-   - debug: Crashlytics debug option (true/false)
-
- Additionally, you can specify `notes`, `emails`, `groups` and `notifications`.
- Distributing to Groups: When using the `groups` parameter, it's important to use the group **alias** names for each group you'd like to distribute to. A group's alias can be found in the web UI. If you're viewing the Beta page, you can open the groups dialog by clicking the 'Manage Groups' button.
- This action uses the `submit` binary provided by the Crashlytics framework. If the binary is not found in its usual path, you'll need to specify the path manually by using the `crashlytics_path` option.
- */
-public func crashlytics(ipaPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                        apkPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                        crashlyticsPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                        apiToken: String,
-                        buildSecret: String,
-                        notesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                        notes: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                        groups: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
-                        emails: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
-                        notifications: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                        debug: OptionalConfigValue<Bool> = .fastlaneDefault(false))
-{
-    let ipaPathArg = ipaPath.asRubyArgument(name: "ipa_path", type: nil)
-    let apkPathArg = apkPath.asRubyArgument(name: "apk_path", type: nil)
-    let crashlyticsPathArg = crashlyticsPath.asRubyArgument(name: "crashlytics_path", type: nil)
-    let apiTokenArg = RubyCommand.Argument(name: "api_token", value: apiToken, type: nil)
-    let buildSecretArg = RubyCommand.Argument(name: "build_secret", value: buildSecret, type: nil)
-    let notesPathArg = notesPath.asRubyArgument(name: "notes_path", type: nil)
-    let notesArg = notes.asRubyArgument(name: "notes", type: nil)
-    let groupsArg = groups.asRubyArgument(name: "groups", type: nil)
-    let emailsArg = emails.asRubyArgument(name: "emails", type: nil)
-    let notificationsArg = notifications.asRubyArgument(name: "notifications", type: nil)
-    let debugArg = debug.asRubyArgument(name: "debug", type: nil)
-    let array: [RubyCommand.Argument?] = [ipaPathArg,
-                                          apkPathArg,
-                                          crashlyticsPathArg,
-                                          apiTokenArg,
-                                          buildSecretArg,
-                                          notesPathArg,
-                                          notesArg,
-                                          groupsArg,
-                                          emailsArg,
-                                          notificationsArg,
-                                          debugArg]
-    let args: [RubyCommand.Argument] = array
-        .filter { $0?.value != nil }
-        .compactMap { $0 }
-    let command = RubyCommand(commandID: "", methodName: "crashlytics", className: nil, args: args)
     _ = runner.executeCommand(command)
 }
 
@@ -4951,6 +4890,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
    - certOwnerName: The certificate name to use for new profiles, or to renew with. (e.g. "Felix Krause")
    - filename: Filename to use for the generated provisioning profile (must include .mobileprovision)
    - skipFetchProfiles: Skips the verification of existing profiles which is useful if you have thousands of profiles
+   - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
    - skipCertificateVerification: Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine
    - platform: Set the provisioning profile's platform (i.e. ios, tvos, macos, catalyst)
    - readonly: Only fetch existing profile, don't generate new ones
@@ -4979,6 +4919,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
                                                       certOwnerName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                       filename: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                       skipFetchProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                                      includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                       skipCertificateVerification: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                       platform: Any = "ios",
                                                       readonly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -5003,6 +4944,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
     let certOwnerNameArg = certOwnerName.asRubyArgument(name: "cert_owner_name", type: nil)
     let filenameArg = filename.asRubyArgument(name: "filename", type: nil)
     let skipFetchProfilesArg = skipFetchProfiles.asRubyArgument(name: "skip_fetch_profiles", type: nil)
+    let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
     let skipCertificateVerificationArg = skipCertificateVerification.asRubyArgument(name: "skip_certificate_verification", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let readonlyArg = readonly.asRubyArgument(name: "readonly", type: nil)
@@ -5026,6 +4968,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
                                           certOwnerNameArg,
                                           filenameArg,
                                           skipFetchProfilesArg,
+                                          includeAllCertificatesArg,
                                           skipCertificateVerificationArg,
                                           platformArg,
                                           readonlyArg,
@@ -6647,6 +6590,8 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
+   - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
+   - forceForNewCertificates: Renew the provisioning profiles if the device count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
@@ -6694,6 +6639,8 @@ public func match(type: String = matchfile.type,
                   keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.keychainPassword),
                   force: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.force),
                   forceForNewDevices: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceForNewDevices),
+                  includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.includeAllCertificates),
+                  forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceForNewCertificates),
                   skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipConfirmation),
                   skipDocs: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipDocs),
                   platform: String = matchfile.platform,
@@ -6739,6 +6686,8 @@ public func match(type: String = matchfile.type,
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let forceForNewDevicesArg = forceForNewDevices.asRubyArgument(name: "force_for_new_devices", type: nil)
+    let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
+    let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
     let skipDocsArg = skipDocs.asRubyArgument(name: "skip_docs", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
@@ -6783,6 +6732,8 @@ public func match(type: String = matchfile.type,
                                           keychainPasswordArg,
                                           forceArg,
                                           forceForNewDevicesArg,
+                                          includeAllCertificatesArg,
+                                          forceForNewCertificatesArg,
                                           skipConfirmationArg,
                                           skipDocsArg,
                                           platformArg,
@@ -6838,6 +6789,8 @@ public func match(type: String = matchfile.type,
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
+   - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
+   - forceForNewCertificates: Renew the provisioning profiles if the device count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
@@ -6889,6 +6842,8 @@ public func matchNuke(type: String = "development",
                       keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       forceForNewDevices: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                      includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                      forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       skipDocs: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       platform: String = "ios",
@@ -6934,6 +6889,8 @@ public func matchNuke(type: String = "development",
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let forceForNewDevicesArg = forceForNewDevices.asRubyArgument(name: "force_for_new_devices", type: nil)
+    let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
+    let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
     let skipDocsArg = skipDocs.asRubyArgument(name: "skip_docs", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
@@ -6978,6 +6935,8 @@ public func matchNuke(type: String = "development",
                                           keychainPasswordArg,
                                           forceArg,
                                           forceForNewDevicesArg,
+                                          includeAllCertificatesArg,
+                                          forceForNewCertificatesArg,
                                           skipConfirmationArg,
                                           skipDocsArg,
                                           platformArg,
@@ -7140,7 +7099,7 @@ public func nexusUpload(file: String,
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
  */
 public func notarize(package: String,
-                     useNotarytool: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                     useNotarytool: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                      tryEarlyStapling: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      bundleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -9774,6 +9733,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
    - certOwnerName: The certificate name to use for new profiles, or to renew with. (e.g. "Felix Krause")
    - filename: Filename to use for the generated provisioning profile (must include .mobileprovision)
    - skipFetchProfiles: Skips the verification of existing profiles which is useful if you have thousands of profiles
+   - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
    - skipCertificateVerification: Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine
    - platform: Set the provisioning profile's platform (i.e. ios, tvos, macos, catalyst)
    - readonly: Only fetch existing profile, don't generate new ones
@@ -9802,6 +9762,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
                                     certOwnerName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                     filename: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                     skipFetchProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                    includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                     skipCertificateVerification: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                     platform: Any = "ios",
                                     readonly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -9826,6 +9787,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
     let certOwnerNameArg = certOwnerName.asRubyArgument(name: "cert_owner_name", type: nil)
     let filenameArg = filename.asRubyArgument(name: "filename", type: nil)
     let skipFetchProfilesArg = skipFetchProfiles.asRubyArgument(name: "skip_fetch_profiles", type: nil)
+    let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
     let skipCertificateVerificationArg = skipCertificateVerification.asRubyArgument(name: "skip_certificate_verification", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let readonlyArg = readonly.asRubyArgument(name: "readonly", type: nil)
@@ -9849,6 +9811,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
                                           certOwnerNameArg,
                                           filenameArg,
                                           skipFetchProfilesArg,
+                                          includeAllCertificatesArg,
                                           skipCertificateVerificationArg,
                                           platformArg,
                                           readonlyArg,
@@ -10152,7 +10115,7 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - eraseSimulator: Enabling this option will automatically erase the simulator before running the application
    - headless: Enabling this option will prevent displaying the simulator window
-   - overrideStatusBar: Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception
+   - overrideStatusBar: Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception (Adjust 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable if override status bar is not working. Might be because simulator is not fully booted. Defaults to 10 seconds)
    - overrideStatusBarArguments: Fully customize the status bar by setting each option here. See `xcrun simctl status_bar --help`
    - localizeSimulator: Enabling this option will configure the Simulator's system language
    - darkMode: Enabling this option will configure the Simulator to be in dark mode (false for light, true for dark)
@@ -10952,6 +10915,8 @@ public func swiftlint(mode: String = "lint",
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
+   - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
+   - forceForNewCertificates: Renew the provisioning profiles if the device count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
@@ -10999,6 +10964,8 @@ public func syncCodeSigning(type: String = "development",
                             keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             forceForNewDevices: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                            includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                            forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             skipDocs: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             platform: String = "ios",
@@ -11044,6 +11011,8 @@ public func syncCodeSigning(type: String = "development",
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let forceForNewDevicesArg = forceForNewDevices.asRubyArgument(name: "force_for_new_devices", type: nil)
+    let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
+    let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
     let skipDocsArg = skipDocs.asRubyArgument(name: "skip_docs", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
@@ -11088,6 +11057,8 @@ public func syncCodeSigning(type: String = "development",
                                           keychainPasswordArg,
                                           forceArg,
                                           forceForNewDevicesArg,
+                                          includeAllCertificatesArg,
+                                          forceForNewCertificatesArg,
                                           skipConfirmationArg,
                                           skipDocsArg,
                                           platformArg,
@@ -13069,7 +13040,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode-12.5.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-13.Release.Candidate.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13271,4 +13242,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.136]
+// FastlaneRunnerAPIVersion [0.9.137]
