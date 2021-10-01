@@ -89,16 +89,4 @@ task(:update_gem_spec_authors) do
   File.write("fastlane.gemspec", gemspec)
 end
 
-#####################################################
-# @!group Helper Methods
-#####################################################
-
-def box(str)
-  l = str.length + 4
-  puts('')
-  puts('=' * l)
-  puts('| ' + str + ' |')
-  puts('=' * l)
-end
-
 task(default: :test_all)
