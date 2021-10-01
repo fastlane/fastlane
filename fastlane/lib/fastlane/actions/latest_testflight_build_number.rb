@@ -9,9 +9,16 @@ module Fastlane
 
     class LatestTestflightBuildNumberAction < Action
       def self.run(params)
+        current_build_nr = Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER]
+        current_build_v = Actions.lane_context[SharedValues::LATEST_VERSION]
+
         AppStoreBuildNumberAction.run(params)
+
         build_nr = Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER]
         build_v = Actions.lane_context[SharedValues::LATEST_VERSION]
+
+        Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = current_build_nr
+        Actions.lane_context[SharedValues::LATEST_VERSION] = current_build_v
         Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER] = build_nr
         Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION] = build_v
         return build_nr
