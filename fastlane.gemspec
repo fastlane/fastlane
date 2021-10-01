@@ -58,7 +58,6 @@ Gem::Specification.new do |spec|
     "changelog_uri" => "https://github.com/fastlane/fastlane/releases",
     "documentation_uri" => "https://docs.fastlane.tools/",
     "homepage_uri" => spec.homepage,
-    "mailing_list_uri" => "https://github.com/fastlane/fastlane/discussions",
     "source_code_uri" => "https://github.com/fastlane/fastlane"
   }
 
