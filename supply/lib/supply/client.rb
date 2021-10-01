@@ -286,10 +286,10 @@ module Supply
 
       filtered_release = filtered_track.releases.first { |r| !r.name.nil? && r.name == version }
 
-      # Since we can release on Alpha/Beta without release notes.
+      # Since we can release on Internal/Alpha/Beta without release notes.
       if filtered_release.release_notes.nil?
-        UI.user_error!("Version '#{version}' for '#{current_package_name}' does not seem to have any release notes. Nothing to download.")
-        return nil
+        UI.message("Version '#{version}' for '#{current_package_name}' does not seem to have any release notes. Nothing to download.")
+        return []
       end
 
       return filtered_release.release_notes.map do |row|
