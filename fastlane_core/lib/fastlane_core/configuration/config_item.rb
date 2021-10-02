@@ -282,7 +282,7 @@ module FastlaneCore
         return value.map { |k, v| "#{k.to_s.shellescape}=#{v.shellescape}" }.join(' ') if value.kind_of?(Hash)
       elsif data_type == Hash && value.kind_of?(String)
         begin
-          parsed = JSON.parse(value)
+          parsed = JSON.parse(value, :symbolize_names => true)
           return parsed if parsed.kind_of?(Hash)
         rescue JSON::ParserError
         end
