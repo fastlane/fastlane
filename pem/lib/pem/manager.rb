@@ -73,7 +73,8 @@ module PEM
 
         if PEM.config[:generate_p12]
           p12_cert_path = File.join(output_path, "#{filename_base}.p12")
-          p12 = OpenSSL::PKCS12.create(PEM.config[:p12_password], certificate_type, pkey, x509_certificate)
+          p12_password = PEM.config[:p12_password] == "" ? nil : PEM.config[:p12_password]
+          p12 = OpenSSL::PKCS12.create(p12_password, certificate_type, pkey, x509_certificate)
           File.write(p12_cert_path, p12.to_der)
           UI.message("p12 certificate: ".green + Pathname.new(p12_cert_path).realpath.to_s)
         end
