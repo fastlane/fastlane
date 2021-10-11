@@ -29,7 +29,7 @@ module Spaceship
       attr_accessor :in_house
 
       def self.from(hash: nil, filepath: nil)
-        api_token ||= self.create(**hash) if hash
+        api_token ||= self.create(**hash.transform_keys(&:to_sym)) if hash
         api_token ||= self.from_json_file(filepath) if filepath
         return api_token
       end
