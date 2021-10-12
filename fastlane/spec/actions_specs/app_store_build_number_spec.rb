@@ -25,7 +25,7 @@ describe Fastlane do
       end
 
       it "returns value as string (with build number as version string)" do
-        allow(Fastlane::Actions::AppStoreBuildNumberAction).to receive(:get_build_number).and_return(OpenStruct.new({ build_nr: "1.2.3", build_v: "foo" }))
+        allow(Fastlane::Actions::AppStoreBuildNumberAction).to receive(:get_build_info).and_return(OpenStruct.new({ build_nr: "1.2.3", build_v: "foo" }))
 
         result = Fastlane::FastFile.new.parse("lane :test do
           app_store_build_number(username: 'name@example.com', app_identifier: 'x.y.z')
@@ -35,7 +35,7 @@ describe Fastlane do
       end
 
       it "returns value as integer (with build number as version number)" do
-        allow(Fastlane::Actions::AppStoreBuildNumberAction).to receive(:get_build_number).and_return(OpenStruct.new({ build_nr: "3", build_v: "foo" }))
+        allow(Fastlane::Actions::AppStoreBuildNumberAction).to receive(:get_build_info).and_return(OpenStruct.new({ build_nr: "3", build_v: "foo" }))
 
         result = Fastlane::FastFile.new.parse("lane :test do
           app_store_build_number(username: 'name@example.com', app_identifier: 'x.y.z')
@@ -45,7 +45,7 @@ describe Fastlane do
       end
     end
 
-    describe "#get_build_number" do
+    describe "#get_build_info" do
       let(:fake_api_key_json_path) do
         "./spaceship/spec/connect_api/fixtures/asc_key.json"
       end
@@ -133,7 +133,7 @@ describe Fastlane do
             expect(UI).to receive(:message).with("Fetching the latest build number for live-version")
             expect(UI).to receive(:message).with("Latest upload for live-version #{app_version} is build: #{build_number}")
 
-            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_number(options)
+            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
             expect(result.build_nr).to eq(build_number)
             expect(result.build_v).to eq(app_version)
           end
@@ -147,7 +147,7 @@ describe Fastlane do
 
             options[:api_key] = "api_key"
             options[:api_key_path] = "api_key_path"
-            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_number(options)
+            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
             expect(result.build_nr).to eq(build_number)
             expect(result.build_v).to eq(app_version)
           end
@@ -169,7 +169,7 @@ describe Fastlane do
             expect(UI).to receive(:message).with("Latest upload for live-version #{app_version} is build: #{build_number}")
 
             options[:username] = "username"
-            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_number(options)
+            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
             expect(result.build_nr).to eq(build_number)
             expect(result.build_v).to eq(app_version)
           end
@@ -211,7 +211,7 @@ describe Fastlane do
             expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on any platform is build: #{build_number}")
 
-            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_number(options)
+            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
             expect(result.build_nr).to eq(build_number)
             expect(result.build_v).to eq(app_version)
           end
@@ -229,7 +229,7 @@ describe Fastlane do
             expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on #{platform} platform is build: #{build_number}")
 
-            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_number(options)
+            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
             expect(result.build_nr).to eq(build_number)
             expect(result.build_v).to eq(app_version)
           end
@@ -248,7 +248,7 @@ describe Fastlane do
             expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on any platform is build: #{build_number}")
 
-            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_number(options)
+            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
             expect(result.build_nr).to eq(build_number)
             expect(result.build_v).to eq(app_version)
           end
@@ -266,7 +266,7 @@ describe Fastlane do
             expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on #{platform} platform is build: #{build_number}")
 
-            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_number(options)
+            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
             expect(result.build_nr).to eq(build_number)
             expect(result.build_v).to eq(app_version)
           end
@@ -290,7 +290,7 @@ describe Fastlane do
             expect(UI).to receive(:important).with("Could not find a build for version #{app_version} on #{platform} platform on App Store Connect")
             expect(UI).to receive(:user_error!).with("Could not find a build on App Store Connect - and 'initial_build_number' option is not set")
 
-            Fastlane::Actions::AppStoreBuildNumberAction.get_build_number(options)
+            Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
           end
         end
 
@@ -312,7 +312,7 @@ describe Fastlane do
             expect(UI).to receive(:important).with("Could not find a build for version #{app_version} on #{platform} platform on App Store Connect")
             expect(UI).to receive(:message).with("Using initial build number of 5678")
 
-            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_number(options)
+            result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
             expect(result.build_nr).to eq(5678)
             expect(result.build_v).to eq(app_version)
           end
