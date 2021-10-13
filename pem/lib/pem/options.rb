@@ -86,7 +86,7 @@ module PEM
                                      env_name: "PEM_P12_PASSWORD",
                                      sensitive: true,
                                      description: "The password that is used for your p12 file",
-                                     default_value: ""),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :pem_name,
                                      short_option: "-o",
                                      env_name: "PEM_FILE_NAME",
