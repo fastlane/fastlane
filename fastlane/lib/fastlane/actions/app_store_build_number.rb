@@ -9,9 +9,18 @@ module Fastlane
 
     class AppStoreBuildNumberAction < Action
       def self.run(params)
+        build_v, build_nr = get_build_version_and_number(params)
+
+        Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = build_nr
+        Actions.lane_context[SharedValues::LATEST_VERSION] = build_v
+
+        return build_nr
+      end
+
+      def self.get_build_version_and_number(params)
         require 'spaceship'
 
-        result = get_build_number(params)
+        result = get_build_info(params)
         build_nr = result.build_nr
 
         # Convert build_nr to int (for legacy use) if no "." in string
@@ -19,13 +28,10 @@ module Fastlane
           build_nr = build_nr.to_i
         end
 
-        Actions.lane_context[SharedValues::LATEST_BUILD_NUMBER] = build_nr
-        Actions.lane_context[SharedValues::LATEST_VERSION] = result.build_v
-
-        return build_nr
+        return result.build_v, build_nr
       end
 
-      def self.get_build_number(params)
+      def self.get_build_info(params)
         # Prompts select team if multiple teams and none specified
         if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
           UI.message("Creating authorization token for App Store Connect API")
