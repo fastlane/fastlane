@@ -156,7 +156,8 @@ module Scan
         title: "Test Results",
         rows: [
           ["Number of tests", result[:tests]],
-          ["Number of failures", failures_str]
+          ["Number of failures", failures_str],
+          ["Success rate", result[:failures].fdiv(result[:tests]).round(2).to_s + " %"]
         ]
       }))
       puts("")
