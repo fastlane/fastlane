@@ -117,6 +117,10 @@ module Snapshot
         'iPad Air' => 'iPad Air',
         'iPad (5th generation)' => 'iPad (5th generation)',
         'iPad (7th generation)' => 'iPad (7th generation)',
+        'iPad mini 2' => 'iPad mini 2',
+        'iPad mini 3' => 'iPad mini 3',
+        'iPad mini 4' => 'iPad mini 4',
+        'iPad mini (6th generation)' => 'iPad mini (6th generation)',
         'iPad Pro (9.7-inch)' => 'iPad Pro (9.7-inch)',
         'iPad Pro (9.7 inch)' => 'iPad Pro (9.7-inch)', # iOS 10.3.1 simulator
         'iPad Pro (10.5-inch)' => 'iPad Pro (10.5-inch)',
