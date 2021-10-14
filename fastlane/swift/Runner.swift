@@ -132,7 +132,7 @@ extension Runner {
     }
 
     @objc func startSocketComs() {
-        guard let socketClient = self.socketClient else {
+        guard let socketClient = socketClient else {
             return
         }
 
