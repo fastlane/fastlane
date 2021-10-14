@@ -1982,10 +1982,10 @@ public func bundleInstall(binstubs: OptionalConfigValue<String?> = .fastlaneDefa
    - endingLocale: **DEPRECATED!** Return the device to this locale after running tests
    - useAdbRoot: **DEPRECATED!** Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
    - appApkPath: The path to the APK for the app under test
-   - testsApkPath: The path to the APK for the the tests bundle
+   - testsApkPath: The path to the APK for the tests bundle
    - specificDevice: Use the device or emulator with the given serial number or qualifier
    - deviceType: Type of device used for screenshots. Matches Google Play Types (phone, sevenInch, tenInch, tv, wear)
-   - exitOnTestFailure: Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary
+   - exitOnTestFailure: Whether or not to exit Screengrab on test failure. Exiting on failure will not copy screenshots to local machine nor open screenshots summary
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - useTimestampSuffix: Add timestamp suffix to screenshot filename
    - adbHost: Configure the host used by adb to connect, allows running on remote devices farm
@@ -5022,7 +5022,7 @@ public func getPushCertificate(development: OptionalConfigValue<Bool> = .fastlan
                                username: String,
                                teamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                               p12Password: String,
+                               p12Password: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                pemName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                outputPath: String = ".",
                                newProfile: ((String) -> Void)? = nil)
@@ -5037,7 +5037,7 @@ public func getPushCertificate(development: OptionalConfigValue<Bool> = .fastlan
     let usernameArg = RubyCommand.Argument(name: "username", value: username, type: nil)
     let teamIdArg = teamId.asRubyArgument(name: "team_id", type: nil)
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
-    let p12PasswordArg = RubyCommand.Argument(name: "p12_password", value: p12Password, type: nil)
+    let p12PasswordArg = p12Password.asRubyArgument(name: "p12_password", type: nil)
     let pemNameArg = pemName.asRubyArgument(name: "pem_name", type: nil)
     let outputPathArg = RubyCommand.Argument(name: "output_path", value: outputPath, type: nil)
     let newProfileArg = RubyCommand.Argument(name: "new_profile", value: newProfile, type: .stringClosure)
@@ -7420,7 +7420,7 @@ public func pem(development: OptionalConfigValue<Bool> = .fastlaneDefault(false)
                 username: String,
                 teamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                 teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                p12Password: String,
+                p12Password: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                 pemName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                 outputPath: String = ".",
                 newProfile: ((String) -> Void)? = nil)
@@ -7435,7 +7435,7 @@ public func pem(development: OptionalConfigValue<Bool> = .fastlaneDefault(false)
     let usernameArg = RubyCommand.Argument(name: "username", value: username, type: nil)
     let teamIdArg = teamId.asRubyArgument(name: "team_id", type: nil)
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
-    let p12PasswordArg = RubyCommand.Argument(name: "p12_password", value: p12Password, type: nil)
+    let p12PasswordArg = p12Password.asRubyArgument(name: "p12_password", type: nil)
     let pemNameArg = pemName.asRubyArgument(name: "pem_name", type: nil)
     let outputPathArg = RubyCommand.Argument(name: "output_path", value: outputPath, type: nil)
     let newProfileArg = RubyCommand.Argument(name: "new_profile", value: newProfile, type: .stringClosure)
@@ -9256,10 +9256,10 @@ public func scp(username: String,
    - endingLocale: **DEPRECATED!** Return the device to this locale after running tests
    - useAdbRoot: **DEPRECATED!** Restarts the adb daemon using `adb root` to allow access to screenshots directories on device. Use if getting 'Permission denied' errors
    - appApkPath: The path to the APK for the app under test
-   - testsApkPath: The path to the APK for the the tests bundle
+   - testsApkPath: The path to the APK for the tests bundle
    - specificDevice: Use the device or emulator with the given serial number or qualifier
    - deviceType: Type of device used for screenshots. Matches Google Play Types (phone, sevenInch, tenInch, tv, wear)
-   - exitOnTestFailure: Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary
+   - exitOnTestFailure: Whether or not to exit Screengrab on test failure. Exiting on failure will not copy screenshots to local machine nor open screenshots summary
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - useTimestampSuffix: Add timestamp suffix to screenshot filename
    - adbHost: Configure the host used by adb to connect, allows running on remote devices farm
@@ -13040,7 +13040,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode-13.Release.Candidate.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13242,4 +13242,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.137]
+// FastlaneRunnerAPIVersion [0.9.138]

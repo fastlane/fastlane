@@ -99,7 +99,7 @@ open class LaneFile: NSObject, LaneFileProtocol {
         #if !SWIFT_PACKAGE
             // When not in SPM environment, we load the Fastfile from its `className()`.
             loadFastfile()
-            guard let fastfileInstance = self.fastfileInstance as? Fastfile else {
+            guard let fastfileInstance = fastfileInstance as? Fastfile else {
                 let message = "Unable to instantiate class named: \(className())"
                 log(message: message)
                 fatalError(message)

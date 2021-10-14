@@ -47,7 +47,7 @@ public protocol ScreengrabfileProtocol: class {
     /// The path to the APK for the app under test
     var appApkPath: String? { get }
 
-    /// The path to the APK for the the tests bundle
+    /// The path to the APK for the tests bundle
     var testsApkPath: String? { get }
 
     /// Use the device or emulator with the given serial number or qualifier
@@ -56,7 +56,7 @@ public protocol ScreengrabfileProtocol: class {
     /// Type of device used for screenshots. Matches Google Play Types (phone, sevenInch, tenInch, tv, wear)
     var deviceType: String { get }
 
-    /// Whether or not to exit Screengrab on test failure. Exiting on failure will not copy sceenshots to local machine nor open sceenshots summary
+    /// Whether or not to exit Screengrab on test failure. Exiting on failure will not copy screenshots to local machine nor open screenshots summary
     var exitOnTestFailure: Bool { get }
 
     /// Enabling this option will automatically uninstall the application before running it
@@ -96,4 +96,4 @@ public extension ScreengrabfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.82]
+// FastlaneRunnerAPIVersion [0.9.83]
