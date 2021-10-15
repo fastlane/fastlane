@@ -22,6 +22,8 @@ module FastlaneCore
           output = stdout.read
         end
 
+        @devices << Device.new(name: "Mac", os_type: "macOS", os_version: nil, udid: nil, state: "Booted", is_simulator: false)
+
         runtime_info = ''
         Open3.popen3('xcrun simctl list runtimes') do |stdin, stdout, stderr, wait_thr|
           # This regex outputs the version info in the format "<platform> <version><exact version>"
