@@ -58,9 +58,9 @@ module Spaceship
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def self.all(client: nil, app_store_version_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
-        resp = client.get_app_preview_sets(filter: filter, includes: includes, limit: limit, sort: sort)
+        resp = client.get_app_preview_sets(app_store_version_localization_id: app_store_version_localization_id, filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       end
 
