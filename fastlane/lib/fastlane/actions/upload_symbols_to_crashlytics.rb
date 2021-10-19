@@ -103,10 +103,41 @@ module Fastlane
       end
 
       def self.find_binary_path(params)
-        params[:binary_path] ||= (Dir["/Applications/Fabric.app/**/upload-symbols"] + Dir["./Pods/Fabric/upload-symbols"] + Dir["./scripts/upload-symbols"] + Dir["./Pods/FirebaseCrashlytics/upload-symbols"]).last
-        UI.user_error!("Failed to find Fabric's upload_symbols binary at /Applications/Fabric.app/**/upload-symbols or ./Pods/**/upload-symbols. Please specify the location of the binary explicitly by using the binary_path option") unless params[:binary_path]
+        params[:binary_path] ||= (
+            Dir["/Applications/Fabric.app/**/upload-symbols"] +
+            Dir["./Pods/Fabric/upload-symbols"] +
+            Dir["./scripts/upload-symbols"] +
+            Dir["./Pods/FirebaseCrashlytics/upload-symbols"] +
+            Dir[spm_uploadsymbols_path(params)]
+        ).last
+        UI.user_error!("Failed to find Fabric's upload_symbols binary at /Applications/Fabric.app/**/upload-symbols or ./Pods/**/upload-symbols or in the SPM SourcePackages folder. Please specify the location of the binary explicitly by using the binary_path option") unless params[:binary_path]
+        UI.verbose("Found upload-symbolds binary at #{params[:binary_path]}")
 
         params[:binary_path] = File.expand_path(params[:binary_path])
+      end
+
+      def self.spm_uploadsymbols_path(params)
+        config = {}
+        FastlaneCore::Project.detect_projects(config)
+        project = FastlaneCore::Project.new(config)
+        # This is the build path excluding the random string after the hyphen
+        build_base = "#{derived_data_path(params)}/#{project.project_name}"
+        "#{build_base}-*/**/upload-symbols"
+      end
+
+      def self.derived_data_path(params)
+        path = params[:derived_data_path]
+        path ||= xcode_preferences ? xcode_preferences['IDECustomDerivedDataLocation'] : nil
+        path ||= "~/Library/Developer/Xcode/DerivedData"
+        # Make it absolute so it works with Dir later
+        File.expand_path(path)
+      end
+
+      def self.xcode_preferences
+        require 'fastlane_core/core_ext/cfpropertylist'
+        file = File.expand_path("~/Library/Preferences/com.apple.dt.Xcode.plist")
+        plist = CFPropertyList::List.new(file: file).value if File.exist?(file)
+        CFPropertyList.native_types(plist) unless plist.nil?
       end
 
       #####################################################
@@ -118,7 +149,12 @@ module Fastlane
       end
 
       def self.details
-        "This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode. This action will not fail the build if one of the uploads failed. The reason for that is that sometimes some of dSYM files are invalid, and we don't want them to fail the complete build."
+        [
+          "This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode.",
+          "This action will not fail the build if one of the uploads failed. The reason for that is that sometimes some of dSYM files are invalid, and we don't want them to fail the complete build.",
+          "Cocoapods users: If you do not include your `Pods` folder in source control, you must run the `cocoapods` action first to ensure `upload-symbols` has been downloaded",
+          "SPM (Swift Package Manager) users: If you are listing your dependencies in `package.swift`, you must run the `spm` action first. If your dependencies are defined within the `.xcodeproj` file, you must run `gym` or an equivalent action first to build the project and install dependencies"
+        ].join("\n")
       end
 
       def self.available_options
@@ -198,7 +234,11 @@ module Fastlane
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DEBUG",
                                        description: "Enable debug mode for upload-symbols",
                                        type: Boolean,
-                                       default_value: false)
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :derived_data_path,
+                                       env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTIC_DERIVED_DATA_PATH",
+                                       description: "The directory where built products and other derived data will go",
+                                       optional: true)
         ]
       end
 
