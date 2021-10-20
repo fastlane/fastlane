@@ -13188,7 +13188,7 @@ public func xcodebuild() {
    - ignoreFilePath: Relative or absolute path to the file containing the list of ignored files
    - includeTestTargets: Enables coverage reports for .xctest targets
    - excludeTargets: Comma separated list of targets to exclude from coverage report
-   - includeTargets: Comma separated list of targets to include in coverage report. If specified then exlude_targets will be ignored
+   - includeTargets: Comma separated list of targets to include in coverage report. If specified then exclude_targets will be ignored
    - onlyProjectTargets: Display the coverage only for main project targets (e.g. skip Pods targets)
    - disableCoveralls: Add this flag to disable automatic submission to Coveralls
    - coverallsServiceName: Name of the CI service compatible with Coveralls. i.e. travis-ci. This option must be defined along with coveralls_service_job_id
