@@ -73,7 +73,7 @@ module Supply
           urls.each do |url|
             if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images
               file_path = "#{path}.#{FastImage.type(url)}"
-            else # SCREENSHOT_TYPES are stored in locale/images/<screensho_types>
+            else # SCREENSHOT_TYPES are stored in locale/images/<screenshot_types>
               file_path = File.join(path, "#{image_counter}_#{listing.language}.#{FastImage.type(url)}")
             end
 
