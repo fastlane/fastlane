@@ -37,7 +37,7 @@
 # ./floatsign source "iPhone Distribution: Name" -p "path/to/profile" [-d "display name"]  [-e entitlements] [-k keychain] [-b "BundleIdentifier"] outputIpa
 #
 #
-# Modifed 26th January 2012
+# Modified 26th January 2012
 #
 # new features January 2012:
 # 1. change the app display name
