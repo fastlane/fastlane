@@ -446,7 +446,7 @@ bundle_id_capability = Spaceship::ConnectAPI::BundleIdCapability.create(bundle_i
 
 # Delete an capability from bundle identifier
 capabilities.each do |capability|
-  if capability.capability_type == Spacehship::ConnectAPI::BundleIdCapability::Type::MAPS
+  if capability.capability_type == Spaceship::ConnectAPI::BundleIdCapability::Type::MAPS
     capability.delete!
   end
 end
