@@ -145,7 +145,7 @@ module Deliver
         if duplicate
           UI.message("Previous uploaded. Skipping '#{screenshot.path}'...")
         else
-          UI.verbose("Queued uplaod screenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{screenshot.path}")
+          UI.verbose("Queued upload screenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{screenshot.path}")
           worker.enqueue(UploadScreenshotJob.new(app_screenshot_set, screenshot.path))
           number_of_screenshots_per_set[app_screenshot_set] += 1
         end
