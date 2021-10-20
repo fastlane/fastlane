@@ -261,7 +261,7 @@ describe "Build Manager" do
         allow(Spaceship::ConnectAPI).to receive(:post_beta_app_review_submissions) # pretend it worked.
         allow(Spaceship::ConnectAPI::TestFlight).to receive(:instance).and_return(mock_base_client)
 
-        # Allow build to return app, buidl_beta_detail, and pre_release_version
+        # Allow build to return app, build_beta_detail, and pre_release_version
         # These are models that are expected to usually be included in the build passed into distribute
         allow(ready_to_submit_mock_build).to receive(:app).and_return(app)
         allow(ready_to_submit_mock_build).to receive(:pre_release_version).and_return(pre_release_version)
