@@ -45,7 +45,7 @@ module Deliver
 
       unless FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS')
         UI.user_error!('Please set a value to "FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS" environment variable ' \
-                       'if you acknowleage the risk and try this out.')
+                       'if you acknowledge the risk and try this out.')
       end
 
       UI.important("Will begin uploading snapshots for '#{version.version_string}' on App Store Connect")
