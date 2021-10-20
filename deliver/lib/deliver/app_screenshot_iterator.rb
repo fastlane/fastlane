@@ -59,7 +59,7 @@ module Deliver
     # @yieldparam [optional, Spaceship::ConnectAPI::AppStoreVersionLocalization] localization
     # @yieldparam [optional, Spaceship::ConnectAPI::AppStoreScreenshotSet] app_screenshot_set
     # @yieldparam [optional, Deliver::AppScreenshot] screenshot
-    # @yieldparam [optional, Integer] index a number reperesents which position the screenshot will be
+    # @yieldparam [optional, Integer] index a number represents which position the screenshot will be
     def each_local_screenshot(screenshots_per_language, &block)
       return enum_for(__method__, screenshots_per_language) unless block_given?
 
