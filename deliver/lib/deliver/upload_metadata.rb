@@ -654,7 +654,7 @@ module Deliver
       end
       UI.message("Setting the app's age rating...")
 
-      # Maping from legacy ITC values to App Store Connect Values
+      # Mapping from legacy ITC values to App Store Connect Values
       mapped_values = {}
       attributes = {}
       json.each do |k, v|
