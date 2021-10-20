@@ -124,7 +124,7 @@ module Fastlane
 
     # This is being called from `method_missing` from the Fastfile
     # It's also used when an action is called from another action
-    # @param from_action Indicates if this action is being trigged by another action.
+    # @param from_action Indicates if this action is being triggered by another action.
     #                    If so, it won't show up in summary.
     def trigger_action_by_name(method_sym, custom_dir, from_action, *arguments)
       # First, check if there is a predefined method in the actions folder
