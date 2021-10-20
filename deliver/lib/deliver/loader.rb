@@ -40,7 +40,7 @@ module Deliver
       end
 
       # @param path [String] A directory path otherwise this initializer fails
-      # @param nested [Boolan] Whether given path is nested of another special directory.
+      # @param nested [Boolean] Whether given path is nested of another special directory.
       #  This affects `expandable?` to return `false` when this set to `true`.
       def initialize(path, nested: false)
         raise(ArgumentError, "Given path must be a directory path - #{path}") unless File.directory?(path)
