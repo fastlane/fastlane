@@ -235,7 +235,7 @@ module Deliver
 
         mapped_values = {}
 
-        # Only update primary and secondar category if explicitly set
+        # Only update primary and secondary category if explicitly set
         unless primary_category.empty?
           mapped = Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
             primary_category
