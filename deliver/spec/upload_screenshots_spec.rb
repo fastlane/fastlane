@@ -55,7 +55,7 @@ describe Deliver::UploadScreenshots do
     subject { described_class.new }
 
     before do
-      # mock these methods partially to simplfy test cases
+      # mock these methods partially to simplify test cases
       allow(subject).to receive(:wait_for_complete)
       allow(subject).to receive(:retry_upload_screenshots_if_needed)
     end
