@@ -113,7 +113,7 @@ describe Spaceship::AppVersion, all: true do
     end
 
     describe "#candidate_builds" do
-      it "proplery fetches and parses all builds ready to be deployed" do
+      it "properly fetches and parses all builds ready to be deployed" do
         version = app.edit_version
         res = version.candidate_builds
         build = res.first
