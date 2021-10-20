@@ -214,7 +214,7 @@ module Fastlane
             ],
             ignore: [
               "ignore/path/1",
-              "ingore/path/2"
+              "ignore/path/2"
             ],
             options: "--keep-intermediate-files --search-undocumented-doc",
             warnings: "--warn-missing-output-path --warn-missing-company-id"
