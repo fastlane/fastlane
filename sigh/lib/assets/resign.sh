@@ -149,7 +149,7 @@ usage() {
     echo -e "\t\t\t\t\t\t\tCan't use together with '-n, --version-number' option." >&2
     echo -e "\t-b, --bundle-id bundleId\t\tSpecify new bundle identifier (CFBundleIdentifier)." >&2
     echo -e "\t\t\t\t\t\t\tWarning: will NOT apply for nested apps and extensions." >&2
-    echo -e "\t    --use-app-entitlements\t\tExtract app bundle codesigning entitlements and combine with entitlements from new provisionin profile." >&2
+    echo -e "\t    --use-app-entitlements\t\tExtract app bundle codesigning entitlements and combine with entitlements from new provisioning profile." >&2
     echo -e "\t\t\t\t\t\t\tCan't use together with '-e, --entitlements' option." >&2
     echo -e "\t--keychain-path path\t\t\tSpecify the path to a keychain that /usr/bin/codesign should use." >&2
     echo -e "\t-v, --verbose\t\t\t\tVerbose output." >&2
@@ -838,7 +838,7 @@ function resign {
                 ENTITLEMENTS_VALUE=$(echo "$ENTITLEMENTS_VALUE" | /usr/bin/sed -e "s/$OLD_ICLOUD_ENV/$NEW_ICLOUD_ENV/g")
             fi
 
-            # Remove the entry for current key from profisioning profile entitlements (if exists)
+            # Remove the entry for current key from provisioning profile entitlements (if exists)
             PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
 
             # Add new entry to patched entitlements
