@@ -46,7 +46,7 @@ describe Deliver::Loader do
     end
 
     describe '#expandable?' do
-      it 'should be true for specific directroies' do
+      it 'should be true for specific directories' do
         Deliver::Loader::EXPANDABLE_DIR_NAMES.each do |name|
           expect(described_class.new(directory_path(name)).expandable?).to be(true)
         end
@@ -116,7 +116,7 @@ describe Deliver::Loader do
       expect(basenames.include?('fonts')).to eq(false)
     end
 
-    it 'should expand specific directories when they have sub language directroies' do
+    it 'should expand specific directories when they have sub language directories' do
       Deliver::Loader::SPECIAL_DIR_NAMES.each do |dirname|
         FileUtils.mkdir(File.join(@root, dirname))
         FileUtils.mkdir(File.join(@root, dirname, @languages.first))
