@@ -87,7 +87,7 @@
 # Logging functions
 
 log() {
-    # Make sure it returns 0 code even when verose mode is off (test 1)
+    # Make sure it returns 0 code even when verbose mode is off (test 1)
     # To use like [[ condition ]] && log "x" && something
     if [[ -n "$VERBOSE" ]]; then echo -e "$@"; else test 1; fi
 }
