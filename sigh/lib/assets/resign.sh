@@ -561,7 +561,7 @@ function resign {
     FRAMEWORKS_DIR="$APP_PATH/Frameworks"
     if [ -d "$FRAMEWORKS_DIR" ]; then
         if [ "$TEAM_IDENTIFIER" == "" ]; then
-            error "ERROR: embedded frameworks detected, re-signing iOS 8 (or higher) applications wihout a team identifier in the certificate/profile does not work"
+            error "ERROR: embedded frameworks detected, re-signing iOS 8 (or higher) applications without a team identifier in the certificate/profile does not work"
         fi
 
         log "Resigning embedded frameworks using certificate: '$CERTIFICATE'"

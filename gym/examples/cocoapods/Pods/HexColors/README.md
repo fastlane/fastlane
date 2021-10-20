@@ -26,7 +26,7 @@ UIColor *shortColorWithHex = [UIColor colorWithHexString:@"fff"];
 // with hash
 NSColor *colorWithHex = [NSColor colorWithHexString:@"#ff8942"];
 
-// wihtout hash
+// without hash
 NSColor *secondColorWithHex = [NSColor colorWithHexString:@"ff8942"];
 
 // short handling
