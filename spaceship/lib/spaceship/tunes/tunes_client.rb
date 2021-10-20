@@ -958,7 +958,7 @@ module Spaceship
     end
 
     #####################################################
-    # @!group CandiateBuilds
+    # @!group CandidateBuilds
     #####################################################
 
     def candidate_builds(app_id, version_id)
