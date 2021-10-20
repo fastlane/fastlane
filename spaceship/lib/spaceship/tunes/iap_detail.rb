@@ -220,7 +220,7 @@ module Spaceship
       #   if the iap is not yet cleared for sale
       # @return ([Spaceship::Tunes::PricingInfo]) An array of pricing infos from the same pricing tier
       #   if the iap uses world wide pricing
-      # @return ([Spaceship::Tunes::IAPSubscriptionPricingInfo]) An array of pricing infos from multple subscription pricing tiers
+      # @return ([Spaceship::Tunes::IAPSubscriptionPricingInfo]) An array of pricing infos from multiple subscription pricing tiers
       #   if the iap uses territorial pricing
       def pricing_info
         return [] unless cleared_for_sale
