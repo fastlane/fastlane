@@ -6136,7 +6136,7 @@ public func importCertificate(certificatePath: String,
  Installs an .ipa file on a connected iOS-device via usb or wifi
 
  - parameters:
-   - extra: Extra Commandline arguments passed to ios-deploy
+   - extra: Extra Command-line arguments passed to ios-deploy
    - deviceId: id of the device / if not set defaults to first found device
    - skipWifi: Do not search for devices via WiFi
    - ipa: The IPA file to put on the device
