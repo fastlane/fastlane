@@ -11,7 +11,7 @@ module Fastlane
       end
 
       def self.description
-        'This action restore your file that was backuped with the `backup_file` action'
+        'This action restore your file that was backed up with the `backup_file` action'
       end
 
       def self.is_supported?(platform)

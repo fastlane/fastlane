@@ -8482,7 +8482,7 @@ public func resign(ipa: String,
 }
 
 /**
- This action restore your file that was backuped with the `backup_file` action
+ This action restore your file that was backed up with the `backup_file` action
 
  - parameter path: Original file name you want to restore
  */
