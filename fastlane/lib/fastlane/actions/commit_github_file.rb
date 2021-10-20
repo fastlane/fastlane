@@ -45,7 +45,7 @@ module Fastlane
               error = if json['message'] == "Invalid request.\n\n\"sha\" wasn't supplied."
                         "File already exists - please remove from repo before uploading or rename this upload"
                       else
-                        "Uprocessable error"
+                        "Unprocessable error"
                       end
               UI.user_error!(error)
             end
