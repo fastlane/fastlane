@@ -307,7 +307,7 @@ module Deliver
 
         # App Metadata
         FastlaneCore::ConfigItem.new(key: :individual_metadata_items,
-                                     env_name: "DELIVER_INDIVUDAL_METADATA_ITEMS",
+                                     env_name: "DELIVER_INDIVIDUAL_METADATA_ITEMS",
                                      description: "An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow",
                                      deprecated: "Removed after the migration to the new App Store Connect API in June 2020",
                                      type: Array,
