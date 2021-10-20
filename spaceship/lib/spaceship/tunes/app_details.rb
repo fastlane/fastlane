@@ -23,7 +23,7 @@ module Spaceship
       # @return (Hash) A hash representing the privacy URL in all languages
       attr_reader :privacy_url
 
-      # @return (Hash) A hash prepresenting the privacy URL in all languages for Apple TV
+      # @return (Hash) A hash representing the privacy URL in all languages for Apple TV
       attr_reader :apple_tv_privacy_policy
 
       # Categories (e.g. MZGenre.Business)
