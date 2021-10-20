@@ -230,7 +230,7 @@ module Spaceship
 
       private
 
-      # Checks wheather an iap uses world wide or territorial pricing.
+      # Checks whether an iap uses world wide or territorial pricing.
       #
       # @return (true, false)
       def world_wide_pricing?
