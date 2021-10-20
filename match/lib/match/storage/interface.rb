@@ -36,7 +36,7 @@ module Match
         not_implemented(__method__)
       end
 
-      # Returns a short string describing + identifing the current
+      # Returns a short string describing + identifying the current
       # storage backend. This will be printed when nuking a storage
       def human_readable_description
         not_implemented(__method__)
