@@ -35,7 +35,7 @@ describe FastlaneCore::HelpFormatter do
 
   before do
     commander.program = {
-      name: 'foor_bar_test',
+      name: 'foo_bar_test',
       description: 'This is a mock CLI app for testing'
     }
     default_command_options = [
