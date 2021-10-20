@@ -11,7 +11,7 @@ module Spaceship
       # Localized values
       ####
 
-      # @return (Array) Raw access the all available languages. You shouldn't use it probbaly
+      # @return (Array) Raw access the all available languages. You shouldn't use it probably
       attr_accessor :languages
 
       # @return (Hash) A hash representing the app name in all languages
