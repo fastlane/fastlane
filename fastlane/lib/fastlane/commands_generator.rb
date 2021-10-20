@@ -68,7 +68,7 @@ module Fastlane
       return if $troubleshoot
       UI.error("---")
       UI.error("Are you sure you want to enable '--troubleshoot'?")
-      UI.error("All commmands will run in full unfiltered output mode.")
+      UI.error("All commands will run in full unfiltered output mode.")
       UI.error("Sensitive data, like passwords, could be printed to the log.")
       UI.error("---")
       if UI.confirm("Do you really want to enable --troubleshoot")
