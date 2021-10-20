@@ -83,7 +83,7 @@ module FastlaneCore
 
         # App Store Connect will allow users to upload  X.Y is the same as X.Y.0 and treat them as the same version
         # However, only the first uploaded version format will be the one that is queryable
-        # This could lead to BuildWatcher never finding X.Y.0 if X.Y was upoaded first as X.Y will only yield results
+        # This could lead to BuildWatcher never finding X.Y.0 if X.Y was uploaded first as X.Y will only yield results
         #
         # This will add an additional request to search for both X.Y and X.Y.0 but
         # will give preference to the version format specified passed in
