@@ -31,7 +31,7 @@ describe Deliver::Loader do
         expect(described_class.new(directory_path(language)).language).to eq(language)
       end
 
-      it 'should be same as language name noramized even when case is different' do
+      it 'should be same as language name normalized even when case is different' do
         expect(described_class.new(directory_path(language.upcase)).language).to eq(language)
       end
     end
