@@ -82,7 +82,7 @@
 # 1. fix the way app entitlements are extracted
 #
 # new features October 2021
-# 1. change codesign signatue to use --generate-entitlement-der to include DER encoded entitlements
+# 1. change codesign signature to use --generate-entitlement-der to include DER encoded entitlements
 
 # Logging functions
 
