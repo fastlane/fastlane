@@ -15,7 +15,7 @@ module Spaceship
       # @return (Spaceship::Tunes::Application) A reference to the application
       attr_accessor :application
 
-      # @return (Spaceship::Tunes::IAPFamilies) A reference to the familie list
+      # @return (Spaceship::Tunes::IAPFamilies) A reference to the family list
       def families
         attrs = {}
         attrs[:application] = self.application
@@ -49,7 +49,7 @@ module Spaceship
       #      tier: 1
       #    }
       #  ]
-      # @param family_id (String) Only used on RECURRING purchases, assigns the In-App-Purchase to a specific familie
+      # @param family_id (String) Only used on RECURRING purchases, assigns the In-App-Purchase to a specific family
       # @param subscription_free_trial (String) Free Trial duration (1w,1m,3m....)
       # @param subscription_duration (String) 1w,1m.....
       # @param subscription_price_target (Hash) Only used on RECURRING purchases, used to set the
