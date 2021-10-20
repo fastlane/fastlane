@@ -255,7 +255,7 @@ module Gym
       binary_path
     end
 
-    # copys framework from temp folder:
+    # copies framework from temp folder:
 
     def copy_files_from_path(path)
       UI.success("Exporting Files:")
