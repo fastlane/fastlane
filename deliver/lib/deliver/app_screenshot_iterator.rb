@@ -1,5 +1,5 @@
 module Deliver
-  # This is a convinient class that enumerates app store connect's screenshots in various degrees.
+  # This is a convenient class that enumerates app store connect's screenshots in various degrees.
   class AppScreenshotIterator
     NUMBER_OF_THREADS = Helper.test? ? 1 : [ENV.fetch("DELIVER_NUMBER_OF_THREADS", 10).to_i, 10].min
 
