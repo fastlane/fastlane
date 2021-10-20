@@ -197,7 +197,7 @@ module Deliver
                                      verify_block: proc do |value|
                                        now_in_ms = Time.now.to_i * 1000
                                        if value < now_in_ms
-                                         UI.user_error!("'#{value}' needs to be in the future and in milliseonds (current time is '#{now_in_ms}')")
+                                         UI.user_error!("'#{value}' needs to be in the future and in milliseconds (current time is '#{now_in_ms}')")
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :phased_release,
