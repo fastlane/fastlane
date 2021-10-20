@@ -21,7 +21,7 @@ module Gym
           print("Invalid code signing settings")
           print("Your project defines a provisioning profile that doesn't match the bundle identifier of your app")
           print("Make sure you use the correct provisioning profile for this app")
-          print("Take a look at the ouptput above for more information")
+          print("Take a look at the output above for more information")
           print("You can follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/")
         when /provisioning profiles matching the bundle identifier .(.*)./ # the . around the (.*) are for the strange "
           print("You don't have the provisioning profile for '#{$1}' installed on the local machine")
