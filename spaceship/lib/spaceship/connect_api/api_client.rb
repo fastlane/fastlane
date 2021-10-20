@@ -170,7 +170,7 @@ module Spaceship
 
         return response
       rescue UnauthorizedAccessError => error
-        # Catch unathorized access and re-raising
+        # Catch unauthorized access and re-raising
         # There is no need to try again
         raise error
       rescue TimeoutRetryError => error
