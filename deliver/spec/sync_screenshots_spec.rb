@@ -2,7 +2,7 @@ require 'deliver/sync_screenshots'
 require 'fakefs/spec_helpers'
 
 describe Deliver::SyncScreenshots do
-  describe '#do_replace_screeshots' do
+  describe '#do_replace_screenshots' do
     subject { described_class.new(app: nil, platform: nil) }
 
     DisplayType = Spaceship::ConnectAPI::AppScreenshotSet::DisplayType
