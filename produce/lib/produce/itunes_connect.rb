@@ -71,7 +71,7 @@ module Produce
         # Add users to app
         unless user_ids.empty?
           application.add_users(user_ids: user_ids)
-          UI.message("Successfuly added #{user_ids.size} #{user_ids.count == 1 ? 'user' : 'users'} to app")
+          UI.message("Successfully added #{user_ids.size} #{user_ids.count == 1 ? 'user' : 'users'} to app")
         end
 
         UI.success("Successfully created new app '#{Produce.config[:app_name]}' on App Store Connect with ID #{application.id}")
