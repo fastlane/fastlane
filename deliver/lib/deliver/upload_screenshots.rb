@@ -258,7 +258,7 @@ module Deliver
     # helper method so Spaceship::Tunes.client.available_languages is easier to test
     def self.available_languages
       # 2020-08-24 - Available locales are not available as an endpoint in App Store Connect
-      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is avilable)
+      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is available)
       Deliver::Languages::ALL_LANGUAGES
     end
 
