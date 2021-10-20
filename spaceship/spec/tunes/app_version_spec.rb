@@ -76,14 +76,14 @@ describe Spaceship::AppVersion, all: true do
         })
       end
 
-      it "increquent_mild" do
+      it "infrequent_mild" do
         val = @v.raw_data['ratings']['nonBooleanDescriptors'].find do |a|
           a['name'].include?('CARTOON_FANTASY_VIOLENCE')
         end
         expect(val['level']).to eq("ITC.apps.ratings.level.INFREQUENT_MILD")
       end
 
-      it "increquent_mild" do
+      it "infrequent_mild" do
         val = @v.raw_data['ratings']['nonBooleanDescriptors'].find do |a|
           a['name'].include?('CARTOON_FANTASY_VIOLENCE')
         end
