@@ -94,7 +94,7 @@ module Spaceship
             }
           end
 
-          app_store_verions_data = platforms.map do |platform|
+          app_store_version_data = platforms.map do |platform|
             {
               type: "appStoreVersions",
               id: "${store-version-#{platform}}"
@@ -103,7 +103,7 @@ module Spaceship
 
           relationships = {
             appStoreVersions: {
-              data: app_store_verions_data
+              data: app_store_version_data
             },
             appInfos: {
               data: [

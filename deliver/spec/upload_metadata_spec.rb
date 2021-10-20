@@ -257,7 +257,7 @@ describe Deliver::UploadMetadata do
               description: { "en-US" => "App description" }
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           expect(version).to receive(:update).with(attributes: {})
@@ -287,7 +287,7 @@ describe Deliver::UploadMetadata do
               auto_release_date: 1_595_395_800_000
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           expect(version).to receive(:update).with(attributes: {
@@ -311,7 +311,7 @@ describe Deliver::UploadMetadata do
               automatic_release: false
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -340,7 +340,7 @@ describe Deliver::UploadMetadata do
               phased_release: false
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -368,7 +368,7 @@ describe Deliver::UploadMetadata do
               reset_ratings: true
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -393,7 +393,7 @@ describe Deliver::UploadMetadata do
               reset_ratings: false
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
