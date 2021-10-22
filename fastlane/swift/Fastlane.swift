@@ -4013,6 +4013,8 @@ public func downloadAppPrivacyDetailsFromAppStore(username: String,
  Download dSYM files from App Store Connect for Bitcode apps
 
  - parameters:
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)
    - username: Your Apple ID Username for App Store Connect
    - appIdentifier: The bundle identifier of your app
    - teamId: The ID of your App Store Connect team if you're in multiple teams
@@ -4037,7 +4039,9 @@ public func downloadAppPrivacyDetailsFromAppStore(username: String,
  ```|
  >|
  */
-public func downloadDsyms(username: String,
+public func downloadDsyms(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                          apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                          username: String,
                           appIdentifier: String,
                           teamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                           teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -4050,6 +4054,8 @@ public func downloadDsyms(username: String,
                           waitForDsymProcessing: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                           waitTimeout: Int = 300)
 {
+    let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
+    let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let usernameArg = RubyCommand.Argument(name: "username", value: username, type: nil)
     let appIdentifierArg = RubyCommand.Argument(name: "app_identifier", value: appIdentifier, type: nil)
     let teamIdArg = teamId.asRubyArgument(name: "team_id", type: nil)
@@ -4062,7 +4068,9 @@ public func downloadDsyms(username: String,
     let outputDirectoryArg = outputDirectory.asRubyArgument(name: "output_directory", type: nil)
     let waitForDsymProcessingArg = waitForDsymProcessing.asRubyArgument(name: "wait_for_dsym_processing", type: nil)
     let waitTimeoutArg = RubyCommand.Argument(name: "wait_timeout", value: waitTimeout, type: nil)
-    let array: [RubyCommand.Argument?] = [usernameArg,
+    let array: [RubyCommand.Argument?] = [apiKeyPathArg,
+                                          apiKeyArg,
+                                          usernameArg,
                                           appIdentifierArg,
                                           teamIdArg,
                                           teamNameArg,
@@ -13242,4 +13250,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.138]
+// FastlaneRunnerAPIVersion [0.9.139]

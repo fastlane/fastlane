@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane (2.196.0)
+    fastlane (2.197.0)
       CFPropertyList (>= 2.3, < 4.0.0)
       addressable (>= 2.8, < 3.0.0)
       artifactory (~> 3.0)
@@ -51,17 +51,17 @@ GEM
     ast (2.4.2)
     atomos (0.1.3)
     aws-eventstream (1.2.0)
-    aws-partitions (1.509.0)
-    aws-sdk-core (3.121.1)
+    aws-partitions (1.518.0)
+    aws-sdk-core (3.121.3)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)
       aws-sigv4 (~> 1.1)
       jmespath (~> 1.0)
-    aws-sdk-kms (1.48.0)
-      aws-sdk-core (~> 3, >= 3.120.0)
+    aws-sdk-kms (1.50.0)
+      aws-sdk-core (~> 3, >= 3.121.2)
       aws-sigv4 (~> 1.1)
-    aws-sdk-s3 (1.103.0)
-      aws-sdk-core (~> 3, >= 3.120.0)
+    aws-sdk-s3 (1.104.0)
+      aws-sdk-core (~> 3, >= 3.121.2)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.4)
     aws-sigv4 (1.4.0)
@@ -117,7 +117,7 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     dotenv (2.7.6)
     emoji_regex (3.2.3)
-    excon (0.86.0)
+    excon (0.87.0)
     fakefs (1.2.3)
     faraday (1.4.1)
       faraday-excon (~> 1.1)
@@ -133,7 +133,7 @@ GEM
       faraday (>= 0.8)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.1.0)
-    faraday_middleware (1.1.0)
+    faraday_middleware (1.2.0)
       faraday (~> 1.0)
     fastimage (2.2.5)
     fastlane-plugin-clubmate (0.1.0)
@@ -142,7 +142,7 @@ GEM
     gh_inspector (1.1.3)
     git (1.8.1)
       rchardet (~> 1.8)
-    google-apis-androidpublisher_v3 (0.11.0)
+    google-apis-androidpublisher_v3 (0.12.0)
       google-apis-core (>= 0.4, < 2.a)
     google-apis-core (0.4.1)
       addressable (~> 2.5, >= 2.5.1)
@@ -189,7 +189,7 @@ GEM
     interception (0.5)
     jmespath (1.4.0)
     json (2.5.1)
-    jwt (2.2.3)
+    jwt (2.3.0)
     kramdown (2.3.0)
       rexml
     kramdown-parser-gfm (1.1.0)
@@ -200,7 +200,7 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2021.0225)
     mini_magick (4.11.0)
-    mini_mime (1.1.1)
+    mini_mime (1.1.2)
     multi_json (1.15.0)
     multipart-post (2.0.0)
     mustermann (1.1.1)
@@ -391,4 +391,4 @@ DEPENDENCIES
   yard (~> 0.9.11)
 
 BUNDLED WITH
-   2.2.17
+   2.2.27
