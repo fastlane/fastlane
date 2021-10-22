@@ -40,8 +40,7 @@ module Spaceship
         "buildBetaDetail" => "build_beta_detail",
         "preReleaseVersion" => "pre_release_version",
         "individualTesters" => "individual_testers",
-        "buildBundles" => "build_bundles",
-        "preReleaseVersion" => "pre_release_version"
+        "buildBundles" => "build_bundles"
       })
 
       ESSENTIAL_INCLUDES = "app,buildBetaDetail,preReleaseVersion,buildBundles"
