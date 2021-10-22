@@ -211,11 +211,11 @@
 			};
 			buildConfigurationList = B33BAF521F51F8D90001A751 /* Build configuration list for PBXProject "FastlaneSwiftRunner" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
+				Base,
 			);
 			mainGroup = B33BAF4E1F51F8D90001A751;
 			productRefGroup = B33BAF4E1F51F8D90001A751;
