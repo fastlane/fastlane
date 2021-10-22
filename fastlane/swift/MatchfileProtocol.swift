@@ -1,7 +1,7 @@
 // MatchfileProtocol.swift
 // Copyright (c) 2021 FastlaneTools
 
-public protocol MatchfileProtocol: class {
+public protocol MatchfileProtocol: AnyObject {
     /// Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution
     var type: String { get }
 

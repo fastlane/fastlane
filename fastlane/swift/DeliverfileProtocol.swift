@@ -1,7 +1,7 @@
 // DeliverfileProtocol.swift
 // Copyright (c) 2021 FastlaneTools
 
-public protocol DeliverfileProtocol: class {
+public protocol DeliverfileProtocol: AnyObject {
     /// Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
     var apiKeyPath: String? { get }
 

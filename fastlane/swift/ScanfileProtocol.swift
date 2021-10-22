@@ -1,7 +1,7 @@
 // ScanfileProtocol.swift
 // Copyright (c) 2021 FastlaneTools
 
-public protocol ScanfileProtocol: class {
+public protocol ScanfileProtocol: AnyObject {
     /// Path to the workspace file
     var workspace: String? { get }
 
