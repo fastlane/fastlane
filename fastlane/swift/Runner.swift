@@ -265,6 +265,8 @@ private extension DispatchTimeInterval {
             result = TimeInterval(value) * 0.000_000_001
         case .never:
             fatalError()
+        @unknown default:
+            fatalError()
         }
         return result
     }
