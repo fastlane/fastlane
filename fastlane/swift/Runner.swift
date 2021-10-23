@@ -22,6 +22,39 @@ func desc(_: String) {
     // no-op, this is handled in fastlane/lane_list.rb
 }
 
+class AtomicDictionary<Key: Hashable, Value> {
+    private let lockQueue = DispatchQueue(label: "tools.fastlane.serial.queue")
+    private var storage: [Key: Value]
+
+    init() {
+        self.storage = [:]
+    }
+
+    func get(_ key: Key) -> Value? {
+        lockQueue.sync {
+            storage[key]
+        }
+    }
+
+    func set(_ key: Key, value: Value) {
+        lockQueue.sync {
+            storage[key] = value
+        }
+    }
+
+    func removeValue(forKey key: Key) {
+        lockQueue.sync {
+            _ = storage.removeValue(forKey: key)
+        }
+    }
+
+    var allValues: [Key: Value] {
+        lockQueue.sync {
+            storage
+        }
+    }
+}
+
 class Runner {
     private var thread: Thread!
     private var socketClient: SocketClient!
@@ -29,7 +62,7 @@ class Runner {
     private var returnValue: String? // lol, so safe
     private var currentlyExecutingCommand: RubyCommandable?
     private var shouldLeaveDispatchGroupDuringDisconnect = false
-    private var executeNext: [String: Bool] = [:]
+    private var executeNext: AtomicDictionary<String, Bool> = AtomicDictionary()
 
     func executeCommand(_ command: RubyCommandable) -> String {
         dispatchGroup.enter()
@@ -38,7 +71,7 @@ class Runner {
 
         let secondsToWait = DispatchTimeInterval.seconds(SocketClient.defaultCommandTimeoutSeconds)
         // swiftformat:disable:next redundantSelf
-        let timeoutResult = Self.waitWithPolling(self.executeNext[command.id], toEventually: { $0 == true }, timeout: SocketClient.defaultCommandTimeoutSeconds)
+        let timeoutResult = Self.waitWithPolling(self.executeNext.get(command.id), toEventually: { $0 == true }, timeout: SocketClient.defaultCommandTimeoutSeconds)
         executeNext.removeValue(forKey: command.id)
         let failureMessage = "command didn't execute in: \(SocketClient.defaultCommandTimeoutSeconds) seconds"
         let success = testDispatchTimeoutResult(timeoutResult, failureMessage: failureMessage, timeToWait: secondsToWait)
@@ -160,10 +193,10 @@ extension Runner: SocketClientDelegateProtocol {
             if let command = currentlyExecutingCommand as? RubyCommand {
                 if let closureArgumentValue = closureArgumentValue, !closureArgumentValue.isEmpty {
                     command.performCallback(callbackArg: closureArgumentValue, socket: socketClient) {
-                        self.executeNext[command.id] = true
+                        self.executeNext.set(command.id, value: true)
                     }
                 } else {
-                    executeNext[command.id] = true
+                    executeNext.set(command.id, value: true)
                 }
             }
             dispatchGroup.leave()
@@ -172,14 +205,14 @@ extension Runner: SocketClientDelegateProtocol {
             verbose(message: "server acknowledged a cancel request")
             dispatchGroup.leave()
             if let command = currentlyExecutingCommand as? RubyCommand {
-                executeNext[command.id] = true
+                executeNext.set(command.id, value: true)
             }
             completion(socketClient)
         case .alreadyClosedSockets, .connectionFailure, .malformedRequest, .malformedResponse, .serverError:
             log(message: "error encountered while executing command:\n\(serverResponse)")
             dispatchGroup.leave()
             if let command = currentlyExecutingCommand as? RubyCommand {
-                executeNext[command.id] = true
+                executeNext.set(command.id, value: true)
             }
             completion(socketClient)
         case let .commandTimeout(timeout):
