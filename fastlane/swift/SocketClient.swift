@@ -149,7 +149,6 @@ class SocketClient: NSObject {
                 self.outputStream.write(buffer.assumingMemoryBound(to: UInt8.self), maxLength: data.count)
             }
         }
-
     }
 
     private func privateSend(string: String) {
