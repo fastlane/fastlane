@@ -65,6 +65,30 @@ describe Gym do
                            ])
     end
 
+    it "suppressing xcode warnings", requires_xcodebuild: true do
+      log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+
+      xcargs = { DEBUG: "1", BUNDLE_NAME: "Example App" }
+      options = { project: "./gym/examples/standard/Example.xcodeproj", sdk: "9.0", xcargs: xcargs, scheme: 'Example', suppress_xcode_warnings: true }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      result = Gym::BuildCommandGenerator.generate
+      expect(result).to eq([
+                             "set -o pipefail &&",
+                             "xcodebuild",
+                             "-scheme Example",
+                             "-project ./gym/examples/standard/Example.xcodeproj",
+                             "-sdk '9.0'",
+                             "-destination 'generic/platform=iOS'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                             "DEBUG=1 BUNDLE_NAME=Example\\ App",
+                             :archive,
+                             "| tee #{log_path.shellescape}",
+                             "| sed -e '/warning:/,/\^/d'",
+                             "| xcpretty"
+                           ])
+    end
+
     it "enables unicode", requires_xcodebuild: true do
       log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
