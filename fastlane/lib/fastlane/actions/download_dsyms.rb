@@ -134,7 +134,7 @@ module Fastlane
             break
           else
             UI.message("Waiting for dSYM file to appear...")
-            sleep(30)
+            sleep(30) unless FastlaneCore::Helper.is_test?
             build = Spaceship::ConnectAPI::Build.get(build_id: build.id)
             next
           end
