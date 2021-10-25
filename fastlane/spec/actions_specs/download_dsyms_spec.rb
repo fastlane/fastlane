@@ -44,6 +44,7 @@ describe Fastlane do
         allow(build6).to receive(:build_bundles).and_return([build_bundle])
 
         allow(build_bundle).to receive(:dsym_url).and_return(download_url)
+        allow(build_bundle).to receive(:includes_symbols).and_return(true)
 
         allow(empty_build).to receive(:build_bundles).and_return(nil)
 
