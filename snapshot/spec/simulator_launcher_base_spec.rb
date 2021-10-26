@@ -16,7 +16,7 @@ describe Snapshot do
             .with("xcrun instruments -w #{device_udid} &> /dev/null")
             .and_return("").exactly(1).times
         end
-        
+
         expect(Fastlane::Helper).to receive(:backticks)
           .with("xcrun simctl addmedia #{device_udid} #{paths.join(' ')} &> /dev/null")
           .and_return("").exactly(1).times
