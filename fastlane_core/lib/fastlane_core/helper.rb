@@ -105,6 +105,12 @@ module FastlaneCore
       (/darwin/ =~ RUBY_PLATFORM) != nil
     end
 
+    # @return CPU type
+    def self.cpu_type
+      return "" unless self.mac?
+      return `sysctl -n machdep.cpu.brand_string`.split("\n").first
+    end
+
     # Do we want to disable the colored output?
     def self.colors_disabled?
       FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS") || ENV.key?("NO_COLOR")
