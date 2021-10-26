@@ -7,10 +7,16 @@ describe Snapshot do
       it "should call simctl addmedia" do
         allow(Snapshot::TestCommandGenerator).to receive(:device_udid).and_return(device_udid)
 
-        expect(Fastlane::Helper).to receive(:backticks)
-          .with("xcrun instruments -w #{device_udid} &> /dev/null")
-          .and_return("").exactly(1).times
-
+        if Fastlane::Helper.xcode_version.to_i >= 13
+          expect(Fastlane::Helper).to receive(:backticks)
+            .with("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
+            .and_return("").exactly(1).times
+        else
+          expect(Fastlane::Helper).to receive(:backticks)
+            .with("xcrun instruments -w #{device_udid} &> /dev/null")
+            .and_return("").exactly(1).times
+        end
+        
         expect(Fastlane::Helper).to receive(:backticks)
           .with("xcrun simctl addmedia #{device_udid} #{paths.join(' ')} &> /dev/null")
           .and_return("").exactly(1).times
@@ -25,9 +31,15 @@ describe Snapshot do
       it "should call simctl addmedia and fallback to addphoto" do
         allow(Snapshot::TestCommandGenerator).to receive(:device_udid).and_return(device_udid)
 
-        expect(Fastlane::Helper).to receive(:backticks)
-          .with("xcrun instruments -w #{device_udid} &> /dev/null")
-          .and_return("").exactly(1).times
+        if Fastlane::Helper.xcode_version.to_i >= 13
+          expect(Fastlane::Helper).to receive(:backticks)
+            .with("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
+            .and_return("").exactly(1).times
+        else
+          expect(Fastlane::Helper).to receive(:backticks)
+            .with("xcrun instruments -w #{device_udid} &> /dev/null")
+            .and_return("").exactly(1).times
+        end
 
         expect(Fastlane::Helper).to receive(:backticks)
           .with("xcrun simctl addmedia #{device_udid} #{paths.join(' ')} &> /dev/null")
