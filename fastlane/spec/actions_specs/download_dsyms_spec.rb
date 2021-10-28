@@ -93,7 +93,7 @@ describe Fastlane do
            [build5, '2.0.0', '2', '2020-09-12T14:00:00+01:00'],
            [build6, '2.0.0', '5', '2020-09-12T15:00:00+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number).twice
+            expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
@@ -125,10 +125,7 @@ describe Fastlane do
           expect(Spaceship::ConnectAPI::Build).to receive(:get).with(build_id: build_id).and_return(build1)
 
           build = build1
-          expect(build).to receive(:version).and_return(build_number)
-
           expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
-
           expect(Fastlane::Actions::DownloadDsymsAction).not_to(receive(:download))
 
           Fastlane::FastFile.new.parse("lane :test do
@@ -143,7 +140,7 @@ describe Fastlane do
 
           [[build1, '1.07.0', '3', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number).twice
+            expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
@@ -160,7 +157,7 @@ describe Fastlane do
 
           [[build1, '2.0.0', '2', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number).twice
+            expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
@@ -185,7 +182,7 @@ describe Fastlane do
 
           [[build2, '2.0.0', '3', '2020-09-12T11:00:00+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version).twice
-            expect(build).to receive(:version).and_return(build_number).exactly(3).times
+            expect(build).to receive(:version).and_return(build_number).exactly(2).times
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
 
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
@@ -215,7 +212,7 @@ describe Fastlane do
 
           [[build2, '1.0.0', '42', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number).twice
+            expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
 
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
@@ -239,7 +236,7 @@ describe Fastlane do
 
           [[build2, '2.0.0', '42', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number).twice
+            expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
 
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
@@ -267,7 +264,7 @@ describe Fastlane do
           [[build5, '2.0.0', '2', '2020-09-12T14:00:00+01:00'],
            [build6, '2.0.0', '5', '2020-09-12T15:00:00+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number).twice
+            expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
