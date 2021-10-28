@@ -136,7 +136,6 @@ module Fastlane
             UI.message("Waiting for dSYM file to appear...")
             sleep(30) unless FastlaneCore::Helper.is_test?
             build = Spaceship::ConnectAPI::Build.get(build_id: build.id)
-            next
           end
         end
 
@@ -146,7 +145,6 @@ module Fastlane
           dsym_urls.each do |url|
             self.download(url, build, app, output_directory)
           end
-          return if build.version
         end
       end
       # rubocop:enable Metrics/PerceivedComplexity
