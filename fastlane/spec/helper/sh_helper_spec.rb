@@ -15,7 +15,7 @@ describe Fastlane::Actions do
           Fastlane::Actions.sh("exit 1", error_callback: ->(_) { called = true })
 
           expect(called).to be(true)
-          expect(FastlaneCore::UI).to have_received(:error).with("Exit status of command 'exit 1' was 1 instead of 0.\n")
+          expect(FastlaneCore::UI).to have_received(:error).with("Exit status of command 'exit 1' was 1 instead of 0.")
         end
       end
 
@@ -25,7 +25,7 @@ describe Fastlane::Actions do
           expect_command("exit 1", exitstatus: 1)
           Fastlane::Actions.sh("exit 1")
 
-          expect(UI).to have_received(:shell_error!).with("Exit status of command 'exit 1' was 1 instead of 0.\n")
+          expect(UI).to have_received(:shell_error!).with("Exit status of command 'exit 1' was 1 instead of 0.")
         end
       end
     end
