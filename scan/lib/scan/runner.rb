@@ -226,7 +226,7 @@ module Scan
         FileUtils.cp(xctestrun_file, output_path)
         UI.message("Successfully copied xctestrun file: #{output_path}")
       else
-        UI.user_error!("Could not find .xctextrun file to copy")
+        UI.user_error!("Could not find .xctestrun file to copy")
       end
     end
 
