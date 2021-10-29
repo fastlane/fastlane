@@ -48,8 +48,7 @@ module Fastlane
               UI.user_error!("You are not authorized to access #{repo_name}, please make sure you provided a valid API token (GITHUB_API_TOKEN)")
             end,
             '*' => proc do |result|
-              UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
-              return nil
+              UI.user_error!("GitHub responded with #{result[:status]}:#{result[:body]}")
             end
           }
         ) do |result|
