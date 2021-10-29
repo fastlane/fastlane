@@ -27,7 +27,7 @@ class AtomicDictionary<Key: Hashable, Value> {
     private var storage: [Key: Value]
 
     init() {
-        self.storage = [:]
+        storage = [:]
     }
 
     func get(_ key: Key) -> Value? {
