@@ -105,10 +105,10 @@ module FastlaneCore
       (/darwin/ =~ RUBY_PLATFORM) != nil
     end
 
-    # @return CPU type
-    def self.cpu_type
+    # @return architecture type
+    def self.architecture_type
       return "" unless self.mac?
-      return `sysctl -n machdep.cpu.brand_string`.split("\n").first
+      return `arch`.split("\n").first
     end
 
     # Do we want to disable the colored output?
