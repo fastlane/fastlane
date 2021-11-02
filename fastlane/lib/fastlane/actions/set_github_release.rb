@@ -19,12 +19,12 @@ module Fastlane
 
         payload = {
           'tag_name' => params[:tag_name],
-          'name' => params[:name],
-          'body' => params[:description],
           'draft' => !!params[:is_draft],
           'prerelease' => !!params[:is_prerelease],
           'generate_release_notes' => !!params[:is_generate_release_notes]
         }
+        payload['name'] = params[:name] if params[:name]
+        payload['body'] = params[:description] if params[:description]
         payload['target_commitish'] = params[:commitish] if params[:commitish]
 
         GithubApiAction.run(
