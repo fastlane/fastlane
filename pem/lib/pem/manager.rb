@@ -18,7 +18,13 @@ module PEM
 
         if existing_certificate
           remaining_days = (existing_certificate.expires - Time.now) / 60 / 60 / 24
-          UI.message("Existing push notification profile for '#{existing_certificate.owner_name}' is valid for #{remaining_days.round} more days.")
+
+          platfrom_string = ''
+          if PEM.config[:platform] && !PEM.config[:website_push]
+            platfrom_string = " #{PEM.config[:platform]} platform"
+          end
+
+          UI.message("Existing push notification profile for '#{existing_certificate.owner_name}'#{platfrom_string} is valid for #{remaining_days.round} more days.")
           if remaining_days > PEM.config[:active_days_limit]
             if PEM.config[:force]
               UI.success("You already have an existing push certificate, but a new one will be created since the --force option has been set.")
@@ -59,7 +65,7 @@ module PEM
 
         x509_certificate = cert.download
 
-        filename_base = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}"
+        filename_base = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}_#{PEM.config[:platform]}"
         filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
 
         output_path = File.expand_path(PEM.config[:output_path])
@@ -86,12 +92,29 @@ module PEM
       end
 
       def certificate
-        if PEM.config[:development]
-          Spaceship.certificate.development_push
-        elsif PEM.config[:website_push]
+        if PEM.config[:website_push]
           Spaceship.certificate.website_push
         else
-          Spaceship.certificate.production_push
+          platform = PEM.config[:platform]
+          UI.user_error!('platform parameter is unspecified.') unless platform
+
+          case platform
+          when 'ios'
+            if PEM.config[:development]
+              Spaceship.certificate.development_push
+            else
+              Spaceship.certificate.production_push
+            end
+          when 'macos'
+            if PEM.config[:development]
+              Spaceship.certificate.mac_development_push
+            else
+              Spaceship.certificate.mac_production_push
+            end
+          else
+            UI.user_error!("Unsupported platform '#{platform}'. Supported platforms for development and production certificates are 'ios' & 'macos'")
+          end
+
         end
       end
 
