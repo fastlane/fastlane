@@ -67,6 +67,7 @@ module Match
                                              title: "Summary for match nuke #{Fastlane::VERSION}")
 
       prepare_list
+      filter_by_cert
       print_tables
 
       if params[:readonly]
@@ -139,7 +140,7 @@ module Match
         types = profile_types(prov_type)
         # Filtering on 'profileType' seems to be undocumented as of 2020-07-30
         # but works on both web session and official API
-        self.profiles += Spaceship::ConnectAPI::Profile.all(filter: { profileType: types.join(",") })
+        self.profiles += Spaceship::ConnectAPI::Profile.all(filter: { profileType: types.join(",") }, includes: "certificates")
       end
 
       # Gets the main and additional cert types
@@ -171,6 +172,56 @@ module Match
       end
 
       self.files = certs + keys + profiles
+    end
+
+    def filter_by_cert
+      return if self.params[:force]
+
+      puts("")
+      if self.certs.count > 0
+        rows = self.certs.each_with_index.collect do |cert, i|
+          cert_expiration = cert.expiration_date.nil? ? "Unknown" : Time.parse(cert.expiration_date).strftime("%Y-%m-%d")
+          [i+1, cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
+        end
+        puts(Terminal::Table.new({
+          title: "Certificates that can be revoked".green,
+          headings: ["Option", "Name", "ID", "Type", "Expires"],
+          rows: FastlaneCore::PrintTable.transform_output(rows)
+        }))
+        puts("")
+      end
+
+      if UI.confirm("Do you want to nuke specific certificates and their associated profiles?")
+        input_indexes = UI.input("Enter the \"Option\" number(s) from the table above? (comma-separated)").split(',')
+
+        new_certs = input_indexes.map do |index|
+          self.certs[index.to_i - 1]
+        end
+
+        self.certs = new_certs
+
+        # Do profile selection logic
+        cert_ids = self.certs.map(&:id)
+        self.profiles = self.profiles.select do |profile|
+          profile_cert_ids = profile.certificates.map(&:id)
+          (cert_ids & profile_cert_ids).any?
+        end
+
+        # Do file selection logic
+        self.files = self.files.select do |f|
+          filename_and_ext = File.basename(f)
+          filename = File.basename(f, ".*")
+
+          select = self.certs.find do |cert|
+            filename == cert.id.to_s
+          end || self.profiles.find do |profile|
+            # might need to check extension if mac or catalyst
+            profile.name.end_with?(filename.gsub("_", " "))
+          end
+
+          select
+        end
+      end
     end
 
     # Print tables to ask the user
