@@ -5,6 +5,7 @@ module Fastlane
       def self.run(params)
         package_path = params[:package]
         bundle_id = params[:bundle_id]
+        skip_stapling = params[:skip_stapling]
         try_early_stapling = params[:try_early_stapling]
         print_log = params[:print_log]
         verbose = params[:verbose]
@@ -38,13 +39,13 @@ module Fastlane
         UI.user_error!('Could not read bundle identifier, provide as a parameter') unless bundle_id
 
         if use_notarytool
-          notarytool(params, package_path, bundle_id, try_early_stapling, print_log, verbose, api_key, compressed_package_path)
+          notarytool(params, package_path, bundle_id, skip_stapling, print_log, verbose, api_key, compressed_package_path)
         else
-          altool(params, package_path, bundle_id, try_early_stapling, print_log, verbose, api_key, compressed_package_path)
+          altool(params, package_path, bundle_id, try_early_stapling, skip_stapling, print_log, verbose, api_key, compressed_package_path)
         end
       end
 
-      def self.notarytool(params, package_path, bundle_id, try_early_stapling, print_log, verbose, api_key, compressed_package_path)
+      def self.notarytool(params, package_path, bundle_id, skip_stapling, print_log, verbose, api_key, compressed_package_path)
         temp_file = nil
 
         # Create authorization part of command with either API Key or Apple ID
@@ -89,10 +90,15 @@ module Fastlane
           submission_id = notarization_info["id"]
           UI.success("Successfully uploaded package to notarization service with request identifier #{submission_id}")
 
-          UI.message('Stapling package')
-          self.staple(package_path, verbose)
+          if skip_stapling
+            UI.success("Successfully notarized artifact")
+          else
+            UI.message('Stapling package')
 
-          UI.success("Successfully notarized and stapled package")
+            self.staple(package_path, verbose)
+
+            UI.success("Successfully notarized and stapled package")
+          end
         when 'Invalid'
           UI.user_error!("Could not notarize package with message '#{notarization_info['statusSummary']}'")
         else
@@ -102,7 +108,7 @@ module Fastlane
         temp_file.delete if temp_file
       end
 
-      def self.altool(params, package_path, bundle_id, try_early_stapling, print_log, verbose, api_key, compressed_package_path)
+      def self.altool(params, package_path, bundle_id, try_early_stapling, skip_stapling, print_log, verbose, api_key, compressed_package_path)
         UI.message('Uploading package to notarization service, might take a while')
 
         notarization_upload_command = "xcrun altool --notarize-app -t osx -f \"#{compressed_package_path || package_path}\" --primary-bundle-id #{bundle_id} --output-format xml"
@@ -133,7 +139,7 @@ module Fastlane
           while notarization_info.empty? || (notarization_info['Status'] == 'in progress')
             if notarization_info.empty?
               UI.message('Waiting to query request status')
-            elsif try_early_stapling
+            elsif try_early_stapling && !skip_stapling
               UI.message('Request in progress, trying early staple')
 
               begin
@@ -182,11 +188,15 @@ module Fastlane
 
         case notarization_info['Status']
         when 'success'
-          UI.message('Stapling package')
+          if skip_stapling
+            UI.success("Successfully notarized artifact#{log_suffix}")
+          else
+            UI.message('Stapling package')
 
-          self.staple(package_path, verbose)
+            self.staple(package_path, verbose)
 
-          UI.success("Successfully notarized and stapled package#{log_suffix}")
+            UI.success("Successfully notarized and stapled package#{log_suffix}")
+          end
         when 'invalid'
           UI.user_error!("Could not notarize package with message '#{notarization_info['Status Message']}'#{log_suffix}")
         else
@@ -262,6 +272,14 @@ module Fastlane
                                        env_name: 'FL_NOTARIZE_TRY_EARLY_STAPLING',
                                        description: 'Whether to try early stapling while the notarization request is in progress',
                                        optional: true,
+                                       conflicting_options: [:skip_stapling],
+                                       default_value: false,
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :skip_stapling,
+                                       env_name: 'FL_NOTARIZE_SKIP_STAPLING',
+                                       description: 'Do not staple the notarization ticket to the artifact; useful for single file executables and ZIP archives',
+                                       optional: true,
+                                       conflicting_options: [:try_early_stapling],
                                        default_value: false,
                                        type: Boolean),
           FastlaneCore::ConfigItem.new(key: :bundle_id,
