@@ -13,6 +13,7 @@ require 'tempfile'
 require 'base64'
 
 module Match
+  # rubocop:disable Metrics/ClassLength
   class Nuke
     attr_accessor :params
     attr_accessor :type
@@ -186,7 +187,7 @@ module Match
       if self.certs.count > 0
         rows = self.certs.each_with_index.collect do |cert, i|
           cert_expiration = cert.expiration_date.nil? ? "Unknown" : Time.parse(cert.expiration_date).strftime("%Y-%m-%d")
-          [i+1, cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
+          [i + 1, cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
         end
         puts(Terminal::Table.new({
           title: "Certificates that can be revoked".green,
@@ -423,4 +424,5 @@ module Match
       end
     end
   end
+  # rubocop:disable Metrics/ClassLength
 end
