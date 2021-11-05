@@ -9,6 +9,9 @@ require_relative 'module'
 require_relative 'storage'
 require_relative 'encryption'
 
+require 'tempfile'
+require 'base64'
+
 module Match
   class Nuke
     attr_accessor :params
@@ -175,8 +178,10 @@ module Match
     end
 
     def filter_by_cert
+      # Force will continue to revoke and delete all certificates and profiles
       return if self.params[:force]
 
+      # Print table showing certificates that can be revoked
       puts("")
       if self.certs.count > 0
         rows = self.certs.each_with_index.collect do |cert, i|
@@ -194,11 +199,10 @@ module Match
       if UI.confirm("Do you want to nuke specific certificates and their associated profiles?")
         input_indexes = UI.input("Enter the \"Option\" number(s) from the table above? (comma-separated)").split(',')
 
-        new_certs = input_indexes.map do |index|
+        # Get certificates from option indexes
+        self.certs = input_indexes.map do |index|
           self.certs[index.to_i - 1]
         end
-
-        self.certs = new_certs
 
         # Do profile selection logic
         cert_ids = self.certs.map(&:id)
@@ -209,17 +213,34 @@ module Match
 
         # Do file selection logic
         self.files = self.files.select do |f|
-          filename_and_ext = File.basename(f)
+          found = false
+
+          ext = File.extname(f)
           filename = File.basename(f, ".*")
 
-          select = self.certs.find do |cert|
-            filename == cert.id.to_s
-          end || self.profiles.find do |profile|
-            # might need to check extension if mac or catalyst
-            profile.name.end_with?(filename.gsub("_", " "))
+          # Attempt to find cert based on filename
+          if ext == ".cer" || ext == ".p12"
+            found ||= self.certs.any? do |cert|
+              filename == cert.id.to_s
+            end
           end
 
-          select
+          # Attempt to find profile matched on UUIDs in profile
+          if ext == ".mobileprovision" || ext == ".provisionprofile"
+            storage_uuid = FastlaneCore::ProvisioningProfile.uuid(f)
+
+            found ||= self.profiles.any? do |profile|
+              tmp_file = Tempfile.new
+              tmp_file.write(Base64.decode64(profile.profile_content))
+              tmp_file.close
+
+              # Compare profile uuid in storage to profile uuid on developer portal
+              portal_uuid = FastlaneCore::ProvisioningProfile.uuid(tmp_file.path)
+              storage_uuid == portal_uuid
+            end
+          end
+
+          found
         end
       end
     end
