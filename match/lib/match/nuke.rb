@@ -181,21 +181,20 @@ module Match
     def filter_by_cert
       # Force will continue to revoke and delete all certificates and profiles
       return if self.params[:force]
+      return if self.certs.count < 2
 
       # Print table showing certificates that can be revoked
       puts("")
-      if self.certs.count > 0
-        rows = self.certs.each_with_index.collect do |cert, i|
-          cert_expiration = cert.expiration_date.nil? ? "Unknown" : Time.parse(cert.expiration_date).strftime("%Y-%m-%d")
-          [i + 1, cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
-        end
-        puts(Terminal::Table.new({
-          title: "Certificates that can be revoked".green,
-          headings: ["Option", "Name", "ID", "Type", "Expires"],
-          rows: FastlaneCore::PrintTable.transform_output(rows)
-        }))
-        puts("")
+      rows = self.certs.each_with_index.collect do |cert, i|
+        cert_expiration = cert.expiration_date.nil? ? "Unknown" : Time.parse(cert.expiration_date).strftime("%Y-%m-%d")
+        [i + 1, cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
       end
+      puts(Terminal::Table.new({
+        title: "Certificates that can be revoked".green,
+        headings: ["Option", "Name", "ID", "Type", "Expires"],
+        rows: FastlaneCore::PrintTable.transform_output(rows)
+      }))
+      puts("")
 
       if UI.confirm("Do you want to nuke specific certificates and their associated profiles?")
         input_indexes = UI.input("Enter the \"Option\" number(s) from the table above? (comma-separated)").split(',')
@@ -203,6 +202,10 @@ module Match
         # Get certificates from option indexes
         self.certs = input_indexes.map do |index|
           self.certs[index.to_i - 1]
+        end.compact
+
+        if self.certs.empty?
+          UI.user_error!("No certificates were selected based on option number(s) entered")
         end
 
         # Do profile selection logic
