@@ -180,7 +180,7 @@ module Match
 
     def filter_by_cert
       # Force will continue to revoke and delete all certificates and profiles
-      return if self.params[:force]
+      return if self.params[:force] || !UI.interactive?
       return if self.certs.count < 2
 
       # Print table showing certificates that can be revoked
@@ -196,7 +196,8 @@ module Match
       }))
       puts("")
 
-      if UI.confirm("Do you want to nuke specific certificates and their associated profiles?")
+      UI.important("By default, all listed certificates and profiles will be nuked")
+      if UI.confirm("Do you want to only nuke specific certificates and their associated profiles?")
         input_indexes = UI.input("Enter the \"Option\" number(s) from the table above? (comma-separated)").split(',')
 
         # Get certificates from option indexes
