@@ -109,8 +109,10 @@ module Fastlane
           options = plist_files.keys
           selected = UI.select("What build configuration would you like to use?", options)
           plist_file = plist_files[selected]
-        else
+        elsif plist_files_count > 0
           plist_file = plist_files.values.first
+        else
+          return nil
         end
 
         # $(SRCROOT) is the path of where the XcodeProject is
@@ -131,6 +133,8 @@ module Fastlane
       end
 
       def self.get_version_number_from_plist!(plist_file)
+        return '$(MARKETING_VERSION)' if plist_file.nil?
+
         plist = Xcodeproj::Plist.read_from_path(plist_file)
         UI.user_error!("Unable to read plist: #{plist_file}") unless plist
 
