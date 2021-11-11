@@ -261,7 +261,7 @@ module FastlaneCore
           ("-u #{username.shellescape}" unless use_jwt),
           ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
           ("-jwt #{jwt}" if use_jwt),
-          "-f #{source.shellescape}",
+          "-assetFile #{source.shellescape}",
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),

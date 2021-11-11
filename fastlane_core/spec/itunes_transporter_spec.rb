@@ -187,7 +187,7 @@ describe FastlaneCore do
         ("-u #{email.shellescape}" if jwt.nil?),
         ("-p @env:ITMS_TRANSPORTER_PASSWORD" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
-        "-f /tmp/my.app.id.itmsp",
+        "-assetFile /tmp/my.app.id.itmsp",
         (transporter.to_s if transporter),
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
