@@ -7,7 +7,9 @@ describe FastlaneCore do
   let(:jwt) { '409jjl43j90ghjqoineio49024' }
 
   describe FastlaneCore::ItunesTransporter do
-    def shell_upload_command(provider_short_name: nil, transporter: nil, jwt: nil)
+    def shell_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false)
+      upload_part = use_asset_path ? "-assetFile /tmp/my_app.ipa" : "-f /tmp/my.app.id.itmsp"
+
       escaped_password = password.shellescape
       unless FastlaneCore::Helper.windows?
         escaped_password = escaped_password.gsub("\\'") do
@@ -21,7 +23,7 @@ describe FastlaneCore do
         ("-u #{email.shellescape}" if jwt.nil?),
         ("-p #{escaped_password}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
-        "-f \"/tmp/my.app.id.itmsp\"",
+        upload_part,
         (transporter.to_s if transporter),
         "-k 100000",
         ("-WONoPause true" if FastlaneCore::Helper.windows?),
@@ -65,7 +67,9 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
-    def java_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, classpath: true)
+    def java_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, classpath: true, use_asset_path: false)
+      upload_part = use_asset_path ? "-assetFile /tmp/my_app.ipa" : "-f /tmp/my.app.id.itmsp"
+
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
@@ -82,7 +86,7 @@ describe FastlaneCore do
         ("-u #{email.shellescape}" if jwt.nil?),
         ("-p #{password.shellescape}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
-        "-f /tmp/my.app.id.itmsp",
+        upload_part,
         (transporter.to_s if transporter),
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
@@ -134,7 +138,9 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
-    def java_upload_command_9(provider_short_name: nil, transporter: nil, jwt: nil)
+    def java_upload_command_9(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false)
+      upload_part = use_asset_path ? "-assetFile /tmp/my_app.ipa" : "-f /tmp/my.app.id.itmsp"
+
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
         "-Djava.ext.dirs=#{FastlaneCore::Helper.transporter_java_ext_dir.shellescape}",
@@ -149,7 +155,7 @@ describe FastlaneCore do
         ("-u #{email.shellescape}" if jwt.nil?),
         ("-p #{password.shellescape}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
-        "-f /tmp/my.app.id.itmsp",
+        upload_part,
         (transporter.to_s if transporter),
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
@@ -179,7 +185,9 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
-    def xcrun_upload_command(provider_short_name: nil, transporter: nil, jwt: nil)
+    def xcrun_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false)
+      upload_part = use_asset_path ? "-assetFile /tmp/my_app.ipa" : "-f /tmp/my.app.id.itmsp"
+
       [
         ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.nil?),
         "xcrun iTMSTransporter",
@@ -187,7 +195,7 @@ describe FastlaneCore do
         ("-u #{email.shellescape}" if jwt.nil?),
         ("-p @env:ITMS_TRANSPORTER_PASSWORD" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
-        "-assetFile /tmp/my.app.id.itmsp",
+        upload_part,
         (transporter.to_s if transporter),
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
@@ -307,6 +315,27 @@ describe FastlaneCore do
               expect(transporter.provider_ids).to eq(java_provider_id_command(jwt: jwt))
             end
           end
+
+          describe "with package_path" do
+            describe "upload command generation" do
+              it 'generates a call to xcrun iTMSTransporter' do
+                transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+                expect(transporter.upload(package_path: '/tmp/my.app.id.itmsp')).to eq(java_upload_command(jwt: jwt))
+              end
+            end
+          end
+
+          describe "with asset_path" do
+            describe "upload command generation" do
+              it 'generates a call to xcrun iTMSTransporter' do
+                expect(Dir).to receive(:tmpdir).and_return("/tmp")
+                expect(FileUtils).to receive(:cp)
+
+                transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+                expect(transporter.upload(asset_path: '/tmp/my_app.ipa')).to eq(java_upload_command(jwt: jwt, use_asset_path: true))
+              end
+            end
+          end
         end
       end
 
@@ -387,6 +416,27 @@ describe FastlaneCore do
             it 'generates a call to java directly' do
               transporter = FastlaneCore::ItunesTransporter.new(nil, nil, true, 'abcd1234', jwt)
               expect(transporter.download('my.app.id', '/tmp')).to eq(shell_download_command(jwt: jwt))
+            end
+          end
+
+          describe "with package_path" do
+            describe "upload command generation" do
+              it 'generates a call to xcrun iTMSTransporter' do
+                transporter = FastlaneCore::ItunesTransporter.new(nil, nil, true, 'abcd1234', jwt)
+                expect(transporter.upload(package_path: '/tmp/my.app.id.itmsp')).to eq(shell_upload_command(jwt: jwt))
+              end
+            end
+          end
+
+          describe "with asset_path" do
+            describe "upload command generation" do
+              it 'generates a call to xcrun iTMSTransporter' do
+                expect(Dir).to receive(:tmpdir).and_return("/tmp")
+                expect(FileUtils).to receive(:cp)
+
+                transporter = FastlaneCore::ItunesTransporter.new(nil, nil, true, 'abcd1234', jwt)
+                expect(transporter.upload(asset_path: '/tmp/my_app.ipa')).to eq(shell_upload_command(jwt: jwt, use_asset_path: true))
+              end
             end
           end
         end
@@ -649,6 +699,31 @@ describe FastlaneCore do
             expect(transporter.download('my.app.id', '/tmp')).to eq(java_download_command_9(jwt: jwt))
           end
         end
+
+        describe "with package_path" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+          describe "upload command generation" do
+            it 'generates a call to xcrun iTMSTransporter' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.upload(package_path: '/tmp/my.app.id.itmsp')).to eq(java_upload_command_9(jwt: jwt))
+            end
+          end
+        end
+
+        describe "with asset_path" do
+          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+          describe "upload command generation" do
+            it 'generates a call to xcrun iTMSTransporter' do
+              expect(Dir).to receive(:tmpdir).and_return("/tmp")
+              expect(FileUtils).to receive(:cp)
+
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.upload(asset_path: '/tmp/my_app.ipa')).to eq(java_upload_command_9(jwt: jwt, use_asset_path: true))
+            end
+          end
+        end
       end
     end
 
@@ -730,39 +805,62 @@ describe FastlaneCore do
           stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
         end
 
-        describe "upload command generation" do
-          it 'generates a call to xcrun iTMSTransporter' do
-            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
-            expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command(jwt: jwt))
+        describe "with app_id and dir" do
+          describe "upload command generation" do
+            it 'generates a call to xcrun iTMSTransporter' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command(jwt: jwt))
+            end
+          end
+
+          describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set" do
+            before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV,Signiant" }
+
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command(transporter: "-t DAV,Signiant", jwt: jwt))
+            end
+
+            after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+          end
+
+          describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set with empty string" do
+            before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+
+            it 'generates a call to java directly' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command(jwt: jwt))
+            end
+
+            after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
+          end
+
+          describe "download command generation" do
+            it 'generates a call to xcrun iTMSTransporter' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.download('my.app.id', '/tmp')).to eq(xcrun_download_command(jwt: jwt))
+            end
           end
         end
 
-        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set" do
-          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV,Signiant" }
-
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
-            expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command(transporter: "-t DAV,Signiant", jwt: jwt))
+        describe "with package_path" do
+          describe "upload command generation" do
+            it 'generates a call to xcrun iTMSTransporter' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.upload(package_path: '/tmp/my.app.id.itmsp')).to eq(xcrun_upload_command(jwt: jwt))
+            end
           end
-
-          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
         end
 
-        describe "upload command generation with DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS set with empty string" do
-          before(:each) { ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = " " }
+        describe "with asset_path" do
+          describe "upload command generation" do
+            it 'generates a call to xcrun iTMSTransporter' do
+              expect(Dir).to receive(:tmpdir).and_return("/tmp")
+              expect(FileUtils).to receive(:cp)
 
-          it 'generates a call to java directly' do
-            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
-            expect(transporter.upload('my.app.id', '/tmp')).to eq(xcrun_upload_command(jwt: jwt))
-          end
-
-          after(:each) { ENV.delete("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS") }
-        end
-
-        describe "download command generation" do
-          it 'generates a call to xcrun iTMSTransporter' do
-            transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
-            expect(transporter.download('my.app.id', '/tmp')).to eq(xcrun_download_command(jwt: jwt))
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+              expect(transporter.upload(asset_path: '/tmp/my_app.ipa')).to eq(xcrun_upload_command(jwt: jwt, use_asset_path: true))
+            end
           end
         end
       end
