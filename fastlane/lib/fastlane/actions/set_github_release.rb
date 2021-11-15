@@ -22,7 +22,8 @@ module Fastlane
           'name' => params[:name],
           'body' => params[:description],
           'draft' => !!params[:is_draft],
-          'prerelease' => !!params[:is_prerelease]
+          'prerelease' => !!params[:is_prerelease],
+          'generate_release_notes' => !!params[:is_generate_release_notes]
         }
         payload['target_commitish'] = params[:commitish] if params[:commitish]
 
@@ -217,6 +218,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :is_prerelease,
                                        env_name: "FL_SET_GITHUB_RELEASE_IS_PRERELEASE",
                                        description: "Whether the release should be marked as prerelease",
+                                       optional: true,
+                                       default_value: false,
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :is_generate_release_notes,
+                                       env_name: "FL_SET_GITHUB_RELEASE_IS_GENERATE_RELEASE_NOTES",
+                                       description: "Whether the name and body of this release should be generated automatically",
                                        optional: true,
                                        default_value: false,
                                        type: Boolean),
