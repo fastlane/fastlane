@@ -19,12 +19,12 @@ module PEM
         if existing_certificate
           remaining_days = (existing_certificate.expires - Time.now) / 60 / 60 / 24
 
-          platfrom_string = ''
-          if PEM.config[:platform] && !PEM.config[:website_push]
-            platfrom_string = " #{PEM.config[:platform]} platform"
+          display_platform = ''
+          if PEM.config[:website_push]
+            display_platform = " #{PEM.config[:platform]} platform"
           end
 
-          UI.message("Existing push notification profile for '#{existing_certificate.owner_name}'#{platfrom_string} is valid for #{remaining_days.round} more days.")
+          UI.message("Existing push notification profile for '#{existing_certificate.owner_name}'#{display_platform} is valid for #{remaining_days.round} more days.")
           if remaining_days > PEM.config[:active_days_limit]
             if PEM.config[:force]
               UI.success("You already have an existing push certificate, but a new one will be created since the --force option has been set.")

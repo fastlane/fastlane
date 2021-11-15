@@ -6,26 +6,19 @@ require_relative 'module'
 
 module PEM
   class Options
-    def self.default_platform
-      case Fastlane::Helper::LaneHelper.current_platform.to_s
-      when "mac"
-        "macos"
-      else
-        "ios"
-      end
-    end
-
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
       [
         FastlaneCore::ConfigItem.new(key: :platform,
-                                     env_name: "PEM_PLATFORM",
                                      description: "Set certificate's platform. Used for creation of production & development certificates. Supported platforms: ios, macos",
-                                     default_value: default_platform,
-                                     default_value_dynamic: true,
-                                     optional: true),
+                                     short_option: "-m",
+                                     env_name: "PEM_PLATFORM",
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("The platform can only be ios or macos") unless ['ios', 'macos'].include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :development,
                                      env_name: "PEM_DEVELOPMENT",
                                      description: "Renew the development push certificate instead of the production one",
