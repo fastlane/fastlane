@@ -15,6 +15,38 @@ describe Fastlane do
         }.to_json
       end
 
+      it "file at :api_key_path must exist" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            notarize(
+              api_key_path: '/tmp/file_does_not_exist'
+            )
+          end").runner.execute(:test)
+        end.to raise_error("API Key not found at '/tmp/file_does_not_exist'")
+      end
+
+      it "forbids to provide both :username and :api_key" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            notarize(
+              username: 'myusername@example.com',
+              api_key: {'anykey' => 'anyvalue'}
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Unresolved conflict between options: 'username' and 'api_key'")
+      end
+
+      it "forbids to provide both :skip_stapling and :try_early_stapling" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            notarize(
+              skip_stapling: true,
+              try_early_stapling: true
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Unresolved conflict between options: 'skip_stapling' and 'try_early_stapling'")
+      end
+
       context "with notary tool" do
         let(:package) { Tempfile.new('app.ipa.zip') }
         let(:bundle_id) { 'com.some.app' }
@@ -38,6 +70,25 @@ describe Fastlane do
                 bundle_id: '#{bundle_id}',
                 username: '#{username}',
                 asc_provider: '#{asc_provider}',
+              )
+            end").runner.execute(:test)
+          end
+
+          it "successful with skip_stapling" do
+            stub_const('ENV', { "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" => app_specific_password })
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider}", { error_callback: anything, log: false }).and_return(success_submit_response)
+
+            expect(Fastlane::Actions).not_to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
+
+            result = Fastlane::FastFile.new.parse("lane :test do
+              notarize(
+                use_notarytool: true,
+                package: '#{package.path}',
+                bundle_id: '#{bundle_id}',
+                username: '#{username}',
+                asc_provider: '#{asc_provider}',
+                skip_stapling: true
               )
             end").runner.execute(:test)
           end
