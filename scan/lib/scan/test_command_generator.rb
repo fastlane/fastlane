@@ -73,6 +73,11 @@ module Scan
       options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
       options << config[:xcargs] if config[:xcargs]
 
+      if FastlaneCore::Helper.xcode_at_least?(13) && config[:number_of_retries] > 0
+        options << "-retry-tests-on-failure"
+        options << "-test-iterations #{config[:number_of_retries]}"
+      end
+
       # detect_values will ensure that these values are present as Arrays if
       # they are present at all
       options += config[:only_testing].map { |test_id| "-only-testing:#{test_id.shellescape}" } if config[:only_testing]

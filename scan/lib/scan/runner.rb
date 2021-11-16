@@ -55,7 +55,14 @@ module Scan
     end
 
     def execute(retries: 0)
-      Scan.cache[:retry_attempt] = Scan.config[:number_of_retries] - retries
+      # Xcode 13 and up has -retry-tests-on-failure and -test-iterations built into xcodebuild
+      # Don't attempt any fastlane retries since this will be handled in xcodebuild test command
+      if Helper.xcode_at_least?("13.0")
+        retries = 0
+        Scan.cache[:retry_attempt] = 0
+      else
+        Scan.cache[:retry_attempt] = Scan.config[:number_of_retries] - retries
+      end
 
       command = @test_command_generator.generate
 

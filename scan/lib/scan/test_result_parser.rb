@@ -10,6 +10,9 @@ module Scan
         }
       end
 
+      require 'pp'
+      pp output
+
       # e.g. ...<testsuites tests='2' failures='1'>...
       matched = output.scan(/<testsuites\b(?=[^<>]*\s+tests='(\d+)')(?=[^<>]*\s+failures='(\d+)')[^<>]+>/)
 
