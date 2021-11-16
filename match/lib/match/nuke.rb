@@ -84,13 +84,9 @@ module Match
       if (self.certs + self.profiles + self.files).count > 0
         unless params[:skip_confirmation]
           UI.error("---")
-          if self.safe_remove_certs
-            UI.error("Are you sure you want to completely delete and remove all the")
-            UI.error("certificates and delete provisioning profiles listed above? (y/n)")
-          else
-            UI.error("Are you sure you want to completely delete and revoke all the")
-            UI.error("certificates and delete provisioning profiles listed above? (y/n)")
-          end
+          remove_or_revoke_message = self.safe_remove_certs ? "remove" : "revoke"
+          UI.error("Are you sure you want to completely delete and #{remove_or_revoke_message} all the")
+          UI.error("certificates and delete provisioning profiles listed above? (y/n)")
           UI.error("Warning: By nuking distribution, both App Store and Ad Hoc profiles will be deleted") if type == "distribution"
           UI.error("Warning: The :app_identifier value will be ignored - this will delete all profiles for all your apps!") if had_app_identifier
           UI.error("---")
@@ -201,7 +197,7 @@ module Match
         [i + 1, cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
       end
       puts(Terminal::Table.new({
-        title: "Certificates that can be #{revoked_or_removed_message}".green,
+        title: "Certificates that can be #{removed_or_revoked_message}".green,
         headings: ["Option", "Name", "ID", "Type", "Expires"],
         rows: FastlaneCore::PrintTable.transform_output(rows)
       }))
@@ -270,7 +266,7 @@ module Match
           [cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
         end
         puts(Terminal::Table.new({
-          title: "Certificates that are going to be #{revoked_or_removed_message}".green,
+          title: "Certificates that are going to be #{removed_or_revoked_message}".green,
           headings: ["Name", "ID", "Type", "Expires"],
           rows: FastlaneCore::PrintTable.transform_output(rows)
         }))
@@ -452,7 +448,7 @@ module Match
       UI.important("from repository without revoking them.")
     end
 
-    def revoked_or_removed_message
+    def removed_or_revoked_message
       self.safe_remove_certs ? "removed" : "revoked"
     end
   end
