@@ -324,6 +324,7 @@ module Deliver
       is_3rd_gen = [
         "iPad Pro (12.9-inch) (3rd generation)", # Default simulator has this name
         "iPad Pro (12.9-inch) (4th generation)", # Default simulator has this name
+        "iPad Pro (12.9-inch) (5th generation)", # Default simulator has this name
         "IPAD_PRO_3GEN_129", # Screenshots downloaded from App Store Connect has this name
         "ipadPro129" # Legacy: screenshots downloaded from iTunes Connect used to have this name
       ].any? { |key| filename.include?(key) }
