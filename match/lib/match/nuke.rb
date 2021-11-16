@@ -171,7 +171,7 @@ module Match
         keys += self.storage.list_files(file_name: ct.to_s, file_ext: "p12")
       end
 
-      # Finds all the iOS and macOS profofiles in the file storage
+      # Finds all the iOS and macOS profiles in the file storage
       profiles = []
       prov_types.each do |prov_type|
         profiles += self.storage.list_files(file_name: prov_type.to_s, file_ext: "mobileprovision")
