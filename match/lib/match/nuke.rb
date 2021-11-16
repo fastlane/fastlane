@@ -84,11 +84,17 @@ module Match
       if (self.certs + self.profiles + self.files).count > 0
         unless params[:skip_confirmation]
           UI.error("---")
-          UI.error("Are you sure you want to completely delete and revoke all the")
-          UI.error("certificates and provisioning profiles listed above? (y/n)")
+          if self.safe_remove_certs
+            UI.error("Are you sure you want to completely delete and remove all the")
+            UI.error("certificates and delete provisioning profiles listed above? (y/n)")
+          else
+            UI.error("Are you sure you want to completely delete and revoke all the")
+            UI.error("certificates and delete provisioning profiles listed above? (y/n)")
+          end
           UI.error("Warning: By nuking distribution, both App Store and Ad Hoc profiles will be deleted") if type == "distribution"
           UI.error("Warning: The :app_identifier value will be ignored - this will delete all profiles for all your apps!") if had_app_identifier
           UI.error("---")
+          print_safe_remove_certs_hint
         end
         if params[:skip_confirmation] || UI.confirm("Do you really want to nuke everything listed above?")
           nuke_it_now!
@@ -125,7 +131,7 @@ module Match
         UI.error("By nuking your account's distribution, all your apps deployed via ad-hoc will stop working!") if type == "distribution"
         UI.error("By nuking your account's enterprise, all your in-house apps will stop working!") if type == "enterprise"
         UI.error("---")
-
+        print_safe_remove_certs_hint
         UI.user_error!("Enterprise account nuke cancelled") unless UI.confirm("Do you really want to nuke your Enterprise account?")
       end
     end
@@ -193,7 +199,7 @@ module Match
         [i + 1, cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
       end
       puts(Terminal::Table.new({
-        title: "Certificates that can be revoked".green,
+        title: "Certificates that can be #{revoked_or_removed_message}".green,
         headings: ["Option", "Name", "ID", "Type", "Expires"],
         rows: FastlaneCore::PrintTable.transform_output(rows)
       }))
@@ -262,7 +268,7 @@ module Match
           [cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
         end
         puts(Terminal::Table.new({
-          title: "Certificates that are going to be revoked".green,
+          title: "Certificates that are going to be #{revoked_or_removed_message}".green,
           headings: ["Name", "ID", "Type", "Expires"],
           rows: FastlaneCore::PrintTable.transform_output(rows)
         }))
@@ -316,7 +322,8 @@ module Match
         UI.success("Successfully deleted profile")
       end
 
-      UI.header("Revoking #{self.certs.count} certificates...") unless self.certs.count == 0
+      removing_or_revoking_message = self.safe_remove_certs ? "Removing" : "Revoking"
+      UI.header("#{removing_or_revoking_message} #{self.certs.count} certificates...") unless self.certs.count == 0
       self.certs.each do |cert|
         if self.safe_remove_certs
           UI.message("Certificate '#{cert.name}' (#{cert.id}) will be removed from repository without revoking it")
@@ -434,6 +441,17 @@ module Match
       else
         raise "Unknown provisioning type '#{prov_type}'"
       end
+    end
+
+    # Helpers for `safe_remove_certs`
+    def print_safe_remove_certs_hint
+      return if self.safe_remove_certs
+      UI.important("Hint: You can use --safe_remove_certs option to remove certificates")
+      UI.important("from repository without revoking them.")
+    end
+
+    def revoked_or_removed_message
+      self.safe_remove_certs ? "removed" : "revoked"
     end
   end
   # rubocop:disable Metrics/ClassLength
