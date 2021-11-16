@@ -4993,6 +4993,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
  Ensure a valid push profile is active, creating a new one if needed (via _pem_)
 
  - parameters:
+   - platform: Set certificate's platform. Used for creation of production & development certificates. Supported platforms: ios, macos
    - development: Renew the development push certificate instead of the production one
    - websitePush: Create a Website Push certificate
    - generateP12: Generate a p12 file additionally to a PEM file
@@ -5020,7 +5021,8 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
  ```|
  >|
  */
-public func getPushCertificate(development: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+public func getPushCertificate(platform: String = "ios",
+                               development: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                websitePush: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                generateP12: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                                activeDaysLimit: Int = 30,
@@ -5035,6 +5037,7 @@ public func getPushCertificate(development: OptionalConfigValue<Bool> = .fastlan
                                outputPath: String = ".",
                                newProfile: ((String) -> Void)? = nil)
 {
+    let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let developmentArg = development.asRubyArgument(name: "development", type: nil)
     let websitePushArg = websitePush.asRubyArgument(name: "website_push", type: nil)
     let generateP12Arg = generateP12.asRubyArgument(name: "generate_p12", type: nil)
@@ -5049,7 +5052,8 @@ public func getPushCertificate(development: OptionalConfigValue<Bool> = .fastlan
     let pemNameArg = pemName.asRubyArgument(name: "pem_name", type: nil)
     let outputPathArg = RubyCommand.Argument(name: "output_path", value: outputPath, type: nil)
     let newProfileArg = RubyCommand.Argument(name: "new_profile", value: newProfile, type: .stringClosure)
-    let array: [RubyCommand.Argument?] = [developmentArg,
+    let array: [RubyCommand.Argument?] = [platformArg,
+                                          developmentArg,
                                           websitePushArg,
                                           generateP12Arg,
                                           activeDaysLimitArg,
@@ -5078,7 +5082,7 @@ public func getPushCertificate(development: OptionalConfigValue<Bool> = .fastlan
    - target: Target name, optional. Will be needed if you have more than one non-test target to avoid being prompted to select one
    - configuration: Configuration name, optional. Will be needed if you have altered the configurations from the default or your version number depends on the configuration selected
 
- This action will return the current version number set on your project.
+ This action will return the current version number set on your project. It first looks in the plist and then for '$(MARKETING_VERSION)' in the build settings.
  */
 @discardableResult public func getVersionNumber(xcodeproj: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                 target: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -7098,6 +7102,7 @@ public func nexusUpload(file: String,
    - package: Path to package to notarize, e.g. .app bundle or disk image
    - useNotarytool: Whether to `xcrun notarytool` or `xcrun altool`
    - tryEarlyStapling: Whether to try early stapling while the notarization request is in progress
+   - skipStapling: Do not staple the notarization ticket to the artifact; useful for single file executables and ZIP archives
    - bundleId: Bundle identifier to uniquely identify the package
    - username: Apple ID username
    - ascProvider: Provider short name for accounts associated with multiple providers
@@ -7109,6 +7114,7 @@ public func nexusUpload(file: String,
 public func notarize(package: String,
                      useNotarytool: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                      tryEarlyStapling: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                     skipStapling: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      bundleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      ascProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -7120,6 +7126,7 @@ public func notarize(package: String,
     let packageArg = RubyCommand.Argument(name: "package", value: package, type: nil)
     let useNotarytoolArg = useNotarytool.asRubyArgument(name: "use_notarytool", type: nil)
     let tryEarlyStaplingArg = tryEarlyStapling.asRubyArgument(name: "try_early_stapling", type: nil)
+    let skipStaplingArg = skipStapling.asRubyArgument(name: "skip_stapling", type: nil)
     let bundleIdArg = bundleId.asRubyArgument(name: "bundle_id", type: nil)
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
     let ascProviderArg = ascProvider.asRubyArgument(name: "asc_provider", type: nil)
@@ -7130,6 +7137,7 @@ public func notarize(package: String,
     let array: [RubyCommand.Argument?] = [packageArg,
                                           useNotarytoolArg,
                                           tryEarlyStaplingArg,
+                                          skipStaplingArg,
                                           bundleIdArg,
                                           usernameArg,
                                           ascProviderArg,
@@ -7391,6 +7399,7 @@ public func optOutUsage() {
  Alias for the `get_push_certificate` action
 
  - parameters:
+   - platform: Set certificate's platform. Used for creation of production & development certificates. Supported platforms: ios, macos
    - development: Renew the development push certificate instead of the production one
    - websitePush: Create a Website Push certificate
    - generateP12: Generate a p12 file additionally to a PEM file
@@ -7418,7 +7427,8 @@ public func optOutUsage() {
  ```|
  >|
  */
-public func pem(development: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+public func pem(platform: String = "ios",
+                development: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                 websitePush: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                 generateP12: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                 activeDaysLimit: Int = 30,
@@ -7433,6 +7443,7 @@ public func pem(development: OptionalConfigValue<Bool> = .fastlaneDefault(false)
                 outputPath: String = ".",
                 newProfile: ((String) -> Void)? = nil)
 {
+    let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let developmentArg = development.asRubyArgument(name: "development", type: nil)
     let websitePushArg = websitePush.asRubyArgument(name: "website_push", type: nil)
     let generateP12Arg = generateP12.asRubyArgument(name: "generate_p12", type: nil)
@@ -7447,7 +7458,8 @@ public func pem(development: OptionalConfigValue<Bool> = .fastlaneDefault(false)
     let pemNameArg = pemName.asRubyArgument(name: "pem_name", type: nil)
     let outputPathArg = RubyCommand.Argument(name: "output_path", value: outputPath, type: nil)
     let newProfileArg = RubyCommand.Argument(name: "new_profile", value: newProfile, type: .stringClosure)
-    let array: [RubyCommand.Argument?] = [developmentArg,
+    let array: [RubyCommand.Argument?] = [platformArg,
+                                          developmentArg,
                                           websitePushArg,
                                           generateP12Arg,
                                           activeDaysLimitArg,
@@ -9438,6 +9450,7 @@ public func setChangelog(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDef
     - description: Description of this release
     - isDraft: Whether the release should be marked as draft
     - isPrerelease: Whether the release should be marked as prerelease
+    - isGenerateReleaseNotes: Whether the name and body of this release should be generated automatically
     - uploadAssets: Path to assets to be uploaded with the release
 
   - returns: A hash containing all relevant information of this release
@@ -9457,6 +9470,7 @@ public func setChangelog(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDef
                                                 description: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                 isDraft: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                 isPrerelease: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                                isGenerateReleaseNotes: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                 uploadAssets: OptionalConfigValue<[String]?> = .fastlaneDefault(nil)) -> [String: Any]
 {
     let repositoryNameArg = RubyCommand.Argument(name: "repository_name", value: repositoryName, type: nil)
@@ -9469,6 +9483,7 @@ public func setChangelog(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDef
     let descriptionArg = description.asRubyArgument(name: "description", type: nil)
     let isDraftArg = isDraft.asRubyArgument(name: "is_draft", type: nil)
     let isPrereleaseArg = isPrerelease.asRubyArgument(name: "is_prerelease", type: nil)
+    let isGenerateReleaseNotesArg = isGenerateReleaseNotes.asRubyArgument(name: "is_generate_release_notes", type: nil)
     let uploadAssetsArg = uploadAssets.asRubyArgument(name: "upload_assets", type: nil)
     let array: [RubyCommand.Argument?] = [repositoryNameArg,
                                           serverUrlArg,
@@ -9480,6 +9495,7 @@ public func setChangelog(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDef
                                           descriptionArg,
                                           isDraftArg,
                                           isPrereleaseArg,
+                                          isGenerateReleaseNotesArg,
                                           uploadAssetsArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -13048,7 +13064,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-13.1.0.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13250,4 +13266,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.139]
+// FastlaneRunnerAPIVersion [0.9.140]
