@@ -18,6 +18,7 @@ module Match
     attr_accessor :params
     attr_accessor :type
 
+    attr_accessor :safe_remove_certs
     attr_accessor :certs
     attr_accessor :profiles
     attr_accessor :files
@@ -69,6 +70,8 @@ module Match
       FastlaneCore::PrintTable.print_values(config: params,
                                          hide_keys: [:app_identifier],
                                              title: "Summary for match nuke #{Fastlane::VERSION}")
+
+      self.safe_remove_certs = params[:safe_remove_certs] || false
 
       prepare_list
       filter_by_cert
@@ -315,6 +318,11 @@ module Match
 
       UI.header("Revoking #{self.certs.count} certificates...") unless self.certs.count == 0
       self.certs.each do |cert|
+        if self.safe_remove_certs
+          UI.message("Certificate '#{cert.name}' (#{cert.id}) will be removed from repository without revoking it")
+          next
+        end
+
         UI.message("Revoking certificate '#{cert.name}' (#{cert.id})...")
         begin
           cert.delete!
