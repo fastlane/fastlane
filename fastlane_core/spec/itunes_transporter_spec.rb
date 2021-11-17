@@ -336,6 +336,27 @@ describe FastlaneCore do
               end
             end
           end
+
+          describe "with package_path and asset_path" do
+            describe "upload command generation" do
+              it 'generates a call to xcrun iTMSTransporter with -assetFile' do
+                expect(Dir).to receive(:tmpdir).and_return("/tmp")
+                expect(FileUtils).to receive(:cp)
+
+                transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+                expect(transporter.upload(package_path: '/tmp/my.app.id.itmsp', asset_path: '/tmp/my_app.ipa')).to eq(java_upload_command(jwt: jwt, use_asset_path: true))
+              end
+            end
+
+            describe "upload command generation with ITMSTRANSPORTER_FORCE_ITMS_PACKAGE_UPLOAD=true" do
+              it 'generates a call to xcrun iTMSTransporter with -assetFile' do
+                stub_const('ENV', { 'ITMSTRANSPORTER_FORCE_ITMS_PACKAGE_UPLOAD' => 'true' })
+
+                transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+                expect(transporter.upload(package_path: '/tmp/my.app.id.itmsp', asset_path: '/tmp/my_app.ipa')).to eq(java_upload_command(jwt: jwt, use_asset_path: false))
+              end
+            end
+          end
         end
       end
 
