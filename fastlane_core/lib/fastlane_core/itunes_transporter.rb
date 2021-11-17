@@ -150,10 +150,10 @@ module FastlaneCore
     end
 
     def file_upload_option(source)
-      if File.extname(source) == ".itmsp"
-        return "-f #{source.shellescape}"
-      else
+      if !File.directory?(source) && [".ipa", ".pkg", ".dmg", ".zip"].include?(File.extname(source).downcase)
         return "-assetFile #{source.shellescape}"
+      else
+        return "-f #{source.shellescape}"
       end
     end
 
