@@ -131,6 +131,9 @@ public protocol GymfileProtocol: class {
     /// Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
     var skipProfileDetection: Bool { get }
 
+    /// Allows for override of the default `xcodebuild` command
+    var xcodebuildCommand: String { get }
+
     /// Sets a custom path for Swift Package Manager dependencies
     var clonedSourcePackagesPath: String? { get }
 
@@ -188,6 +191,7 @@ public extension GymfileProtocol {
     var analyzeBuildTime: Bool? { return nil }
     var xcprettyUtf: Bool? { return nil }
     var skipProfileDetection: Bool { return false }
+    var xcodebuildCommand: String { return "xcodebuild" }
     var clonedSourcePackagesPath: String? { return nil }
     var skipPackageDependenciesResolution: Bool { return false }
     var disablePackageAutomaticUpdates: Bool { return false }
@@ -196,4 +200,4 @@ public extension GymfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.90]
+// FastlaneRunnerAPIVersion [0.9.91]

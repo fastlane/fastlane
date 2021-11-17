@@ -1322,6 +1322,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - analyzeBuildTime: Analyze the project build time and store the output in 'culprits.txt' file
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
+   - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
@@ -1374,6 +1375,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                         analyzeBuildTime: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                         xcprettyUtf: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                         skipProfileDetection: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        xcodebuildCommand: String = "xcodebuild",
                                         clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -1422,6 +1424,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let analyzeBuildTimeArg = analyzeBuildTime.asRubyArgument(name: "analyze_build_time", type: nil)
     let xcprettyUtfArg = xcprettyUtf.asRubyArgument(name: "xcpretty_utf", type: nil)
     let skipProfileDetectionArg = skipProfileDetection.asRubyArgument(name: "skip_profile_detection", type: nil)
+    let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
@@ -1469,6 +1472,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           analyzeBuildTimeArg,
                                           xcprettyUtfArg,
                                           skipProfileDetectionArg,
+                                          xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
@@ -1524,6 +1528,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - analyzeBuildTime: Analyze the project build time and store the output in 'culprits.txt' file
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
+   - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
@@ -1573,6 +1578,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            analyzeBuildTime: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcprettyUtf: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            skipProfileDetection: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                           xcodebuildCommand: String = "xcodebuild",
                                            clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -1618,6 +1624,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let analyzeBuildTimeArg = analyzeBuildTime.asRubyArgument(name: "analyze_build_time", type: nil)
     let xcprettyUtfArg = xcprettyUtf.asRubyArgument(name: "xcpretty_utf", type: nil)
     let skipProfileDetectionArg = skipProfileDetection.asRubyArgument(name: "skip_profile_detection", type: nil)
+    let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
@@ -1662,6 +1669,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           analyzeBuildTimeArg,
                                           xcprettyUtfArg,
                                           skipProfileDetectionArg,
+                                          xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
@@ -1718,6 +1726,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - analyzeBuildTime: Analyze the project build time and store the output in 'culprits.txt' file
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
+   - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
@@ -1768,6 +1777,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            analyzeBuildTime: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcprettyUtf: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            skipProfileDetection: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                           xcodebuildCommand: String = "xcodebuild",
                                            clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -1814,6 +1824,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let analyzeBuildTimeArg = analyzeBuildTime.asRubyArgument(name: "analyze_build_time", type: nil)
     let xcprettyUtfArg = xcprettyUtf.asRubyArgument(name: "xcpretty_utf", type: nil)
     let skipProfileDetectionArg = skipProfileDetection.asRubyArgument(name: "skip_profile_detection", type: nil)
+    let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
@@ -1859,6 +1870,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           analyzeBuildTimeArg,
                                           xcprettyUtfArg,
                                           skipProfileDetectionArg,
+                                          xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
@@ -5525,6 +5537,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - analyzeBuildTime: Analyze the project build time and store the output in 'culprits.txt' file
    - xcprettyUtf: Have xcpretty use unicode encoding when reporting builds
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
+   - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
@@ -5577,6 +5590,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                    analyzeBuildTime: OptionalConfigValue<Bool?> = .fastlaneDefault(gymfile.analyzeBuildTime),
                                    xcprettyUtf: OptionalConfigValue<Bool?> = .fastlaneDefault(gymfile.xcprettyUtf),
                                    skipProfileDetection: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.skipProfileDetection),
+                                   xcodebuildCommand: String = gymfile.xcodebuildCommand,
                                    clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.clonedSourcePackagesPath),
                                    skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.skipPackageDependenciesResolution),
                                    disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.disablePackageAutomaticUpdates),
@@ -5625,6 +5639,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let analyzeBuildTimeArg = analyzeBuildTime.asRubyArgument(name: "analyze_build_time", type: nil)
     let xcprettyUtfArg = xcprettyUtf.asRubyArgument(name: "xcpretty_utf", type: nil)
     let skipProfileDetectionArg = skipProfileDetection.asRubyArgument(name: "skip_profile_detection", type: nil)
+    let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
@@ -5672,6 +5687,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                           analyzeBuildTimeArg,
                                           xcprettyUtfArg,
                                           skipProfileDetectionArg,
+                                          xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
@@ -13266,4 +13282,4 @@ public let snapshotfile = Snapshotfile()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.140]
+// FastlaneRunnerAPIVersion [0.9.141]
