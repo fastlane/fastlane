@@ -36,6 +36,10 @@ module Fastlane
       def self.is_supported?(platform)
         %i[ios mac].include?(platform)
       end
+
+      def self.category
+        :testing
+      end
     end
   end
 end
