@@ -15,7 +15,8 @@ module Fastlane
     :match,
     :scan,
     :gym,
-    :precheck
+    :precheck,
+    :trainer
   ]
 
   # a list of all the config files we currently expect
