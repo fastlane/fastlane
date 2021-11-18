@@ -86,7 +86,7 @@ describe Trainer do
                               ])
       end
 
-      it "works as expected with xcresult" do
+      it "works as expected with xcresult", requires_xcode: true do
         tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult")
         expect(tp.data).to eq([
                                 {
