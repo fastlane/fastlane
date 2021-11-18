@@ -72,6 +72,7 @@ describe Fastlane do
           update_fastlane
           s3
           match_nuke
+          trainer
         )
       end
 
