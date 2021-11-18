@@ -9,12 +9,12 @@ describe Trainer do
 
       it "raises an error if FormatVersion is not supported" do
         expect do
-          Trainer::TestParser.new("trainer/spec/fixtures/InvalidVersionMismatch.plist")
+          Trainer::TestParser.new("./trainer/spec/fixtures/InvalidVersionMismatch.plist")
         end.to raise_error("Format version '0.9' is not supported, must be 1.1, 1.2")
       end
 
       it "loads a file without throwing an error" do
-        Trainer::TestParser.new("trainer/spec/fixtures/Valid1.plist")
+        Trainer::TestParser.new("./trainer/spec/fixtures/Valid1.plist")
       end
     end
 
@@ -29,13 +29,13 @@ describe Trainer do
     describe "Stores the data in a useful format" do
       describe "#tests_successful?" do
         it "returns false if tests failed" do
-          tp = Trainer::TestParser.new("trainer/spec/fixtures/Valid1.plist")
+          tp = Trainer::TestParser.new("./trainer/spec/fixtures/Valid1.plist")
           expect(tp.tests_successful?).to eq(false)
         end
       end
 
       it "works as expected with plist" do
-        tp = Trainer::TestParser.new("trainer/spec/fixtures/Valid1.plist")
+        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Valid1.plist")
         expect(tp.data).to eq([
                                 {
                                   project_path: "Trainer.xcodeproj",
@@ -87,7 +87,7 @@ describe Trainer do
       end
 
       it "works as expected with xcresult" do
-        tp = Trainer::TestParser.new("trainer/spec/fixtures/Test.test_result.xcresult")
+        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult")
         expect(tp.data).to eq([
                                 {
                                   project_path: "Test.xcodeproj",

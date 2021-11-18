@@ -17,6 +17,10 @@ module Fastlane
       end
 
       def self.description
+        "Convert the Xcode plist log to a JUnit report"
+      end
+
+      def self.detail
         "Convert the Xcode plist log to a JUnit report. This will raise an exception if the tests failed"
       end
 
