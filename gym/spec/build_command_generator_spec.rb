@@ -89,6 +89,25 @@ describe Gym do
                            ])
     end
 
+    it "#xcodebuild_command option is used if provided", requires_xcodebuild: true do
+      log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
+
+      options = { xcodebuild_command: "arch -arm64 xcodebuild", project: "./gym/examples/standard/Example.xcodeproj", scheme: 'Example' }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+      result = Gym::BuildCommandGenerator.generate
+      expect(result).to eq([
+                             "set -o pipefail &&",
+                             "arch -arm64 xcodebuild",
+                             "-scheme Example",
+                             "-project ./gym/examples/standard/Example.xcodeproj",
+                             "-destination 'generic/platform=iOS'",
+                             "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
+                             :archive,
+                             "| tee #{log_path.shellescape}",
+                             "| xcpretty"
+                           ])
+    end
+
     it "uses system scm", requires_xcodebuild: true do
       options = { project: "./gym/examples/standard/Example.xcodeproj", use_system_scm: true }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)

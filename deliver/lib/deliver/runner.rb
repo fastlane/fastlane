@@ -186,7 +186,7 @@ module Deliver
       end
 
       transporter = transporter_for_selected_team
-      result = transporter.upload(package_path: package_path)
+      result = transporter.upload(package_path: package_path, asset_path: upload_ipa || upload_pkg)
 
       unless result
         transporter_errors = transporter.displayable_errors

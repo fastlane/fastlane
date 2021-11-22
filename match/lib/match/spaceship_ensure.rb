@@ -70,6 +70,7 @@ module Match
       UI.error("for the user #{username}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
       UI.error("Git repository. This might be caused by revoking the certificate on the Dev Portal")
+      UI.error("If missing certificate is a Developer ID Installer, you may need to auth with Apple ID instead of App Store API Key")
       UI.user_error!("To reset the certificates of your Apple account, you can use the `fastlane match nuke` feature, more information on https://docs.fastlane.tools/actions/match/")
     end
 

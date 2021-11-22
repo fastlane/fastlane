@@ -7,7 +7,7 @@ module Gym
     class << self
       def generate
         parts = prefix
-        parts << "xcodebuild"
+        parts << Gym.config[:xcodebuild_command]
         parts += options
         parts += buildactions
         parts += setting

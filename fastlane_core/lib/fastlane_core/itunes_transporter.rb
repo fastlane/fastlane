@@ -1,4 +1,5 @@
 require 'shellwords'
+require 'tmpdir'
 require 'fileutils'
 require 'credentials_manager/account_manager'
 
@@ -148,6 +149,17 @@ module FastlaneCore
       end
     end
 
+    def file_upload_option(source)
+      ext = File.extname(source).downcase
+      is_asset_file_type = !File.directory?(source) && [".ipa", ".pkg", ".dmg", ".zip"].include?(ext)
+
+      if is_asset_file_type
+        return "-assetFile #{source.shellescape}"
+      else
+        return "-f #{source.shellescape}"
+      end
+    end
+
     def additional_upload_parameters
       # As Apple recommends in Transporter User Guide we shouldn't specify the -t transport parameter
       # and instead allow Transporter to use automatic transport discovery
@@ -177,7 +189,7 @@ module FastlaneCore
         ("-u #{username.shellescape}" unless use_jwt),
         ("-p #{shell_escaped_password(password)}" unless use_jwt),
         ("-jwt #{jwt}" if use_jwt),
-        "-f \"#{source}\"",
+        file_upload_option(source),
         additional_upload_parameters, # that's here, because the user might overwrite the -t option
         "-k 100000",
         ("-WONoPause true" if Helper.windows?), # Windows only: process instantly returns instead of waiting for key press
@@ -261,7 +273,7 @@ module FastlaneCore
           ("-u #{username.shellescape}" unless use_jwt),
           ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
           ("-jwt #{jwt}" if use_jwt),
-          "-f #{source.shellescape}",
+          file_upload_option(source),
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
@@ -282,7 +294,7 @@ module FastlaneCore
           ("-u #{username.shellescape}" unless use_jwt),
           ("-p #{password.shellescape}" unless use_jwt),
           ("-jwt #{jwt}" if use_jwt),
-          "-f #{source.shellescape}",
+          file_upload_option(source),
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
@@ -472,12 +484,31 @@ module FastlaneCore
     # @param app_id [Integer] The unique App ID
     # @param dir [String] the path in which the package file is located
     # @param package_path [String] the path to the package file (used instead of app_id and dir)
+    # @param asset_path [String] the path to the ipa/dmg/pkg file (used instead of package_path if running on macOS)
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transferring
-    def upload(app_id = nil, dir = nil, package_path: nil)
-      raise "app_id and dir are required or package_path is required" if (app_id.nil? || dir.nil?) && package_path.nil?
-      actual_dir = package_path || File.join(dir, "#{app_id}.itmsp")
+    def upload(app_id = nil, dir = nil, package_path: nil, asset_path: nil)
+      raise "app_id and dir are required or package_path or asset_path is required" if (app_id.nil? || dir.nil?) && package_path.nil? && asset_path.nil?
+
+      # Transport can upload .ipa, .dmg, and .pkg files directly with -assetFile
+      # However, -assetFile requires -assetDescription if Linux or Windows
+      # This will give the asset directly if macOS and asset_path exists
+      # otherwise it will use the .itmsp package
+
+      force_itmsp = FastlaneCore::Env.truthy?("ITMSTRANSPORTER_FORCE_ITMS_PACKAGE_UPLOAD")
+      can_use_asset_path = Helper.is_mac? && asset_path
+
+      actual_dir = if can_use_asset_path && !force_itmsp
+                     # The asset gets deleted upon completion so copying to a temp directory
+                     tmp_asset_path = File.join(Dir.tmpdir, File.basename(asset_path))
+                     FileUtils.cp(asset_path, tmp_asset_path)
+                     tmp_asset_path
+                   elsif package_path
+                     package_path
+                   else
+                     File.join(dir, "#{app_id}.itmsp")
+                   end
 
       UI.message("Going to upload updated app to App Store Connect")
       UI.success("This might take a few minutes. Please don't interrupt the script.")
@@ -492,7 +523,7 @@ module FastlaneCore
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
-        return upload(app_id, dir, package_path: package_path)
+        return upload(app_id, dir, package_path: package_path, asset_path: asset_path)
       end
 
       if result

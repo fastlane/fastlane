@@ -1756,6 +1756,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WPBN76YKX2;
+				MARKETING_VERSION = 7.6.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1765,6 +1766,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WPBN76YKX2;
+				MARKETING_VERSION = 7.6.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

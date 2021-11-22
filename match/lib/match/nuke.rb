@@ -9,7 +9,11 @@ require_relative 'module'
 require_relative 'storage'
 require_relative 'encryption'
 
+require 'tempfile'
+require 'base64'
+
 module Match
+  # rubocop:disable Metrics/ClassLength
   class Nuke
     attr_accessor :params
     attr_accessor :type
@@ -67,6 +71,7 @@ module Match
                                              title: "Summary for match nuke #{Fastlane::VERSION}")
 
       prepare_list
+      filter_by_cert
       print_tables
 
       if params[:readonly]
@@ -139,7 +144,7 @@ module Match
         types = profile_types(prov_type)
         # Filtering on 'profileType' seems to be undocumented as of 2020-07-30
         # but works on both web session and official API
-        self.profiles += Spaceship::ConnectAPI::Profile.all(filter: { profileType: types.join(",") })
+        self.profiles += Spaceship::ConnectAPI::Profile.all(filter: { profileType: types.join(",") }, includes: "certificates")
       end
 
       # Gets the main and additional cert types
@@ -171,6 +176,78 @@ module Match
       end
 
       self.files = certs + keys + profiles
+    end
+
+    def filter_by_cert
+      # Force will continue to revoke and delete all certificates and profiles
+      return if self.params[:force] || !UI.interactive?
+      return if self.certs.count < 2
+
+      # Print table showing certificates that can be revoked
+      puts("")
+      rows = self.certs.each_with_index.collect do |cert, i|
+        cert_expiration = cert.expiration_date.nil? ? "Unknown" : Time.parse(cert.expiration_date).strftime("%Y-%m-%d")
+        [i + 1, cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
+      end
+      puts(Terminal::Table.new({
+        title: "Certificates that can be revoked".green,
+        headings: ["Option", "Name", "ID", "Type", "Expires"],
+        rows: FastlaneCore::PrintTable.transform_output(rows)
+      }))
+      puts("")
+
+      UI.important("By default, all listed certificates and profiles will be nuked")
+      if UI.confirm("Do you want to only nuke specific certificates and their associated profiles?")
+        input_indexes = UI.input("Enter the \"Option\" number(s) from the table above? (comma-separated)").split(',')
+
+        # Get certificates from option indexes
+        self.certs = input_indexes.map do |index|
+          self.certs[index.to_i - 1]
+        end.compact
+
+        if self.certs.empty?
+          UI.user_error!("No certificates were selected based on option number(s) entered")
+        end
+
+        # Do profile selection logic
+        cert_ids = self.certs.map(&:id)
+        self.profiles = self.profiles.select do |profile|
+          profile_cert_ids = profile.certificates.map(&:id)
+          (cert_ids & profile_cert_ids).any?
+        end
+
+        # Do file selection logic
+        self.files = self.files.select do |f|
+          found = false
+
+          ext = File.extname(f)
+          filename = File.basename(f, ".*")
+
+          # Attempt to find cert based on filename
+          if ext == ".cer" || ext == ".p12"
+            found ||= self.certs.any? do |cert|
+              filename == cert.id.to_s
+            end
+          end
+
+          # Attempt to find profile matched on UUIDs in profile
+          if ext == ".mobileprovision" || ext == ".provisionprofile"
+            storage_uuid = FastlaneCore::ProvisioningProfile.uuid(f)
+
+            found ||= self.profiles.any? do |profile|
+              tmp_file = Tempfile.new
+              tmp_file.write(Base64.decode64(profile.profile_content))
+              tmp_file.close
+
+              # Compare profile uuid in storage to profile uuid on developer portal
+              portal_uuid = FastlaneCore::ProvisioningProfile.uuid(tmp_file.path)
+              storage_uuid == portal_uuid
+            end
+          end
+
+          found
+        end
+      end
     end
 
     # Print tables to ask the user
@@ -351,4 +428,5 @@ module Match
       end
     end
   end
+  # rubocop:disable Metrics/ClassLength
 end
