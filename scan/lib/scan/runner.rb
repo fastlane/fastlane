@@ -136,48 +136,40 @@ module Scan
     end
 
     def trainer_test_results
-        require "trainer"
+      require "trainer"
 
-        results = {
-          number_of_tests_including_retries: 0,
-          number_of_failures_including_retries: 0,
-          number_of_tests: 0,
-          number_of_failures: 0
-        }
+      results = {
+        number_of_tests_including_retries: 0,
+        number_of_failures_including_retries: 0,
+        number_of_tests: 0,
+        number_of_failures: 0
+      }
 
-        # TODO: Need to make sure these paths exist
-        params = {
-          path: Scan.cache[:result_bundle_path],
-          output_path: Scan.config[:output_directory],
-          silent: true,
-          extension: "xml"
-        }
+      # TODO: Need to make sure these paths exist
+      params = {
+        path: Scan.cache[:result_bundle_path],
+        output_path: Scan.config[:output_directory],
+        silent: true,
+        extension: "xml"
+      }
 
-        resulting_paths = Trainer::TestParser.auto_convert(params)
-        resulting_paths.each do |path, data|
-          results[:number_of_tests_including_retries] += data[:number_of_tests]
-          results[:number_of_failures_including_retries] += data[:number_of_failures]
-          results[:number_of_tests] += data[:number_of_tests_excluding_retries]
-          results[:number_of_failures] += data[:number_of_failures_excluding_retries]
-        end
+      resulting_paths = Trainer::TestParser.auto_convert(params)
+      resulting_paths.each do |path, data|
+        results[:number_of_tests_including_retries] += data[:number_of_tests]
+        results[:number_of_failures_including_retries] += data[:number_of_failures]
+        results[:number_of_tests] += data[:number_of_tests_excluding_retries]
+        results[:number_of_failures] += data[:number_of_failures_excluding_retries]
+      end
 
-        return results
-
-    rescue => err
-      puts "error happened"
-      puts err
-      puts err.backtrace
+      return results
+  rescue => err
+    puts("error happened")
+    puts(err)
+    puts(err.backtrace)
     end
 
     def handle_results(tests_exit_status)
       results = trainer_test_results
-
-#      if Scan.config[:disable_xcpretty]
-#        unless tests_exit_status == 0
-#          UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
-#        end
-#        return
-#      end
 
       number_of_tests_including_retries = results[:number_of_tests_including_retries]
       number_of_failures_including_retries = results[:number_of_failures_including_retries]
@@ -185,8 +177,11 @@ module Scan
       number_of_tests = results[:number_of_tests]
       number_of_failures = results[:number_of_failures]
 
-      # need to re-enable this
-      #SlackPoster.new.run(result)
+      # TODO: need to re-enable this
+      SlackPoster.new.run({
+        tests: number_of_tests,
+        failures: number_of_failures
+      })
 
       if number_of_failures > 0
         failures_str = number_of_failures.to_s.red

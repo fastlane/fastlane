@@ -16,6 +16,16 @@ describe Scan do
         allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)
         allow(mock_test_result_parser).to receive(:parse_result).and_return({ tests: 100, failures: 0 })
 
+        allow(Trainer::TestParser).to receive(:auto_convert).and_return({
+          "some/path": {
+            successful: true,
+            number_of_tests: 10,
+            number_of_failures: 0,
+            number_of_tests_excluding_retries: 10,
+            number_of_failures_excluding_retries: 0
+          }
+        })
+
         @scan = Scan::Runner.new
       end
 
@@ -56,9 +66,16 @@ describe Scan do
               output_directory: '/tmp/scan_results',
               project: './scan/examples/standard/app.xcodeproj'
             })
-            custom_parser = "custom_parser"
-            expect(Scan::TestResultParser).to receive(:new).and_return(custom_parser)
-            expect(custom_parser).to receive(:parse_result).and_return({ tests: 5, failures: 3 })
+
+            allow(Trainer::TestParser).to receive(:auto_convert).and_return({
+              "some/path": {
+                successful: true,
+                number_of_tests: 10,
+                number_of_failures: 1,
+                number_of_tests_excluding_retries: 10,
+                number_of_failures_excluding_retries: 1
+              }
+            })
 
             @scan.handle_results(0)
           end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed")

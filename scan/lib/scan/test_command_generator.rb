@@ -111,9 +111,6 @@ module Scan
         return pipe
       end
 
-      pipe << "| xcbeautify"
-      return pipe
-
       formatter = []
       if (custom_formatter = Scan.config[:formatter])
         if custom_formatter.end_with?(".rb")
@@ -192,7 +189,7 @@ module Scan
       retry_count = Scan.cache[:retry_attempt] || 0
       attempt = retry_count > 0 ? "-#{retry_count}" : ""
       ext = FastlaneCore::Helper.xcode_version.to_i >= 11 ? '.xcresult' : '.test_result'
-      path = File.join(root_dir, Scan.config[:scheme]) + attempt + ext
+      path = File.join([root_dir, Scan.config[:scheme]].compact) + attempt + ext
 
       Scan.cache[:result_bundle_path] = path
 

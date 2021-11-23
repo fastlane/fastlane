@@ -22,8 +22,10 @@ module Trainer
     # Returns a hash with the path being the key, and the value
     # defining if the tests were successful
     def self.auto_convert(config)
-      FastlaneCore::PrintTable.print_values(config: config,
-                                             title: "Summary for trainer #{Fastlane::VERSION}") unless config[:silent]
+      unless config[:silent]
+        FastlaneCore::PrintTable.print_values(config: config,
+                                               title: "Summary for trainer #{Fastlane::VERSION}")
+      end
 
       containing_dir = config[:path]
       # Xcode < 10
