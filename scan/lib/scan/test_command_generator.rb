@@ -53,7 +53,7 @@ module Scan
       if config[:use_system_scm] && !options.include?("-scmProvider system")
         options << "-scmProvider system"
       end
-      options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
+      options << "-resultBundlePath '#{result_bundle_path(config[:result_bundle])}'"
       if FastlaneCore::Helper.xcode_at_least?(10)
         options << "-parallel-testing-worker-count #{config[:concurrent_workers]}" if config[:concurrent_workers]
         options << "-maximum-concurrent-test-simulator-destinations #{config[:max_concurrent_simulators]}" if config[:max_concurrent_simulators]
@@ -110,6 +110,9 @@ module Scan
       if Scan.config[:disable_xcpretty] || Scan.config[:output_style] == 'raw'
         return pipe
       end
+
+      pipe << "| xcbeautify"
+      return pipe
 
       formatter = []
       if (custom_formatter = Scan.config[:formatter])
@@ -183,11 +186,13 @@ module Scan
     end
 
     # The path to the result bundle
-    def result_bundle_path
+    def result_bundle_path(use_output_directory)
+      root_dir = use_output_directory ? Scan.config[:output_directory] : Dir.mktmpdir
+
       retry_count = Scan.cache[:retry_attempt] || 0
       attempt = retry_count > 0 ? "-#{retry_count}" : ""
       ext = FastlaneCore::Helper.xcode_version.to_i >= 11 ? '.xcresult' : '.test_result'
-      path = File.join(Scan.config[:output_directory], Scan.config[:scheme]) + attempt + ext
+      path = File.join(root_dir, Scan.config[:scheme]) + attempt + ext
 
       Scan.cache[:result_bundle_path] = path
 

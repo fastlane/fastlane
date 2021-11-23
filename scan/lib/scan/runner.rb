@@ -135,29 +135,78 @@ module Scan
       return retryable_tests.uniq
     end
 
-    def handle_results(tests_exit_status)
-      if Scan.config[:disable_xcpretty]
-        unless tests_exit_status == 0
-          UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+    def trainer_test_results
+        require "trainer"
+
+        results = {
+          number_of_tests_including_retries: 0,
+          number_of_failures_including_retries: 0,
+          number_of_tests: 0,
+          number_of_failures: 0
+        }
+
+        # TODO: Need to make sure these paths exist
+        params = {
+          path: Scan.cache[:result_bundle_path],
+          output_path: Scan.config[:output_directory],
+          silent: true,
+          extension: "xml"
+        }
+
+        resulting_paths = Trainer::TestParser.auto_convert(params)
+        resulting_paths.each do |path, data|
+          results[:number_of_tests_including_retries] += data[:number_of_tests]
+          results[:number_of_failures_including_retries] += data[:number_of_failures]
+          results[:number_of_tests] += data[:number_of_tests_excluding_retries]
+          results[:number_of_failures] += data[:number_of_failures_excluding_retries]
         end
-        return
+
+        return results
+
+    rescue => err
+      puts "error happened"
+      puts err
+      puts err.backtrace
+    end
+
+    def handle_results(tests_exit_status)
+      results = trainer_test_results
+
+#      if Scan.config[:disable_xcpretty]
+#        unless tests_exit_status == 0
+#          UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+#        end
+#        return
+#      end
+
+      number_of_tests_including_retries = results[:number_of_tests_including_retries]
+      number_of_failures_including_retries = results[:number_of_failures_including_retries]
+
+      number_of_tests = results[:number_of_tests]
+      number_of_failures = results[:number_of_failures]
+
+      # need to re-enable this
+      #SlackPoster.new.run(result)
+
+      if number_of_failures > 0
+        failures_str = number_of_failures.to_s.red
+      else
+        failures_str = number_of_failures.to_s.green
       end
 
-      result = TestResultParser.new.parse_result(test_results)
-      SlackPoster.new.run(result)
+      rows = [
+        ["Number of tests", number_of_tests.to_s],
+        ["Number of failures", failures_str]
+      ]
 
-      if result[:failures] > 0
-        failures_str = result[:failures].to_s.red
-      else
-        failures_str = result[:failures].to_s.green
+      if number_of_tests != number_of_tests_including_retries
+        rows << ["Number of tests with retries", number_of_tests_including_retries.to_s]
+        rows << ["Number of failures with retries", number_of_failures_including_retries.to_s]
       end
 
       puts(Terminal::Table.new({
         title: "Test Results",
-        rows: [
-          ["Number of tests", result[:tests]],
-          ["Number of failures", failures_str]
-        ]
+        rows: rows
       }))
       puts("")
 
@@ -165,7 +214,7 @@ module Scan
       zip_build_products
       copy_xctestrun
 
-      if result[:failures] > 0
+      if number_of_failures > 0
         open_report
 
         UI.test_failure!("Tests have failed")

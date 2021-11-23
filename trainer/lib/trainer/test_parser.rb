@@ -14,11 +14,16 @@ module Trainer
 
     attr_accessor :raw_json
 
+    attr_accessor :number_of_tests
+    attr_accessor :number_of_failures
+    attr_accessor :number_of_tests_excluding_retries
+    attr_accessor :number_of_failures_excluding_retries
+
     # Returns a hash with the path being the key, and the value
     # defining if the tests were successful
     def self.auto_convert(config)
       FastlaneCore::PrintTable.print_values(config: config,
-                                             title: "Summary for trainer #{Fastlane::VERSION}")
+                                             title: "Summary for trainer #{Fastlane::VERSION}") unless config[:silent]
 
       containing_dir = config[:path]
       # Xcode < 10
@@ -62,9 +67,15 @@ module Trainer
 
         tp = Trainer::TestParser.new(path, config)
         File.write(to_path, tp.to_junit)
-        puts("Successfully generated '#{to_path}'")
+        puts("Successfully generated '#{to_path}'") unless config[:silent]
 
-        return_hash[to_path] = tp.tests_successful?
+        return_hash[to_path] = {
+          successful: tp.tests_successful?,
+          number_of_tests: tp.number_of_tests,
+          number_of_failures: tp.number_of_failures,
+          number_of_tests_excluding_retries: tp.number_of_tests_excluding_retries,
+          number_of_failures_excluding_retries: tp.number_of_failures_excluding_retries
+        }
       end
       return_hash
     end
@@ -83,6 +94,17 @@ module Trainer
 
         ensure_file_valid!
         parse_content(config[:xcpretty_naming])
+      end
+
+      self.number_of_tests = 0
+      self.number_of_failures = 0
+      self.number_of_tests_excluding_retries = 0
+      self.number_of_failures_excluding_retries = 0
+      self.data.each do |thing|
+        self.number_of_tests += thing[:number_of_tests].to_i
+        self.number_of_failures += thing[:number_of_failures].to_i
+        self.number_of_tests_excluding_retries += thing[:number_of_tests_excluding_retries].to_i
+        self.number_of_failures_excluding_retries += thing[:number_of_failures_excluding_retries].to_i
       end
     end
 
@@ -191,9 +213,12 @@ module Trainer
       rows = testable_summaries.map do |testable_summary|
         all_tests = testable_summary.all_tests.flatten
 
+        tests_by_identifier = {}
+
         test_rows = all_tests.map do |test|
+          identifier = "#{test.parent.name}.#{test.name}"
           test_row = {
-            identifier: "#{test.parent.name}.#{test.name}",
+            identifier: identifier,
             name: test.name,
             duration: test.duration,
             status: test.test_status,
@@ -215,6 +240,8 @@ module Trainer
             }]
           end
 
+          tests_by_identifier[identifier] = test_row
+
           test_row
         end
 
@@ -228,6 +255,10 @@ module Trainer
 
         row[:number_of_tests] = row[:tests].count
         row[:number_of_failures] = row[:tests].find_all { |a| (a[:failures] || []).count > 0 }.count
+
+        unique_tests = tests_by_identifier.values || []
+        row[:number_of_tests_excluding_retries] = unique_tests.count
+        row[:number_of_failures_excluding_retries] = unique_tests.find_all { |a| (a[:failures] || []).count > 0 }.count
 
         row
       end
