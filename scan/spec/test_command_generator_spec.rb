@@ -404,6 +404,9 @@ describe Scan do
           })
           Scan.cache[:temp_junit_report] = './scan/spec/fixtures/boring.log'
 
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
             with(command: %r{xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null}, print_all: false, print_command: true)
