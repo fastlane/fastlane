@@ -145,10 +145,14 @@ module Scan
         number_of_failures: 0
       }
 
-      # TODO: Need to make sure these paths exist
+      result_bundle_path = Scan.cache[:result_bundle_path]
+      output_path = Scan.config[:output_directory] || Dir.mktmpdir
+
+      UI.crash!("A -resultBundlePath is needed to parse the test results. This should not happen. Please file an issue.") unless result_bundle_path
+
       params = {
-        path: Scan.cache[:result_bundle_path],
-        output_path: Scan.config[:output_directory],
+        path: result_bundle_path,
+        output_path: output_path,
         silent: true,
         extension: "xml"
       }
@@ -162,10 +166,6 @@ module Scan
       end
 
       return results
-  rescue => err
-    puts("error happened")
-    puts(err)
-    puts(err.backtrace)
     end
 
     def handle_results(tests_exit_status)
@@ -177,7 +177,6 @@ module Scan
       number_of_tests = results[:number_of_tests]
       number_of_failures = results[:number_of_failures]
 
-      # TODO: need to re-enable this
       SlackPoster.new.run({
         tests: number_of_tests,
         failures: number_of_failures
