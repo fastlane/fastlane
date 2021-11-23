@@ -69,7 +69,7 @@ module Trainer
 
         tp = Trainer::TestParser.new(path, config)
         File.write(to_path, tp.to_junit)
-        puts("Successfully generated '#{to_path}'") unless config[:silent]
+        UI.success("Successfully generated '#{to_path}'") unless config[:silent]
 
         return_hash[to_path] = {
           successful: tp.tests_successful?,
