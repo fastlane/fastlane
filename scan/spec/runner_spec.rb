@@ -39,6 +39,9 @@ describe Scan do
             include_simulator_logs: false
           })
 
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
           expect(FastlaneCore::Simulator).not_to(receive(:copy_logs))
           @scan.handle_results(0)
         end
@@ -54,6 +57,9 @@ describe Scan do
             include_simulator_logs: true
           })
 
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
           expect(FastlaneCore::Simulator).to receive(:copy_logs)
           @scan.handle_results(0)
         end
@@ -66,6 +72,9 @@ describe Scan do
               output_directory: '/tmp/scan_results',
               project: './scan/examples/standard/app.xcodeproj'
             })
+
+            # This is a needed side effect from running TestCommandGenerator which is not done in this test
+            Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
 
             allow(Trainer::TestParser).to receive(:auto_convert).and_return({
               "some/path": {
@@ -90,6 +99,9 @@ describe Scan do
             disable_xcpretty: true
           })
 
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
           Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
           @scan.handle_results(0)
           expect(Scan.cache[:temp_junit_report]).to(eq('/var/folders/non_existent_file.junit'))
@@ -102,6 +114,9 @@ describe Scan do
               project: './scan/examples/standard/app.xcodeproj',
               disable_xcpretty: true
             })
+
+            # This is a needed side effect from running TestCommandGenerator which is not done in this test
+            Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
 
             @scan.handle_results(1)
           end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Test execution failed. Exit status: 1")

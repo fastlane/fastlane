@@ -148,7 +148,7 @@ module Scan
       result_bundle_path = Scan.cache[:result_bundle_path]
       output_path = Scan.config[:output_directory] || Dir.mktmpdir
 
-      UI.crash!("A -resultBundlePath is needed to parse the test results. This should not happen. Please file an issue.") unless result_bundle_path
+      UI.crash!("A -resultBundlePath is needed to parse the test results. This should not have happened. Please file an issue.") unless result_bundle_path
 
       params = {
         path: result_bundle_path,
