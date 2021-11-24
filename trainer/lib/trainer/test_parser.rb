@@ -110,7 +110,7 @@ module Trainer
         self.number_of_failures += thing[:number_of_failures].to_i
         self.number_of_tests_excluding_retries += thing[:number_of_tests_excluding_retries].to_i
         self.number_of_failures_excluding_retries += thing[:number_of_failures_excluding_retries].to_i
-        self.number_of_retries += thing[:number_of_retries]
+        self.number_of_retries += thing[:number_of_retries].to_i
       end
     end
 
@@ -248,7 +248,6 @@ module Trainer
             retry_count += 1
           end
           info[:retry_count] = retry_count
-          test_row[:retry_count] = retry_count
 
           # Set failure message if failure found
           failure = test.find_failure(failures)
