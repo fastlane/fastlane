@@ -22,7 +22,8 @@ describe Scan do
             number_of_tests: 10,
             number_of_failures: 0,
             number_of_tests_excluding_retries: 10,
-            number_of_failures_excluding_retries: 0
+            number_of_failures_excluding_retries: 0,
+            number_of_retries: 0
           }
         })
 
@@ -82,7 +83,8 @@ describe Scan do
                 number_of_tests: 10,
                 number_of_failures: 1,
                 number_of_tests_excluding_retries: 10,
-                number_of_failures_excluding_retries: 1
+                number_of_failures_excluding_retries: 1,
+                number_of_retries: 0
               }
             })
 

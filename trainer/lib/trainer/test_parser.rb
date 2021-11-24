@@ -18,6 +18,7 @@ module Trainer
     attr_accessor :number_of_failures
     attr_accessor :number_of_tests_excluding_retries
     attr_accessor :number_of_failures_excluding_retries
+    attr_accessor :number_of_retries
 
     # Returns a hash with the path being the key, and the value
     # defining if the tests were successful
@@ -76,7 +77,8 @@ module Trainer
           number_of_tests: tp.number_of_tests,
           number_of_failures: tp.number_of_failures,
           number_of_tests_excluding_retries: tp.number_of_tests_excluding_retries,
-          number_of_failures_excluding_retries: tp.number_of_failures_excluding_retries
+          number_of_failures_excluding_retries: tp.number_of_failures_excluding_retries,
+          number_of_retries: tp.number_of_retries
         }
       end
       return_hash
@@ -102,11 +104,13 @@ module Trainer
       self.number_of_failures = 0
       self.number_of_tests_excluding_retries = 0
       self.number_of_failures_excluding_retries = 0
+      self.number_of_retries = 0
       self.data.each do |thing|
         self.number_of_tests += thing[:number_of_tests].to_i
         self.number_of_failures += thing[:number_of_failures].to_i
         self.number_of_tests_excluding_retries += thing[:number_of_tests_excluding_retries].to_i
         self.number_of_failures_excluding_retries += thing[:number_of_failures_excluding_retries].to_i
+        self.number_of_retries += thing[:number_of_retries]
       end
     end
 
@@ -215,6 +219,9 @@ module Trainer
       rows = testable_summaries.map do |testable_summary|
         all_tests = testable_summary.all_tests.flatten
 
+        # Used by store number of passes and failures by identifier
+        # This is used when Xcode 13 (and up) retries tests
+        # The identifier is duplicated until test succeeds or max count is reachd
         tests_by_identifier = {}
 
         test_rows = all_tests.map do |test|
@@ -230,6 +237,19 @@ module Trainer
             guid: ""
           }
 
+          info = tests_by_identifier[identifier] || {}
+          info[:failure_count] ||= 0
+          info[:success_count] ||= 0
+
+          retry_count = info[:retry_count]
+          if retry_count.nil?
+            retry_count = 0
+          else
+            retry_count += 1
+          end
+          info[:retry_count] = retry_count
+          test_row[:retry_count] = retry_count
+
           # Set failure message if failure found
           failure = test.find_failure(failures)
           if failure
@@ -240,9 +260,13 @@ module Trainer
               performance_failure: {},
               failure_message: failure.failure_message
             }]
+
+            info[:failure_count] += 1
+          else
+            info[:success_count] = 1
           end
 
-          tests_by_identifier[identifier] = test_row
+          tests_by_identifier[identifier] = info
 
           test_row
         end
@@ -258,9 +282,11 @@ module Trainer
         row[:number_of_tests] = row[:tests].count
         row[:number_of_failures] = row[:tests].find_all { |a| (a[:failures] || []).count > 0 }.count
 
+        # Used for seeing if any tests continued to fail after all of the Xcode 13 (and up) retries have finished
         unique_tests = tests_by_identifier.values || []
         row[:number_of_tests_excluding_retries] = unique_tests.count
-        row[:number_of_failures_excluding_retries] = unique_tests.find_all { |a| (a[:failures] || []).count > 0 }.count
+        row[:number_of_failures_excluding_retries] = unique_tests.find_all { |a| a[:success_count] == 0 }.count
+        row[:number_of_retries] = unique_tests.map { |a| a[:retry_count] }.inject(:+)
 
         row
       end

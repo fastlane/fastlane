@@ -139,10 +139,9 @@ module Scan
       require "trainer"
 
       results = {
-        number_of_tests_including_retries: 0,
-        number_of_failures_including_retries: 0,
         number_of_tests: 0,
-        number_of_failures: 0
+        number_of_failures: 0,
+        number_of_retries: 0
       }
 
       result_bundle_path = Scan.cache[:result_bundle_path]
@@ -159,10 +158,9 @@ module Scan
 
       resulting_paths = Trainer::TestParser.auto_convert(params)
       resulting_paths.each do |path, data|
-        results[:number_of_tests_including_retries] += data[:number_of_tests]
-        results[:number_of_failures_including_retries] += data[:number_of_failures]
         results[:number_of_tests] += data[:number_of_tests_excluding_retries]
         results[:number_of_failures] += data[:number_of_failures_excluding_retries]
+        results[:number_of_retries] += data[:number_of_retries]
       end
 
       return results
@@ -171,9 +169,7 @@ module Scan
     def handle_results(tests_exit_status)
       results = trainer_test_results
 
-      number_of_tests_including_retries = results[:number_of_tests_including_retries]
-      number_of_failures_including_retries = results[:number_of_failures_including_retries]
-
+      number_of_retries = results[:number_of_retries]
       number_of_tests = results[:number_of_tests]
       number_of_failures = results[:number_of_failures]
 
@@ -188,19 +184,21 @@ module Scan
         failures_str = number_of_failures.to_s.green
       end
 
-      rows = [
-        ["Number of tests", number_of_tests.to_s],
-        ["Number of failures", failures_str]
-      ]
-
-      if number_of_tests != number_of_tests_including_retries
-        rows << ["Number of tests with retries", number_of_tests_including_retries.to_s]
-        rows << ["Number of failures with retries", number_of_failures_including_retries.to_s]
-      end
+      retries_str = case number_of_retries
+                    when 0
+                      ""
+                    when 1
+                      " (and 1 retry)"
+                    else
+                      " (and #{number_of_retries} retries)"
+                    end
 
       puts(Terminal::Table.new({
         title: "Test Results",
-        rows: rows
+        rows: [
+          ["Number of tests", "#{number_of_tests}#{retries_str}"],
+          ["Number of failures", failures_str]
+        ]
       }))
       puts("")
 
