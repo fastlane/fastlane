@@ -36,8 +36,10 @@ module Fastlane
       end
 
       def self.details
-        "Finds and selects a version of an installed Xcode that best matches the provided [`Gem::Version` requirement specifier](http://www.rubydoc.info/github/rubygems/rubygems/Gem/Version)"
-        "You can either manually provide a specific version using `version:` or you make use of the `.xcode-version` file.",
+        [
+          "Finds and selects a version of an installed Xcode that best matches the provided [`Gem::Version` requirement specifier](http://www.rubydoc.info/github/rubygems/rubygems/Gem/Version)",
+          "You can either manually provide a specific version using `version:` or you make use of the `.xcode-version` file."
+        ].join("\n")
       end
 
       def self.authors
