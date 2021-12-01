@@ -99,7 +99,7 @@ module Fastlane
       return Thread.new do
         if FastlaneCore::Globals.verbose?
           return_value = Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string}))
-          UI.message("runner output:".yellow + return_value)
+          UI.message("runner output: ".yellow + return_value)
         else
           Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string} > /dev/null))
         end
