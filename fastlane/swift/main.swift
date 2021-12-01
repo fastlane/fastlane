@@ -38,7 +38,7 @@ class MainProcess {
 let process = MainProcess()
 process.startFastlaneThread()
 
-while !process.doneRunningLane, RunLoop.current.run(mode: RunLoop.Mode.default, before: Date(timeIntervalSinceNow: 2)) {
+while !process.doneRunningLane, RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 2)) {
     // no op
 }
 
