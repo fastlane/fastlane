@@ -76,7 +76,7 @@ module Fastlane
       self.ensure_runner_built!
       return_value = Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lanes))
       if FastlaneCore::Globals.verbose?
-        UI.message("runner output:".yellow + return_value)
+        UI.message("runner output: ".yellow + return_value)
       end
     end
 
