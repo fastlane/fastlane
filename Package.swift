@@ -18,6 +18,6 @@ let package = Package(
             exclude: ["Actions.swift", "Plugins.swift", "main.swift", "formatting", "FastlaneSwiftRunner"]
         ),
     ],
-    swiftLanguageVersions: [5]
+    swiftLanguageVersions: [4]
 )
  
