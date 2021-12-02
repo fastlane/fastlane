@@ -22,36 +22,42 @@ func desc(_: String) {
     // no-op, this is handled in fastlane/lane_list.rb
 }
 
-class AtomicDictionary<Key: Hashable, Value> {
-    private let lockQueue = DispatchQueue(label: "tools.fastlane.serial.queue")
+class UnfairDictionary<Key: Hashable, Value> {
+    private var unfairLock: UnsafeMutablePointer<os_unfair_lock>
     private var storage: [Key: Value]
 
     init() {
+        unfairLock = UnsafeMutablePointer<os_unfair_lock>.allocate(capacity: 1)
+        unfairLock.initialize(to: os_unfair_lock())
         storage = [:]
     }
 
+    deinit {
+        unfairLock.deallocate()
+    }
+
     func get(_ key: Key) -> Value? {
-        lockQueue.sync {
-            storage[key]
-        }
+        os_unfair_lock_lock(unfairLock)
+        defer { os_unfair_lock_unlock(unfairLock) }
+        return storage[key]
     }
 
     func set(_ key: Key, value: Value) {
-        lockQueue.sync {
-            storage[key] = value
-        }
+        os_unfair_lock_lock(unfairLock)
+        defer { os_unfair_lock_unlock(unfairLock) }
+        storage[key] = value
     }
 
     func removeValue(forKey key: Key) {
-        lockQueue.sync {
-            _ = storage.removeValue(forKey: key)
-        }
+        os_unfair_lock_lock(unfairLock)
+        defer { os_unfair_lock_unlock(unfairLock) }
+        _ = storage.removeValue(forKey: key)
     }
 
     var allValues: [Key: Value] {
-        lockQueue.sync {
-            storage
-        }
+        os_unfair_lock_lock(unfairLock)
+        defer { os_unfair_lock_unlock(unfairLock) }
+        return storage
     }
 }
 
@@ -62,7 +68,7 @@ class Runner {
     private var returnValue: String? // lol, so safe
     private var currentlyExecutingCommand: RubyCommandable?
     private var shouldLeaveDispatchGroupDuringDisconnect = false
-    private var executeNext: AtomicDictionary<String, Bool> = AtomicDictionary()
+    private var executeNext: UnfairDictionary<String, Bool> = UnfairDictionary()
 
     func executeCommand(_ command: RubyCommandable) -> String {
         dispatchGroup.enter()
