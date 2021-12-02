@@ -72,7 +72,7 @@ public class Main {
     public func run(with fastFile: LaneFile?) {
         process.startFastlaneThread(with: fastFile)
 
-        while !process.doneRunningLane, RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 2)) {
+        while !process.doneRunningLane, RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date(timeIntervalSinceNow: 2)) {
             // no op
         }
     }
