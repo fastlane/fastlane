@@ -22,7 +22,7 @@ func desc(_: String) {
     // no-op, this is handled in fastlane/lane_list.rb
 }
 
-class UnfairDictionary<Key: Hashable, Value> {
+class AtomicDictionary<Key: Hashable, Value> {
     private var unfairLock: UnsafeMutablePointer<os_unfair_lock>
     private var storage: [Key: Value]
 
@@ -68,7 +68,7 @@ class Runner {
     private var returnValue: String? // lol, so safe
     private var currentlyExecutingCommand: RubyCommandable?
     private var shouldLeaveDispatchGroupDuringDisconnect = false
-    private var executeNext: UnfairDictionary<String, Bool> = UnfairDictionary()
+    private var executeNext: AtomicDictionary<String, Bool> = AtomicDictionary()
 
     func executeCommand(_ command: RubyCommandable) -> String {
         dispatchGroup.enter()
