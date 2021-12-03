@@ -75,10 +75,11 @@ module Fastlane
 
         filter = { app: app.id }
         filter["preReleaseVersion.platform"] = platform
-        build_resps = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion,buildBundles").all_pages
-        builds = build_resps.flat_map(&:to_models)
+        filter["preReleaseVersion.version"] = version if version
+        filter["version"] = build_number if build_number
+        build_resp = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion,buildBundles")
 
-        builds.each do |build|
+        build_resp.all_pages_each do |build|
           asc_app_version = build.app_version
           asc_build_number = build.version
           uploaded_date = DateTime.parse(build.uploaded_date)

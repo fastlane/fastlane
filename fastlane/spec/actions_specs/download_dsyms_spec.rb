@@ -74,7 +74,12 @@ describe Fastlane do
 
       context 'with no special options' do
         it 'downloads all dsyms of all builds in all trains' do
-          expect(build_resp).to receive(:to_models).and_return([build1, build2, build3, build4, build5, build6])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
+                                                        .and_yield(build2)
+                                                        .and_yield(build3)
+                                                        .and_yield(build4)
+                                                        .and_yield(build5)
+                                                        .and_yield(build6)
 
           [[build1, '1.0.0', '1', '2020-09-12T10:00:00+01:00'],
            [build2, '1.0.0', '2', '2020-09-12T11:00:00+01:00'],
@@ -98,7 +103,7 @@ describe Fastlane do
 
       context 'with version with leading zero' do
         it 'downloads all dsyms of all builds in train 1.07.0' do
-          expect(build_resp).to receive(:to_models).and_return([build1])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
 
           [[build1, '1.07.0', '3', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
@@ -115,7 +120,7 @@ describe Fastlane do
 
       context 'when build_number is an integer' do
         it 'downloads the correct dsyms' do
-          expect(build_resp).to receive(:to_models).and_return([build1])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
 
           [[build1, '2.0.0', '2', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
@@ -134,7 +139,8 @@ describe Fastlane do
         it 'downloads only dsyms of latest build in latest train' do
           expect(Spaceship::ConnectAPI).to receive(:get_builds).and_return([build2, build1])
 
-          expect(build_resp).to receive(:to_models).and_return([build1, build2])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
+                                                        .and_yield(build2)
 
           [[build1, '2.0.0', '2', '2020-09-12T10:00:00+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
@@ -164,7 +170,8 @@ describe Fastlane do
           expect(version_build).to receive(:version).and_return('42')
           expect(version).to receive(:build).and_return(version_build)
 
-          expect(build_resp).to receive(:to_models).and_return([build1, build2])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
+                                                        .and_yield(build2)
 
           [[build1, '1.0.0', '33', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
@@ -188,7 +195,8 @@ describe Fastlane do
 
       context 'when min_version is set' do
         it 'downloads only dsyms of trains newer than or equal min_version' do
-          expect(build_resp).to receive(:to_models).and_return([build1, build2])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
+                                                        .and_yield(build2)
 
           [[build1, '1.0.0', '33', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
@@ -212,7 +220,12 @@ describe Fastlane do
 
       context 'with after_uploaded_date' do
         it 'downloads dsyms with more recent uploaded_date' do
-          expect(build_resp).to receive(:to_models).and_return([build1, build2, build3, build4, build5, build6])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
+                                                        .and_yield(build2)
+                                                        .and_yield(build3)
+                                                        .and_yield(build4)
+                                                        .and_yield(build5)
+                                                        .and_yield(build6)
 
           [[build1, '1.0.0', '1', '2020-09-12T10:00:00+01:00'],
            [build2, '1.0.0', '2', '2020-09-12T11:00:00+01:00'],
