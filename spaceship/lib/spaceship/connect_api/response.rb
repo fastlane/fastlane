@@ -64,6 +64,19 @@ module Spaceship
           yield(model)
         end
       end
+
+      def all_pages_each(&block)
+        to_models.each do |model|
+          yield(model)
+        end
+
+        resp = self
+        loop do
+          resp = resp.next_page
+          break if resp.nil?
+          resp.each(&block)
+        end
+      end
     end
   end
 end
