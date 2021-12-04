@@ -36,28 +36,32 @@ class AtomicDictionary<Key: Hashable, Value> {
         unfairLock.deallocate()
     }
 
-    func get(_ key: Key) -> Value? {
+    subscript(_ key: Key) -> Value? {
+        get {
+            get(key)
+        }
+        set(newValue) {
+            set(key, value: newValue)
+        }
+    }
+    
+    private func get(_ key: Key) -> Value? {
         os_unfair_lock_lock(unfairLock)
         defer { os_unfair_lock_unlock(unfairLock) }
         return storage[key]
     }
 
-    func set(_ key: Key, value: Value) {
+    private func set(_ key: Key, value: Value?) {
         os_unfair_lock_lock(unfairLock)
         defer { os_unfair_lock_unlock(unfairLock) }
         storage[key] = value
     }
 
-    func removeValue(forKey key: Key) {
+    @discardableResult
+    func removeValue(forKey key: Key) -> Value? {
         os_unfair_lock_lock(unfairLock)
         defer { os_unfair_lock_unlock(unfairLock) }
-        _ = storage.removeValue(forKey: key)
-    }
-
-    var allValues: [Key: Value] {
-        os_unfair_lock_lock(unfairLock)
-        defer { os_unfair_lock_unlock(unfairLock) }
-        return storage
+        return storage.removeValue(forKey: key)
     }
 }
 
@@ -77,7 +81,7 @@ class Runner {
 
         let secondsToWait = DispatchTimeInterval.seconds(SocketClient.defaultCommandTimeoutSeconds)
         // swiftformat:disable:next redundantSelf
-        let timeoutResult = Self.waitWithPolling(self.executeNext.get(command.id), toEventually: { $0 == true }, timeout: SocketClient.defaultCommandTimeoutSeconds)
+        let timeoutResult = Self.waitWithPolling(self.executeNext[command.id], toEventually: { $0 == true }, timeout: SocketClient.defaultCommandTimeoutSeconds)
         executeNext.removeValue(forKey: command.id)
         let failureMessage = "command didn't execute in: \(SocketClient.defaultCommandTimeoutSeconds) seconds"
         let success = testDispatchTimeoutResult(timeoutResult, failureMessage: failureMessage, timeToWait: secondsToWait)
@@ -198,11 +202,11 @@ extension Runner: SocketClientDelegateProtocol {
             returnValue = returnedObject
             if let command = currentlyExecutingCommand as? RubyCommand {
                 if let closureArgumentValue = closureArgumentValue, !closureArgumentValue.isEmpty {
-                    command.performCallback(callbackArg: closureArgumentValue, socket: socketClient) {
-                        self.executeNext.set(command.id, value: true)
+                    command.performCallback(callbackArg: closureArgumentValue, socket: socketClient) { [self] in
+                        executeNext[command.id] = true
                     }
                 } else {
-                    executeNext.set(command.id, value: true)
+                    executeNext[command.id] = true
                 }
             }
             dispatchGroup.leave()
@@ -211,14 +215,14 @@ extension Runner: SocketClientDelegateProtocol {
             verbose(message: "server acknowledged a cancel request")
             dispatchGroup.leave()
             if let command = currentlyExecutingCommand as? RubyCommand {
-                executeNext.set(command.id, value: true)
+                executeNext[command.id] = true
             }
             completion(socketClient)
         case .alreadyClosedSockets, .connectionFailure, .malformedRequest, .malformedResponse, .serverError:
             log(message: "error encountered while executing command:\n\(serverResponse)")
             dispatchGroup.leave()
             if let command = currentlyExecutingCommand as? RubyCommand {
-                executeNext.set(command.id, value: true)
+                executeNext[command.id] = true
             }
             completion(socketClient)
         case let .commandTimeout(timeout):
