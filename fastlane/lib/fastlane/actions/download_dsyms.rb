@@ -115,39 +115,37 @@ module Fastlane
           end
 
           UI.verbose("Build_version: #{asc_build_number} matches #{build_number}, grabbing dsym_url") if build_number
-
-          build.build_bundles&.each do |build_bundle|
-            download_dsym(build_bundle: build_bundle, build: build, app: app, wait_for_dsym_processing: wait_for_dsym_processing, wait_timeout: wait_timeout, output_directory: output_directory)
-          end
+          download_dsym(build: build, app: app, wait_for_dsym_processing: wait_for_dsym_processing, wait_timeout: wait_timeout, output_directory: output_directory)
         end
       end
 
-      def self.download_dsym(build_bundle: nil, build: nil, app: nil, wait_for_dsym_processing: nil, wait_timeout: nil, output_directory: nil)
+      def self.download_dsym(build: nil, app: nil, wait_for_dsym_processing: nil, wait_timeout: nil, output_directory: nil)
         start = Time.now
-        download_url = nil
+        dsym_urls = []
 
         loop do
-          download_url = build_bundle.dsym_url
+          build_bundles = build.build_bundles.select { |b| b.includes_symbols == true }
+          dsym_urls = build_bundles.map(&:dsym_url).compact
 
-          unless download_url
-            if !wait_for_dsym_processing || (Time.now - start) > wait_timeout
-              # In some cases, AppStoreConnect does not process the dSYMs, thus no error should be thrown.
-              UI.message("Could not find any dSYM for #{build.version} (#{build.app_version})")
-            else
-              UI.message("Waiting for dSYM file to appear...")
-              sleep(30)
-              next
-            end
+          break if build_bundles.count == dsym_urls.count
+
+          if !wait_for_dsym_processing || (Time.now - start) > wait_timeout
+            # In some cases, AppStoreConnect does not process the dSYMs, thus no error should be thrown.
+            UI.message("Could not find any dSYM for #{build.version} (#{build.app_version})")
+            break
+          else
+            UI.message("Waiting for dSYM file to appear...")
+            sleep(30) unless FastlaneCore::Helper.is_test?
+            build = Spaceship::ConnectAPI::Build.get(build_id: build.id)
           end
-
-          break
         end
 
-        if download_url
-          self.download(download_url, build, app, output_directory)
-          return if build.version
-        else
+        if dsym_urls.count == 0
           UI.message("No dSYM URL for #{build.version} (#{build.app_version})")
+        else
+          dsym_urls.each do |url|
+            self.download(url, build, app, output_directory)
+          end
         end
       end
       # rubocop:enable Metrics/PerceivedComplexity
