@@ -202,8 +202,8 @@ extension Runner: SocketClientDelegateProtocol {
             returnValue = returnedObject
             if let command = currentlyExecutingCommand as? RubyCommand {
                 if let closureArgumentValue = closureArgumentValue, !closureArgumentValue.isEmpty {
-                    command.performCallback(callbackArg: closureArgumentValue, socket: socketClient) { [self] in
-                        executeNext[command.id] = true
+                    command.performCallback(callbackArg: closureArgumentValue, socket: socketClient) {
+                        self.executeNext[command.id] = true
                     }
                 } else {
                     executeNext[command.id] = true

@@ -79,8 +79,8 @@ class SocketClient: NSObject {
             self.inputStream.delegate = self
             self.outputStream.delegate = self
 
-            self.inputStream.schedule(in: .main, forMode: RunLoopMode.defaultRunLoopMode)
-            self.outputStream.schedule(in: .main, forMode: RunLoopMode.defaultRunLoopMode)
+            self.inputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
+            self.outputStream.schedule(in: .main, forMode: .defaultRunLoopMode)
         }
 
         dispatchGroup.enter()
