@@ -50,6 +50,10 @@ module Fastlane
               set_build_setting(config, "PROVISIONING_PROFILE_SPECIFIER", params[:profile_name])
               UI.important("Set Provisioning Profile name to: #{params[:profile_name]} for target: #{target.name} for build configuration: #{config.name}")
             end
+            if params[:entitlements_file_path]
+              set_build_setting(config, "CODE_SIGN_ENTITLEMENTS", params[:entitlements_file_path])
+              UI.important("Set Entitlements file path to: #{params[:entitlements_file_path]} for target: #{target.name} for build configuration: #{config.name}")
+            end
             # Since Xcode 8, this is no longer needed, you simply use PROVISIONING_PROFILE_SPECIFIER
             if params[:profile_uuid]
               set_build_setting(config, "PROVISIONING_PROFILE", params[:profile_uuid])
@@ -143,6 +147,10 @@ module Fastlane
                                        env_name: "FL_CODE_SIGN_IDENTITY",
                                        description: "Code signing identity type (iPhone Developer, iPhone Distribution)",
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :entitlements_file_path,
+                                       env_name: "FL_CODE_SIGN_ENTITLEMENTS_FILE_PATH",
+                                       description: "Path to your entitlements file",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :profile_name,
                                        env_name: "FL_PROVISIONING_PROFILE_SPECIFIER",
                                        description: "Provisioning profile name to use for code signing",
@@ -172,6 +180,15 @@ module Fastlane
           update_code_signing_settings(
             use_automatic_signing: true,
             path: "demo-project/demo/demo.xcodeproj"
+          )',
+          ' # more advanced manual code signing
+          update_code_signing_settings(
+            use_automatic_signing: true,
+            path: "demo-project/demo/demo.xcodeproj",
+            team_id: "QABC123DEV",
+            bundle_identifier: "com.demoapp.QABC123DEV",
+            profile_name: "Demo App Deployment Profile",
+            entitlements_file_path: "Demo App/generated/New.entitlements"
           )'
         ]
       end
@@ -185,7 +202,7 @@ module Fastlane
       end
 
       def self.authors
-        ["mathiasAichinger", "hjanuschka", "p4checo", "portellaa", "aeons", "att55"]
+        ["mathiasAichinger", "hjanuschka", "p4checo", "portellaa", "aeons", "att55", "abcdev"]
       end
 
       def self.is_supported?(platform)
