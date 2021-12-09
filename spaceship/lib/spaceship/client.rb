@@ -391,10 +391,11 @@ module Spaceship
 
         keychain_entry = CredentialsManager::AccountManager.new(user: user, password: password)
         user ||= keychain_entry.user
-        password = keychain_entry.password
+        password = keychain_entry.password(ask_if_missing: !Spaceship::Globals.check_session)
       end
 
       if user.to_s.strip.empty? || password.to_s.strip.empty?
+        exit_with_session_state(user, false) if Spaceship::Globals.check_session
         raise NoUserCredentialsError.new, "No login data provided"
       end
 
@@ -413,21 +414,16 @@ module Spaceship
       end
     end
 
-    # This method is used for both the Apple Dev Portal and App Store Connect
-    # This will also handle 2 step verification and 2 factor authentication
+    # Check if we have a cached/valid session
     #
-    # It is called in `send_login_request` of sub classes (which the method `login`, above, transferred over to via `do_login`)
-    # rubocop:disable Metrics/PerceivedComplexity
-    def send_shared_login_request(user, password)
-      # Check if we have a cached/valid session
-      #
-      # Background:
-      # December 4th 2017 Apple introduced a rate limit - which is of course fine by itself -
-      # but unfortunately also rate limits successful logins. If you call multiple tools in a
-      # lane (e.g. call match 5 times), this would lock you out of the account for a while.
-      # By loading existing sessions and checking if they're valid, we're sending less login requests.
-      # More context on why this change was necessary https://github.com/fastlane/fastlane/pull/11108
-      #
+    # Background:
+    # December 4th 2017 Apple introduced a rate limit - which is of course fine by itself -
+    # but unfortunately also rate limits successful logins. If you call multiple tools in a
+    # lane (e.g. call match 5 times), this would lock you out of the account for a while.
+    # By loading existing sessions and checking if they're valid, we're sending less login requests.
+    # More context on why this change was necessary https://github.com/fastlane/fastlane/pull/11108
+    #
+    def has_valid_session
       # If there was a successful manual login before, we have a session on disk
       if load_session_from_file
         # Check if the session is still valid here
@@ -462,6 +458,23 @@ module Spaceship
       #
       # After this point, we sure have no valid session any more and have to create a new one
       #
+      return false
+    end
+
+    # This method is used for both the Apple Dev Portal and App Store Connect
+    # This will also handle 2 step verification and 2 factor authentication
+    #
+    # It is called in `send_login_request` of sub classes (which the method `login`, above, transferred over to via `do_login`)
+    # rubocop:disable Metrics/PerceivedComplexity
+    def send_shared_login_request(user, password)
+      # Check if the cache or FASTLANE_SESSION is still valid
+      has_valid_session = self.has_valid_session
+
+      # Exit if `--check_session` flag was passed
+      exit_with_session_state(user, has_valid_session) if Spaceship::Globals.check_session
+
+      # If the session is valid no need to attempt to generate a new one.
+      return true if has_valid_session
 
       data = {
         accountName: user,
@@ -564,6 +577,13 @@ module Spaceship
       end
 
       return false
+    end
+
+    # This method is used to log if the session is valid or not and then exit
+    # It is called when the `--check_session` flag is passed
+    def exit_with_session_state(user, has_valid_session)
+      puts("#{has_valid_session ? 'Valid' : 'No valid'} session found (#{user}). Exiting.")
+      exit(has_valid_session)
     end
 
     def itc_service_key
