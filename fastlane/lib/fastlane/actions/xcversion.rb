@@ -6,22 +6,6 @@ module Fastlane
 
         version = params[:version]
 
-        if version.to_s.length == 0
-          # The user didn't provide an Xcode version, let's see
-          # if the current project has a `.xcode-version` file
-          #
-          # The code below can be improved to also consider
-          # the directory of the Xcode project
-          xcode_version_paths = Dir.glob(".xcode-version")
-
-          if xcode_version_paths.first
-            UI.verbose("Loading required version from #{xcode_version_paths.first}")
-            version = File.read(xcode_version_paths.first).strip
-          else
-            UI.user_error!("No version: provided when calling the `xcversion` action")
-          end
-        end
-
         xcode = Helper::XcversionHelper.find_xcode(version)
         UI.user_error!("Cannot find an installed Xcode satisfying '#{version}'") if xcode.nil?
 
@@ -29,6 +13,16 @@ module Fastlane
         UI.message("Setting Xcode version to #{xcode.path} for all build steps")
 
         ENV["DEVELOPER_DIR"] = File.join(xcode.path, "/Contents/Developer")
+      end
+
+      def self.read_xcode_version_file
+        xcode_version_paths = Dir.glob(".xcode-version")
+
+        if xcode_version_paths.first
+          return File.read(xcode_version_paths.first).strip
+        end
+
+        return nil
       end
 
       def self.description
@@ -51,7 +45,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_XCODE_VERSION",
                                        description: "The version of Xcode to select specified as a Gem::Version requirement string (e.g. '~> 7.1.0')",
-                                       optional: true,
+                                       default_value: self.read_xcode_version_file,
+                                       default_value_dynamic: true,
                                        verify_block: Helper::XcversionHelper::Verify.method(:requirement))
         ]
       end

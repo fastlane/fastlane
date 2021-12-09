@@ -68,41 +68,68 @@ describe Fastlane do
         end
       end
 
-      context "when a version is not specified" do
+      describe "version default value" do
         context "load a .xcode-version file if it exists" do
+          context "uses default" do
+            let(:v13_0) do
+              double("XcodeInstall::Xcode", version: "13.0", path: "/Test/Xcode13.0")
+            end
 
-          let(:v13_0) do
-            double("XcodeInstall::Xcode", version: "13.0", path: "/Test/Xcode13.0")
-          end
+            let(:xcode_version_path) { ".xcode-version" }
+            before do
+              require "xcode/install"
+              installer = double("XcodeInstall::Installer")
+              allow(installer).to receive(:installed_versions).and_return([v13_0])
+              allow(XcodeInstall::Installer).to receive(:new).and_return(installer)
+              allow(Dir).to receive(:glob).with(".xcode-version").and_return([xcode_version_path])
+            end
 
-          let(:xcode_version_path) { ".xcode-version" }
-          before do
-            require "xcode/install"
-            installer = double("XcodeInstall::Installer")
-            allow(installer).to receive(:installed_versions).and_return([v13_0])
-            allow(XcodeInstall::Installer).to receive(:new).and_return(installer)
-            expect(Dir).to receive(:glob).with(".xcode-version").and_return([xcode_version_path])
-          end
+            it "succeeds if the numbers match" do
+              expect(UI).to receive(:message).with(/Setting Xcode version/)
+              allow(File).to receive(:read).with(xcode_version_path).and_return("13.0")
 
-          it "succeeds if the numbers match" do
-            expect(UI).to receive(:message).with(/Setting Xcode version/)
-            expect(File).to receive(:read).with(xcode_version_path).and_return("13.0")
-
-            result = Fastlane::FastFile.new.parse("lane :test do
-              xcversion
-            end").runner.execute(:test)
-
-            expect(ENV["DEVELOPER_DIR"]).to eq(File.join(v13_0.path, "Contents/Developer"))
-          end
-
-          it "fails if the numbers don't match" do
-            expect(File).to receive(:read).with(xcode_version_path).and_return("14.0")
-
-            expect do
-              Fastlane::FastFile.new.parse("lane :test do
+              result = Fastlane::FastFile.new.parse("lane :test do
                 xcversion
               end").runner.execute(:test)
-            end.to raise_error("Cannot find an installed Xcode satisfying '14.0'")
+
+              expect(ENV["DEVELOPER_DIR"]).to eq(File.join(v13_0.path, "Contents/Developer"))
+            end
+
+            it "fails if the numbers don't match" do
+              allow(File).to receive(:read).with(xcode_version_path).and_return("14.0")
+
+              expect do
+                Fastlane::FastFile.new.parse("lane :test do
+                  xcversion
+                end").runner.execute(:test)
+              end.to raise_error("Cannot find an installed Xcode satisfying '14.0'")
+            end
+          end
+
+          context "overrides default" do
+            let(:v13_0) do
+              double("XcodeInstall::Xcode", version: "13.0", path: "/Test/Xcode13.0")
+            end
+
+            let(:xcode_version_path) { ".xcode-version" }
+            before do
+              require "xcode/install"
+              installer = double("XcodeInstall::Installer")
+              allow(installer).to receive(:installed_versions).and_return([v13_0])
+              allow(XcodeInstall::Installer).to receive(:new).and_return(installer)
+              allow(Dir).to receive(:glob).with(".xcode-version").and_return([xcode_version_path])
+            end
+
+            it "succeeds if the numbers match" do
+              expect(UI).to receive(:message).with(/Setting Xcode version/)
+              allow(File).to receive(:read).with(xcode_version_path).and_return("14.0")
+
+              result = Fastlane::FastFile.new.parse("lane :test do
+                xcversion(version: '13.0')
+              end").runner.execute(:test)
+
+              expect(ENV["DEVELOPER_DIR"]).to eq(File.join(v13_0.path, "Contents/Developer"))
+            end
           end
         end
 
@@ -112,7 +139,7 @@ describe Fastlane do
               Fastlane::FastFile.new.parse("lane :test do
                 xcversion
               end").runner.execute(:test)
-            end.to raise_error("No version: provided when calling the `xcversion` action")
+            end.to raise_error("Version must be specified")
           end
         end
       end
