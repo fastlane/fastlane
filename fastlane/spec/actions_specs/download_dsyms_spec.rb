@@ -113,7 +113,7 @@ describe Fastlane do
 
       context 'with wait_for_dsym_processing' do
         it 'downloads all dsyms of all builds in all trains' do
-          expect(build_resp).to receive(:to_models).and_return([not_processed_build])
+          expect(build_resp).to receive(:all_pages_each).and_yield(not_processed_build)
 
           # Returns not processed build (no dsym url)
           build = not_processed_build
