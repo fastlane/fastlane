@@ -14,10 +14,10 @@ public protocol ScanfileProtocol: class {
     /// The project's scheme. Make sure it's marked as `Shared`
     var scheme: String? { get }
 
-    /// The name of the simulator type you want to run tests on (e.g. 'iPhone 6')
+    /// The name of the simulator type you want to run tests on (e.g. 'iPhone 6' or 'iPhone SE (2nd generation) (14.5)')
     var device: String? { get }
 
-    /// Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])
+    /// Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air', 'iPhone SE (2nd generation) (14.5)'])
     var devices: [String]? { get }
 
     /// Should skip auto detecting of devices if none were specified
@@ -296,4 +296,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.96]
+// FastlaneRunnerAPIVersion [0.9.97]

@@ -4323,7 +4323,7 @@ public func ensureNoDebugCode(text: String,
 
  If building your app requires a specific version of Xcode, you can invoke this command before using gym.
  For example, to ensure that a beta version of Xcode is not accidentally selected to build, which would make uploading to TestFlight fail.
- You can either manually provide a specific version using `version: ` or you make use of the `.xcode-version` file.
+ You can either manually provide a specific version using `version:` or you make use of the `.xcode-version` file.
  Using the `strict` parameter, you can either verify the full set of version numbers strictly (i.e. `11.3.1`) or only a subset of them (i.e. `11.3` or `11`).
  */
 public func ensureXcodeVersion(version: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -8536,8 +8536,8 @@ public func rubyVersion() {
    - project: Path to the project file
    - packagePath: Path to the Swift Package
    - scheme: The project's scheme. Make sure it's marked as `Shared`
-   - device: The name of the simulator type you want to run tests on (e.g. 'iPhone 6')
-   - devices: Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])
+   - device: The name of the simulator type you want to run tests on (e.g. 'iPhone 6' or 'iPhone SE (2nd generation) (14.5)')
+   - devices: Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air', 'iPhone SE (2nd generation) (14.5)'])
    - skipDetectDevices: Should skip auto detecting of devices if none were specified
    - ensureDevicesFound: Should fail if devices not found
    - forceQuitSimulator: Enabling this option will automatically killall Simulator processes before the run
@@ -8941,8 +8941,8 @@ public func say(text: [String],
    - project: Path to the project file
    - packagePath: Path to the Swift Package
    - scheme: The project's scheme. Make sure it's marked as `Shared`
-   - device: The name of the simulator type you want to run tests on (e.g. 'iPhone 6')
-   - devices: Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])
+   - device: The name of the simulator type you want to run tests on (e.g. 'iPhone 6' or 'iPhone SE (2nd generation) (14.5)')
+   - devices: Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air', 'iPhone SE (2nd generation) (14.5)'])
    - skipDetectDevices: Should skip auto detecting of devices if none were specified
    - ensureDevicesFound: Should fail if devices not found
    - forceQuitSimulator: Enabling this option will automatically killall Simulator processes before the run
@@ -11549,6 +11549,7 @@ public func updateAppIdentifier(xcodeproj: String,
    - targets: Specify targets you want to toggle the signing mech. (default to all targets)
    - buildConfigurations: Specify build_configurations you want to toggle the signing mech. (default to all configurations)
    - codeSignIdentity: Code signing identity type (iPhone Developer, iPhone Distribution)
+   - entitlementsFilePath: Path to your entitlements file
    - profileName: Provisioning profile name to use for code signing
    - profileUuid: Provisioning profile UUID to use for code signing
    - bundleIdentifier: Application Product Bundle Identifier
@@ -11563,6 +11564,7 @@ public func updateCodeSigningSettings(path: String,
                                       targets: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                                       buildConfigurations: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                                       codeSignIdentity: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                      entitlementsFilePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                       profileName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                       profileUuid: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                       bundleIdentifier: OptionalConfigValue<String?> = .fastlaneDefault(nil))
@@ -11573,6 +11575,7 @@ public func updateCodeSigningSettings(path: String,
     let targetsArg = targets.asRubyArgument(name: "targets", type: nil)
     let buildConfigurationsArg = buildConfigurations.asRubyArgument(name: "build_configurations", type: nil)
     let codeSignIdentityArg = codeSignIdentity.asRubyArgument(name: "code_sign_identity", type: nil)
+    let entitlementsFilePathArg = entitlementsFilePath.asRubyArgument(name: "entitlements_file_path", type: nil)
     let profileNameArg = profileName.asRubyArgument(name: "profile_name", type: nil)
     let profileUuidArg = profileUuid.asRubyArgument(name: "profile_uuid", type: nil)
     let bundleIdentifierArg = bundleIdentifier.asRubyArgument(name: "bundle_identifier", type: nil)
@@ -11582,6 +11585,7 @@ public func updateCodeSigningSettings(path: String,
                                           targetsArg,
                                           buildConfigurationsArg,
                                           codeSignIdentityArg,
+                                          entitlementsFilePathArg,
                                           profileNameArg,
                                           profileUuidArg,
                                           bundleIdentifierArg]
@@ -13174,6 +13178,7 @@ public func xctool() {
  - parameter version: The version of Xcode to select specified as a Gem::Version requirement string (e.g. '~> 7.1.0')
 
  Finds and selects a version of an installed Xcode that best matches the provided [`Gem::Version` requirement specifier](http://www.rubydoc.info/github/rubygems/rubygems/Gem/Version)
+ You can either manually provide a specific version using `version:` or you make use of the `.xcode-version` file.
  */
 public func xcversion(version: String) {
     let versionArg = RubyCommand.Argument(name: "version", value: version, type: nil)
@@ -13272,14 +13277,14 @@ func parseInt(fromString: String, function: String = #function) -> Int {
     return NSString(string: fromString.trimmingCharacters(in: .punctuationCharacters)).integerValue
 }
 
-public let deliverfile = Deliverfile()
-public let gymfile = Gymfile()
-public let matchfile = Matchfile()
-public let precheckfile = Precheckfile()
-public let scanfile = Scanfile()
-public let screengrabfile = Screengrabfile()
-public let snapshotfile = Snapshotfile()
+public let deliverfile: Deliverfile = .init()
+public let gymfile: Gymfile = .init()
+public let matchfile: Matchfile = .init()
+public let precheckfile: Precheckfile = .init()
+public let scanfile: Scanfile = .init()
+public let screengrabfile: Screengrabfile = .init()
+public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.141]
+// FastlaneRunnerAPIVersion [0.9.142]

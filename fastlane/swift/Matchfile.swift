@@ -17,4 +17,4 @@ public class Matchfile: MatchfileProtocol {
     // during the `init` process, and you won't see this message
 }
 
-// Generated with fastlane 2.198.1
+// Generated with fastlane 2.199.0

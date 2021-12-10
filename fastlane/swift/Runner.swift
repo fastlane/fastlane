@@ -10,13 +10,9 @@
 
 import Foundation
 
-let logger: Logger = {
-    Logger()
-}()
+let logger: Logger = .init()
 
-let runner: Runner = {
-    Runner()
-}()
+let runner: Runner = .init()
 
 func desc(_: String) {
     // no-op, this is handled in fastlane/lane_list.rb
@@ -71,7 +67,7 @@ class Runner {
 
         let runLoop = RunLoop.current
         let timeoutDate = Date(timeInterval: TimeInterval(timeout), since: Date())
-        var fulfilled: Bool = false
+        var fulfilled = false
         let _expression = memoizedClosure(expression)
         repeat {
             do {
