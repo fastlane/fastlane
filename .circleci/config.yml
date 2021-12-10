@@ -84,6 +84,10 @@ jobs:
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
+      - run:
+          name: fastlane snapshot reset_simulators
+          command: |
+            fastlane snapshot reset_simulators --force
       - *set_ruby
       - run:
           name: debug | ruby version
@@ -99,10 +103,6 @@ jobs:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
       - *cache_restore_rubocop
-      - run:
-          name: bundle exec fastlane snapshot reset_simulators
-          command: |
-            RUBYOPT=<< parameters.ruby_opt >> bundle exec fastlane snapshot reset_simulators --force
       - run:
           name: bundle exec fastlane execute_tests
           command: |
