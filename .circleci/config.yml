@@ -100,6 +100,10 @@ jobs:
           command: bundle exec danger || echo "danger failed"
       - *cache_restore_rubocop
       - run:
+          name: bundle exec fastlane snapshot reset_simulators
+          command: |
+            RUBYOPT=<< parameters.ruby_opt >> bundle exec fastlane snapshot reset_simulators
+      - run:
           name: bundle exec fastlane execute_tests
           command: |
             RUBYOPT=<< parameters.ruby_opt >> bundle exec fastlane execute_tests
