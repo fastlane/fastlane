@@ -10,13 +10,14 @@ describe Snapshot do
     let(:iphone6_10_1) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6 (10.1)", os_version: '10.1', udid: "33333", state: "Don't Care", is_simulator: true) }
     let(:iphone6s_10_1) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6s (10.1)", os_version: '10.1', udid: "98765", state: "Don't Care", is_simulator: true) }
     let(:iphone4s_9_0) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 4s", os_version: '9.0', udid: "4444", state: "Don't Care", is_simulator: true) }
-    let(:ipad_air_9_1) { FastlaneCore::DeviceManager::Device.new(name: "iPad Air", os_version: '9.1', udid: "12345", state: "Don't Care", is_simulator: true) }
+    let(:iphone8_9_1) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 8", os_version: '9.1', udid: "55555", state: "Don't Care", is_simulator: true) }
+    let(:ipad_air_9_1) { FastlaneCore::DeviceManager::Device.new(name: "iPad Air (4th generation)", os_version: '9.1', udid: "12345", state: "Don't Care", is_simulator: true) }
     let(:appleTV) { FastlaneCore::DeviceManager::Device.new(name: "Apple TV 1080p", os_version: os_version, udid: "22222", state: "Don't Care", is_simulator: true) }
     let(:appleWatch6_44mm_7_4) { FastlaneCore::DeviceManager::Device.new(name: "Apple Watch Series 6 - 44mm", os_version: '7.4', udid: "5555544", state: "Don't Care", is_simulator: true) }
 
     before do
       allow(Snapshot::LatestOsVersion).to receive(:version).and_return(os_version)
-      allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone6_9_0, iphone6_9_3, iphone6_9_2, appleTV, iphone6_9_3_2, iphone6_10_1, iphone6s_10_1, iphone4s_9_0, ipad_air_9_1, appleWatch6_44mm_7_4])
+      allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone6_9_0, iphone6_9_3, iphone6_9_2, appleTV, iphone6_9_3_2, iphone6_10_1, iphone6s_10_1, iphone4s_9_0, iphone8_9_1, ipad_air_9_1, appleWatch6_44mm_7_4])
       fake_out_xcode_project_loading
     end
 
@@ -172,8 +173,8 @@ describe Snapshot do
         expect(FileUtils).to receive(:rm_f).with(%r{#{Snapshot.config[:output_directory]}/en-US/system-cfcd208495d565ef66e7dff9f98764da\.log}).and_return(true)
         expect(FileUtils).to receive(:cp).with(/.*/, %r{#{Snapshot.config[:output_directory]}/en-US/system-cfcd208495d565ef66e7dff9f98764da\.log}).and_return(true)
 
-        Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPhone 6s"], "de-DE", nil, 0)
-        Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPad Air"], "en-US", nil, 0)
+        Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPhone 8"], "de-DE", nil, 0)
+        Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPad Air (4th generation)"], "en-US", nil, 0)
       end
     end
 
@@ -189,7 +190,7 @@ describe Snapshot do
           configure(options)
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
           command = Snapshot::TestCommandGenerator.generate(
-            devices: ["iPhone 6"],
+            devices: ["iPhone 8"],
             language: "en",
             locale: nil,
             log_path: '/path/to/logs'
@@ -218,7 +219,7 @@ describe Snapshot do
           configure(options.merge(xcargs: "-only-testing:TestBundle/TestSuite/Screenshots"))
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
           command = Snapshot::TestCommandGenerator.generate(
-            devices: ["iPhone 6"],
+            devices: ["iPhone 8"],
             language: "en",
             locale: nil,
             log_path: '/path/to/logs'
@@ -312,7 +313,7 @@ describe Snapshot do
 
         it 'uses the fixed derivedDataPath if given', requires_xcode: true do
           expect(Dir).not_to(receive(:mktmpdir))
-          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
           expect(command.join('')).to include("-derivedDataPath #{temp}")
         end
       end
@@ -325,7 +326,7 @@ describe Snapshot do
         end
 
         it 'uses the "test-without-building" command and not the default "build test"', requires_xcode: true do
-          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
           expect(command.join('')).to include("test-without-building")
           expect(command.join('')).not_to(include("build test"))
         end
@@ -335,7 +336,7 @@ describe Snapshot do
         it 'adds the testplan to the xcodebuild command', requires_xcode: true do
           configure(options.merge(testplan: 'simple'))
 
-          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
           expect(command.join('')).to include("-testPlan 'simple'") if FastlaneCore::Helper.xcode_at_least?(11)
         end
       end
@@ -344,7 +345,7 @@ describe Snapshot do
         it "only tests the test bundle/suite/cases specified in only_testing when the input is an array", requires_xcode: true do
           configure(options.merge(only_testing: %w(TestBundleA/TestSuiteB TestBundleC)))
 
-          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
           expect(command.join('')).to include("-only-testing:TestBundleA/TestSuiteB")
           expect(command.join('')).to include("-only-testing:TestBundleC")
         end
@@ -352,7 +353,7 @@ describe Snapshot do
         it "only tests the test bundle/suite/cases specified in only_testing when the input is a string", requires_xcode: true do
           configure(options.merge(only_testing: 'TestBundleA/TestSuiteB'))
 
-          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
           expect(command.join('')).to include("-only-testing:TestBundleA/TestSuiteB")
           expect(command.join('')).not_to(include("-only-testing:TestBundleC"))
         end
@@ -362,7 +363,7 @@ describe Snapshot do
         it "does not test the test bundle/suite/cases specified in skip_testing when the input is an array", requires_xcode: true do
           configure(options.merge(skip_testing: %w(TestBundleA/TestSuiteB TestBundleC)))
 
-          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
           expect(command.join('')).to include("-skip-testing:TestBundleA/TestSuiteB")
           expect(command.join('')).to include("-skip-testing:TestBundleC")
         end
@@ -370,7 +371,7 @@ describe Snapshot do
         it "does not test the test bundle/suite/cases specified in skip_testing when the input is a string", requires_xcode: true do
           configure(options.merge(skip_testing: 'TestBundleA/TestSuiteB'))
 
-          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
           expect(command.join('')).to include("-skip-testing:TestBundleA/TestSuiteB")
           expect(command.join('')).not_to(include("-skip-testing:TestBundleC"))
         end
@@ -380,14 +381,14 @@ describe Snapshot do
         it "does not include xcpretty in the pipe command when true", requires_xcode: true do
           configure(options.merge(disable_xcpretty: true))
 
-          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
           expect(command.join('')).to_not(include("| xcpretty "))
         end
 
         it "includes xcpretty in the pipe command when false", requires_xcode: true do
           configure(options.merge(disable_xcpretty: false))
 
-          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
           expect(command.join('')).to include("| xcpretty ")
         end
       end
@@ -396,14 +397,14 @@ describe Snapshot do
         it "includes /dev/null in the pipe command when true", requires_xcode: true do
           configure(options.merge(suppress_xcode_output: true))
 
-          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
           expect(command.join('')).to include("> /dev/null")
         end
 
         it "does not include /dev/null in the pipe command when false", requires_xcode: true do
           configure(options.merge(suppress_xcode_output: false))
 
-          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 6"], language: "en", locale: nil)
+          command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
           expect(command.join('')).to_not(include("> /dev/null"))
         end
       end
@@ -445,21 +446,21 @@ describe Snapshot do
       let(:simulator_launcher) do
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
         launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: Snapshot.config)
-        launcher_config.devices = ["iPhone 6"]
+        launcher_config.devices = ["iPhone 8"]
         return simulator_launcher = Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config)
       end
 
       it 'uses correct name and language', requires_xcode: true do
         log_path = simulator_launcher.xcodebuild_log_path(language: "pt", locale: nil)
         expect(log_path).to eq(
-          File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 6-pt.log").to_s
+          File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 8-pt.log").to_s
         )
       end
 
       it 'uses includes locale if specified', requires_xcode: true do
         log_path = simulator_launcher.xcodebuild_log_path(language: "pt", locale: "pt_BR")
         expect(log_path).to eq(
-          File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 6-pt-pt_BR.log").to_s
+          File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 8-pt-pt_BR.log").to_s
         )
       end
 
@@ -477,7 +478,7 @@ describe Snapshot do
       let(:simulator_launcher) do
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
         launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: Snapshot.config)
-        launcher_config.devices = ["iPhone 6"]
+        launcher_config.devices = ["iPhone 8"]
         return simulator_launcher = Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config)
       end
 
