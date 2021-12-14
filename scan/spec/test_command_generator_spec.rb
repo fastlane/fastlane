@@ -155,6 +155,40 @@ describe Scan do
                                    ])
     end
 
+    describe "supports number of retries" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+      end
+
+      it "with 1 or more retries", requires_xcodebuild: true do
+        log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+        options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", number_of_retries: 1 }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        # Result bundle path is always used but put in tmp dir if not explicitly specified
+        result_bundle_path = Dir.mktmpdir
+        expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
+
+        result = @test_command_generator.generate
+
+        expect(result).to start_with([
+                                       "set -o pipefail &&",
+                                       "env NSUnbufferedIO=YES xcodebuild",
+                                       "-scheme app",
+                                       "-project ./scan/examples/standard/app.xcodeproj",
+                                       "-sdk '9.0'",
+                                       "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                       "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                       "-resultBundlePath '#{result_bundle_path}.xcresult'",
+                                       "-retry-tests-on-failure",
+                                       "-test-iterations 1",
+                                       :build,
+                                       :test
+                                     ])
+      end
+    end
+
     it "supports custom xcpretty formatter as a gem name", requires_xcodebuild: true do
       options = { formatter: "custom-formatter", project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
