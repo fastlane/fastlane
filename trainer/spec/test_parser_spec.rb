@@ -105,7 +105,10 @@ describe Trainer do
                                     }
                                   ],
                                   number_of_tests: 1,
-                                  number_of_failures: 0
+                                  number_of_failures: 0,
+                                  number_of_tests_excluding_retries: 1,
+                                  number_of_failures_excluding_retries: 0,
+                                  number_of_retries: 0
                                 },
                                 {
                                   project_path: "Test.xcodeproj",
@@ -181,7 +184,10 @@ describe Trainer do
                                     }
                                   ],
                                   number_of_tests: 6,
-                                  number_of_failures: 2
+                                  number_of_failures: 2,
+                                  number_of_tests_excluding_retries: 6,
+                                  number_of_failures_excluding_retries: 2,
+                                  number_of_retries: 0
                                 }
                               ])
       end
