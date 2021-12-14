@@ -73,12 +73,9 @@ module FastlaneCore
     end
 
     def self.fetch_info_plist_with_unzip(path)
-      list, error, = Open3.capture3("unzip", "-Z", "-1", path)
+      entry, error, = Open3.capture3("unzip", "-Z", "-1", path, "*.app/Info.plist")
       UI.command_output(error) unless error.empty?
-      return nil if list.empty?
-      entry = list.chomp.split("\n").find do |e|
-        File.fnmatch("**/Payload/*.app/Info.plist", e, File::FNM_PATHNAME)
-      end
+      return nil if entry.empty?
       data, error, = Open3.capture3("unzip", "-p", path, entry)
       UI.command_output(error) unless error.empty?
       return nil if data.empty?
