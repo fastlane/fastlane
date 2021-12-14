@@ -43,6 +43,11 @@ module Trainer
                                      env_name: "TRAINER_XCPRETTY_NAMING",
                                      description: "Produces class name and test name identical to xcpretty naming in junit file",
                                      is_string: false,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :silent,
+                                     env_name: "TRAINER_SILENT",
+                                     description: "Silences all output",
+                                     is_string: false,
                                      default_value: false)
       ]
     end

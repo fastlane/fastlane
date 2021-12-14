@@ -135,27 +135,68 @@ module Scan
       return retryable_tests.uniq
     end
 
+    def trainer_test_results
+      require "trainer"
+
+      results = {
+        number_of_tests: 0,
+        number_of_failures: 0,
+        number_of_retries: 0
+      }
+
+      result_bundle_path = Scan.cache[:result_bundle_path]
+      output_path = Scan.config[:output_directory] || Dir.mktmpdir
+
+      UI.crash!("A -resultBundlePath is needed to parse the test results. This should not have happened. Please file an issue.") unless result_bundle_path
+
+      params = {
+        path: result_bundle_path,
+        output_path: output_path,
+        silent: true,
+        extension: "xml"
+      }
+
+      resulting_paths = Trainer::TestParser.auto_convert(params)
+      resulting_paths.each do |path, data|
+        results[:number_of_tests] += data[:number_of_tests_excluding_retries]
+        results[:number_of_failures] += data[:number_of_failures_excluding_retries]
+        results[:number_of_retries] += data[:number_of_retries]
+      end
+
+      return results
+    end
+
     def handle_results(tests_exit_status)
-      if Scan.config[:disable_xcpretty]
-        unless tests_exit_status == 0
-          UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
-        end
-        return
-      end
+      results = trainer_test_results
 
-      result = TestResultParser.new.parse_result(test_results)
-      SlackPoster.new.run(result)
+      number_of_retries = results[:number_of_retries]
+      number_of_tests = results[:number_of_tests]
+      number_of_failures = results[:number_of_failures]
 
-      if result[:failures] > 0
-        failures_str = result[:failures].to_s.red
+      SlackPoster.new.run({
+        tests: number_of_tests,
+        failures: number_of_failures
+      })
+
+      if number_of_failures > 0
+        failures_str = number_of_failures.to_s.red
       else
-        failures_str = result[:failures].to_s.green
+        failures_str = number_of_failures.to_s.green
       end
+
+      retries_str = case number_of_retries
+                    when 0
+                      ""
+                    when 1
+                      " (and 1 retry)"
+                    else
+                      " (and #{number_of_retries} retries)"
+                    end
 
       puts(Terminal::Table.new({
         title: "Test Results",
         rows: [
-          ["Number of tests", result[:tests]],
+          ["Number of tests", "#{number_of_tests}#{retries_str}"],
           ["Number of failures", failures_str]
         ]
       }))
@@ -165,7 +206,7 @@ module Scan
       zip_build_products
       copy_xctestrun
 
-      if result[:failures] > 0
+      if number_of_failures > 0
         open_report
 
         UI.test_failure!("Tests have failed")
