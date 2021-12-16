@@ -72,11 +72,9 @@ module Scan
       end
       options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
       options << config[:xcargs] if config[:xcargs]
-      if config[:number_of_retries] >= 1
-        if FastlaneCore::Helper.xcode_at_least?(13)
-          options << "-retry-tests-on-failure"
-          options << "-test-iterations #{config[:number_of_retries]}"
-        end
+      if config[:number_of_retries] >= 1 && FastlaneCore::Helper.xcode_at_least?(13)
+        options << "-retry-tests-on-failure"
+        options << "-test-iterations #{config[:number_of_retries]}"
       end
 
       # detect_values will ensure that these values are present as Arrays if
