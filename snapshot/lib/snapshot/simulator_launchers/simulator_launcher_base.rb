@@ -95,7 +95,7 @@ module Snapshot
 
         UI.message("Launch Simulator #{device_type}")
         if FastlaneCore::Helper.xcode_version.to_i >= 13
-          Helper.backticks("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
+          Helper.backticks("xcrun simctl bootstatus #{device_udid} -b &> /dev/null")
         else
           Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
         end
