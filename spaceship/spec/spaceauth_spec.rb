@@ -37,6 +37,46 @@ describe Spaceship::SpaceauthRunner do
     end
   end
 
+  describe 'check_session option' do
+    before :each do
+      Spaceship::Globals.check_session = true
+    end
+
+    after :each do
+      Spaceship::Globals.check_session = false
+    end
+
+    it 'when using the default user, it should return a message saying the session is logged in with an exit code of 0' do
+      expect do
+        expect do
+          Spaceship::SpaceauthRunner.new.run
+        end.to raise_error(SystemExit) do |error|
+          expect(error.status).to eq(0)
+        end
+      end.to output(/Valid session found \(.*\). Exiting./).to_stdout
+    end
+
+    it 'when passed a known user, it should return a message saying the session is logged in with an exit code of 0' do
+      expect do
+        expect do
+          Spaceship::SpaceauthRunner.new(username: 'spaceship@krausefx.com').run
+        end.to raise_error(SystemExit) do |error|
+          expect(error.status).to eq(0)
+        end
+      end.to output(/Valid session found \(.*\). Exiting./).to_stdout
+    end
+
+    it 'when passed an unknown user, it should return a message saying no valid session found with an exit code of 1' do
+      expect do
+        expect do
+          Spaceship::SpaceauthRunner.new(username: 'unknown-user').run
+        end.to raise_error(SystemExit) do |error|
+          expect(error.status).to eq(1)
+        end
+      end.to output(/No valid session found \(.*\). Exiting./).to_stdout
+    end
+  end
+
   describe '#session_string' do
     it 'should return the session when called after run' do
       expect(Spaceship::SpaceauthRunner.new.run.session_string).to match(%r{.*domain: idmsa.apple.com.*path: \"\/appleauth\/auth\/\".*})
