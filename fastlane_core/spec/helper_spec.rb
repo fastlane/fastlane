@@ -18,7 +18,7 @@ describe FastlaneCore do
     end
 
     describe '#colors_disabled?' do
-      it "should return false if no environemnt variables set" do
+      it "should return false if no environment variables set" do
         stub_const('ENV', {})
         expect(FastlaneCore::Helper.colors_disabled?).to be(false)
       end

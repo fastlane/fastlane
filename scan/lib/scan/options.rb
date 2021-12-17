@@ -60,7 +60,7 @@ module Scan
                                      optional: true,
                                      is_string: true,
                                      env_name: "SCAN_DEVICE",
-                                     description: "The name of the simulator type you want to run tests on (e.g. 'iPhone 6')",
+                                     description: "The name of the simulator type you want to run tests on (e.g. 'iPhone 6' or 'iPhone SE (2nd generation) (14.5)')",
                                      conflicting_options: [:devices],
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'device' and 'devices' options in one run")
@@ -70,7 +70,7 @@ module Scan
                                      is_string: false,
                                      env_name: "SCAN_DEVICES",
                                      type: Array,
-                                     description: "Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])",
+                                     description: "Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air', 'iPhone SE (2nd generation) (14.5)'])",
                                      conflicting_options: [:device],
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'device' and 'devices' options in one run")

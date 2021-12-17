@@ -40,7 +40,7 @@ describe Deliver::SyncScreenshots do
         )
       end
 
-      it 'should enqueue upload jobs for the screenshots that not exsit on App Store Connect' do
+      it 'should enqueue upload jobs for the screenshots that do not exist on App Store Connect' do
         delete_worker = mock_queue_worker([])
         upload_worker = mock_queue_worker([Deliver::SyncScreenshots::UploadScreenshotJob.new(app_screenshot_set_55, screenshots[0].path),
                                            Deliver::SyncScreenshots::UploadScreenshotJob.new(app_screenshot_set_55, screenshots[1].path),
@@ -75,7 +75,7 @@ describe Deliver::SyncScreenshots do
         )
       end
 
-      it 'should enqueue upload jobs for the screenshots that not exsit on App Store Connect' do
+      it 'should enqueue upload jobs for the screenshots that do not exist on App Store Connect' do
         delete_worker = mock_queue_worker([])
         upload_worker = mock_queue_worker([Deliver::SyncScreenshots::UploadScreenshotJob.new(app_screenshot_set_55, screenshots[1].path),
                                            Deliver::SyncScreenshots::UploadScreenshotJob.new(app_screenshot_set_65, screenshots[3].path)])
@@ -106,7 +106,7 @@ describe Deliver::SyncScreenshots do
         )
       end
 
-      it 'should enqueue delete jobs for the screenshots that not exsit on local' do
+      it 'should enqueue delete jobs for the screenshots that do not exist on local' do
         delete_worker = mock_queue_worker([Deliver::SyncScreenshots::DeleteScreenshotJob.new(app_screenshots[0], en_US.locale),
                                            Deliver::SyncScreenshots::DeleteScreenshotJob.new(app_screenshots[1], en_US.locale)])
         upload_worker = mock_queue_worker([])
