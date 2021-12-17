@@ -27,8 +27,6 @@ module Scan
           print("If you are using zshell or another shell, make sure to edit the correct bash file.")
           print("For more information visit this stackoverflow answer:")
           print("https://stackoverflow.com/a/17031697/445598")
-        when /Testing failed/
-          UI.build_failure!("Error building the application. #{details}")
         when /Executed/, /Failing tests:/
           # this is *really* important:
           # we don't want to raise an exception here
@@ -42,6 +40,8 @@ module Scan
           # Instead, it just prints "Failing tests:"
           # followed by a list of tests that failed.
           return
+        when /Testing failed/
+          UI.build_failure!("Error building the application. #{details}")
         end
         UI.build_failure!("Error building/testing the application. #{details}")
       end

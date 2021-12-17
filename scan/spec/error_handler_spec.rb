@@ -14,6 +14,15 @@ describe Scan do
         end
       end
 
+      describe "when parsing parallel test failure output (variant 2)" do
+        it "does not report a build failure" do
+          output = File.open('./scan/spec/fixtures/parallel_testing_failure_2.log', &:read)
+          expect do
+            Scan::ErrorHandler.handle_build_error(output, log_path)
+          end.to_not(raise_error(FastlaneCore::Interface::FastlaneBuildFailure))
+        end
+      end
+
       describe "when parsing non-parallel test failure output" do
         it "does not report a build failure" do
           output = File.open('./scan/spec/fixtures/non_parallel_testing_failure.log', &:read)

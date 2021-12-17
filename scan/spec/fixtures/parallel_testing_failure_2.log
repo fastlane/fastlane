@@ -1,0 +1,11 @@
+2021-12-16 02:00:34.115 xcodebuild[43007:24524312] [MT] IDETestOperationsObserverDebug: 5803.885 elapsed -- Testing started completed.
+2021-12-16 02:00:34.115 xcodebuild[43007:24524312] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2021-12-16 02:00:34.116 xcodebuild[43007:24524312] [MT] IDETestOperationsObserverDebug: 5803.885 sec, +5803.885 sec -- end
+Testing failed:
+	Foo-UI-Tests:
+		The test runner encountered an error (Failed to prepare device 'Clone 5 of iPad Pro (9.7-inch)' for impending launch. If you believe this error represents a bug, please attach the result bundle at /Users/username/Developer/Foo/output/build/Foo.xcresult. (Underlying Error: Unable to boot the Simulator. launchd failed to respond. (Underlying Error: Failed to start launchd_sim: could not bind to session, launchd_sim may have crashed or quit responding)))
+Failing tests:
+	Foo-UI-Tests:
+		Test1.testSomething()
+		Test2.testSomething()
+** TEST EXECUTE FAILED **
