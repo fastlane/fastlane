@@ -33,7 +33,7 @@ module FastlaneCore
       File.write(File.join(self.package_path, METADATA_FILE_NAME), xml)
       UI.success("Wrote XML data to '#{self.package_path}'") if FastlaneCore::Globals.verbose?
 
-      return self.package_path
+      return { package_path: self.package_path, ipa_path: ipa_path }
     end
 
     def unique_ipa_path(ipa_path)

@@ -170,19 +170,23 @@ module Deliver
       end
 
       if upload_ipa
-        package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
+        package_info = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           ipa_path: options[:ipa],
           package_path: "/tmp",
           platform: options[:platform]
         )
+        package_path = package_info[:package_path]
+        upload_ipa = package_info[:ipa_path]
       elsif upload_pkg
-        package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
+        package_info = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           pkg_path: options[:pkg],
           package_path: "/tmp",
           platform: options[:platform]
         )
+        package_path = package_info[:package_path]
+        upload_pkg = package_info[:pkg_path]
       end
 
       transporter = transporter_for_selected_team

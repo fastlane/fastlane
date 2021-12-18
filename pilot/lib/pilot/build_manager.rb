@@ -26,15 +26,19 @@ module Pilot
 
       platform = fetch_app_platform
       if options[:ipa]
-        package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_app_id,
+        package_info = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_app_id,
                                                                       ipa_path: options[:ipa],
                                                                   package_path: dir,
                                                                       platform: platform)
+        package_path = package_info[:package_path]
+        options[:ipa] = package_info[:ipa_path]
       else
-        package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(app_id: fetch_app_id,
+        package_info = FastlaneCore::PkgUploadPackageBuilder.new.generate(app_id: fetch_app_id,
                                                                         pkg_path: options[:pkg],
                                                                     package_path: dir,
                                                                         platform: platform)
+        package_path = package_info[:package_path]
+        options[:pkg] = package_info[:pkg_path]
       end
 
       transporter = transporter_for_selected_team(options)
