@@ -25,26 +25,18 @@ module Pilot
       dir = Dir.mktmpdir
 
       platform = fetch_app_platform
-      filename_multibyte = 0
-
       if options[:ipa]
-        File.basename(options[:ipa], '.ipa').chars.each do |c|
-          filename_multibyte += 1 if c =~ /[^0-9|A-z_]/
-        end
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_app_id,
                                                                       ipa_path: options[:ipa],
                                                                   package_path: dir,
                                                                       platform: platform)
-        options[:ipa] = Dir.glob("#{package_path}/*.ipa") if filename_multibyte > 0
+        options[:ipa] = Dir.glob("#{package_path}/*.ipa") if option[:ipa].match?(/[^0-9|A-z_]/)
       else
-        File.basename(upload_ipa, '.pkg').chars.each do |c|
-          filename_multibyte += 1 if c =~ /[^0-9|A-z_]/
-        end
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(app_id: fetch_app_id,
                                                                         pkg_path: options[:pkg],
                                                                     package_path: dir,
                                                                         platform: platform)
-        options[:pkg] = Dir.glob("#{package_path}/*.pkg") if filename_multibyte > 0
+        options[:pkg] = Dir.glob("#{package_path}/*.pkg") if option[:pkg].match?(/[^0-9|A-z_]/)
       end
 
       transporter = transporter_for_selected_team(options)
