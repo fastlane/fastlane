@@ -161,6 +161,7 @@ module Deliver
 
       upload_ipa = options[:ipa]
       upload_pkg = options[:pkg]
+      filename_multibyte = 0
 
       # 2020-01-27
       # Only verify platform if if both ipa and pkg exists (for backwards support)
@@ -170,23 +171,27 @@ module Deliver
       end
 
       if upload_ipa
-        package_info = FastlaneCore::IpaUploadPackageBuilder.new.generate(
+        File.basename(upload_ipa, '.ipa').chars.each do |c|
+          filename_multibyte += 1 if c =~ /[^0-9|A-z_]/
+        end
+        package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           ipa_path: options[:ipa],
           package_path: "/tmp",
           platform: options[:platform]
         )
-        package_path = package_info[:package_path]
-        upload_ipa = package_info[:ipa_path]
+        upload_ipa = Dir.glob("#{package_path}/*.ipa") if filename_multibyte > 0
       elsif upload_pkg
-        package_info = FastlaneCore::PkgUploadPackageBuilder.new.generate(
+        File.basename(upload_pkg, '.pkg').chars.each do |c|
+          filename_multibyte += 1 if c =~ /[^0-9|A-z_]/
+        end
+        package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           pkg_path: options[:pkg],
           package_path: "/tmp",
           platform: options[:platform]
         )
-        package_path = package_info[:package_path]
-        upload_pkg = package_info[:pkg_path]
+        upload_ipa = Dir.glob("#{package_path}/*.pkg") if filename_multibyte > 0
       end
 
       transporter = transporter_for_selected_team
