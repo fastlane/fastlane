@@ -30,11 +30,13 @@ module Pilot
                                                                       ipa_path: options[:ipa],
                                                                   package_path: dir,
                                                                       platform: platform)
+        options[:ipa] = Dir.glob("#{package_path}/*.ipa")[0] if File.basename(options[:ipa], '.ipa').match?(/[^0-9|A-z_]/)
       else
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(app_id: fetch_app_id,
                                                                         pkg_path: options[:pkg],
                                                                     package_path: dir,
                                                                         platform: platform)
+        options[:pkg] = Dir.glob("#{package_path}/*.pkg")[0] if File.basename(options[:pkg], 'pkg').match?(/[^0-9|A-z_]/)
       end
 
       transporter = transporter_for_selected_team(options)
