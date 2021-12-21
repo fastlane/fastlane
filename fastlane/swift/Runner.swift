@@ -22,7 +22,15 @@ func desc(_: String) {
     // no-op, this is handled in fastlane/lane_list.rb
 }
 
-class AtomicDictionary<Key: Hashable, Value> {
+protocol AtomicDictionaryProtocol: class {
+    subscript(_ key: String) -> Bool? { get set }
+    @discardableResult
+    func removeValue(forKey key: String) -> Bool?
+}
+
+@available(macOS, introduced: 10.12)
+class UnfairLockAtomicDictionary<Key: Hashable, Value> {
+
     private var unfairLock: UnsafeMutablePointer<os_unfair_lock>
     private var storage: [Key: Value]
 
@@ -65,6 +73,65 @@ class AtomicDictionary<Key: Hashable, Value> {
     }
 }
 
+@available(macOS, introduced: 10.12)
+class UnfairLockAtomicDictionaryStringBool: UnfairLockAtomicDictionary<String, Bool> {
+}
+
+@available(macOS, introduced: 10.12)
+extension UnfairLockAtomicDictionaryStringBool: AtomicDictionaryProtocol {
+}
+
+@available(macOS, deprecated: 10.12)
+class OSSpinLockAtomicDictionary<Key: Hashable, Value> {
+
+    private var spinLock = OS_SPINLOCK_INIT
+    private var storage: [Key: Value]
+
+    init() {
+        storage = [:]
+    }
+
+    deinit {
+    }
+
+    subscript(_ key: Key) -> Value? {
+        get {
+            get(key)
+        }
+        set(newValue) {
+            set(key, value: newValue)
+        }
+    }
+
+    private func get(_ key: Key) -> Value? {
+        OSSpinLockLock(&spinLock)
+        defer { OSSpinLockUnlock(&spinLock) }
+        return storage[key]
+    }
+
+    private func set(_ key: Key, value: Value?) {
+        OSSpinLockLock(&spinLock)
+        defer { OSSpinLockUnlock(&spinLock) }
+        storage[key] = value
+    }
+
+    @discardableResult
+    func removeValue(forKey key: Key) -> Value? {
+        OSSpinLockLock(&spinLock)
+        defer { OSSpinLockUnlock(&spinLock) }
+        return storage.removeValue(forKey: key)
+    }
+}
+
+@available(macOS, deprecated: 10.12)
+class OSSpinLockAtomicDictionaryStringBool: OSSpinLockAtomicDictionary<String, Bool> {
+}
+
+@available(macOS, deprecated: 10.12)
+extension OSSpinLockAtomicDictionaryStringBool: AtomicDictionaryProtocol {
+
+}
+
 class Runner {
     private var thread: Thread!
     private var socketClient: SocketClient!
@@ -72,7 +139,14 @@ class Runner {
     private var returnValue: String? // lol, so safe
     private var currentlyExecutingCommand: RubyCommandable?
     private var shouldLeaveDispatchGroupDuringDisconnect = false
-    private var executeNext: AtomicDictionary<String, Bool> = AtomicDictionary()
+    private var executeNext: AtomicDictionaryProtocol = {
+        if #available(macOS 10.12, *) {
+            return UnfairLockAtomicDictionaryStringBool()
+        }
+        else {
+            return OSSpinLockAtomicDictionaryStringBool()
+        }
+    }()
 
     func executeCommand(_ command: RubyCommandable) -> String {
         dispatchGroup.enter()
