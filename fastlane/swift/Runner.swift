@@ -10,126 +10,12 @@
 
 import Foundation
 
-let logger: Logger = {
-    Logger()
-}()
+let logger: Logger = .init()
 
-let runner: Runner = {
-    Runner()
-}()
+let runner: Runner = .init()
 
 func desc(_: String) {
     // no-op, this is handled in fastlane/lane_list.rb
-}
-
-protocol AtomicDictionaryProtocol: class {
-    subscript(_ key: String) -> Bool? { get set }
-    @discardableResult
-    func removeValue(forKey key: String) -> Bool?
-}
-
-@available(macOS, introduced: 10.12)
-class UnfairLockAtomicDictionary<Key: Hashable, Value> {
-
-    private var unfairLock: UnsafeMutablePointer<os_unfair_lock>
-    private var storage: [Key: Value]
-
-    init() {
-        unfairLock = UnsafeMutablePointer<os_unfair_lock>.allocate(capacity: 1)
-        unfairLock.initialize(to: os_unfair_lock())
-        storage = [:]
-    }
-
-    deinit {
-        unfairLock.deallocate()
-    }
-
-    subscript(_ key: Key) -> Value? {
-        get {
-            get(key)
-        }
-        set(newValue) {
-            set(key, value: newValue)
-        }
-    }
-    
-    private func get(_ key: Key) -> Value? {
-        os_unfair_lock_lock(unfairLock)
-        defer { os_unfair_lock_unlock(unfairLock) }
-        return storage[key]
-    }
-
-    private func set(_ key: Key, value: Value?) {
-        os_unfair_lock_lock(unfairLock)
-        defer { os_unfair_lock_unlock(unfairLock) }
-        storage[key] = value
-    }
-
-    @discardableResult
-    func removeValue(forKey key: Key) -> Value? {
-        os_unfair_lock_lock(unfairLock)
-        defer { os_unfair_lock_unlock(unfairLock) }
-        return storage.removeValue(forKey: key)
-    }
-}
-
-@available(macOS, introduced: 10.12)
-class UnfairLockAtomicDictionaryStringBool: UnfairLockAtomicDictionary<String, Bool> {
-}
-
-@available(macOS, introduced: 10.12)
-extension UnfairLockAtomicDictionaryStringBool: AtomicDictionaryProtocol {
-}
-
-@available(macOS, deprecated: 10.12)
-class OSSpinLockAtomicDictionary<Key: Hashable, Value> {
-
-    private var spinLock = OS_SPINLOCK_INIT
-    private var storage: [Key: Value]
-
-    init() {
-        storage = [:]
-    }
-
-    deinit {
-    }
-
-    subscript(_ key: Key) -> Value? {
-        get {
-            get(key)
-        }
-        set(newValue) {
-            set(key, value: newValue)
-        }
-    }
-
-    private func get(_ key: Key) -> Value? {
-        OSSpinLockLock(&spinLock)
-        defer { OSSpinLockUnlock(&spinLock) }
-        return storage[key]
-    }
-
-    private func set(_ key: Key, value: Value?) {
-        OSSpinLockLock(&spinLock)
-        defer { OSSpinLockUnlock(&spinLock) }
-        storage[key] = value
-    }
-
-    @discardableResult
-    func removeValue(forKey key: Key) -> Value? {
-        OSSpinLockLock(&spinLock)
-        defer { OSSpinLockUnlock(&spinLock) }
-        return storage.removeValue(forKey: key)
-    }
-}
-
-@available(macOS, deprecated: 10.12)
-class OSSpinLockAtomicDictionaryStringBool: OSSpinLockAtomicDictionary<String, Bool> {
-}
-
-@available(macOS, deprecated: 10.12)
-extension OSSpinLockAtomicDictionaryStringBool: AtomicDictionaryProtocol {
-
 }
 
 class Runner {
@@ -139,12 +25,11 @@ class Runner {
     private var returnValue: String? // lol, so safe
     private var currentlyExecutingCommand: RubyCommandable?
     private var shouldLeaveDispatchGroupDuringDisconnect = false
-    private var executeNext: AtomicDictionaryProtocol = {
+    private var executeNext: AtomicDictionary<String, Bool> = {
         if #available(macOS 10.12, *) {
-            return UnfairLockAtomicDictionaryStringBool()
-        }
-        else {
-            return OSSpinLockAtomicDictionaryStringBool()
+            return UnfairAtomicDictionary<String, Bool>()
+        } else {
+            return OSSPinAtomicDictionary<String, Bool>()
         }
     }()
 
@@ -188,7 +73,7 @@ class Runner {
 
         let runLoop = RunLoop.current
         let timeoutDate = Date(timeInterval: TimeInterval(timeout), since: Date())
-        var fulfilled: Bool = false
+        var fulfilled = false
         let _expression = memoizedClosure(expression)
         repeat {
             do {
