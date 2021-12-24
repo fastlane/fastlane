@@ -29,45 +29,27 @@ extension DictionaryProtocol {
     }
 }
 
-protocol SyncProtocol: DictionaryProtocol {
-    func lock()
-    func unlock()
-    func sync<T>(_ work: () throws -> T) rethrows -> T
-}
-
-extension SyncProtocol {
-    func sync<T>(_ work: () throws -> T) rethrows -> T {
-        lock()
-        defer { unlock() }
-        return try work()
-    }
-}
-
-protocol LockProtocol: SyncProtocol {
+protocol LockProtocol: DictionaryProtocol {
     associatedtype Lock
 
     var _lock: Lock { get set }
 }
 
-@available(macOS, introduced: 10.12)
-extension LockProtocol where Lock == UnsafeMutablePointer<os_unfair_lock> {
+extension LockProtocol {
     func lock() {
-        os_unfair_lock_lock(_lock)
+        if #available(macOS 10.12, *), let _lock = _lock as? UnsafeMutablePointer<os_unfair_lock> {
+            os_unfair_lock_lock(_lock)
+        } else if var _lock = _lock as? Int32 {
+            OSSpinLockLock(&_lock)
+        }
     }
 
     func unlock() {
-        os_unfair_lock_unlock(_lock)
-    }
-}
-
-@available(macOS, deprecated: 10.12)
-extension LockProtocol where Lock == OSSpinLock {
-    func lock() {
-        OSSpinLockLock(&_lock)
-    }
-
-    func unlock() {
-        OSSpinLockUnlock(&_lock)
+        if #available(macOS 10.12, *), let _lock = _lock as? UnsafeMutablePointer<os_unfair_lock> {
+            os_unfair_lock_unlock(_lock)
+        } else if var _lock = _lock as? Int32 {
+            OSSpinLockUnlock(&_lock)
+        }
     }
 }
 
@@ -108,38 +90,29 @@ class AtomicDictionary<Key: Hashable, Value>: LockProtocol {
 
     @discardableResult
     func removeValue(forKey key: Key) -> Value? {
-        sync {
-            storage.removeValue(forKey: key)
-        }
+        lock()
+        defer { unlock() }
+        return storage.removeValue(forKey: key)
     }
 
     func get(_ key: Key) -> Value? {
-        sync {
-            storage[key]
-        }
+        lock()
+        defer { unlock() }
+        return storage[key]
     }
 
     func set(_ key: Key, value: Value?) {
-        sync {
-            storage[key] = value
-        }
+        lock()
+        defer { unlock() }
+        storage[key] = value
     }
-
-    func lock() {}
-
-    func unlock() {}
 }
 
 @available(macOS, deprecated: 10.12)
-class OSSPinAtomicDictionary<Key: Hashable, Value>: AtomicDictionary<Key, Value> {
-    override func lock() {}
-    override func unlock() {}
-}
+class OSSPinAtomicDictionary<Key: Hashable, Value>: AtomicDictionary<Key, Value> {}
 
 @available(macOS, introduced: 10.12)
 class UnfairAtomicDictionary<Key: Hashable, Value>: AtomicDictionary<Key, Value> {
-    override func lock() {}
-    override func unlock() {}
 
     deinit {
         (_lock as? UnsafeMutablePointer<os_unfair_lock>)?.deallocate()
