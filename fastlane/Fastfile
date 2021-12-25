@@ -194,6 +194,11 @@ lane :generate_swift_api do |options|
   sh("rm -r ../.build")
   sh("rm ../FastlaneRunner")
   generated_files
+  Dir.chdir("spec/fixtures/xcodeproj_swift/test_upgrade_from_v2.198") do
+    sh("bundle exec fastlane custom --enable_runner_upgrades --verbose")
+    UI.success("Done testing fastlane.swift upgrade from fastlane version 2.198")
+    sh("rm fastlane/FastlaneRunner")
+  end
 end
 
 desc "Generate the FastlaneSwiftRunner project manifest"

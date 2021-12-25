@@ -6,7 +6,7 @@ module Fastlane
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
-    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false, swift_server_port: nil)
+    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false, enable_runner_upgrades: false, swift_server_port: nil)
       UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
 
@@ -23,7 +23,7 @@ module Fastlane
         elsif Helper.ci?
           UI.verbose("Running in CI, not attempting to update the FastlaneRunner project".yellow)
         else
-          display_upgraded_message = self.ensure_runner_up_to_date_fastlane!
+          display_upgraded_message = self.ensure_runner_up_to_date_fastlane(enable_runner_upgrades: enable_runner_upgrades)
         end
 
         self.ensure_runner_built!
@@ -250,7 +250,7 @@ module Fastlane
     end
 
     # do we have the latest FastlaneSwiftRunner code from the current version of fastlane?
-    def self.ensure_runner_up_to_date_fastlane!
+    def self.ensure_runner_up_to_date_fastlane(enable_runner_upgrades: false)
       upgraded = false
       upgrader = SwiftRunnerUpgrader.new
 
@@ -259,8 +259,12 @@ module Fastlane
         UI.message("It looks like your `FastlaneSwiftRunner` project is not up-to-date".green)
         UI.message("If you don't update it, fastlane could fail".green)
         UI.message("We can try to automatically update it for you, usually this works 🎈 🐐".green)
-        user_wants_upgrade = UI.confirm("Should we try to upgrade just your `FastlaneSwiftRunner` project?")
-
+        user_wants_upgrade = enable_runner_upgrades
+        if user_wants_upgrade
+          UI.verbose("enable_runner_upgrades is true, attempting to update the FastlaneRunner project".yellow)
+        else
+          user_wants_upgrade = UI.confirm("Should we try to upgrade just your `FastlaneSwiftRunner` project?")
+        end
         UI.important("Ok, if things break, you can try to run this lane again and you'll be prompted to upgrade another time") unless user_wants_upgrade
 
         if user_wants_upgrade
