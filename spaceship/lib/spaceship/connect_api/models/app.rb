@@ -415,6 +415,49 @@ module Spaceship
       end
 
       #
+      # Review Submissions
+      #
+
+      def get_ready_review_submission(client: nil, platform: nil, includes: nil)
+        client ||= Spaceship::ConnectAPI
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          state: [
+            Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::READY_FOR_REVIEW
+          ].join(","),
+          platform: platform
+        }
+
+        return get_review_submissions(client: client, filter: filter, includes: includes).first
+      end
+
+      def get_in_progress_review_submission(client: nil, platform: nil, includes: nil)
+        client ||= Spaceship::ConnectAPI
+        platform ||= Spaceship::ConnectAPI::Platform::IOS
+        filter = {
+          state: [
+            Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::WAITING_FOR_REVIEW
+          ].join(","),
+          platform: platform
+        }
+
+        return get_review_submissions(client: client, filter: filter, includes: includes).first
+      end
+
+      # appStoreVersionForReview,items
+      def get_review_submissions(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_review_submissions(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.flat_map(&:to_models)
+      end
+
+      def create_review_submission(client: nil, platform: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.post_review_submission(app_id: id, platform: platform)
+        return resp.to_models.first
+      end
+
+      #
       # Users
       #
 
