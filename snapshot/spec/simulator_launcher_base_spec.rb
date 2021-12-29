@@ -9,7 +9,7 @@ describe Snapshot do
 
         if Fastlane::Helper.xcode_version.to_i >= 13
           expect(Fastlane::Helper).to receive(:backticks)
-            .with("xcrun simctl bootstatus #{device_udid} -b &> /dev/null")
+            .with("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
             .and_return("").exactly(1).times
         else
           expect(Fastlane::Helper).to receive(:backticks)
@@ -33,7 +33,7 @@ describe Snapshot do
 
         if Fastlane::Helper.xcode_version.to_i >= 13
           expect(Fastlane::Helper).to receive(:backticks)
-            .with("xcrun simctl bootstatus #{device_udid} -b &> /dev/null")
+            .with("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
             .and_return("").exactly(1).times
         else
           expect(Fastlane::Helper).to receive(:backticks)
