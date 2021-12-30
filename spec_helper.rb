@@ -18,6 +18,11 @@ unless ENV["DEBUG"]
 end
 
 if FastlaneCore::Helper.mac?
+  system("defaults write com.apple.dt.Xcode IDECustomDerivedDataLocation .DerivedData.noindex")
+  system("defaults write com.apple.dt.Xcode IDEBuildLocationStyle Custom")
+  system("defaults write com.apple.dt.Xcode IDECustomBuildLocationType RelativeToDerivedData")
+  system("defaults write com.apple.dt.Xcode IDECustomBuildProductsPath Build/Products")
+  system("defaults write com.apple.dt.Xcode IDECustomBuildIntermediatesPath Build/Intermediates")
   xcode_path = FastlaneCore::Helper.xcode_path
   unless xcode_path.include?("Contents/Developer")
     UI.error("Seems like you didn't set the developer tools path correctly")
