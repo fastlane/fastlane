@@ -102,9 +102,10 @@ describe Scan do
 Failing tests:
   FastlaneAppTests:
           FastlaneAppTests.testCoinToss()
+          -[FastlaneAppTestsOC testCoinTossOC]
           ERROR_OUTPUT
 
-        expect(Fastlane::UI).to receive(:important).with("Retrying tests: FastlaneAppTests/FastlaneAppTests/testCoinToss").once
+        expect(Fastlane::UI).to receive(:important).with("Retrying tests: FastlaneAppTests/FastlaneAppTests/testCoinToss, FastlaneAppTests/FastlaneAppTestsOC/testCoinTossOC").once
         expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
         expect(@scan).to receive(:execute)
 
@@ -116,9 +117,10 @@ Failing tests:
 Failing tests:
   Fastlane-App-Tests:
           FastlaneAppTests.testCoinToss()
+          -[FastlaneAppTestsOC testCoinTossOC]
           ERROR_OUTPUT
 
-        expect(Fastlane::UI).to receive(:important).with("Retrying tests: Fastlane-App-Tests/FastlaneAppTests/testCoinToss").once
+        expect(Fastlane::UI).to receive(:important).with("Retrying tests: Fastlane-App-Tests/FastlaneAppTests/testCoinToss, Fastlane-App-Tests/FastlaneAppTestsOC/testCoinTossOC").once
         expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
         expect(@scan).to receive(:execute)
 
@@ -130,6 +132,7 @@ Failing tests:
 Failing tests:
 FastlaneAppTests:
 FastlaneAppTests.testCoinToss()
+-[FastlaneAppTestsOC testCoinTossOC]
           ERROR_OUTPUT
 
         expect do

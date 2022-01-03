@@ -126,7 +126,7 @@ module Scan
 
         test_cases = suite.split(":\n").fetch(1, []).split("\n").each
                           .select { |line| line.match?(/^\s+/) }
-                          .map { |line| line.strip.gsub(".", "/").gsub("()", "") }
+                          .map { |line| line.strip.gsub(/[\s\.]/, "/").gsub(/[\-\[\]\(\)]/, "") }
                           .map { |line| suite_name + "/" + line }
 
         retryable_tests += test_cases
