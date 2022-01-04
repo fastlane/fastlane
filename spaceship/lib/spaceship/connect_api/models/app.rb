@@ -1,6 +1,7 @@
 require_relative '../model'
 require_relative './build'
 
+# rubocop:disable Metrics/ClassLength
 module Spaceship
   class ConnectAPI
     class App
@@ -477,3 +478,4 @@ module Spaceship
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
