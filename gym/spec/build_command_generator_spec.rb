@@ -328,7 +328,7 @@ describe Gym do
                                "-project ./gym/examples/standard/Example.xcodeproj",
                                "-destination 'generic/platform=iOS'",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
-                               "OTHER_SWIFT_FLAGS=\"-Xfrontend -debug-time-function-bodies\"",
+                               "OTHER_SWIFT_FLAGS=\"\\$(value) -Xfrontend -debug-time-function-bodies\"",
                                :archive,
                                "| tee #{@log_path.shellescape}",
                                "| xcpretty"

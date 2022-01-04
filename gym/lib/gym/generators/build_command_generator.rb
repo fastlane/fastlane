@@ -43,7 +43,7 @@ module Gym
           options << "-scmProvider system"
         end
         options << config[:xcargs] if config[:xcargs]
-        options << "OTHER_SWIFT_FLAGS=\"-Xfrontend -debug-time-function-bodies\"" if config[:analyze_build_time]
+        options << "OTHER_SWIFT_FLAGS=\"\\\$(value) -Xfrontend -debug-time-function-bodies\"" if config[:analyze_build_time]
 
         options
       end
