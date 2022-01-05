@@ -73,7 +73,7 @@ module FastlaneCore
     end
 
     def self.fetch_info_plist_with_unzip(path)
-      entry, error, = Open3.capture3("unzip", "-Z", "-1", path, "*/Payload/*.app/Info.plist")
+      entry, error, = Open3.capture3("unzip", "-Z", "-1", path, "*Payload/*.app/Info.plist")
 
       # unzip can return multiple Info.plist files if is an embedded app bundle (a WatchKit app)
       #   - ContainsWatchApp/Payload/Sample.app/Watch/Sample WatchKit App.app/Info.plist
