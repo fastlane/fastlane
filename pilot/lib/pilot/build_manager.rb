@@ -30,17 +30,15 @@ module Pilot
                                                                       ipa_path: options[:ipa],
                                                                   package_path: dir,
                                                                       platform: platform)
-        upload_ipa = Dir.glob("#{package_path}/*.ipa")[0] || options[:ipa]
       else
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(app_id: fetch_app_id,
                                                                         pkg_path: options[:pkg],
                                                                     package_path: dir,
                                                                         platform: platform)
-        upload_pkg = Dir.glob("#{package_path}/*.pkg")[0] || options[:pkg]
       end
 
       transporter = transporter_for_selected_team(options)
-      result = transporter.upload(package_path: package_path, asset_path: upload_ipa || upload_pkg)
+      result = transporter.upload(package_path: package_path, asset_path: options[:ipa] || options[:pkg])
 
       unless result
         transporter_errors = transporter.displayable_errors

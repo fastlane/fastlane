@@ -2,6 +2,7 @@ require 'shellwords'
 require 'tmpdir'
 require 'fileutils'
 require 'credentials_manager/account_manager'
+require 'securerandom'
 
 require_relative 'features'
 require_relative 'helper'
@@ -501,7 +502,9 @@ module FastlaneCore
 
       actual_dir = if can_use_asset_path && !force_itmsp
                      # The asset gets deleted upon completion so copying to a temp directory
-                     tmp_asset_path = File.join(Dir.tmpdir, File.basename(asset_path))
+                     # (with randomized filename, for multibyte-mixed filename upload fails)
+                     new_file_name = "#{SecureRandom.uuid}#{File.extname(asset_path)}"
+                     tmp_asset_path = File.join(Dir.tmpdir, new_file_name)
                      FileUtils.cp(asset_path, tmp_asset_path)
                      tmp_asset_path
                    elsif package_path
