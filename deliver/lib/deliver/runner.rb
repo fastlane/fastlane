@@ -176,7 +176,6 @@ module Deliver
           package_path: "/tmp",
           platform: options[:platform]
         )
-        upload_ipa = Dir.glob("#{package_path}/*.ipa")[0] || options[:ipa]
       elsif upload_pkg
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
@@ -184,7 +183,6 @@ module Deliver
           package_path: "/tmp",
           platform: options[:platform]
         )
-        upload_pkg = Dir.glob("#{package_path}/*.pkg")[0] || options[:pkg]
       end
 
       transporter = transporter_for_selected_team
