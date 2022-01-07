@@ -410,7 +410,7 @@ module Pilot
       # This is where we could add a check to see if encryption is required and has been updated
       uploaded_build = set_export_compliance_if_needed(uploaded_build, options)
 
-      if options[:groups] || options[:distribute_external]
+      if options[:submit_beta_review]
         if uploaded_build.ready_for_beta_submission?
           uploaded_build.post_beta_app_review_submission
         else

@@ -7619,6 +7619,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
     let waitProcessingTimeoutDurationArg = waitProcessingTimeoutDuration.asRubyArgument(name: "wait_processing_timeout_duration", type: nil)
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
+    let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -7656,7 +7657,8 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                                           waitProcessingIntervalArg,
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
-                                          rejectBuildWaitingForReviewArg]
+                                          rejectBuildWaitingForReviewArg,
+                                          submitBetaReviewArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -11325,6 +11327,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
     let waitProcessingTimeoutDurationArg = waitProcessingTimeoutDuration.asRubyArgument(name: "wait_processing_timeout_duration", type: nil)
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
+    let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -11362,7 +11365,8 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                                           waitProcessingIntervalArg,
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
-                                          rejectBuildWaitingForReviewArg]
+                                          rejectBuildWaitingForReviewArg,
+                                          submitBetaReviewArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -12669,6 +12673,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
     let waitProcessingTimeoutDurationArg = waitProcessingTimeoutDuration.asRubyArgument(name: "wait_processing_timeout_duration", type: nil)
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
+    let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -12706,7 +12711,8 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                           waitProcessingIntervalArg,
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
-                                          rejectBuildWaitingForReviewArg]
+                                          rejectBuildWaitingForReviewArg,
+                                          submitBetaReviewArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
