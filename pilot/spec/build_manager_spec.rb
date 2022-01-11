@@ -249,6 +249,7 @@ describe "Build Manager" do
           beta_app_feedback_email: "josh+oldfeedback@rokkincat.com",
           beta_app_description: "old description for all the things",
           uses_non_exempt_encryption: false,
+          submit_beta_review: true,
           changelog: "log of changing"
         }
       end
