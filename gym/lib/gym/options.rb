@@ -1,4 +1,5 @@
 require 'fastlane_core/configuration/config_item'
+require 'fastlane/helper/xcodebuild_formatter_helper'
 require 'credentials_manager/appfile_config'
 require_relative 'module'
 
@@ -241,6 +242,7 @@ module Gym
         # xcpretty
         FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
                                      env_name: "DISABLE_XCPRETTY",
+                                     deprecated: "Use `xcodebuild_formatter: ''` instead",
                                      description: "Disable xcpretty formatting of build output",
                                      optional: true,
                                      type: Boolean),
@@ -268,17 +270,17 @@ module Gym
                                      env_name: "XCPRETTY_REPORT_JSON",
                                      description: "Have xcpretty create a JSON compilation database at the provided path",
                                      optional: true),
-        FastlaneCore::ConfigItem.new(key: :analyze_build_time,
-                                     env_name: "GYM_ANALYZE_BUILD_TIME",
-                                     description: "Analyze the project build time and store the output in 'culprits.txt' file",
-                                     optional: true,
-                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :xcpretty_utf,
                                      env_name: "XCPRETTY_UTF",
                                      description: "Have xcpretty use unicode encoding when reporting builds",
                                      optional: true,
                                      type: Boolean),
 
+        FastlaneCore::ConfigItem.new(key: :analyze_build_time,
+                                     env_name: "GYM_ANALYZE_BUILD_TIME",
+                                     description: "Analyze the project build time and store the output in 'culprits.txt' file",
+                                     optional: true,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :skip_profile_detection,
                                      env_name: "GYM_SKIP_PROFILE_DETECTION",
                                      description: "Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used",

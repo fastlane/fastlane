@@ -73,12 +73,48 @@ module Gym
         pipe = []
         pipe << "| tee #{xcodebuild_log_path.shellescape}"
 
-        unless Gym.config[:disable_xcpretty]
+        formatter = Gym.config[:xcodebuild_formatter].chomp
+        options = legacy_xcpretty_options
+
+        if Gym.config[:disable_xcpretty] || formatter == ''
+          UI.verbose("Not using an xcodebuild formatter")
+        elsif !options.empty?
+          UI.important("Detected legacy xcpretty being used so formatting wth xcpretty")
+          UI.important("Option(s) used: #{options.join(', ')}")
           pipe += pipe_xcpretty
+        elsif formatter == 'xcpretty'
+          pipe += pipe_xcpretty
+        elsif formatter == 'xcbeautify'
+          pipe += pipe_xcbeautify
+        else
+          pipe << "| #{formatter}"
         end
 
         pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]
         pipe
+      end
+
+      def pipe_xcbeautify
+        pipe = ['| xcbeautify']
+
+        if FastlaneCore::Helper.colors_disabled?
+          pipe << '--disable-colored-output'
+        end
+
+        return pipe
+      end
+
+      def legacy_xcpretty_options
+        options = []
+
+        options << "xcpretty_test_format" if Gym.config[:xcpretty_test_format]
+        options << "xcpretty_formatter" if Gym.config[:xcpretty_formatter]
+        options << "xcpretty_report_junit" if Gym.config[:xcpretty_report_junit]
+        options << "xcpretty_report_html" if Gym.config[:xcpretty_report_html]
+        options << "xcpretty_report_json" if Gym.config[:xcpretty_report_json]
+        options << "xcpretty_utf" if Gym.config[:xcpretty_utf]
+
+        return options
       end
 
       def pipe_xcpretty
