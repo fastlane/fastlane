@@ -72,29 +72,39 @@ module Gym
       def pipe
         pipe = []
         pipe << "| tee #{xcodebuild_log_path.shellescape}"
+
         unless Gym.config[:disable_xcpretty]
-          formatter = Gym.config[:xcpretty_formatter]
-          pipe << "| xcpretty"
-          pipe << " --test" if Gym.config[:xcpretty_test_format]
-          pipe << " --no-color" if Helper.colors_disabled?
-          pipe << " --formatter " if formatter
-          pipe << formatter if formatter
-          pipe << "--utf" if Gym.config[:xcpretty_utf]
-          report_output_junit = Gym.config[:xcpretty_report_junit]
-          report_output_html = Gym.config[:xcpretty_report_html]
-          report_output_json = Gym.config[:xcpretty_report_json]
-          if report_output_junit
-            pipe << " --report junit --output "
-            pipe << report_output_junit.shellescape
-          elsif report_output_html
-            pipe << " --report html --output "
-            pipe << report_output_html.shellescape
-          elsif report_output_json
-            pipe << " --report json-compilation-database --output "
-            pipe << report_output_json.shellescape
-          end
+          pipe += pipe_xcpretty
         end
+
         pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]
+        pipe
+      end
+
+      def pipe_xcpretty
+        pipe = []
+
+        formatter = Gym.config[:xcpretty_formatter]
+        pipe << "| xcpretty"
+        pipe << " --test" if Gym.config[:xcpretty_test_format]
+        pipe << " --no-color" if Helper.colors_disabled?
+        pipe << " --formatter " if formatter
+        pipe << formatter if formatter
+        pipe << "--utf" if Gym.config[:xcpretty_utf]
+        report_output_junit = Gym.config[:xcpretty_report_junit]
+        report_output_html = Gym.config[:xcpretty_report_html]
+        report_output_json = Gym.config[:xcpretty_report_json]
+        if report_output_junit
+          pipe << " --report junit --output "
+          pipe << report_output_junit.shellescape
+        elsif report_output_html
+          pipe << " --report html --output "
+          pipe << report_output_html.shellescape
+        elsif report_output_json
+          pipe << " --report json-compilation-database --output "
+          pipe << report_output_json.shellescape
+        end
+
         pipe
       end
 

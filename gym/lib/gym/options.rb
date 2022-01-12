@@ -230,6 +230,15 @@ module Gym
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
                                      type: Boolean),
+
+        FastlaneCore::ConfigItem.new(key: :xcodebuild_formatter,
+                                     env_names: ["GYM_XCODEBUILD_FORMATTER", "FASTLANE_XCODEBUILD_FORMATTER"],
+                                     description: "xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test')",
+                                     type: String,
+                                     default_value: Fastlane::Helper::XcodebuildFormatterHelper.xcbeautify_installed? ? 'xcbeautify' : 'xcpretty',
+                                     default_value_dynamic: true),
+
+        # xcpretty
         FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
                                      env_name: "DISABLE_XCPRETTY",
                                      description: "Disable xcpretty formatting of build output",
@@ -269,6 +278,7 @@ module Gym
                                      description: "Have xcpretty use unicode encoding when reporting builds",
                                      optional: true,
                                      type: Boolean),
+
         FastlaneCore::ConfigItem.new(key: :skip_profile_detection,
                                      env_name: "GYM_SKIP_PROFILE_DETECTION",
                                      description: "Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used",
