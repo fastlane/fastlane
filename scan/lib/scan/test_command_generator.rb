@@ -111,12 +111,55 @@ module Scan
     def pipe
       pipe = ["| tee '#{xcodebuild_log_path}'"]
 
+      # disable_xcpretty is now deprecated and directs to use output_style of raw
       if Scan.config[:disable_xcpretty] || Scan.config[:output_style] == 'raw'
         return pipe
       end
 
+      formatter = Scan.config[:xcodebuild_formatter].chomp
+      options = legacy_xcpretty_options
+
+      if !options.empty?
+        UI.important("Detected legacy xcpretty being used so formatting wth xcpretty")
+        UI.important("Option(s) used: #{options.join(', ')}")
+        pipe << pipe_xcpretty
+      elsif formatter == 'xcpretty'
+        pipe << pipe_xcpretty
+      elsif formatter == 'xcbeautify'
+        pipe << pipe_xcbeautify
+      else
+        pipe << "| #{formatter}"
+      end
+
+      return pipe
+    end
+
+    def pipe_xcbeautify
+      formatter = ['| xcbeautify']
+
+      if FastlaneCore::Helper.colors_disabled?
+        formatter << '--disable-colored-output'
+      end
+
+      return formatter.join(' ')
+    end
+
+    def legacy_xcpretty_options
+      options = []
+
+      options << "formatter" if Scan.config[:formatter]
+      options << "xcpretty_formatter" if Scan.config[:xcpretty_formatter]
+      options << "output_style" if Scan.config[:output_style]
+      options << "output_files" if Scan.config[:output_files]
+      options << "output_types" if (Scan.config[:output_types] || "").include?("json-compilation-database")
+      options << "custom_report_file_name" if Scan.config[:custom_report_file_name]
+
+      return options
+    end
+
+    def pipe_xcpretty
       formatter = []
-      if (custom_formatter = Scan.config[:formatter])
+      if (custom_formatter = Scan.config[:xcpretty_formatter] || Scan.config[:formatter])
         if custom_formatter.end_with?(".rb")
           formatter << "-f '#{custom_formatter}'"
         else
@@ -147,7 +190,7 @@ module Scan
                                                                          Scan.config[:xcpretty_args])
       reporter_options = @reporter_options_generator.generate_reporter_options
       reporter_xcpretty_args = @reporter_options_generator.generate_xcpretty_args_options
-      return pipe << "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')} #{reporter_xcpretty_args}"
+      return "| xcpretty #{formatter.join(' ')} #{reporter_options.join(' ')} #{reporter_xcpretty_args}"
     end
 
     # Store the raw file
