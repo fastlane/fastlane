@@ -143,7 +143,7 @@ describe Deliver::AppScreenshot do
       it "should calculate all supported Apple Watch resolutions" do
         expect_screen_size_from_file("AppleWatch-Series3{312x390}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH)
         expect_screen_size_from_file("AppleWatch-Series4{368x448}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH_SERIES4)
-        expect_screen_size_from_file("AppleWatch-Series7{368x484}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH_SERIES7)
+        expect_screen_size_from_file("AppleWatch-Series7{396x484}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH_SERIES7)
       end
     end
 
