@@ -1023,7 +1023,7 @@ describe Scan do
     end
 
     describe "#pipe" do
-      it "uses no pipe with disable_xcpretty" do
+      it "uses no pipe with disable_xcpretty", requires_xcodebuild: true do
         options = { project: "./scan/examples/standard/app.xcodeproj", disable_xcpretty: true }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
@@ -1032,7 +1032,7 @@ describe Scan do
         expect(pipe).to eq(["| tee '#{log_path}'"])
       end
 
-      it "uses no pipe with output_type of raw" do
+      it "uses no pipe with output_type of raw", requires_xcodebuild: true do
         options = { project: "./scan/examples/standard/app.xcodeproj", disable_xcpretty: true }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
@@ -1043,7 +1043,7 @@ describe Scan do
 
       describe "with xcodebuild_formatter" do
         describe "with no xcpretty options" do
-          it "default when xcbeautify not installed" do
+          it "default when xcbeautify not installed", requires_xcodebuild: true do
             allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(false)
 
             options = { project: "./scan/examples/standard/app.xcodeproj" }
@@ -1054,7 +1054,7 @@ describe Scan do
             expect(pipe.join(" ")).to include("| xcpretty ")
           end
 
-          it "default when xcbeautify installed" do
+          it "default when xcbeautify installed", requires_xcodebuild: true do
             allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(true)
 
             options = { project: "./scan/examples/standard/app.xcodeproj" }
@@ -1065,7 +1065,7 @@ describe Scan do
             expect(pipe).to eq(["| tee '#{log_path}'", "| xcbeautify"])
           end
 
-          it "xcpretty override when xcbeautify installed" do
+          it "xcpretty override when xcbeautify installed", requires_xcodebuild: true do
             allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(true)
 
             options = { project: "./scan/examples/standard/app.xcodeproj", xcodebuild_formatter: "xcpretty" }
@@ -1076,7 +1076,7 @@ describe Scan do
             expect(pipe.join(" ")).to include("| xcpretty ")
           end
 
-          it "customer formatter" do
+          it "customer formatter", requires_xcodebuild: true do
             allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(true)
 
             options = { project: "./scan/examples/standard/app.xcodeproj", xcodebuild_formatter: "/path/to/another/xcbeautify" }
@@ -1088,7 +1088,7 @@ describe Scan do
           end
         end
 
-        it "with xcpretty options when xcbeautify installed" do
+        it "with xcpretty options when xcbeautify installed", requires_xcodebuild: true do
           allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(true)
 
           options = { project: "./scan/examples/standard/app.xcodeproj", output_style: "rspec" }
@@ -1102,7 +1102,7 @@ describe Scan do
     end
 
     describe "#legacy_xcpretty_options" do
-      it "with formatter" do
+      it "with formatter", requires_xcodebuild: true do
         options = { project: "./scan/examples/standard/app.xcodeproj", formatter: "Something.rb" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
@@ -1110,7 +1110,7 @@ describe Scan do
         expect(options).to eq(['formatter'])
       end
 
-      it "with xcpretty_formatter" do
+      it "with xcpretty_formatter", requires_xcodebuild: true do
         options = { project: "./scan/examples/standard/app.xcodeproj", xcpretty_formatter: "Something.rb" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
@@ -1118,7 +1118,7 @@ describe Scan do
         expect(options).to eq(['xcpretty_formatter'])
       end
 
-      it "with output_style" do
+      it "with output_style", requires_xcodebuild: true do
         options = { project: "./scan/examples/standard/app.xcodeproj", output_style: "rspec" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
@@ -1126,7 +1126,7 @@ describe Scan do
         expect(options).to eq(['output_style'])
       end
 
-      it "with output_files" do
+      it "with output_files", requires_xcodebuild: true do
         options = { project: "./scan/examples/standard/app.xcodeproj", output_files: 'something.json' }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
@@ -1134,7 +1134,7 @@ describe Scan do
         expect(options).to eq(['output_files'])
       end
 
-      it "with output_types of 'json-compilation-database'" do
+      it "with output_types of 'json-compilation-database'", requires_xcodebuild: true do
         options = { project: "./scan/examples/standard/app.xcodeproj", output_types: 'json-compilation-database' }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
@@ -1142,7 +1142,7 @@ describe Scan do
         expect(options).to eq(['output_types'])
       end
 
-      it "with customer_report_file_name" do
+      it "with customer_report_file_name", requires_xcodebuild: true do
         options = { project: "./scan/examples/standard/app.xcodeproj", custom_report_file_name: 'some_file.html', output_types: 'html' }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
