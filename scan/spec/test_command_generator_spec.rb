@@ -73,7 +73,7 @@ describe Scan do
     allow(Scan).to receive(:project).and_return(@project)
   end
 
-  context "xcpretty" do
+  context "with xcpretty" do
     before(:each) do
       allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(false)
     end
@@ -1008,6 +1008,146 @@ describe Scan do
           result = @test_command_generator.generate
           expect(result.last).to include("| xcpretty ")
         end
+      end
+    end
+  end
+
+  context "with any formatter" do
+    let(:log_path) { "log_path" }
+
+    before(:each) do
+      @test_command_generator = Scan::TestCommandGenerator.new
+      @project.options.delete(:use_system_scm)
+
+      allow(@test_command_generator).to receive(:xcodebuild_log_path).and_return(log_path)
+    end
+
+    describe "#pipe" do
+      it "uses no pipe with disable_xcpretty" do
+        options = { project: "./scan/examples/standard/app.xcodeproj", disable_xcpretty: true }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        pipe = @test_command_generator.pipe
+
+        expect(pipe).to eq(["| tee '#{log_path}'"])
+      end
+
+      it "uses no pipe with output_type of raw" do
+        options = { project: "./scan/examples/standard/app.xcodeproj", disable_xcpretty: true }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        pipe = @test_command_generator.pipe
+
+        expect(pipe).to eq(["| tee '#{log_path}'"])
+      end
+
+      describe "with xcodebuild_formatter" do
+        describe "with no xcpretty options" do
+          it "default when xcbeautify not installed" do
+            allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(false)
+
+            options = { project: "./scan/examples/standard/app.xcodeproj" }
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+            pipe = @test_command_generator.pipe
+
+            expect(pipe.join(" ")).to include("| xcpretty ")
+          end
+
+          it "default when xcbeautify installed" do
+            allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(true)
+
+            options = { project: "./scan/examples/standard/app.xcodeproj" }
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+            pipe = @test_command_generator.pipe
+
+            expect(pipe).to eq(["| tee '#{log_path}'", "| xcbeautify"])
+          end
+
+          it "xcpretty override when xcbeautify installed" do
+            allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(true)
+
+            options = { project: "./scan/examples/standard/app.xcodeproj", xcodebuild_formatter: "xcpretty" }
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+            pipe = @test_command_generator.pipe
+
+            expect(pipe.join(" ")).to include("| xcpretty ")
+          end
+
+          it "customer formatter" do
+            allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(true)
+
+            options = { project: "./scan/examples/standard/app.xcodeproj", xcodebuild_formatter: "/path/to/another/xcbeautify" }
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+            pipe = @test_command_generator.pipe
+
+            expect(pipe).to eq(["| tee '#{log_path}'", "| /path/to/another/xcbeautify"])
+          end
+        end
+
+        it "with xcpretty options when xcbeautify installed" do
+          allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(true)
+
+          options = { project: "./scan/examples/standard/app.xcodeproj", output_style: "rspec" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+          pipe = @test_command_generator.pipe
+
+          expect(pipe.join(" ")).to include("| xcpretty ")
+        end
+      end
+    end
+
+    describe "#legacy_xcpretty_options" do
+      it "with formatter" do
+        options = { project: "./scan/examples/standard/app.xcodeproj", formatter: "Something.rb" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        options = @test_command_generator.legacy_xcpretty_options
+        expect(options).to eq(['formatter'])
+      end
+
+      it "with xcpretty_formatter" do
+        options = { project: "./scan/examples/standard/app.xcodeproj", xcpretty_formatter: "Something.rb" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        options = @test_command_generator.legacy_xcpretty_options
+        expect(options).to eq(['xcpretty_formatter'])
+      end
+
+      it "with output_style" do
+        options = { project: "./scan/examples/standard/app.xcodeproj", output_style: "rspec" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        options = @test_command_generator.legacy_xcpretty_options
+        expect(options).to eq(['output_style'])
+      end
+
+      it "with output_files" do
+        options = { project: "./scan/examples/standard/app.xcodeproj", output_files: 'something.json' }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        options = @test_command_generator.legacy_xcpretty_options
+        expect(options).to eq(['output_files'])
+      end
+
+      it "with output_types of 'json-compilation-database'" do
+        options = { project: "./scan/examples/standard/app.xcodeproj", output_types: 'json-compilation-database' }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        options = @test_command_generator.legacy_xcpretty_options
+        expect(options).to eq(['output_types'])
+      end
+
+      it "with customer_report_file_name" do
+        options = { project: "./scan/examples/standard/app.xcodeproj", custom_report_file_name: 'some_file.html', output_types: 'html' }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        options = @test_command_generator.legacy_xcpretty_options
+        expect(options).to eq(['custom_report_file_name'])
       end
     end
   end

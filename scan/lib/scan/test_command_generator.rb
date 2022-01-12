@@ -148,7 +148,7 @@ module Scan
       options = []
 
       options << "formatter" if Scan.config[:formatter]
-      options << "xcpretty_formatter" if Scan.config[:formatter]
+      options << "xcpretty_formatter" if Scan.config[:xcpretty_formatter]
       options << "output_style" if Scan.config[:output_style]
       options << "output_files" if Scan.config[:output_files]
       options << "output_types" if (Scan.config[:output_types] || "").include?("json-compilation-database")
