@@ -30,7 +30,7 @@ module Spaceship
       #
 
       # appCustomProductPageVersion,appEvent,appStoreVersion,appStoreVersionExperiment
-      def self.all(client: nil, review_submission_id: nil, includes: nil, limit: nil, sort: nil)
+      def self.all(client: nil, review_submission_id:, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_review_submission_items(review_submission_id: review_submission_id, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)

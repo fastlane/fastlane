@@ -1130,17 +1130,17 @@ module Spaceship
         # reviewSubmissions
         #
 
-        def get_review_submissions(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_review_submissions(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
           tunes_request_client.get("apps/#{app_id}/reviewSubmissions", params)
         end
 
-        def get_review_submission(review_submission_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_review_submission(review_submission_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
           tunes_request_client.get("reviewSubmissions/#{review_submission_id}", params)
         end
 
-        def post_review_submission(app_id: nil, platform: nil)
+        def post_review_submission(app_id:, platform:)
           body = {
             data: {
               type: "reviewSubmissions",
@@ -1161,7 +1161,7 @@ module Spaceship
           tunes_request_client.post("reviewSubmissions", body)
         end
 
-        def patch_review_submission(review_submission_id: nil, attributes: nil)
+        def patch_review_submission(review_submission_id:, attributes: nil)
           body = {
             data: {
               type: "reviewSubmissions",
@@ -1177,12 +1177,12 @@ module Spaceship
         # reviewSubmissionItems
         #
 
-        def get_review_submission_items(review_submission_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_review_submission_items(review_submission_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
           tunes_request_client.get("reviewSubmissions/#{review_submission_id}/items", params)
         end
 
-        def post_review_submission_item(review_submission_id: nil, app_store_version_id: nil)
+        def post_review_submission_item(review_submission_id:, app_store_version_id: nil)
           body = {
             data: {
               type: "reviewSubmissionItems",

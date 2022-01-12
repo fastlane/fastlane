@@ -419,9 +419,8 @@ module Spaceship
       # Review Submissions
       #
 
-      def get_ready_review_submission(client: nil, platform: nil, includes: nil)
+      def get_ready_review_submission(client: nil, platform:, includes: nil)
         client ||= Spaceship::ConnectAPI
-        platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           state: [
             Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::READY_FOR_REVIEW
@@ -432,9 +431,8 @@ module Spaceship
         return get_review_submissions(client: client, filter: filter, includes: includes).first
       end
 
-      def get_in_progress_review_submission(client: nil, platform: nil, includes: nil)
+      def get_in_progress_review_submission(client: nil, platform:, includes: nil)
         client ||= Spaceship::ConnectAPI
-        platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           state: [
             Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::WAITING_FOR_REVIEW
@@ -452,7 +450,7 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def create_review_submission(client: nil, platform: nil)
+      def create_review_submission(client: nil, platform:)
         client ||= Spaceship::ConnectAPI
         resp = client.post_review_submission(app_id: id, platform: platform)
         return resp.to_models.first

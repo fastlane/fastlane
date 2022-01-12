@@ -43,7 +43,7 @@ module Spaceship
       #
 
       # appStoreVersionForReview,items,submittedByActor,lastUpdatedByActor
-      def self.get(client: nil, review_submission_id: nil, includes: nil)
+      def self.get(client: nil, review_submission_id:, includes: nil)
         client ||= Spaceship::ConnectAPI
         resp = client.get_review_submission(review_submission_id: review_submission_id, includes: includes)
         return resp.to_models.first
@@ -63,7 +63,7 @@ module Spaceship
         return resp.to_models.first
       end
 
-      def add_app_store_version_to_review_items(client: nil, app_store_version_id: nil)
+      def add_app_store_version_to_review_items(client: nil, app_store_version_id:)
         client ||= Spaceship::ConnectAPI
         resp = client.post_review_submission_item(review_submission_id: id, app_store_version_id: app_store_version_id)
         return resp.to_models.first
