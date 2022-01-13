@@ -138,6 +138,7 @@ module Fastlane
         plist = Xcodeproj::Plist.read_from_path(plist_file)
         UI.user_error!("Unable to read plist: #{plist_file}") unless plist
 
+        return '${MARKETING_VERSION}' if plist["CFBundleShortVersionString"].nil?
         plist["CFBundleShortVersionString"]
       end
 
