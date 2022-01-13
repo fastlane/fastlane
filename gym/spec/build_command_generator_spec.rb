@@ -460,7 +460,7 @@ describe Gym do
     end
 
     describe "#legacy_xcpretty_options" do
-      it "with xcpretty_test_format", xcpretty_test_format: true do
+      it "with xcpretty_test_format", requires_xcodebuild: true do
         options = { project: "./gym/examples/standard/Example.xcodeproj", xcpretty_test_format: true }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
@@ -468,7 +468,7 @@ describe Gym do
         expect(options).to eq(['xcpretty_test_format'])
       end
 
-      it "with xcpretty_formatter", xcpretty_test_format: true do
+      it "with xcpretty_formatter", requires_xcodebuild: true do
         allow(File).to receive(:exist?).and_call_original
         expect(File).to receive(:exist?).with("thing.rb").and_return(true)
 
@@ -479,7 +479,7 @@ describe Gym do
         expect(options).to eq(['xcpretty_formatter'])
       end
 
-      it "with xcpretty_report_junit", xcpretty_test_format: true do
+      it "with xcpretty_report_junit", requires_xcodebuild: true do
         options = { project: "./gym/examples/standard/Example.xcodeproj", xcpretty_report_junit: "thing.junit" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
@@ -487,7 +487,7 @@ describe Gym do
         expect(options).to eq(['xcpretty_report_junit'])
       end
 
-      it "with xcpretty_report_html", xcpretty_test_format: true do
+      it "with xcpretty_report_html", requires_xcodebuild: true do
         options = { project: "./gym/examples/standard/Example.xcodeproj", xcpretty_report_html: "thing.html" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
@@ -495,7 +495,7 @@ describe Gym do
         expect(options).to eq(['xcpretty_report_html'])
       end
 
-      it "with xcpretty_report_json", xcpretty_test_format: true do
+      it "with xcpretty_report_json", requires_xcodebuild: true do
         options = { project: "./gym/examples/standard/Example.xcodeproj", xcpretty_report_json: "thing.json" }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
@@ -503,7 +503,7 @@ describe Gym do
         expect(options).to eq(['xcpretty_report_json'])
       end
 
-      it "with xcpretty_utf", xcpretty_test_format: true do
+      it "with xcpretty_utf", requires_xcodebuild: true do
         options = { project: "./gym/examples/standard/Example.xcodeproj", xcpretty_utf: true }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
