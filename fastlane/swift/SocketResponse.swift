@@ -1,5 +1,5 @@
 // SocketResponse.swift
-// Copyright (c) 2021 FastlaneTools
+// Copyright (c) 2022 FastlaneTools
 
 //
 //  ** NOTE **
