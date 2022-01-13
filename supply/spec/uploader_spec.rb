@@ -168,7 +168,14 @@ describe Supply do
 
       let(:client) { double('client') }
       let(:version_codes) { [1, 2, 3] }
-      let(:config) { { track: 'alpha', track_promote_to: 'beta' } }
+      let(:config) {
+        {
+          release_status: Supply::ReleaseStatus::COMPLETED,
+          track_promote_release_status: Supply::ReleaseStatus::COMPLETED,
+          track: 'alpha',
+          track_promote_to: 'beta'
+        }
+      }
       let(:track) { double('alpha') }
       let(:release) { double('release1') }
 
