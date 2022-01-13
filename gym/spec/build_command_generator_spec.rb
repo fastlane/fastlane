@@ -381,6 +381,7 @@ describe Gym do
 
         pipe = Gym::BuildCommandGenerator.pipe
         expect(pipe.join(" ")).not_to include("| xcpretty")
+        expect(pipe.join(" ")).not_to include("| xcbeautify")
       end
 
       it "uses no pipe with xcodebuild_formatter of empty string", requires_xcodebuild: true do
@@ -392,6 +393,7 @@ describe Gym do
 
         pipe = Gym::BuildCommandGenerator.pipe
         expect(pipe.join(" ")).not_to include("| xcpretty")
+        expect(pipe.join(" ")).not_to include("| xcbeautify")
       end
 
       describe "with xcodebuild_formatter" do
