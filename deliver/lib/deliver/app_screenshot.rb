@@ -63,6 +63,8 @@ module Deliver
       IOS_APPLE_WATCH = "iOS-Apple-Watch"
       # Apple Watch Series 4
       IOS_APPLE_WATCH_SERIES4 = "iOS-Apple-Watch-Series4"
+      # Apple Watch Series 7
+      IOS_APPLE_WATCH_SERIES7 = "iOS-Apple-Watch-Series7"
 
       # Apple TV
       APPLE_TV = "Apple-TV"
@@ -117,6 +119,7 @@ module Deliver
         ScreenSize::MAC => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_DESKTOP,
         ScreenSize::IOS_APPLE_WATCH => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_3,
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_4,
+        ScreenSize::IOS_APPLE_WATCH_SERIES7 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_7,
         ScreenSize::APPLE_TV => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_APPLE_TV
       }
       return matching[self.screen_size]
@@ -151,6 +154,7 @@ module Deliver
         ScreenSize::MAC => "Mac",
         ScreenSize::IOS_APPLE_WATCH => "Watch",
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => "Watch Series4",
+        ScreenSize::IOS_APPLE_WATCH_SERIES7 => "Watch Series7",
         ScreenSize::APPLE_TV => "Apple TV"
       }
       return matching[self.screen_size]
@@ -312,6 +316,9 @@ module Deliver
         ],
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => [
           [368, 448]
+        ],
+        ScreenSize::IOS_APPLE_WATCH_SERIES7 => [
+          [396, 484]
         ],
         ScreenSize::APPLE_TV => [
           [1920, 1080],

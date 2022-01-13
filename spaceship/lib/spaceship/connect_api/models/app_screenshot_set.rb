@@ -38,6 +38,7 @@ module Spaceship
 
         APP_WATCH_SERIES_3 = "APP_WATCH_SERIES_3"
         APP_WATCH_SERIES_4 = "APP_WATCH_SERIES_4"
+        APP_WATCH_SERIES_7 = "APP_WATCH_SERIES_7"
 
         APP_APPLE_TV = "APP_APPLE_TV"
 
@@ -85,6 +86,7 @@ module Spaceship
 
           APP_WATCH_SERIES_3,
           APP_WATCH_SERIES_4,
+          APP_WATCH_SERIES_7,
 
           APP_DESKTOP
         ]
