@@ -85,8 +85,6 @@ module FastlaneCore
       UI.command_output(error) unless error.empty?
       return nil if entry.nil? || entry.empty?
       data, error, = Open3.capture3("unzip", "-p", path, entry)
-      puts("data: #{data}")
-      puts("error: #{error}")
       UI.command_output(error) unless error.empty?
       return nil if data.empty?
       data
