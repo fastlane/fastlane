@@ -15,6 +15,8 @@ describe Snapshot do
       allow(Snapshot::LatestOsVersion).to receive(:version).and_return(os_version)
       allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone6_9_0, iphone6_9_3, iphone6_9_2, appleTV, iphone6_9_3_2, iphone6_10_1, iphone6s_10_1, iphone4s_9_0, ipad_air_9_1])
       fake_out_xcode_project_loading
+
+      allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(false)
     end
 
     describe '#destination' do
