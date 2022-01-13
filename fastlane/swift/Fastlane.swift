@@ -1,5 +1,5 @@
 // Fastlane.swift
-// Copyright (c) 2021 FastlaneTools
+// Copyright (c) 2022 FastlaneTools
 
 import Foundation
 /**
@@ -10708,6 +10708,7 @@ public func ssh(username: String,
    - skipUploadImages: Whether to skip uploading images, screenshots not included
    - skipUploadScreenshots: Whether to skip uploading SCREENSHOTS
    - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal
+   - trackPromoteReleaseStatus: Promoted track release status (used when promoting a track) - valid values are completed, draft, halted, inProgress
    - validateOnly: Only validate changes with Google Play rather than actually publish
    - mapping: Path to the mapping file to upload (mapping.txt or native-debug-symbols.zip alike)
    - mappingPaths: An array of paths to mapping files to upload (mapping.txt or native-debug-symbols.zip alike)
@@ -10749,6 +10750,7 @@ public func supply(packageName: String,
                    skipUploadImages: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    skipUploadScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    trackPromoteTo: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                   trackPromoteReleaseStatus: String = "completed",
                    validateOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    mapping: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    mappingPaths: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -10788,6 +10790,7 @@ public func supply(packageName: String,
     let skipUploadImagesArg = skipUploadImages.asRubyArgument(name: "skip_upload_images", type: nil)
     let skipUploadScreenshotsArg = skipUploadScreenshots.asRubyArgument(name: "skip_upload_screenshots", type: nil)
     let trackPromoteToArg = trackPromoteTo.asRubyArgument(name: "track_promote_to", type: nil)
+    let trackPromoteReleaseStatusArg = RubyCommand.Argument(name: "track_promote_release_status", value: trackPromoteReleaseStatus, type: nil)
     let validateOnlyArg = validateOnly.asRubyArgument(name: "validate_only", type: nil)
     let mappingArg = mapping.asRubyArgument(name: "mapping", type: nil)
     let mappingPathsArg = mappingPaths.asRubyArgument(name: "mapping_paths", type: nil)
@@ -10826,6 +10829,7 @@ public func supply(packageName: String,
                                           skipUploadImagesArg,
                                           skipUploadScreenshotsArg,
                                           trackPromoteToArg,
+                                          trackPromoteReleaseStatusArg,
                                           validateOnlyArg,
                                           mappingArg,
                                           mappingPathsArg,
@@ -12352,6 +12356,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
    - skipUploadImages: Whether to skip uploading images, screenshots not included
    - skipUploadScreenshots: Whether to skip uploading SCREENSHOTS
    - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal
+   - trackPromoteReleaseStatus: Promoted track release status (used when promoting a track) - valid values are completed, draft, halted, inProgress
    - validateOnly: Only validate changes with Google Play rather than actually publish
    - mapping: Path to the mapping file to upload (mapping.txt or native-debug-symbols.zip alike)
    - mappingPaths: An array of paths to mapping files to upload (mapping.txt or native-debug-symbols.zip alike)
@@ -12393,6 +12398,7 @@ public func uploadToPlayStore(packageName: String,
                               skipUploadImages: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                               skipUploadScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                               trackPromoteTo: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                              trackPromoteReleaseStatus: String = "completed",
                               validateOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                               mapping: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               mappingPaths: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -12432,6 +12438,7 @@ public func uploadToPlayStore(packageName: String,
     let skipUploadImagesArg = skipUploadImages.asRubyArgument(name: "skip_upload_images", type: nil)
     let skipUploadScreenshotsArg = skipUploadScreenshots.asRubyArgument(name: "skip_upload_screenshots", type: nil)
     let trackPromoteToArg = trackPromoteTo.asRubyArgument(name: "track_promote_to", type: nil)
+    let trackPromoteReleaseStatusArg = RubyCommand.Argument(name: "track_promote_release_status", value: trackPromoteReleaseStatus, type: nil)
     let validateOnlyArg = validateOnly.asRubyArgument(name: "validate_only", type: nil)
     let mappingArg = mapping.asRubyArgument(name: "mapping", type: nil)
     let mappingPathsArg = mappingPaths.asRubyArgument(name: "mapping_paths", type: nil)
@@ -12470,6 +12477,7 @@ public func uploadToPlayStore(packageName: String,
                                           skipUploadImagesArg,
                                           skipUploadScreenshotsArg,
                                           trackPromoteToArg,
+                                          trackPromoteReleaseStatusArg,
                                           validateOnlyArg,
                                           mappingArg,
                                           mappingPathsArg,
@@ -13084,7 +13092,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode-13.1.0.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-13.2.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13287,4 +13295,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.142]
+// FastlaneRunnerAPIVersion [0.9.143]
