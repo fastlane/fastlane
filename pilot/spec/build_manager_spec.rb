@@ -522,7 +522,7 @@ describe "Build Manager" do
   end
 
   describe "#upload" do
-    describe "uses Manager.login (which does spaceship login)" do
+    describe "uses Manager.login (which does spaceship login) for ipa" do
       let(:fake_build_manager) { Pilot::BuildManager.new }
       let(:fake_app_id) { 123 }
       let(:fake_dir) { "fake dir" }
@@ -574,6 +574,207 @@ describe "Build Manager" do
         expect(fake_build_manager).to receive(:fetch_app_id).and_return(fake_app_id).exactly(2).times
         expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version)
         expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build)
+
+        fake_app = double
+        expect(fake_app).to receive(:id).and_return(fake_app_id)
+        expect(fake_build_manager).to receive(:app).and_return(fake_app)
+
+        fake_build = double
+        expect(fake_build).to receive(:app_version)
+        expect(fake_build).to receive(:version)
+        expect(UI).to receive(:message).with("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
+        expect(UI).to receive(:message).with("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps.")
+        expect(FastlaneCore::BuildWatcher).to receive(:wait_for_build_processing_to_be_complete).and_return(fake_build)
+
+        expect(fake_build_manager).to receive(:distribute).with(upload_options, build: fake_build)
+
+        fake_build_manager.upload(upload_options)
+      end
+    end
+
+    describe "uses Manager.login for pkg for osx platform" do
+      let(:fake_build_manager) { Pilot::BuildManager.new }
+      let(:fake_app_id) { 123 }
+      let(:fake_dir) { "fake dir" }
+      let(:fake_app_platform) { "osx" }
+      let(:upload_options) do
+        {
+          apple_id: fake_app_id,
+          skip_waiting_for_build_processing: true,
+          pkg: 'bar'
+        }
+      end
+
+      before(:each) do
+        allow(fake_build_manager).to receive(:fetch_app_platform).and_return(fake_app_platform)
+        allow(Dir).to receive(:mktmpdir).and_return(fake_dir)
+
+        fake_pkguploadpackagebuilder = double
+        allow(fake_pkguploadpackagebuilder).to receive(:generate).with(app_id: fake_app_id, pkg_path: upload_options[:pkg], package_path: fake_dir, platform: fake_app_platform).and_return(true)
+        allow(FastlaneCore::PkgUploadPackageBuilder).to receive(:new).and_return(fake_pkguploadpackagebuilder)
+
+        fake_itunestransporter = double
+        allow(fake_itunestransporter).to receive(:upload).and_return(true)
+        allow(FastlaneCore::ItunesTransporter).to receive(:new).and_return(fake_itunestransporter)
+
+        expect(UI).to receive(:success).with("Ready to upload new build to TestFlight (App: #{fake_app_id})...")
+        expect(UI).to receive(:success).with("Successfully uploaded the new binary to App Store Connect")
+      end
+
+      it "when skip_waiting_for_build_processing and apple_id are not set" do
+        # remove options that make login unnecessary
+        upload_options.delete(:apple_id)
+        upload_options.delete(:skip_waiting_for_build_processing)
+
+        # allow Manager.login method this time
+        expect(fake_build_manager).to receive(:login).at_least(:once)
+
+        # check for changelog or whats new!
+        expect(fake_build_manager).to receive(:check_for_changelog_or_whats_new!).with(upload_options)
+
+        # other stuff required to let `upload` work:
+
+        expect(fake_build_manager).to receive(:fetch_app_id).and_return(fake_app_id).exactly(2).times
+        expect(FastlaneCore::PkgFileAnalyser).to receive(:fetch_app_version)
+        expect(FastlaneCore::PkgFileAnalyser).to receive(:fetch_app_build)
+
+        fake_app = double
+        expect(fake_app).to receive(:id).and_return(fake_app_id)
+        expect(fake_build_manager).to receive(:app).and_return(fake_app)
+
+        fake_build = double
+        expect(fake_build).to receive(:app_version)
+        expect(fake_build).to receive(:version)
+        expect(UI).to receive(:message).with("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
+        expect(UI).to receive(:message).with("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps.")
+        expect(FastlaneCore::BuildWatcher).to receive(:wait_for_build_processing_to_be_complete).and_return(fake_build)
+
+        expect(fake_build_manager).to receive(:distribute).with(upload_options, build: fake_build)
+
+        fake_build_manager.upload(upload_options)
+      end
+    end
+
+    describe "uses Manager.login for pkg for osx platform when both ipa and pkg are available" do
+      let(:fake_build_manager) { Pilot::BuildManager.new }
+      let(:fake_app_id) { 123 }
+      let(:fake_dir) { "fake dir" }
+      let(:fake_app_platform) { "osx" }
+      let(:upload_options) do
+        {
+          apple_id: fake_app_id,
+          skip_waiting_for_build_processing: true,
+          ipa: 'foo',
+          pkg: 'bar'
+        }
+      end
+
+      before(:each) do
+        allow(fake_build_manager).to receive(:fetch_app_platform).and_return(fake_app_platform)
+        allow(Dir).to receive(:mktmpdir).and_return(fake_dir)
+
+        fake_pkguploadpackagebuilder = double
+        allow(fake_pkguploadpackagebuilder).to receive(:generate).with(app_id: fake_app_id, pkg_path: upload_options[:pkg], package_path: fake_dir, platform: fake_app_platform).and_return(true)
+        allow(FastlaneCore::PkgUploadPackageBuilder).to receive(:new).and_return(fake_pkguploadpackagebuilder)
+
+        fake_itunestransporter = double
+        allow(fake_itunestransporter).to receive(:upload).and_return(true)
+        allow(FastlaneCore::ItunesTransporter).to receive(:new).and_return(fake_itunestransporter)
+
+        expect(UI).to receive(:important).with("WARNING: Both `ipa` and `pkg` options are defined either explicitly or with default_value (build found in directory)")
+        expect(UI).to receive(:important).with("Uploading `ipa` is preferred by default. Set `app_platform` to `osx` to force uploading `pkg`")
+
+        expect(UI).to receive(:success).with("Ready to upload new build to TestFlight (App: #{fake_app_id})...")
+        expect(UI).to receive(:success).with("Successfully uploaded the new binary to App Store Connect")
+      end
+
+      it "when skip_waiting_for_build_processing and apple_id are not set" do
+        # remove options that make login unnecessary
+        upload_options.delete(:apple_id)
+        upload_options.delete(:skip_waiting_for_build_processing)
+
+        # allow Manager.login method this time
+        expect(fake_build_manager).to receive(:login).at_least(:once)
+
+        # check for changelog or whats new!
+        expect(fake_build_manager).to receive(:check_for_changelog_or_whats_new!).with(upload_options)
+
+        # other stuff required to let `upload` work:
+
+        expect(fake_build_manager).to receive(:fetch_app_id).and_return(fake_app_id).exactly(2).times
+        expect(FastlaneCore::IpaFileAnalyser).to_not(receive(:fetch_app_version))
+        expect(FastlaneCore::IpaFileAnalyser).to_not(receive(:fetch_app_build))
+        expect(FastlaneCore::PkgFileAnalyser).to receive(:fetch_app_version)
+        expect(FastlaneCore::PkgFileAnalyser).to receive(:fetch_app_build)
+
+        fake_app = double
+        expect(fake_app).to receive(:id).and_return(fake_app_id)
+        expect(fake_build_manager).to receive(:app).and_return(fake_app)
+
+        fake_build = double
+        expect(fake_build).to receive(:app_version)
+        expect(fake_build).to receive(:version)
+        expect(UI).to receive(:message).with("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
+        expect(UI).to receive(:message).with("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps.")
+        expect(FastlaneCore::BuildWatcher).to receive(:wait_for_build_processing_to_be_complete).and_return(fake_build)
+
+        expect(fake_build_manager).to receive(:distribute).with(upload_options, build: fake_build)
+
+        fake_build_manager.upload(upload_options)
+      end
+    end
+
+    describe "uses Manager.login for ipa for ios platform when both ipa and pkg are available" do
+      let(:fake_build_manager) { Pilot::BuildManager.new }
+      let(:fake_app_id) { 123 }
+      let(:fake_dir) { "fake dir" }
+      let(:fake_app_platform) { "ios" }
+      let(:upload_options) do
+        {
+          apple_id: fake_app_id,
+          skip_waiting_for_build_processing: true,
+          ipa: 'foo',
+          pkg: 'bar'
+        }
+      end
+
+      before(:each) do
+        allow(fake_build_manager).to receive(:fetch_app_platform).and_return(fake_app_platform)
+        allow(Dir).to receive(:mktmpdir).and_return(fake_dir)
+
+        fake_ipauploadpackagebuilder = double
+        allow(fake_ipauploadpackagebuilder).to receive(:generate).with(app_id: fake_app_id, ipa_path: upload_options[:ipa], package_path: fake_dir, platform: fake_app_platform).and_return(true)
+        allow(FastlaneCore::IpaUploadPackageBuilder).to receive(:new).and_return(fake_ipauploadpackagebuilder)
+
+        fake_itunestransporter = double
+        allow(fake_itunestransporter).to receive(:upload).and_return(true)
+        allow(FastlaneCore::ItunesTransporter).to receive(:new).and_return(fake_itunestransporter)
+
+        expect(UI).to receive(:important).with("WARNING: Both `ipa` and `pkg` options are defined either explicitly or with default_value (build found in directory)")
+        expect(UI).to receive(:important).with("Uploading `ipa` is preferred by default. Set `app_platform` to `osx` to force uploading `pkg`")
+
+        expect(UI).to receive(:success).with("Ready to upload new build to TestFlight (App: #{fake_app_id})...")
+        expect(UI).to receive(:success).with("Successfully uploaded the new binary to App Store Connect")
+      end
+
+      it "when skip_waiting_for_build_processing and apple_id are not set" do
+        # remove options that make login unnecessary
+        upload_options.delete(:apple_id)
+        upload_options.delete(:skip_waiting_for_build_processing)
+
+        # allow Manager.login method this time
+        expect(fake_build_manager).to receive(:login).at_least(:once)
+
+        # check for changelog or whats new!
+        expect(fake_build_manager).to receive(:check_for_changelog_or_whats_new!).with(upload_options)
+
+        # other stuff required to let `upload` work:
+
+        expect(fake_build_manager).to receive(:fetch_app_id).and_return(fake_app_id).exactly(2).times
+        expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version)
+        expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build)
+        expect(FastlaneCore::PkgFileAnalyser).to_not(receive(:fetch_app_version))
+        expect(FastlaneCore::PkgFileAnalyser).to_not(receive(:fetch_app_build))
 
         fake_app = double
         expect(fake_app).to receive(:id).and_return(fake_app_id)
