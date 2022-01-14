@@ -119,7 +119,9 @@ module Scan
       formatter = Scan.config[:xcodebuild_formatter].chomp
       options = legacy_xcpretty_options
 
-      if !options.empty?
+      if formatter == ''
+        UI.verbose("Not using an xcodebuild formatter")
+      elsif !options.empty?
         UI.important("Detected legacy xcpretty being used so formatting wth xcpretty")
         UI.important("Option(s) used: #{options.join(', ')}")
         pipe << pipe_xcpretty
