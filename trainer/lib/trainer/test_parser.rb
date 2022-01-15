@@ -50,29 +50,40 @@ module Trainer
 
       return_hash = {}
       files.each do |path|
-        if config[:output_directory]
-          FileUtils.mkdir_p(config[:output_directory])
-          # Remove .xcresult or .plist extension
-          if path.end_with?(".xcresult")
-            filename = File.basename(path).gsub(".xcresult", config[:extension])
+        extension = config[:extension]
+        output_filename = config[:output_filename]
+
+        should_write_file = !extension.nil? || !output_filename.nil?
+
+        if should_write_file
+          if config[:output_directory]
+            FileUtils.mkdir_p(config[:output_directory])
+            # Remove .xcresult or .plist extension
+            # Use custom file name ONLY if one file otherwise issues
+            if files.size == 1 && output_filename
+              filename = output_filename
+            elsif path.end_with?(".xcresult")
+              filename ||= File.basename(path).gsub(".xcresult", extension)
+            else
+              filename ||= File.basename(path).gsub(".plist", extension)
+            end
+            to_path = File.join(config[:output_directory], filename)
           else
-            filename = File.basename(path).gsub(".plist", config[:extension])
-          end
-          to_path = File.join(config[:output_directory], filename)
-        else
-          # Remove .xcresult or .plist extension
-          if path.end_with?(".xcresult")
-            to_path = path.gsub(".xcresult", config[:extension])
-          else
-            to_path = path.gsub(".plist", config[:extension])
+            # Remove .xcresult or .plist extension
+            if path.end_with?(".xcresult")
+              to_path = path.gsub(".xcresult", extension)
+            else
+              to_path = path.gsub(".plist", extension)
+            end
           end
         end
 
         tp = Trainer::TestParser.new(path, config)
-        File.write(to_path, tp.to_junit)
-        UI.success("Successfully generated '#{to_path}'") unless config[:silent]
+        File.write(to_path, tp.to_junit) if should_write_file
+        UI.success("Successfully generated '#{to_path}'") if should_write_file && !config[:silent]
 
-        return_hash[to_path] = {
+        return_hash[path] = {
+          to_path: to_path,
           successful: tp.tests_successful?,
           number_of_tests: tp.number_of_tests,
           number_of_failures: tp.number_of_failures,

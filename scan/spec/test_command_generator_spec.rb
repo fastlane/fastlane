@@ -1160,14 +1160,6 @@ describe Scan do
         expect(options).to eq(['output_style'])
       end
 
-      it "with output_files", requires_xcodebuild: true do
-        options = { project: "./scan/examples/standard/app.xcodeproj", output_files: 'something.json' }
-        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-
-        options = @test_command_generator.legacy_xcpretty_options
-        expect(options).to eq(['output_files'])
-      end
-
       it "with output_types of 'json-compilation-database'", requires_xcodebuild: true do
         options = { project: "./scan/examples/standard/app.xcodeproj", output_types: 'json-compilation-database' }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)

@@ -137,6 +137,36 @@ module Scan
       return retryable_tests.uniq
     end
 
+    def find_filename(type)
+      index = Scan.config[:output_types].split(',').index(type)
+      return nil if index.nil?
+      return (Scan.config[:output_files] || "").split(',')[index]
+    end
+
+    def output_html?
+      return Scan.config[:output_types].split(',').include?('html')
+    end
+
+    def output_junit?
+      return Scan.config[:output_types].split(',').include?('junit')
+    end
+
+    def output_json_compilation_database?
+      return Scan.config[:output_types].split(',').include?('json-compilation-database')
+    end
+
+    def output_html_filename
+      return find_filename('html')
+    end
+
+    def output_junit_filename
+      return find_filename('junit')
+    end
+
+    def output_json_compilation_database_filename
+      return find_filename('json-compilation-database')
+    end
+
     def trainer_test_results
       require "trainer"
 
@@ -147,16 +177,36 @@ module Scan
       }
 
       result_bundle_path = Scan.cache[:result_bundle_path]
+
       output_path = Scan.config[:output_directory] || Dir.mktmpdir
+      output_path = File.absolute_path(output_path)
 
       UI.crash!("A -resultBundlePath is needed to parse the test results. This should not have happened. Please file an issue.") unless result_bundle_path
 
       params = {
         path: result_bundle_path,
-        output_path: output_path,
-        silent: true,
-        extension: "xml"
+        silent: true
       }
+
+      formatter = Scan.config[:xcodebuild_formatter].chomp
+
+      if output_html? && formatter != 'xcpretty'
+        UI.error("HTML output is only available with `xcodebuild_formatter: 'xcpretty'` right now...")
+      end
+
+      if output_json_compilation_database? && formatter != 'xcpretty'
+        UI.error("JSON Compilation Database output is only available with `xcodebuild_formatter: 'xcpretty'` right now...")
+      end
+
+      if output_junit?
+        if formatter == 'xcpretty'
+          UI.verbose("Generating junit report with xcpretty")
+        else
+          UI.verbose("Generating junit report with trainer")
+          params[:output_filename] = output_junit_filename || "report.junit"
+          params[:output_directory] = output_path
+        end
+      end
 
       resulting_paths = Trainer::TestParser.auto_convert(params)
       resulting_paths.each do |path, data|
