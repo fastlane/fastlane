@@ -867,5 +867,23 @@ describe Scan do
         expect(result.last).to include("| xcpretty ")
       end
     end
+
+    context "suppress_xcode_warnings" do
+      it "include warning suppressing in the pipe command when true", requires_xcode: true do
+        options = { suppress_xcode_warnings: true, project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        result = @test_command_generator.generate
+        expect(result).to include("| sed -e '/warning:/,/\^/d'")
+      end
+
+      it "does not includes warning suppressing in the pipe command when false", requires_xcode: true do
+        options = { suppress_xcode_warnings: false, project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        result = @test_command_generator.generate
+        expect(result).to_not(include("| sed -e '/warning:/,/\^/d'"))
+      end
+    end
   end
 end

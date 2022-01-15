@@ -107,6 +107,10 @@ module Scan
     def pipe
       pipe = ["| tee '#{xcodebuild_log_path}'"]
 
+      if Scan.config[:suppress_xcode_warnings]
+        pipe << "| sed -e '/warning:/,/\^/d'"
+      end
+
       if Scan.config[:disable_xcpretty] || Scan.config[:output_style] == 'raw'
         return pipe
       end
