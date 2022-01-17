@@ -224,6 +224,11 @@ module Gym
                                      verify_block: proc do |value|
                                        UI.user_error!("File not found at path '#{File.expand_path(value)}'") unless File.exist?(value)
                                      end),
+        FastlaneCore::ConfigItem.new(key: :suppress_xcode_warnings,
+                                     env_name: "SUPPRESS_XCODE_WARNINGS",
+                                     description: "Suppress only warnings from the output of xcodebuild to stdout. Output warnings is still saved in buildlog_path",
+                                     optional: true,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
                                      short_option: "-r",
                                      env_name: "SUPPRESS_OUTPUT",

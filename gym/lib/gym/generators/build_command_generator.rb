@@ -72,6 +72,9 @@ module Gym
       def pipe
         pipe = []
         pipe << "| tee #{xcodebuild_log_path.shellescape}"
+        if Gym.config[:suppress_xcode_warnings]
+          pipe << "| sed -e '/warning:/,/\^/d'"
+        end
         unless Gym.config[:disable_xcpretty]
           formatter = Gym.config[:xcpretty_formatter]
           pipe << "| xcpretty"
