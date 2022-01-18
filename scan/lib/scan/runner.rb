@@ -185,17 +185,23 @@ module Scan
 
       params = {
         path: result_bundle_path,
-        silent: true
+        silent: !FastlaneCore::Globals.verbose?
       }
 
       formatter = Scan.config[:xcodebuild_formatter].chomp
-
+      show_output_types_tip = false
       if output_html? && formatter != 'xcpretty'
-        UI.error("HTML output is only available with `xcodebuild_formatter: 'xcpretty'` right now...")
+        UI.important("Skipping HTML... only available with `xcodebuild_formatter: 'xcpretty'` right now")
+        show_output_types_tip = true
       end
 
       if output_json_compilation_database? && formatter != 'xcpretty'
-        UI.error("JSON Compilation Database output is only available with `xcodebuild_formatter: 'xcpretty'` right now...")
+        UI.important("Skipping JSON Compilation Database... only available with `xcodebuild_formatter: 'xcpretty'` right now")
+        show_output_types_tip = true
+      end
+
+      if show_output_types_tip
+        UI.important("Your 'xcodebuild_formatter' doesn't support these 'output_types'. Change your 'output_types' to prevent these warnings from showing...")
       end
 
       if output_junit?
@@ -219,6 +225,8 @@ module Scan
     end
 
     def handle_results(tests_exit_status)
+      return if Scan.config[:build_for_testing]
+
       results = trainer_test_results
 
       number_of_retries = results[:number_of_retries]
