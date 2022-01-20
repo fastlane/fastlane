@@ -185,6 +185,7 @@ module Scan
 
       params = {
         path: result_bundle_path,
+        output_remove_retry_attempts: Scan.config[:output_remove_retry_attempts],
         silent: !FastlaneCore::Globals.verbose?
       }
 

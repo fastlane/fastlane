@@ -100,7 +100,7 @@ module Trainer
       UI.user_error!("File not found at path '#{path}'") unless File.exist?(path)
 
       if File.directory?(path) && path.end_with?(".xcresult")
-        parse_xcresult(path)
+        parse_xcresult(path, output_remove_retry_attempts: config[:output_remove_retry_attempts])
       else
         self.file_content = File.read(path)
         self.raw_json = Plist.parse_xml(self.file_content)
@@ -193,7 +193,7 @@ module Trainer
       return output
     end
 
-    def parse_xcresult(path)
+    def parse_xcresult(path, output_remove_retry_attempts: false)
       require 'shellwords'
       path = Shellwords.escape(path)
 
@@ -218,10 +218,10 @@ module Trainer
 
       # Converts the ActionTestPlanRunSummaries to data for junit generator
       failures = actions_invocation_record.issues.test_failure_summaries || []
-      summaries_to_data(summaries, failures)
+      summaries_to_data(summaries, failures, output_remove_retry_attempts: output_remove_retry_attempts)
     end
 
-    def summaries_to_data(summaries, failures)
+    def summaries_to_data(summaries, failures, output_remove_retry_attempts: false)
       # Gets flat list of all ActionTestableSummary
       all_summaries = summaries.map(&:summaries).flatten
       testable_summaries = all_summaries.map(&:testable_summaries).flatten
@@ -279,6 +279,32 @@ module Trainer
           tests_by_identifier[identifier] = info
 
           test_row
+        end
+
+        # Remove failed retries that eventually succeeded 
+        # from the count and the test rows
+        if output_remove_retry_attempts
+          test_rows = test_rows.reject do |test_row|
+            remove = false
+
+            identifier = test_row[:identifier]
+            info = tests_by_identifier[identifier]
+
+            # Remove test row if it eventually succeded and its a failure row
+            #if info[:failure_count] > 0 && info[:success_count] > 0
+            if info[:retry_count] > 0
+              remove = !(test_row[:failures] || []).empty?
+            end
+
+            # Remove all failure and retry count if test did eventually pass
+            if remove
+              info[:failure_count] = 0
+              info[:retry_count] -= 1
+              tests_by_identifier[identifier] = info
+            end
+
+            remove
+          end
         end
 
         row = {
