@@ -281,8 +281,7 @@ module Trainer
           test_row
         end
 
-        # Remove failed retries that eventually succeeded 
-        # from the count and the test rows
+        # Remove retry attempts from the count and test rows
         if output_remove_retry_attempts
           test_rows = test_rows.reject do |test_row|
             remove = false
@@ -290,15 +289,14 @@ module Trainer
             identifier = test_row[:identifier]
             info = tests_by_identifier[identifier]
 
-            # Remove test row if it eventually succeded and its a failure row
-            #if info[:failure_count] > 0 && info[:success_count] > 0
+            # Remove if this row is a retry and is a failure
             if info[:retry_count] > 0
               remove = !(test_row[:failures] || []).empty?
             end
 
             # Remove all failure and retry count if test did eventually pass
             if remove
-              info[:failure_count] = 0
+              info[:failure_count] -= 1
               info[:retry_count] -= 1
               tests_by_identifier[identifier] = info
             end
