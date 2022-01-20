@@ -34,6 +34,10 @@ module Spaceship
         return api_token
       end
 
+      def self.from_token(in_house: nil, token_text: nil)
+        self.new(in_house: in_house, token_text: token_text)
+      end
+
       def self.from_json_file(filepath)
         json = JSON.parse(File.read(filepath), { symbolize_names: true })
 
@@ -49,20 +53,23 @@ module Spaceship
         self.create(**json)
       end
 
-      def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, is_key_content_base64: false, duration: nil, in_house: nil, **)
+      def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, is_key_content_base64: false, duration: nil, in_house: nil, token_text: nil, **)
         key_id ||= ENV['SPACESHIP_CONNECT_API_KEY_ID']
         issuer_id ||= ENV['SPACESHIP_CONNECT_API_ISSUER_ID']
         filepath ||= ENV['SPACESHIP_CONNECT_API_KEY_FILEPATH']
         duration ||= ENV['SPACESHIP_CONNECT_API_TOKEN_DURATION']
+        token_text ||= ENV['SPACESHIP_CONNECT_API_TOKEN_TEXT']
 
         in_house_env = ENV['SPACESHIP_CONNECT_API_IN_HOUSE']
         in_house ||= !["", "no", "false", "off", "0"].include?(in_house_env) if in_house_env
 
-        key ||= ENV['SPACESHIP_CONNECT_API_KEY']
-        key ||= File.binread(filepath)
+        if token_text.nil?
+          key ||= ENV['SPACESHIP_CONNECT_API_KEY']
+          key ||= File.binread(filepath)
 
-        if !key.nil? && is_key_content_base64
-          key = Base64.decode64(key)
+          if !key.nil? && is_key_content_base64
+            key = Base64.decode64(key)
+          end
         end
 
         self.new(
@@ -71,17 +78,25 @@ module Spaceship
           key: OpenSSL::PKey::EC.new(key),
           key_raw: key,
           duration: duration,
-          in_house: in_house
+          in_house: in_house,
+          token_text: token_text
         )
       end
 
-      def initialize(key_id: nil, issuer_id: nil, key: nil, key_raw: nil, duration: nil, in_house: nil)
+      def initialize(key_id: nil, issuer_id: nil, key: nil, key_raw: nil, duration: nil, in_house: nil, token_text: nil)
+        @in_house = in_house
+        @text = token_text
+        @text_direct = !@text.nil?
+        if @text_direct
+          token_decoded_payload, = JWT.decode(token_text, nil, false, { algorithm: 'ES256' })
+          @expiration = Time.at(token_decoded_payload['exp'])
+          return
+        end
         @key_id = key_id
         @key = key
         @key_raw = key_raw
         @issuer_id = issuer_id
         @duration = duration
-        @in_house = in_house
 
         @duration ||= DEFAULT_TOKEN_DURATION
         @duration = @duration.to_i if @duration
@@ -90,6 +105,10 @@ module Spaceship
       end
 
       def refresh!
+        if @text_direct
+          raise "Cannot perform refresh on directly given token; it is perhaps expired; expiration is #{@expiration}"
+        end
+
         @expiration = Time.now + @duration
 
         header = {
