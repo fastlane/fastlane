@@ -264,7 +264,7 @@ module Scan
 
         FastlaneCore::ConfigItem.new(key: :xcodebuild_formatter,
                                      env_names: ["SCAN_XCODEBUILD_FORMATTER", "FASTLANE_XCODEBUILD_FORMATTER"],
-                                     description: "xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter",
+                                     description: "xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)",
                                      type: String,
                                      default_value: Fastlane::Helper::XcodebuildFormatterHelper.xcbeautify_installed? ? 'xcbeautify' : 'xcpretty',
                                      default_value_dynamic: true),

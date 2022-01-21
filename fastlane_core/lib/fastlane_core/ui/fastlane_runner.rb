@@ -118,7 +118,7 @@ module Commander
         # We need to make sure that the trainer fastlane plugin is no longer installed
         # to avoid any clashes
         if Gem::Specification.any? { |s| (s.name == 'fastlane-plugin-trainer') && Gem::Requirement.default =~ (s.version) }
-          FastlaneCore::UI.user_error!("As of 2.201.0, trainer is included in fastlane. Please remove the trainer plugin from your Gemfile or Pluginfile (or with 'gem uninstall fastlane-plugin-trainer')")
+          FastlaneCore::UI.user_error!("Migration Needed: As of 2.201.0, trainer is included in fastlane. Please remove the trainer plugin from your Gemfile or Pluginfile (or with 'gem uninstall fastlane-plugin-trainer') - More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/")
         end
 
         return_value = run_active_command

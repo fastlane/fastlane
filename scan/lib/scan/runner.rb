@@ -51,13 +51,18 @@ module Scan
         end
       end
 
-      # Set retries to 0 if Xcode 13 because TestCommandGenerator will set '-retry-tests-on-failure -test-iterations'
-      retries = Helper.xcode_at_least?(13) ? 0 : Scan.config[:number_of_retries]
+      retries = Scan.config[:number_of_retries]
       execute(retries: retries)
     end
 
     def execute(retries: 0)
-      Scan.cache[:retry_attempt] = Scan.config[:number_of_retries] - retries
+      # Set retries to 0 if Xcode 13 because TestCommandGenerator will set '-retry-tests-on-failure -test-iterations'
+      if Helper.xcode_at_least?(13)
+        retries = 0
+        Scan.cache[:retry_attempt] = 0
+      else
+        Scan.cache[:retry_attempt] = Scan.config[:number_of_retries] - retries
+      end
 
       command = @test_command_generator.generate
 
