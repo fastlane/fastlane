@@ -30,7 +30,7 @@ module Fastlane
             raise ex
           end
         ensure
-          if (result_bundle_path = Scan.cache[:result_bundle_path])
+          if Scan.cache && (result_bundle_path = Scan.cache[:result_bundle_path])
             Actions.lane_context[SharedValues::SCAN_GENERATED_XCRESULT_PATH] = File.absolute_path(result_bundle_path)
           else
             Actions.lane_context[SharedValues::SCAN_GENERATED_XCRESULT_PATH] = nil
