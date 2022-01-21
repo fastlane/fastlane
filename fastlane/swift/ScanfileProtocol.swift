@@ -80,9 +80,6 @@ public protocol ScanfileProtocol: class {
     /// Should the HTML report be opened when tests are completed?
     var openReport: Bool { get }
 
-    /// Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
-    var disableXcpretty: Bool? { get }
-
     /// The directory in which all reports will be stored
     var outputDirectory: String { get }
 
@@ -104,8 +101,20 @@ public protocol ScanfileProtocol: class {
     /// Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
     var suppressXcodeOutput: Bool? { get }
 
-    /// A custom xcpretty formatter to use
+    /// xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+    var xcodebuildFormatter: String { get }
+
+    /// Remove retry attempts from test results table and the JUnit report (if not using xcpretty)
+    var outputRemoveRetryAttempts: Bool { get }
+
+    /// **DEPRECATED!** Use `output_style: 'raw'` instead - Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
+    var disableXcpretty: Bool? { get }
+
+    /// **DEPRECATED!** Use 'xcpretty_formatter' instead - A custom xcpretty formatter to use
     var formatter: String? { get }
+
+    /// A custom xcpretty formatter to use
+    var xcprettyFormatter: String? { get }
 
     /// Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
     var xcprettyArgs: String? { get }
@@ -246,7 +255,6 @@ public extension ScanfileProtocol {
     var addressSanitizer: Bool? { return nil }
     var threadSanitizer: Bool? { return nil }
     var openReport: Bool { return false }
-    var disableXcpretty: Bool? { return nil }
     var outputDirectory: String { return "./test_output" }
     var outputStyle: String? { return nil }
     var outputTypes: String { return "html,junit" }
@@ -254,7 +262,11 @@ public extension ScanfileProtocol {
     var buildlogPath: String { return "~/Library/Logs/scan" }
     var includeSimulatorLogs: Bool { return false }
     var suppressXcodeOutput: Bool? { return nil }
+    var xcodebuildFormatter: String { return "xcbeautify" }
+    var outputRemoveRetryAttempts: Bool { return false }
+    var disableXcpretty: Bool? { return nil }
     var formatter: String? { return nil }
+    var xcprettyFormatter: String? { return nil }
     var xcprettyArgs: String? { return nil }
     var derivedDataPath: String? { return nil }
     var shouldZipBuildProducts: Bool { return false }
@@ -296,4 +308,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.98]
+// FastlaneRunnerAPIVersion [0.9.99]
