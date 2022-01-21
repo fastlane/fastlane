@@ -30,7 +30,11 @@ module Fastlane
             raise ex
           end
         ensure
-          Actions.lane_context[SharedValues::SCAN_GENERATED_XCRESULT_PATH] = File.absolute_path(Scan.cache[:result_bundle_path])
+          if (result_bundle_path = Scan.cache[:result_bundle_path])
+            Actions.lane_context[SharedValues::SCAN_GENERATED_XCRESULT_PATH] = File.absolute_path(result_bundle_path)
+          else
+            Actions.lane_context[SharedValues::SCAN_GENERATED_XCRESULT_PATH] = nil
+          end
 
           unless values[:derived_data_path].to_s.empty?
             plist_files_before = manager.plist_files_before || []
