@@ -1,4 +1,5 @@
 require 'fastlane_core/configuration/config_item'
+require 'fastlane/helper/xcodebuild_formatter_helper'
 require 'credentials_manager/appfile_config'
 require_relative 'module'
 
@@ -230,8 +231,18 @@ module Gym
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
                                      type: Boolean),
+
+        FastlaneCore::ConfigItem.new(key: :xcodebuild_formatter,
+                                     env_names: ["GYM_XCODEBUILD_FORMATTER", "FASTLANE_XCODEBUILD_FORMATTER"],
+                                     description: "xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)",
+                                     type: String,
+                                     default_value: Fastlane::Helper::XcodebuildFormatterHelper.xcbeautify_installed? ? 'xcbeautify' : 'xcpretty',
+                                     default_value_dynamic: true),
+
+        # xcpretty
         FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
                                      env_name: "DISABLE_XCPRETTY",
+                                     deprecated: "Use `xcodebuild_formatter: ''` instead",
                                      description: "Disable xcpretty formatting of build output",
                                      optional: true,
                                      type: Boolean),
@@ -259,14 +270,15 @@ module Gym
                                      env_name: "XCPRETTY_REPORT_JSON",
                                      description: "Have xcpretty create a JSON compilation database at the provided path",
                                      optional: true),
-        FastlaneCore::ConfigItem.new(key: :analyze_build_time,
-                                     env_name: "GYM_ANALYZE_BUILD_TIME",
-                                     description: "Analyze the project build time and store the output in 'culprits.txt' file",
-                                     optional: true,
-                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :xcpretty_utf,
                                      env_name: "XCPRETTY_UTF",
                                      description: "Have xcpretty use unicode encoding when reporting builds",
+                                     optional: true,
+                                     type: Boolean),
+
+        FastlaneCore::ConfigItem.new(key: :analyze_build_time,
+                                     env_name: "GYM_ANALYZE_BUILD_TIME",
+                                     description: "Analyze the project build time and store the output in 'culprits.txt' file",
                                      optional: true,
                                      type: Boolean),
         FastlaneCore::ConfigItem.new(key: :skip_profile_detection,

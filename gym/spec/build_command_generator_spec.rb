@@ -11,6 +11,13 @@ describe Gym do
   end
 
   describe Gym::BuildCommandGenerator do
+    before(:each) do
+      allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(false)
+
+      # Gym::Options.available_options caches options after first load and we don't want that for tests
+      allow(Gym::Options).to receive(:available_options).and_return(Gym::Options.plain_options)
+    end
+
     it "raises an exception when project path wasn't found" do
       tmp_path = Dir.mktmpdir
       path = "#{tmp_path}/notExistent"
@@ -359,6 +366,151 @@ describe Gym do
 
         result = Gym::BuildCommandGenerator.post_build
         expect(result).to be_empty
+      end
+    end
+  end
+
+  context "with any formatter" do
+    describe "#pipe" do
+      it "uses no pipe with disable_xcpretty", requires_xcodebuild: true do
+        allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(false)
+        allow(Gym::Options).to receive(:available_options).and_return(Gym::Options.plain_options)
+
+        options = { project: "./gym/examples/standard/Example.xcodeproj", disable_xcpretty: true }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        pipe = Gym::BuildCommandGenerator.pipe
+        expect(pipe.join(" ")).not_to include("| xcpretty")
+        expect(pipe.join(" ")).not_to include("| xcbeautify")
+      end
+
+      it "uses no pipe with xcodebuild_formatter of empty string", requires_xcodebuild: true do
+        allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(false)
+        allow(Gym::Options).to receive(:available_options).and_return(Gym::Options.plain_options)
+
+        options = { project: "./gym/examples/standard/Example.xcodeproj", xcodebuild_formatter: '' }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        pipe = Gym::BuildCommandGenerator.pipe
+        expect(pipe.join(" ")).not_to include("| xcpretty")
+        expect(pipe.join(" ")).not_to include("| xcbeautify")
+      end
+
+      describe "with xcodebuild_formatter" do
+        describe "with no xcpretty options" do
+          it "default when xcbeautify not installed", requires_xcodebuild: true do
+            allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(false)
+            allow(Gym::Options).to receive(:available_options).and_return(Gym::Options.plain_options)
+
+            options = { project: "./gym/examples/standard/Example.xcodeproj" }
+            Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+            pipe = Gym::BuildCommandGenerator.pipe
+
+            expect(pipe.join(" ")).to include("| xcpretty")
+          end
+
+          it "default when xcbeautify installed", requires_xcodebuild: true do
+            allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(true)
+            allow(Gym::Options).to receive(:available_options).and_return(Gym::Options.plain_options)
+
+            options = { project: "./gym/examples/standard/Example.xcodeproj" }
+            Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+            pipe = Gym::BuildCommandGenerator.pipe
+
+            expect(pipe.join(" ")).to include("| xcbeautify")
+          end
+
+          it "xcpretty override when xcbeautify installed", requires_xcodebuild: true do
+            allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(true)
+            allow(Gym::Options).to receive(:available_options).and_return(Gym::Options.plain_options)
+
+            options = { project: "./gym/examples/standard/Example.xcodeproj", xcodebuild_formatter: 'xcpretty' }
+            Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+            pipe = Gym::BuildCommandGenerator.pipe
+
+            expect(pipe.join(" ")).to include("| xcpretty")
+          end
+
+          it "customer formatter", requires_xcodebuild: true do
+            allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(false)
+            allow(Gym::Options).to receive(:available_options).and_return(Gym::Options.plain_options)
+
+            options = { project: "./gym/examples/standard/Example.xcodeproj", xcodebuild_formatter: '/path/to/xcbeautify' }
+            Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+            pipe = Gym::BuildCommandGenerator.pipe
+
+            expect(pipe.join(" ")).to include("| /path/to/xcbeautify")
+          end
+        end
+
+        it "with xcpretty options when xcbeautify installed", requires_xcodebuild: true do
+          allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(true)
+          allow(Gym::Options).to receive(:available_options).and_return(Gym::Options.plain_options)
+
+          options = { project: "./gym/examples/standard/Example.xcodeproj", xcpretty_test_format: true }
+          Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+          pipe = Gym::BuildCommandGenerator.pipe
+
+          expect(pipe.join(" ")).to include("| xcpretty")
+        end
+      end
+    end
+
+    describe "#legacy_xcpretty_options" do
+      it "with xcpretty_test_format", requires_xcodebuild: true do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", xcpretty_test_format: true }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        options = Gym::BuildCommandGenerator.legacy_xcpretty_options
+        expect(options).to eq(['xcpretty_test_format'])
+      end
+
+      it "with xcpretty_formatter", requires_xcodebuild: true do
+        allow(File).to receive(:exist?).and_call_original
+        expect(File).to receive(:exist?).with("thing.rb").and_return(true)
+
+        options = { project: "./gym/examples/standard/Example.xcodeproj", xcpretty_formatter: "thing.rb" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        options = Gym::BuildCommandGenerator.legacy_xcpretty_options
+        expect(options).to eq(['xcpretty_formatter'])
+      end
+
+      it "with xcpretty_report_junit", requires_xcodebuild: true do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", xcpretty_report_junit: "thing.junit" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        options = Gym::BuildCommandGenerator.legacy_xcpretty_options
+        expect(options).to eq(['xcpretty_report_junit'])
+      end
+
+      it "with xcpretty_report_html", requires_xcodebuild: true do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", xcpretty_report_html: "thing.html" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        options = Gym::BuildCommandGenerator.legacy_xcpretty_options
+        expect(options).to eq(['xcpretty_report_html'])
+      end
+
+      it "with xcpretty_report_json", requires_xcodebuild: true do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", xcpretty_report_json: "thing.json" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        options = Gym::BuildCommandGenerator.legacy_xcpretty_options
+        expect(options).to eq(['xcpretty_report_json'])
+      end
+
+      it "with xcpretty_utf", requires_xcodebuild: true do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", xcpretty_utf: true }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        options = Gym::BuildCommandGenerator.legacy_xcpretty_options
+        expect(options).to eq(['xcpretty_utf'])
       end
     end
   end
