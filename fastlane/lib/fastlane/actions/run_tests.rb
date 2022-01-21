@@ -4,6 +4,7 @@ module Fastlane
       SCAN_DERIVED_DATA_PATH = :SCAN_DERIVED_DATA_PATH
       SCAN_GENERATED_PLIST_FILE = :SCAN_GENERATED_PLIST_FILE
       SCAN_GENERATED_PLIST_FILES = :SCAN_GENERATED_PLIST_FILES
+      SCAN_GENERATED_XCRESULT_PATH = :SCAN_GENERATED_XCRESULT_PATH
       SCAN_ZIP_BUILD_PRODUCTS_PATH = :SCAN_ZIP_BUILD_PRODUCTS_PATH
     end
 
@@ -29,6 +30,8 @@ module Fastlane
             raise ex
           end
         ensure
+          Actions.lane_context[SharedValues::SCAN_GENERATED_XCRESULT_PATH] = File.absolute_path(Scan.cache[:result_bundle_path])
+
           unless values[:derived_data_path].to_s.empty?
             plist_files_before = manager.plist_files_before || []
 
@@ -70,6 +73,7 @@ module Fastlane
           ['SCAN_DERIVED_DATA_PATH', 'The path to the derived data'],
           ['SCAN_GENERATED_PLIST_FILE', 'The generated plist file'],
           ['SCAN_GENERATED_PLIST_FILES', 'The generated plist files'],
+          ['SCAN_GENERATED_XCRESULT_PATH', 'The path to the generated .xcresult'],
           ['SCAN_ZIP_BUILD_PRODUCTS_PATH', 'The path to the zipped build products']
         ]
       end
