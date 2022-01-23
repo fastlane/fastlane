@@ -56,10 +56,10 @@
         "macOS": "11.6"
       },
       "monterey": {
-        "HOMEBREW_VERSION": "3.3.11-80-g5ee14b9",
+        "HOMEBREW_VERSION": "3.3.11-103-g768b172",
         "HOMEBREW_PREFIX": "/opt/homebrew",
-        "Homebrew/homebrew-core": "9ca1b8fa2865504f50fcdbe679417daedfa274cc",
-        "CLT": "13.1.0.0.1.1633545042",
+        "Homebrew/homebrew-core": "3636e44542f6dbd859a4bd8a143a433e8930361f",
+        "CLT": "13.2.0.0.1.1638488800",
         "Xcode": "13.2.1",
         "macOS": "12.0.1"
       }

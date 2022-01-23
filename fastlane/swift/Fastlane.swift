@@ -11433,31 +11433,39 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
    - path: Path to the directory that should be converted
    - extension: The extension for the newly created file. Usually .xml or .junit
    - outputDirectory: Directoy in which the xml files should be written to. Same directory as source by default
+   - outputFilename: Filename the xml file should be written to. Defaults to name of input file. (Only works if one input file is used)
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're handling this with a test reporter
    - xcprettyNaming: Produces class name and test name identical to xcpretty naming in junit file
    - silent: Silences all output
+   - outputRemoveRetryAttempts: Doesn't include retry attempts in the output
 
  - returns: A hash with the key being the path of the generated file, the value being if the tests were successful
  */
 public func trainer(path: String = ".",
                     extension: String = ".xml",
                     outputDirectory: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                    outputFilename: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                     xcprettyNaming: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                    silent: OptionalConfigValue<Bool> = .fastlaneDefault(false))
+                    silent: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                    outputRemoveRetryAttempts: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let pathArg = RubyCommand.Argument(name: "path", value: path, type: nil)
     let extensionArg = RubyCommand.Argument(name: "extension", value: `extension`, type: nil)
     let outputDirectoryArg = outputDirectory.asRubyArgument(name: "output_directory", type: nil)
+    let outputFilenameArg = outputFilename.asRubyArgument(name: "output_filename", type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
     let xcprettyNamingArg = xcprettyNaming.asRubyArgument(name: "xcpretty_naming", type: nil)
     let silentArg = silent.asRubyArgument(name: "silent", type: nil)
+    let outputRemoveRetryAttemptsArg = outputRemoveRetryAttempts.asRubyArgument(name: "output_remove_retry_attempts", type: nil)
     let array: [RubyCommand.Argument?] = [pathArg,
                                           extensionArg,
                                           outputDirectoryArg,
+                                          outputFilenameArg,
                                           failBuildArg,
                                           xcprettyNamingArg,
-                                          silentArg]
+                                          silentArg,
+                                          outputRemoveRetryAttemptsArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -13386,4 +13394,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.144]
+// FastlaneRunnerAPIVersion [0.9.145]
