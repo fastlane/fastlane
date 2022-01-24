@@ -23,12 +23,32 @@ module Deliver
       update_idfa(options, app, version)
       update_submission_information(options, app)
 
-      version.create_app_store_version_submission
-
+      create_review_submission(options, app, version, platform)
       UI.success("Successfully submitted the app for review!")
     end
 
-    private def select_build(options, app, version, platform)
+    private
+    
+    def create_review_submission(options, app, version, platform)
+      if app.get_in_progress_review_submission(platform: platform)
+        UI.user_error!("Cannot submit for review - A review submission is already in progress")
+      end
+
+      # TODO: I don't like this logic here
+      # Maybe error out if there are aleady items in this review?
+      submission = app.get_ready_review_submission(platform: platform, includes: "items")
+
+      if submission.nil?
+        submission = app.create_review_submission(platform: platform)
+      elsif !submission.items.empty?
+        UI.user_error!("Cannot submit for review - A review submission already exists with items not managed by fastlane. Please cancel or remove items from submission for the App Store Connect website")
+      end
+
+      submission.add_app_store_version_to_review_items(app_store_version_id: version.id)
+      submission.submit_for_review
+    end
+
+    def select_build(options, app, version, platform)
       if options[:build_number] && options[:build_number] != "latest"
         UI.message("Selecting existing build-number: #{options[:build_number]}")
 
