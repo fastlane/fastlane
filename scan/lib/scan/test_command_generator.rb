@@ -53,7 +53,7 @@ module Scan
       if config[:use_system_scm] && !options.include?("-scmProvider system")
         options << "-scmProvider system"
       end
-      options << "-resultBundlePath '#{result_bundle_path(config[:result_bundle])}'"
+      options << "-resultBundlePath '#{result_bundle_path(true)}'" if config[:result_bundle]
       if FastlaneCore::Helper.xcode_at_least?(10)
         options << "-parallel-testing-worker-count #{config[:concurrent_workers]}" if config[:concurrent_workers]
         options << "-maximum-concurrent-test-simulator-destinations #{config[:max_concurrent_simulators]}" if config[:max_concurrent_simulators]
