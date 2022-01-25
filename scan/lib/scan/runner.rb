@@ -20,6 +20,7 @@ module Scan
     end
 
     def run
+      @xcresults_before_run = find_xcresults_in_derived_data
       handle_results(test_app)
     end
 
@@ -172,6 +173,12 @@ module Scan
       return find_filename('json-compilation-database')
     end
 
+    def find_xcresults_in_derived_data
+      derived_data_path = Scan.config[:derived_data_path]
+      xcresults_path = File.join(derived_data_path, "Logs", "Test", "*.xcresult")
+      return Dir[xcresults_path]
+    end
+
     def trainer_test_results
       require "trainer"
 
@@ -182,6 +189,19 @@ module Scan
       }
 
       result_bundle_path = Scan.cache[:result_bundle_path]
+
+      # Looks for xcresult file in derived data if not specifically set
+      if result_bundle_path.nil?
+        xcresults = find_xcresults_in_derived_data
+        new_xcresults = xcresults - @xcresults_before_run
+
+        if new_xcresults.size != 1
+          UI.crash!("Cannot find .xcresult in derived data which is needed to determine test results")
+        end
+
+        result_bundle_path = new_xcresults.first
+        Scan.cache[:result_bundle_path] = result_bundle_path
+      end
 
       output_path = Scan.config[:output_directory] || Dir.mktmpdir
       output_path = File.absolute_path(output_path)

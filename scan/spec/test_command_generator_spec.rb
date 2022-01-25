@@ -111,10 +111,6 @@ describe Scan do
           options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", toolchain: "com.apple.dt.toolchain.Swift_2_3" }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
           expect(result).to start_with([
                                          "set -o pipefail &&",
@@ -125,7 +121,6 @@ describe Scan do
                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                          "-toolchain 'com.apple.dt.toolchain.Swift_2_3'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                          :build,
                                          :test
                                        ])
@@ -139,10 +134,6 @@ describe Scan do
         options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", xcargs: xcargs }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-        # Result bundle path is always used but put in tmp dir if not explicitly specified
-        result_bundle_path = Dir.mktmpdir
-        expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
         result = @test_command_generator.generate
 
         expect(result).to start_with([
@@ -153,7 +144,6 @@ describe Scan do
                                        "-sdk '9.0'",
                                        "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                        "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                       "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                        "DEBUG=1 BUNDLE_NAME=Example\\ App",
                                        :build,
                                        :test
@@ -171,14 +161,6 @@ describe Scan do
           options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", number_of_retries: 1 }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
 
           expect(result).to start_with([
@@ -189,7 +171,6 @@ describe Scan do
                                          "-sdk '9.0'",
                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                          "-retry-tests-on-failure",
                                          "-test-iterations 1",
                                          :build,
@@ -254,10 +235,6 @@ describe Scan do
           it "uses the correct build command with the example project with no additional parameters", requires_xcodebuild: true do
             log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-            # Result bundle path is always used but put in tmp dir if not explicitly specified
-            result_bundle_path = Dir.mktmpdir
-            expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
             result = @test_command_generator.generate
             expect(result).to start_with([
                                            "set -o pipefail &&",
@@ -266,7 +243,6 @@ describe Scan do
                                            "-project ./scan/examples/standard/app.xcodeproj",
                                            "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                            "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                           "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                            :build,
                                            :test
                                          ])
@@ -306,10 +282,6 @@ describe Scan do
             it "uses the correct build command with the example package and scheme", requires_xcodebuild: true do
               log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-              # Result bundle path is always used but put in tmp dir if not explicitly specified
-              result_bundle_path = Dir.mktmpdir
-              expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
               result = @test_command_generator.generate
               expect(result).to start_with([
                                              "set -o pipefail &&",
@@ -318,7 +290,6 @@ describe Scan do
                                              "-scheme package",
                                              "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                              "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                             "-resultBundlePath '#{result_bundle_path}/package.xcresult'",
                                              :build,
                                              :test
                                            ])
@@ -339,10 +310,6 @@ describe Scan do
             it "uses the correct build command with the example package and scheme", requires_xcodebuild: true do
               log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-              # Result bundle path is always used but put in tmp dir if not explicitly specified
-              result_bundle_path = Dir.mktmpdir
-              expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
               result = @test_command_generator.generate
               expect(result).to start_with([
                                              "set -o pipefail &&",
@@ -352,7 +319,6 @@ describe Scan do
                                              "-workspace .",
                                              "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                              "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                             "-resultBundlePath '#{result_bundle_path}/package.xcresult'",
                                              :build,
                                              :test
                                            ])
@@ -375,10 +341,6 @@ describe Scan do
         it "uses the correct build command with the example project", requires_xcodebuild: true do
           log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
           expect(result).to start_with([
                                          "set -o pipefail &&",
@@ -387,7 +349,6 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                          "-derivedDataPath /tmp/my/derived_data",
-                                         "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                          :build,
                                          :test
                                        ])
@@ -538,10 +499,6 @@ describe Scan do
                       only_testing: %w(TestBundleA/TestSuiteB TestBundleC) }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
 
           expect(result).to start_with([
@@ -551,7 +508,6 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath '#{result_bundle_path}/app.xcresult'",
                                          '-only-testing:TestBundleA/TestSuiteB',
                                          '-only-testing:TestBundleC',
                                          :build,
@@ -566,10 +522,6 @@ describe Scan do
                       only_testing: 'TestBundleA/TestSuiteB' }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
 
           expect(result).to start_with([
@@ -579,7 +531,6 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath '#{result_bundle_path}/app.xcresult'",
                                          '-only-testing:TestBundleA/TestSuiteB',
                                          :build,
                                          :test
@@ -593,10 +544,6 @@ describe Scan do
                       skip_testing: %w(TestBundleA/TestSuiteB TestBundleC) }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
 
           expect(result).to start_with([
@@ -606,7 +553,6 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath '#{result_bundle_path}/app.xcresult'",
                                          '-skip-testing:TestBundleA/TestSuiteB',
                                          '-skip-testing:TestBundleC',
                                          :build,
@@ -621,10 +567,6 @@ describe Scan do
                       skip_testing: 'TestBundleA/TestSuiteB' }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
 
           expect(result).to start_with([
@@ -634,7 +576,6 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath '#{result_bundle_path}/app.xcresult'",
                                          '-skip-testing:TestBundleA/TestSuiteB',
                                          :build,
                                          :test
@@ -646,10 +587,6 @@ describe Scan do
         options = { project: "./scan/examples/standard/app.xcodeproj", device: "iPhone 6s" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-        # Result bundle path is always used but put in tmp dir if not explicitly specified
-        result_bundle_path = Dir.mktmpdir
-        expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
         result = @test_command_generator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
@@ -659,7 +596,6 @@ describe Scan do
                                        # expect the single highest versioned iOS simulator device available with matching name
                                        "-destination 'platform=iOS Simulator,id=021A465B-A294-4D9E-AD07-6BDC8E186343'",
                                        "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                       "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                        :build,
                                        :test
                                      ])
@@ -672,10 +608,6 @@ describe Scan do
         ] }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-        # Result bundle path is always used but put in tmp dir if not explicitly specified
-        result_bundle_path = Dir.mktmpdir
-        expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
         result = @test_command_generator.generate
         expect(result).to start_with([
                                        "set -o pipefail &&",
@@ -685,7 +617,6 @@ describe Scan do
                                        "-destination 'platform=iOS Simulator,id=70E1E92F-A292-4980-BC3C-7770C5EEFCFD' " \
                                        "-destination 'platform=iOS Simulator,id=DD134998-177F-47DA-99FA-D549D9305476'",
                                        "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                       "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                        :build,
                                        :test
                                      ])
@@ -694,10 +625,6 @@ describe Scan do
       it "rejects devices with versions below deployment target", requires_xcodebuild: true do
         options = { project: "./scan/examples/standard/app.xcodeproj", device: "iPhone 5 (8.4)" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-
-        # Result bundle path is always used but put in tmp dir if not explicitly specified
-        result_bundle_path = Dir.mktmpdir
-        expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
 
         result = @test_command_generator.generate
         # FIXME: expect UI error starting "No simulators found that are equal to the version of specifier"
@@ -715,10 +642,6 @@ describe Scan do
         it "should build-for-testing", requires_xcodebuild: true do
           Scan.config[:build_for_testing] = true
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
           expect(result).to start_with([
                                          "set -o pipefail &&",
@@ -728,17 +651,12 @@ describe Scan do
                                          "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
                                          "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                          "build-for-testing"
                                        ])
         end
         it "should test-without-building", requires_xcodebuild: true do
           Scan.config[:test_without_building] = true
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
           expect(result).to start_with([
                                          "set -o pipefail &&",
@@ -748,7 +666,6 @@ describe Scan do
                                          "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
                                          "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                          "test-without-building"
                                        ])
         end
@@ -768,10 +685,6 @@ describe Scan do
         it "should run tests from xctestrun file", requires_xcodebuild: true do
           Scan.config[:xctestrun] = "/folder/mytests.xctestrun"
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
           expect(result).to start_with([
                                          "set -o pipefail &&",
@@ -779,7 +692,6 @@ describe Scan do
                                          "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
                                          "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                          "-xctestrun '/folder/mytests.xctestrun'",
                                          "test-without-building"
                                        ])
@@ -794,10 +706,6 @@ describe Scan do
           ] }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
           expect(result).to start_with([
                                          "set -o pipefail &&",
@@ -807,7 +715,6 @@ describe Scan do
                                          "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' " \
                                          "-destination 'platform=iOS Simulator,name=iPad Air 2,OS=9.2'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                          :build,
                                          :test
                                        ])
@@ -820,10 +727,6 @@ describe Scan do
           ] }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
           expect(result).to start_with([
                                          "set -o pipefail &&",
@@ -833,7 +736,6 @@ describe Scan do
                                          "-destination 'platform=iOS Simulator,id=70E1E92F-A292-4980-BC3C-7770C5EEFCFD' " \
                                          "-destination 'platform=iOS Simulator,id=DD134998-177F-47DA-99FA-D549D9305476'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                          :build,
                                          :test
                                        ])
@@ -846,10 +748,6 @@ describe Scan do
           ] }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
-          # Result bundle path is always used but put in tmp dir if not explicitly specified
-          result_bundle_path = Dir.mktmpdir
-          expect(Dir).to receive(:mktmpdir).and_return(result_bundle_path).once
-
           result = @test_command_generator.generate
           expect(result).to start_with([
                                          "set -o pipefail &&",
@@ -858,7 +756,6 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination 'platform=iOS Simulator,id=9905A018-9DC9-4DD8-BA14-B0B000CC8622'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                          :build,
                                          :test
                                        ])
