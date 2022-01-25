@@ -171,7 +171,7 @@ FastlaneAppTests.testCoinToss()
 
         expect do
           @scan.retry_execute(retries: 5, error_output: error_output)
-        end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Failed to find failed tests to retry (could not parse error output)")
+        end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Failed to find failed tests to retry (could not parse error output)")
       end
     end
 
