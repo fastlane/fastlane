@@ -191,7 +191,7 @@ describe Scan do
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
                                          "-resultBundlePath '#{result_bundle_path}.xcresult'",
                                          "-retry-tests-on-failure",
-                                         "-test-iterations 1",
+                                         "-test-iterations 2",
                                          :build,
                                          :test
                                        ])
