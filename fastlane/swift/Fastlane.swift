@@ -8629,7 +8629,7 @@ public func rubyVersion() {
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
-   - numberOfRetries: The number of times a test can fail before scan should stop retrying
+   - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
  More information: https://docs.fastlane.tools/actions/scan/
@@ -9046,7 +9046,7 @@ public func say(text: [String],
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
-   - numberOfRetries: The number of times a test can fail before scan should stop retrying
+   - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
  More information: https://docs.fastlane.tools/actions/scan/
@@ -13394,4 +13394,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.145]
+// FastlaneRunnerAPIVersion [0.9.146]
