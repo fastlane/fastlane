@@ -116,7 +116,7 @@ describe Snapshot do
 
       describe 'copy_simulator_logs' do
         before (:each) do
-          @config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, {
+          @config = FastlaneCore::Configuration.create(Snapshot::Options.plain_options, {
             output_directory: '/tmp/scan_results',
             output_simulator_logs: true,
             devices: ['iPhone 6 (10.1)', 'iPhone 6s'],
@@ -186,7 +186,7 @@ describe Snapshot do
         let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests", namespace_log_files: true } }
 
         def configure(options)
-          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.plain_options, options)
         end
 
         context 'default options' do
@@ -418,7 +418,7 @@ describe Snapshot do
         let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleMacOS", namespace_log_files: true } }
 
         it "uses default parameters on macOS", requires_xcode: true do
-          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options.merge(devices: ["Mac"]))
+          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.plain_options, options.merge(devices: ["Mac"]))
           expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
           command = Snapshot::TestCommandGenerator.generate(
             devices: ["Mac"],
@@ -448,7 +448,7 @@ describe Snapshot do
       describe "Unique logs" do
         let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests", namespace_log_files: true } }
         let(:simulator_launcher) do
-          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.plain_options, options)
           launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: Snapshot.config)
           launcher_config.devices = ["iPhone 6"]
           return simulator_launcher = Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config)
@@ -480,7 +480,7 @@ describe Snapshot do
       describe "Unique logs disabled" do
         let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests" } }
         let(:simulator_launcher) do
-          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+          Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.plain_options, options)
           launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: Snapshot.config)
           launcher_config.devices = ["iPhone 6"]
           return simulator_launcher = Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config)
