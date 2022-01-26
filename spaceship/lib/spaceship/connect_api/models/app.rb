@@ -435,7 +435,8 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         filter = {
           state: [
-            Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::WAITING_FOR_REVIEW
+            Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::WAITING_FOR_REVIEW,
+            Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::IN_REVIEW
           ].join(","),
           platform: platform
         }

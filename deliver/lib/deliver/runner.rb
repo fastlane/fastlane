@@ -212,7 +212,7 @@ module Deliver
           end
 
           UI.message("Waiting for cancellation to take effect...")
-          sleep(10)
+          sleep(15)
         end
 
         UI.success("Successfully cancelled previous submission!")
