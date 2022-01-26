@@ -14,8 +14,8 @@ describe Deliver::SubmitForReview do
     let(:selected_build) { double('selected_build') }
     let(:idfa_declaration) { double('idfa_declaration') }
 
-    let(:empty_submission) do
-      double('empty_submission',
+    let(:submission) do
+      double('submission',
              id: '1')
     end
 
@@ -77,27 +77,73 @@ describe Deliver::SubmitForReview do
     end
 
     context 'submits successfully' do
-      it 'no options' do
-        options = {
-          platform: Spaceship::ConnectAPI::Platform::IOS
-        }
+      describe 'no options' do
 
-        expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
-        expect(review_submitter).to receive(:select_build).and_return(selected_build)
+        it 'with in progress review submission' do
+          options = {
+            platform: Spaceship::ConnectAPI::Platform::IOS
+          }
 
-        expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+          expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+          expect(review_submitter).to receive(:select_build).and_return(selected_build)
 
-        expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
-        expect(edit_version).to receive(:uses_idfa).and_return(false)
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
 
-        expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
-        expect(app).to receive(:get_ready_review_submission).and_return(nil)
-        expect(app).to receive(:create_review_submission).and_return(empty_submission)
+          expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
+          expect(edit_version).to receive(:uses_idfa).and_return(false)
 
-        expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
-        expect(empty_submission).to receive(:submit_for_review)
+          expect(app).to receive(:get_in_progress_review_submission).and_return(submission)
 
-        review_submitter.submit!(options)
+          expect do
+            review_submitter.submit!(options)
+          end.to raise_error("Cannot submit for review - A review submission is already in progress")
+        end
+
+        it 'with empty submission' do
+          options = {
+            platform: Spaceship::ConnectAPI::Platform::IOS
+          }
+
+          expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+          expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+
+          expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
+          expect(edit_version).to receive(:uses_idfa).and_return(false)
+
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(submission)
+          expect(submission).to receive(:items).and_return([])
+          expect(app).not_to receive(:create_review_submission)
+
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
+
+          review_submitter.submit!(options)
+        end
+
+        it 'with submission containing items' do
+          options = {
+            platform: Spaceship::ConnectAPI::Platform::IOS
+          }
+
+          expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+          expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+
+          expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
+          expect(edit_version).to receive(:uses_idfa).and_return(false)
+
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(submission)
+          expect(submission).to receive(:items).and_return([double('some item')])
+
+          expect do
+            review_submitter.submit!(options)
+          end.to raise_error("Cannot submit for review - A review submission already exists with items not managed by fastlane. Please cancel or remove items from submission for the App Store Connect website")
+        end
       end
 
       context 'export_compliance_uses_encryption' do
@@ -121,10 +167,10 @@ describe Deliver::SubmitForReview do
 
           expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
           expect(app).to receive(:get_ready_review_submission).and_return(nil)
-          expect(app).to receive(:create_review_submission).and_return(empty_submission)
+          expect(app).to receive(:create_review_submission).and_return(submission)
 
-          expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
-          expect(empty_submission).to receive(:submit_for_review)
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
         end
@@ -153,10 +199,10 @@ describe Deliver::SubmitForReview do
 
           expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
           expect(app).to receive(:get_ready_review_submission).and_return(nil)
-          expect(app).to receive(:create_review_submission).and_return(empty_submission)
+          expect(app).to receive(:create_review_submission).and_return(submission)
 
-          expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
-          expect(empty_submission).to receive(:submit_for_review)
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
         end
@@ -182,10 +228,10 @@ describe Deliver::SubmitForReview do
 
           expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
           expect(app).to receive(:get_ready_review_submission).and_return(nil)
-          expect(app).to receive(:create_review_submission).and_return(empty_submission)
+          expect(app).to receive(:create_review_submission).and_return(submission)
 
-          expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
-          expect(empty_submission).to receive(:submit_for_review)
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
         end
@@ -210,10 +256,10 @@ describe Deliver::SubmitForReview do
 
           expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
           expect(app).to receive(:get_ready_review_submission).and_return(nil)
-          expect(app).to receive(:create_review_submission).and_return(empty_submission)
+          expect(app).to receive(:create_review_submission).and_return(submission)
 
-          expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
-          expect(empty_submission).to receive(:submit_for_review)
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
         end
@@ -249,10 +295,10 @@ describe Deliver::SubmitForReview do
 
           expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
           expect(app).to receive(:get_ready_review_submission).and_return(nil)
-          expect(app).to receive(:create_review_submission).and_return(empty_submission)
+          expect(app).to receive(:create_review_submission).and_return(submission)
 
-          expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
-          expect(empty_submission).to receive(:submit_for_review)
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
         end
@@ -288,10 +334,10 @@ describe Deliver::SubmitForReview do
 
           expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
           expect(app).to receive(:get_ready_review_submission).and_return(nil)
-          expect(app).to receive(:create_review_submission).and_return(empty_submission)
+          expect(app).to receive(:create_review_submission).and_return(submission)
 
-          expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
-          expect(empty_submission).to receive(:submit_for_review)
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
         end
