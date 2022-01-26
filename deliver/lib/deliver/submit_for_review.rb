@@ -28,14 +28,12 @@ module Deliver
     end
 
     private
-    
+
     def create_review_submission(options, app, version, platform)
       if app.get_in_progress_review_submission(platform: platform)
         UI.user_error!("Cannot submit for review - A review submission is already in progress")
       end
 
-      # TODO: I don't like this logic here
-      # Maybe error out if there are aleady items in this review?
       submission = app.get_ready_review_submission(platform: platform, includes: "items")
 
       if submission.nil?

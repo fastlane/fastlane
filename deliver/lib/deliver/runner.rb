@@ -200,11 +200,11 @@ module Deliver
 
       submission = app.get_in_progress_review_submission(platform: platform)
       if submission
-        submission.cancel_submission()
+        submission.cancel_submission
         UI.message("Review submission cancellation has been requested")
 
         # An app version won't get removed from review instantly
-        # Polling until app version has a state of DEVELOPER_REJECT 
+        # Polling until app version has a state of DEVELOPER_REJECT
         loop do
           version = app.get_edit_app_store_version(platform: platform)
           if version.app_store_state == Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REJECTED

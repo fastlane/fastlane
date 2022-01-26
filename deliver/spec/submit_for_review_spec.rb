@@ -8,10 +8,16 @@ describe Deliver::SubmitForReview do
     let(:app) { double('app') }
     let(:edit_version) do
       double('edit_version',
+             id: '1',
              version_string: "1.0.0")
     end
     let(:selected_build) { double('selected_build') }
     let(:idfa_declaration) { double('idfa_declaration') }
+
+    let(:empty_submission) do
+      double('empty_submission',
+             id: '1')
+    end
 
     before do
       allow(Deliver).to receive(:cache).and_return({ app: app })
@@ -84,7 +90,12 @@ describe Deliver::SubmitForReview do
         expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
         expect(edit_version).to receive(:uses_idfa).and_return(false)
 
-        expect(edit_version).to receive(:create_app_store_version_submission)
+        expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+        expect(app).to receive(:get_ready_review_submission).and_return(nil)
+        expect(app).to receive(:create_review_submission).and_return(empty_submission)
+
+        expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+        expect(empty_submission).to receive(:submit_for_review)
 
         review_submitter.submit!(options)
       end
@@ -108,7 +119,12 @@ describe Deliver::SubmitForReview do
           expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
           expect(edit_version).to receive(:uses_idfa).and_return(false)
 
-          expect(edit_version).to receive(:create_app_store_version_submission)
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(nil)
+          expect(app).to receive(:create_review_submission).and_return(empty_submission)
+
+          expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(empty_submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
         end
@@ -135,7 +151,12 @@ describe Deliver::SubmitForReview do
             contentRightsDeclaration: "USES_THIRD_PARTY_CONTENT"
           })
 
-          expect(edit_version).to receive(:create_app_store_version_submission)
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(nil)
+          expect(app).to receive(:create_review_submission).and_return(empty_submission)
+
+          expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(empty_submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
         end
@@ -159,7 +180,12 @@ describe Deliver::SubmitForReview do
           expect(edit_version).to receive(:update).with(attributes: { usesIdfa: false }).and_return(edit_version)
           expect(edit_version).to receive(:uses_idfa).and_return(false).exactly(2).times
 
-          expect(edit_version).to receive(:create_app_store_version_submission)
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(nil)
+          expect(app).to receive(:create_review_submission).and_return(empty_submission)
+
+          expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(empty_submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
         end
@@ -182,7 +208,12 @@ describe Deliver::SubmitForReview do
           expect(edit_version).to receive(:uses_idfa).and_return(false).exactly(2).times
           expect(idfa_declaration).to receive(:delete!)
 
-          expect(edit_version).to receive(:create_app_store_version_submission)
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(nil)
+          expect(app).to receive(:create_review_submission).and_return(empty_submission)
+
+          expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(empty_submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
         end
@@ -216,7 +247,12 @@ describe Deliver::SubmitForReview do
             attributesActionWithPreviousAd: true
           })
 
-          expect(edit_version).to receive(:create_app_store_version_submission)
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(nil)
+          expect(app).to receive(:create_review_submission).and_return(empty_submission)
+
+          expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(empty_submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
         end
@@ -250,7 +286,12 @@ describe Deliver::SubmitForReview do
             attributesActionWithPreviousAd: true
           })
 
-          expect(edit_version).to receive(:create_app_store_version_submission)
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(nil)
+          expect(app).to receive(:create_review_submission).and_return(empty_submission)
+
+          expect(empty_submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(empty_submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
         end
