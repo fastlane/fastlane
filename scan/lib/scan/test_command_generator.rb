@@ -55,6 +55,7 @@ module Scan
       end
       options << "-resultBundlePath '#{result_bundle_path(true)}'" if config[:result_bundle]
       if FastlaneCore::Helper.xcode_at_least?(10)
+        options << "-parallel-testing-enabled #{config[:parallel_testing] ? 'YES' : 'NO'}" unless config[:parallel_testing].nil?
         options << "-parallel-testing-worker-count #{config[:concurrent_workers]}" if config[:concurrent_workers]
         options << "-maximum-concurrent-test-simulator-destinations #{config[:max_concurrent_simulators]}" if config[:max_concurrent_simulators]
         options << "-disable-concurrent-testing" if config[:disable_concurrent_testing]

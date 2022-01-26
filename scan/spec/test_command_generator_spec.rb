@@ -355,6 +355,40 @@ describe Scan do
         end
       end
 
+      describe "Test Parallel Testing" do
+        # don't want to override settings defined in xcode unless explicitly asked to
+        it "doesn't add option if not passed explicitly", requires_xcodebuild: true do
+          log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+          options = { project: "./scan/examples/standard/app.xcodeproj" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+          result = @test_command_generator.generate
+          expect(result).not_to include("-parallel-testing-enabled YES") if FastlaneCore::Helper.xcode_at_least?(10)
+          expect(result).not_to include("-parallel-testing-enabled NO") if FastlaneCore::Helper.xcode_at_least?(10)
+        end
+
+        it "specify YES when set to true", requires_xcodebuild: true do
+          log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+          options = { project: "./scan/examples/standard/app.xcodeproj", parallel_testing: true }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+          result = @test_command_generator.generate
+          expect(result).to include("-parallel-testing-enabled YES") if FastlaneCore::Helper.xcode_at_least?(10)
+        end
+
+        it "specify NO when set to false", requires_xcodebuild: true do
+          log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+          options = { project: "./scan/examples/standard/app.xcodeproj", parallel_testing: false }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+          result = @test_command_generator.generate
+          expect(result).to include("-parallel-testing-enabled NO") if FastlaneCore::Helper.xcode_at_least?(10)
+        end
+      end
+
       describe "Test Concurrent Workers" do
         before do
           options = { project: "./scan/examples/standard/app.xcodeproj", concurrent_workers: 4 }
