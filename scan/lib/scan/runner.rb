@@ -303,6 +303,7 @@ module Scan
       end
 
       open_report
+      results
     end
 
     def open_report
