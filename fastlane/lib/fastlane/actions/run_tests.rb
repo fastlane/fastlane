@@ -13,14 +13,13 @@ module Fastlane
         require 'scan'
         manager = Scan::Manager.new
 
-        results = nil
-
         begin
           results = manager.work(values)
 
           zip_build_products_path = Scan.cache[:zip_build_products_path]
           Actions.lane_context[SharedValues::SCAN_ZIP_BUILD_PRODUCTS_PATH] = zip_build_products_path if zip_build_products_path
 
+          return results
         rescue FastlaneCore::Interface::FastlaneBuildFailure => ex
           # Specifically catching FastlaneBuildFailure to prevent build/compile errors from being
           # silenced when :fail_build is set to false
@@ -47,8 +46,6 @@ module Fastlane
             Actions.lane_context[SharedValues::SCAN_GENERATED_PLIST_FILE] = all_test_summaries.last
           end
         end
-
-        return results
       end
 
       def self.description
