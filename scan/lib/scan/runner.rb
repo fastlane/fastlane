@@ -21,7 +21,7 @@ module Scan
 
     def run
       @xcresults_before_run = find_xcresults_in_derived_data
-      handle_results(test_app)
+      return handle_results(test_app)
     end
 
     def test_app
@@ -185,7 +185,9 @@ module Scan
       results = {
         number_of_tests: 0,
         number_of_failures: 0,
-        number_of_retries: 0
+        number_of_retries: 0,
+        number_of_tests_excluding_retries: 0,
+        number_of_failures_excluding_retries: 0
       }
 
       result_bundle_path = Scan.cache[:result_bundle_path]
@@ -242,8 +244,10 @@ module Scan
 
       resulting_paths = Trainer::TestParser.auto_convert(params)
       resulting_paths.each do |path, data|
-        results[:number_of_tests] += data[:number_of_tests_excluding_retries]
-        results[:number_of_failures] += data[:number_of_failures_excluding_retries]
+        results[:number_of_tests] += data[:number_of_tests]
+        results[:number_of_failures] += data[:number_of_failures]
+        results[:number_of_tests_excluding_retries] += data[:number_of_tests_excluding_retries]
+        results[:number_of_failures_excluding_retries] += data[:number_of_failures_excluding_retries]
         results[:number_of_retries] += data[:number_of_retries]
       end
 
@@ -251,13 +255,13 @@ module Scan
     end
 
     def handle_results(tests_exit_status)
-      return if Scan.config[:build_for_testing]
+      return nil if Scan.config[:build_for_testing]
 
       results = trainer_test_results
 
       number_of_retries = results[:number_of_retries]
-      number_of_tests = results[:number_of_tests]
-      number_of_failures = results[:number_of_failures]
+      number_of_tests = results[:number_of_tests_excluding_retries]
+      number_of_failures = results[:number_of_failures_excluding_retries]
 
       SlackPoster.new.run({
         tests: number_of_tests,
@@ -303,7 +307,7 @@ module Scan
       end
 
       open_report
-      results
+      return results
     end
 
     def open_report
