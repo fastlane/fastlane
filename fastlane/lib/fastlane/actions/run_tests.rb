@@ -56,6 +56,14 @@ module Fastlane
         "More information: https://docs.fastlane.tools/actions/scan/"
       end
 
+      def self.return_value
+        'Outputs has of results with :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries'
+      end
+
+      def self.return_type
+        :hash
+      end
+
       def self.author
         "KrauseFx"
       end
