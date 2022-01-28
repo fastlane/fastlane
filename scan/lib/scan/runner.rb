@@ -257,6 +257,10 @@ module Scan
     end
 
     def handle_results(tests_exit_status)
+      copy_simulator_logs
+      zip_build_products
+      copy_xctestrun
+
       return nil if Scan.config[:build_for_testing]
 
       results = trainer_test_results
@@ -293,10 +297,6 @@ module Scan
         ]
       }))
       puts("")
-
-      copy_simulator_logs
-      zip_build_products
-      copy_xctestrun
 
       if number_of_failures > 0
         open_report
