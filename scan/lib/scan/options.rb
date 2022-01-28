@@ -328,6 +328,11 @@ module Scan
                                      default_value: false),
 
         # concurrency
+        FastlaneCore::ConfigItem.new(key: :parallel_testing,
+                                     type: Boolean,
+                                     env_name: "SCAN_PARALLEL_TESTING",
+                                     description: "Optionally override the per-target setting in the scheme for running tests in parallel. Equivalent to -parallel-testing-enabled",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :concurrent_workers,
                                      type: Integer,
                                      env_name: "SCAN_CONCURRENT_WORKERS",
