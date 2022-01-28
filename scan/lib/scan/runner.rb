@@ -175,6 +175,8 @@ module Scan
 
     def find_xcresults_in_derived_data
       derived_data_path = Scan.config[:derived_data_path]
+      return [] if derived_data_path.nil? # Swift packages might not have derived data
+
       xcresults_path = File.join(derived_data_path, "Logs", "Test", "*.xcresult")
       return Dir[xcresults_path]
     end
