@@ -8600,6 +8600,7 @@ public func rubyVersion() {
    - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
+   - parallelTesting: Optionally override the per-target setting in the scheme for running tests in parallel. Equivalent to -parallel-testing-enabled
    - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
    - maxConcurrentSimulators: Constrain the number of simulator devices on which to test concurrently. Equivalent to -maximum-concurrent-test-simulator-destinations
    - disableConcurrentTesting: Do not run test bundles in parallel on the specified destinations. Testing will occur on each destination serially. Equivalent to -disable-concurrent-testing
@@ -8632,83 +8633,86 @@ public func rubyVersion() {
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
+ - returns: Outputs has of results with :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
+
  More information: https://docs.fastlane.tools/actions/scan/
  */
-public func runTests(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     project: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     packagePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     scheme: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     device: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     devices: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
-                     skipDetectDevices: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     ensureDevicesFound: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     forceQuitSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     resetSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     disableSlideToType: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                     prelaunchSimulator: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                     reinstallApp: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     appIdentifier: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     onlyTesting: Any? = nil,
-                     skipTesting: Any? = nil,
-                     testplan: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     onlyTestConfigurations: Any? = nil,
-                     skipTestConfigurations: Any? = nil,
-                     xctestrun: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     toolchain: Any? = nil,
-                     clean: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     codeCoverage: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                     addressSanitizer: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                     threadSanitizer: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                     openReport: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     outputDirectory: String = "./test_output",
-                     outputStyle: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     outputTypes: String = "html,junit",
-                     outputFiles: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     buildlogPath: String = "~/Library/Logs/scan",
-                     includeSimulatorLogs: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                     xcodebuildFormatter: String = "xcbeautify",
-                     outputRemoveRetryAttempts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                     formatter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     xcprettyArgs: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     derivedDataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     shouldZipBuildProducts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     outputXctestrun: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     resultBundle: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     useClangReportName: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     concurrentWorkers: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
-                     maxConcurrentSimulators: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
-                     disableConcurrentTesting: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     skipBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     testWithoutBuilding: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                     buildForTesting: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                     sdk: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     configuration: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     xcargs: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     appName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     deploymentTargetVersion: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     slackUrl: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     slackChannel: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     slackMessage: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     slackUseWebhookConfiguredUsernameAndIcon: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     slackUsername: String = "fastlane",
-                     slackIconUrl: String = "https://fastlane.tools/assets/img/fastlane_icon.png",
-                     skipSlack: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     slackOnlyOnFailure: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     slackDefaultPayloads: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
-                     destination: Any? = nil,
-                     catalystPlatform: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     customReportFileName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     xcodebuildCommand: String = "env NSUnbufferedIO=YES xcodebuild",
-                     clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                     skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     numberOfRetries: Int = 0,
-                     failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(true))
+@discardableResult public func runTests(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        project: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        packagePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        scheme: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        device: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        devices: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                                        skipDetectDevices: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        ensureDevicesFound: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        forceQuitSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        resetSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        disableSlideToType: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                                        prelaunchSimulator: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                                        reinstallApp: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        appIdentifier: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        onlyTesting: Any? = nil,
+                                        skipTesting: Any? = nil,
+                                        testplan: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        onlyTestConfigurations: Any? = nil,
+                                        skipTestConfigurations: Any? = nil,
+                                        xctestrun: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        toolchain: Any? = nil,
+                                        clean: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        codeCoverage: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                                        addressSanitizer: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                                        threadSanitizer: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                                        openReport: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        outputDirectory: String = "./test_output",
+                                        outputStyle: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        outputTypes: String = "html,junit",
+                                        outputFiles: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        buildlogPath: String = "~/Library/Logs/scan",
+                                        includeSimulatorLogs: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                                        xcodebuildFormatter: String = "xcbeautify",
+                                        outputRemoveRetryAttempts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                                        formatter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        xcprettyArgs: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        derivedDataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        shouldZipBuildProducts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        outputXctestrun: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        resultBundle: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        useClangReportName: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        parallelTesting: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                                        concurrentWorkers: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
+                                        maxConcurrentSimulators: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
+                                        disableConcurrentTesting: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        skipBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        testWithoutBuilding: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                                        buildForTesting: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                                        sdk: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        configuration: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        xcargs: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        appName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        deploymentTargetVersion: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        slackUrl: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        slackChannel: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        slackMessage: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        slackUseWebhookConfiguredUsernameAndIcon: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        slackUsername: String = "fastlane",
+                                        slackIconUrl: String = "https://fastlane.tools/assets/img/fastlane_icon.png",
+                                        skipSlack: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        slackOnlyOnFailure: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        slackDefaultPayloads: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                                        destination: Any? = nil,
+                                        catalystPlatform: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        customReportFileName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        xcodebuildCommand: String = "env NSUnbufferedIO=YES xcodebuild",
+                                        clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        numberOfRetries: Int = 0,
+                                        failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(true)) -> [String: Any]
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -8754,6 +8758,7 @@ public func runTests(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
     let outputXctestrunArg = outputXctestrun.asRubyArgument(name: "output_xctestrun", type: nil)
     let resultBundleArg = resultBundle.asRubyArgument(name: "result_bundle", type: nil)
     let useClangReportNameArg = useClangReportName.asRubyArgument(name: "use_clang_report_name", type: nil)
+    let parallelTestingArg = parallelTesting.asRubyArgument(name: "parallel_testing", type: nil)
     let concurrentWorkersArg = concurrentWorkers.asRubyArgument(name: "concurrent_workers", type: nil)
     let maxConcurrentSimulatorsArg = maxConcurrentSimulators.asRubyArgument(name: "max_concurrent_simulators", type: nil)
     let disableConcurrentTestingArg = disableConcurrentTesting.asRubyArgument(name: "disable_concurrent_testing", type: nil)
@@ -8829,6 +8834,7 @@ public func runTests(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
                                           outputXctestrunArg,
                                           resultBundleArg,
                                           useClangReportNameArg,
+                                          parallelTestingArg,
                                           concurrentWorkersArg,
                                           maxConcurrentSimulatorsArg,
                                           disableConcurrentTestingArg,
@@ -8864,7 +8870,7 @@ public func runTests(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
         .filter { $0?.value != nil }
         .compactMap { $0 }
     let command = RubyCommand(commandID: "", methodName: "run_tests", className: nil, args: args)
-    _ = runner.executeCommand(command)
+    return parseDictionary(fromString: runner.executeCommand(command))
 }
 
 /**
@@ -9017,6 +9023,7 @@ public func say(text: [String],
    - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
+   - parallelTesting: Optionally override the per-target setting in the scheme for running tests in parallel. Equivalent to -parallel-testing-enabled
    - concurrentWorkers: Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
    - maxConcurrentSimulators: Constrain the number of simulator devices on which to test concurrently. Equivalent to -maximum-concurrent-test-simulator-destinations
    - disableConcurrentTesting: Do not run test bundles in parallel on the specified destinations. Testing will occur on each destination serially. Equivalent to -disable-concurrent-testing
@@ -9049,83 +9056,86 @@ public func say(text: [String],
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
+ - returns: Outputs has of results with :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
+
  More information: https://docs.fastlane.tools/actions/scan/
  */
-public func scan(workspace: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.workspace),
-                 project: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.project),
-                 packagePath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.packagePath),
-                 scheme: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.scheme),
-                 device: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.device),
-                 devices: OptionalConfigValue<[String]?> = .fastlaneDefault(scanfile.devices),
-                 skipDetectDevices: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipDetectDevices),
-                 ensureDevicesFound: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.ensureDevicesFound),
-                 forceQuitSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.forceQuitSimulator),
-                 resetSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.resetSimulator),
-                 disableSlideToType: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.disableSlideToType),
-                 prelaunchSimulator: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.prelaunchSimulator),
-                 reinstallApp: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.reinstallApp),
-                 appIdentifier: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.appIdentifier),
-                 onlyTesting: Any? = scanfile.onlyTesting,
-                 skipTesting: Any? = scanfile.skipTesting,
-                 testplan: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.testplan),
-                 onlyTestConfigurations: Any? = scanfile.onlyTestConfigurations,
-                 skipTestConfigurations: Any? = scanfile.skipTestConfigurations,
-                 xctestrun: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.xctestrun),
-                 toolchain: Any? = scanfile.toolchain,
-                 clean: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.clean),
-                 codeCoverage: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.codeCoverage),
-                 addressSanitizer: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.addressSanitizer),
-                 threadSanitizer: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.threadSanitizer),
-                 openReport: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.openReport),
-                 outputDirectory: String = scanfile.outputDirectory,
-                 outputStyle: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.outputStyle),
-                 outputTypes: String = scanfile.outputTypes,
-                 outputFiles: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.outputFiles),
-                 buildlogPath: String = scanfile.buildlogPath,
-                 includeSimulatorLogs: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.includeSimulatorLogs),
-                 suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.suppressXcodeOutput),
-                 xcodebuildFormatter: String = scanfile.xcodebuildFormatter,
-                 outputRemoveRetryAttempts: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.outputRemoveRetryAttempts),
-                 disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.disableXcpretty),
-                 formatter: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.formatter),
-                 xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.xcprettyFormatter),
-                 xcprettyArgs: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.xcprettyArgs),
-                 derivedDataPath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.derivedDataPath),
-                 shouldZipBuildProducts: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.shouldZipBuildProducts),
-                 outputXctestrun: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.outputXctestrun),
-                 resultBundle: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.resultBundle),
-                 useClangReportName: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.useClangReportName),
-                 concurrentWorkers: OptionalConfigValue<Int?> = .fastlaneDefault(scanfile.concurrentWorkers),
-                 maxConcurrentSimulators: OptionalConfigValue<Int?> = .fastlaneDefault(scanfile.maxConcurrentSimulators),
-                 disableConcurrentTesting: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.disableConcurrentTesting),
-                 skipBuild: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipBuild),
-                 testWithoutBuilding: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.testWithoutBuilding),
-                 buildForTesting: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.buildForTesting),
-                 sdk: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.sdk),
-                 configuration: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.configuration),
-                 xcargs: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.xcargs),
-                 xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.xcconfig),
-                 appName: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.appName),
-                 deploymentTargetVersion: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.deploymentTargetVersion),
-                 slackUrl: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.slackUrl),
-                 slackChannel: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.slackChannel),
-                 slackMessage: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.slackMessage),
-                 slackUseWebhookConfiguredUsernameAndIcon: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.slackUseWebhookConfiguredUsernameAndIcon),
-                 slackUsername: String = scanfile.slackUsername,
-                 slackIconUrl: String = scanfile.slackIconUrl,
-                 skipSlack: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipSlack),
-                 slackOnlyOnFailure: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.slackOnlyOnFailure),
-                 slackDefaultPayloads: OptionalConfigValue<[String]?> = .fastlaneDefault(scanfile.slackDefaultPayloads),
-                 destination: Any? = scanfile.destination,
-                 catalystPlatform: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.catalystPlatform),
-                 customReportFileName: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.customReportFileName),
-                 xcodebuildCommand: String = scanfile.xcodebuildCommand,
-                 clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.clonedSourcePackagesPath),
-                 skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipPackageDependenciesResolution),
-                 disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.disablePackageAutomaticUpdates),
-                 useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.useSystemScm),
-                 numberOfRetries: Int = scanfile.numberOfRetries,
-                 failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.failBuild))
+@discardableResult public func scan(workspace: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.workspace),
+                                    project: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.project),
+                                    packagePath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.packagePath),
+                                    scheme: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.scheme),
+                                    device: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.device),
+                                    devices: OptionalConfigValue<[String]?> = .fastlaneDefault(scanfile.devices),
+                                    skipDetectDevices: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipDetectDevices),
+                                    ensureDevicesFound: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.ensureDevicesFound),
+                                    forceQuitSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.forceQuitSimulator),
+                                    resetSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.resetSimulator),
+                                    disableSlideToType: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.disableSlideToType),
+                                    prelaunchSimulator: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.prelaunchSimulator),
+                                    reinstallApp: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.reinstallApp),
+                                    appIdentifier: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.appIdentifier),
+                                    onlyTesting: Any? = scanfile.onlyTesting,
+                                    skipTesting: Any? = scanfile.skipTesting,
+                                    testplan: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.testplan),
+                                    onlyTestConfigurations: Any? = scanfile.onlyTestConfigurations,
+                                    skipTestConfigurations: Any? = scanfile.skipTestConfigurations,
+                                    xctestrun: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.xctestrun),
+                                    toolchain: Any? = scanfile.toolchain,
+                                    clean: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.clean),
+                                    codeCoverage: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.codeCoverage),
+                                    addressSanitizer: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.addressSanitizer),
+                                    threadSanitizer: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.threadSanitizer),
+                                    openReport: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.openReport),
+                                    outputDirectory: String = scanfile.outputDirectory,
+                                    outputStyle: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.outputStyle),
+                                    outputTypes: String = scanfile.outputTypes,
+                                    outputFiles: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.outputFiles),
+                                    buildlogPath: String = scanfile.buildlogPath,
+                                    includeSimulatorLogs: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.includeSimulatorLogs),
+                                    suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.suppressXcodeOutput),
+                                    xcodebuildFormatter: String = scanfile.xcodebuildFormatter,
+                                    outputRemoveRetryAttempts: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.outputRemoveRetryAttempts),
+                                    disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.disableXcpretty),
+                                    formatter: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.formatter),
+                                    xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.xcprettyFormatter),
+                                    xcprettyArgs: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.xcprettyArgs),
+                                    derivedDataPath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.derivedDataPath),
+                                    shouldZipBuildProducts: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.shouldZipBuildProducts),
+                                    outputXctestrun: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.outputXctestrun),
+                                    resultBundle: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.resultBundle),
+                                    useClangReportName: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.useClangReportName),
+                                    parallelTesting: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.parallelTesting),
+                                    concurrentWorkers: OptionalConfigValue<Int?> = .fastlaneDefault(scanfile.concurrentWorkers),
+                                    maxConcurrentSimulators: OptionalConfigValue<Int?> = .fastlaneDefault(scanfile.maxConcurrentSimulators),
+                                    disableConcurrentTesting: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.disableConcurrentTesting),
+                                    skipBuild: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipBuild),
+                                    testWithoutBuilding: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.testWithoutBuilding),
+                                    buildForTesting: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.buildForTesting),
+                                    sdk: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.sdk),
+                                    configuration: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.configuration),
+                                    xcargs: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.xcargs),
+                                    xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.xcconfig),
+                                    appName: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.appName),
+                                    deploymentTargetVersion: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.deploymentTargetVersion),
+                                    slackUrl: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.slackUrl),
+                                    slackChannel: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.slackChannel),
+                                    slackMessage: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.slackMessage),
+                                    slackUseWebhookConfiguredUsernameAndIcon: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.slackUseWebhookConfiguredUsernameAndIcon),
+                                    slackUsername: String = scanfile.slackUsername,
+                                    slackIconUrl: String = scanfile.slackIconUrl,
+                                    skipSlack: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipSlack),
+                                    slackOnlyOnFailure: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.slackOnlyOnFailure),
+                                    slackDefaultPayloads: OptionalConfigValue<[String]?> = .fastlaneDefault(scanfile.slackDefaultPayloads),
+                                    destination: Any? = scanfile.destination,
+                                    catalystPlatform: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.catalystPlatform),
+                                    customReportFileName: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.customReportFileName),
+                                    xcodebuildCommand: String = scanfile.xcodebuildCommand,
+                                    clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.clonedSourcePackagesPath),
+                                    skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipPackageDependenciesResolution),
+                                    disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.disablePackageAutomaticUpdates),
+                                    useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.useSystemScm),
+                                    numberOfRetries: Int = scanfile.numberOfRetries,
+                                    failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.failBuild)) -> [String: Any]
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -9171,6 +9181,7 @@ public func scan(workspace: OptionalConfigValue<String?> = .fastlaneDefault(scan
     let outputXctestrunArg = outputXctestrun.asRubyArgument(name: "output_xctestrun", type: nil)
     let resultBundleArg = resultBundle.asRubyArgument(name: "result_bundle", type: nil)
     let useClangReportNameArg = useClangReportName.asRubyArgument(name: "use_clang_report_name", type: nil)
+    let parallelTestingArg = parallelTesting.asRubyArgument(name: "parallel_testing", type: nil)
     let concurrentWorkersArg = concurrentWorkers.asRubyArgument(name: "concurrent_workers", type: nil)
     let maxConcurrentSimulatorsArg = maxConcurrentSimulators.asRubyArgument(name: "max_concurrent_simulators", type: nil)
     let disableConcurrentTestingArg = disableConcurrentTesting.asRubyArgument(name: "disable_concurrent_testing", type: nil)
@@ -9246,6 +9257,7 @@ public func scan(workspace: OptionalConfigValue<String?> = .fastlaneDefault(scan
                                           outputXctestrunArg,
                                           resultBundleArg,
                                           useClangReportNameArg,
+                                          parallelTestingArg,
                                           concurrentWorkersArg,
                                           maxConcurrentSimulatorsArg,
                                           disableConcurrentTestingArg,
@@ -9281,7 +9293,7 @@ public func scan(workspace: OptionalConfigValue<String?> = .fastlaneDefault(scan
         .filter { $0?.value != nil }
         .compactMap { $0 }
     let command = RubyCommand(commandID: "", methodName: "scan", className: nil, args: args)
-    _ = runner.executeCommand(command)
+    return parseDictionary(fromString: runner.executeCommand(command))
 }
 
 /**
@@ -13394,4 +13406,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.147]
+// FastlaneRunnerAPIVersion [0.9.148]
