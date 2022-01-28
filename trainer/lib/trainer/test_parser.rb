@@ -250,6 +250,7 @@ module Trainer
 
           info = tests_by_identifier[identifier] || {}
           info[:failure_count] ||= 0
+          info[:skip_count] ||= 0
           info[:success_count] ||= 0
 
           retry_count = info[:retry_count]
@@ -272,6 +273,9 @@ module Trainer
             }]
 
             info[:failure_count] += 1
+          elsif test.test_status == "Skipped"
+            test_row[:skipped] = true
+            info[:skip_count] += 1
           else
             info[:success_count] = 1
           end
@@ -319,7 +323,8 @@ module Trainer
         # Used for seeing if any tests continued to fail after all of the Xcode 13 (and up) retries have finished
         unique_tests = tests_by_identifier.values || []
         row[:number_of_tests_excluding_retries] = unique_tests.count
-        row[:number_of_failures_excluding_retries] = unique_tests.find_all { |a| a[:success_count] == 0 }.count
+        row[:number_of_skipped] = unique_tests.map { |a| a[:skip_count] }.inject(:+)
+        row[:number_of_failures_excluding_retries] = unique_tests.find_all { |a| (a[:success_count] + a[:skip_count]) == 0 }.count
         row[:number_of_retries] = unique_tests.map { |a| a[:retry_count] }.inject(:+)
 
         row

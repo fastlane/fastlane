@@ -188,6 +188,7 @@ module Scan
         number_of_tests: 0,
         number_of_failures: 0,
         number_of_retries: 0,
+        number_of_skipped: 0,
         number_of_tests_excluding_retries: 0,
         number_of_failures_excluding_retries: 0
       }
@@ -250,6 +251,7 @@ module Scan
         results[:number_of_failures] += data[:number_of_failures]
         results[:number_of_tests_excluding_retries] += data[:number_of_tests_excluding_retries]
         results[:number_of_failures_excluding_retries] += data[:number_of_failures_excluding_retries]
+        results[:number_of_skipped] += data[:number_of_skipped] || 0
         results[:number_of_retries] += data[:number_of_retries]
       end
 
@@ -266,6 +268,7 @@ module Scan
       results = trainer_test_results
 
       number_of_retries = results[:number_of_retries]
+      number_of_skipped = results[:number_of_skipped]
       number_of_tests = results[:number_of_tests_excluding_retries]
       number_of_failures = results[:number_of_failures_excluding_retries]
 
@@ -293,8 +296,9 @@ module Scan
         title: "Test Results",
         rows: [
           ["Number of tests", "#{number_of_tests}#{retries_str}"],
+          number_of_skipped > 0 ? ["Number of tests skipped", number_of_skipped] : nil,
           ["Number of failures", failures_str]
-        ]
+        ].compact
       }))
       puts("")
 
