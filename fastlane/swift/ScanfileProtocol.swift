@@ -134,6 +134,9 @@ public protocol ScanfileProtocol: class {
     /// Generate the json compilation database with clang naming convention (compile_commands.json)
     var useClangReportName: Bool { get }
 
+    /// Optionally override the per-target setting in the scheme for running tests in parallel. Equivalent to -parallel-testing-enabled
+    var parallelTesting: Bool? { get }
+
     /// Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
     var concurrentWorkers: Int? { get }
 
@@ -273,6 +276,7 @@ public extension ScanfileProtocol {
     var outputXctestrun: Bool { return false }
     var resultBundle: Bool { return false }
     var useClangReportName: Bool { return false }
+    var parallelTesting: Bool? { return nil }
     var concurrentWorkers: Int? { return nil }
     var maxConcurrentSimulators: Int? { return nil }
     var disableConcurrentTesting: Bool { return false }
@@ -308,4 +312,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.102]
+// FastlaneRunnerAPIVersion [0.9.103]
