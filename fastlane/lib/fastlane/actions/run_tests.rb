@@ -14,12 +14,12 @@ module Fastlane
         manager = Scan::Manager.new
 
         begin
-          manager.work(values)
+          results = manager.work(values)
 
           zip_build_products_path = Scan.cache[:zip_build_products_path]
           Actions.lane_context[SharedValues::SCAN_ZIP_BUILD_PRODUCTS_PATH] = zip_build_products_path if zip_build_products_path
 
-          return true
+          return results
         rescue FastlaneCore::Interface::FastlaneBuildFailure => ex
           # Specifically catching FastlaneBuildFailure to prevent build/compile errors from being
           # silenced when :fail_build is set to false
@@ -54,6 +54,14 @@ module Fastlane
 
       def self.details
         "More information: https://docs.fastlane.tools/actions/scan/"
+      end
+
+      def self.return_value
+        'Outputs has of results with :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries'
+      end
+
+      def self.return_type
+        :hash
       end
 
       def self.author
