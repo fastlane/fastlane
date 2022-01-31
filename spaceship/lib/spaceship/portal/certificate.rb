@@ -168,7 +168,7 @@ module Spaceship
         "R58UK2EWSO" => Production,
         "9RQEK7MSXA" => InHouse,
         "LA30L5BJEU" => Certificate,
-        "BKLRAVXMGM" => DevelopmentPush,
+        "JKG5JZ54H7" => DevelopmentPush,
         "UPV3DW712I" => ProductionPush,
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
@@ -178,12 +178,13 @@ module Spaceship
       }
 
       OLDER_IOS_CERTIFICATE_TYPES = [
-        # those are also sent by the browser, but not sure what they represent
+        "3BQKVH9I2X", # old ProductionPush
+        "BKLRAVXMGM", # old DevelopmentPush
+        # those are also sent by the browser, but not sure what they represent:
         "T44PTHVNID",
         "DZQUP8189Y",
         "FGQUP4785Z",
         "S5WE21TULA",
-        "3BQKVH9I2X", # ProductionPush,
         "FUOY7LWJET"
       ]
 
