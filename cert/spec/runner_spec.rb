@@ -151,5 +151,35 @@ describe Cert do
         end
       end
     end
+
+    describe 'direct token text support' do
+      describe '#login' do
+        context 'with valid token' do
+          api_token_text = 'Token.Text.JWT_content'
+          in_house = false
+          api_token = { in_house: in_house, token_text: api_token_text }
+          fake_api_key_json_path = './spaceship/spec/connect_api/fixtures/asc_key.json'
+
+          let(:mock_token) { Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path) }
+
+          before(:each) do
+            allow(Spaceship::ConnectAPI::Token).to receive(:from_token).and_return(mock_token)
+            allow(Spaceship::ConnectAPI).to receive(:token=)
+
+            options = { api_token: api_token }
+            Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options)
+            Cert::Runner.new.login
+          end
+
+          it 'creates token' do
+            expect(Spaceship::ConnectAPI::Token).to have_received(:from_token).with(api_token)
+          end
+
+          it 'assigns token' do
+            expect(Spaceship::ConnectAPI).to have_received(:token=).with(mock_token)
+          end
+        end
+      end
+    end
   end
 end

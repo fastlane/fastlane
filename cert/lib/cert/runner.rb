@@ -20,7 +20,11 @@ module Cert
     end
 
     def login
-      if (api_token = Spaceship::ConnectAPI::Token.from(hash: Cert.config[:api_key], filepath: Cert.config[:api_key_path]))
+      if !Cert.config[:api_token].nil?
+        UI.message('Passing given authorization token for App Store Connect API')
+        api_token = Spaceship::ConnectAPI::Token.from_token(Cert.config[:api_token])
+        Spaceship::ConnectAPI.token = api_token
+      elsif (api_token = Spaceship::ConnectAPI::Token.from(hash: Cert.config[:api_key], filepath: Cert.config[:api_key_path]))
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
       elsif !Spaceship::ConnectAPI.token.nil?
