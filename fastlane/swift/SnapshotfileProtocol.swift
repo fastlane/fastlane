@@ -1,7 +1,7 @@
 // SnapshotfileProtocol.swift
 // Copyright (c) 2022 FastlaneTools
 
-public protocol SnapshotfileProtocol: class {
+public protocol SnapshotfileProtocol: AnyObject {
     /// Path the workspace file
     var workspace: String? { get }
 

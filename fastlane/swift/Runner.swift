@@ -25,7 +25,13 @@ class Runner {
     private var returnValue: String? // lol, so safe
     private var currentlyExecutingCommand: RubyCommandable?
     private var shouldLeaveDispatchGroupDuringDisconnect = false
-    private var executeNext: [String: Bool] = [:]
+    private var executeNext: AtomicDictionary<String, Bool> = {
+        if #available(macOS 10.12, *) {
+            return UnfairAtomicDictionary<String, Bool>()
+        } else {
+            return OSSPinAtomicDictionary<String, Bool>()
+        }
+    }()
 
     func executeCommand(_ command: RubyCommandable) -> String {
         dispatchGroup.enter()
@@ -260,6 +266,8 @@ private extension DispatchTimeInterval {
         case let .nanoseconds(value):
             result = TimeInterval(value) * 0.000_000_001
         case .never:
+            fatalError()
+        @unknown default:
             fatalError()
         }
         return result

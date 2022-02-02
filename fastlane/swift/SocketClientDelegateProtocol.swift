@@ -10,7 +10,7 @@
 
 import Foundation
 
-protocol SocketClientDelegateProtocol: class {
+protocol SocketClientDelegateProtocol: AnyObject {
     func connectionsOpened()
     func connectionsClosed()
     func commandExecuted(serverResponse: SocketClientResponse, completion: (SocketClient) -> Void)

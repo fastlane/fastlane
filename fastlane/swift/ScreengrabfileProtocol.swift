@@ -1,7 +1,7 @@
 // ScreengrabfileProtocol.swift
 // Copyright (c) 2022 FastlaneTools
 
-public protocol ScreengrabfileProtocol: class {
+public protocol ScreengrabfileProtocol: AnyObject {
     /// Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx
     var androidHome: String? { get }
 
