@@ -346,6 +346,10 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
+      def add_individual_testers_to_build(build_id: nil, beta_tester_ids: [])
+        Spaceship::ConnectAPI.add_individual_testers_to_build(build_id: build_id, beta_tester_ids: beta_tester_ids)
+      end
+
       #
       # Builds
       #

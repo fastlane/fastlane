@@ -97,6 +97,18 @@ module Spaceship
           test_flight_request_client.get("betaAppReviewSubmissions", params)
         end
 
+        #
+        # betaAppReviewSubmissions
+        #
+
+        def get_beta_app_review_submission_state_for_build(build_id: nil)
+          response = test_flight_request_client.get("builds/#{build_id}/betaAppReviewSubmission", {})
+          if response.body["data"].nil?
+            return nil
+          end
+          return response.body["data"]["attributes"]["betaReviewState"]
+        end
+
         def post_beta_app_review_submissions(build_id: nil)
           body = {
             data: {
@@ -189,6 +201,19 @@ module Spaceship
           }
 
           test_flight_request_client.post("builds/#{build_id}/relationships/betaGroups", body)
+        end
+
+        def add_individual_testers_to_build(build_id: nil, beta_tester_ids: [])
+          body = {
+            data: beta_tester_ids.map do |id|
+              {
+                type: "betaTesters",
+                id: id
+              }
+            end
+          }
+
+          test_flight_request_client.post("builds/#{build_id}/relationships/individualTesters", body)
         end
 
         def delete_beta_groups_from_build(build_id: nil, beta_group_ids: [])

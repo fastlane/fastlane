@@ -147,6 +147,17 @@ Additionally you can specify the app identifier (if necessary):
 fastlane pilot add email@email.com -a com.krausefx.app -g group-1,group-2
 ```
 
+### Add an existing tester to a build
+
+To add an existing tester to a build use the `pilot add_to_build` command. This will search an existing tester by its email address and a build by its build number. Then it will add the existing tester to that build.
+
+```no-highlight
+fastlane pilot add_to_build email@email.com -a com.krausefx.app --build-number 1.0.5
+```
+
+If you don't specify a build number, the latest build will be used.
+
+
 ### Find a tester
 
 To find a specific tester use
