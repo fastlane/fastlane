@@ -101,7 +101,7 @@ describe Snapshot do
       describe '#find_device' do
         it 'finds a device that has a matching name and OS version' do
           found = Snapshot::TestCommandGenerator.find_device('iPhone 8', '9.0')
-          expect(found).to eq(iphone6_9_0)
+          expect(found).to eq(iphone8_9_1)
         end
 
         it 'does not find a device that has a different name' do
@@ -111,7 +111,7 @@ describe Snapshot do
 
         it 'finds a device with the same name, but a different OS version, picking the highest available OS version' do
           found = Snapshot::TestCommandGenerator.find_device('iPhone 8', '10.0')
-          expect(found).to be(iphone6_9_3)
+          expect(found).to eq(iphone8_9_1)
         end
       end
 
