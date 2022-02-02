@@ -1,5 +1,5 @@
 // Appfile.swift
-// Copyright (c) 2021 FastlaneTools
+// Copyright (c) 2022 FastlaneTools
 
 var appIdentifier: String { return "" } // The bundle identifier of your app
 var appleID: String { return "" } // Your Apple email address

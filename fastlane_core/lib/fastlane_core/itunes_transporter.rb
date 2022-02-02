@@ -2,6 +2,7 @@ require 'shellwords'
 require 'tmpdir'
 require 'fileutils'
 require 'credentials_manager/account_manager'
+require 'securerandom'
 
 require_relative 'features'
 require_relative 'helper'
@@ -150,10 +151,13 @@ module FastlaneCore
     end
 
     def file_upload_option(source)
-      if File.extname(source) == ".itmsp"
-        return "-f #{source.shellescape}"
-      else
+      ext = File.extname(source).downcase
+      is_asset_file_type = !File.directory?(source) && [".ipa", ".pkg", ".dmg", ".zip"].include?(ext)
+
+      if is_asset_file_type
         return "-assetFile #{source.shellescape}"
+      else
+        return "-f #{source.shellescape}"
       end
     end
 
@@ -492,9 +496,15 @@ module FastlaneCore
       # However, -assetFile requires -assetDescription if Linux or Windows
       # This will give the asset directly if macOS and asset_path exists
       # otherwise it will use the .itmsp package
-      actual_dir = if Helper.is_mac? && asset_path
+
+      force_itmsp = FastlaneCore::Env.truthy?("ITMSTRANSPORTER_FORCE_ITMS_PACKAGE_UPLOAD")
+      can_use_asset_path = Helper.is_mac? && asset_path
+
+      actual_dir = if can_use_asset_path && !force_itmsp
                      # The asset gets deleted upon completion so copying to a temp directory
-                     tmp_asset_path = File.join(Dir.tmpdir, File.basename(asset_path))
+                     # (with randomized filename, for multibyte-mixed filename upload fails)
+                     new_file_name = "#{SecureRandom.uuid}#{File.extname(asset_path)}"
+                     tmp_asset_path = File.join(Dir.tmpdir, new_file_name)
                      FileUtils.cp(asset_path, tmp_asset_path)
                      tmp_asset_path
                    elsif package_path

@@ -1,7 +1,7 @@
 // GymfileProtocol.swift
-// Copyright (c) 2021 FastlaneTools
+// Copyright (c) 2022 FastlaneTools
 
-public protocol GymfileProtocol: class {
+public protocol GymfileProtocol: AnyObject {
     /// Path to the workspace file
     var workspace: String? { get }
 
@@ -104,7 +104,10 @@ public protocol GymfileProtocol: class {
     /// Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
     var suppressXcodeOutput: Bool? { get }
 
-    /// Disable xcpretty formatting of build output
+    /// xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+    var xcodebuildFormatter: String { get }
+
+    /// **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Disable xcpretty formatting of build output
     var disableXcpretty: Bool? { get }
 
     /// Use the test (RSpec style) format for build output
@@ -122,14 +125,17 @@ public protocol GymfileProtocol: class {
     /// Have xcpretty create a JSON compilation database at the provided path
     var xcprettyReportJson: String? { get }
 
-    /// Analyze the project build time and store the output in 'culprits.txt' file
-    var analyzeBuildTime: Bool? { get }
-
     /// Have xcpretty use unicode encoding when reporting builds
     var xcprettyUtf: Bool? { get }
 
+    /// Analyze the project build time and store the output in 'culprits.txt' file
+    var analyzeBuildTime: Bool? { get }
+
     /// Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
     var skipProfileDetection: Bool { get }
+
+    /// Allows for override of the default `xcodebuild` command
+    var xcodebuildCommand: String { get }
 
     /// Sets a custom path for Swift Package Manager dependencies
     var clonedSourcePackagesPath: String? { get }
@@ -179,15 +185,17 @@ public extension GymfileProtocol {
     var xcargs: String? { return nil }
     var xcconfig: String? { return nil }
     var suppressXcodeOutput: Bool? { return nil }
+    var xcodebuildFormatter: String { return "xcbeautify" }
     var disableXcpretty: Bool? { return nil }
     var xcprettyTestFormat: Bool? { return nil }
     var xcprettyFormatter: String? { return nil }
     var xcprettyReportJunit: String? { return nil }
     var xcprettyReportHtml: String? { return nil }
     var xcprettyReportJson: String? { return nil }
-    var analyzeBuildTime: Bool? { return nil }
     var xcprettyUtf: Bool? { return nil }
+    var analyzeBuildTime: Bool? { return nil }
     var skipProfileDetection: Bool { return false }
+    var xcodebuildCommand: String { return "xcodebuild" }
     var clonedSourcePackagesPath: String? { return nil }
     var skipPackageDependenciesResolution: Bool { return false }
     var disablePackageAutomaticUpdates: Bool { return false }
@@ -196,4 +204,4 @@ public extension GymfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.90]
+// FastlaneRunnerAPIVersion [0.9.98]

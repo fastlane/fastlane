@@ -17,9 +17,11 @@ describe Fastlane do
       let(:build6) { double('build6') }
 
       let(:build_bundle) { double('build_bundle') }
-      let(:empty_build_bundle) { double('empty_build_bundle') }
+      let(:not_processed_build_bundle) { double('not_processed_build_bundle') }
+      let(:no_symbols_build_bundle) { double('no_symbols_build_bundle') }
 
-      let(:empty_build) { double('empty_build') }
+      let(:not_processed_build) { double('not_processed_build') }
+      let(:no_symbols_build) { double('no_symbols_build') }
 
       let(:download_url) { 'https://example.com/myapp-dsym' }
 
@@ -43,9 +45,17 @@ describe Fastlane do
         allow(build5).to receive(:build_bundles).and_return([build_bundle])
         allow(build6).to receive(:build_bundles).and_return([build_bundle])
 
-        allow(build_bundle).to receive(:dsym_url).and_return(download_url)
+        allow(not_processed_build).to receive(:build_bundles).and_return([not_processed_build_bundle])
+        allow(no_symbols_build).to receive(:build_bundles).and_return([no_symbols_build_bundle])
 
-        allow(empty_build).to receive(:build_bundles).and_return(nil)
+        allow(build_bundle).to receive(:dsym_url).and_return(download_url)
+        allow(build_bundle).to receive(:includes_symbols).and_return(true)
+
+        allow(not_processed_build_bundle).to receive(:dsym_url).and_return(nil)
+        allow(not_processed_build_bundle).to receive(:includes_symbols).and_return(true)
+
+        allow(no_symbols_build_bundle).to receive(:dsym_url).and_return(nil)
+        allow(no_symbols_build_bundle).to receive(:includes_symbols).and_return(false)
 
         allow(Fastlane::Actions::DownloadDsymsAction).to receive(:download)
       end
@@ -74,7 +84,12 @@ describe Fastlane do
 
       context 'with no special options' do
         it 'downloads all dsyms of all builds in all trains' do
-          expect(build_resp).to receive(:to_models).and_return([build1, build2, build3, build4, build5, build6])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
+                                                        .and_yield(build2)
+                                                        .and_yield(build3)
+                                                        .and_yield(build4)
+                                                        .and_yield(build5)
+                                                        .and_yield(build6)
 
           [[build1, '1.0.0', '1', '2020-09-12T10:00:00+01:00'],
            [build2, '1.0.0', '2', '2020-09-12T11:00:00+01:00'],
@@ -83,7 +98,7 @@ describe Fastlane do
            [build5, '2.0.0', '2', '2020-09-12T14:00:00+01:00'],
            [build6, '2.0.0', '5', '2020-09-12T15:00:00+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number).twice
+            expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
@@ -96,13 +111,41 @@ describe Fastlane do
         end
       end
 
+      context 'with wait_for_dsym_processing' do
+        it 'downloads all dsyms of all builds in all trains' do
+          expect(build_resp).to receive(:all_pages_each).and_yield(not_processed_build)
+
+          # Returns not processed build (no dsym url)
+          build = not_processed_build
+          build_id = 1
+          version = '2.0.0'
+          build_number = '5'
+          uploaded_date = '2020-09-12T15:00:00+01:00'
+          expect(build).to receive(:id).and_return(build_id)
+          expect(build).to receive(:app_version).and_return(version)
+          expect(build).to receive(:version).and_return(build_number)
+          expect(build).to receive(:uploaded_date).and_return(uploaded_date)
+
+          # Refetches build info
+          expect(Spaceship::ConnectAPI::Build).to receive(:get).with(build_id: build_id).and_return(build1)
+
+          build = build1
+          expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
+          expect(Fastlane::Actions::DownloadDsymsAction).not_to(receive(:download))
+
+          Fastlane::FastFile.new.parse("lane :test do
+              download_dsyms(username: 'user@fastlane.tools', app_identifier: 'tools.fastlane.myapp', wait_for_dsym_processing: true)
+          end").runner.execute(:test)
+        end
+      end
+
       context 'with version with leading zero' do
         it 'downloads all dsyms of all builds in train 1.07.0' do
-          expect(build_resp).to receive(:to_models).and_return([build1])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
 
           [[build1, '1.07.0', '3', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number).twice
+            expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
@@ -115,11 +158,11 @@ describe Fastlane do
 
       context 'when build_number is an integer' do
         it 'downloads the correct dsyms' do
-          expect(build_resp).to receive(:to_models).and_return([build1])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
 
           [[build1, '2.0.0', '2', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number).twice
+            expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
           end
@@ -134,7 +177,8 @@ describe Fastlane do
         it 'downloads only dsyms of latest build in latest train' do
           expect(Spaceship::ConnectAPI).to receive(:get_builds).and_return([build2, build1])
 
-          expect(build_resp).to receive(:to_models).and_return([build1, build2])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
+                                                        .and_yield(build2)
 
           [[build1, '2.0.0', '2', '2020-09-12T10:00:00+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
@@ -144,7 +188,7 @@ describe Fastlane do
 
           [[build2, '2.0.0', '3', '2020-09-12T11:00:00+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version).twice
-            expect(build).to receive(:version).and_return(build_number).exactly(3).times
+            expect(build).to receive(:version).and_return(build_number).exactly(2).times
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
 
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
@@ -164,7 +208,8 @@ describe Fastlane do
           expect(version_build).to receive(:version).and_return('42')
           expect(version).to receive(:build).and_return(version_build)
 
-          expect(build_resp).to receive(:to_models).and_return([build1, build2])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
+                                                        .and_yield(build2)
 
           [[build1, '1.0.0', '33', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
@@ -174,7 +219,7 @@ describe Fastlane do
 
           [[build2, '1.0.0', '42', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number).twice
+            expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
 
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
@@ -188,7 +233,8 @@ describe Fastlane do
 
       context 'when min_version is set' do
         it 'downloads only dsyms of trains newer than or equal min_version' do
-          expect(build_resp).to receive(:to_models).and_return([build1, build2])
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
+                                                        .and_yield(build2)
 
           [[build1, '1.0.0', '33', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
@@ -198,7 +244,7 @@ describe Fastlane do
 
           [[build2, '2.0.0', '42', '2020-09-12T14:10:30+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number).twice
+            expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
 
             expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
@@ -212,23 +258,37 @@ describe Fastlane do
 
       context 'with after_uploaded_date' do
         it 'downloads dsyms with more recent uploaded_date' do
-          expect(build_resp).to receive(:to_models).and_return([build1, build2, build3, build4, build5, build6])
 
-          [[build1, '1.0.0', '1', '2020-09-12T10:00:00+01:00'],
-           [build2, '1.0.0', '2', '2020-09-12T11:00:00+01:00'],
-           [build3, '1.7.0', '4', '2020-09-12T12:00:00+01:00'],
-           [build4, '2.0.0', '1', '2020-09-12T13:00:00+01:00']].each do |build, version, build_number, uploaded_date|
+          expect(build_resp).to receive(:all_pages_each).and_yield(build1)
+                                                        .and_yield(build2)
+                                                        .and_yield(build3)
+                                                        .and_yield(build4)
+                                                        .and_yield(build5)
+                                                        .and_yield(build6)
+
+          # after after_uploaded_date
+          [[build1, '2.0.0', '5', '2020-09-12T15:00:00+01:00'],
+           [build2, '2.0.0', '2', '2020-09-12T14:00:00+01:00']].each do |build, version, build_number, uploaded_date|
+            expect(build).to receive(:app_version).and_return(version)
+            expect(build).to receive(:version).and_return(build_number)
+            expect(build).to receive(:uploaded_date).and_return(uploaded_date)
+            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
+          end
+
+          # on after_uploaded_date
+          [[build3, '2.0.0', '1', '2020-09-12T13:00:00+01:00']].each do |build, version, build_number, uploaded_date|
             expect(build).to receive(:app_version).and_return(version)
             expect(build).to receive(:version).and_return(build_number)
             expect(build).to receive(:uploaded_date).and_return(uploaded_date)
           end
 
-          [[build5, '2.0.0', '2', '2020-09-12T14:00:00+01:00'],
-           [build6, '2.0.0', '5', '2020-09-12T15:00:00+01:00']].each do |build, version, build_number, uploaded_date|
-            expect(build).to receive(:app_version).and_return(version)
-            expect(build).to receive(:version).and_return(build_number).twice
-            expect(build).to receive(:uploaded_date).and_return(uploaded_date)
-            expect(Fastlane::Actions::DownloadDsymsAction).to receive(:download).with(download_url, build, app, nil)
+          # before after_uploaded_date
+          [[build4, '1.7.0', '4', '2020-09-12T12:00:00+01:00'],
+           [build5, '1.0.0', '2', '2020-09-12T11:00:00+01:00'],
+           [build6, '1.0.0', '1', '2020-09-12T10:00:00+01:00']].each do |build, version, build_number, uploaded_date|
+            expect(build).not_to(receive(:app_version))
+            expect(build).not_to(receive(:version))
+            expect(build).not_to(receive(:uploaded_date))
           end
 
           expect(Fastlane::Actions::DownloadDsymsAction).not_to(receive(:download))

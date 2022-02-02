@@ -197,8 +197,25 @@ module Deliver
     def reject_version_if_possible
       app = Deliver.cache[:app]
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
-      if app.reject_version_if_possible!(platform: platform)
-        UI.success("Successfully rejected previous version!")
+
+      submission = app.get_in_progress_review_submission(platform: platform)
+      if submission
+        submission.cancel_submission
+        UI.message("Review submission cancellation has been requested")
+
+        # An app version won't get removed from review instantly
+        # Polling until app version has a state of DEVELOPER_REJECT
+        loop do
+          version = app.get_edit_app_store_version(platform: platform)
+          if version.app_store_state == Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REJECTED
+            break
+          end
+
+          UI.message("Waiting for cancellation to take effect...")
+          sleep(15)
+        end
+
+        UI.success("Successfully cancelled previous submission!")
       end
     end
 

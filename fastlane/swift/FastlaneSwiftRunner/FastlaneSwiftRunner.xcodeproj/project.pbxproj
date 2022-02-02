@@ -10,6 +10,7 @@
 		0311E387230AC1B20060BB5C /* Plugins.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0311E386230AC1B20060BB5C /* Plugins.swift */; };
 		0311E38B230AC9490060BB5C /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0311E38A230AC9490060BB5C /* Actions.swift */; };
 		1257253924B7992C00E04FA3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1257253824B7992B00E04FA3 /* main.swift */; };
+		1267C3F42773A43E004DE48A /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1267C3F32773A43E004DE48A /* Atomic.swift */; };
 		12D2EB8D2620D83C00844013 /* OptionalConfigValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D2EB8C2620D83B00844013 /* OptionalConfigValue.swift */; };
 		B302067B1F5E3E9000DE6EBD /* SnapshotfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */; };
 		B302067C1F5E3E9000DE6EBD /* GymfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */; };
@@ -26,6 +27,7 @@
 		B3BA65AC1F5A269100B34850 /* SocketClientDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A31F5A269100B34850 /* SocketClientDelegateProtocol.swift */; };
 		B3BA65AD1F5A269100B34850 /* SocketResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A41F5A269100B34850 /* SocketResponse.swift */; };
 		B3BA65AF1F5A2D5C00B34850 /* RunnerArgument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65AE1F5A2D5C00B34850 /* RunnerArgument.swift */; };
+		C0459CAC27261897002CDFB9 /* FastlaneRunner in CopyFiles */ = {isa = PBXBuildFile; fileRef = D556D6A91F6A08F5003108E3 /* FastlaneRunner */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		D55B28C31F6C588300DC42C5 /* Deliverfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28BC1F6C588300DC42C5 /* Deliverfile.swift */; };
 		D55B28C41F6C588300DC42C5 /* Gymfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28BD1F6C588300DC42C5 /* Gymfile.swift */; };
 		D55B28C51F6C588300DC42C5 /* Matchfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28BE1F6C588300DC42C5 /* Matchfile.swift */; };
@@ -40,10 +42,24 @@
 		D5D1DE991FFEE8EA00502A00 /* RubyCommandable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5D1DE981FFEE8E900502A00 /* RubyCommandable.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		C0459CAB27261886002CDFB9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = $SRCROOT/../..;
+			dstSubfolderSpec = 0;
+			files = (
+				C0459CAC27261897002CDFB9 /* FastlaneRunner in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		0311E386230AC1B20060BB5C /* Plugins.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Plugins.swift; path = ../Plugins.swift; sourceTree = "<group>"; };
 		0311E38A230AC9490060BB5C /* Actions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Actions.swift; path = ../Actions.swift; sourceTree = "<group>"; };
 		1257253824B7992B00E04FA3 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = ../main.swift; sourceTree = "<group>"; };
+		1267C3F32773A43E004DE48A /* Atomic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Atomic.swift; path = ../Atomic.swift; sourceTree = "<group>"; };
 		12D2EB8C2620D83B00844013 /* OptionalConfigValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OptionalConfigValue.swift; path = ../OptionalConfigValue.swift; sourceTree = "<group>"; };
 		B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotfileProtocol.swift; path = ../SnapshotfileProtocol.swift; sourceTree = "<group>"; };
 		B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GymfileProtocol.swift; path = ../GymfileProtocol.swift; sourceTree = "<group>"; };
@@ -121,6 +137,7 @@
 		B3BA65B11F5A325E00B34850 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				1267C3F32773A43E004DE48A /* Atomic.swift */,
 				B3144C072005533400470AFE /* README.txt */,
 				D5B8A5B21FFDC49D00536B24 /* ControlCommand.swift */,
 				B3BA65A01F5A269100B34850 /* RubyCommand.swift */,
@@ -181,7 +198,7 @@
 			buildPhases = (
 				B33BAF531F51F8D90001A751 /* Sources */,
 				B33BAF541F51F8D90001A751 /* Frameworks */,
-				D529C72B1F68BB1C0036536D /* ShellScript */,
+				C0459CAB27261886002CDFB9 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -199,7 +216,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = "Joshua Liebowitz";
 				TargetAttributes = {
 					B33BAF561F51F8D90001A751 = {
@@ -211,11 +228,11 @@
 			};
 			buildConfigurationList = B33BAF521F51F8D90001A751 /* Build configuration list for PBXProject "FastlaneSwiftRunner" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
+				Base,
 			);
 			mainGroup = B33BAF4E1F51F8D90001A751;
 			productRefGroup = B33BAF4E1F51F8D90001A751;
@@ -227,22 +244,6 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		D529C72B1F68BB1C0036536D /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd \"${SRCROOT}\"\ncd ../..\ncp \"${TARGET_BUILD_DIR}/${EXECUTABLE_PATH}\" .\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		B33BAF531F51F8D90001A751 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -252,6 +253,7 @@
 				D5D1DE991FFEE8EA00502A00 /* RubyCommandable.swift in Sources */,
 				D55B28C41F6C588300DC42C5 /* Gymfile.swift in Sources */,
 				B302067D1F5E3E9000DE6EBD /* MatchfileProtocol.swift in Sources */,
+				1267C3F42773A43E004DE48A /* Atomic.swift in Sources */,
 				B3BA65AC1F5A269100B34850 /* SocketClientDelegateProtocol.swift in Sources */,
 				B3BA65A71F5A269100B34850 /* LaneFileProtocol.swift in Sources */,
 				D55B28C61F6C588300DC42C5 /* Precheckfile.swift in Sources */,
@@ -299,6 +301,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -306,8 +309,10 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -355,6 +360,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -362,8 +368,10 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -394,6 +402,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -405,6 +414,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;

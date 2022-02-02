@@ -1,7 +1,7 @@
 // ScanfileProtocol.swift
-// Copyright (c) 2021 FastlaneTools
+// Copyright (c) 2022 FastlaneTools
 
-public protocol ScanfileProtocol: class {
+public protocol ScanfileProtocol: AnyObject {
     /// Path to the workspace file
     var workspace: String? { get }
 
@@ -14,10 +14,10 @@ public protocol ScanfileProtocol: class {
     /// The project's scheme. Make sure it's marked as `Shared`
     var scheme: String? { get }
 
-    /// The name of the simulator type you want to run tests on (e.g. 'iPhone 6')
+    /// The name of the simulator type you want to run tests on (e.g. 'iPhone 6' or 'iPhone SE (2nd generation) (14.5)')
     var device: String? { get }
 
-    /// Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])
+    /// Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air', 'iPhone SE (2nd generation) (14.5)'])
     var devices: [String]? { get }
 
     /// Should skip auto detecting of devices if none were specified
@@ -80,9 +80,6 @@ public protocol ScanfileProtocol: class {
     /// Should the HTML report be opened when tests are completed?
     var openReport: Bool { get }
 
-    /// Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
-    var disableXcpretty: Bool? { get }
-
     /// The directory in which all reports will be stored
     var outputDirectory: String { get }
 
@@ -104,8 +101,20 @@ public protocol ScanfileProtocol: class {
     /// Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
     var suppressXcodeOutput: Bool? { get }
 
-    /// A custom xcpretty formatter to use
+    /// xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+    var xcodebuildFormatter: String { get }
+
+    /// Remove retry attempts from test results table and the JUnit report (if not using xcpretty)
+    var outputRemoveRetryAttempts: Bool { get }
+
+    /// **DEPRECATED!** Use `output_style: 'raw'` instead - Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
+    var disableXcpretty: Bool? { get }
+
+    /// **DEPRECATED!** Use 'xcpretty_formatter' instead - A custom xcpretty formatter to use
     var formatter: String? { get }
+
+    /// A custom xcpretty formatter to use
+    var xcprettyFormatter: String? { get }
 
     /// Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')
     var xcprettyArgs: String? { get }
@@ -124,6 +133,9 @@ public protocol ScanfileProtocol: class {
 
     /// Generate the json compilation database with clang naming convention (compile_commands.json)
     var useClangReportName: Bool { get }
+
+    /// Optionally override the per-target setting in the scheme for running tests in parallel. Equivalent to -parallel-testing-enabled
+    var parallelTesting: Bool? { get }
 
     /// Specify the exact number of test runners that will be spawned during parallel testing. Equivalent to -parallel-testing-worker-count
     var concurrentWorkers: Int? { get }
@@ -212,7 +224,7 @@ public protocol ScanfileProtocol: class {
     /// Lets xcodebuild use system's scm configuration
     var useSystemScm: Bool { get }
 
-    /// The number of times a test can fail before scan should stop retrying
+    /// The number of times a test can fail
     var numberOfRetries: Int { get }
 
     /// Should this step stop the build if the tests fail? Set this to false if you're using trainer
@@ -246,7 +258,6 @@ public extension ScanfileProtocol {
     var addressSanitizer: Bool? { return nil }
     var threadSanitizer: Bool? { return nil }
     var openReport: Bool { return false }
-    var disableXcpretty: Bool? { return nil }
     var outputDirectory: String { return "./test_output" }
     var outputStyle: String? { return nil }
     var outputTypes: String { return "html,junit" }
@@ -254,13 +265,18 @@ public extension ScanfileProtocol {
     var buildlogPath: String { return "~/Library/Logs/scan" }
     var includeSimulatorLogs: Bool { return false }
     var suppressXcodeOutput: Bool? { return nil }
+    var xcodebuildFormatter: String { return "xcbeautify" }
+    var outputRemoveRetryAttempts: Bool { return false }
+    var disableXcpretty: Bool? { return nil }
     var formatter: String? { return nil }
+    var xcprettyFormatter: String? { return nil }
     var xcprettyArgs: String? { return nil }
     var derivedDataPath: String? { return nil }
     var shouldZipBuildProducts: Bool { return false }
     var outputXctestrun: Bool { return false }
     var resultBundle: Bool { return false }
     var useClangReportName: Bool { return false }
+    var parallelTesting: Bool? { return nil }
     var concurrentWorkers: Int? { return nil }
     var maxConcurrentSimulators: Int? { return nil }
     var disableConcurrentTesting: Bool { return false }
@@ -296,4 +312,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.95]
+// FastlaneRunnerAPIVersion [0.9.103]

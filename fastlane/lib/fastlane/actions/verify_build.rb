@@ -101,7 +101,7 @@ module Fastlane
           UI.user_error!("Mismatched team_identifier. Required: '#{params[:team_identifier]}'; Found: '#{values['team_identifier']}'") unless params[:team_identifier] == values['team_identifier']
         end
         if params[:team_name]
-          UI.user_error!("Mismatched team_name. Required: '#{params[:team_name]}'; Found: 'values['team_name']'") unless params[:team_name] == values['team_name']
+          UI.user_error!("Mismatched team_name. Required: '#{params[:team_name]}'; Found: '#{values['team_name']}'") unless params[:team_name] == values['team_name']
         end
         if params[:app_name]
           UI.user_error!("Mismatched app_name. Required: '#{params[:app_name]}'; Found: '#{values['app_name']}'") unless params[:app_name] == values['app_name']

@@ -1,5 +1,5 @@
 // LaneFileProtocol.swift
-// Copyright (c) 2021 FastlaneTools
+// Copyright (c) 2022 FastlaneTools
 
 //
 //  ** NOTE **
@@ -10,7 +10,7 @@
 
 import Foundation
 
-public protocol LaneFileProtocol: class {
+public protocol LaneFileProtocol: AnyObject {
     var fastlaneVersion: String { get }
     static func runLane(from fastfile: LaneFile?, named lane: String, with parameters: [String: String]) -> Bool
 

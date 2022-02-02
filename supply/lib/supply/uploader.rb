@@ -164,6 +164,10 @@ module Supply
         UI.user_error!(%(Cannot specify rollout percentage when the release status is set to 'draft'))
       end
 
+      if Supply.config[:track_promote_release_status] == Supply::ReleaseStatus::DRAFT && Supply.config[:rollout]
+        UI.user_error!(%(Cannot specify rollout percentage when the track promote release status is set to 'draft'))
+      end
+
       unless Supply.config[:version_codes_to_retain].nil?
         Supply.config[:version_codes_to_retain] = Supply.config[:version_codes_to_retain].map(&:to_i)
       end
@@ -182,7 +186,7 @@ module Supply
         end
       else
         releases = releases.select do |release|
-          release.status == Supply::ReleaseStatus::COMPLETED
+          release.status == Supply.config[:release_status]
         end
       end
 
@@ -200,7 +204,7 @@ module Supply
         release.status = Supply::ReleaseStatus::IN_PROGRESS
         release.user_fraction = rollout
       else
-        release.status = Supply::ReleaseStatus::COMPLETED
+        release.status = Supply.config[:track_promote_release_status]
         release.user_fraction = nil
       end
 

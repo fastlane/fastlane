@@ -33,7 +33,7 @@ module Fastlane
         # wait on socket_thread to be in ready state, then start the runner thread
         self.cruise_swift_lane_in_thread(lane, parameters, swift_server_port)
 
-        socket_thread.join
+        socket_thread.value
       rescue Exception => ex # rubocop:disable Lint/RescueException
         e = ex
       end
@@ -74,7 +74,10 @@ module Fastlane
 
     def self.display_lanes
       self.ensure_runner_built!
-      Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lanes))
+      return_value = Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lanes))
+      if FastlaneCore::Globals.verbose?
+        UI.message("runner output: ".yellow + return_value)
+      end
     end
 
     def self.cruise_swift_lane_in_thread(lane, parameters = nil, swift_server_port)
@@ -94,7 +97,12 @@ module Fastlane
       parameter_string += " swiftServerPort #{swift_server_port}"
 
       return Thread.new do
-        Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string} > /dev/null))
+        if FastlaneCore::Globals.verbose?
+          return_value = Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string}))
+          UI.message("runner output: ".yellow + return_value)
+        else
+          Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string} > /dev/null))
+        end
       end
     end
 

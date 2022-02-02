@@ -1,5 +1,5 @@
 // SocketClient.swift
-// Copyright (c) 2021 FastlaneTools
+// Copyright (c) 2022 FastlaneTools
 
 //
 //  ** NOTE **
@@ -144,7 +144,11 @@ class SocketClient: NSObject {
 
     private func sendThroughQueue(string: String) {
         let data = string.data(using: .utf8)!
-        _ = data.withUnsafeBytes { self.outputStream.write($0, maxLength: data.count) }
+        data.withUnsafeBytes { (buffer: UnsafeRawBufferPointer) in
+            if let buffer = buffer.baseAddress {
+                self.outputStream.write(buffer.assumingMemoryBound(to: UInt8.self), maxLength: data.count)
+            }
+        }
     }
 
     private func privateSend(string: String) {

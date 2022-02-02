@@ -7,8 +7,13 @@ describe FastlaneCore do
   let(:jwt) { '409jjl43j90ghjqoineio49024' }
 
   describe FastlaneCore::ItunesTransporter do
+    let(:random_uuid) { '2a912f38-5dbc-4fc3-a5b3-1bf184b2b021' }
+    before(:each) do
+      allow(SecureRandom).to receive(:uuid).and_return(random_uuid)
+    end
+
     def shell_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false)
-      upload_part = use_asset_path ? "-assetFile /tmp/my_app.ipa" : "-f /tmp/my.app.id.itmsp"
+      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
 
       escaped_password = password.shellescape
       unless FastlaneCore::Helper.windows?
@@ -68,7 +73,7 @@ describe FastlaneCore do
     end
 
     def java_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, classpath: true, use_asset_path: false)
-      upload_part = use_asset_path ? "-assetFile /tmp/my_app.ipa" : "-f /tmp/my.app.id.itmsp"
+      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
 
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
@@ -139,7 +144,7 @@ describe FastlaneCore do
     end
 
     def java_upload_command_9(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false)
-      upload_part = use_asset_path ? "-assetFile /tmp/my_app.ipa" : "-f /tmp/my.app.id.itmsp"
+      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
 
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
@@ -186,7 +191,7 @@ describe FastlaneCore do
     end
 
     def xcrun_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false)
-      upload_part = use_asset_path ? "-assetFile /tmp/my_app.ipa" : "-f /tmp/my.app.id.itmsp"
+      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
 
       [
         ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.nil?),
@@ -333,6 +338,27 @@ describe FastlaneCore do
 
                 transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
                 expect(transporter.upload(asset_path: '/tmp/my_app.ipa')).to eq(java_upload_command(jwt: jwt, use_asset_path: true))
+              end
+            end
+          end
+
+          describe "with package_path and asset_path" do
+            describe "upload command generation" do
+              it 'generates a call to xcrun iTMSTransporter with -assetFile' do
+                expect(Dir).to receive(:tmpdir).and_return("/tmp")
+                expect(FileUtils).to receive(:cp)
+
+                transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+                expect(transporter.upload(package_path: '/tmp/my.app.id.itmsp', asset_path: '/tmp/my_app.ipa')).to eq(java_upload_command(jwt: jwt, use_asset_path: true))
+              end
+            end
+
+            describe "upload command generation with ITMSTRANSPORTER_FORCE_ITMS_PACKAGE_UPLOAD=true" do
+              it 'generates a call to xcrun iTMSTransporter with -assetFile' do
+                stub_const('ENV', { 'ITMSTRANSPORTER_FORCE_ITMS_PACKAGE_UPLOAD' => 'true' })
+
+                transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+                expect(transporter.upload(package_path: '/tmp/my.app.id.itmsp', asset_path: '/tmp/my_app.ipa')).to eq(java_upload_command(jwt: jwt, use_asset_path: false))
               end
             end
           end

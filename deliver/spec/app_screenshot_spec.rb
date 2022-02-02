@@ -36,6 +36,13 @@ describe Deliver::AppScreenshot do
       end
     end
 
+    context "when filename contains 'iPad Pro (5th generation)'" do
+      it "returns iPad Pro(12.9-inch) 3rd generation" do
+        screenshot = Deliver::AppScreenshot.new("path/to/screenshot/Screen-Name-iPad Pro (12.9-inch) (5th generation){2732x2048}.png", "de-DE")
+        expect(screenshot.screen_size).to eq(ScreenSize::IOS_IPAD_PRO_12_9)
+      end
+    end
+
     context "when filename contains 'IPAD_PRO_3GEN_129'" do
       it "returns iPad Pro(12.9-inch) 3rd generation" do
         screenshot = Deliver::AppScreenshot.new("path/to/screenshot/IPAD_PRO_3GEN_129-AAABBBCCCDDD{2732x2048}.png", "de-DE")
@@ -136,6 +143,7 @@ describe Deliver::AppScreenshot do
       it "should calculate all supported Apple Watch resolutions" do
         expect_screen_size_from_file("AppleWatch-Series3{312x390}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH)
         expect_screen_size_from_file("AppleWatch-Series4{368x448}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH_SERIES4)
+        expect_screen_size_from_file("AppleWatch-Series7{396x484}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH_SERIES7)
       end
     end
 
@@ -331,6 +339,10 @@ describe Deliver::AppScreenshot do
 
     it "should return watchSeries4 for Apple Watch Series 4" do
       expect(app_screenshot_with(ScreenSize::IOS_APPLE_WATCH_SERIES4).device_type).to eq("APP_WATCH_SERIES_4")
+    end
+
+    it "should return watchSeries7 for Apple Watch Series 7" do
+      expect(app_screenshot_with(ScreenSize::IOS_APPLE_WATCH_SERIES7).device_type).to eq("APP_WATCH_SERIES_7")
     end
 
     it "should return appleTV for Apple TV" do

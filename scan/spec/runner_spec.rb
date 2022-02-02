@@ -16,6 +16,17 @@ describe Scan do
         allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)
         allow(mock_test_result_parser).to receive(:parse_result).and_return({ tests: 100, failures: 0 })
 
+        allow(Trainer::TestParser).to receive(:auto_convert).and_return({
+          "some/path": {
+            successful: true,
+            number_of_tests: 10,
+            number_of_failures: 0,
+            number_of_tests_excluding_retries: 10,
+            number_of_failures_excluding_retries: 0,
+            number_of_retries: 0
+          }
+        })
+
         @scan = Scan::Runner.new
       end
 
@@ -28,6 +39,9 @@ describe Scan do
             project: './scan/examples/standard/app.xcodeproj',
             include_simulator_logs: false
           })
+
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
 
           expect(FastlaneCore::Simulator).not_to(receive(:copy_logs))
           @scan.handle_results(0)
@@ -44,6 +58,9 @@ describe Scan do
             include_simulator_logs: true
           })
 
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
           expect(FastlaneCore::Simulator).to receive(:copy_logs)
           @scan.handle_results(0)
         end
@@ -56,9 +73,20 @@ describe Scan do
               output_directory: '/tmp/scan_results',
               project: './scan/examples/standard/app.xcodeproj'
             })
-            custom_parser = "custom_parser"
-            expect(Scan::TestResultParser).to receive(:new).and_return(custom_parser)
-            expect(custom_parser).to receive(:parse_result).and_return({ tests: 5, failures: 3 })
+
+            # This is a needed side effect from running TestCommandGenerator which is not done in this test
+            Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
+            allow(Trainer::TestParser).to receive(:auto_convert).and_return({
+              "some/path": {
+                successful: true,
+                number_of_tests: 10,
+                number_of_failures: 1,
+                number_of_tests_excluding_retries: 10,
+                number_of_failures_excluding_retries: 1,
+                number_of_retries: 0
+              }
+            })
 
             @scan.handle_results(0)
           end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed")
@@ -73,6 +101,9 @@ describe Scan do
             disable_xcpretty: true
           })
 
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
           Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
           @scan.handle_results(0)
           expect(Scan.cache[:temp_junit_report]).to(eq('/var/folders/non_existent_file.junit'))
@@ -85,6 +116,9 @@ describe Scan do
               project: './scan/examples/standard/app.xcodeproj',
               disable_xcpretty: true
             })
+
+            # This is a needed side effect from running TestCommandGenerator which is not done in this test
+            Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
 
             @scan.handle_results(1)
           end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Test execution failed. Exit status: 1")
@@ -102,9 +136,10 @@ describe Scan do
 Failing tests:
   FastlaneAppTests:
           FastlaneAppTests.testCoinToss()
+          -[FastlaneAppTestsOC testCoinTossOC]
           ERROR_OUTPUT
 
-        expect(Fastlane::UI).to receive(:important).with("Retrying tests: FastlaneAppTests/FastlaneAppTests/testCoinToss").once
+        expect(Fastlane::UI).to receive(:important).with("Retrying tests: FastlaneAppTests/FastlaneAppTests/testCoinToss, FastlaneAppTests/FastlaneAppTestsOC/testCoinTossOC").once
         expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
         expect(@scan).to receive(:execute)
 
@@ -116,9 +151,10 @@ Failing tests:
 Failing tests:
   Fastlane-App-Tests:
           FastlaneAppTests.testCoinToss()
+          -[FastlaneAppTestsOC testCoinTossOC]
           ERROR_OUTPUT
 
-        expect(Fastlane::UI).to receive(:important).with("Retrying tests: Fastlane-App-Tests/FastlaneAppTests/testCoinToss").once
+        expect(Fastlane::UI).to receive(:important).with("Retrying tests: Fastlane-App-Tests/FastlaneAppTests/testCoinToss, Fastlane-App-Tests/FastlaneAppTestsOC/testCoinTossOC").once
         expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
         expect(@scan).to receive(:execute)
 
@@ -130,11 +166,12 @@ Failing tests:
 Failing tests:
 FastlaneAppTests:
 FastlaneAppTests.testCoinToss()
+-[FastlaneAppTestsOC testCoinTossOC]
           ERROR_OUTPUT
 
         expect do
           @scan.retry_execute(retries: 5, error_output: error_output)
-        end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Failed to find failed tests to retry (could not parse error output)")
+        end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Failed to find failed tests to retry (could not parse error output)")
       end
     end
 

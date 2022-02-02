@@ -20,7 +20,8 @@ module Scan
     end
 
     def run
-      handle_results(test_app)
+      @xcresults_before_run = find_xcresults_in_derived_data
+      return handle_results(test_app)
     end
 
     def test_app
@@ -51,11 +52,18 @@ module Scan
         end
       end
 
-      execute(retries: Scan.config[:number_of_retries])
+      retries = Scan.config[:number_of_retries]
+      execute(retries: retries)
     end
 
     def execute(retries: 0)
-      Scan.cache[:retry_attempt] = Scan.config[:number_of_retries] - retries
+      # Set retries to 0 if Xcode 13 because TestCommandGenerator will set '-retry-tests-on-failure -test-iterations'
+      if Helper.xcode_at_least?(13)
+        retries = 0
+        Scan.cache[:retry_attempt] = 0
+      else
+        Scan.cache[:retry_attempt] = Scan.config[:number_of_retries] - retries
+      end
 
       command = @test_command_generator.generate
 
@@ -99,7 +107,7 @@ module Scan
       tests = retryable_tests(error_output)
 
       if tests.empty?
-        UI.crash!("Failed to find failed tests to retry (could not parse error output)")
+        UI.build_failure!("Failed to find failed tests to retry (could not parse error output)")
       end
 
       Scan.config[:only_testing] = tests
@@ -126,7 +134,7 @@ module Scan
 
         test_cases = suite.split(":\n").fetch(1, []).split("\n").each
                           .select { |line| line.match?(/^\s+/) }
-                          .map { |line| line.strip.gsub(".", "/").gsub("()", "") }
+                          .map { |line| line.strip.gsub(/[\s\.]/, "/").gsub(/[\-\[\]\(\)]/, "") }
                           .map { |line| suite_name + "/" + line }
 
         retryable_tests += test_cases
@@ -135,37 +143,162 @@ module Scan
       return retryable_tests.uniq
     end
 
-    def handle_results(tests_exit_status)
-      if Scan.config[:disable_xcpretty]
-        unless tests_exit_status == 0
-          UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+    def find_filename(type)
+      index = Scan.config[:output_types].split(',').index(type)
+      return nil if index.nil?
+      return (Scan.config[:output_files] || "").split(',')[index]
+    end
+
+    def output_html?
+      return Scan.config[:output_types].split(',').include?('html')
+    end
+
+    def output_junit?
+      return Scan.config[:output_types].split(',').include?('junit')
+    end
+
+    def output_json_compilation_database?
+      return Scan.config[:output_types].split(',').include?('json-compilation-database')
+    end
+
+    def output_html_filename
+      return find_filename('html')
+    end
+
+    def output_junit_filename
+      return find_filename('junit')
+    end
+
+    def output_json_compilation_database_filename
+      return find_filename('json-compilation-database')
+    end
+
+    def find_xcresults_in_derived_data
+      derived_data_path = Scan.config[:derived_data_path]
+      return [] if derived_data_path.nil? # Swift packages might not have derived data
+
+      xcresults_path = File.join(derived_data_path, "Logs", "Test", "*.xcresult")
+      return Dir[xcresults_path]
+    end
+
+    def trainer_test_results
+      require "trainer"
+
+      results = {
+        number_of_tests: 0,
+        number_of_failures: 0,
+        number_of_retries: 0,
+        number_of_tests_excluding_retries: 0,
+        number_of_failures_excluding_retries: 0
+      }
+
+      result_bundle_path = Scan.cache[:result_bundle_path]
+
+      # Looks for xcresult file in derived data if not specifically set
+      if result_bundle_path.nil?
+        xcresults = find_xcresults_in_derived_data
+        new_xcresults = xcresults - @xcresults_before_run
+
+        if new_xcresults.size != 1
+          UI.build_failure!("Cannot find .xcresult in derived data which is needed to determine test results. This is an issue within scan. File an issue on GitHub or try setting option `result_bundle: true`")
         end
-        return
+
+        result_bundle_path = new_xcresults.first
+        Scan.cache[:result_bundle_path] = result_bundle_path
       end
 
-      result = TestResultParser.new.parse_result(test_results)
-      SlackPoster.new.run(result)
+      output_path = Scan.config[:output_directory] || Dir.mktmpdir
+      output_path = File.absolute_path(output_path)
 
-      if result[:failures] > 0
-        failures_str = result[:failures].to_s.red
+      UI.build_failure!("A -resultBundlePath is needed to parse the test results. This should not have happened. Please file an issue.") unless result_bundle_path
+
+      params = {
+        path: result_bundle_path,
+        output_remove_retry_attempts: Scan.config[:output_remove_retry_attempts],
+        silent: !FastlaneCore::Globals.verbose?
+      }
+
+      formatter = Scan.config[:xcodebuild_formatter].chomp
+      show_output_types_tip = false
+      if output_html? && formatter != 'xcpretty'
+        UI.important("Skipping HTML... only available with `xcodebuild_formatter: 'xcpretty'` right now")
+        show_output_types_tip = true
+      end
+
+      if output_json_compilation_database? && formatter != 'xcpretty'
+        UI.important("Skipping JSON Compilation Database... only available with `xcodebuild_formatter: 'xcpretty'` right now")
+        show_output_types_tip = true
+      end
+
+      if show_output_types_tip
+        UI.important("Your 'xcodebuild_formatter' doesn't support these 'output_types'. Change your 'output_types' to prevent these warnings from showing...")
+      end
+
+      if output_junit?
+        if formatter == 'xcpretty'
+          UI.verbose("Generating junit report with xcpretty")
+        else
+          UI.verbose("Generating junit report with trainer")
+          params[:output_filename] = output_junit_filename || "report.junit"
+          params[:output_directory] = output_path
+        end
+      end
+
+      resulting_paths = Trainer::TestParser.auto_convert(params)
+      resulting_paths.each do |path, data|
+        results[:number_of_tests] += data[:number_of_tests]
+        results[:number_of_failures] += data[:number_of_failures]
+        results[:number_of_tests_excluding_retries] += data[:number_of_tests_excluding_retries]
+        results[:number_of_failures_excluding_retries] += data[:number_of_failures_excluding_retries]
+        results[:number_of_retries] += data[:number_of_retries]
+      end
+
+      return results
+    end
+
+    def handle_results(tests_exit_status)
+      copy_simulator_logs
+      zip_build_products
+      copy_xctestrun
+
+      return nil if Scan.config[:build_for_testing]
+
+      results = trainer_test_results
+
+      number_of_retries = results[:number_of_retries]
+      number_of_tests = results[:number_of_tests_excluding_retries]
+      number_of_failures = results[:number_of_failures_excluding_retries]
+
+      SlackPoster.new.run({
+        tests: number_of_tests,
+        failures: number_of_failures
+      })
+
+      if number_of_failures > 0
+        failures_str = number_of_failures.to_s.red
       else
-        failures_str = result[:failures].to_s.green
+        failures_str = number_of_failures.to_s.green
       end
+
+      retries_str = case number_of_retries
+                    when 0
+                      ""
+                    when 1
+                      " (and 1 retry)"
+                    else
+                      " (and #{number_of_retries} retries)"
+                    end
 
       puts(Terminal::Table.new({
         title: "Test Results",
         rows: [
-          ["Number of tests", result[:tests]],
+          ["Number of tests", "#{number_of_tests}#{retries_str}"],
           ["Number of failures", failures_str]
         ]
       }))
       puts("")
 
-      copy_simulator_logs
-      zip_build_products
-      copy_xctestrun
-
-      if result[:failures] > 0
+      if number_of_failures > 0
         open_report
 
         UI.test_failure!("Tests have failed")
@@ -176,6 +309,7 @@ module Scan
       end
 
       open_report
+      return results
     end
 
     def open_report
