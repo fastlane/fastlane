@@ -320,7 +320,7 @@ module FastlaneCore
         UI.verbose("Uninstalling app '#{app_identifier}' from #{device_type}...")
 
         UI.message("Launch Simulator #{device_type}")
-        if FastlaneCore::Helper.xcode_version.to_i >= 13
+        if FastlaneCore::Helper.xcode_at_least("13")
           Helper.backticks("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
         else
           Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")

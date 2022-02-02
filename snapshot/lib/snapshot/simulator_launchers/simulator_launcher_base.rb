@@ -94,7 +94,7 @@ module Snapshot
         device_udid = TestCommandGenerator.device_udid(device_type)
 
         UI.message("Launch Simulator #{device_type}")
-        if FastlaneCore::Helper.xcode_version.to_i >= 13
+        if FastlaneCore::Helper.xcode_at_least("13")
           Helper.backticks("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
         else
           Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
@@ -121,7 +121,7 @@ module Snapshot
 
       UI.message("Launch Simulator #{device_type}")
       # Boot the simulator and wait for it to finish booting
-      Helper.backticks("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
+      Helper.backticks("xcrun simctl bootstatus #{device_udid} -b &> /dev/null")
 
       # "Booted" status is not enough for to adjust the status bar
       # Simulator could stil be booting with Apple logo
