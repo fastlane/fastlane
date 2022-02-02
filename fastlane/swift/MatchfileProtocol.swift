@@ -110,6 +110,9 @@ public protocol MatchfileProtocol: AnyObject {
     /// Disables confirmation prompts during nuke, answering them with yes
     var skipConfirmation: Bool { get }
 
+    /// Remove certs from repository during nuke without revoking them on the developer portal
+    var safeRemoveCerts: Bool { get }
+
     /// Skip generation of a README.md for the created git repository
     var skipDocs: Bool { get }
 
@@ -178,6 +181,7 @@ public extension MatchfileProtocol {
     var includeAllCertificates: Bool { return false }
     var forceForNewCertificates: Bool { return false }
     var skipConfirmation: Bool { return false }
+    var safeRemoveCerts: Bool { return false }
     var skipDocs: Bool { return false }
     var platform: String { return "ios" }
     var deriveCatalystAppIdentifier: Bool { return false }
@@ -192,4 +196,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.92]
+// FastlaneRunnerAPIVersion [0.9.93]

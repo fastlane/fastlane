@@ -1,5 +1,5 @@
 // Atomic.swift
-// Copyright (c) 2021 FastlaneTools
+// Copyright (c) 2022 FastlaneTools
 
 import Foundation
 
@@ -45,29 +45,29 @@ extension UnsafeMutablePointer: AnyLock {
         spin.initialize(to: OS_SPINLOCK_INIT)
         return spin
     }
-    
+
     @available(macOS, introduced: 10.12)
     static func make() -> Self where Pointee == os_unfair_lock {
         let unfairLock = UnsafeMutablePointer<os_unfair_lock>.allocate(capacity: 1)
         unfairLock.initialize(to: os_unfair_lock())
         return unfairLock
     }
-    
+
     @available(macOS, deprecated: 10.12)
     static func lock(_ lock: Self) where Pointee == OSSpinLock {
         OSSpinLockLock(lock)
     }
-    
+
     @available(macOS, deprecated: 10.12)
     static func unlock(_ lock: Self) where Pointee == OSSpinLock {
         OSSpinLockUnlock(lock)
     }
-    
+
     @available(macOS, introduced: 10.12)
     static func lock(_ lock: Self) where Pointee == os_unfair_lock {
         os_unfair_lock_lock(lock)
     }
-    
+
     @available(macOS, introduced: 10.12)
     static func unlock(_ lock: Self) where Pointee == os_unfair_lock {
         os_unfair_lock_unlock(lock)
@@ -77,7 +77,6 @@ extension UnsafeMutablePointer: AnyLock {
 // MARK: - Classes
 
 class AtomicDictionary<Key: Hashable, Value>: LockProtocol {
-    
     typealias Lock = AnyLock
 
     var _lock: Lock
@@ -85,7 +84,7 @@ class AtomicDictionary<Key: Hashable, Value>: LockProtocol {
     private var storage: [Key: Value] = [:]
 
     init(_ lock: Lock) {
-        self._lock = lock
+        _lock = lock
     }
 
     @discardableResult
@@ -106,11 +105,11 @@ class AtomicDictionary<Key: Hashable, Value>: LockProtocol {
         defer { unlock() }
         storage[key] = value
     }
-    
+
     func lock() {
         fatalError()
     }
-    
+
     func unlock() {
         fatalError()
     }
@@ -119,7 +118,7 @@ class AtomicDictionary<Key: Hashable, Value>: LockProtocol {
 @available(macOS, introduced: 10.12)
 final class UnfairAtomicDictionary<Key: Hashable, Value>: AtomicDictionary<Key, Value> {
     typealias Lock = UnsafeMutablePointer<os_unfair_lock>
-    
+
     init() {
         super.init(Lock.make())
     }
@@ -136,7 +135,7 @@ final class UnfairAtomicDictionary<Key: Hashable, Value>: AtomicDictionary<Key, 
 @available(macOS, deprecated: 10.12)
 final class OSSPinAtomicDictionary<Key: Hashable, Value>: AtomicDictionary<Key, Value> {
     typealias Lock = UnsafeMutablePointer<OSSpinLock>
-    
+
     init() {
         super.init(Lock.make())
     }
