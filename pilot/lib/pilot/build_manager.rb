@@ -18,6 +18,11 @@ module Pilot
 
       UI.user_error!("No ipa or pkg file given") if config[:ipa].nil? && config[:pkg].nil?
 
+      if config[:ipa] && config[:pkg]
+        UI.important("WARNING: Both `ipa` and `pkg` options are defined either explicitly or with default_value (build found in directory)")
+        UI.important("Uploading `ipa` is preferred by default. Set `app_platform` to `osx` to force uploading `pkg`")
+      end
+
       check_for_changelog_or_whats_new!(options)
 
       UI.success("Ready to upload new build to TestFlight (App: #{fetch_app_id})...")
@@ -25,24 +30,29 @@ module Pilot
       dir = Dir.mktmpdir
 
       platform = fetch_app_platform
-      if options[:ipa]
+      ipa_path = options[:ipa]
+      if ipa_path && platform != 'osx'
+        asset_path = ipa_path
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_app_id,
-                                                                      ipa_path: options[:ipa],
+                                                                      ipa_path: ipa_path,
                                                                   package_path: dir,
                                                                       platform: platform)
       else
+        pkg_path = options[:pkg]
+        asset_path = pkg_path
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(app_id: fetch_app_id,
-                                                                        pkg_path: options[:pkg],
+                                                                        pkg_path: pkg_path,
                                                                     package_path: dir,
                                                                         platform: platform)
       end
 
       transporter = transporter_for_selected_team(options)
-      result = transporter.upload(package_path: package_path, asset_path: options[:ipa] || options[:pkg])
+      result = transporter.upload(package_path: package_path, asset_path: asset_path)
 
       unless result
         transporter_errors = transporter.displayable_errors
-        UI.user_error!("Error uploading ipa file: \n #{transporter_errors}")
+        file_type = platform == "osx" ? "pkg" : "ipa"
+        UI.user_error!("Error uploading #{file_type} file: \n #{transporter_errors}")
       end
 
       UI.success("Successfully uploaded the new binary to App Store Connect")
@@ -98,7 +108,7 @@ module Pilot
 
     def wait_for_build_processing_to_be_complete(return_when_build_appears = false)
       platform = fetch_app_platform
-      if config[:ipa]
+      if config[:ipa] && platform != "osx"
         app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
         app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
       elsif config[:pkg]
