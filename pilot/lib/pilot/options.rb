@@ -324,7 +324,12 @@ module Pilot
                                      env_name: "PILOT_REJECT_PREVIOUS_BUILD",
                                      description: "Expire previous if it's 'waiting for review'",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :submit_beta_review,
+                                     env_name: "PILOT_DISTRIBUTE_EXTERNAL",
+                                     description: "Send the build for a beta review",
+                                     type: Boolean,
+                                     default_value: true)
       ]
     end
   end
