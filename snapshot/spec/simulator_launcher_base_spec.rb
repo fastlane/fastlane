@@ -7,7 +7,7 @@ describe Snapshot do
       it "should call simctl addmedia" do
         allow(Snapshot::TestCommandGenerator).to receive(:device_udid).and_return(device_udid)
 
-        if FastlaneCore::Helper.xcode_at_least("13")
+        if FastlaneCore::Helper.xcode_at_least?("13")
           expect(Fastlane::Helper).to receive(:backticks)
             .with("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
             .and_return("").exactly(1).times
@@ -30,7 +30,7 @@ describe Snapshot do
       it "should call simctl addmedia and fallback to addphoto" do
         allow(Snapshot::TestCommandGenerator).to receive(:device_udid).and_return(device_udid)
 
-        if FastlaneCore::Helper.xcode_at_least("13")
+        if FastlaneCore::Helper.xcode_at_least?("13")
           expect(Fastlane::Helper).to receive(:backticks)
             .with("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
             .and_return("").exactly(1).times
