@@ -1127,6 +1127,89 @@ module Spaceship
         end
 
         #
+        # reviewSubmissions
+        #
+
+        def get_review_submissions(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("apps/#{app_id}/reviewSubmissions", params)
+        end
+
+        def get_review_submission(review_submission_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("reviewSubmissions/#{review_submission_id}", params)
+        end
+
+        def post_review_submission(app_id:, platform:)
+          body = {
+            data: {
+              type: "reviewSubmissions",
+              attributes: {
+                platform: platform
+              },
+              relationships: {
+                app: {
+                  data: {
+                    type: "apps",
+                    id: app_id
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("reviewSubmissions", body)
+        end
+
+        def patch_review_submission(review_submission_id:, attributes: nil)
+          body = {
+            data: {
+              type: "reviewSubmissions",
+              id: review_submission_id,
+              attributes: attributes,
+            }
+          }
+
+          tunes_request_client.patch("reviewSubmissions/#{review_submission_id}", body)
+        end
+
+        #
+        # reviewSubmissionItems
+        #
+
+        def get_review_submission_items(review_submission_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("reviewSubmissions/#{review_submission_id}/items", params)
+        end
+
+        def post_review_submission_item(review_submission_id:, app_store_version_id: nil)
+          body = {
+            data: {
+              type: "reviewSubmissionItems",
+              relationships: {
+                reviewSubmission: {
+                  data: {
+                    type: "reviewSubmissions",
+                    id: review_submission_id
+                  }
+                }
+              }
+            }
+          }
+
+          unless app_store_version_id.nil?
+            body[:data][:relationships][:appStoreVersion] = {
+              data: {
+                type: "appStoreVersions",
+                id: app_store_version_id
+              }
+            }
+          end
+
+          tunes_request_client.post("reviewSubmissionItems", body)
+        end
+
+        #
         # sandboxTesters
         #
 

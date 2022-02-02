@@ -217,6 +217,14 @@ module Supply
                                      verify_block: proc do |value|
                                        UI.user_error!("'rollout' is no longer a valid track name - please use 'production' instead") if value.casecmp('rollout').zero?
                                      end),
+        FastlaneCore::ConfigItem.new(key: :track_promote_release_status,
+                                     env_name: "SUPPLY_TRACK_PROMOTE_RELEASE_STATUS",
+                                     optional: true,
+                                     description: "Promoted track release status (used when promoting a track) - valid values are #{Supply::ReleaseStatus::ALL.join(', ')}",
+                                     default_value: Supply::ReleaseStatus::COMPLETED,
+                                     verify_block: proc do |value|
+                                                     UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::ReleaseStatus::ALL.include?(value)
+                                                   end),
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,

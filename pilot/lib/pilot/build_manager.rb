@@ -38,7 +38,7 @@ module Pilot
       end
 
       transporter = transporter_for_selected_team(options)
-      result = transporter.upload(package_path: package_path)
+      result = transporter.upload(package_path: package_path, asset_path: options[:ipa] || options[:pkg])
 
       unless result
         transporter_errors = transporter.displayable_errors

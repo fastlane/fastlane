@@ -27,10 +27,45 @@ module Snapshot
         tee_command << log_path.shellescape if log_path
 
         pipe = ["| #{tee_command.join(' ')}"]
-        if Snapshot.config[:disable_xcpretty]
-          return pipe
+
+        formatter = Snapshot.config[:xcodebuild_formatter].chomp
+        options = legacy_xcpretty_options
+
+        if Snapshot.config[:disable_xcpretty] || formatter == ''
+          UI.verbose("Not using an xcodebuild formatter")
+        elsif !options.empty?
+          UI.important("Detected legacy xcpretty being used so formatting wth xcpretty")
+          UI.important("Option(s) used: #{options.join(', ')}")
+          pipe += pipe_xcpretty
+        elsif formatter == 'xcpretty'
+          pipe += pipe_xcpretty
+        elsif formatter == 'xcbeautify'
+          pipe += pipe_xcbeautify
+        else
+          pipe << "| #{formatter}"
         end
 
+        pipe
+      end
+
+      def pipe_xcbeautify
+        pipe = ['| xcbeautify']
+
+        if FastlaneCore::Helper.colors_disabled?
+          pipe << '--disable-colored-output'
+        end
+
+        return pipe
+      end
+
+      def legacy_xcpretty_options
+        options = []
+        options << "xcpretty_args" if Snapshot.config[:xcpretty_args]
+        return options
+      end
+
+      def pipe_xcpretty
+        pipe = []
         xcpretty = "xcpretty #{Snapshot.config[:xcpretty_args]}"
         xcpretty << "--no-color" if Helper.colors_disabled?
         pipe << "| #{xcpretty}"

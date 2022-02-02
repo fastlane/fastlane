@@ -1,5 +1,6 @@
 require 'fastlane_core/configuration/config_item'
 require 'fastlane_core/device_manager'
+require 'fastlane/helper/xcodebuild_formatter_helper'
 require 'credentials_manager/appfile_config'
 require_relative 'module'
 
@@ -11,9 +12,13 @@ module Snapshot
     end
 
     def self.available_options
+      @options ||= plain_options
+    end
+
+    def self.plain_options
       output_directory = (File.directory?("fastlane") ? "fastlane/screenshots" : "screenshots")
 
-      @options ||= [
+      [
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      short_option: "-w",
                                      env_name: "SNAPSHOT_WORKSPACE",
@@ -194,12 +199,6 @@ module Snapshot
                                      description: "The configuration to use when building the app. Defaults to 'Release'",
                                      default_value_dynamic: true,
                                      optional: true),
-        FastlaneCore::ConfigItem.new(key: :xcpretty_args,
-                                     short_option: "-x",
-                                     env_name: "SNAPSHOT_XCPRETTY_ARGS",
-                                     description: "Additional xcpretty arguments",
-                                     is_string: true,
-                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :sdk,
                                      short_option: "-k",
                                      env_name: "SNAPSHOT_SDK",
@@ -289,11 +288,28 @@ module Snapshot
                                      verify_block: proc do |value|
                                        verify_type('skip_testing', [Array, String], value)
                                      end),
+
+        FastlaneCore::ConfigItem.new(key: :xcodebuild_formatter,
+                                     env_names: ["SNAPSHOT_XCODEBUILD_FORMATTER", "FASTLANE_XCODEBUILD_FORMATTER"],
+                                     description: "xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)",
+                                     type: String,
+                                     default_value: Fastlane::Helper::XcodebuildFormatterHelper.xcbeautify_installed? ? 'xcbeautify' : 'xcpretty',
+                                     default_value_dynamic: true),
+
+        # xcpretty
+        FastlaneCore::ConfigItem.new(key: :xcpretty_args,
+                                     short_option: "-x",
+                                     env_name: "SNAPSHOT_XCPRETTY_ARGS",
+                                     deprecated: "Use `xcodebuild_formatter: ''` instead",
+                                     description: "Additional xcpretty arguments",
+                                     is_string: true,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
                                      env_name: "SNAPSHOT_DISABLE_XCPRETTY",
                                      description: "Disable xcpretty formatting of build",
                                      type: Boolean,
                                      optional: true),
+
         FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
                                      env_name: "SNAPSHOT_SUPPRESS_XCODE_OUTPUT",
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",

@@ -4,6 +4,7 @@ module Fastlane
       SCAN_DERIVED_DATA_PATH = :SCAN_DERIVED_DATA_PATH
       SCAN_GENERATED_PLIST_FILE = :SCAN_GENERATED_PLIST_FILE
       SCAN_GENERATED_PLIST_FILES = :SCAN_GENERATED_PLIST_FILES
+      SCAN_GENERATED_XCRESULT_PATH = :SCAN_GENERATED_XCRESULT_PATH
       SCAN_ZIP_BUILD_PRODUCTS_PATH = :SCAN_ZIP_BUILD_PRODUCTS_PATH
     end
 
@@ -13,12 +14,12 @@ module Fastlane
         manager = Scan::Manager.new
 
         begin
-          manager.work(values)
+          results = manager.work(values)
 
           zip_build_products_path = Scan.cache[:zip_build_products_path]
           Actions.lane_context[SharedValues::SCAN_ZIP_BUILD_PRODUCTS_PATH] = zip_build_products_path if zip_build_products_path
 
-          return true
+          return results
         rescue FastlaneCore::Interface::FastlaneBuildFailure => ex
           # Specifically catching FastlaneBuildFailure to prevent build/compile errors from being
           # silenced when :fail_build is set to false
@@ -29,6 +30,12 @@ module Fastlane
             raise ex
           end
         ensure
+          if Scan.cache && (result_bundle_path = Scan.cache[:result_bundle_path])
+            Actions.lane_context[SharedValues::SCAN_GENERATED_XCRESULT_PATH] = File.absolute_path(result_bundle_path)
+          else
+            Actions.lane_context[SharedValues::SCAN_GENERATED_XCRESULT_PATH] = nil
+          end
+
           unless values[:derived_data_path].to_s.empty?
             plist_files_before = manager.plist_files_before || []
 
@@ -47,6 +54,14 @@ module Fastlane
 
       def self.details
         "More information: https://docs.fastlane.tools/actions/scan/"
+      end
+
+      def self.return_value
+        'Outputs has of results with :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries'
+      end
+
+      def self.return_type
+        :hash
       end
 
       def self.author
@@ -70,6 +85,7 @@ module Fastlane
           ['SCAN_DERIVED_DATA_PATH', 'The path to the derived data'],
           ['SCAN_GENERATED_PLIST_FILE', 'The generated plist file'],
           ['SCAN_GENERATED_PLIST_FILES', 'The generated plist files'],
+          ['SCAN_GENERATED_XCRESULT_PATH', 'The path to the generated .xcresult'],
           ['SCAN_ZIP_BUILD_PRODUCTS_PATH', 'The path to the zipped build products']
         ]
       end

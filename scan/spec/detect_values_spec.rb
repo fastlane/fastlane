@@ -76,6 +76,10 @@ describe Scan do
     end
 
     describe "validation" do
+      before(:each) do
+        allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(false)
+      end
+
       it "advises of problems with multiple output_types and a custom_report_file_name", requires_xcodebuild: true do
         options = {
           project: "./scan/examples/standard/app.xcodeproj",

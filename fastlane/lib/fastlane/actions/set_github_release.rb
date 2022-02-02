@@ -19,11 +19,12 @@ module Fastlane
 
         payload = {
           'tag_name' => params[:tag_name],
-          'name' => params[:name],
-          'body' => params[:description],
           'draft' => !!params[:is_draft],
-          'prerelease' => !!params[:is_prerelease]
+          'prerelease' => !!params[:is_prerelease],
+          'generate_release_notes' => !!params[:is_generate_release_notes]
         }
+        payload['name'] = params[:name] if params[:name]
+        payload['body'] = params[:description] if params[:description]
         payload['target_commitish'] = params[:commitish] if params[:commitish]
 
         GithubApiAction.run(
@@ -48,8 +49,7 @@ module Fastlane
               UI.user_error!("You are not authorized to access #{repo_name}, please make sure you provided a valid API token (GITHUB_API_TOKEN)")
             end,
             '*' => proc do |result|
-              UI.error("GitHub responded with #{result[:status]}:#{result[:body]}")
-              return nil
+              UI.user_error!("GitHub responded with #{result[:status]}:#{result[:body]}")
             end
           }
         ) do |result|
@@ -218,6 +218,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :is_prerelease,
                                        env_name: "FL_SET_GITHUB_RELEASE_IS_PRERELEASE",
                                        description: "Whether the release should be marked as prerelease",
+                                       optional: true,
+                                       default_value: false,
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :is_generate_release_notes,
+                                       env_name: "FL_SET_GITHUB_RELEASE_IS_GENERATE_RELEASE_NOTES",
+                                       description: "Whether the name and body of this release should be generated automatically",
                                        optional: true,
                                        default_value: false,
                                        type: Boolean),

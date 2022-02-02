@@ -41,6 +41,9 @@ module Spaceship
         MAC_APP_DEVELOPMENT = "MAC_APP_DEVELOPMENT"
         DEVELOPER_ID_KEXT = "DEVELOPER_ID_KEXT"
         DEVELOPER_ID_APPLICATION = "DEVELOPER_ID_APPLICATION"
+
+        # As of 2021-11-09, this is only available with Apple ID auth
+        DEVELOPER_ID_INSTALLER = "DEVELOPER_ID_INSTALLER"
       end
 
       def self.type

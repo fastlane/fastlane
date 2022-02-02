@@ -15,6 +15,8 @@ describe Snapshot do
       allow(Snapshot::LatestOsVersion).to receive(:version).and_return(os_version)
       allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone6_9_0, iphone6_9_3, iphone6_9_2, appleTV, iphone6_9_3_2, iphone6_10_1, iphone6s_10_1, iphone4s_9_0, ipad_air_9_1])
       fake_out_xcode_project_loading
+
+      allow(Fastlane::Helper::XcodebuildFormatterHelper).to receive(:xcbeautify_installed?).and_return(false)
     end
 
     describe '#destination' do
@@ -45,7 +47,7 @@ describe Snapshot do
 
     describe 'copy_simulator_logs' do
       before (:each) do
-        @config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, {
+        @config = FastlaneCore::Configuration.create(Snapshot::Options.plain_options, {
           output_directory: '/tmp/scan_results',
           output_simulator_logs: true,
           devices: ['iPhone 6 (10.1)', 'iPhone 6s'],
@@ -115,7 +117,7 @@ describe Snapshot do
       let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests", namespace_log_files: true } }
 
       def configure(options)
-        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.plain_options, options)
       end
 
       context 'default options' do
@@ -244,7 +246,7 @@ describe Snapshot do
       let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleMacOS", namespace_log_files: true } }
 
       it "uses default parameters on macOS", requires_xcode: true do
-        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options.merge(devices: ["Mac"]))
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.plain_options, options.merge(devices: ["Mac"]))
         expect(Dir).to receive(:mktmpdir).with("snapshot_derived").and_return("/tmp/path/to/snapshot_derived")
         command = Snapshot::TestCommandGeneratorXcode8.generate(device_type: "Mac", language: "en", locale: nil)
         expect(command).to eq(
@@ -270,7 +272,7 @@ describe Snapshot do
       let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests", namespace_log_files: true } }
 
       it 'uses correct name and language', requires_xcode: true do
-        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.plain_options, options)
         log_path = Snapshot::TestCommandGeneratorXcode8.xcodebuild_log_path(device_type: "iPhone 6", language: "pt", locale: nil)
         expect(log_path).to eq(
           File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 6-pt.log").to_s
@@ -278,7 +280,7 @@ describe Snapshot do
       end
 
       it 'uses includes locale if specified', requires_xcode: true do
-        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.plain_options, options)
         log_path = Snapshot::TestCommandGeneratorXcode8.xcodebuild_log_path(device_type: "iPhone 6", language: "pt", locale: "pt_BR")
         expect(log_path).to eq(
           File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests-iPhone 6-pt-pt_BR.log").to_s
@@ -286,7 +288,7 @@ describe Snapshot do
       end
 
       it 'can work without parameters', requires_xcode: true do
-        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.plain_options, options)
         log_path = Snapshot::TestCommandGeneratorXcode8.xcodebuild_log_path
         expect(log_path).to eq(
           File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log").to_s
@@ -298,7 +300,7 @@ describe Snapshot do
       let(:options) { { project: "./snapshot/example/Example.xcodeproj", scheme: "ExampleUITests" } }
 
       it 'uses correct file name', requires_xcode: true do
-        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
+        Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.plain_options, options)
         log_path = Snapshot::TestCommandGeneratorXcode8.xcodebuild_log_path(device_type: "iPhone 6", language: "pt", locale: nil)
         expect(log_path).to eq(
           File.expand_path("#{FastlaneCore::Helper.buildlog_path}/snapshot/Example-ExampleUITests.log").to_s

@@ -73,12 +73,17 @@ module FastlaneCore
     end
 
     def self.fetch_info_plist_with_unzip(path)
-      list, error, = Open3.capture3("unzip", "-Z", "-1", path)
+      entry, error, = Open3.capture3("unzip", "-Z", "-1", path, "*Payload/*.app/Info.plist")
+
+      # unzip can return multiple Info.plist files if is an embedded app bundle (a WatchKit app)
+      #   - ContainsWatchApp/Payload/Sample.app/Watch/Sample WatchKit App.app/Info.plist
+      #   - ContainsWatchApp/Payload/Sample.app/Info.plist
+      #
+      # we can determine the main Info.plist by the shortest path
+      entry = entry.lines.map(&:chomp).min_by(&:size)
+
       UI.command_output(error) unless error.empty?
-      return nil if list.empty?
-      entry = list.chomp.split("\n").find do |e|
-        File.fnmatch("**/Payload/*.app/Info.plist", e, File::FNM_PATHNAME)
-      end
+      return nil if entry.nil? || entry.empty?
       data, error, = Open3.capture3("unzip", "-p", path, entry)
       UI.command_output(error) unless error.empty?
       return nil if data.empty?

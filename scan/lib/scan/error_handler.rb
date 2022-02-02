@@ -27,6 +27,15 @@ module Scan
           print("If you are using zshell or another shell, make sure to edit the correct bash file.")
           print("For more information visit this stackoverflow answer:")
           print("https://stackoverflow.com/a/17031697/445598")
+        when /Testing failed on/
+          # This is important because xcbeautify and raw output will print:
+          # Testing failed on 'iPhone 13 Pro Max'
+          # when multiple devices are use.
+          # xcpretty hides this output so its not an issue with xcpretty.
+          # We need to catch "Testing failed on" before "Test failed"
+          # so that an error isn't raised.
+          # Raising an error prevents trainer from processing the xcresult
+          return
         when /Testing failed/
           UI.build_failure!("Error building the application. #{details}")
         when /Executed/, /Failing tests:/
