@@ -6645,6 +6645,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
    - forceForNewCertificates: Renew the provisioning profiles if the device count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
+   - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
    - deriveCatalystAppIdentifier: Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
@@ -6694,6 +6695,7 @@ public func match(type: String = matchfile.type,
                   includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.includeAllCertificates),
                   forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceForNewCertificates),
                   skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipConfirmation),
+                  safeRemoveCerts: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.safeRemoveCerts),
                   skipDocs: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipDocs),
                   platform: String = matchfile.platform,
                   deriveCatalystAppIdentifier: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.deriveCatalystAppIdentifier),
@@ -6741,6 +6743,7 @@ public func match(type: String = matchfile.type,
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
+    let safeRemoveCertsArg = safeRemoveCerts.asRubyArgument(name: "safe_remove_certs", type: nil)
     let skipDocsArg = skipDocs.asRubyArgument(name: "skip_docs", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let deriveCatalystAppIdentifierArg = deriveCatalystAppIdentifier.asRubyArgument(name: "derive_catalyst_app_identifier", type: nil)
@@ -6787,6 +6790,7 @@ public func match(type: String = matchfile.type,
                                           includeAllCertificatesArg,
                                           forceForNewCertificatesArg,
                                           skipConfirmationArg,
+                                          safeRemoveCertsArg,
                                           skipDocsArg,
                                           platformArg,
                                           deriveCatalystAppIdentifierArg,
@@ -6844,6 +6848,7 @@ public func match(type: String = matchfile.type,
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
    - forceForNewCertificates: Renew the provisioning profiles if the device count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
+   - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
    - deriveCatalystAppIdentifier: Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
@@ -6897,6 +6902,7 @@ public func matchNuke(type: String = "development",
                       includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                      safeRemoveCerts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       skipDocs: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       platform: String = "ios",
                       deriveCatalystAppIdentifier: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -6944,6 +6950,7 @@ public func matchNuke(type: String = "development",
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
+    let safeRemoveCertsArg = safeRemoveCerts.asRubyArgument(name: "safe_remove_certs", type: nil)
     let skipDocsArg = skipDocs.asRubyArgument(name: "skip_docs", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let deriveCatalystAppIdentifierArg = deriveCatalystAppIdentifier.asRubyArgument(name: "derive_catalyst_app_identifier", type: nil)
@@ -6990,6 +6997,7 @@ public func matchNuke(type: String = "development",
                                           includeAllCertificatesArg,
                                           forceForNewCertificatesArg,
                                           skipConfirmationArg,
+                                          safeRemoveCertsArg,
                                           skipDocsArg,
                                           platformArg,
                                           deriveCatalystAppIdentifierArg,
@@ -7562,6 +7570,7 @@ public func pem(platform: String = "ios",
    - waitProcessingTimeoutDuration: Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception
    - waitForUploadedBuild: **DEPRECATED!** No longer needed with the transition over to the App Store Connect API - Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used
    - rejectBuildWaitingForReview: Expire previous if it's 'waiting for review'
+   - submitBetaReview: Send the build for a beta review
 
  More details can be found on https://docs.fastlane.tools/actions/pilot/.
  This integration will only do the TestFlight upload.
@@ -7603,7 +7612,8 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                   waitProcessingInterval: Int = 30,
                   waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                   waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                  rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false))
+                  rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                  submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -7643,6 +7653,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
     let waitProcessingTimeoutDurationArg = waitProcessingTimeoutDuration.asRubyArgument(name: "wait_processing_timeout_duration", type: nil)
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
+    let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -7680,7 +7691,8 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                                           waitProcessingIntervalArg,
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
-                                          rejectBuildWaitingForReviewArg]
+                                          rejectBuildWaitingForReviewArg,
+                                          submitBetaReviewArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -11026,6 +11038,7 @@ public func swiftlint(mode: String = "lint",
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
    - forceForNewCertificates: Renew the provisioning profiles if the device count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
+   - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
    - deriveCatalystAppIdentifier: Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
@@ -11075,6 +11088,7 @@ public func syncCodeSigning(type: String = "development",
                             includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                            safeRemoveCerts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             skipDocs: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             platform: String = "ios",
                             deriveCatalystAppIdentifier: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11122,6 +11136,7 @@ public func syncCodeSigning(type: String = "development",
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
+    let safeRemoveCertsArg = safeRemoveCerts.asRubyArgument(name: "safe_remove_certs", type: nil)
     let skipDocsArg = skipDocs.asRubyArgument(name: "skip_docs", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let deriveCatalystAppIdentifierArg = deriveCatalystAppIdentifier.asRubyArgument(name: "derive_catalyst_app_identifier", type: nil)
@@ -11168,6 +11183,7 @@ public func syncCodeSigning(type: String = "development",
                                           includeAllCertificatesArg,
                                           forceForNewCertificatesArg,
                                           skipConfirmationArg,
+                                          safeRemoveCertsArg,
                                           skipDocsArg,
                                           platformArg,
                                           deriveCatalystAppIdentifierArg,
@@ -11312,6 +11328,7 @@ public func testfairy(apiKey: String,
    - waitProcessingTimeoutDuration: Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception
    - waitForUploadedBuild: **DEPRECATED!** No longer needed with the transition over to the App Store Connect API - Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used
    - rejectBuildWaitingForReview: Expire previous if it's 'waiting for review'
+   - submitBetaReview: Send the build for a beta review
 
  More details can be found on https://docs.fastlane.tools/actions/pilot/.
  This integration will only do the TestFlight upload.
@@ -11353,7 +11370,8 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                        waitProcessingInterval: Int = 30,
                        waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                        waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                       rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false))
+                       rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                       submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -11393,6 +11411,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
     let waitProcessingTimeoutDurationArg = waitProcessingTimeoutDuration.asRubyArgument(name: "wait_processing_timeout_duration", type: nil)
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
+    let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -11430,7 +11449,8 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                                           waitProcessingIntervalArg,
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
-                                          rejectBuildWaitingForReviewArg]
+                                          rejectBuildWaitingForReviewArg,
+                                          submitBetaReviewArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -12707,6 +12727,7 @@ public func uploadToPlayStoreInternalAppSharing(packageName: String,
    - waitProcessingTimeoutDuration: Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception
    - waitForUploadedBuild: **DEPRECATED!** No longer needed with the transition over to the App Store Connect API - Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used
    - rejectBuildWaitingForReview: Expire previous if it's 'waiting for review'
+   - submitBetaReview: Send the build for a beta review
 
  More details can be found on https://docs.fastlane.tools/actions/pilot/.
  This integration will only do the TestFlight upload.
@@ -12748,7 +12769,8 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                waitProcessingInterval: Int = 30,
                                waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                                waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                               rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false))
+                               rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                               submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -12788,6 +12810,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
     let waitProcessingTimeoutDurationArg = waitProcessingTimeoutDuration.asRubyArgument(name: "wait_processing_timeout_duration", type: nil)
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
+    let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -12825,7 +12848,8 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                           waitProcessingIntervalArg,
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
-                                          rejectBuildWaitingForReviewArg]
+                                          rejectBuildWaitingForReviewArg,
+                                          submitBetaReviewArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -13406,4 +13430,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.148]
+// FastlaneRunnerAPIVersion [0.9.149]
