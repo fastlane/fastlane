@@ -102,6 +102,7 @@ jobs:
       - run:
           name: bundle exec fastlane execute_tests
           command: |
+            bundle exec fastlane snapshot reset_simulators --force
             RUBYOPT=<< parameters.ruby_opt >> bundle exec fastlane execute_tests
       - *cache_save_rubocop
       - run:
