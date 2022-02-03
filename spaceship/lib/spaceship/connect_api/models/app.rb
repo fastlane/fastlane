@@ -78,7 +78,17 @@ module Spaceship
 
       def self.find(bundle_id, client: nil)
         client ||= Spaceship::ConnectAPI
-        return all(client: client, filter: { bundleId: bundle_id }).find do |app|
+
+        # On 2022/2/2, filtering by bundle identifier started to fail for identifiers longer than 25 characters
+        # Temporarily removing this filter and filtering locally until this is fixed
+        #
+        # Also go uncomment the tests in spaceship/spec/connectapi/models/app_spec.rb when this is fixed
+        #
+        # return all(client: client, filter: { bundleId: bundle_id }).find do |app|
+        #   app.bundle_id == bundle_id
+        # end
+
+        return all(client: client).find do |app|
           app.bundle_id == bundle_id
         end
       end
