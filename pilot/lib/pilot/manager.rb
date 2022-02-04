@@ -20,7 +20,11 @@ module Pilot
     end
 
     def login
-      if (api_token = Spaceship::ConnectAPI::Token.from(hash: config[:api_key], filepath: config[:api_key_path]))
+      if !config[:api_token].nil?
+        UI.message('Passing given authorization token for App Store Connect API')
+        api_token = Spaceship::ConnectAPI::Token.from_token(config[:api_token])
+        Spaceship::ConnectAPI.token = api_token
+      elsif (api_token = Spaceship::ConnectAPI::Token.from(hash: config[:api_key], filepath: config[:api_key_path]))
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
       elsif !Spaceship::ConnectAPI.token.nil?
