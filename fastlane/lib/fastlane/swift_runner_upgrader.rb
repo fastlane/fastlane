@@ -216,10 +216,10 @@ module Fastlane
       # Check if upgrade is needed
       # If fastlane build settings exists already, we don't need any more changes to the Xcode project
       self.fastlane_runner_target.build_configurations.each { |config|
-        return false if dry_run && config.build_settings["CODE_SIGN_IDENTITY"].nil?
-        return false if dry_run && config.build_settings["MACOSX_DEPLOYMENT_TARGET"].nil?
+        return true if dry_run && config.build_settings["CODE_SIGN_IDENTITY"].nil?
+        return true if dry_run && config.build_settings["MACOSX_DEPLOYMENT_TARGET"].nil?
       }
-      return true if dry_run
+      return false if dry_run
 
       # Proceed to upgrade
       self.fastlane_runner_target.build_configurations.each { |config|
@@ -236,11 +236,10 @@ module Fastlane
       phase_copy_sign = self.fastlane_runner_target.copy_files_build_phases.select { |phase_copy| phase_copy.name == "FastlaneRunnerCopySigned" }.first
 
       old_phase_copy_sign = self.fastlane_runner_target.shell_script_build_phases.select { |phase_copy| phase_copy.shell_script == "cd \"${SRCROOT}\"\ncd ../..\ncp \"${TARGET_BUILD_DIR}/${EXECUTABLE_PATH}\" .\n" }.first
-      unless phase_copy_sign
-        return false if dry_run
-      end
 
-      return true if dry_run
+      return true if dry_run && phase_copy_sign.nil?
+
+      return false if dry_run
 
       # Proceed to upgrade
       old_phase_copy_sign.remove_from_project unless old_phase_copy_sign.nil?
