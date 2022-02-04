@@ -18,7 +18,10 @@ module Precheck
                                          hide_keys: [:output_path],
                                              title: "Summary for precheck #{Fastlane::VERSION}")
 
-      api_token = if (token = Spaceship::ConnectAPI::Token.from(hash: Precheck.config[:api_key], filepath: Precheck.config[:api_key_path]))
+      api_token = if !Precheck.config[:api_token].nil
+                    UI.message('Passing given authorization token for App Store Connect API')
+                    Spaceship::ConnectAPI::Token.from_token(Precheck.config[:api_token])
+                  elsif (token = Spaceship::ConnectAPI::Token.from(hash: Precheck.config[:api_key], filepath: Precheck.config[:api_key_path]))
                     UI.message("Creating authorization token for App Store Connect API")
                     token
                   elsif (token = Spaceship::ConnectAPI.token)
