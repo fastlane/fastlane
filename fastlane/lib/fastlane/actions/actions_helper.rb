@@ -112,6 +112,11 @@ module Fastlane
       Dir[File.expand_path('*.rb', File.dirname(__FILE__))].each do |file|
         require file
       end
+
+      Dir[File.expand_path('../action_sets/*/actions/*.rb', File.dirname(__FILE__))].each do |file|
+        puts "🔥 Requiring file: #{file}"
+        require file
+      end
     end
 
     # Import all the helpers
