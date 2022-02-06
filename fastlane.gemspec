@@ -78,7 +78,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
   spec.add_dependency('addressable', '>= 2.8', '< 3.0.0') # Support for URI templates
-  spec.add_dependency('multipart-post', '~> 2.0.0') # Needed for uploading builds to appetize
+  spec.add_dependency('multipart-post', '~> 2.0.0') # Needed for uploading builds to appetize, Amazon
   spec.add_dependency('word_wrap', '~> 1.0.0') # to add line breaks for tables with long strings
 
   spec.add_dependency('optparse', '~> 0.1.1') # Used to parse options with Commander

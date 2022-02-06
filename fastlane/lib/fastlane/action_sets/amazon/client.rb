@@ -2,7 +2,6 @@
 
 require 'net/http'
 require 'net/http/post/multipart'
-require 'marcel'
 require 'uri'
 require 'json'
 
@@ -618,7 +617,7 @@ module Fastlane::ActionSets::Amazon
 
     def upload_body_and_headers(filepath)
       filename = File.basename(filepath)
-      mime_type = Marcel::MimeType.for(Pathname.new(filepath))
+      mime_type = mime_type_for_file(filepath)
       body = UploadIO.new(File.expand_path(filepath), mime_type)
       headers = { 'Content-Type' => mime_type, 'fileName' => filename }
       if body.respond_to?(:length)
@@ -627,6 +626,10 @@ module Fastlane::ActionSets::Amazon
         headers['Content-Length'] = body.stat.size.to_s
       end
       return body, headers
+    end
+
+    def mime_type_for_file(path)
+      Helper.backticks("file --mime-encoding #{path.shellescape}", print: false)
     end
   end
 
