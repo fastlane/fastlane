@@ -9,14 +9,3 @@ module Fastlane
     end
   end
 end
-
-module Fastlane::ActionSets::Amazon
-  class Client
-    def initialize
-    end
-
-    def do_stuff
-      puts "do stuff"
-    end
-  end
-end
