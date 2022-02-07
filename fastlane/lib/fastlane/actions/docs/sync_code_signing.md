@@ -460,6 +460,13 @@ Accessing Google Cloud Storage from your CI system requires you to provide the `
 
 Accessing Amazon S3 Storage from your CI system requires you to provide the `s3_region`, `s3_access_key`, `s3_secret_access_key` and `s3_bucket` options (or environment variables), with keys that has read access to the bucket.
 
+To configure a custom S3 endpoint:
+
+- Provide `s3_endpoint` to match or set environment variable `MATCH_S3_ENDPOINT` as the url to your S3 server.
+- Provide `s3_region` (It is not used in this case, but still required by the S3 client)
+- Optionally set `s3_ssl_verify_peer` to false when testing.
+- Set `s3_force_path_style` to true if you need the bucket name in the request path instead of the subdomain (looking at you Minio).
+
 ### Nuke
 
 If you never really cared about code signing and have a messy Apple Developer account with a lot of invalid, expired or Xcode managed profiles/certificates, you can use the `match nuke` command to revoke your certificates and provisioning profiles. Don't worry, apps that are already available in the App Store / TestFlight will still work. Builds distributed via Ad Hoc or Enterprise will be disabled after nuking your account, so you'll have to re-upload a new build. After clearing your account you'll start from a clean state, and you can run _match_ to generate your certificates and profiles again.

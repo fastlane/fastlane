@@ -15,6 +15,9 @@ module Match
       attr_reader :s3_region
       attr_reader :s3_client
       attr_reader :s3_object_prefix
+      attr_reader :s3_endpoint
+      attr_reader :s3_force_path_style
+      attr_reader :s3_ssl_verify_peer
       attr_reader :readonly
       attr_reader :username
       attr_reader :team_id
@@ -28,6 +31,9 @@ module Match
         s3_secret_access_key = params[:s3_secret_access_key]
         s3_bucket = params[:s3_bucket]
         s3_object_prefix = params[:s3_object_prefix]
+        s3_endpoint = params[:s3_endpoint]
+        s3_force_path_style = params[:s3_force_path_style]
+        s3_ssl_verify_peer = params[:s3_ssl_verify_peer]
 
         if params[:git_url].to_s.length > 0
           UI.important("Looks like you still define a `git_url` somewhere, even though")
@@ -42,6 +48,9 @@ module Match
           s3_secret_access_key: s3_secret_access_key,
           s3_bucket: s3_bucket,
           s3_object_prefix: s3_object_prefix,
+          s3_endpoint: s3_endpoint,
+          s3_force_path_style: s3_force_path_style,
+          s3_ssl_verify_peer: s3_ssl_verify_peer,
           readonly: params[:readonly],
           username: params[:username],
           team_id: params[:team_id],
@@ -56,6 +65,9 @@ module Match
                      s3_secret_access_key: nil,
                      s3_bucket: nil,
                      s3_object_prefix: nil,
+                     s3_endpoint: nil,
+                     s3_force_path_style: nil,
+                     s3_ssl_verify_peer: nil,
                      readonly: nil,
                      username: nil,
                      team_id: nil,
@@ -64,7 +76,10 @@ module Match
                      api_key: nil)
         @s3_bucket = s3_bucket
         @s3_region = s3_region
-        @s3_client = Fastlane::Helper::S3ClientHelper.new(access_key: s3_access_key, secret_access_key: s3_secret_access_key, region: s3_region)
+        @s3_endpoint = s3_endpoint
+        @s3_force_path_style = s3_force_path_style
+        @s3_ssl_verify_peer = s3_ssl_verify_peer
+        @s3_client = Fastlane::Helper::S3ClientHelper.new(access_key: s3_access_key, secret_access_key: s3_secret_access_key, region: s3_region, endpoint: s3_endpoint, force_path_style: s3_force_path_style, ssl_verify_peer: s3_ssl_verify_peer)
         @s3_object_prefix = s3_object_prefix.to_s
         @readonly = readonly
         @username = username

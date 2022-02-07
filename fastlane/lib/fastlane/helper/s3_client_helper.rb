@@ -5,11 +5,23 @@ module Fastlane
     class S3ClientHelper
       attr_reader :access_key
       attr_reader :region
+      attr_reader :endpoint
+      attr_reader :force_path_style
+      attr_reader :ssl_verify_peer
 
-      def initialize(access_key: nil, secret_access_key: nil, region: nil, s3_client: nil)
+      def initialize(access_key: nil,
+                     secret_access_key: nil,
+                     region: nil,
+                     endpoint: nil,
+                     force_path_style: nil,
+                     ssl_verify_peer: nil,
+                     s3_client: nil)
         @access_key = access_key
         @secret_access_key = secret_access_key
         @region = region
+        @endpoint = endpoint
+        @force_path_style = force_path_style
+        @ssl_verify_peer = ssl_verify_peer
 
         @client = s3_client
       end
@@ -60,7 +72,10 @@ module Fastlane
         @client ||= Aws::S3::Client.new(
           {
             region: region,
-            credentials: create_credentials
+            credentials: create_credentials,
+            endpoint: endpoint,
+            force_path_style: force_path_style,
+            ssl_verify_peer: ssl_verify_peer
           }.compact
         )
       end

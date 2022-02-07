@@ -54,6 +54,9 @@ module Match
         s3_access_key: params[:s3_access_key].to_s,
         s3_secret_access_key: params[:s3_secret_access_key].to_s,
         s3_bucket: params[:s3_bucket].to_s,
+        s3_endpoint: params[:s3_endpoint].to_s,
+        s3_force_path_style: params[:s3_force_path_style].to_s,
+        s3_ssl_verify_peer: params[:s3_ssl_verify_peer].to_s,
         team_id: params[:team_id] || Spaceship::ConnectAPI.client.portal_team_id
       })
       self.storage.download
