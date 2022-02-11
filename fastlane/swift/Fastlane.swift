@@ -8240,7 +8240,7 @@ public func puts(message: OptionalConfigValue<String?> = .fastlaneDefault(nil)) 
  This can be useful when basing your release process on the version string only stored in one place - in the podspec.
  As one of the first steps you'd read the podspec and its version and the rest of the workflow can use that version string (when e.g. creating a new git tag or a GitHub Release).
  */
-@discardableResult public func readPodspec(path: String) -> [String: String] {
+@discardableResult public func readPodspec(path: String) -> [String: Any] {
     let pathArg = RubyCommand.Argument(name: "path", value: path, type: nil)
     let array: [RubyCommand.Argument?] = [pathArg]
     let args: [RubyCommand.Argument] = array
