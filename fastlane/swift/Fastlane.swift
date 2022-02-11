@@ -6643,7 +6643,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - force: Renew the provisioning profiles every time you run match
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
-   - forceForNewCertificates: Renew the provisioning profiles if the device count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
+   - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
    - skipDocs: Skip generation of a README.md for the created git repository
@@ -6846,7 +6846,7 @@ public func match(type: String = matchfile.type,
    - force: Renew the provisioning profiles every time you run match
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
-   - forceForNewCertificates: Renew the provisioning profiles if the device count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
+   - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
    - skipDocs: Skip generation of a README.md for the created git repository
@@ -8240,7 +8240,7 @@ public func puts(message: OptionalConfigValue<String?> = .fastlaneDefault(nil)) 
  This can be useful when basing your release process on the version string only stored in one place - in the podspec.
  As one of the first steps you'd read the podspec and its version and the rest of the workflow can use that version string (when e.g. creating a new git tag or a GitHub Release).
  */
-@discardableResult public func readPodspec(path: String) -> [String: String] {
+@discardableResult public func readPodspec(path: String) -> [String: Any] {
     let pathArg = RubyCommand.Argument(name: "path", value: path, type: nil)
     let array: [RubyCommand.Argument?] = [pathArg]
     let args: [RubyCommand.Argument] = array
@@ -11036,7 +11036,7 @@ public func swiftlint(mode: String = "lint",
    - force: Renew the provisioning profiles every time you run match
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
-   - forceForNewCertificates: Renew the provisioning profiles if the device count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
+   - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
    - skipDocs: Skip generation of a README.md for the created git repository
@@ -13430,4 +13430,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.151]
+// FastlaneRunnerAPIVersion [0.9.152]

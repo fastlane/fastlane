@@ -104,7 +104,7 @@ public protocol MatchfileProtocol: AnyObject {
     /// Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
     var includeAllCertificates: Bool { get }
 
-    /// Renew the provisioning profiles if the device count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
+    /// Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
     var forceForNewCertificates: Bool { get }
 
     /// Disables confirmation prompts during nuke, answering them with yes
@@ -196,4 +196,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.95]
+// FastlaneRunnerAPIVersion [0.9.96]
