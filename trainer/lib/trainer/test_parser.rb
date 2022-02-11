@@ -19,6 +19,7 @@ module Trainer
     attr_accessor :number_of_tests_excluding_retries
     attr_accessor :number_of_failures_excluding_retries
     attr_accessor :number_of_retries
+    attr_accessor :number_of_skipped
 
     # Returns a hash with the path being the key, and the value
     # defining if the tests were successful
@@ -89,7 +90,8 @@ module Trainer
           number_of_failures: tp.number_of_failures,
           number_of_tests_excluding_retries: tp.number_of_tests_excluding_retries,
           number_of_failures_excluding_retries: tp.number_of_failures_excluding_retries,
-          number_of_retries: tp.number_of_retries
+          number_of_retries: tp.number_of_retries,
+          number_of_skipped: tp.number_of_skipped
         }
       end
       return_hash
@@ -116,12 +118,14 @@ module Trainer
       self.number_of_tests_excluding_retries = 0
       self.number_of_failures_excluding_retries = 0
       self.number_of_retries = 0
+      self.number_of_skipped = 0
       self.data.each do |thing|
         self.number_of_tests += thing[:number_of_tests].to_i
         self.number_of_failures += thing[:number_of_failures].to_i
         self.number_of_tests_excluding_retries += thing[:number_of_tests_excluding_retries].to_i
         self.number_of_failures_excluding_retries += thing[:number_of_failures_excluding_retries].to_i
         self.number_of_retries += thing[:number_of_retries].to_i
+        self.number_of_skipped += thing[:number_of_skipped].to_i
       end
     end
 
@@ -250,6 +254,7 @@ module Trainer
 
           info = tests_by_identifier[identifier] || {}
           info[:failure_count] ||= 0
+          info[:skip_count] ||= 0
           info[:success_count] ||= 0
 
           retry_count = info[:retry_count]
@@ -272,6 +277,9 @@ module Trainer
             }]
 
             info[:failure_count] += 1
+          elsif test.test_status == "Skipped"
+            test_row[:skipped] = true
+            info[:skip_count] += 1
           else
             info[:success_count] = 1
           end
@@ -319,7 +327,8 @@ module Trainer
         # Used for seeing if any tests continued to fail after all of the Xcode 13 (and up) retries have finished
         unique_tests = tests_by_identifier.values || []
         row[:number_of_tests_excluding_retries] = unique_tests.count
-        row[:number_of_failures_excluding_retries] = unique_tests.find_all { |a| a[:success_count] == 0 }.count
+        row[:number_of_skipped] = unique_tests.map { |a| a[:skip_count] }.inject(:+)
+        row[:number_of_failures_excluding_retries] = unique_tests.find_all { |a| (a[:success_count] + a[:skip_count]) == 0 }.count
         row[:number_of_retries] = unique_tests.map { |a| a[:retry_count] }.inject(:+)
 
         row
