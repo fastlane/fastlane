@@ -19,6 +19,7 @@ module Trainer
     attr_accessor :number_of_tests_excluding_retries
     attr_accessor :number_of_failures_excluding_retries
     attr_accessor :number_of_retries
+    attr_accessor :number_of_skipped
 
     # Returns a hash with the path being the key, and the value
     # defining if the tests were successful
@@ -89,7 +90,8 @@ module Trainer
           number_of_failures: tp.number_of_failures,
           number_of_tests_excluding_retries: tp.number_of_tests_excluding_retries,
           number_of_failures_excluding_retries: tp.number_of_failures_excluding_retries,
-          number_of_retries: tp.number_of_retries
+          number_of_retries: tp.number_of_retries,
+          number_of_skipped: tp.number_of_skipped
         }
       end
       return_hash
@@ -116,12 +118,14 @@ module Trainer
       self.number_of_tests_excluding_retries = 0
       self.number_of_failures_excluding_retries = 0
       self.number_of_retries = 0
+      self.number_of_skipped = 0
       self.data.each do |thing|
         self.number_of_tests += thing[:number_of_tests].to_i
         self.number_of_failures += thing[:number_of_failures].to_i
         self.number_of_tests_excluding_retries += thing[:number_of_tests_excluding_retries].to_i
         self.number_of_failures_excluding_retries += thing[:number_of_failures_excluding_retries].to_i
         self.number_of_retries += thing[:number_of_retries].to_i
+        self.number_of_skipped += thing[:number_of_skipped].to_i
       end
     end
 
