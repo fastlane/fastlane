@@ -436,7 +436,8 @@ module Spaceship
         filter = {
           state: [
             Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::WAITING_FOR_REVIEW,
-            Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::IN_REVIEW
+            Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::IN_REVIEW,
+            Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::UNRESOLVED_ISSUES
           ].join(","),
           platform: platform
         }
