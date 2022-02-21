@@ -350,7 +350,7 @@ describe Fastlane do
 
         context "when slather version is 2.4.0" do
           let(:version) { '2.4.0' }
-          it "doesnot pass the validation" do
+          it "does not pass the validation" do
             expect do
               action.validate_params!(param)
             end.to raise_error(FastlaneCore::Interface::FastlaneError, 'configuration option is available since version 2.4.1')

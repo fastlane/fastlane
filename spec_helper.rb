@@ -53,7 +53,7 @@ RSpec.configure do |config|
       # no method implemented
     end
 
-    # Make sure PATH didnt get emptied during execution of previous (!) test
+    # Make sure PATH didn't get emptied during execution of previous (!) test
     expect(ENV['PATH']).to be_truthy, "PATH is missing. (Previous test probably emptied it.)"
   end
 

@@ -275,7 +275,7 @@ describe Deliver::UploadScreenshots do
       end
     end
 
-    context 'when one of the screenshots is FAILD state and tries reamins non zero' do
+    context 'when one of the screenshots is FAILD state and tries remains non zero' do
       it 'should retry upload_screenshots' do
         app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => false, 'error?' => true)
         app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
@@ -407,7 +407,7 @@ describe Deliver::UploadScreenshots do
     end
 
     context 'when localization has screenshots uploaded in wrong order' do
-      it 'should reoder screenshots' do
+      it 'should reorder screenshots' do
         app_screenshot1 = make_app_screenshot(id: '1', file_name: '6.5_1.jpg')
         app_screenshot2 = make_app_screenshot(id: '2', file_name: '6.5_2.jpg')
         app_screenshot3 = make_app_screenshot(id: '3', file_name: '6.5_3.jpg')
@@ -423,7 +423,7 @@ describe Deliver::UploadScreenshots do
     end
 
     context 'when localization has screenshots uploaded in wrong order with trailing numbers up to 10' do
-      it 'should reoder screenshots' do
+      it 'should reorder screenshots' do
         app_screenshot1 = make_app_screenshot(id: '1', file_name: '6.5_1.jpg')
         app_screenshot2 = make_app_screenshot(id: '2', file_name: '6.5_2.jpg')
         app_screenshot10 = make_app_screenshot(id: '10', file_name: '6.5_10.jpg')

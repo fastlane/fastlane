@@ -206,7 +206,7 @@ class SocketClient: NSObject {
 extension SocketClient: StreamDelegate {
     func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
         guard !cleaningUpAfterDone else {
-            // Still getting response from server eventhough we are done.
+            // Still getting response from server even though we are done.
             // No big deal, we're closing the streams anyway.
             // That being said, we need to balance out the dispatchGroups
             dispatchGroup.leave()
@@ -244,7 +244,7 @@ extension SocketClient: StreamDelegate {
 
             case Stream.Event.errorOccurred:
                 // probably safe to close all the things because Ruby already disconnected
-                verbose(message: "output stream recevied error")
+                verbose(message: "output stream received error")
 
             case Stream.Event.endEncountered:
                 // nothing special here

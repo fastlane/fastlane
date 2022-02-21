@@ -131,7 +131,7 @@ describe Deliver::Loader do
       expanded_special_folders = folders_expanded.select do |folder|
         folder.path.include?(Deliver::Loader::APPLE_TV_DIR_NAME) || folder.path.include?(Deliver::Loader::IMESSAGE_DIR_NAME)
       end
-      # all expanded folder should have its languge
+      # all expanded folder should have its language
       expect(expanded_special_folders.map(&:language).any?(&:nil?)).to be(false)
     end
   end
