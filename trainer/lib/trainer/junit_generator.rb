@@ -19,7 +19,7 @@ module Trainer
 
       xml = xml.gsub('system_', 'system-').delete("\e") # Jenkins can not parse 'ESC' symbol
 
-      # We have to manuall clear empty lines
+      # We have to manually clear empty lines
       # They may contain white spaces
       clean_xml = []
       xml.each_line do |row|
