@@ -230,13 +230,7 @@ module Trainer
       all_summaries = summaries.map(&:summaries).flatten
       testable_summaries = all_summaries.map(&:testable_summaries).flatten
 
-      summary_to_name = {}
-
-      all_summaries.each do |summary|
-        summary.testable_summaries.each do |testable_summary|
-          summary_to_name[testable_summary] = summary.name
-        end
-      end
+      summaries_to_names = test_summaries_to_configuration_names(all_summaries)
 
       # Maps ActionTestableSummary to rows for junit generator
       rows = testable_summaries.map do |testable_summary|
@@ -325,7 +319,7 @@ module Trainer
           project_path: testable_summary.project_relative_path,
           target_name: testable_summary.target_name,
           test_name: testable_summary.name,
-          configuration_name: summary_to_name[testable_summary],
+          configuration_name: summaries_to_names[testable_summary],
           duration: all_tests.map(&:duration).inject(:+),
           tests: test_rows
         }
@@ -344,6 +338,16 @@ module Trainer
       end
 
       self.data = rows
+    end
+
+    def test_summaries_to_configuration_names(test_summaries)
+      summary_to_name = {}
+      test_summaries.each do |summary|
+        summary.testable_summaries.each do |testable_summary|
+          summary_to_name[testable_summary] = summary.name
+        end
+      end
+      summary_to_name
     end
 
     # Convert the Hashes and Arrays in something more useful
