@@ -230,6 +230,14 @@ module Trainer
       all_summaries = summaries.map(&:summaries).flatten
       testable_summaries = all_summaries.map(&:testable_summaries).flatten
 
+      summary_to_name = {}
+
+      all_summaries.each do |summary|
+        summary.testable_summaries.each do |testable_summary|
+          summary_to_name[testable_summary] = summary.name
+        end
+      end
+
       # Maps ActionTestableSummary to rows for junit generator
       rows = testable_summaries.map do |testable_summary|
         all_tests = testable_summary.all_tests.flatten
@@ -317,6 +325,7 @@ module Trainer
           project_path: testable_summary.project_relative_path,
           target_name: testable_summary.target_name,
           test_name: testable_summary.name,
+          configuration_name: summary_to_name[testable_summary],
           duration: all_tests.map(&:duration).inject(:+),
           tests: test_rows
         }
