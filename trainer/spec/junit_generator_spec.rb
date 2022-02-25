@@ -24,7 +24,7 @@ describe Trainer do
       expect(tp.to_junit).to eq(junit)
     end
 
-    it "works with an xcresult" do
+    it "works with an xcresult", requires_xcode: true do
       tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult")
       junit = File.read("./trainer/spec/fixtures/XCResult.junit")
       expect(tp.to_junit).to eq(junit)
