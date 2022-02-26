@@ -266,14 +266,9 @@ module Supply
       filtered_tracks = tracks.select { |t| !t.releases.nil? && t.releases.any? { |r| r.name == version } }
 
       if filtered_tracks.length > 1
-        # Production track takes precedence if version is present in multiple tracks
+        # Prefer tracks in production, beta, alpha, internal order
         # E.g.: A release might've been promoted from Alpha/Beta track. This means the release will be present in two or more tracks
-        if filtered_tracks.any? { |t| t.track == Supply::Tracks::DEFAULT }
-          filtered_tracks = filtered_tracks.select { |t| t.track == Supply::Tracks::DEFAULT }
-        else
-          # E.g.: A release might be in both Alpha & Beta (not sure if this is possible, just catching if it ever happens), giving Beta precedence.
-          filtered_tracks = filtered_tracks.select { |t| t.track == Supply::Tracks::BETA }
-        end
+        filtered_tracks = filtered_tracks.sort_by { |t| Supply::Tracks::DEFAULTS.index(t.track) || Float::INFINITY }
       end
 
       filtered_track = filtered_tracks.first
