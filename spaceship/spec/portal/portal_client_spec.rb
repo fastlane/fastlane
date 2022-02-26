@@ -292,7 +292,7 @@ describe Spaceship::Client do
     end
 
     describe '#delete_provisioning_profile!' do
-      it 'makes a requeset to delete a provisioning profile' do
+      it 'makes a request to delete a provisioning profile' do
         response = subject.delete_provisioning_profile!('2MAY7NPHRU')
         expect(response['resultCode']).to eq(0)
       end

@@ -267,7 +267,7 @@ BODY
       expect(subject.req_home.body).to eq(default_body)
     end
 
-    it "fails to retry request if loggin fails in retry block when UnauthorizedAccess Error raised" do
+    it "fails to retry request if login fails in retry block when UnauthorizedAccess Error raised" do
       subject.login
       stub_client_retry_auth(401, 1, 200, default_body)
 

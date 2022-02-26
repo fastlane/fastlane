@@ -213,7 +213,7 @@ describe Pilot do
       end
 
       context "when 'app' variable is not set" do
-        context "when Spaceship retuns a valid 'app' object" do
+        context "when Spaceship returns a valid 'app' object" do
           before(:each) do
             allow(fake_manager)
               .to receive(:fetch_app_id)
@@ -227,7 +227,7 @@ describe Pilot do
             expect(fake_manager).to receive(:fetch_app_id)
           end
 
-          it "retuns the Spaceship app object" do
+          it "returns the Spaceship app object" do
             app_result = fake_manager.app
 
             expect(app_result).to eq(fake_app)

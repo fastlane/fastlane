@@ -81,7 +81,7 @@ describe Deliver::AppScreenshotIterator do
       end
     end
 
-    context 'when locale doens\'t match the one for given local screenshots' do
+    context 'when locale doesn\'t match the one for given local screenshots' do
       it 'should iterates nothing' do
         localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization', get_app_screenshot_sets: [], locale: ['fr-FR'])
         screenshots_per_language = { 'en-US' => [] }

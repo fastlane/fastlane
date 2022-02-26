@@ -1111,7 +1111,7 @@ public func backupXcarchive(xcarchive: String,
  Automatically add a badge to your app icon
 
  - parameters:
-   - dark: Adds a dark flavored badge ontop of your icon
+   - dark: Adds a dark flavored badge on top of your icon
    - custom: Add your custom overlay/badge image
    - noBadge: Hides the beta badge
    - shield: Add a shield to your app icon from shields.io
@@ -5110,7 +5110,7 @@ public func getPushCertificate(platform: String = "ios",
  Get the version number of your project
 
  - parameters:
-   - xcodeproj: Path to the Xcode project to read version number from, or its containing directory, optional. If ommitted, or if a directory is passed instead, it will use the first Xcode project found within the given directory, or the project root directory if none is passed
+   - xcodeproj: Path to the Xcode project to read version number from, or its containing directory, optional. If omitted, or if a directory is passed instead, it will use the first Xcode project found within the given directory, or the project root directory if none is passed
    - target: Target name, optional. Will be needed if you have more than one non-test target to avoid being prompted to select one
    - configuration: Configuration name, optional. Will be needed if you have altered the configurations from the default or your version number depends on the configuration selected
 
@@ -11464,7 +11464,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
  - parameters:
    - path: Path to the directory that should be converted
    - extension: The extension for the newly created file. Usually .xml or .junit
-   - outputDirectory: Directoy in which the xml files should be written to. Same directory as source by default
+   - outputDirectory: Directory in which the xml files should be written to. Same directory as source by default
    - outputFilename: Filename the xml file should be written to. Defaults to name of input file. (Only works if one input file is used)
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're handling this with a test reporter
    - xcprettyNaming: Produces class name and test name identical to xcpretty naming in junit file

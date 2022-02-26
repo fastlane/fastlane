@@ -21,7 +21,7 @@ describe Fastlane do
         end.to raise_error("Please pass a valid platform. Use one of the following: all, iOS, Mac, tvOS, watchOS")
       end
 
-      it "default use case is boostrap" do
+      it "default use case is bootstrap" do
         result = Fastlane::FastFile.new.parse("lane :test do
             carthage
           end").runner.execute(:test)

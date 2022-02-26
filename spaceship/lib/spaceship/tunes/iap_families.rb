@@ -7,7 +7,7 @@ module Spaceship
       attr_accessor :application
 
       # Create a new Purchase Family
-      # a freshly created family has to have atleast one product.
+      # a freshly created family has to have at least one product.
       # the product will be created, and versions/pricing_intervals and so on
       # should be set by subsequent edit.
       # @param name (String) Familyname
