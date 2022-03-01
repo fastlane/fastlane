@@ -17,7 +17,11 @@ module Sigh
                                          hide_keys: [:output_path],
                                              title: "Summary for sigh #{Fastlane::VERSION}")
 
-      if (api_token = Spaceship::ConnectAPI::Token.from(hash: Sigh.config[:api_key], filepath: Sigh.config[:api_key_path]))
+      if !Sigh.config[:api_token].nil?
+        UI.message('Passing given authorization token for App Store Connect API')
+        api_token = Spaceship::ConnectAPI::Token.from_token(Sigh.config[:api_token])
+        Spaceship::ConnectAPI.token = api_token
+      elsif (api_token = Spaceship::ConnectAPI::Token.from(hash: Sigh.config[:api_key], filepath: Sigh.config[:api_key_path]))
         UI.message("Creating authorization token for App Store Connect API")
         Spaceship::ConnectAPI.token = api_token
       elsif !Spaceship::ConnectAPI.token.nil?

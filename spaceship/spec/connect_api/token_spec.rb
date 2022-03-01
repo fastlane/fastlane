@@ -221,4 +221,111 @@ describe Spaceship::ConnectAPI::Token do
       expect(header['kid']).to eq(key_id)
     end
   end
+
+  describe 'direct token text support' do
+    let(:test_private_key) { OpenSSL::PKey::EC.new('prime256v1').generate_key }
+    let(:test_iat) { Time.now.to_i }
+    let(:test_exp) { test_iat + 20 * 60 }
+    let(:test_token_jwt_text) do
+      JWT.encode(
+        {
+          iss: issuer_id,
+          iat: test_iat,
+          exp: test_exp,
+          aud: "appstoreconnect-v1"
+        },
+        test_private_key,
+        "ES256",
+        header_fields = {
+          alg: 'ES256',
+          typ: 'JWT',
+          kid: key_id
+        }
+      )
+    end
+
+    @token = nil
+
+    shared_examples 'token created from token text' do |expected_in_house|
+      it 'stores correct text' do
+        expect(@token.text).to eq(test_token_jwt_text)
+      end
+
+      it 'stores correct in_house' do
+        expect(@token.in_house).to eq(expected_in_house)
+      end
+
+      it 'stores correct expiration' do
+        expect(@token.expiration.to_i).to eq(test_exp)
+      end
+
+      it 'raises exception if refreshed' do
+        expected_expiration = Time.at(test_exp)
+        expect do
+          @token.refresh!
+        end.to raise_error("Cannot perform refresh on directly given token; it is perhaps expired; expiration is #{expected_expiration}")
+      end
+    end
+
+    describe '#from_token' do
+      context 'with valid token text' do
+        in_house = true
+
+        before(:each) do
+          @token = Spaceship::ConnectAPI::Token.from_token(in_house: in_house, token_text: test_token_jwt_text)
+        end
+
+        it_behaves_like 'token created from token text', in_house
+      end
+
+      context 'with invalid token text' do
+        test_token_jwt_text_invalid = 'Token.Text.JWT_invalid'
+
+        it 'fails to create' do
+          expect do
+            Spaceship::ConnectAPI::Token.from_token(in_house: false, token_text: test_token_jwt_text_invalid)
+          end.to raise_error(JWT::DecodeError)
+        end
+      end
+    end
+
+    describe '#create' do
+      context 'with arguments' do
+        in_house = true
+
+        before(:each) do
+          @token = Spaceship::ConnectAPI::Token.create(in_house: in_house, token_text: test_token_jwt_text)
+        end
+
+        it_behaves_like 'token created from token text', in_house
+      end
+
+      context 'with environment variables' do
+        in_house = true
+
+        before(:each) do
+          stub_const('ENV', {
+            'SPACESHIP_CONNECT_API_IN_HOUSE' => in_house ? 'yes' : 'no',
+            'SPACESHIP_CONNECT_API_TOKEN_TEXT' => test_token_jwt_text
+          })
+        end
+
+        before(:each) do
+          @token = Spaceship::ConnectAPI::Token.create
+        end
+
+        it_behaves_like 'token created from token text', in_house
+      end
+    end
+
+    describe 'init' do
+      in_house = false
+
+      before(:each) do
+        @token = Spaceship::ConnectAPI::Token.new(in_house: in_house, token_text: test_token_jwt_text)
+      end
+
+      it_behaves_like 'token created from token text', in_house
+    end
+  end
 end
