@@ -135,7 +135,7 @@ module Match
         UI.crash!("Error encrypting '#{path}'")
       end
 
-      # The encryption parameters in this implementations reflect the old behaviour which depended on the users' local OpenSSL version
+      # The encryption parameters in this implementations reflect the old behavior which depended on the users' local OpenSSL version
       # 1.0.x OpenSSL and earlier versions use MD5, 1.1.0c and newer uses SHA256, we try both before giving an error
       def decrypt_specific_file(path: nil, password: nil, hash_algorithm: "MD5")
         stored_data = Base64.decode64(File.read(path))
