@@ -238,7 +238,7 @@ module Trainer
 
         # Used by store number of passes and failures by identifier
         # This is used when Xcode 13 (and up) retries tests
-        # The identifier is duplicated until test succeeds or max count is reachd
+        # The identifier is duplicated until test succeeds or max count is reached
         tests_by_identifier = {}
 
         test_rows = all_tests.map do |test|
