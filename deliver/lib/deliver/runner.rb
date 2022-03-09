@@ -207,28 +207,25 @@ module Deliver
       upload_ipa = options[:ipa]
       upload_pkg = options[:pkg]
 
-      # 2020-01-27
-      # Only verify platform if if both ipa and pkg exists (for backwards support)
-      if upload_ipa && upload_pkg
-        upload_ipa = ["ios", "appletvos"].include?(options[:platform])
-        upload_pkg = options[:platform] == "osx"
-      end
-
-      if upload_ipa
+      case options[:platform]
+      when "ios", "appletvos"
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           ipa_path: options[:ipa],
           package_path: "/tmp",
           platform: options[:platform]
         )
-      elsif upload_pkg
+      when "osx"
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           pkg_path: options[:pkg],
           package_path: "/tmp",
           platform: options[:platform]
         )
+      else
+        UI.user_error!("no suitable file found for upload for platform: #{options[:platform]}")
       end
+        
 
       transporter = transporter_for_selected_team
       result = transporter.upload(package_path: package_path, asset_path: upload_ipa || upload_pkg)
