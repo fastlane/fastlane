@@ -9,7 +9,6 @@ require_relative 'errors'
 require_relative 'iap_subscription_pricing_tier'
 require_relative 'pricing_tier'
 require_relative 'territory'
-require_relative 'user_detail'
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -950,13 +949,6 @@ module Spaceship
       Spaceship::Tunes::AppVersionRef.factory(data)
     end
 
-    # Fetches the User Detail information from ITC. This gets called often and almost never changes
-    # so we cache it
-    # @return [UserDetail] the response
-    def user_detail_data
-      @_cached_user_detail_data ||= Spaceship::Tunes::UserDetail.factory(user_details_data, self)
-    end
-
     #####################################################
     # @!group CandiateBuilds
     #####################################################
@@ -1582,9 +1574,9 @@ module Spaceship
       @sso_token_for_video = nil
     end
 
-    # the contentProviderIr found in the UserDetail instance
+    # the contentProviderId found in the user details data
     def content_provider_id
-      @content_provider_id ||= user_detail_data.content_provider_id
+      @content_provider_id ||= user_details_data["provider"]["providerId"]
     end
 
     # the ssoTokenForImage found in the AppVersionRef instance
