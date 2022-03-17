@@ -163,7 +163,7 @@ module Spaceship
 
       response = request(:post) do |req|
         req.url("https://appstoreconnect.apple.com/olympus/v1/session")
-        req.body = {"provider": {"providerId": result[:team_id]}}.to_json
+        req.body = { "provider": { "providerId": result[:team_id] } }.to_json
         req.headers['Content-Type'] = 'application/json'
         req.headers['X-Requested-With'] = 'olympus-ui'
       end

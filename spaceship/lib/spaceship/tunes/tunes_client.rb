@@ -1576,7 +1576,10 @@ module Spaceship
 
     # the contentProviderId found in the user details data
     def content_provider_id
-      @content_provider_id ||= user_details_data["provider"]["providerId"]
+      provider = user_details_data["provider"]["providerId"]
+      if provider
+        @content_provider_id ||= provider.to_s
+      end
     end
 
     # the ssoTokenForImage found in the AppVersionRef instance
