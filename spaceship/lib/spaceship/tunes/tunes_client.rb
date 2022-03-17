@@ -71,13 +71,13 @@ module Spaceship
         puts("Looking for App Store Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
 
         teams.each do |t|
-          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name).zero?
+          t_id = t['providerId'].to_s if t['name'].casecmp(t_name).zero?
         end
 
         puts("Could not find team with name '#{t_name}', trying to fallback to default team") if t_id.length.zero?
       end
 
-      t_id = teams.first['contentProvider']['contentProviderId'].to_s if teams.count == 1
+      t_id = teams.first['providerId'].to_s if teams.count == 1
 
       if t_id.length > 0
         puts("Looking for App Store Connect Team with ID #{t_id}") if Spaceship::Globals.verbose?
