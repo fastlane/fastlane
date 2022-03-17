@@ -3,7 +3,7 @@ describe Spaceship::DUClient, :du do
 
   let(:client) { Spaceship::AppVersion.client }
   let(:app) { Spaceship::Application.all.first }
-  let(:contentProviderId) { "1234567" }
+  let(:contentProviderId) { "4321" }
   let(:ssoTokenForImage) { "sso token for image" }
   let(:version) { app.edit_version }
 
