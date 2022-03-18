@@ -828,18 +828,14 @@ describe "Build Manager" do
     let(:selected_team_name) { "123 name" }
     let(:selected_team) do
       {
-        "contentProvider" => {
-          "contentProviderId" => selected_team_id,
-          "name" => selected_team_name
-        }
+        "providerId" => selected_team_id,
+        "name" => selected_team_name
       }
     end
     let(:unselected_team) do
       {
-        "contentProvider" => {
-          "contentProviderId" => "456",
-          "name" => "456 name"
-        }
+        "providerId" => "456",
+        "name" => "456 name"
       }
     end
 

@@ -9,7 +9,6 @@ require_relative 'errors'
 require_relative 'iap_subscription_pricing_tier'
 require_relative 'pricing_tier'
 require_relative 'territory'
-require_relative 'user_detail'
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -72,13 +71,13 @@ module Spaceship
         puts("Looking for App Store Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
 
         teams.each do |t|
-          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name).zero?
+          t_id = t['providerId'].to_s if t['name'].casecmp(t_name).zero?
         end
 
         puts("Could not find team with name '#{t_name}', trying to fallback to default team") if t_id.length.zero?
       end
 
-      t_id = teams.first['contentProvider']['contentProviderId'].to_s if teams.count == 1
+      t_id = teams.first['providerId'].to_s if teams.count == 1
 
       if t_id.length > 0
         puts("Looking for App Store Connect Team with ID #{t_id}") if Spaceship::Globals.verbose?
@@ -950,13 +949,6 @@ module Spaceship
       Spaceship::Tunes::AppVersionRef.factory(data)
     end
 
-    # Fetches the User Detail information from ITC. This gets called often and almost never changes
-    # so we cache it
-    # @return [UserDetail] the response
-    def user_detail_data
-      @_cached_user_detail_data ||= Spaceship::Tunes::UserDetail.factory(user_details_data, self)
-    end
-
     #####################################################
     # @!group CandiateBuilds
     #####################################################
@@ -1582,9 +1574,14 @@ module Spaceship
       @sso_token_for_video = nil
     end
 
-    # the contentProviderIr found in the UserDetail instance
+    # the contentProviderId found in the user details data
     def content_provider_id
-      @content_provider_id ||= user_detail_data.content_provider_id
+      return @content_provider_id if @content_provider_id
+
+      provider = user_details_data["provider"]["providerId"]
+      @content_provider_id ||= provider.to_s if provider
+
+      return @content_provider_id
     end
 
     # the ssoTokenForImage found in the AppVersionRef instance
