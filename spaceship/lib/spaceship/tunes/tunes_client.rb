@@ -93,9 +93,9 @@ module Spaceship
         if ENV["FASTLANE_HIDE_TEAM_INFORMATION"].to_s.length == 0
           puts("Note: to automatically choose the team, provide either the App Store Connect Team ID, or the Team Name in your fastlane/Appfile:")
           puts("Alternatively you can pass the team name or team ID using the `FASTLANE_ITC_TEAM_ID` or `FASTLANE_ITC_TEAM_NAME` environment variable")
-          first_team = teams.first["contentProvider"]
+          first_team = teams.first
           puts("")
-          puts("  itc_team_id \"#{first_team['contentProviderId']}\"")
+          puts("  itc_team_id \"#{first_team['providerId']}\"")
           puts("")
           puts("or")
           puts("")
@@ -105,7 +105,7 @@ module Spaceship
 
         # We're not using highline here, as spaceship doesn't have a dependency to fastlane_core or highline
         teams.each_with_index do |team, i|
-          puts("#{i + 1}) \"#{team['contentProvider']['name']}\" (#{team['contentProvider']['contentProviderId']})")
+          puts("#{i + 1}) \"#{team['name']}\" (#{team['providerId']})")
         end
 
         unless Spaceship::Client::UserInterface.interactive?
@@ -118,7 +118,7 @@ module Spaceship
         team_to_use = teams[selected] if selected >= 0
 
         if team_to_use
-          self.team_id = team_to_use['contentProvider']['contentProviderId'].to_s # actually set the team id here
+          self.team_id = team_to_use['providerId'].to_s # actually set the team id here
           return self.team_id
         end
       end
