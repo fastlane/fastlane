@@ -91,9 +91,9 @@ module Spaceship
       loop do
         puts("Multiple #{'App Store Connect teams'.yellow} found, please enter the number of the team you want to use: ")
         if ENV["FASTLANE_HIDE_TEAM_INFORMATION"].to_s.length == 0
+          first_team = teams.first
           puts("Note: to automatically choose the team, provide either the App Store Connect Team ID, or the Team Name in your fastlane/Appfile:")
           puts("Alternatively you can pass the team name or team ID using the `FASTLANE_ITC_TEAM_ID` or `FASTLANE_ITC_TEAM_NAME` environment variable")
-          first_team = teams.first
           puts("")
           puts("  itc_team_id \"#{first_team['providerId']}\"")
           puts("")
@@ -984,7 +984,7 @@ module Spaceship
         tries -= 1
         if tries > 0
           logger.warn("Received temporary server error from App Store Connect. Retrying the request...")
-          sleep(3) unless Object.const_defined?("SpecHelper")
+          sleep(3) unless Object.const_defined?(:SpecHelper)
           retry
         end
       end
@@ -1552,7 +1552,7 @@ module Spaceship
         msg = "App Store Connect temporary error received: '#{ex.message}'. Retrying after #{seconds_to_sleep} seconds (remaining: #{tries})..."
         puts(msg)
         logger.warn(msg)
-        sleep(seconds_to_sleep) unless Object.const_defined?("SpecHelper")
+        sleep(seconds_to_sleep) unless Object.const_defined?(:SpecHelper)
         retry
       end
       raise ex # re-raise the exception
@@ -1562,7 +1562,7 @@ module Spaceship
         msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{potential_server_error_tries})..."
         puts(msg)
         logger.warn(msg)
-        sleep(seconds_to_sleep) unless Object.const_defined?("SpecHelper")
+        sleep(seconds_to_sleep) unless Object.const_defined?(:SpecHelper)
         retry
       end
       raise ex
