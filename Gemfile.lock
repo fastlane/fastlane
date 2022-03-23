@@ -28,6 +28,7 @@ PATH
       multipart-post (~> 2.0.0)
       naturally (~> 2.2)
       optparse (~> 0.1.1)
+      parallel (>= 1.17.0)
       plist (>= 3.1.0, < 4.0.0)
       rubyzip (>= 2.0.0, < 3.0.0)
       security (= 0.1.3)
@@ -391,4 +392,4 @@ DEPENDENCIES
   yard (~> 0.9.11)
 
 BUNDLED WITH
-   2.2.27
+   2.3.8
