@@ -209,7 +209,7 @@ module Trainer
         testable_summary.all_tests.find_all { |a| a.test_status == 'Failure' }
       end.flatten
 
-       # Find a list of all ids for ActionTestSummary
+      # Find a list of all ids for ActionTestSummary
       summary_ids = failed_tests.map do |test|
         test.summary_ref.id
       end
@@ -226,7 +226,6 @@ module Trainer
     end
 
     def summaries_to_data(testable_summaries, summaries_to_names, failures, output_remove_retry_attempts: false, xcpretty_naming:)
-
       # Maps ActionTestableSummary to rows for junit generator
       rows = testable_summaries.map do |testable_summary|
         all_tests = testable_summary.all_tests.flatten
@@ -351,13 +350,13 @@ module Trainer
       testable_summaries = self.raw_json['TestableSummaries'].collect do |summary_data|
         Trainer::TestResult::ActionTestableSummary.new(summary_data)
       end
-      
+
       self.data = testable_summaries.map do |testable_summary|
         summary_row = {
           project_path: testable_summary.project_path,
           target_name: testable_summary.target_name,
           test_name: testable_summary.test_name,
-          duration: testable_summary.tests.map { |current_test| current_test.duration }.inject(:+),
+          duration: testable_summary.tests.map(&:duration).inject(:+),
           tests: testable_summary.all_tests.map do |current_test|
             test_group, test_name = test_group_and_name(testable_summary, current_test, xcpretty_naming)
             current_row = {
