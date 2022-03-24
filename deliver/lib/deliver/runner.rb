@@ -243,8 +243,8 @@ module Deliver
       return generic_transporter unless options[:itc_provider].nil? && tunes_client.teams.count > 1
 
       begin
-        team = tunes_client.teams.find { |t| t['contentProvider']['contentProviderId'].to_s == tunes_client.team_id }
-        name = team['contentProvider']['name']
+        team = tunes_client.teams.find { |t| t['providerId'].to_s == tunes_client.team_id }
+        name = team['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
         return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
