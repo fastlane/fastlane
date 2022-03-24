@@ -11,6 +11,7 @@ coverage/
 rspec_logs.json
 test_output/
 .DS_STORE
+.DS_Store
 .keys
 *.swp
 
