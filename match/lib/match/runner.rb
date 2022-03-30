@@ -82,9 +82,9 @@ module Match
         app_identifiers = params[:app_identifier].to_s.split(/\s*,\s*/).uniq
       end
 
-      # sometimes we get an array with arrays, this is a bug. To unblock people using match, I suggest we flatten!
+      # sometimes we get an array with arrays, this is a bug. To unblock people using match, I suggest we flatten
       # then in the future address the root cause of https://github.com/fastlane/fastlane/issues/11324
-      app_identifiers.flatten!
+      app_identifiers = app_identifiers.flatten
 
       # Verify the App ID (as we don't want 'match' to fail at a later point)
       if spaceship
