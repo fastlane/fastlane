@@ -150,7 +150,7 @@ module Cert
         when :mac_installer_distribution
           return Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION
         when :developer_id_application
-          return Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+          return Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2
         when :developer_id_kext
           return Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_KEXT
         when :developer_id_installer
