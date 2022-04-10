@@ -113,6 +113,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('google-cloud-storage', '~> 1.31') # Access Google Cloud Storage for match
   spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
   spec.add_dependency('aws-sdk-s3', '~> 1.0') # Used for S3 storage in fastlane match
+  spec.add_dependency('parallel', '>= 1.17.0') # Used for trainer
 
   # Development only
   spec.add_development_dependency('rake')
