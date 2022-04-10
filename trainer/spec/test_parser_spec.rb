@@ -50,8 +50,7 @@ describe Trainer do
                                       object_class: "IDESchemeActionTestSummary",
                                       status: "Success",
                                       guid: "6840EEB8-3D7A-4B2D-9A45-6955DC11D32B",
-                                      duration: 0.1,
-                                      failures: []
+                                      duration: 0.1
                                     },
                                     {
                                       identifier: "Unit/testExample2()",
@@ -78,8 +77,7 @@ describe Trainer do
                                       object_class: "IDESchemeActionTestSummary",
                                       status: "Success",
                                       guid: "72D0B210-939D-4751-966F-986B6CB2660C",
-                                      duration: 0.2,
-                                      failures: []
+                                      duration: 0.2
                                     }
                                   ],
                                   number_of_tests: 3,
@@ -141,11 +139,11 @@ describe Trainer do
                                       guid: "",
                                       failures: [
                                         {
-                                          file_name: "/Users/josh/Projects/fastlane/test-ios/TestTests/TestTests.swift",
-                                          line_number: 37,
-                                          message: "XCTAssertTrue failed",
-                                          performance_failure: nil,
-                                          failure_message: "XCTAssertTrue failed (/Users/josh/Projects/fastlane/test-ios/TestTests/TestTests.swift:37)"
+                                          file_name: "",
+                                          line_number: 0,
+                                          message: "",
+                                          performance_failure: {},
+                                          failure_message: "XCTAssertTrue failed (/Users/josh/Projects/fastlane/test-ios/TestTests/TestTests.swift#CharacterRangeLen=0&EndingLineNumber=36&StartingLineNumber=36)"
                                           }
                                       ]
                                     },
@@ -174,11 +172,11 @@ describe Trainer do
                                       guid: "",
                                       failures: [
                                         {
-                                          file_name: "/Users/josh/Projects/fastlane/test-ios/TestThisDude/TestThisDude.swift",
-                                          line_number: 36,
-                                          message: "XCTAssertTrue failed",
-                                          performance_failure: nil,
-                                          failure_message: "XCTAssertTrue failed (/Users/josh/Projects/fastlane/test-ios/TestThisDude/TestThisDude.swift:36)"
+                                          file_name: "",
+                                          line_number: 0,
+                                          message: "",
+                                          performance_failure: {},
+                                          failure_message: "XCTAssertTrue failed (/Users/josh/Projects/fastlane/test-ios/TestThisDude/TestThisDude.swift#CharacterRangeLen=0&EndingLineNumber=35&StartingLineNumber=35)"
                                         }
                                       ]
                                     },

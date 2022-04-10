@@ -14,7 +14,7 @@
         <testcase classname="TestTests" name="testExample()" time="0.0005381107330322266">
         </testcase>
         <testcase classname="TestTests" name="testFailureJosh1()" time="0.006072044372558594">
-            <failure message="XCTAssertTrue failed">/Users/josh/Projects/fastlane/test-ios/TestTests/TestTests.swift:37
+            <failure message="XCTAssertTrue failed (/Users/josh/Projects/fastlane/test-ios/TestTests/TestTests.swift#CharacterRangeLen=0&amp;EndingLineNumber=36&amp;StartingLineNumber=36)">
             </failure>
         </testcase>
         <testcase classname="TestTests" name="testPerformanceExample()" time="0.2661939859390259">
@@ -22,7 +22,7 @@
         <testcase classname="TestThisDude" name="testExample()" time="0.0004099607467651367">
         </testcase>
         <testcase classname="TestThisDude" name="testFailureJosh2()" time="0.001544952392578125">
-            <failure message="XCTAssertTrue failed">/Users/josh/Projects/fastlane/test-ios/TestThisDude/TestThisDude.swift:36
+            <failure message="XCTAssertTrue failed (/Users/josh/Projects/fastlane/test-ios/TestThisDude/TestThisDude.swift#CharacterRangeLen=0&amp;EndingLineNumber=35&amp;StartingLineNumber=35)">
             </failure>
         </testcase>
         <testcase classname="TestThisDude" name="testPerformanceExample()" time="0.2531709671020508">
