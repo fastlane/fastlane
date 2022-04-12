@@ -157,8 +157,6 @@ module Spaceship
       end
 
       def with_asc_retry(tries = 5, &_block)
-        tries = 1 if Object.const_defined?("SpecHelper")
-
         response = yield
 
         status = response.status if response
@@ -170,9 +168,16 @@ module Spaceship
 
         return response
       rescue UnauthorizedAccessError => error
-        # Catch unathorized access and re-raising
-        # There is no need to try again
-        raise error
+        tries -= 1
+        puts(error) if Spaceship::Globals.verbose?
+        if tries.zero?
+          raise error
+        else
+          msg = "Token has expired or has been revoked! Trying to refresh..."
+          puts(msg) if Spaceship::Globals.verbose?
+          @token.refresh!
+          retry
+        end
       rescue TimeoutRetryError => error
         tries -= 1
         puts(error) if Spaceship::Globals.verbose?

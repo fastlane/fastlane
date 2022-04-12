@@ -102,6 +102,8 @@ describe Spaceship::ConnectAPI::APIClient do
       body = JSON.generate({ "errors": [] })
       stub_client_request(client.hostname, 401, body)
 
+      expect(mock_token).to receive(:refresh!).exactly(4).times
+
       expect do
         client.get('')
       end.to raise_error(Spaceship::UnauthorizedAccessError)
