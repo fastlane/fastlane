@@ -34,7 +34,10 @@ module Fastlane
         UI.user_error!("Could not find valid certificate at '#{params[:certificate]}'") unless File.size(params[:certificate]) > 0
         cert = OpenSSL::X509::Certificate.new(File.read(params[:certificate]))
         store.add_cert(cert)
+
         p7.verify([cert], store)
+        failed_to_verify = (p7.data.nil? || p7.data == "") && !(p7.error_string || "").empty?
+        UI.crash!("Profile could not be verified: #{p7.error_string}") if failed_to_verify
         data = Plist.parse_xml(p7.data)
 
         target_filter = params[:target_filter] || params[:build_configuration_filter]
