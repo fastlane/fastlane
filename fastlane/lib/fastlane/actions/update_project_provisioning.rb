@@ -37,7 +37,9 @@ module Fastlane
 
         p7.verify([cert], store)
         failed_to_verify = (p7.data.nil? || p7.data == "") && !(p7.error_string || "").empty?
-        UI.crash!("Profile could not be verified: #{p7.error_string}") if failed_to_verify
+        if failed_to_verify
+          UI.crash!("Profile could not be verified with error: '#{p7.error_string}'. Try regenerating provisioning profile.")
+        end
         data = Plist.parse_xml(p7.data)
 
         target_filter = params[:target_filter] || params[:build_configuration_filter]
