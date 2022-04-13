@@ -11,7 +11,7 @@ module Fastlane
 
         UI.message("Setting Team ID to '#{team}' for all build steps")
 
-        [:CERT_TEAM_ID, :SIGH_TEAM_ID, :PEM_TEAM_ID, :PRODUCE_TEAM_ID, :SIGH_TEAM_ID, :FASTLANE_TEAM_ID].each do |current|
+        [:CERT_TEAM_ID, :PEM_TEAM_ID, :PRODUCE_TEAM_ID, :SIGH_TEAM_ID, :FASTLANE_TEAM_ID].each do |current|
           ENV[current.to_s] = team
         end
       end
