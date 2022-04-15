@@ -19,22 +19,22 @@ module Fastlane
         if edit.nil?
           edit = instance.create_edit(app_id: app_id)
         elsif edit.status != 'IN_PROGRESS'
-          UI.error! "Active edit must be 'IN_PROGRESS'; instead, it is '#{edit.status}'."
+          UI.error!("Active edit must be 'IN_PROGRESS'; instead, it is '#{edit.status}'.")
         end
         edit_id = edit.id
 
         # Get a list of APKs and find our specific APK, or use the first one
         apks = instance.get_apks(edit_id: edit_id, app_id: app_id)
         if apks.empty?
-          UI.error! 'Did not find any APKs to replace.'
+          UI.error!('Did not find any APKs to replace.')
         elsif apks.length > 1 && !replace_apk_id
           apk_ids = apks.map(&:id)
-          UI.user_error! "Found >1 replaceable APKs; pass one of #{apk_ids.join(',')} into apk_id="
+          UI.user_error!("Found >1 replaceable APKs; pass one of #{apk_ids.join(',')} into apk_id=")
         end
         apk_id = apks[0].id
         if replace_apk_id
           apk = apks.find { |a| a.id == replace_apk_id }
-          UI.user_error! "Unable to find APK with id match #{replace_apk_id}" unless apk
+          UI.user_error!("Unable to find APK with id match #{replace_apk_id}") unless apk
           apk_id = apk.id
         end
 
@@ -46,7 +46,7 @@ module Fastlane
           edit_id: edit_id,
           app_id: app_id
         )
-        UI.message "Successfully created new version and replaced APK #{apk_id}."
+        UI.message("Successfully created new version and replaced APK #{apk_id}.")
       end
 
       #####################################################
@@ -81,7 +81,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :replace_apk_id,
                                         env_name: "AMAZON_REPLACE_APK_ID",
                                         description: "The ID of the APK you wish to replace, if applicable",
-                                        optional: true),
+                                        optional: true)
         ]
       end
 

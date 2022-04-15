@@ -87,7 +87,7 @@ describe Fastlane do
 
         before(:each) do
           seed_environment
-          creds =  Fastlane::ActionSets::Amazon::ClientCredentials.new({
+          creds = Fastlane::ActionSets::Amazon::ClientCredentials.new({
             'access_token' => ENV['AMAZON_APP_SUBMISSION_API_JWT'] || 'jwt.jwt.jwt',
             'scope' => 'appstore::apps:readwrite',
             'token_type' => 'bearer',
@@ -248,10 +248,10 @@ describe Fastlane do
 
         describe 'APK functionality' do
           let(:apk_filepath) { File.join(__dir__, '..', '..', 'fixtures', 'mock-app.apk') }
-          let(:apk_id) { 'M8FYZDFK0GJG0 '}
+          let(:apk_id) { 'M8FYZDFK0GJG0 ' }
           let(:json_data) do
             {
-              'versionCode' => 21040401,
+              'versionCode' => 21_040_401,
               'id' => apk_id,
               'name' => 'APK1'
             }
@@ -263,8 +263,8 @@ describe Fastlane do
 
             result = @instance.get_apks(edit_id: edit_id, app_id: app_id)
             expect(result).to eq([
-              Fastlane::ActionSets::Amazon::APKMetadata.new(json_data)
-            ])
+                                   Fastlane::ActionSets::Amazon::APKMetadata.new(json_data)
+                                 ])
           end
 
           it 'gets a single apk' do
@@ -338,9 +338,9 @@ describe Fastlane do
 
             images = @instance.get_images('screenshots', language: language, edit_id: edit_id, app_id: app_id)
             expect(images).to eq([
-              'amzn1.dex.asset.f98f7b86f7674a7e9ed9192273fc9b56',
-              'amzn1.dex.asset.991a8f7d43254282842896da7bd68f5e'
-            ])
+                                   'amzn1.dex.asset.f98f7b86f7674a7e9ed9192273fc9b56',
+                                   'amzn1.dex.asset.991a8f7d43254282842896da7bd68f5e'
+                                 ])
           end
 
           it 'uploads an image' do
@@ -381,7 +381,7 @@ describe Fastlane do
           let(:language) { 'en-US' }
           let(:json_data) do
             [
-              { id: 'amzn1.dex.asset.f98f7b86f7674a7e9ed9192273fc9b56' },
+              { id: 'amzn1.dex.asset.f98f7b86f7674a7e9ed9192273fc9b56' }
             ]
           end
 
@@ -457,7 +457,7 @@ describe Fastlane do
         end
 
         describe 'targeting functionality' do
-          let(:apk_id) { 'M8FYZDFK0GJG0 '}
+          let(:apk_id) { 'M8FYZDFK0GJG0 ' }
           let(:json_data) do
             {
               'amazonDevices' => [

@@ -75,7 +75,7 @@ module Fastlane::ActionSets::Amazon
       }
 
       headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }
-      response, _ = make_request(uri, verb: :post, body: body, headers: headers)
+      response, = make_request(uri, verb: :post, body: body, headers: headers)
       @client_credentials = ClientCredentials.new(response)
       @last_authenticated = Time.now
       return @client_credentials
@@ -142,7 +142,7 @@ module Fastlane::ActionSets::Amazon
     # @return [Edit]
     def validate_edit(edit_id, app_id:)
       path = "v1/applications/#{app_id}/edits/#{edit_id}/validate"
-      edit, _ = do_post(path, etag: @etag_cache[edit_id])
+      edit, = do_post(path, etag: @etag_cache[edit_id])
       return Edit.new(edit)
     end
 
@@ -156,7 +156,7 @@ module Fastlane::ActionSets::Amazon
     # @return [Edit]
     def commit_edit(edit_id, app_id:)
       path = "v1/applications/#{app_id}/edits/#{edit_id}/commit"
-      edit, _ = do_post(path, etag: @etag_cache[edit_id])
+      edit, = do_post(path, etag: @etag_cache[edit_id])
       return Edit.new(edit)
     end
 
@@ -169,7 +169,7 @@ module Fastlane::ActionSets::Amazon
     #
     # @return [Hash<String, Listing>]
     def get_listings(edit_id:, app_id:)
-      listings, _ = do_get("v1/applications/#{app_id}/edits/#{edit_id}/listings")
+      listings, = do_get("v1/applications/#{app_id}/edits/#{edit_id}/listings")
       return listings['listings'].each_with_object({}) do |(key, value), obj|
         obj[key] = Listing.new(value)
       end
@@ -260,7 +260,7 @@ module Fastlane::ActionSets::Amazon
     #
     # @return [Array<APKMetadata>]
     def get_apks(edit_id:, app_id:)
-      apks, _ = do_get("v1/applications/#{app_id}/edits/#{edit_id}/apks")
+      apks, = do_get("v1/applications/#{app_id}/edits/#{edit_id}/apks")
       return apks.map { |json| APKMetadata.new(json) }
     end
 
@@ -316,7 +316,7 @@ module Fastlane::ActionSets::Amazon
     def upload_apk(apk_filepath, edit_id:, app_id:)
       path = "v1/applications/#{app_id}/edits/#{edit_id}/apks/upload"
       body, headers = upload_body_and_headers(apk_filepath)
-      apk_metadata, _ = do_post(path, body: body, headers: headers)
+      apk_metadata, = do_post(path, body: body, headers: headers)
       return APKMetadata.new(apk_metadata)
     end
 
@@ -336,7 +336,7 @@ module Fastlane::ActionSets::Amazon
         'file' => UploadIO.new(File.expand_path(apk_filepath), mime_type, filename)
       }
       headers = { 'fileName' => filename }
-      upload_metadata, _ = do_post(path, body: body, headers: headers)
+      upload_metadata, = do_post(path, body: body, headers: headers)
       return upload_metadata['fileId']
     end
 
@@ -350,7 +350,7 @@ module Fastlane::ActionSets::Amazon
     def attach_apk(file_id, edit_id:, app_id:)
       path = "v1/applications/#{app_id}/edits/#{edit_id}/apks/attach"
       body = { 'fileId' => file_id }
-      apk, _ = do_post(path, body: body)
+      apk, = do_post(path, body: body)
       return APKMetadata.new(apk)
     end
 
@@ -468,8 +468,8 @@ module Fastlane::ActionSets::Amazon
     # @return [String] The asset identifier of the video
     def upload_video(filepath, language:, edit_id:, app_id:)
       etag_key = [edit_id, language].join('-')
-      # NOTE: The Amazon Appstore API documentation denotes this is "…/videos",
-      #       but it's really "…/videos/upload"
+      # NOTE: The Amazon Appstore API documentation denotes this is ".../videos",
+      #       but it's really ".../videos/upload"
       path = "v1/applications/#{app_id}/edits/#{edit_id}/listings/#{language}/videos/upload"
       body, headers = upload_body_and_headers(filepath)
       video_metadata, etag = do_post(path, body: body, headers: headers, etag: @etag_cache[etag_key])
@@ -503,7 +503,6 @@ module Fastlane::ActionSets::Amazon
       @etag_cache[etag_key] = etag
       return nil
     end
-
 
     # Availability
 
@@ -591,8 +590,8 @@ module Fastlane::ActionSets::Amazon
 
     def make_request(path_or_uri, verb:, body:, headers:, etag: nil)
       uri = path_or_uri
-      if path_or_uri.is_a?(String)
-        uri = URI::join(@base_url, path_or_uri)
+      if path_or_uri.kind_of?(String)
+        uri = URI.join(@base_url, path_or_uri)
       end
 
       if @client_credentials&.access_token
@@ -602,12 +601,12 @@ module Fastlane::ActionSets::Amazon
       request = Request.new(uri, verb: verb, body: body, headers: headers)
 
       http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true if uri.instance_of? URI::HTTPS
+      http.use_ssl = true if uri.instance_of?(URI::HTTPS)
       req = request.as_net_http_request
       response = http.request(req)
 
       case response
-      when Net::HTTPSuccess then
+      when Net::HTTPSuccess
         return (response.body ? JSON.parse(response.body) : nil), response['ETag']
       else
         raise "Unexpected HTTP #{response.code} response: #{response.body}"
@@ -740,14 +739,12 @@ module Fastlane::ActionSets::Amazon
         URI.encode_www_form(body)
       when 'application/json'
         body.to_json
-      else
-        nil
       end
     end
 
     # @return [Boolean]
     def is_multipart
-      is_upload && (body.is_a?(Hash) || body.is_a?(Array))
+      is_upload && (body.kind_of?(Hash) || body.kind_of?(Array))
     end
 
     # @return [Boolean]
