@@ -5,7 +5,6 @@ require 'net/http/post/multipart'
 require 'uri'
 require 'json'
 
-require_relative './request'
 require_relative './types/apk_metadata'
 require_relative './types/client_credentials'
 require_relative './types/details'
