@@ -304,6 +304,12 @@ module Match
                                                                            platform: params[:platform]),
                              parsed["TeamIdentifier"].first)
 
+      cert_info = Utils.get_cert_info(parsed["DeveloperCertificates"].first.string).to_h
+      Utils.fill_environment(Utils.environment_variable_name_certificate_name(app_identifier: app_identifier,
+                                                                                        type: prov_type,
+                                                                                    platform: params[:platform]),
+                             cert_info["Common Name"])
+
       Utils.fill_environment(Utils.environment_variable_name_profile_name(app_identifier: app_identifier,
                                                                                     type: prov_type,
                                                                                 platform: params[:platform]),
