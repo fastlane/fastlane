@@ -419,7 +419,12 @@ module Match
 
       return false unless portal_profile
 
-      profile_certs_count = portal_profile.fetch_all_certificates.count
+      # When a certificate expires (not revoked) provisioning profile stays valid.
+      # And if we regenerate certificate count will not differ:
+      #   * For portal certificates, we filter out the expired one but includes a new certificate;
+      #   * Profile still contains an expired certificate and is valid.
+      # Thus, we need to check the validity of profile certificates too.
+      profile_certs_count = portal_profile.fetch_all_certificates.select(&:valid?).count
 
       certificate_types =
         case platform
