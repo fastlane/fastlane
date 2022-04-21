@@ -34,7 +34,9 @@ module Fastlane
         UI.user_error!("Could not find valid certificate at '#{params[:certificate]}'") unless File.size(params[:certificate]) > 0
         cert = OpenSSL::X509::Certificate.new(File.read(params[:certificate]))
         store.add_cert(cert)
+
         p7.verify([cert], store)
+        check_verify!(p7)
         data = Plist.parse_xml(p7.data)
 
         target_filter = params[:target_filter] || params[:build_configuration_filter]
@@ -79,6 +81,13 @@ module Fastlane
 
         # complete
         UI.success("Successfully updated project settings in '#{folder}'")
+      end
+
+      def self.check_verify!(p7)
+        failed_to_verify = (p7.data.nil? || p7.data == "") && !(p7.error_string || "").empty?
+        if failed_to_verify
+          UI.crash!("Profile could not be verified with error: '#{p7.error_string}'. Try regenerating provisioning profile.")
+        end
       end
 
       def self.description
