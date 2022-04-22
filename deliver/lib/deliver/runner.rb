@@ -46,6 +46,11 @@ module Deliver
     end
 
     def run
+      if options[:verify]
+        verify_binary
+        return
+      end
+
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
 
       # Rejecting before upload meta
@@ -153,6 +158,45 @@ module Deliver
       end
 
       UploadPriceTier.new.upload(options)
+    end
+
+    # Verify the binary with App Store Connect
+    def verify_binary
+    UI.message("Verifying binary with App Store Connect")
+
+      verify_ipa = options[:ipa]
+      verify_pkg = options[:pkg]
+
+      # 2020-01-27
+      # Only verify platform if if both ipa and pkg exists (for backwards support)
+      if verify_ipa && verify_pkg
+        verify_ipa = ["ios", "appletvos"].include?(options[:platform])
+        verify_pkg = options[:platform] == "osx"
+      end
+
+      if verify_ipa
+        package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
+          app_id: Deliver.cache[:app].id,
+          ipa_path: options[:ipa],
+          package_path: "/tmp",
+          platform: options[:platform]
+        )
+      elsif verify_pkg
+        package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
+          app_id: Deliver.cache[:app].id,
+          pkg_path: options[:pkg],
+          package_path: "/tmp",
+          platform: options[:platform]
+        )
+      end
+
+      transporter = transporter_for_selected_team
+      result = transporter.verify(package_path: package_path)
+
+      unless result
+        transporter_errors = transporter.displayable_errors
+        UI.user_error!("Error verifying the ipa file: \n #{transporter_errors}")
+      end
     end
 
     # Upload the binary to App Store Connect
