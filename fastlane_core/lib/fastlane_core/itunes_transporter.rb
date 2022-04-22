@@ -223,6 +223,18 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
+    def build_verify_command(source = "/tmp")
+      use_jwt = !jwt.to_s.empty?
+      [
+        '"' + Helper.transporter_path + '"',
+        '-m verify',
+        file_upload_option(source),
+        ("-u \"#{username.shellescape}\"" unless use_jwt),
+        ("-p #{shell_escaped_password(password)}" unless use_jwt),
+        ("-jwt #{jwt}" if use_jwt)
+      ].compact.join(' ')
+    end
+
     def handle_error(password)
       # rubocop:disable Style/CaseEquality
       # rubocop:disable Style/YodaCondition
