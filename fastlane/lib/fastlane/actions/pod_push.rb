@@ -58,6 +58,11 @@ module Fastlane
         if params[:synchronous]
           command << "--synchronous"
         end
+        
+        if params[:subspec]
+          subspec = params[:subspec]
+          command << "--subspec='#{subspec}'"
+        end
 
         result = Actions.sh(command.join(' '))
         UI.success("Successfully pushed Podspec ⬆️ ")
