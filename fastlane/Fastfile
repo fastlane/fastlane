@@ -343,12 +343,47 @@ private_lane :send_mac_app_ci_reminder do
   end
 end
 
+desc "Generate changelog from GitHub compare and PR data for mentioning GitHub usernames in release notes"
+private_lane :github_changelog do |options|
+  old_version = options[:old_version] || current_version
+  path = "/repos/fastlane/fastlane/compare/#{old_version}...HEAD"
+
+  # Get all commits from previous version (tag) to HEAD
+  resp = github_api(path: path)
+  body = JSON.parse(resp[:body])
+  commits = body["commits"].reverse
+
+  formatted = commits.map do |commit|
+    # Default to commit message info
+    message = commit["commit"]["message"].lines.first.strip
+    name = commit["commit"]["author"]["name"]
+    username = commit["author"]["login"]
+
+    # Get pull request associate with commit message
+    sha = commit["sha"]
+    pr_resp = github_api(path: "/search/issues?q=repo:fastlane/fastlane+is:pr+base:master+SHA:#{sha}")
+    body = JSON.parse(pr_resp[:body])
+    items = body["items"]
+
+    if items.size == 1
+      item = items.first
+      message = "#{item['title']} (##{item['number']})"
+      username = item["user"]["login"]
+    else
+      UI.user_error!("Cannot generate changelog. Multiple commits found for #{sha}")
+    end
+
+    "* #{message} via #{name} (@#{username})"
+  end.join("\n")
+
+  formatted
+end
+
 desc "Print out the changelog since the last tagged release and open the GitHub page with the changes"
 lane :show_changelog do |options|
   old_version = options[:old_version] || current_version
 
-  changes = sh("git log --pretty='* %s via %aN' #{old_version}...HEAD --no-merges ..", log: $verbose).gsub("\n\n", "\n")
-  changes.gsub!("[WIP]", "") # sometimes a [WIP] is merged
+  changes = github_changelog(old_version: old_version)
 
   github_diff_url = "https://github.com/fastlane/fastlane/compare/#{old_version}...master"
   sh("open #{github_diff_url}")
