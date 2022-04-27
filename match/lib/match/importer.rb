@@ -31,6 +31,7 @@ module Match
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
         google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
         google_cloud_project_id: params[:google_cloud_project_id].to_s,
+        skip_google_cloud_account_confirmation: params[:skip_google_cloud_account_confirmation],
         s3_bucket: params[:s3_bucket],
         s3_region: params[:s3_region],
         s3_access_key: params[:s3_access_key],
