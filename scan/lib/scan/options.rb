@@ -522,7 +522,12 @@ module Scan
                                     env_name: 'SCAN_NUMBER_OF_RETRIES',
                                     description: "The number of times a test can fail",
                                     type: Integer,
-                                    default_value: 0)
+                                    default_value: 0),
+        FastlaneCore::ConfigItem.new(key: :fail_build,
+                                    env_name: "SCAN_FAIL_BUILD",
+                                    description: "Should this step stop the build if the tests fail? Set this to false if you're using trainer",
+                                    type: Boolean,
+                                    default_value: true)
 
       ]
     end

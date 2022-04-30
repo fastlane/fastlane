@@ -71,13 +71,7 @@ module Fastlane
       def self.available_options
         require 'scan'
 
-        FastlaneCore::CommanderGenerator.new.generate(Scan::Options.available_options) + [
-          FastlaneCore::ConfigItem.new(key: :fail_build,
-                                       env_name: "SCAN_FAIL_BUILD",
-                                       description: "Should this step stop the build if the tests fail? Set this to false if you're using trainer",
-                                       type: Boolean,
-                                       default_value: true)
-        ]
+        FastlaneCore::CommanderGenerator.new.generate(Scan::Options.available_options)
       end
 
       def self.output

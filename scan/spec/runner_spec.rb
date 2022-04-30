@@ -93,6 +93,39 @@ describe Scan do
         end
       end
 
+      describe "when handling result" do
+        it "returns output if fail_build is false", requires_xcodebuild: true do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            project: './scan/examples/standard/app.xcodeproj',
+            fail_build: false
+          })
+
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
+          allow(Trainer::TestParser).to receive(:auto_convert).and_return({
+            "some/path": {
+              successful: true,
+              number_of_tests: 10,
+              number_of_failures: 1,
+              number_of_tests_excluding_retries: 10,
+              number_of_failures_excluding_retries: 1,
+              number_of_retries: 0
+            }
+          })
+
+          expect(@scan.handle_results(0)).to eq({
+            number_of_tests: 10,
+            number_of_failures: 1,
+            number_of_skipped: 0,
+            number_of_tests_excluding_retries: 10,
+            number_of_failures_excluding_retries: 1,
+            number_of_retries: 0
+        })
+        end
+      end
+
       describe "with scan option :disable_xcpretty set to true" do
         it "does not generate a temp junit report", requires_xcodebuild: true do
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
