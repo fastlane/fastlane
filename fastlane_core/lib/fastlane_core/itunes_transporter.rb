@@ -223,7 +223,7 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
-    def build_verify_command(username, password, source = "/tmp", jwt = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
       use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
@@ -231,7 +231,8 @@ module FastlaneCore
         "-f #{source.shellescape}",
         ("-u \"#{username.shellescape}\"" unless use_jwt),
         ("-p #{shell_escaped_password(password)}" unless use_jwt),
-        ("-jwt #{jwt}" if use_jwt)
+        ("-jwt #{jwt}" if use_jwt),
+        ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?)
       ].compact.join(' ')
     end
 
@@ -316,7 +317,7 @@ module FastlaneCore
       end
     end
 
-    def build_verify_command(username, password, source = "/tmp", jwt = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
       use_jwt = !jwt.to_s.empty?
       if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
@@ -327,6 +328,7 @@ module FastlaneCore
           ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
           ("-jwt #{jwt}" if use_jwt),
           "-f #{source.shellescape}",
+          ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ') # compact gets rid of the possibly nil ENV value
       else
@@ -345,6 +347,7 @@ module FastlaneCore
           ("-p #{password.shellescape}" unless use_jwt),
           ("-jwt #{jwt}" if use_jwt),
           "-f #{source.shellescape}",
+          ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ') # compact gets rid of the possibly nil ENV value
       end
@@ -605,8 +608,8 @@ module FastlaneCore
       password_placeholder = @jwt.nil? ? 'YourPassword' : nil
       jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
 
-      command = @transporter_executor.build_verify_command(@user, @password, actual_dir, @jwt)
-      UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, jwt_placeholder))
+      command = @transporter_executor.build_verify_command(@user, @password, actual_dir, @provider_short_name, @jwt)
+      UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
