@@ -228,10 +228,10 @@ module FastlaneCore
       [
         '"' + Helper.transporter_path + '"',
         '-m verify',
-        "-f #{source.shellescape}",
-        ("-u \"#{username.shellescape}\"" unless use_jwt),
+        ("-u #{username.shellescape}" unless use_jwt),
         ("-p #{shell_escaped_password(password)}" unless use_jwt),
         ("-jwt #{jwt}" if use_jwt),
+        "-f #{source.shellescape}",
         ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?)
       ].compact.join(' ')
     end
