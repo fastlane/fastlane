@@ -597,7 +597,7 @@ module FastlaneCore
     # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transferring
     def verify(app_id = nil, dir = nil, package_path: nil)
-      raise "app_id and dir are required, package_path" if (app_id.nil? || dir.nil?) && package_path.nil?
+      raise "Either a combination of app id and directory or a package_path are required" if (app_id.nil? || dir.nil?) && package_path.nil?
 
       actual_dir = if package_path
                      package_path
