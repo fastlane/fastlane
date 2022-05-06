@@ -604,7 +604,7 @@ module FastlaneCore
                    else
                      File.join(dir, "#{app_id}.itmsp")
                    end
-                   
+
       password_placeholder = @jwt.nil? ? 'YourPassword' : nil
       jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
 

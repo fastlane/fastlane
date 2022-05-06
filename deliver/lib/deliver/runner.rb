@@ -163,7 +163,7 @@ module Deliver
 
     # Verify the binary with App Store Connect
     def verify_binary
-    UI.message("Verifying binary with App Store Connect")
+      UI.message("Verifying binary with App Store Connect")
 
       verify_ipa = options[:ipa]
       verify_pkg = options[:pkg]

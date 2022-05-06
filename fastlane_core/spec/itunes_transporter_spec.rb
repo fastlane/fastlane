@@ -137,7 +137,7 @@ describe FastlaneCore do
         ("-u #{email.shellescape}" if jwt.nil?),
         ("-p #{password.shellescape}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
-        "-f /tmp/my.app.id.itmsp",        
+        "-f /tmp/my.app.id.itmsp",
         (transporter.to_s if transporter),
         ("-itc_provider #{provider_short_name}" if provider_short_name),
         '2>&1'
