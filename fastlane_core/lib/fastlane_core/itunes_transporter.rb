@@ -232,6 +232,7 @@ module FastlaneCore
         ("-p #{shell_escaped_password(password)}" unless use_jwt),
         ("-jwt #{jwt}" if use_jwt),
         "-f #{source.shellescape}",
+        ("-WONoPause true" if Helper.windows?), # Windows only: process instantly returns instead of waiting for key press
         ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?)
       ].compact.join(' ')
     end
