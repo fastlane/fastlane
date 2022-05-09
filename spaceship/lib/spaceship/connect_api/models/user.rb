@@ -62,6 +62,11 @@ module Spaceship
         resp = client.get_user_visible_apps(user_id: id, limit: limit)
         return resp.to_models
       end
+
+      def delete!(client: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_user(user_id: id)
+      end
     end
   end
 end
