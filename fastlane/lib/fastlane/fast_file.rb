@@ -397,6 +397,24 @@ module Fastlane
       end
     end
 
+    # @param gem_name [String] The name of the gem to import
+    # @param paths [Array] the list of pattern to expand matching fastfiles to import
+    def import_from_gem(gem_name: nil, paths: ["fastlane/Fastfile*"])
+      UI.message("Importing from gem: #{gem_name}")
+      rubygem = Bundler.rubygems.find_name(gem_name).first
+      raise "Couldn't find gem #{gem_name}" unless rubygem
+
+      gem_path = rubygem.full_gem_path
+
+      fastfiles = paths.map { |r| Dir.glob("#{gem_path}/#{r}") }.flatten
+      raise "No fastfiles found. #{paths}" if fastfiles.empty?
+
+      fastfiles.map do |file_path|
+        UI.message("Importing #{file_path}")
+        import(file_path)
+      end
+    end
+
     #####################################################
     # @!group Versioning helpers
     #####################################################
