@@ -448,9 +448,9 @@ module Spaceship
         # buildDeliveries
         #
 
-        def get_build_deliveries(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_build_deliveries(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("buildDeliveries", params)
+          test_flight_request_client.get("apps/#{app_id}/buildDeliveries", params)
         end
 
         #

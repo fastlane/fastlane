@@ -773,7 +773,8 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
     describe "buildDeliveries" do
       context 'get_build_deliveries' do
-        let(:path) { "buildDeliveries" }
+        let(:app_id) { "123" }
+        let(:path) { "apps/#{app_id}/buildDeliveries" }
         let(:version) { "189" }
         let(:default_params) { {} }
 
@@ -781,14 +782,14 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
           params = {}
           req_mock = test_request_params(path, params.merge(default_params))
           expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
-          client.get_build_deliveries
+          client.get_build_deliveries(app_id: app_id)
         end
 
         it 'succeeds with filter' do
           params = { filter: { version: version } }
           req_mock = test_request_params(path, params.merge(default_params))
           expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
-          client.get_build_deliveries(**params)
+          client.get_build_deliveries(app_id: app_id, **params)
         end
       end
     end
