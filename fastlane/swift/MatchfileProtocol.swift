@@ -196,4 +196,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.98]
+// FastlaneRunnerAPIVersion [0.9.99]
