@@ -9,6 +9,8 @@ require_relative 'html_generator'
 require_relative 'submit_for_review'
 require_relative 'upload_price_tier'
 require_relative 'upload_metadata'
+require_relative 'upload_app_clip_default_experience_metadata'
+require_relative 'upload_app_clip_default_experience_header_images'
 require_relative 'upload_screenshots'
 require_relative 'sync_screenshots'
 require_relative 'detect_values'
@@ -159,6 +161,8 @@ module Deliver
       end
 
       UploadPriceTier.new.upload(options)
+      UploadAppClipDefaultExperienceMetadata.new.upload_metadata(options)
+      UploadAppClipDefaultExperienceHeaderImages.new.find_and_upload(options)
     end
 
     # Verify the binary with App Store Connect
