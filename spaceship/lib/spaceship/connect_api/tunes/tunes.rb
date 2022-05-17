@@ -1275,6 +1275,156 @@ module Spaceship
           params = tunes_request_client.build_params(filter: filter, includes: includes)
           tunes_request_client.get("reviewRejections", params)
         end
+        # appClips
+        #
+
+        def get_app_clips(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("apps/#{app_id}/appClips", params)
+        end
+
+        #
+        # appClipDefaultExperiences
+        #
+
+        def get_app_clip_default_experience(app_clip_default_experience_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appClipDefaultExperiences/#{app_clip_default_experience_id}", params)
+        end
+
+        def get_app_clip_default_experience_localizations(app_clip_default_experience_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appClipDefaultExperiences/#{app_clip_default_experience_id}/appClipDefaultExperienceLocalizations", params)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/create_a_default_app_clip_experience
+        def post_app_clip_default_experience(app_clip_id: nil, app_store_version_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipDefaultExperiences",
+              attributes: attributes,
+              relationships: {
+                appClip: {
+                  data: {
+                    type: 'appClips',
+                    id: app_clip_id
+                  }
+                },
+                releaseWithAppStoreVersion: {
+                  data: {
+                    type: "appStoreVersions",
+                    id: app_store_version_id
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("appClipDefaultExperiences", body)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/modify_a_default_app_clip_experience
+        def patch_app_clip_default_experience(default_experience_id: nil, attributes: {})
+          body = {
+            data: {
+              id: default_experience_id,
+              type: "appClipDefaultExperiences",
+              attributes: attributes
+            }
+          }
+
+          tunes_request_client.patch("appClipDefaultExperiences/#{default_experience_id}", body)
+        end
+
+        #
+        # appClipDefaultExperienceLocalizations
+        #
+
+        def get_app_clip_default_experience_header_image(app_clip_default_experience_localization_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appClipDefaultExperienceLocalizations/#{app_clip_default_experience_localization_id}/relationships/appClipHeaderImage", params)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/create_the_localized_metadata_for_a_default_app_clip_experience
+        def post_app_clip_default_experience_localization(default_experience_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipDefaultExperienceLocalizations",
+              attributes: attributes,
+              relationships: {
+                appClipDefaultExperience: {
+                  data: {
+                    type: 'appClipDefaultExperiences',
+                    id: default_experience_id
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("appClipDefaultExperienceLocalizations", body)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/modify_the_localization_for_a_default_app_clip_experience
+        def patch_app_clip_default_experience_localization(app_clip_default_experience_localization_id: nil, attributes: {})
+          body = {
+            data: {
+              id: app_clip_default_experience_localization_id,
+              type: "appClipDefaultExperienceLocalizations",
+              attributes: attributes
+            }
+          }
+
+          tunes_request_client.patch("appClipDefaultExperienceLocalizations/#{app_clip_default_experience_localization_id}", body)
+        end
+
+        #
+        # appClipHeaderImages
+        #
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/read_the_app_clip_card_image
+        def get_app_clip_header_image(app_clip_header_image_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("appClipHeaderImages/#{app_clip_header_image_id}", params)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/create_an_app_clip_card_image_for_a_default_app_clip_experience
+        def post_app_clip_header_image(app_clip_default_experience_localization_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipHeaderImages",
+              attributes: attributes,
+              relationships: {
+                appClipDefaultExperienceLocalization: {
+                  data: {
+                    type: 'appClipDefaultExperienceLocalizations',
+                    id: app_clip_default_experience_localization_id
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("appClipHeaderImages", body)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/modify_an_app_clip_card_image
+        def patch_app_clip_header_image(app_clip_header_image_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipHeaderImages",
+              id: app_clip_header_image_id,
+              attributes: attributes
+            }
+          }
+
+          tunes_request_client.patch("appClipHeaderImages/#{app_clip_header_image_id}", body)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/delete_a_default_app_clip_experience_image
+        def delete_app_clip_header_image(app_clip_header_image_id: nil)
+          tunes_request_client.delete("appClipHeaderImages/#{app_clip_header_image_id}")
+        end
       end
     end
   end
