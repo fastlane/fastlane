@@ -49,16 +49,16 @@ module Supply
     # @param service_account_json: The raw service account Json data
     def initialize(service_account_json: nil, params: nil)
       auth_client = nil
-      
+
       if params[:access_token]
-        signet = Signet::OAuth2::Client.new access_token: params[:access_token] # Client#needs_access_token? will return false
-        auth_client = Google::Auth::Credentials.new signet
+        signet = Signet::OAuth2::Client.new(access_token: params[:access_token]) # Client#needs_access_token? will return false
+        auth_client = Google::Auth::Credentials.new(signet)
       else
         auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
         UI.verbose("Fetching a new access token from Google...")
         auth_client.fetch_access_token!
       end
-        
+
       if FastlaneCore::Env.truthy?("DEBUG")
         Google::Apis.logger.level = Logger::DEBUG
       end
