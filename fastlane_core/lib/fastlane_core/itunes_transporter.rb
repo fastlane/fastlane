@@ -223,6 +223,20 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+      use_jwt = !jwt.to_s.empty?
+      [
+        '"' + Helper.transporter_path + '"',
+        '-m verify',
+        ("-u #{username.shellescape}" unless use_jwt),
+        ("-p #{shell_escaped_password(password)}" unless use_jwt),
+        ("-jwt #{jwt}" if use_jwt),
+        "-f #{source.shellescape}",
+        ("-WONoPause true" if Helper.windows?), # Windows only: process instantly returns instead of waiting for key press
+        ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?)
+      ].compact.join(' ')
+    end
+
     def handle_error(password)
       # rubocop:disable Style/CaseEquality
       # rubocop:disable Style/YodaCondition
@@ -298,6 +312,42 @@ module FastlaneCore
           file_upload_option(source),
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
+          ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
+          '2>&1' # cause stderr to be written to stdout
+        ].compact.join(' ') # compact gets rid of the possibly nil ENV value
+      end
+    end
+
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+      use_jwt = !jwt.to_s.empty?
+      if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
+        [
+          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" unless use_jwt),
+          'xcrun iTMSTransporter',
+          '-m verify',
+          ("-u #{username.shellescape}" unless use_jwt),
+          ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
+          ("-jwt #{jwt}" if use_jwt),
+          "-f #{source.shellescape}",
+          ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
+          '2>&1' # cause stderr to be written to stdout
+        ].compact.join(' ') # compact gets rid of the possibly nil ENV value
+      else
+        [
+          Helper.transporter_java_executable_path.shellescape,
+          "-Djava.ext.dirs=#{Helper.transporter_java_ext_dir.shellescape}",
+          '-XX:NewSize=2m',
+          '-Xms32m',
+          '-Xmx1024m',
+          '-Xms1024m',
+          '-Djava.awt.headless=true',
+          '-Dsun.net.http.retryPost=false',
+          java_code_option,
+          '-m verify',
+          ("-u #{username.shellescape}" unless use_jwt),
+          ("-p #{password.shellescape}" unless use_jwt),
+          ("-jwt #{jwt}" if use_jwt),
+          "-f #{source.shellescape}",
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ') # compact gets rid of the possibly nil ENV value
@@ -531,6 +581,46 @@ module FastlaneCore
 
       if result
         UI.header("Successfully uploaded package to App Store Connect. It might take a few minutes until it's visible online.")
+
+        FileUtils.rm_rf(actual_dir) unless Helper.test? # we don't need the package any more, since the upload was successful
+      else
+        handle_error(@password)
+      end
+
+      return result
+    end
+
+    # Verifies the given binary with App Store Connect
+    # @param app_id [Integer] The unique App ID
+    # @param dir [String] the path in which the package file is located
+    # @param package_path [String] the path to the package file (used instead of app_id and dir)
+    # @return (Bool) True if everything worked fine
+    # @raise [Deliver::TransporterTransferError] when something went wrong
+    #   when transferring
+    def verify(app_id = nil, dir = nil, package_path: nil)
+      raise "Either a combination of app id and directory or a package_path are required" if (app_id.nil? || dir.nil?) && package_path.nil?
+
+      actual_dir = if package_path
+                     package_path
+                   else
+                     File.join(dir, "#{app_id}.itmsp")
+                   end
+
+      password_placeholder = @jwt.nil? ? 'YourPassword' : nil
+      jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
+
+      command = @transporter_executor.build_verify_command(@user, @password, actual_dir, @provider_short_name, @jwt)
+      UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder))
+
+      begin
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+      rescue TransporterRequiresApplicationSpecificPasswordError => ex
+        handle_two_step_failure(ex)
+        return verify(app_id, dir, package_path: package_path)
+      end
+
+      if result
+        UI.header("Successfully verified package on App Store Connect")
 
         FileUtils.rm_rf(actual_dir) unless Helper.test? # we don't need the package any more, since the upload was successful
       else
