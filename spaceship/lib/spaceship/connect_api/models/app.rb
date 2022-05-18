@@ -362,9 +362,8 @@ module Spaceship
       def get_build_deliveries(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         filter ||= {}
-        filter[:app] = id
 
-        resps = client.get_build_deliveries(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        resps = client.get_build_deliveries(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
 

@@ -87,7 +87,7 @@ class ConnectAPIStubbing
       end
 
       def stub_build_deliveries
-        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/buildDeliveries").
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/1234/buildDeliveries").
           to_return(status: 200, body: read_fixture_file('build_deliveries.json'), headers: { 'Content-Type' => 'application/json' })
       end
 
