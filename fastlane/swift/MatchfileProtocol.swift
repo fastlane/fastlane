@@ -74,6 +74,9 @@ public protocol MatchfileProtocol: AnyObject {
     /// ID of the Google Cloud project to use for authentication
     var googleCloudProjectId: String? { get }
 
+    /// Skips confirming to use the system google account
+    var skipGoogleCloudAccountConfirmation: Bool { get }
+
     /// Name of the S3 region
     var s3Region: String? { get }
 
@@ -169,6 +172,7 @@ public extension MatchfileProtocol {
     var googleCloudBucketName: String? { return nil }
     var googleCloudKeysFile: String? { return nil }
     var googleCloudProjectId: String? { return nil }
+    var skipGoogleCloudAccountConfirmation: Bool { return false }
     var s3Region: String? { return nil }
     var s3AccessKey: String? { return nil }
     var s3SecretAccessKey: String? { return nil }
@@ -196,4 +200,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.99]
+// FastlaneRunnerAPIVersion [0.9.100]

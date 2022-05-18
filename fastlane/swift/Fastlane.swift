@@ -663,6 +663,7 @@ public func appledoc(input: [String],
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
    - syncScreenshots: Sync screenshots with local ones. This is currently beta optionso set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
+   - verifyOnly: Verifies archive with App Store Connect without uploading
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
    - automaticRelease: Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
    - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)
@@ -734,6 +735,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                      overwriteScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      syncScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      submitForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                     verifyOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      rejectIfPossible: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      automaticRelease: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                      autoReleaseDate: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
@@ -798,6 +800,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
     let overwriteScreenshotsArg = overwriteScreenshots.asRubyArgument(name: "overwrite_screenshots", type: nil)
     let syncScreenshotsArg = syncScreenshots.asRubyArgument(name: "sync_screenshots", type: nil)
     let submitForReviewArg = submitForReview.asRubyArgument(name: "submit_for_review", type: nil)
+    let verifyOnlyArg = verifyOnly.asRubyArgument(name: "verify_only", type: nil)
     let rejectIfPossibleArg = rejectIfPossible.asRubyArgument(name: "reject_if_possible", type: nil)
     let automaticReleaseArg = automaticRelease.asRubyArgument(name: "automatic_release", type: nil)
     let autoReleaseDateArg = autoReleaseDate.asRubyArgument(name: "auto_release_date", type: nil)
@@ -861,6 +864,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                                           overwriteScreenshotsArg,
                                           syncScreenshotsArg,
                                           submitForReviewArg,
+                                          verifyOnlyArg,
                                           rejectIfPossibleArg,
                                           automaticReleaseArg,
                                           autoReleaseDateArg,
@@ -3550,6 +3554,8 @@ public func createXcframework(frameworks: OptionalConfigValue<[String]?> = .fast
    - dangerId: The identifier of this Danger instance
    - dangerfile: The location of your Dangerfile
    - githubApiToken: GitHub API token for danger
+   - githubEnterpriseHost: GitHub host URL for GitHub Enterprise
+   - githubEnterpriseApiBaseUrl: GitHub API base URL for GitHub Enterprise
    - failOnErrors: Should always fail the build process, defaults to false
    - newComment: Makes Danger post a new comment instead of editing its previous one
    - removePreviousComments: Makes Danger remove all previous comment and create a new one in the end of the list
@@ -3566,6 +3572,8 @@ public func danger(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefault(t
                    dangerId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    dangerfile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    githubApiToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                   githubEnterpriseHost: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                   githubEnterpriseApiBaseUrl: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    failOnErrors: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    newComment: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    removePreviousComments: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -3579,6 +3587,8 @@ public func danger(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefault(t
     let dangerIdArg = dangerId.asRubyArgument(name: "danger_id", type: nil)
     let dangerfileArg = dangerfile.asRubyArgument(name: "dangerfile", type: nil)
     let githubApiTokenArg = githubApiToken.asRubyArgument(name: "github_api_token", type: nil)
+    let githubEnterpriseHostArg = githubEnterpriseHost.asRubyArgument(name: "github_enterprise_host", type: nil)
+    let githubEnterpriseApiBaseUrlArg = githubEnterpriseApiBaseUrl.asRubyArgument(name: "github_enterprise_api_base_url", type: nil)
     let failOnErrorsArg = failOnErrors.asRubyArgument(name: "fail_on_errors", type: nil)
     let newCommentArg = newComment.asRubyArgument(name: "new_comment", type: nil)
     let removePreviousCommentsArg = removePreviousComments.asRubyArgument(name: "remove_previous_comments", type: nil)
@@ -3591,6 +3601,8 @@ public func danger(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefault(t
                                           dangerIdArg,
                                           dangerfileArg,
                                           githubApiTokenArg,
+                                          githubEnterpriseHostArg,
+                                          githubEnterpriseApiBaseUrlArg,
                                           failOnErrorsArg,
                                           newCommentArg,
                                           removePreviousCommentsArg,
@@ -3671,6 +3683,7 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
    - syncScreenshots: Sync screenshots with local ones. This is currently beta optionso set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
+   - verifyOnly: Verifies archive with App Store Connect without uploading
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
    - automaticRelease: Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
    - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)
@@ -3742,6 +3755,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                     overwriteScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.overwriteScreenshots),
                     syncScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.syncScreenshots),
                     submitForReview: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.submitForReview),
+                    verifyOnly: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.verifyOnly),
                     rejectIfPossible: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.rejectIfPossible),
                     automaticRelease: OptionalConfigValue<Bool?> = .fastlaneDefault(deliverfile.automaticRelease),
                     autoReleaseDate: OptionalConfigValue<Int?> = .fastlaneDefault(deliverfile.autoReleaseDate),
@@ -3806,6 +3820,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
     let overwriteScreenshotsArg = overwriteScreenshots.asRubyArgument(name: "overwrite_screenshots", type: nil)
     let syncScreenshotsArg = syncScreenshots.asRubyArgument(name: "sync_screenshots", type: nil)
     let submitForReviewArg = submitForReview.asRubyArgument(name: "submit_for_review", type: nil)
+    let verifyOnlyArg = verifyOnly.asRubyArgument(name: "verify_only", type: nil)
     let rejectIfPossibleArg = rejectIfPossible.asRubyArgument(name: "reject_if_possible", type: nil)
     let automaticReleaseArg = automaticRelease.asRubyArgument(name: "automatic_release", type: nil)
     let autoReleaseDateArg = autoReleaseDate.asRubyArgument(name: "auto_release_date", type: nil)
@@ -3869,6 +3884,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                                           overwriteScreenshotsArg,
                                           syncScreenshotsArg,
                                           submitForReviewArg,
+                                          verifyOnlyArg,
                                           rejectIfPossibleArg,
                                           automaticReleaseArg,
                                           autoReleaseDateArg,
@@ -6633,6 +6649,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
    - googleCloudProjectId: ID of the Google Cloud project to use for authentication
+   - skipGoogleCloudAccountConfirmation: Skips confirming to use the system google account
    - s3Region: Name of the S3 region
    - s3AccessKey: S3 access key
    - s3SecretAccessKey: S3 secret access key
@@ -6683,6 +6700,7 @@ public func match(type: String = matchfile.type,
                   googleCloudBucketName: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.googleCloudBucketName),
                   googleCloudKeysFile: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.googleCloudKeysFile),
                   googleCloudProjectId: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.googleCloudProjectId),
+                  skipGoogleCloudAccountConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipGoogleCloudAccountConfirmation),
                   s3Region: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3Region),
                   s3AccessKey: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3AccessKey),
                   s3SecretAccessKey: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3SecretAccessKey),
@@ -6731,6 +6749,7 @@ public func match(type: String = matchfile.type,
     let googleCloudBucketNameArg = googleCloudBucketName.asRubyArgument(name: "google_cloud_bucket_name", type: nil)
     let googleCloudKeysFileArg = googleCloudKeysFile.asRubyArgument(name: "google_cloud_keys_file", type: nil)
     let googleCloudProjectIdArg = googleCloudProjectId.asRubyArgument(name: "google_cloud_project_id", type: nil)
+    let skipGoogleCloudAccountConfirmationArg = skipGoogleCloudAccountConfirmation.asRubyArgument(name: "skip_google_cloud_account_confirmation", type: nil)
     let s3RegionArg = s3Region.asRubyArgument(name: "s3_region", type: nil)
     let s3AccessKeyArg = s3AccessKey.asRubyArgument(name: "s3_access_key", type: nil)
     let s3SecretAccessKeyArg = s3SecretAccessKey.asRubyArgument(name: "s3_secret_access_key", type: nil)
@@ -6778,6 +6797,7 @@ public func match(type: String = matchfile.type,
                                           googleCloudBucketNameArg,
                                           googleCloudKeysFileArg,
                                           googleCloudProjectIdArg,
+                                          skipGoogleCloudAccountConfirmationArg,
                                           s3RegionArg,
                                           s3AccessKeyArg,
                                           s3SecretAccessKeyArg,
@@ -6836,6 +6856,7 @@ public func match(type: String = matchfile.type,
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
    - googleCloudProjectId: ID of the Google Cloud project to use for authentication
+   - skipGoogleCloudAccountConfirmation: Skips confirming to use the system google account
    - s3Region: Name of the S3 region
    - s3AccessKey: S3 access key
    - s3SecretAccessKey: S3 secret access key
@@ -6890,6 +6911,7 @@ public func matchNuke(type: String = "development",
                       googleCloudBucketName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       googleCloudKeysFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       googleCloudProjectId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                      skipGoogleCloudAccountConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       s3Region: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       s3AccessKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       s3SecretAccessKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -6938,6 +6960,7 @@ public func matchNuke(type: String = "development",
     let googleCloudBucketNameArg = googleCloudBucketName.asRubyArgument(name: "google_cloud_bucket_name", type: nil)
     let googleCloudKeysFileArg = googleCloudKeysFile.asRubyArgument(name: "google_cloud_keys_file", type: nil)
     let googleCloudProjectIdArg = googleCloudProjectId.asRubyArgument(name: "google_cloud_project_id", type: nil)
+    let skipGoogleCloudAccountConfirmationArg = skipGoogleCloudAccountConfirmation.asRubyArgument(name: "skip_google_cloud_account_confirmation", type: nil)
     let s3RegionArg = s3Region.asRubyArgument(name: "s3_region", type: nil)
     let s3AccessKeyArg = s3AccessKey.asRubyArgument(name: "s3_access_key", type: nil)
     let s3SecretAccessKeyArg = s3SecretAccessKey.asRubyArgument(name: "s3_secret_access_key", type: nil)
@@ -6985,6 +7008,7 @@ public func matchNuke(type: String = "development",
                                           googleCloudBucketNameArg,
                                           googleCloudKeysFileArg,
                                           googleCloudProjectIdArg,
+                                          skipGoogleCloudAccountConfirmationArg,
                                           s3RegionArg,
                                           s3AccessKeyArg,
                                           s3SecretAccessKeyArg,
@@ -9662,6 +9686,7 @@ public func setPodKey(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefaul
  - parameters:
    - force: Force setup, even if not executed by CI
    - provider: CI provider. If none is set, the provider is detected automatically
+   - timeout: Set a custom timeout in seconds for keychain.  Set `0` if you want to specify 'no time-out'
 
  - Creates a new temporary keychain for use with match|
  - Switches match to `readonly` mode to not create new profiles/cert on CI|
@@ -9670,12 +9695,15 @@ public func setPodKey(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefaul
  This action helps with CI integration. Add this to the top of your Fastfile if you use CI.
  */
 public func setupCi(force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                    provider: OptionalConfigValue<String?> = .fastlaneDefault(nil))
+                    provider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                    timeout: Int = 3600)
 {
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let providerArg = provider.asRubyArgument(name: "provider", type: nil)
+    let timeoutArg = RubyCommand.Argument(name: "timeout", value: timeout, type: nil)
     let array: [RubyCommand.Argument?] = [forceArg,
-                                          providerArg]
+                                          providerArg,
+                                          timeoutArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -11026,6 +11054,7 @@ public func swiftlint(mode: String = "lint",
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
    - googleCloudProjectId: ID of the Google Cloud project to use for authentication
+   - skipGoogleCloudAccountConfirmation: Skips confirming to use the system google account
    - s3Region: Name of the S3 region
    - s3AccessKey: S3 access key
    - s3SecretAccessKey: S3 secret access key
@@ -11076,6 +11105,7 @@ public func syncCodeSigning(type: String = "development",
                             googleCloudBucketName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             googleCloudKeysFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             googleCloudProjectId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                            skipGoogleCloudAccountConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             s3Region: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             s3AccessKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             s3SecretAccessKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -11124,6 +11154,7 @@ public func syncCodeSigning(type: String = "development",
     let googleCloudBucketNameArg = googleCloudBucketName.asRubyArgument(name: "google_cloud_bucket_name", type: nil)
     let googleCloudKeysFileArg = googleCloudKeysFile.asRubyArgument(name: "google_cloud_keys_file", type: nil)
     let googleCloudProjectIdArg = googleCloudProjectId.asRubyArgument(name: "google_cloud_project_id", type: nil)
+    let skipGoogleCloudAccountConfirmationArg = skipGoogleCloudAccountConfirmation.asRubyArgument(name: "skip_google_cloud_account_confirmation", type: nil)
     let s3RegionArg = s3Region.asRubyArgument(name: "s3_region", type: nil)
     let s3AccessKeyArg = s3AccessKey.asRubyArgument(name: "s3_access_key", type: nil)
     let s3SecretAccessKeyArg = s3SecretAccessKey.asRubyArgument(name: "s3_secret_access_key", type: nil)
@@ -11171,6 +11202,7 @@ public func syncCodeSigning(type: String = "development",
                                           googleCloudBucketNameArg,
                                           googleCloudKeysFileArg,
                                           googleCloudProjectIdArg,
+                                          skipGoogleCloudAccountConfirmationArg,
                                           s3RegionArg,
                                           s3AccessKeyArg,
                                           s3SecretAccessKeyArg,
@@ -12214,6 +12246,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
    - syncScreenshots: Sync screenshots with local ones. This is currently beta optionso set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
+   - verifyOnly: Verifies archive with App Store Connect without uploading
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
    - automaticRelease: Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
    - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)
@@ -12285,6 +12318,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                              overwriteScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              syncScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              submitForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                             verifyOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              rejectIfPossible: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              automaticRelease: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                              autoReleaseDate: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
@@ -12349,6 +12383,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
     let overwriteScreenshotsArg = overwriteScreenshots.asRubyArgument(name: "overwrite_screenshots", type: nil)
     let syncScreenshotsArg = syncScreenshots.asRubyArgument(name: "sync_screenshots", type: nil)
     let submitForReviewArg = submitForReview.asRubyArgument(name: "submit_for_review", type: nil)
+    let verifyOnlyArg = verifyOnly.asRubyArgument(name: "verify_only", type: nil)
     let rejectIfPossibleArg = rejectIfPossible.asRubyArgument(name: "reject_if_possible", type: nil)
     let automaticReleaseArg = automaticRelease.asRubyArgument(name: "automatic_release", type: nil)
     let autoReleaseDateArg = autoReleaseDate.asRubyArgument(name: "auto_release_date", type: nil)
@@ -12412,6 +12447,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                                           overwriteScreenshotsArg,
                                           syncScreenshotsArg,
                                           submitForReviewArg,
+                                          verifyOnlyArg,
                                           rejectIfPossibleArg,
                                           automaticReleaseArg,
                                           autoReleaseDateArg,
@@ -13430,4 +13466,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.155]
+// FastlaneRunnerAPIVersion [0.9.156]
