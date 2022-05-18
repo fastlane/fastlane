@@ -24,7 +24,11 @@ describe Fastlane do
           source_directory_path = Dir.mktmpdir("fl_spec_import_from_git_source")
 
           Dir.chdir(source_directory_path) do
-            `git init -b master`
+            if Gem::Version.new(`git --version`.strip.split(' ').last) >= Gem::Version.new("2.28.0")
+              `git init -b master`
+            else
+              `git init`
+            end
             `git config user.email "you@example.com"`
             `git config user.name "Your Name"`
 
