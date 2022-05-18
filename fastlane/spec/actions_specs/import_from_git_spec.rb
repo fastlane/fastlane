@@ -24,7 +24,7 @@ describe Fastlane do
           source_directory_path = Dir.mktmpdir("fl_spec_import_from_git_source")
 
           Dir.chdir(source_directory_path) do
-            `git init`
+            `git init -b master`
             `git config user.email "you@example.com"`
             `git config user.name "Your Name"`
 
