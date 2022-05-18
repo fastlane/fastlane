@@ -78,6 +78,9 @@ module Fastlane
         tool_name = ARGV.first ? ARGV.first.downcase : nil
 
         tool_name = process_emojis(tool_name)
+        tool_name = map_aliased_tools(tool_name)
+
+        puts "tool_name: #{tool_name}"
 
         if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
           # Triggering a specific tool
@@ -123,6 +126,25 @@ module Fastlane
         end
       ensure
         FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+      end
+
+      def map_aliased_tools(tool_name)
+        map = {
+          "get_certificates": "cert",
+          "upload_to_app_store": "deliver",
+          "frame_screenshots": "frameit",
+          "build_app": "gym",
+          "build_ios_app": "gym",
+          "build_mac_app": "gym",
+          "sync_code_signing": "match",
+          "get_push_certificate": "pem",
+          "check_app_store_metadata": "precheck",
+          "capture_android_screenshots": "screengrab",
+          "get_provisioning_profile": "sigh",
+          "capture_ios_screenshots": "snapshot",
+          "upload_to_play_store": "supply"
+        }
+        return map[tool_name.to_sym] || tool_name
       end
 
       # Since loading dotenv should respect additional environments passed using

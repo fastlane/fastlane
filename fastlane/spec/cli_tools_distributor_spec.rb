@@ -20,6 +20,16 @@ describe Fastlane::CLIToolsDistributor do
         Fastlane::CLIToolsDistributor.take_off
       end
     end
+
+    it "runs a separate aliased tool when the tool is available and the name is not used in a lane" do
+      FastlaneSpec::Env.with_ARGV(["build_app"]) do
+        require 'gym/options'
+        require 'gym/commands_generator'
+        expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileUseToolNameAsLane").at_least(:once)
+        expect(Gym::CommandsGenerator).to receive(:start).and_return(nil)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
   end
 
   describe "update checking" do
