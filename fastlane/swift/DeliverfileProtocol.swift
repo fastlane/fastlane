@@ -65,6 +65,9 @@ public protocol DeliverfileProtocol: AnyObject {
     /// Submit the new version for Review after uploading everything
     var submitForReview: Bool { get }
 
+    /// Verifies archive with App Store Connect without uploading
+    var verifyOnly: Bool { get }
+
     /// Rejects the previously submitted build if it's in a state where it's possible
     var rejectIfPossible: Bool { get }
 
@@ -214,6 +217,7 @@ public extension DeliverfileProtocol {
     var overwriteScreenshots: Bool { return false }
     var syncScreenshots: Bool { return false }
     var submitForReview: Bool { return false }
+    var verifyOnly: Bool { return false }
     var rejectIfPossible: Bool { return false }
     var automaticRelease: Bool? { return nil }
     var autoReleaseDate: Int? { return nil }
@@ -260,4 +264,4 @@ public extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.102]
+// FastlaneRunnerAPIVersion [0.9.103]
