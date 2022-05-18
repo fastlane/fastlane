@@ -131,6 +131,7 @@ describe Match do
         google_cloud_bucket_name: "",
         google_cloud_keys_file: "",
         google_cloud_project_id: "",
+        skip_google_cloud_account_confirmation: false,
         s3_bucket: nil,
         s3_region: nil,
         s3_access_key: nil,
