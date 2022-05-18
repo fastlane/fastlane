@@ -138,26 +138,34 @@ module Cert
     # All certificates of this type
     def certificates
       filter = {
-        certificateType: certificate_type
+        certificateType: certificate_types.join(",")
       }
       return Spaceship::ConnectAPI::Certificate.all(filter: filter)
     end
 
-    # The kind of certificate we're interested in
+    # The kind of certificate we're interested in (for creating)
     def certificate_type
+      return certificate_types.first
+    end
+
+    # The kind of certificates we're interested in (for listing)
+    def certificate_types
       if Cert.config[:type]
         case Cert.config[:type].to_sym
         when :mac_installer_distribution
-          return Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION
+          return [Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION]
         when :developer_id_application
-          return Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2
+          return [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2,
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+          ]
         when :developer_id_kext
-          return Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_KEXT
+          return [Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_KEXT]
         when :developer_id_installer
           if !Spaceship::ConnectAPI.token.nil?
             raise "As of 2021-11-09, the App Store Connect API does not allow accessing DEVELOPER_ID_INSTALLER with the API Key. Please file an issue on GitHub if this has changed and needs to be updated"
           else
-            return Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_INSTALLER
+            return [Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_INSTALLER]
           end
         else
           UI.user_error("Unaccepted value for :type - #{Cert.config[:type]}")
@@ -182,7 +190,7 @@ module Cert
         end
       end
 
-      return cert_type
+      return [cert_type]
     end
 
     def create_certificate
