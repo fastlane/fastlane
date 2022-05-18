@@ -46,8 +46,8 @@ module Deliver
     end
 
     def run
-      if options[:verify]
-        UI.important("Verify flag is set, only package validation will take place and no submission will be done.")
+      if options[:verify_only]
+        UI.important("Verify flag is set, only package validation will take place and no submission will be made")
         verify_binary
         return
       end
