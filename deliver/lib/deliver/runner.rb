@@ -196,7 +196,7 @@ module Deliver
 
       unless result
         transporter_errors = transporter.displayable_errors
-        UI.user_error!("Error verifying the ipa file: \n #{transporter_errors}")
+        UI.user_error!("Error verifying the binary file: \n #{transporter_errors}")
       end
     end
 
