@@ -313,7 +313,11 @@ module Scan
       end
 
       unless tests_exit_status == 0
-        UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+        if Scan.config[:fail_build]
+          UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+        else
+          UI.error("Test execution failed. Exit status: #{tests_exit_status}")
+        end
       end
 
       open_report
