@@ -502,6 +502,38 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
+      context 'post_beta_tester_assignment' do
+        let(:path) { "betaTesters" }
+        let(:beta_group_ids) { ["123", "456"] }
+        let(:attributes) { { email: "email1", firstName: "first1", lastName: "last1" } }
+        let(:body) do
+          {
+            data: {
+              attributes: attributes,
+              relationships: {
+                betaGroups: {
+                  data: beta_group_ids.map do |id|
+                    {
+                      type: "betaGroups",
+                      id: id
+                    }
+                  end
+                }
+              },
+              type: "betaTesters"
+            }
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.post_beta_tester_assignment(beta_group_ids: beta_group_ids, attributes: attributes)
+        end
+      end
+
       context "add_beta_tester_to_group" do
         let(:beta_group_id) { "123" }
         let(:beta_tester_ids) { ["1234", "5678"] }

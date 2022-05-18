@@ -290,6 +290,28 @@ module Spaceship
           test_flight_request_client.post("bulkBetaTesterAssignments", body)
         end
 
+        # attributes - {email: "", firstName: "", lastName: ""}
+        def post_beta_tester_assignment(beta_group_ids: [], attributes: {})
+          body = {
+            data: {
+              attributes: attributes,
+              relationships: {
+                betaGroups: {
+                  data: beta_group_ids.map do |id|
+                    {
+                      type: "betaGroups",
+                      id: id
+                    }
+                  end
+                }
+              },
+              type: "betaTesters"
+            }
+          }
+
+          test_flight_request_client.post("betaTesters", body)
+        end
+
         def add_beta_tester_to_group(beta_group_id: nil, beta_tester_ids: nil)
           beta_tester_ids || []
           body = {
