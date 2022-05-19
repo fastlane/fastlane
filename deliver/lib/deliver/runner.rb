@@ -137,6 +137,12 @@ module Deliver
 
     # Upload all metadata, screenshots, pricing information, etc. to App Store Connect
     def upload_metadata
+      # App clip experience metadata upload must happen before the upload metadata step. The app
+      # clip app store review detail upload depends on there being a valid app clip default
+      # experience on the edit version.
+      UploadAppClipDefaultExperienceMetadata.new.upload_metadata(options)
+      UploadAppClipDefaultExperienceHeaderImages.new.find_and_upload(options)
+
       upload_metadata = UploadMetadata.new
       upload_screenshots = UploadScreenshots.new
 
@@ -161,8 +167,6 @@ module Deliver
       end
 
       UploadPriceTier.new.upload(options)
-      UploadAppClipDefaultExperienceMetadata.new.upload_metadata(options)
-      UploadAppClipDefaultExperienceHeaderImages.new.find_and_upload(options)
     end
 
     # Verify the binary with App Store Connect

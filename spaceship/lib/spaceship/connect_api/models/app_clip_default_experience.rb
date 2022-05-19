@@ -6,10 +6,12 @@ module Spaceship
 
       attr_accessor :action
       attr_accessor :app_clip_default_experience_localizations
+      attr_accessor :app_clip_app_store_review_detail
 
       attr_mapping(
         'action' => 'action',
-        'appClipDefaultExperienceLocalizations' => 'app_clip_default_experience_localizations'
+        'appClipDefaultExperienceLocalizations' => 'app_clip_default_experience_localizations',
+        'appClipAppStoreReviewDetail' => 'app_clip_app_store_review_detail'
       )
 
       def self.type

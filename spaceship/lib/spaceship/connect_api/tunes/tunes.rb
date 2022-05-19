@@ -771,6 +771,41 @@ module Spaceship
         end
 
         #
+        # appClipAppStoreReviewDetails
+        #
+
+        def post_app_clip_app_store_review_detail(app_clip_default_experience_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipAppStoreReviewDetails",
+              attributes: attributes,
+              relationships: {
+                appClipDefaultExperience: {
+                  data: {
+                    type: "appClipDefaultExperiences",
+                    id: app_clip_default_experience_id
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("appClipAppStoreReviewDetails", body)
+        end
+
+        def patch_app_clip_app_store_review_detail(app_clip_app_store_review_detail_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipAppStoreReviewDetails",
+              id: app_clip_app_store_review_detail_id,
+              attributes: attributes
+            }
+          }
+
+          tunes_request_client.patch("appClipAppStoreReviewDetails/#{app_clip_app_store_review_detail_id}", body)
+        end
+
+        #
         # appStoreVersionLocalizations
         #
 
