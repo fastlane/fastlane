@@ -204,28 +204,34 @@ module Deliver
     def upload_binary
       UI.message("Uploading binary to App Store Connect")
 
-      upload_ipa = options[:ipa]
-      upload_pkg = options[:pkg]
+      ipa_path = options[:ipa]
+      pkg_path = options[:pkg]
 
-      case options[:platform]
-      when "ios", "appletvos"
-        package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
-          app_id: Deliver.cache[:app].id,
-          ipa_path: options[:ipa],
-          package_path: "/tmp",
-          platform: options[:platform]
-        )
-      when "osx"
-        package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
-          app_id: Deliver.cache[:app].id,
-          pkg_path: options[:pkg],
-          package_path: "/tmp",
-          platform: options[:platform]
-        )
-      else
-        UI.user_error!("no suitable file found for upload for platform: #{options[:platform]}")
-      end
-        
+      platform = options[:platform]
+      transporter = transporter_for_selected_team
+
+      case platform
+        when "ios", "appletvos"
+          package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
+            app_id: Deliver.cache[:app].id,
+            ipa_path: ipa_path,
+            package_path: "/tmp",
+            platform: platform
+          )
+          result = transporter.upload(package_path: package_path, asset_path: ipa_path)
+
+        when "osx"
+          package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
+            app_id: Deliver.cache[:app].id,
+            pkg_path: pkg_path,
+            package_path: "/tmp",
+            platform: platform
+          )
+          result = transporter.upload(package_path: package_path, asset_path: pkg_path)
+
+        else
+          UI.user_error!("no suitable file found for upload for platform: #{options[:platform]}")
+        end        
 
       transporter = transporter_for_selected_team
       result = transporter.upload(package_path: package_path, asset_path: upload_ipa || upload_pkg)
