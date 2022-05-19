@@ -78,7 +78,7 @@ module Fastlane
         tool_name = ARGV.first ? ARGV.first.downcase : nil
 
         tool_name = process_emojis(tool_name)
-        tool_name = map_aliased_tools(tool_name) unless tool_name.nil?
+        tool_name = map_aliased_tools(tool_name)
 
         if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
           # Triggering a specific tool
@@ -142,7 +142,7 @@ module Fastlane
           "capture_ios_screenshots": "snapshot",
           "upload_to_play_store": "supply"
         }
-        return map[tool_name.to_sym] || tool_name
+        return map[tool_name&.to_sym] || tool_name
       end
 
       # Since loading dotenv should respect additional environments passed using
