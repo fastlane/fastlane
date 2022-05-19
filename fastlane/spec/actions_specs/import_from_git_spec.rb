@@ -13,7 +13,7 @@ describe Fastlane do
       # (2.32.0).win.1
       # (3)
       def git_version
-        output = `git --version 2> /dev/null`
+        output = `git --version`
         m = output.match(/(?<version>\d+(?:\.\d+)*)/)
         raise "Couldn't parse git version in '#{output}'" unless m
         m['version']
