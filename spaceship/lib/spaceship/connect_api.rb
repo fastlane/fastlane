@@ -19,6 +19,7 @@ require 'spaceship/connect_api/models/user'
 require 'spaceship/connect_api/models/user_invitation'
 
 require 'spaceship/connect_api/models/app'
+require 'spaceship/connect_api/models/app_clip_app_store_review_detail'
 require 'spaceship/connect_api/models/app_clip_default_experience_localization'
 require 'spaceship/connect_api/models/app_clip_default_experience'
 require 'spaceship/connect_api/models/app_clip_header_image'
