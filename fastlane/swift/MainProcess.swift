@@ -49,7 +49,7 @@ class MainProcess {
             let path = main.run(bash: "which fastlane").stdout
             let pids = main.run("lsof", "-t", "-i", ":\(argumentProcessor.port)").stdout.split(separator: "\n")
             pids.forEach { main.run("kill", "-9", $0) }
-            rubySocketCommand = main.runAsync(path, "socket_server", "-c", "1200", "-p", argumentProcessor.port)
+            rubySocketCommand = main.runAsync(path, "socket_server", "-c", argumentProcessor.timeout, "-p", argumentProcessor.port)
             lastPrintDate = Date()
             rubySocketCommand.stderror.onStringOutput { print($0) }
             rubySocketCommand.stdout.onStringOutput { stdout in
