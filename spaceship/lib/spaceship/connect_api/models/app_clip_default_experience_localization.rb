@@ -24,7 +24,7 @@ module Spaceship
 
       def self.create(client: nil, default_experience_id:, attributes:)
         client ||= Spaceship::ConnectAPI
-        return client.post_app_clip_default_experience_localization(default_experience_id: app_clip_default_experience.id, attributes: attributes)
+        return client.post_app_clip_default_experience_localization(default_experience_id: default_experience_id, attributes: attributes)
       end
 
       def self.find_all(client: nil, app_clip_default_experience_id:, filter: {}, includes: nil, limit: nil, sort: nil)

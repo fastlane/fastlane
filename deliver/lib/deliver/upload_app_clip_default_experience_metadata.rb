@@ -48,8 +48,8 @@ module Deliver
         UI.message("Updated app clip default experience")
       else
         # create a new default experience
-        default_experience = Spaceship::ConnectAPI::AppClipDefaultExperience.create(app_clip_id: app_clip.id, app_store_version_id: version.id, attributes: { action: action })
-        UI.important("Created default experience #{default_experience.id}")
+        Spaceship::ConnectAPI::AppClipDefaultExperience.create(app_clip_id: app_clip.id, app_store_version_id: version.id, attributes: { action: action })
+        UI.important("Created default experience for version '#{version.version_string}'")
       end
 
       # update the subtitle localizations
