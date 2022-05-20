@@ -20,7 +20,7 @@ module Spaceship
       # API
       #
 
-      def self.create(client: nil, app_clip_id:, app_store_version_id:, attributes:, template_default_experience_id: nil)
+      def self.create(client: nil, app_clip_id:, app_store_version_id:, attributes: nil, template_default_experience_id: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.post_app_clip_default_experience(app_clip_id: app_clip_id, app_store_version_id: app_store_version_id, attributes: attributes, template_default_experience_id: template_default_experience_id)
         return resps.to_models.first
