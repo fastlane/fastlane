@@ -133,7 +133,7 @@ module Deliver
     def copy_live_version_app_clip_default_experience_metadata(app:, platform:, edit_version:, app_clip:)
       edit_version_default_experience = edit_version.app_clip_default_experience
       if !edit_version_default_experience
-        live_version = fetch_live_app_info(app, platform)
+        live_version = fetch_live_app_store_version(app, platform)
         # no live version to carry over metadata from
         return if live_version.nil?
 
@@ -144,18 +144,7 @@ module Deliver
         # create a default experience and use the live version default experience as a "template"
         Spaceship::ConnectAPI::AppClipDefaultExperience.create(app_clip_id: app_clip.id, app_store_version_id: edit_version.id, template_default_experience_id: live_version_default_experience.id)
 
-        # TODO: if the above code using the "template" doesn't work, we can use the following to manually copy the values
-        #
-        # default_experience.update(attributes: { action: live_version_default_experience.action })
-        # UI.message("Added app clip default experience action from live version #{live_version.version}")
-
-        # # copy the live version localizations
-        # live_version_localizations = Spaceship::ConnectAPI::AppClipDefaultExperience.get(app_clip_default_experience_id: live_version_default_experience.id, includes: 'appClipDefaultExperienceLocalizations').app_clip_default_experience_localizations
-
-        # live_version_localizations.each do |live_localization|
-        #   attributes = { subtitle: live_localization.subtitle, locale: live_localization.locale }
-        #   Spaceship::ConnectAPI::AppClipDefaultExperienceLocalizations.create(default_experience_id: default_experience.id, attributes: attributes)
-        # end
+        UI.message("Created the app clip default experience using the live version's app clip metadata as a template.")
       else
         # if the edit version app clip default experience already exists, just check it's values
         UI.important("ASC requires the app clip default experience to contain a valid `action` value. To specify this value in fastlane use deliver's `app_clip_default_experience_action` option.") if edit_version_default_experience.action.nil?

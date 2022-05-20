@@ -1298,11 +1298,10 @@ module Spaceship
         end
 
         # https://developer.apple.com/documentation/appstoreconnectapi/create_a_default_app_clip_experience
-        def post_app_clip_default_experience(app_clip_id: nil, app_store_version_id: nil, attributes: {}, template_default_experience_id: nil)
+        def post_app_clip_default_experience(app_clip_id: nil, app_store_version_id: nil, attributes:, template_default_experience_id: nil)
           body = {
             data: {
               type: "appClipDefaultExperiences",
-              attributes: attributes,
               relationships: {
                 appClip: {
                   data: {
@@ -1319,6 +1318,8 @@ module Spaceship
               }
             }
           }
+
+          body.data.attributes = attributes unless attributes.nil?
 
           unless template_default_experience_id.nil?
             body[:data][:relationships][:appClipDefaultExperienceTemplate] = {
