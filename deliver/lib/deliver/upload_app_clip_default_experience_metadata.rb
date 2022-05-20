@@ -41,19 +41,19 @@ module Deliver
       UI.user_error!("You must provide at least the subtitle and action for a app clip default experience") if subtitle_localized.nil? || action.nil?
 
       # see if there's an existing experience for this version
-      existing_default_experience = version.app_clip_default_experience
-      if existing_default_experience
+      default_experience = version.app_clip_default_experience
+      if default_experience
         # update the existing default experience
-        existing_default_experience.update(attributes: { action: action })
+        default_experience.update(attributes: { action: action })
         UI.message("Updated app clip default experience")
       else
         # create a new default experience
-        Spaceship::ConnectAPI::AppClipDefaultExperience.create(app_clip_id: app_clip.id, app_store_version_id: version.id, attributes: { action: action })
+        default_experience = Spaceship::ConnectAPI::AppClipDefaultExperience.create(app_clip_id: app_clip.id, app_store_version_id: version.id, attributes: { action: action })
         UI.important("Created default experience for version '#{version.version_string}'")
       end
 
       # update the subtitle localizations
-      upload_subtitle_localizations(app_clip_default_experience: existing_default_experience, subtitle_localizations: subtitle_localized)
+      upload_subtitle_localizations(app_clip_default_experience: default_experience, subtitle_localizations: subtitle_localized)
     end
 
     # from upload_metadata.rb
