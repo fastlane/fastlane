@@ -142,7 +142,7 @@ module Fastlane
           "capture_ios_screenshots": "snapshot",
           "upload_to_play_store": "supply"
         }
-        return map[tool_name.to_sym] || tool_name
+        return map[tool_name&.to_sym] || tool_name
       end
 
       # Since loading dotenv should respect additional environments passed using
