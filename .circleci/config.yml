@@ -55,9 +55,11 @@ aliases:
     run:
       name: bundle install
       command: |
+        sudo gem update --system
         gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
         bundle config set --local path .bundle
         bundle check || bundle install --jobs=4 --retry=3
+        bundle env
 
 jobs:
   tests_macos: &tests_macos_base

@@ -24,6 +24,7 @@ init:
 
 install:
   - set PATH=C:\Ruby26-x64\bin;%PATH%
+  - gem update --system
   - bundle install
   # iconv
   - appveyor DownloadFile
