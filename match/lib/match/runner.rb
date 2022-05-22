@@ -287,7 +287,10 @@ module Match
         FileUtils.cp(profile, params[:output_path])
       end
 
-      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid, platform: params[:platform])
+      if spaceship && !spaceship.profile_exists(type: prov_type,
+                                                username: params[:username],
+                                                uuid: uuid,
+                                                platform: params[:platform])
         # This profile is invalid, let's remove the local file and generate a new one
         File.delete(profile)
         # This method will be called again, no need to modify `files_to_commit`
