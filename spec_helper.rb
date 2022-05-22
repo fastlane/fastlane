@@ -14,7 +14,18 @@ UI = FastlaneCore::UI
 unless ENV["DEBUG"]
   fastlane_tests_tmpdir = "#{Dir.tmpdir}/fastlane_tests"
   $stdout.puts("Changing stdout to #{fastlane_tests_tmpdir}, set `DEBUG` environment variable to print to stdout (e.g. when using `pry`)")
+  $orig_stdout = $stdout
   $stdout = File.open(fastlane_tests_tmpdir, "w")
+end
+
+# for troubleshooting CI issues on specific tests
+def with_orig_stdout(&block)
+  $orig_stdout.puts("Temporarily re-enabling standard stdout")
+  $stdout, $orig_stdout = $orig_stdout, $stdout
+  yield
+ensure
+  $stdout, $orig_stdout = $orig_stdout, $stdout
+  $orig_stdout.puts("Standard stdout re-disabled")
 end
 
 if FastlaneCore::Helper.mac?
