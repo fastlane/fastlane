@@ -12,6 +12,8 @@ Gem::Specification.new do |spec|
 
   spec.summary = "fake gem for fastlane tests"
 
+  spec.files = Dir.glob("fastlane/**/*", File::FNM_DOTMATCH)
+
   spec.add_dependency('fastlane')
   spec.add_dependency('fastlane-plugin-appcenter')
 end
