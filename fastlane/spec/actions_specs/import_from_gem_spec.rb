@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "import_from_spec" do
@@ -12,6 +14,8 @@ describe Fastlane do
       it "loads all fastfile paths specified and find the lanes" do
         Bundler.with_unbundled_env do
           Dir.chdir("fastlane/spec/fixtures/plugins/ImportFromGem") do
+            path = Dir.mktmpdir
+            `bundle config set --local path #{path}`
             `bundle install`
             output = `bundle exec fastlane lanes`
             expect(output.index("----- fastlane first")).not_to eq(nil)
@@ -23,6 +27,8 @@ describe Fastlane do
       it "runs imported actions from an imported gem" do
         Bundler.with_unbundled_env do
           Dir.chdir("fastlane/spec/fixtures/plugins/ImportFromGem") do
+            path = Dir.mktmpdir
+            `bundle config set --local path #{path}`
             `bundle install`
             output = `bundle exec fastlane first`
             expect(output.index("Step: example_action")).not_to eq(nil)

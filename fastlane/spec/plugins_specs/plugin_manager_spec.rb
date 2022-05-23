@@ -53,6 +53,8 @@ describe Fastlane do
       it "returns all fastlane plugins found in transitive dependencies" do
         Bundler.with_unbundled_env do
           Dir.chdir("fastlane/spec/fixtures/plugins/GemfileWithDeps") do
+            path = Dir.mktmpdir
+            `bundle config set --local path #{path}`
             `bundle install`
             output = `bundle exec fastlane lanes`
             expect(output.include?("fastlane-plugin-appcenter")).to be true
