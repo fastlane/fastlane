@@ -233,9 +233,6 @@ module Deliver
         UI.user_error!("no suitable file found for upload for platform: #{options[:platform]}")
       end
 
-      transporter = transporter_for_selected_team
-      result = transporter.upload(package_path: package_path, asset_path: upload_ipa || upload_pkg)
-
       unless result
         transporter_errors = transporter.displayable_errors
         UI.user_error!("Error uploading ipa file: \n #{transporter_errors}")
