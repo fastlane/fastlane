@@ -93,12 +93,17 @@ describe Fastlane::CLIToolsDistributor do
         Fastlane::CLIToolsDistributor.take_off
       end
     end
+  end
+  
+  describe "map_aliased_tools" do
+    it "returns nil when tool_name is nil" do
+      require "fastlane"
+      expect(Fastlane::CLIToolsDistributor.map_aliased_tools(nil)).to eq(nil)
+    end
 
-    it "passes nil when --env is not specified" do
-      FastlaneSpec::Env.with_ARGV(["lanes"]) do
-        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with(nil)
-        Fastlane::CLIToolsDistributor.take_off
-      end
+    it "returns gym when tool_name is build_app" do
+      require "fastlane"
+      expect(Fastlane::CLIToolsDistributor.map_aliased_tools("build_app")).to eq("gym")
     end
   end
 end
