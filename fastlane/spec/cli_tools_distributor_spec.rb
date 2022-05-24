@@ -96,14 +96,18 @@ describe Fastlane::CLIToolsDistributor do
   end
   
   describe "map_aliased_tools" do
+    before do 
+      require 'fastlane'
+    end
+
     it "returns nil when tool_name is nil" do
-      require "fastlane"
       expect(Fastlane::CLIToolsDistributor.map_aliased_tools(nil)).to eq(nil)
     end
 
-    it "returns gym when tool_name is build_app" do
-      require "fastlane"
-      expect(Fastlane::CLIToolsDistributor.map_aliased_tools("build_app")).to eq("gym")
+    Fastlane::TOOL_ALIASES.each do |key, value|
+      it "returns #{value} when tool_name is #{key}" do
+        expect(Fastlane::CLIToolsDistributor.map_aliased_tools(key)).to eq(value)
+      end
     end
   end
 end
