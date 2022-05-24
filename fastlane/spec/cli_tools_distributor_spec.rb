@@ -94,9 +94,9 @@ describe Fastlane::CLIToolsDistributor do
       end
     end
   end
-  
+
   describe "map_aliased_tools" do
-    before do 
+    before do
       require 'fastlane'
     end
 
