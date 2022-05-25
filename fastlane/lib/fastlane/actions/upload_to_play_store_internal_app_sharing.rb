@@ -50,7 +50,7 @@ module Fastlane
         options = Supply::Options.available_options.clone
 
         # remove all the unnecessary (for this action) options
-        options_to_keep = [:package_name, :apk, :apk_paths, :aab, :aab_paths, :json_key, :json_key_data, :root_url, :timeout]
+        options_to_keep = [:package_name, :apk, :apk_paths, :aab, :aab_paths, :json_key, :json_key_data, :access_token, :root_url, :timeout]
         options.delete_if { |option| options_to_keep.include?(option.key) == false }
       end
 
