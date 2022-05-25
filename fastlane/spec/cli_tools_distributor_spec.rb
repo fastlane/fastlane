@@ -93,11 +93,20 @@ describe Fastlane::CLIToolsDistributor do
         Fastlane::CLIToolsDistributor.take_off
       end
     end
+  end
 
-    it "passes nil when --env is not specified" do
-      FastlaneSpec::Env.with_ARGV(["lanes"]) do
-        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with(nil)
-        Fastlane::CLIToolsDistributor.take_off
+  describe "map_aliased_tools" do
+    before do
+      require 'fastlane'
+    end
+
+    it "returns nil when tool_name is nil" do
+      expect(Fastlane::CLIToolsDistributor.map_aliased_tools(nil)).to eq(nil)
+    end
+
+    Fastlane::TOOL_ALIASES.each do |key, value|
+      it "returns #{value} when tool_name is #{key}" do
+        expect(Fastlane::CLIToolsDistributor.map_aliased_tools(key)).to eq(value)
       end
     end
   end
