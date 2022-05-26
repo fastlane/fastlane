@@ -16,8 +16,16 @@ module Spaceship
       attr_accessor :is_aag
       attr_accessor :available_in_new_territories
       attr_accessor :content_rights_declaration
+
+      attr_accessor :available_territories
+      attr_accessor :app_infos
       attr_accessor :app_store_versions
+      attr_accessor :builds
+      attr_accessor :beta_app_review_detail
+      attr_accessor :beta_groups
+      attr_accessor :pre_release_versions
       attr_accessor :prices
+      attr_accessor :review_submissions
 
       # Only available with Apple ID auth
       attr_accessor :distribution_type
@@ -53,8 +61,15 @@ module Spaceship
 
         "contentRightsDeclaration" => "content_rights_declaration",
 
+        "availableTerritories" => "available_territories",
+        "appInfos" => "app_infos",
         "appStoreVersions" => "app_store_versions",
-        "prices" => "prices"
+        "builds" => "builds",
+        "betaAppReviewDetail" => "beta_app_review_detail",
+        "betaGroups" => "beta_groups",
+        "preReleaseVersions" => "pre_release_versions",
+        "prices" => "prices",
+        "reviewSubmissions" => "review_submissions"
       })
 
       ESSENTIAL_INCLUDES = [
