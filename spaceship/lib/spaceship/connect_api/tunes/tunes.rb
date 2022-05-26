@@ -173,10 +173,10 @@ module Spaceship
           end
 
           # Territories
-          territories_data = (territory_ids || []).map do |id|
-            { type: "territories", id: id }
-          end
-          unless territories_data.empty?
+          unless territory_ids.nil?
+            territories_data = (territory_ids).map do |id|
+              { type: "territories", id: id }
+            end
             relationships[:availableTerritories] = {
               data: territories_data
             }
