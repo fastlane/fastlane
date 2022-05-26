@@ -174,7 +174,7 @@ module Spaceship
 
           # Territories
           unless territory_ids.nil?
-            territories_data = (territory_ids).map do |id|
+            territories_data = territory_ids.map do |id|
               { type: "territories", id: id }
             end
             relationships[:availableTerritories] = {
