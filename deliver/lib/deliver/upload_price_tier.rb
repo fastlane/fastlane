@@ -12,7 +12,9 @@ module Deliver
       app = Deliver.cache[:app]
 
       attributes = {}
-      territory_ids = []
+
+      # Check App update method to understand how to use territory_ids.
+      territory_ids = nil # nil won't update app's territory_ids, empty array would remove app from sale.
 
       # As of 2020-09-14:
       # Official App Store Connect does not have an endpoint to get app prices for an app
