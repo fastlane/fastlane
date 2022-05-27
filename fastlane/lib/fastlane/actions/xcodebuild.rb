@@ -267,10 +267,11 @@ module Fastlane
 
         output_result = ""
 
+        override_architecture_prefix = params[:xcodebuild_architecture] ? "arch -#{params[:xcodebuild_architecture]} " : ""
         # In some cases the simulator is not booting up in time
         # One way to solve it is to try to rerun it for one more time
         begin
-          output_result = Actions.sh "set -o pipefail && xcodebuild #{xcodebuild_args} #{pipe_command}"
+          output_result = Actions.sh "set -o pipefail && #{override_architecture_prefix}xcodebuild #{xcodebuild_args} #{pipe_command}"
         rescue => ex
           exit_status = $?.exitstatus
 
@@ -383,8 +384,9 @@ module Fastlane
           ['scheme', 'The scheme to build'],
           ['build_settings', 'Hash of additional build information'],
           ['xcargs', 'Pass additional xcodebuild options'],
-          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
+          ['xcodebuild_architecture', 'Allows to set the architecture that `xcodebuild` is run with, for example to force it to run under Rosetta on an Apple Silicon mac'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
           ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
@@ -437,6 +439,7 @@ module Fastlane
           ['build_settings', 'Hash of additional build information'],
           ['xcargs', 'Pass additional xcodebuild options'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
+          ['xcodebuild_architecture', 'Allows to set the architecture that `xcodebuild` is run with, for example to force it to run under Rosetta on an Apple Silicon mac'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
@@ -529,6 +532,7 @@ module Fastlane
           ['build_settings', 'Hash of additional build information'],
           ['xcargs', 'Pass additional xcodebuild options'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
+          ['xcodebuild_architecture', 'Allows to set the architecture that `xcodebuild` is run with, for example to force it to run under Rosetta on an Apple Silicon mac'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
@@ -571,6 +575,7 @@ module Fastlane
           ['build_settings', 'Hash of additional build information'],
           ['xcargs', 'Pass additional xcodebuild options'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
+          ['xcodebuild_architecture', 'Allows to set the architecture that `xcodebuild` is run with, for example to force it to run under Rosetta on an Apple Silicon mac'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
@@ -621,6 +626,7 @@ module Fastlane
           ['destination_timeout', 'The timeout for connecting to the simulator, in seconds'],
           ['enable_code_coverage', 'Turn code coverage on or off when testing. eg. true|false. Requires Xcode 7+'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
+          ['xcodebuild_architecture', 'Allows to set the architecture that `xcodebuild` is run with, for example to force it to run under Rosetta on an Apple Silicon mac'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
