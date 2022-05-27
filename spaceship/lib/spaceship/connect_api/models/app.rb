@@ -101,6 +101,8 @@ module Spaceship
         return client.get_app(app_id: app_id, includes: includes).first
       end
 
+      # Updates app attributes, price tier and availability of an app in territories
+      # Check Tunes patch_app method for explanation how to use territory_ids parameter to not remove app from sale by mistake
       def update(client: nil, attributes: nil, app_price_tier_id: nil, territory_ids: nil)
         client ||= Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)

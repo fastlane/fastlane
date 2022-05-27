@@ -134,6 +134,11 @@ module Spaceship
           tunes_request_client.post("apps", body)
         end
 
+        # @param territory_ids updates app visibility in regions or countries.
+        #   Possible values:
+        #   empty array will remove app from sale,
+        #   array with territory ids will set availability to territories with those ids,
+        #   nil will leave app availability on AppStore as is
         def patch_app(app_id: nil, attributes: {}, app_price_tier_id: nil, territory_ids: nil)
           relationships = {}
           included = []
