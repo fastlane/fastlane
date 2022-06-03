@@ -424,7 +424,9 @@ module Match
       when :enterprise
         return [
           Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE,
-          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
+          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE
         ]
       when :adhoc
         return [
