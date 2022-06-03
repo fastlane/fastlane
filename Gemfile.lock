@@ -234,7 +234,7 @@ GEM
       binding_of_caller (~> 0.7)
       pry (~> 0.13)
     public_suffix (4.0.6)
-    rack (2.2.3)
+    rack (2.2.3.1)
     rack-protection (2.0.8.1)
       rack
     rainbow (3.0.0)
@@ -391,4 +391,4 @@ DEPENDENCIES
   yard (~> 0.9.11)
 
 BUNDLED WITH
-   2.2.27
+   2.3.14
