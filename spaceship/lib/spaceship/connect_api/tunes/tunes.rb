@@ -134,7 +134,7 @@ module Spaceship
           tunes_request_client.post("apps", body)
         end
 
-        # Updates app attributes, price tier, visibility in regions or countries. 
+        # Updates app attributes, price tier, visibility in regions or countries.
         # Use territory_ids with allow_removing_from_sale to remove app from sale
         # @param territory_ids updates app visibility in regions or countries.
         #   Possible values:
