@@ -102,11 +102,11 @@ module Spaceship
       end
 
       # Updates app attributes, price tier and availability of an app in territories
-      # Check Tunes patch_app method for explanation how to use territory_ids parameter to not remove app from sale by mistake
-      def update(client: nil, attributes: nil, app_price_tier_id: nil, territory_ids: nil)
+      # Check Tunes patch_app method for explanation how to use territory_ids parameter with allow_removing_from_sale to remove app from sale
+      def update(client: nil, attributes: nil, app_price_tier_id: nil, territory_ids: nil, allow_removing_from_sale: false)
         client ||= Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
-        return client.patch_app(app_id: id, attributes: attributes, app_price_tier_id: app_price_tier_id, territory_ids: territory_ids)
+        return client.patch_app(app_id: id, attributes: attributes, app_price_tier_id: app_price_tier_id, territory_ids: territory_ids, allow_removing_from_sale: allow_removing_from_sale)
       end
 
       #
