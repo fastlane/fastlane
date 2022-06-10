@@ -80,7 +80,7 @@ module Fastlane
                                        description: "Path to info plist",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Invalid plist file") unless value.end_with?(".plist")
+                                         UI.user_error!("Invalid plist file") unless value.downcase.end_with?(".plist")
                                        end),
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "FL_UPDATE_PLIST_APP_SCHEME",
