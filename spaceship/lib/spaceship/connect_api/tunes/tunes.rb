@@ -1324,7 +1324,7 @@ module Spaceship
             }
           }
 
-          body.data.attributes = attributes unless attributes.nil?
+          body[:data][:attributes] = attributes unless attributes.nil?
 
           unless template_default_experience_id.nil?
             body[:data][:relationships][:appClipDefaultExperienceTemplate] = {
