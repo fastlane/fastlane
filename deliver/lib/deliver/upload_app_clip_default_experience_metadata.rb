@@ -30,7 +30,7 @@ module Deliver
       if app_clip.nil?
         UI.user_error!("A build with an app clip must be uploaded to App Store Connect before uploading the default experience metadata") if has_options_specified
         # Nothing to do if the app clip is nil and no app clip options specified
-        return if app_clip.nil?
+        return
       end
 
       unless has_options_specified
