@@ -56,6 +56,12 @@ describe Frameit::Device do
     end
 
     describe "valid Android screen sizes" do
+
+      it "should detect Google Pixel 5 in portrait and landscape based on priority" do
+        expect_screen_size_from_file("pixel-portrait{1080x2340}.png", Platform::ANDROID).to eq(Devices::GOOGLE_PIXEL_5)
+        expect_screen_size_from_file("pixel-landscape{2340x1080}.png", Platform::ANDROID).to eq(Devices::GOOGLE_PIXEL_5)
+      end
+
       it "should detect Google Pixel 3 XL in portrait and landscape based on priority" do
         expect_screen_size_from_file("pixel-portrait{1440x2960}.png", Platform::ANDROID).to eq(Devices::GOOGLE_PIXEL_3_XL)
         expect_screen_size_from_file("pixel-landscape{2960x1440}.png", Platform::ANDROID).to eq(Devices::GOOGLE_PIXEL_3_XL)

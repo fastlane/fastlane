@@ -50,6 +50,7 @@ module Frameit
     MIDNIGHT ||= "Midnight"
     STARLIGHT ||= "Starlight"
     SIERRA ||= "Sierra"
+    SORTA_SAGE ||= "Sorta Sage"
 
     def self.all_colors
       Color.constants.map { |c| Color.const_get(c).upcase.gsub(' ', '_') }
@@ -85,6 +86,7 @@ module Frameit
     # Google Pixel 4's priority should be higher than Samsung Galaxy S10+ (priority 8):
     GOOGLE_PIXEL_4 ||= Frameit::Device.new("google-pixel-4", "Google Pixel 4", 9, [[1080, 2280], [2280, 1080]], 444, Color::JUST_BLACK, Platform::ANDROID)
     GOOGLE_PIXEL_4_XL ||= Frameit::Device.new("google-pixel-4-xl", "Google Pixel 4 XL", 9, [[1440, 3040], [3040, 1440]], 537, Color::JUST_BLACK, Platform::ANDROID)
+    GOOGLE_PIXEL_5 ||= Frameit::Device.new("google-pixel-5", "Google Pixel 5", 10, [[1080, 2340], [2340, 1080]], 432, Color::JUST_BLACK, Platform::ANDROID)
     HTC_ONE_A9 ||= Frameit::Device.new("htc-one-a9", "HTC One A9", 6, [[1080, 1920], [1920, 1080]], 441, Color::BLACK, Platform::ANDROID)
     HTC_ONE_M8 ||= Frameit::Device.new("htc-one-m8", "HTC One M8", 3, [[1080, 1920], [1920, 1080]], 441, Color::BLACK, Platform::ANDROID)
     HUAWEI_P8 ||= Frameit::Device.new("huawei-p8", "Huawei P8", 5, [[1080, 1920], [1920, 1080]], 424, Color::BLACK, Platform::ANDROID)
