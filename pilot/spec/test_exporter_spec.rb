@@ -128,7 +128,7 @@ describe Pilot::TesterExporter do
       it "raises an fatal exception with message" do
         expect(UI).to receive(:user_error!).with("You must include an `app_identifier` to `list_testers`")
 
-        fake_tester_exporter.find_app()
+        fake_tester_exporter.find_app
       end
     end
   end
