@@ -73,6 +73,9 @@ describe Match::CommandsGenerator do
   describe ":decrypt option handling" do
     def expect_githelper_clone_with(git_url, shallow_clone, git_branch)
       fake_storage = "fake_storage"
+      fake_working_directory = "fake_working_directory"
+      fake_encryption = "fake_encryption"
+
       expect(Match::Storage::GitStorage).to receive(:configure).with({
         git_url: git_url,
         shallow_clone: shallow_clone,
@@ -81,11 +84,16 @@ describe Match::CommandsGenerator do
       }).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download)
-      allow(fake_storage).to receive(:working_directory).and_return("yolo_path")
+      allow(fake_storage).to receive(:working_directory).and_return(fake_working_directory)
       allow(fake_storage).to receive(:keychain_name).and_return("https://github.com/fastlane/certs")
 
-      expect(FastlaneCore::UI).to receive(:success).with(/Successfully decrypted certificates/)
-      expect(FastlaneCore::UI).to receive(:success).with(/Repo is at/)
+      expect(Match::Encryption).to receive(:for_storage_mode).with("git", {
+        git_url: git_url,
+        working_directory: fake_working_directory
+      }).and_return(fake_encryption)
+
+      expect(fake_encryption).to receive(:decrypt_files)
+      expect(FastlaneCore::UI).to receive(:success).with("Repo is at: '#{fake_working_directory}'")
     end
 
     it "can use the git_url short flag from tool options" do
