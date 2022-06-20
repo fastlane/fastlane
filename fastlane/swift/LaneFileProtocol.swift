@@ -143,6 +143,9 @@ open class LaneFile: NSObject, LaneFileProtocol {
         // Call only on success.
         if !LaneFile.onErrorCalled.contains(lane) {
             fastfileInstance.afterAll(with: lane)
+        } else {
+            log(message: "Error running lane: \(lane) 😥")
+            fatalError("Aborting run due to lane failure")
         }
 
         log(message: "Done running lane: \(lane) 🚀")
