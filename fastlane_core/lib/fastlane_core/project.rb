@@ -342,6 +342,13 @@ module FastlaneCore
         proj << "-disableAutomaticPackageResolution"
       end
 
+      # Xcode13+ xcodebuild command 'without destination param' generates annoying warnings
+      # See: https://github.com/fastlane/fastlane/issues/19579
+      xcode_at_least_13 = FastlaneCore::Helper.xcode_at_least?("13")
+      if xcode_at_least_13 && options[:destination]
+        proj << "-destination #{options[:destination].shellescape}"
+      end
+
       return proj
     end
 
