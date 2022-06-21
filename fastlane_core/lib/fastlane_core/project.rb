@@ -342,13 +342,6 @@ module FastlaneCore
         proj << "-disableAutomaticPackageResolution"
       end
 
-      # Xcode13+ xcodebuild command 'without destination param' generates annoying warnings
-      # See: https://github.com/fastlane/fastlane/issues/19579
-      xcode_at_least_13 = FastlaneCore::Helper.xcode_at_least?("13")
-      if xcode_at_least_13 && options[:destination]
-        proj << "-destination #{options[:destination].shellescape}"
-      end
-
       return proj
     end
 
@@ -363,7 +356,7 @@ module FastlaneCore
       # This xcodebuild bug is fixed in Xcode 8.3 so 'clean' it's not necessary anymore
       # See: https://github.com/fastlane/fastlane/pull/5626
       if FastlaneCore::Helper.xcode_at_least?('8.3')
-        command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+        command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}#{build_xcodebuild_destination}"
       else
         command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
       end
@@ -372,8 +365,24 @@ module FastlaneCore
 
     def build_xcodebuild_resolvepackagedependencies_command
       return nil if options[:skip_package_dependencies_resolution]
-      command = "xcodebuild -resolvePackageDependencies #{xcodebuild_parameters.join(' ')}"
+      command = "xcodebuild -resolvePackageDependencies #{xcodebuild_parameters.join(' ')}#{build_xcodebuild_destination}"
       command
+    end
+
+    def build_xcodebuild_destination
+      # Xcode13+ xcodebuild command 'without destination param' generates annoying warnings
+      # See: https://github.com/fastlane/fastlane/issues/19579
+      destination = ""
+      xcode_at_least_13 = FastlaneCore::Helper.xcode_at_least?("13")
+      if xcode_at_least_13 && options[:destination]
+        begin
+          destination = " " + "-destination #{options[:destination].shellescape}"
+        rescue=> ex
+          # we really don't care about destination warnings if something goes wrong with shellescape
+          UI.important("Failed to set destination for xcodebuild command: #{ex}")
+        end
+      end
+      destination
     end
 
     # Get the build settings for our project
