@@ -328,6 +328,7 @@ describe FastlaneCore do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
         command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
         expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
@@ -338,6 +339,7 @@ describe FastlaneCore do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(false)
         command = "xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
         expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
@@ -565,6 +567,7 @@ describe FastlaneCore do
       it 'build_settings() should not add SPM path if Xcode < 11' do
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
+        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           cloned_source_packages_path: "./path/to/resolve"
