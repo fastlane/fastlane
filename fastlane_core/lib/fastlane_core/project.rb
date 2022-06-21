@@ -377,7 +377,7 @@ module FastlaneCore
       if xcode_at_least_13 && options[:destination]
         begin
           destination = " " + "-destination #{options[:destination].shellescape}"
-        rescue=> ex
+        rescue => ex
           # we really don't care about destination warnings if something goes wrong with shellescape
           UI.important("Failed to set destination for xcodebuild command: #{ex}")
         end
