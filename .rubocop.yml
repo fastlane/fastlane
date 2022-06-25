@@ -8,7 +8,7 @@ require:
   - ./rubocop/is_string_usage.rb
 
 AllCops:
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 2.6
   NewCops: enable
   Include:
     - '**/*.rb'
@@ -23,6 +23,12 @@ AllCops:
     - '**/lib/assets/MatchfileTemplate'
     - '**/spec/fixtures/broken_files/broken_file.rb'
     - '**/*.provisionprofile'
+
+Lint/ErbNewArguments:
+  Enabled: false
+
+Style/SlicingWithRange:
+  Enabled: false
 
 Style/MultipleComparison:
   Enabled: false
