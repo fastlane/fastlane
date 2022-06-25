@@ -66,7 +66,7 @@ module Spaceship
 
       def to_json(*options)
         instance_variables.map do |var|
-          [var.to_s[1..-1], instance_variable_get(var)]
+          [var.to_s[1..], instance_variable_get(var)]
         end.to_h.to_json(*options)
       end
     end

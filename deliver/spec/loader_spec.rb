@@ -75,7 +75,7 @@ describe Deliver::Loader do
       # Add a file with a lang code
       File.open(File.join(@root, @languages.first), 'w') { |f| f << 'touch' }
       # Create dirs for all the other codes
-      @languages[1..-1].each.with_index do |lang, index|
+      @languages[1..].each.with_index do |lang, index|
         FileUtils.mkdir(File.join(@root, (index.even? ? lang : lang.downcase)))
       end
     end
@@ -91,7 +91,7 @@ describe Deliver::Loader do
       @folders = Deliver::Loader.language_folders(@root, true)
 
       expect(@folders.size).not_to(eq(0))
-      expected_languages = @languages[1..-1].map(&:downcase).sort
+      expected_languages = @languages[1..].map(&:downcase).sort
       actual_languages = @folders.map(&:basename).map(&:downcase).sort
       expect(actual_languages).to eq(expected_languages)
     end

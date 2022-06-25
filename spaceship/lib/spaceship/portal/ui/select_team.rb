@@ -33,14 +33,14 @@ module Spaceship
 
       # rubocop:disable Require/MissingRequireStatement
       def self.ci?
-        if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("Helper")
+        if Object.const_defined?(:FastlaneCore) && FastlaneCore.const_defined?(:Helper)
           return FastlaneCore::Helper.ci?
         end
         return false
       end
 
       def self.interactive?
-        if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("UI")
+        if Object.const_defined?(:FastlaneCore) && FastlaneCore.const_defined?(:UI)
           return FastlaneCore::UI.interactive?
         end
         return true

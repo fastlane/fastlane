@@ -140,7 +140,7 @@ module Match
       def decrypt_specific_file(path: nil, password: nil, hash_algorithm: "MD5")
         stored_data = Base64.decode64(File.read(path))
         salt = stored_data[8..15]
-        data_to_decrypt = stored_data[16..-1]
+        data_to_decrypt = stored_data[16..]
 
         decipher = ::OpenSSL::Cipher.new('AES-256-CBC')
         decipher.decrypt

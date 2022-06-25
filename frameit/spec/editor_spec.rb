@@ -68,7 +68,7 @@ describe Frameit do
 
           expect(Frameit::StringsParser).to receive(:parse).and_call_original
 
-          text = editor.send("fetch_text", "title-same-dir")
+          text = editor.send(:fetch_text, "title-same-dir")
           expect(text).to eq("Screen1 Title - same dir")
         end
 
@@ -83,7 +83,7 @@ describe Frameit do
 
           expect(Frameit::StringsParser).to receive(:parse).and_call_original
 
-          text = editor.send("fetch_text", "title-1-up")
+          text = editor.send(:fetch_text, "title-1-up")
           expect(text).to eq("Screen1 Title - 1 dir up")
         end
 
@@ -98,7 +98,7 @@ describe Frameit do
 
           expect(Frameit::StringsParser).to receive(:parse).and_call_original
 
-          text = editor.send("fetch_text", "title-2-up")
+          text = editor.send(:fetch_text, "title-2-up")
           expect(text).to eq("Screen1 Title - 2 dir up")
         end
       end

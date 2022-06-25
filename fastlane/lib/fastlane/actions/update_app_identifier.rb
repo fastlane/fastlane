@@ -91,7 +91,7 @@ module Fastlane
                                        env_name: "FL_UPDATE_APP_IDENTIFIER_PLIST_PATH",
                                        description: "Path to info plist, relative to your Xcode project",
                                        verify_block: proc do |value|
-                                         UI.user_error!("Invalid plist file") unless value[-6..-1].casecmp(".plist").zero?
+                                         UI.user_error!("Invalid plist file") unless value[-6..].casecmp(".plist").zero?
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        env_name: 'FL_UPDATE_APP_IDENTIFIER',

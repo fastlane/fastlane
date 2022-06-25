@@ -1,4 +1,4 @@
-unless Object.const_defined?("Faraday")
+unless Object.const_defined?(:Faraday)
   # We create these empty error classes if we didn't require Faraday
   # so that we can use it in the rescue block below even if we didn't
   # require Faraday or didn't use it
@@ -10,7 +10,7 @@ unless Object.const_defined?("Faraday")
   end
 end
 
-unless Object.const_defined?("OpenSSL")
+unless Object.const_defined?(:OpenSSL)
   module OpenSSL
     module SSL
       class SSLError < StandardError; end

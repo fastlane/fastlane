@@ -82,7 +82,7 @@ describe Deliver::UploadMetadata do
 
       it "skips review information with empty app_review_information" do
         expect(FastlaneCore::UI).not_to receive(:message).with("Uploading app review information to App Store Connect")
-        uploader.send("set_review_information", version, { app_review_information: {} })
+        uploader.send(:set_review_information, version, { app_review_information: {} })
       end
 
       it "successfully set review information" do
@@ -100,7 +100,7 @@ describe Deliver::UploadMetadata do
 
         expect(FastlaneCore::UI).to receive(:message).with("Uploading app review information to App Store Connect")
 
-        uploader.send("set_review_information", version, options)
+        uploader.send(:set_review_information, version, options)
       end
     end
 
@@ -116,7 +116,7 @@ describe Deliver::UploadMetadata do
             "demo_account_required" => true
           })
 
-          uploader.send("set_review_information", version, options)
+          uploader.send(:set_review_information, version, options)
         end
       end
 
@@ -129,7 +129,7 @@ describe Deliver::UploadMetadata do
             "demo_account_required" => false
           })
 
-          uploader.send("set_review_information", version, options)
+          uploader.send(:set_review_information, version, options)
         end
       end
 
@@ -142,7 +142,7 @@ describe Deliver::UploadMetadata do
             "demo_account_required" => false
           })
 
-          uploader.send("set_review_information", version, options)
+          uploader.send(:set_review_information, version, options)
         end
       end
     end

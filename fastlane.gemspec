@@ -62,7 +62,7 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "https://github.com/fastlane/fastlane"
   }
 
-  spec.required_ruby_version = '>= 2.5'
+  spec.required_ruby_version = '>= 2.6'
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
@@ -70,8 +70,6 @@ Gem::Specification.new do |spec|
 
   # spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = Dir["*/lib"]
-
-  spec.add_dependency('signet', '< 0.17') # Needed becuase Ruby 2.5 only support until 0.16
 
   spec.add_dependency('xcodeproj', '>= 1.13.0', '< 2.0.0') # Modify Xcode projects
   spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output

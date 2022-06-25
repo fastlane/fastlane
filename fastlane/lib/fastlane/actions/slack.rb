@@ -63,7 +63,7 @@ module Fastlane
         def self.trim_message(message)
           # We want the last 7000 characters, instead of the first 7000, as the error is at the bottom
           start_index = [message.length - 7000, 0].max
-          message = message[start_index..-1]
+          message = message[start_index..]
           # We want line breaks to be shown on slack output so we replace
           # input non-interpreted line break with interpreted line break
           message.gsub('\n', "\n")

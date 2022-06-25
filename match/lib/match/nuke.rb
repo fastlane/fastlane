@@ -291,7 +291,7 @@ module Match
 
       if self.files.count > 0
         rows = self.files.collect do |f|
-          components = f.split(File::SEPARATOR)[-3..-1]
+          components = f.split(File::SEPARATOR)[-3..]
 
           # from "...1o7xtmh/certs/distribution/8K38XUY3AY.cer" to "distribution cert"
           file_type = components[0..1].reverse.join(" ")[0..-2]
