@@ -203,10 +203,6 @@ jobs:
       - *cache_restore_bundler
 
       - run:
-          name: Install Python
-          command: |
-            brew install python@3.8
-      - run:
           name: Setup Build
           command: |
             gem update --system
@@ -286,7 +282,7 @@ workflows:
           ruby_version: '2.7'
       - validate_documentation:
           name: 'Validate Documentation'
-          ruby_version: 'circleci/ruby:2.6'
+          ruby_version: 'fastlanetools/ci:0.3.0'
       - lint_source_code:
           name: 'Lint source code'
           ruby_version: 'circleci/ruby:2.6'
