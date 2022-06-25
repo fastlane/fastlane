@@ -203,6 +203,10 @@ jobs:
       - *cache_restore_bundler
 
       - run:
+          name: Install Python
+          command: |
+            brew install python@3.8
+      - run:
           name: Setup Build
           command: |
             gem update --system
