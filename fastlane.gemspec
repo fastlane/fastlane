@@ -71,6 +71,13 @@ Gem::Specification.new do |spec|
   # spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = Dir["*/lib"]
 
+  # need to lock signet 0.16 and under when using less than Ruby 2.5 to prevent install issues when using 'gem install'
+  # 'gem install' does not respect Ruby versions and would try installing 0.17 on Ruby 2.5
+  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.6')
+    spec.add_dependency('signet', '<= 0.16')
+    STDERR.puts("WARNING: Locking to a potentially insecure version of 'signet' because you are using a version of Ruby which is marked as End-Of-Life. Please upgrade your Ruby installation to 2.6 or later")
+  end
+
   spec.add_dependency('xcodeproj', '>= 1.13.0', '< 2.0.0') # Modify Xcode projects
   spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output
   spec.add_dependency('terminal-notifier', '>= 2.0.0', '< 3.0.0') # macOS notifications
