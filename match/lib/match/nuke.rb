@@ -422,12 +422,22 @@ module Match
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
         ]
       when :enterprise
-        return [
+        profiles = [
           Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE,
-          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE,
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE,
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE
+          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
         ]
+
+        # As of 2022-06-25, only available with Apple ID auth
+        if Spaceship::ConnectAPI.token
+          UI.important("Skipping #{Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE} and #{Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE}... only available with Apple ID auth")
+        else
+          profiles += [
+            Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE,
+            Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE
+          ]
+        end
+
+        return profiles
       when :adhoc
         return [
           Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC,
