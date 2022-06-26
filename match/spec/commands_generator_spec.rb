@@ -107,6 +107,30 @@ describe Match::CommandsGenerator do
     end
   end
 
+  describe ":import option handling" do
+    let(:fake_match_importer) { double("fake match_importer") }
+
+    before(:each) do
+      allow(Match::Importer).to receive(:new).and_return(fake_match_importer)
+    end
+
+    def expect_import_with(expected_options)
+      expect(fake_match_importer).to receive(:import_cert) do |actual_options|
+        expect(actual_options._values).to eq(expected_options._values)
+      end
+    end
+
+    it "can use the git_url short flag from tool options" do
+      stub_commander_runner_args(['import', '-r', 'git@github.com:you/your_repo.git'])
+
+      expected_options = FastlaneCore::Configuration.create(available_options, { git_url: 'git@github.com:you/your_repo.git' })
+
+      expect_import_with(expected_options)
+
+      Match::CommandsGenerator.start
+    end
+  end
+
   def expect_nuke_run_with(expected_options, type)
     fake_nuke = "nuke"
     expect(Match::Nuke).to receive(:new).and_return(fake_nuke)
