@@ -591,6 +591,100 @@ describe FastlaneCore do
       end
     end
 
+    describe "xcodebuild destination parameter" do
+      context "when xcode version is at_least 13" do
+        before(:each) do
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(true)
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(true)
+        end
+
+        context "when destination parameter is provided in options" do
+          it 'generates an xcodebuild -showBuildSettings command that includes destination', requires_xcode: true do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: "name=iPhone 13 Pro Max"
+            })
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination name\\=iPhone\\ 13\\ Pro\\ Max"
+            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+          end
+
+          it 'generates an xcodebuild -resolvePackageDependencies command that includes destination' do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: "name=iPhone 13 Pro Max"
+              })
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination name\\=iPhone\\ 13\\ Pro\\ Max"
+            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+          end
+        end
+
+        context "when destination parameter is not provided in options" do
+          it 'generates an xcodebuild -showBuildSettings command that does not include destination', requires_xcode: true do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            })
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+          end
+
+          it 'generates an xcodebuild -resolvePackageDependencies command that does not include destination' do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+              })
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+          end
+        end
+      end
+
+      context "when xcode version is less than 13" do
+        before(:each) do
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(true)
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
+        end
+
+        context "when destination parameter is provided in options" do
+          it 'generates an xcodebuild -showBuildSettings command that does not include destination', requires_xcode: true do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: "name=iPhone 13 Pro Max"
+            })
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+          end
+
+          it 'generates an xcodebuild -resolvePackageDependencies command that does not include destination' do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: "name=iPhone 13 Pro Max"
+              })
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+          end
+        end
+
+        context "when destination parameter is not provided in options" do
+          it 'generates an xcodebuild -showBuildSettings command that does not include destination', requires_xcode: true do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            })
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+          end
+
+          it 'generates an xcodebuild -resolvePackageDependencies command that does not include destination' do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+              })
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+          end
+        end
+      end
+    end
+
     describe "#project_paths" do
       it "works with basic projects" do
         project = FastlaneCore::Project.new({

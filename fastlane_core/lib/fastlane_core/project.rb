@@ -356,7 +356,7 @@ module FastlaneCore
       # This xcodebuild bug is fixed in Xcode 8.3 so 'clean' it's not necessary anymore
       # See: https://github.com/fastlane/fastlane/pull/5626
       if FastlaneCore::Helper.xcode_at_least?('8.3')
-        command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}#{build_xcodebuild_destination}"
+        command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}#{xcodebuild_destination_parameter}"
       else
         command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
       end
@@ -365,24 +365,25 @@ module FastlaneCore
 
     def build_xcodebuild_resolvepackagedependencies_command
       return nil if options[:skip_package_dependencies_resolution]
-      command = "xcodebuild -resolvePackageDependencies #{xcodebuild_parameters.join(' ')}#{build_xcodebuild_destination}"
+      command = "xcodebuild -resolvePackageDependencies #{xcodebuild_parameters.join(' ')}#{xcodebuild_destination_parameter}"
       command
     end
 
-    def build_xcodebuild_destination
-      # Xcode13+ xcodebuild command 'without destination param' generates annoying warnings
+    def xcodebuild_destination_parameter
+      # Xcode13+ xcodebuild command 'without destination parameter' generates annoying warnings
       # See: https://github.com/fastlane/fastlane/issues/19579
-      destination = ""
+      destination_parameter = ""
       xcode_at_least_13 = FastlaneCore::Helper.xcode_at_least?("13")
       if xcode_at_least_13 && options[:destination]
         begin
-          destination = " " + "-destination #{options[:destination].shellescape}"
+          destination_parameter = " " + "-destination #{options[:destination].shellescape}"
         rescue => ex
-          # we really don't care about destination warnings if something goes wrong with shellescape
-          UI.important("Failed to set destination for xcodebuild command: #{ex}")
+          # xcodebuild command can continue without destination parameter, so
+          # we really don't care about this exception if something goes wrong with shellescape
+          UI.important("Failed to set destination parameter for xcodebuild command: #{ex}")
         end
       end
-      destination
+      destination_parameter
     end
 
     # Get the build settings for our project
