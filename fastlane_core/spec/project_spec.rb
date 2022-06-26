@@ -603,18 +603,18 @@ describe FastlaneCore do
           it 'generates an xcodebuild -showBuildSettings command that includes destination', requires_xcode: true do
             project = FastlaneCore::Project.new({
               project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-              destination: "name=iPhone 13 Pro Max"
+              destination: "FakeDestination"
             })
-            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination name\\=iPhone\\ 13\\ Pro\\ Max"
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination FakeDestination"
             expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
           end
 
           it 'generates an xcodebuild -resolvePackageDependencies command that includes destination' do
             project = FastlaneCore::Project.new({
               project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-              destination: "name=iPhone 13 Pro Max"
+              destination: "FakeDestination"
               })
-            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination name\\=iPhone\\ 13\\ Pro\\ Max"
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination FakeDestination"
             expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
           end
         end
@@ -649,7 +649,7 @@ describe FastlaneCore do
           it 'generates an xcodebuild -showBuildSettings command that does not include destination', requires_xcode: true do
             project = FastlaneCore::Project.new({
               project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-              destination: "name=iPhone 13 Pro Max"
+              destination: "FakeDestination"
             })
             command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
             expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
@@ -658,7 +658,7 @@ describe FastlaneCore do
           it 'generates an xcodebuild -resolvePackageDependencies command that does not include destination' do
             project = FastlaneCore::Project.new({
               project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-              destination: "name=iPhone 13 Pro Max"
+              destination: "FakeDestination"
               })
             command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
             expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
