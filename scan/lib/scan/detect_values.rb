@@ -209,6 +209,12 @@ module Scan
 
     def self.detect_destination
       if Scan.config[:destination]
+        # No need to show below warnings message(s) for xcode13+, because
+        # Apple recommended to have destination in all xcodebuild commands
+        # otherwise, Apple will generate warnings in console logs
+        # see: https://github.com/fastlane/fastlane/issues/19579
+        return if Helper.xcode_at_least?("13.0")
+
         UI.important("It's not recommended to set the `destination` value directly")
         UI.important("Instead use the other options available in `fastlane scan --help`")
         UI.important("Using your value '#{Scan.config[:destination]}' for now")
