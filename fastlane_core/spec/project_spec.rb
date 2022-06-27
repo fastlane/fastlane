@@ -328,6 +328,7 @@ describe FastlaneCore do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
         command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
         expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
@@ -338,6 +339,7 @@ describe FastlaneCore do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(false)
         command = "xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
         expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
@@ -565,6 +567,7 @@ describe FastlaneCore do
       it 'build_settings() should not add SPM path if Xcode < 11' do
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
+        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           cloned_source_packages_path: "./path/to/resolve"
@@ -585,6 +588,100 @@ describe FastlaneCore do
         project = FastlaneCore::Project.new(config)
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to_not(be_nil)
         expect { project.build_xcodebuild_resolvepackagedependencies_command }.to_not(raise_error)
+      end
+    end
+
+    describe "xcodebuild destination parameter" do
+      context "when xcode version is at_least 13" do
+        before(:each) do
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(true)
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(true)
+        end
+
+        context "when destination parameter is provided in options" do
+          it 'generates an xcodebuild -showBuildSettings command that includes destination', requires_xcode: true do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: "FakeDestination"
+            })
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination FakeDestination"
+            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+          end
+
+          it 'generates an xcodebuild -resolvePackageDependencies command that includes destination' do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: "FakeDestination"
+              })
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination FakeDestination"
+            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+          end
+        end
+
+        context "when destination parameter is not provided in options" do
+          it 'generates an xcodebuild -showBuildSettings command that does not include destination', requires_xcode: true do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            })
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+          end
+
+          it 'generates an xcodebuild -resolvePackageDependencies command that does not include destination' do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+              })
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+          end
+        end
+      end
+
+      context "when xcode version is less than 13" do
+        before(:each) do
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(true)
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
+        end
+
+        context "when destination parameter is provided in options" do
+          it 'generates an xcodebuild -showBuildSettings command that does not include destination', requires_xcode: true do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: "FakeDestination"
+            })
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+          end
+
+          it 'generates an xcodebuild -resolvePackageDependencies command that does not include destination' do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: "FakeDestination"
+              })
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+          end
+        end
+
+        context "when destination parameter is not provided in options" do
+          it 'generates an xcodebuild -showBuildSettings command that does not include destination', requires_xcode: true do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            })
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+          end
+
+          it 'generates an xcodebuild -resolvePackageDependencies command that does not include destination' do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+              })
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+          end
+        end
       end
     end
 

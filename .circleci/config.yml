@@ -255,10 +255,6 @@ workflows:
   build:
     jobs:
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 11.7.0, Ruby 2.5)'
-          xcode_version: '11.7.0'
-          ruby_version: '2.5'
-      - tests_macos:
           name: 'Execute tests on macOS (Xcode 11.7.0, Ruby 2.6)'
           xcode_version: '11.7.0'
           ruby_version: '2.6'
@@ -286,10 +282,10 @@ workflows:
           ruby_version: '2.7'
       - validate_documentation:
           name: 'Validate Documentation'
-          ruby_version: 'circleci/ruby:2.5'
+          ruby_version: 'fastlanetools/ci:0.3.0'
       - lint_source_code:
           name: 'Lint source code'
-          ruby_version: 'circleci/ruby:2.5'
+          ruby_version: 'circleci/ruby:2.6'
       - modules_load_up_tests:
           name: 'Modules load up tests'
-          ruby_version: 'circleci/ruby:2.5'
+          ruby_version: 'circleci/ruby:2.6'

@@ -132,6 +132,7 @@ module Snapshot
         'iPad Pro (12.9-inch)' => 'iPad Pro (12.9-inch)',
         'iPad Pro (12.9 inch)' => 'iPad Pro (12.9-inch)', # iOS 10.3.1 simulator
         'iPad Pro' => 'iPad Pro (12.9-inch)', # iOS 9.3 simulator
+        'iPod touch (7th generation)' => 'iPod touch (7th generation)',
         'Apple TV 1080p' => 'Apple TV',
         'Apple TV 4K (at 1080p)' => 'Apple TV 4K (at 1080p)',
         'Apple TV 4K' => 'Apple TV 4K',
