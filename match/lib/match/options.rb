@@ -223,6 +223,12 @@ module Match
                                      description: "Prefix to be used on all objects uploaded to S3",
                                      optional: true),
 
+        # Storage: GitLab Secure Files
+        FastlaneCore::ConfigItem.new(key: :gitlab_project,
+                                     env_name: "GITLAB_PROJECT",
+                                     description: "GitLab Project Path (i.e. 'gitlab-org/gitlab')",
+                                     optional: true),
+
         # Keychain
         FastlaneCore::ConfigItem.new(key: :keychain_name,
                                      short_option: "-s",

@@ -55,6 +55,7 @@ module Match
         s3_secret_access_key: params[:s3_secret_access_key].to_s,
         s3_bucket: params[:s3_bucket].to_s,
         s3_object_prefix: params[:s3_object_prefix].to_s,
+        gitlab_project: params[:gitlab_project],
         team_id: params[:team_id] || Spaceship::ConnectAPI.client.portal_team_id
       })
       self.storage.download
