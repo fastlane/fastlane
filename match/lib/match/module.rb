@@ -9,7 +9,7 @@ module Match
   DESCRIPTION = "Easily sync your certificates and profiles across your team"
 
   def self.environments
-    return %w(appstore adhoc development enterprise developer_id mac_installer_distribution)
+    return %w(appstore adhoc development enterprise developer_id mac_installer_distribution developer_id_kext)
   end
 
   def self.storage_modes
@@ -25,6 +25,7 @@ module Match
     return :mac_installer_distribution if type == "mac_installer_distribution"
     return :developer_id_installer if type == "developer_id_installer"
     return :developer_id_application if type == "developer_id"
+    return :developer_id_kext if type == "developer_id_kext"
     return :enterprise if type == "enterprise"
     return :development if type == "development"
     return :distribution if ["adhoc", "appstore", "distribution"].include?(type)

@@ -30,6 +30,16 @@ describe Match do
       }
     end
 
+    def developer_id_kext_test_values
+      {
+        app_identifier: "tools.fastlane.app",
+        type: "developer_id_kext",
+        git_url: "https://github.com/fastlane/fastlane/tree/master/certificates",
+        shallow_clone: true,
+        username: "flapple@something.com"
+      }
+    end
+
     before do
       allow(mock_cert).to receive(:id).and_return("123456789")
       allow(mock_cert).to receive(:certificate_content).and_return(Base64.strict_encode64(File.binread(cert_path)))
@@ -112,6 +122,25 @@ describe Match do
       )
 
       Match::Importer.new.import_cert(developer_id_config, cert_path: cert_path, p12_path: p12_path)
+    end
+
+    it "imports a .cert and .p12 when the type is set to developer_id_kext" do
+      repo_dir = Dir.mktmpdir
+      developer_id_kext_config = FastlaneCore::Configuration.create(Match::Options.available_options, developer_id_kext_test_values)
+
+      setup_fake_storage(repo_dir, developer_id_kext_config)
+
+      expect(UI).to receive(:input).and_return("")
+      expect(Spaceship::ConnectAPI).to receive(:login)
+      expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
+      expect(fake_storage).to receive(:save_changes!).with(
+        files_to_commit: [
+          File.join(repo_dir, "certs", "developer_id_kext", "#{mock_cert.id}.cer"),
+          File.join(repo_dir, "certs", "developer_id_kext", "#{mock_cert.id}.p12")
+        ]
+      )
+
+      Match::Importer.new.import_cert(developer_id_kext_config, cert_path: cert_path, p12_path: p12_path)
     end
 
     def setup_fake_storage(repo_dir, config)

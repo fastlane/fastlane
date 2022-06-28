@@ -144,7 +144,7 @@ module Match
 
       prov_types = []
       prov_types = [:development] if cert_type == :development
-      prov_types = [:appstore, :adhoc, :developer_id] if cert_type == :distribution
+      prov_types = [:appstore, :adhoc, :developer_id, :developer_id_kext] if cert_type == :distribution
       prov_types = [:enterprise] if cert_type == :enterprise
 
       # Get all iOS and macOS profile
@@ -437,6 +437,11 @@ module Match
         return [
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT,
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
+        ]
+      when :developer_id_kext
+        return [
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT_KEXT,
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT_KEXT
         ]
       else
         raise "Unknown provisioning type '#{prov_type}'"

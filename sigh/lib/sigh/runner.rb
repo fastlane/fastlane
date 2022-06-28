@@ -84,10 +84,12 @@ module Sigh
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT if Sigh.config[:development]
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT if Sigh.config[:developer_id]
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT_KEXT if Sigh.config[:developer_id_kext]
       when "catalyst"
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT if Sigh.config[:development]
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT if Sigh.config[:developer_id]
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT_KEXT if Sigh.config[:developer_id_kext]
       end
 
       @profile_type
@@ -208,6 +210,7 @@ module Sigh
       return Spaceship::ConnectAPI::Certificate.all(filter: filter)
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
     def certificates_for_profile_and_platform
       types = []
 
@@ -254,6 +257,10 @@ module Sigh
             Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION,
             Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2
           ]
+        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT_KEXT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT_KEXT
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_KEXT
+          ]
         else
           types = [
             Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION,
@@ -264,6 +271,7 @@ module Sigh
 
       fetch_certificates(types)
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def devices_to_use
       # Only use devices if development or adhoc

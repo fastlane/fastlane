@@ -35,12 +35,14 @@ describe Sigh do
         "macos" => {
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE => { in_house: false, options: { platform: "macos" } },
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT => { in_house: false, options: { platform: "macos", development: true } },
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT => { in_house: false, options: { platform: "macos", developer_id: true } }
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT => { in_house: false, options: { platform: "macos", developer_id: true } },
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT_KEXT => { in_house: false, options: { platform: "macos", developer_id_kext: true } }
         },
         "catalyst" => {
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE => { in_house: false, options: { platform: "catalyst" } },
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT => { in_house: false, options: { platform: "catalyst", development: true } },
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT => { in_house: false, options: { platform: "catalyst", developer_id: true } }
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT => { in_house: false, options: { platform: "catalyst", developer_id: true } },
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT_KEXT => { in_house: false, options: { platform: "catalyst", developer_id_kext: true } }
         }
       }
 
@@ -193,9 +195,11 @@ describe Sigh do
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE => "AppStore",
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT => "Development",
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT => "Direct",
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT_KEXT => "DirectKext",
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE => "AppStore",
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT => "Development",
-        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT => "Direct"
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT => "Direct",
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT_KEXT => "DirectKext"
       }
 
       # Creates test for each profile type

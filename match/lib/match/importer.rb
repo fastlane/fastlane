@@ -76,6 +76,10 @@ module Match
           Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION,
           Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2
         ].join(',')
+      when :developer_id_kext
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_KEXT
+        ].join(',')
       when :mac_installer_distribution
         certificate_type = [
           Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION

@@ -44,6 +44,7 @@ module Spaceship
         MAC_APP_DEVELOPMENT = "MAC_APP_DEVELOPMENT"
         MAC_APP_STORE = "MAC_APP_STORE"
         MAC_APP_DIRECT = "MAC_APP_DIRECT"
+        MAC_APP_DIRECT_KEXT = "MAC_APP_DIRECT_KEXT"
         TVOS_APP_DEVELOPMENT = "TVOS_APP_DEVELOPMENT"
         TVOS_APP_STORE = "TVOS_APP_STORE"
         TVOS_APP_ADHOC = "TVOS_APP_ADHOC"
@@ -51,6 +52,7 @@ module Spaceship
         MAC_CATALYST_APP_DEVELOPMENT = "MAC_CATALYST_APP_DEVELOPMENT"
         MAC_CATALYST_APP_STORE = "MAC_CATALYST_APP_STORE"
         MAC_CATALYST_APP_DIRECT = "MAC_CATALYST_APP_DIRECT"
+        MAC_CATALYST_APP_DIRECT_KEXT = "MAC_CATALYST_APP_DIRECT_KEXT"
       end
 
       def self.type
@@ -72,6 +74,14 @@ module Spaceship
       end
 
       def self.create(client: nil, name: nil, profile_type: nil, bundle_id_id: nil, certificate_ids: nil, device_ids: nil, template_name: nil)
+        # map direct_kext to direct
+        case profile_type
+        when ProfileType::MAC_APP_DIRECT_KEXT
+          profile_type = ProfileType::MAC_APP_DIRECT
+        when ProfileType::MAC_CATALYST_APP_DIRECT_KEXT
+          profile_type = ProfileType::MAC_CATALYST_APP_DIRECT
+        end
+      
         client ||= Spaceship::ConnectAPI
         resp = client.post_profiles(
           bundle_id_id: bundle_id_id,

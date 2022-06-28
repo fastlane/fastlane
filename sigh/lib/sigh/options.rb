@@ -14,7 +14,7 @@ module Sigh
                                      description: "Setting this flag will generate AdHoc profiles instead of App Store Profiles",
                                      is_string: false,
                                      default_value: false,
-                                     conflicting_options: [:developer_id, :development],
+                                     conflicting_options: [:developer_id, :developer_id_kext, :development],
                                      conflict_block: proc do |option|
                                        UI.user_error!("You can't enable both :#{option.key} and :adhoc")
                                      end),
@@ -23,16 +23,25 @@ module Sigh
                                      description: "Setting this flag will generate Developer ID profiles instead of App Store Profiles",
                                      is_string: false,
                                      default_value: false,
-                                     conflicting_options: [:adhoc, :development],
+                                     conflicting_options: [:adhoc, :developer_id_kext, :development],
                                      conflict_block: proc do |option|
                                        UI.user_error!("You can't enable both :#{option.key} and :developer_id")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :developer_id_kext,
+                                     env_name: "SIGH_DEVELOPER_ID_KEXT",
+                                     description: "Setting this flag will generate Developer ID Application and Kernel Extension profiles instead of App Store Profiles",
+                                     is_string: false,
+                                     default_value: false,
+                                     conflicting_options: [:adhoc, :developer_id, :development],
+                                     conflict_block: proc do |option|
+                                       UI.user_error!("You can't enable both :#{option.key} and :developer_id_kext")
                                      end),
         FastlaneCore::ConfigItem.new(key: :development,
                                      env_name: "SIGH_DEVELOPMENT",
                                      description: "Renew the development certificate instead of the production one",
                                      is_string: false,
                                      default_value: false,
-                                     conflicting_options: [:adhoc, :developer_id],
+                                     conflicting_options: [:adhoc, :developer_id, :developer_id_kext],
                                      conflict_block: proc do |option|
                                        UI.user_error!("You can't enable both :#{option.key} and :development")
                                      end),

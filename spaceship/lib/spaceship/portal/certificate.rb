@@ -119,6 +119,9 @@ module Spaceship
       # A Mac Developer ID signing certificate for building .pkg installers
       class DeveloperIdInstaller < Certificate; end
 
+      # A Mac Developer ID signing certificate for building .kext bundles
+      class DeveloperIdKext < Certificate; end
+
       #####################################################
       # Certs that are specific for one app
       #####################################################
@@ -196,7 +199,7 @@ module Spaceship
         "W0EURJRMC5" => DeveloperIdApplication,
         "CDZ7EMXIZ1" => MacProductionPush,
         "HQ4KP3I34R" => MacDevelopmentPush,
-        "DIVN2GW3XT" => DeveloperIdApplication
+        "DIVN2GW3XT" => DeveloperIdKext
       }
 
       CERTIFICATE_TYPE_IDS = APPLE_CERTIFICATE_TYPE_IDS

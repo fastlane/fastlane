@@ -10,7 +10,7 @@ module Match
       output_path = File.join(working_directory, "certs", cert_type.to_s)
 
       # Mapping match option to cert option for "Developer ID Application"
-      if cert_type.to_sym == :developer_id_application
+      if cert_type.to_sym == :developer_id_application || cert_type.to_sym == :developer_id_kext
         specific_cert_type = cert_type.to_s
       end
 
@@ -97,6 +97,8 @@ module Match
       # These options are all conflicting so can only set one
       if params[:type] == "developer_id"
         values[:developer_id] = true
+      elsif params[:type] == "developer_id_kext"
+        values[:developer_id_kext] = true
       elsif prov_type == :adhoc
         values[:adhoc] = true
       elsif prov_type == :development
@@ -113,6 +115,7 @@ module Match
     # @return the name of the provisioning profile type
     def self.profile_type_name(type)
       return "Direct" if type == :developer_id
+      return "DirectKext" if type == :developer_id_kext
       return "Development" if type == :development
       return "AdHoc" if type == :adhoc
       return "AppStore" if type == :appstore
