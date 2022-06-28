@@ -1,5 +1,3 @@
-require 'pry'
-
 describe Match do
   describe Match::Storage::GitLabSecureFiles do
     subject { described_class.new(api_v4_url: 'https://example.com/api', private_token: 'abc123', project_id: 'fake-project') }

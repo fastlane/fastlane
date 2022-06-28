@@ -30,7 +30,9 @@ describe Match do
         expect(client.authentication_key).to eq('PRIVATE-TOKEN')      
       end
 
-      it 'returns the job_token header key if both job_token and private_token are defined' do
+      it 'returns the job_token header key if both job_token and private_token are defined, and prints a warning to the logs' do
+        expect_any_instance_of(FastlaneCore::Shell).to receive(:important).with("JOB_TOKEN and PRIVATE_TOKEN both defined, using JOB_TOKEN to execute this job.")
+
         client = described_class.new(
           api_v4_url: 'https://gitlab.example.com/api/v4', 
           project_id: 'sample/project', 
@@ -68,7 +70,9 @@ describe Match do
         expect(client.authentication_value).to eq('xyz123')      
       end
 
-      it 'returns the job_token value if both job_token and private_token are defined' do
+      it 'returns the job_token value if both job_token and private_token are defined, and prints a warning to the logs' do
+        expect_any_instance_of(FastlaneCore::Shell).to receive(:important).with("JOB_TOKEN and PRIVATE_TOKEN both defined, using JOB_TOKEN to execute this job.")
+
         client = described_class.new(
           api_v4_url: 'https://gitlab.example.com/api/v4', 
           project_id: 'sample/project',

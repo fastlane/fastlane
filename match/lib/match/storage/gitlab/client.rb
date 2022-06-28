@@ -8,6 +8,8 @@ module Match
           @private_token  = private_token
           @api_v4_url     = api_v4_url
           @project_id     = project_id
+
+          UI.important("JOB_TOKEN and PRIVATE_TOKEN both defined, using JOB_TOKEN to execute this job.") if @job_token && @private_token
         end
 
         def base_url
