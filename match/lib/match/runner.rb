@@ -54,6 +54,7 @@ module Match
         s3_secret_access_key: params[:s3_secret_access_key],
         s3_bucket: params[:s3_bucket],
         s3_object_prefix: params[:s3_object_prefix],
+        gitlab_project: params[:gitlab_project],
         readonly: params[:readonly],
         username: params[:readonly] ? nil : params[:username], # only pass username if not readonly
         team_id: params[:team_id],
