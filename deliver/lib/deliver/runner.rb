@@ -189,7 +189,7 @@ module Deliver
         )
         result = transporter.verify(package_path: package_path)
       else
-        UI.user_error!("No suitable file found for upload for platform: #{options[:platform]}")
+        UI.user_error!("No suitable file found for verify for platform: #{options[:platform]}")
       end
 
       unless result
