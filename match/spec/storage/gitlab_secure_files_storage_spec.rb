@@ -21,7 +21,7 @@ describe Match do
         files_to_upload.each do |file_name|
           expect(file).to receive(:open).with(file_name)
         end
-      
+
         subject.upload_files(files_to_upload: files_to_upload)
       end
 
@@ -42,7 +42,7 @@ describe Match do
 
       let(:secure_files) do
         file_names.map.with_index do |file_name, index|
-          Match::Storage::GitLab::SecureFile.new(file: {id: index, name: file_name}, client: subject.gitlab_client) 
+          Match::Storage::GitLab::SecureFile.new(file: { id: index, name: file_name }, client: subject.gitlab_client)
         end
       end
 
@@ -53,7 +53,7 @@ describe Match do
       end
 
       it 'deletes files with correct paths' do
-        secure_files.each_with_index do |secure_file, index|          
+        secure_files.each_with_index do |secure_file, index|
           expect(subject.gitlab_client).to receive(:find_file_by_name).with(file_names[index]).and_return(secure_file)
           expect(secure_file.file.name).to eq(file_names[index])
           expect(secure_file).to receive(:delete)
@@ -73,18 +73,18 @@ describe Match do
 
       let(:secure_files) do
         file_names.map.with_index do |file_name, index|
-          Match::Storage::GitLab::SecureFile.new(file: {id: index, name: file_name}, client: subject.gitlab_client) 
+          Match::Storage::GitLab::SecureFile.new(file: { id: index, name: file_name }, client: subject.gitlab_client)
         end
       end
 
       it 'downloads to correct working directory' do
         expect(subject.gitlab_client).to receive(:files).and_return(secure_files)
 
-        secure_files.each_with_index do |secure_file, index|          
+        secure_files.each_with_index do |secure_file, index|
           expect(secure_file.file.name).to eq(file_names[index])
           expect(secure_file).to receive(:download).with(working_directory)
         end
-        
+
         subject.download
       end
     end

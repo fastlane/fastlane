@@ -19,7 +19,7 @@ module Match
             params[:keychain_name] = params[:s3_bucket]
             return Encryption::OpenSSL.configure(params)
           },
-          "gitlab_secure_files" => lambda { |params| 
+          "gitlab_secure_files" => lambda { |params|
             return nil
           }
         }
