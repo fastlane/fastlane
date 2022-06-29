@@ -225,7 +225,7 @@ module Match
 
         # Storage: GitLab Secure Files
         FastlaneCore::ConfigItem.new(key: :gitlab_project,
-                                     env_name: "GITLAB_PROJECT",
+                                     env_name: "MATCH_GITLAB_PROJECT",
                                      description: "GitLab Project Path (i.e. 'gitlab-org/gitlab')",
                                      optional: true),
 

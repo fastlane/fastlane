@@ -1,3 +1,8 @@
+require 'net/http/post/multipart'
+require 'securerandom'
+
+require_relative '../../module'
+require_relative './secure_file'
 
 module Match
   module Storage
@@ -51,7 +56,7 @@ module Match
         end
 
         def find_file_by_name(name)
-          files.select{|secure_file| secure_file.file.name == name}.first
+          files.select { |secure_file| secure_file.file.name == name }.first
         end
 
         def upload_file(current_file, target_file)

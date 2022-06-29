@@ -20,7 +20,7 @@ module Match
           },
           "gitlab_secure_files" => lambda { |params|
             return Storage::GitLabSecureFiles.configure(params)
-          },
+          }
         }
       end
 

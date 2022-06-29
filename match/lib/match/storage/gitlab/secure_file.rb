@@ -1,8 +1,12 @@
+require 'open-uri'
+
+require_relative '../../module'
+
 module Match
   module Storage
     class GitLab
       class SecureFile
-        attr_reader :client, :file 
+        attr_reader :client, :file
 
         def initialize(file:, client:)
           @file   = OpenStruct.new(file)
@@ -20,7 +24,7 @@ module Match
         def destination_file_path
           filename = @file.name.split('/').last
 
-          @file.name.gsub(filename, '').gsub(/^\//, '')
+          @file.name.gsub(filename, '').gsub(%r{^/}, '')
         end
 
         def valid_checksum?(file)
@@ -56,7 +60,6 @@ module Match
 
           @client.execute_request(url, request)
         end
-
       end
     end
   end
