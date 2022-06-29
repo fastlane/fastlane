@@ -51,6 +51,10 @@ module Spaceship
         MAC_CATALYST_APP_DEVELOPMENT = "MAC_CATALYST_APP_DEVELOPMENT"
         MAC_CATALYST_APP_STORE = "MAC_CATALYST_APP_STORE"
         MAC_CATALYST_APP_DIRECT = "MAC_CATALYST_APP_DIRECT"
+
+        # As of 2022-06-25, only available with Apple ID auth
+        MAC_APP_INHOUSE = "MAC_APP_INHOUSE"
+        MAC_CATALYST_APP_INHOUSE = "MAC_CATALYST_APP_INHOUSE"
       end
 
       def self.type
