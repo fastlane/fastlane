@@ -24,6 +24,7 @@ module Fastlane
           'generate_release_notes' => !!params[:is_generate_release_notes]
         }
         payload['name'] = params[:name] if params[:name]
+        payload['discussion_category_name'] = params[:discussion_category_name] if params[:discussion_category_name]
         payload['body'] = params[:description] if params[:description]
         payload['target_commitish'] = params[:commitish] if params[:commitish]
 
@@ -221,6 +222,10 @@ module Fastlane
                                        optional: true,
                                        default_value: false,
                                        type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :discussion_category_name,
+                                       env_name: "FL_SET_GITHUB_RELEASE_DISCUSSION_CATEGORY_NAME",
+                                       description: "If specified, a discussion of the specified category is created and linked to the release. The value must be a category that already exists in the repository. For more information, see https://docs.github.com/en/discussions/managing-discussions-for-your-community/managing-categories-for-discussions",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :is_generate_release_notes,
                                        env_name: "FL_SET_GITHUB_RELEASE_IS_GENERATE_RELEASE_NOTES",
                                        description: "Whether the name and body of this release should be generated automatically",
