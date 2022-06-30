@@ -92,6 +92,9 @@ public protocol MatchfileProtocol: AnyObject {
     /// Prefix to be used on all objects uploaded to S3
     var s3ObjectPrefix: String? { get }
 
+    /// GitLab Project Path (i.e. 'gitlab-org/gitlab')
+    var gitlabProject: String? { get }
+
     /// Keychain the items should be imported to
     var keychainName: String { get }
 
@@ -178,6 +181,7 @@ public extension MatchfileProtocol {
     var s3SecretAccessKey: String? { return nil }
     var s3Bucket: String? { return nil }
     var s3ObjectPrefix: String? { return nil }
+    var gitlabProject: String? { return nil }
     var keychainName: String { return "login.keychain" }
     var keychainPassword: String? { return nil }
     var force: Bool { return false }
@@ -200,4 +204,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.102]
+// FastlaneRunnerAPIVersion [0.9.103]

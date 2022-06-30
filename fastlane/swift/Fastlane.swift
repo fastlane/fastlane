@@ -6655,6 +6655,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - s3SecretAccessKey: S3 secret access key
    - s3Bucket: Name of the S3 bucket
    - s3ObjectPrefix: Prefix to be used on all objects uploaded to S3
+   - gitlabProject: GitLab Project Path (i.e. 'gitlab-org/gitlab')
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
@@ -6706,6 +6707,7 @@ public func match(type: String = matchfile.type,
                   s3SecretAccessKey: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3SecretAccessKey),
                   s3Bucket: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3Bucket),
                   s3ObjectPrefix: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3ObjectPrefix),
+                  gitlabProject: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.gitlabProject),
                   keychainName: String = matchfile.keychainName,
                   keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.keychainPassword),
                   force: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.force),
@@ -6755,6 +6757,7 @@ public func match(type: String = matchfile.type,
     let s3SecretAccessKeyArg = s3SecretAccessKey.asRubyArgument(name: "s3_secret_access_key", type: nil)
     let s3BucketArg = s3Bucket.asRubyArgument(name: "s3_bucket", type: nil)
     let s3ObjectPrefixArg = s3ObjectPrefix.asRubyArgument(name: "s3_object_prefix", type: nil)
+    let gitlabProjectArg = gitlabProject.asRubyArgument(name: "gitlab_project", type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -6803,6 +6806,7 @@ public func match(type: String = matchfile.type,
                                           s3SecretAccessKeyArg,
                                           s3BucketArg,
                                           s3ObjectPrefixArg,
+                                          gitlabProjectArg,
                                           keychainNameArg,
                                           keychainPasswordArg,
                                           forceArg,
@@ -6862,6 +6866,7 @@ public func match(type: String = matchfile.type,
    - s3SecretAccessKey: S3 secret access key
    - s3Bucket: Name of the S3 bucket
    - s3ObjectPrefix: Prefix to be used on all objects uploaded to S3
+   - gitlabProject: GitLab Project Path (i.e. 'gitlab-org/gitlab')
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
@@ -6917,6 +6922,7 @@ public func matchNuke(type: String = "development",
                       s3SecretAccessKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       s3Bucket: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       s3ObjectPrefix: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                      gitlabProject: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       keychainName: String = "login.keychain",
                       keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -6966,6 +6972,7 @@ public func matchNuke(type: String = "development",
     let s3SecretAccessKeyArg = s3SecretAccessKey.asRubyArgument(name: "s3_secret_access_key", type: nil)
     let s3BucketArg = s3Bucket.asRubyArgument(name: "s3_bucket", type: nil)
     let s3ObjectPrefixArg = s3ObjectPrefix.asRubyArgument(name: "s3_object_prefix", type: nil)
+    let gitlabProjectArg = gitlabProject.asRubyArgument(name: "gitlab_project", type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -7014,6 +7021,7 @@ public func matchNuke(type: String = "development",
                                           s3SecretAccessKeyArg,
                                           s3BucketArg,
                                           s3ObjectPrefixArg,
+                                          gitlabProjectArg,
                                           keychainNameArg,
                                           keychainPasswordArg,
                                           forceArg,
@@ -11060,6 +11068,7 @@ public func swiftlint(mode: String = "lint",
    - s3SecretAccessKey: S3 secret access key
    - s3Bucket: Name of the S3 bucket
    - s3ObjectPrefix: Prefix to be used on all objects uploaded to S3
+   - gitlabProject: GitLab Project Path (i.e. 'gitlab-org/gitlab')
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
@@ -11111,6 +11120,7 @@ public func syncCodeSigning(type: String = "development",
                             s3SecretAccessKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             s3Bucket: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             s3ObjectPrefix: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                            gitlabProject: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             keychainName: String = "login.keychain",
                             keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11160,6 +11170,7 @@ public func syncCodeSigning(type: String = "development",
     let s3SecretAccessKeyArg = s3SecretAccessKey.asRubyArgument(name: "s3_secret_access_key", type: nil)
     let s3BucketArg = s3Bucket.asRubyArgument(name: "s3_bucket", type: nil)
     let s3ObjectPrefixArg = s3ObjectPrefix.asRubyArgument(name: "s3_object_prefix", type: nil)
+    let gitlabProjectArg = gitlabProject.asRubyArgument(name: "gitlab_project", type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -11208,6 +11219,7 @@ public func syncCodeSigning(type: String = "development",
                                           s3SecretAccessKeyArg,
                                           s3BucketArg,
                                           s3ObjectPrefixArg,
+                                          gitlabProjectArg,
                                           keychainNameArg,
                                           keychainPasswordArg,
                                           forceArg,
@@ -13263,7 +13275,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode-13.2.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-13.4.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13466,4 +13478,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.158]
+// FastlaneRunnerAPIVersion [0.9.159]
