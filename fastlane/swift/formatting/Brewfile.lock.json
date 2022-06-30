@@ -2,35 +2,40 @@
   "entries": {
     "brew": {
       "swiftformat": {
-        "version": "0.49.9",
+        "version": "0.49.11",
         "bottle": {
           "rebuild": 0,
           "root_url": "https://ghcr.io/v2/homebrew/core",
           "files": {
             "arm64_monterey": {
               "cellar": ":any_skip_relocation",
-              "url": "https://ghcr.io/v2/homebrew/core/swiftformat/blobs/sha256:bacd0dc8f488fd7909252467eaf16dcd339468857aea13a3643f7e0efd7715f8",
-              "sha256": "bacd0dc8f488fd7909252467eaf16dcd339468857aea13a3643f7e0efd7715f8"
+              "url": "https://ghcr.io/v2/homebrew/core/swiftformat/blobs/sha256:1c355872557efa651e7baa0a73414b4d944c8045caf5595b49be5aa487c790b5",
+              "sha256": "1c355872557efa651e7baa0a73414b4d944c8045caf5595b49be5aa487c790b5"
             },
             "arm64_big_sur": {
               "cellar": ":any_skip_relocation",
-              "url": "https://ghcr.io/v2/homebrew/core/swiftformat/blobs/sha256:7bc39a57d110f727993aa556cca5cba5549d536367bc12f25b56e25c4fdfa194",
-              "sha256": "7bc39a57d110f727993aa556cca5cba5549d536367bc12f25b56e25c4fdfa194"
+              "url": "https://ghcr.io/v2/homebrew/core/swiftformat/blobs/sha256:a6c6bcd203119f7a0f687ae57502bf93bbd9d4b05e838b8a8e3dbc76679b54c0",
+              "sha256": "a6c6bcd203119f7a0f687ae57502bf93bbd9d4b05e838b8a8e3dbc76679b54c0"
             },
             "monterey": {
               "cellar": ":any_skip_relocation",
-              "url": "https://ghcr.io/v2/homebrew/core/swiftformat/blobs/sha256:739d230372dd797d5cf5a0586156068ecb5965878550a67b5ca56ccdf2799557",
-              "sha256": "739d230372dd797d5cf5a0586156068ecb5965878550a67b5ca56ccdf2799557"
+              "url": "https://ghcr.io/v2/homebrew/core/swiftformat/blobs/sha256:d8d59a615cf956c6ccbdade566bcb18e1f4aeeaae8399f52e55a4bca7b014ed9",
+              "sha256": "d8d59a615cf956c6ccbdade566bcb18e1f4aeeaae8399f52e55a4bca7b014ed9"
             },
             "big_sur": {
               "cellar": ":any_skip_relocation",
-              "url": "https://ghcr.io/v2/homebrew/core/swiftformat/blobs/sha256:22080bdc75b03f5926d68fb248fc401d6a94876205ce03663a8950644b0e41e6",
-              "sha256": "22080bdc75b03f5926d68fb248fc401d6a94876205ce03663a8950644b0e41e6"
+              "url": "https://ghcr.io/v2/homebrew/core/swiftformat/blobs/sha256:0dddb88b994904ae813b35a9a3d08f33bbd8b7f1bc15addce9e3d366b48257f5",
+              "sha256": "0dddb88b994904ae813b35a9a3d08f33bbd8b7f1bc15addce9e3d366b48257f5"
             },
             "catalina": {
               "cellar": ":any_skip_relocation",
-              "url": "https://ghcr.io/v2/homebrew/core/swiftformat/blobs/sha256:d4cda88cf3bef7b18e960197b8db4826f234e3b3434ba902c3924c37b9040fe8",
-              "sha256": "d4cda88cf3bef7b18e960197b8db4826f234e3b3434ba902c3924c37b9040fe8"
+              "url": "https://ghcr.io/v2/homebrew/core/swiftformat/blobs/sha256:a0e7393b2667a4fb21723f0f50de3b97c256237aa572927b103dd7467fe44624",
+              "sha256": "a0e7393b2667a4fb21723f0f50de3b97c256237aa572927b103dd7467fe44624"
+            },
+            "x86_64_linux": {
+              "cellar": "/home/linuxbrew/.linuxbrew/Cellar",
+              "url": "https://ghcr.io/v2/homebrew/core/swiftformat/blobs/sha256:1d855fe86b853bf153171aa4b9b22c638ba63d42e052795a5e7713afe71f39d6",
+              "sha256": "1d855fe86b853bf153171aa4b9b22c638ba63d42e052795a5e7713afe71f39d6"
             }
           }
         }
@@ -56,12 +61,12 @@
         "macOS": "11.0.1"
       },
       "monterey": {
-        "HOMEBREW_VERSION": "3.4.11-108-g73ee7f6",
+        "HOMEBREW_VERSION": "3.5.3-17-g74e933c",
         "HOMEBREW_PREFIX": "/opt/homebrew",
-        "Homebrew/homebrew-core": "e0a21c4303dffb12b1c0b4b2b7984eaec55448c9",
-        "CLT": "13.2.0.0.1.1638488800",
-        "Xcode": "13.2.1",
-        "macOS": "12.2.1"
+        "Homebrew/homebrew-core": "94237d1700b55d421ce5580080a9d6dff2deba2a",
+        "CLT": "13.4.0.0.1.1651278267",
+        "Xcode": "13.4.1",
+        "macOS": "12.4"
       }
     }
   }
