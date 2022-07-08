@@ -15,6 +15,7 @@ module Match
     # Store the code signing identities in GitLab Secure Files
     class GitLabSecureFiles < Interface
       attr_reader :gitlab_client
+      attr_reader :project_id
       attr_reader :readonly
       attr_reader :username
       attr_reader :team_id

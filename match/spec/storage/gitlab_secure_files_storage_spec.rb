@@ -88,5 +88,17 @@ describe Match do
         subject.download
       end
     end
+
+    describe '#human_readable_description' do
+      it 'returns the correct human readable description for the configured storage mode' do
+        expect(subject.human_readable_description).to eq('GitLab Secure Files Storage [fake-project]')
+      end
+    end
+
+    describe '#generate_matchfile_content' do
+      it 'returns the correct match file contents for the configured storage mode' do
+        expect(subject.generate_matchfile_content).to eq('gitlab_project("fake-project")')
+      end
+    end
   end
 end
