@@ -20,8 +20,7 @@ describe FastlaneCore do
 
     describe '#install_wwdr_certificates' do
       it 'should install all the official WWDR certificates' do
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with(/AppleWWDRCA/)
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with(/AppleWWDRCAG3/)
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with(/AppleWWDRCAG6/)
         FastlaneCore::CertChecker.install_wwdr_certificates
       end
     end
@@ -43,13 +42,13 @@ describe FastlaneCore do
         `ls`
 
         keychain = "keychain with spaces.keychain"
-        cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://developer\.apple\.com/certificationauthority/AppleWWDRCA.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
+        cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
         require "open3"
 
         expect(Open3).to receive(:capture3).with(cmd).and_return("")
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
-        expect(FastlaneCore::CertChecker.install_wwdr_certificate('https://developer.apple.com/certificationauthority/AppleWWDRCA.cer')).to be(true)
+        expect(FastlaneCore::CertChecker.install_wwdr_certificate('https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer')).to be(true)
       end
     end
   end
