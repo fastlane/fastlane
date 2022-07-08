@@ -124,8 +124,8 @@ module FastlaneCore
 
     def self.wwdr_keychain
       priority = [
-        "security list-keychains -d user",
-        "security default-keychain -d user"
+        "security default-keychain -d user",
+        "security list-keychains -d user"
       ]
       priority.each do |command|
         keychains = Helper.backticks(command, print: FastlaneCore::Globals.verbose?).split("\n")
