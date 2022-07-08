@@ -162,7 +162,7 @@ module Match
       end
 
       def skip_docs
-        false
+        true
       end
 
       def list_files(file_name: "", file_ext: "")

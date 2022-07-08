@@ -127,5 +127,23 @@ describe Match do
       end
     end
 
+    describe '#log_upload_error' do
+      it 'logs a custom error message when the file name has already been taken' do
+        expect_any_instance_of(FastlaneCore::Shell).to receive(:error).with("foo already exists in GitLab project sample/project, file not uploaded")
+
+        response_body = { message: { name: ["has already been taken" ] } }.to_json
+        response = OpenStruct.new(code: "400", body: response_body)
+        target_file = 'foo'
+        subject.log_upload_error(response, target_file)
+      end
+
+      it 'logs the returned error message on all other errors' do
+        expect_any_instance_of(FastlaneCore::Shell).to receive(:error).with("Upload error for foo: a generic error message")
+
+        response = OpenStruct.new(code: "500", body: "a generic error message")
+        target_file = 'foo'
+        subject.log_upload_error(response, target_file)
+      end
+    end
   end
 end
