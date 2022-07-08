@@ -90,7 +90,6 @@ module FastlaneCore
     end
 
     def self.install_wwdr_certificates
-      install_wwdr_certificate('https://developer.apple.com/certificationauthority/AppleWWDRCA.cer')
       install_wwdr_certificate('https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer')
     end
 
