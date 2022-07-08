@@ -97,6 +97,8 @@ describe Match do
 
     describe '#generate_matchfile_content' do
       it 'returns the correct match file contents for the configured storage mode' do
+        expect(FastlaneCore::UI).to receive(:input).once.and_return("fake-project")
+
         expect(subject.generate_matchfile_content).to eq('gitlab_project("fake-project")')
       end
     end

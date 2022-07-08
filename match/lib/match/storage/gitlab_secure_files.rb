@@ -173,7 +173,9 @@ module Match
       # This method must return the content of the Matchfile
       # that should be generated
       def generate_matchfile_content(template: nil)
-        return "gitlab_project(\"#{self.project_id}\")"
+        project = UI.input("What is your GitLab Project (i.e. gitlab-org/gitlab): ")
+
+        return "gitlab_project(\"#{project}\")"
       end
     end
   end
