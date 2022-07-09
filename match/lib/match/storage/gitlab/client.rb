@@ -69,7 +69,23 @@ module Match
               "name" => target_file
             )
 
-            execute_request(url, request)
+            response = execute_request(url, request)
+
+            log_upload_error(response, target_file) if response.code != "201"
+          end
+        end
+
+        def log_upload_error(response, target_file)
+          begin
+            response_body = JSON.parse(response.body)
+          rescue JSON::ParserError
+            response_body = response.body
+          end
+
+          if response_body["message"] && (response_body["message"]["name"] == ["has already been taken"])
+            UI.error("#{target_file} already exists in GitLab project #{@project_id}, file not uploaded")
+          else
+            UI.error("Upload error for #{target_file}: #{response_body}")
           end
         end
 
