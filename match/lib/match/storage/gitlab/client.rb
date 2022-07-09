@@ -82,7 +82,7 @@ module Match
             response_body = response.body
           end
 
-          if response_body["message"]["name"] == ["has already been taken"]
+          if response_body["message"] && (response_body["message"]["name"] == ["has already been taken"])
             UI.error("#{target_file} already exists in GitLab project #{@project_id}, file not uploaded")
           else
             UI.error("Upload error for #{target_file}: #{response_body}")
