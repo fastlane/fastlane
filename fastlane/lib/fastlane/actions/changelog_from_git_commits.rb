@@ -141,7 +141,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :merge_commit_filtering,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MERGE_COMMIT_FILTERING',
-                                       description: "Controls inclusion of merge commits when collecting the changelog. Valid values: #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "`:#{o}`" }.join(', ')}",
+                                       description: "Controls inclusion of merge commits when collecting the changelog. Valid values: #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "'#{o}'" }.join(', ')}",
                                        optional: true,
                                        default_value: 'include_merges',
                                        verify_block: proc do |value|
