@@ -90,10 +90,7 @@ module FastlaneCore
     end
 
     def self.install_wwdr_certificate
-      install_wwdr_certificate('https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer')
-    end
-
-    def self.install_wwdr_certificate(url)
+      url = 'https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer'
       file = Tempfile.new(File.basename(url))
       filename = file.path
       keychain = wwdr_keychain

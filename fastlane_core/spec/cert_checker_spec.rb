@@ -20,7 +20,7 @@ describe FastlaneCore do
 
     describe '#install_wwdr_certificate' do
       it 'should install only the latest official WWDR certificate' do
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with(/AppleWWDRCAG6/)
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate)
         FastlaneCore::CertChecker.install_wwdr_certificate
       end
     end
@@ -48,7 +48,7 @@ describe FastlaneCore do
         expect(Open3).to receive(:capture3).with(cmd).and_return("")
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
-        expect(FastlaneCore::CertChecker.install_wwdr_certificate('https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer')).to be(true)
+        expect(FastlaneCore::CertChecker.install_wwdr_certificate()).to be(true)
       end
     end
   end
