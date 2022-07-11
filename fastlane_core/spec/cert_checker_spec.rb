@@ -2,7 +2,7 @@ describe FastlaneCore do
   describe FastlaneCore::CertChecker do
     describe '#installed_identies' do
       it 'should print an error when no local code signing identities are found' do
-        allow(FastlaneCore::CertChecker).to receive(:wwdr_certificates_installed?).and_return(true)
+        allow(FastlaneCore::CertChecker).to receive(:wwdr_certificate_installed?).and_return(true)
         allow(FastlaneCore::CertChecker).to receive(:list_available_identities).and_return("     0 valid identities found\n")
         expect(FastlaneCore::UI).to receive(:error).with(/There are no local code signing identities found/)
 
@@ -10,7 +10,7 @@ describe FastlaneCore do
       end
 
       it 'should not be fooled by 10 local code signing identities available' do
-        allow(FastlaneCore::CertChecker).to receive(:wwdr_certificates_installed?).and_return(true)
+        allow(FastlaneCore::CertChecker).to receive(:wwdr_certificate_installed?).and_return(true)
         allow(FastlaneCore::CertChecker).to receive(:list_available_identities).and_return("     10 valid identities found\n")
         expect(FastlaneCore::UI).not_to(receive(:error))
 
@@ -18,10 +18,10 @@ describe FastlaneCore do
       end
     end
 
-    describe '#install_wwdr_certificates' do
+    describe '#install_wwdr_certificate' do
       it 'should install only the latest official WWDR certificate' do
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with(/AppleWWDRCAG6/)
-        FastlaneCore::CertChecker.install_wwdr_certificates
+        FastlaneCore::CertChecker.install_wwdr_certificate
       end
     end
 
@@ -34,7 +34,7 @@ describe FastlaneCore do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
         expect(FastlaneCore::Helper).to receive(:backticks).with(name_regex, anything).and_return("")
 
-        FastlaneCore::CertChecker.wwdr_certificates_installed?
+        FastlaneCore::CertChecker.wwdr_certificate_installed?
       end
 
       it 'uses the correct command to import it' do

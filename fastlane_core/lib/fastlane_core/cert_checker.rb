@@ -22,7 +22,7 @@ module FastlaneCore
     end
 
     def self.installed_identies(in_keychain: nil)
-      install_wwdr_certificates unless wwdr_certificates_installed?
+      install_wwdr_certificate unless wwdr_certificate_installed?
 
       available = list_available_identities(in_keychain: in_keychain)
       # Match for this text against word boundaries to avoid edge cases around multiples of 10 identities!
@@ -81,7 +81,7 @@ module FastlaneCore
       `#{commands.join(' ')}`
     end
 
-    def self.wwdr_certificates_installed?
+    def self.wwdr_certificate_installed?
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
       keychain = wwdr_keychain
       response = Helper.backticks("security find-certificate -a -c '#{certificate_name}' #{keychain.shellescape}", print: FastlaneCore::Globals.verbose?)
