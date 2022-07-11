@@ -19,7 +19,7 @@ describe FastlaneCore do
     end
 
     describe '#install_wwdr_certificates' do
-      it 'should install all the official WWDR certificates' do
+      it 'should install only the latest official WWDR certificate' do
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with(/AppleWWDRCAG6/)
         FastlaneCore::CertChecker.install_wwdr_certificates
       end

@@ -89,7 +89,7 @@ module FastlaneCore
       certs.count == 2
     end
 
-    def self.install_wwdr_certificates
+    def self.install_wwdr_certificate
       install_wwdr_certificate('https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer')
     end
 
