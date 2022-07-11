@@ -86,7 +86,7 @@ module FastlaneCore
       keychain = wwdr_keychain
       response = Helper.backticks("security find-certificate -a -c '#{certificate_name}' #{keychain.shellescape}", print: FastlaneCore::Globals.verbose?)
       certs = response.split("keychain: \"#{keychain}\"").drop(1)
-      certs.count == 2
+      certs.count == 1
     end
 
     def self.install_wwdr_certificate
