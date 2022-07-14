@@ -14,6 +14,7 @@ module FastlaneCore
       command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym` (before Sierra)
       command << " -T /usr/bin/security"
       command << " -T /usr/bin/productbuild" # to not be asked for permission when using an installer cert for macOS
+      command << " -T /usr/bin/productsign"  # to not be asked for permission when using an installer cert for macOS
       command << " 1> /dev/null" unless output
 
       sensitive_command = command.gsub(password_part, " -P ********")
