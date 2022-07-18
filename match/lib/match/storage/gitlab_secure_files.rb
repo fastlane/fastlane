@@ -15,6 +15,7 @@ module Match
     # Store the code signing identities in GitLab Secure Files
     class GitLabSecureFiles < Interface
       attr_reader :gitlab_client
+      attr_reader :project_id
       attr_reader :readonly
       attr_reader :username
       attr_reader :team_id
@@ -161,7 +162,7 @@ module Match
       end
 
       def skip_docs
-        false
+        true
       end
 
       def list_files(file_name: "", file_ext: "")
@@ -172,7 +173,9 @@ module Match
       # This method must return the content of the Matchfile
       # that should be generated
       def generate_matchfile_content(template: nil)
-        return "gitlab_project(\"#{self.project_id}\")"
+        project = UI.input("What is your GitLab Project (i.e. gitlab-org/gitlab): ")
+
+        return "gitlab_project(\"#{project}\")"
       end
     end
   end
