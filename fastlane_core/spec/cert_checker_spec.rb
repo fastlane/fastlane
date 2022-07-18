@@ -48,7 +48,7 @@ describe FastlaneCore do
         expect(Open3).to receive(:capture3).with(cmd).and_return("")
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
-        expect(FastlaneCore::CertChecker.install_wwdr_certificate()).to be(true)
+        expect(FastlaneCore::CertChecker.install_wwdr_certificate).to be(true)
       end
     end
   end
