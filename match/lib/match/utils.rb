@@ -31,8 +31,16 @@ module Match
       (base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) + ["profile-path"]).join("_")
     end
 
-    def self.get_cert_info(cer_certificate_path)
-      cert = OpenSSL::X509::Certificate.new(File.binread(cer_certificate_path))
+    def self.environment_variable_name_certificate_name(app_identifier: nil, type: nil, platform: :ios)
+      (base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) + ["certificate-name"]).join("_")
+    end
+
+    def self.get_cert_info(cer_certificate)
+      # can receive a certificate path or the file data
+      if File.exist?(cer_certificate)
+        cer_certificate = File.binread(cer_certificate)
+      end
+      cert = OpenSSL::X509::Certificate.new(cer_certificate)
 
       # openssl output:
       # subject= /UID={User ID}/CN={Certificate Name}/OU={Certificate User}/O={Organisation}/C={Country}

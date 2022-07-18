@@ -142,6 +142,11 @@ describe Match do
         expect(result).to eq("sigh_tools.fastlane.app_appstore_profile-path")
       end
 
+      it "#environment_variable_name_certificate_name uses the correct env variable" do
+        result = Match::Utils.environment_variable_name_certificate_name(app_identifier: "tools.fastlane.app", type: "appstore")
+        expect(result).to eq("sigh_tools.fastlane.app_appstore_certificate-name")
+      end
+
       it "pre-fills the environment" do
         my_key = "my_test_key"
         uuid = "my_uuid"

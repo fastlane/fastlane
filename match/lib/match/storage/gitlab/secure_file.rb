@@ -43,8 +43,7 @@ module Match
                 saved_file.write(data.read)
               end
 
-              # Set file mode to read-only
-              FileUtils.chmod('u=r,go-r', destination_file)
+              FileUtils.chmod('u=rw,go-r', destination_file)
             end
 
             UI.crash!("Checksum validation failed for #{@file.name}") unless valid_checksum?(destination_file)
