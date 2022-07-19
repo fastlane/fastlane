@@ -10,7 +10,6 @@ require_relative 'iap_subscription_pricing_tier'
 require_relative 'pricing_tier'
 require_relative 'territory'
 require_relative '../connect_api/response'
-# require_relative '../connect_api/models/app'
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -256,34 +255,51 @@ module Spaceship
     #####################################################
 
     def applications
-      # apps = Spaceship::ConnectAPI::App.all
-      # apps.map do |asc_app|
-      #   platforms = (asc_app.app_store_versions || []).map(&:platform).uniq.map do |asc_platform|
-      #     case asc_platform
-      #     when "TV_OS"
-      #       "appletvos"
-      #     when "MAC_OS"
-      #       "osx"
-      #     when "IOS"
-      #       "ios"
-      #     else
-      #       raise "Cannot find a matching platform for '#{asc_platform}'}"
-      #     end
-      #   end
+      r = request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions,prices")
+      response = Spaceship::ConnectAPI::Response.new(
+        body: r.body,
+        status: r.status,
+        headers: r.headers,
+        client: nil
+      )
 
-      #   {
-      #     'adamId' => asc_app.id,
-      #     'name' => asc_app.name,
-      #     'vendorId' => "",
-      #     'bundleId' => asc_app.bundle_id,
-      #     'lastModifiedDate' => nil,
-      #     'issuesCount' => nil,
-      #     'iconUrl' => nil,
-      #     'versionSets' => platforms.map do |platform|
-      #       { 'type' => 'app', 'platformString' => platform }
-      #     end
-      #   }
-      # end
+      apps = response.all_pages do |url|
+        r = request(:get, url)
+        Spaceship::ConnectAPI::Response.new(
+          body: r.body,
+          status: r.status,
+          headers: r.headers,
+          client: nil
+        )
+      end.flat_map(&:to_models)
+
+      apps.map do |asc_app|
+        platforms = (asc_app.app_store_versions || []).map(&:platform).uniq.map do |asc_platform|
+          case asc_platform
+          when "TV_OS"
+            "appletvos"
+          when "MAC_OS"
+            "osx"
+          when "IOS"
+            "ios"
+          else
+            raise "Cannot find a matching platform for '#{asc_platform}'}"
+          end
+        end
+
+        {
+          'adamId' => asc_app.id,
+          'name' => asc_app.name,
+          'vendorId' => "",
+          'bundleId' => asc_app.bundle_id,
+          'lastModifiedDate' => nil,
+          'issuesCount' => nil,
+          'iconUrl' => nil,
+          'versionSets' => platforms.map do |platform|
+            { 'type' => 'app', 'platformString' => platform }
+          end
+        }
+      end
     end
 
     def app_details(app_id)
