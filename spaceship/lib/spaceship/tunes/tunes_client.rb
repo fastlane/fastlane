@@ -9,7 +9,7 @@ require_relative 'errors'
 require_relative 'iap_subscription_pricing_tier'
 require_relative 'pricing_tier'
 require_relative 'territory'
-require_relative '../connect_api/models/app'
+# require_relative '../connect_api/models/app'
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -255,34 +255,34 @@ module Spaceship
     #####################################################
 
     def applications
-      apps = Spaceship::ConnectAPI::App.all
-      apps.map do |asc_app|
-        platforms = (asc_app.app_store_versions || []).map(&:platform).uniq.map do |asc_platform|
-          case asc_platform
-          when "TV_OS"
-            "appletvos"
-          when "MAC_OS"
-            "osx"
-          when "IOS"
-            "ios"
-          else
-            raise "Cannot find a matching platform for '#{asc_platform}'}"
-          end
-        end
+      # apps = Spaceship::ConnectAPI::App.all
+      # apps.map do |asc_app|
+      #   platforms = (asc_app.app_store_versions || []).map(&:platform).uniq.map do |asc_platform|
+      #     case asc_platform
+      #     when "TV_OS"
+      #       "appletvos"
+      #     when "MAC_OS"
+      #       "osx"
+      #     when "IOS"
+      #       "ios"
+      #     else
+      #       raise "Cannot find a matching platform for '#{asc_platform}'}"
+      #     end
+      #   end
 
-        {
-          'adamId' => asc_app.id,
-          'name' => asc_app.name,
-          'vendorId' => "",
-          'bundleId' => asc_app.bundle_id,
-          'lastModifiedDate' => nil,
-          'issuesCount' => nil,
-          'iconUrl' => nil,
-          'versionSets' => platforms.map do |platform|
-            { 'type' => 'app', 'platformString' => platform }
-          end
-        }
-      end
+      #   {
+      #     'adamId' => asc_app.id,
+      #     'name' => asc_app.name,
+      #     'vendorId' => "",
+      #     'bundleId' => asc_app.bundle_id,
+      #     'lastModifiedDate' => nil,
+      #     'issuesCount' => nil,
+      #     'iconUrl' => nil,
+      #     'versionSets' => platforms.map do |platform|
+      #       { 'type' => 'app', 'platformString' => platform }
+      #     end
+      #   }
+      # end
     end
 
     def app_details(app_id)
