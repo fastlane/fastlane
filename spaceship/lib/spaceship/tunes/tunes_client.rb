@@ -255,6 +255,12 @@ module Spaceship
     #####################################################
 
     def applications
+      # Doing this real bad puts for now until a more formal deprecation logic can get made
+      puts("Spaceship::Tunes::Application.all is deprecated")
+      puts("  It's using a temporary patch to keep it from raising an error but things may not work correctly")
+      puts("  Please consider switching to Spaceship::ConnectAPI if you can")
+      puts("  For more details - https://github.com/fastlane/fastlane/pull/20480")
+
       # This legacy endpoint went offline around July 7th, 2022. This is a rough attempt
       # at retrofitting using the newer App Store Connect API endpoints
       #
