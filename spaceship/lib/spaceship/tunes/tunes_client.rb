@@ -255,6 +255,17 @@ module Spaceship
     #####################################################
 
     def applications
+      # This legacy endpoint went offline around July 7th, 2022. This is a rough attempt
+      # at retrofitting using the newer App Store Connect API endpoints
+      #
+      # This could all be done easily with Spaceship::ConnectAPI::App.find but there were a lot of
+      # circular dependency issues that were very difficult to solve because. Spaceship::Tunes would be
+      # using Spaceship::ConnectAPI which uses Spaceship::Tunes
+      #
+      # However, using Spaceship::ConnectAPI::Response works. This will fetch multiple pages of app
+      # if it needs to
+      #
+      # https://github.com/fastlane/fastlane/pull/20480
       r = request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions,prices")
       response = Spaceship::ConnectAPI::Response.new(
         body: r.body,
