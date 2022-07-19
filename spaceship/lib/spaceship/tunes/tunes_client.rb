@@ -9,6 +9,7 @@ require_relative 'errors'
 require_relative 'iap_subscription_pricing_tier'
 require_relative 'pricing_tier'
 require_relative 'territory'
+require_relative '../connect_api/response'
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -254,8 +255,68 @@ module Spaceship
     #####################################################
 
     def applications
-      r = request(:get, 'ra/apps/manageyourapps/summary/v2')
-      parse_response(r, 'data')['summaries']
+      # Doing this real bad puts for now until a more formal deprecation logic can get made
+      puts("Spaceship::Tunes::Application.all is deprecated")
+      puts("  It's using a temporary patch to keep it from raising an error but things may not work correctly")
+      puts("  Please consider switching to Spaceship::ConnectAPI if you can")
+      puts("  For more details - https://github.com/fastlane/fastlane/pull/20480")
+
+      # This legacy endpoint went offline around July 7th, 2022. This is a rough attempt
+      # at retrofitting using the newer App Store Connect API endpoints
+      #
+      # This could all be done easily with Spaceship::ConnectAPI::App.find but there were a lot of
+      # circular dependency issues that were very difficult to solve because. Spaceship::Tunes would be
+      # using Spaceship::ConnectAPI which uses Spaceship::Tunes
+      #
+      # However, using Spaceship::ConnectAPI::Response works. This will fetch multiple pages of app
+      # if it needs to
+      #
+      # https://github.com/fastlane/fastlane/pull/20480
+      r = request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions,prices")
+      response = Spaceship::ConnectAPI::Response.new(
+        body: r.body,
+        status: r.status,
+        headers: r.headers,
+        client: nil
+      )
+
+      apps = response.all_pages do |url|
+        r = request(:get, url)
+        Spaceship::ConnectAPI::Response.new(
+          body: r.body,
+          status: r.status,
+          headers: r.headers,
+          client: nil
+        )
+      end.flat_map(&:to_models)
+
+      apps.map do |asc_app|
+        platforms = (asc_app.app_store_versions || []).map(&:platform).uniq.map do |asc_platform|
+          case asc_platform
+          when "TV_OS"
+            "appletvos"
+          when "MAC_OS"
+            "osx"
+          when "IOS"
+            "ios"
+          else
+            raise "Cannot find a matching platform for '#{asc_platform}'}"
+          end
+        end
+
+        {
+          'adamId' => asc_app.id,
+          'name' => asc_app.name,
+          'vendorId' => "",
+          'bundleId' => asc_app.bundle_id,
+          'lastModifiedDate' => nil,
+          'issuesCount' => nil,
+          'iconUrl' => nil,
+          'versionSets' => platforms.map do |platform|
+            { 'type' => 'app', 'platformString' => platform }
+          end
+        }
+      end
     end
 
     def app_details(app_id)
