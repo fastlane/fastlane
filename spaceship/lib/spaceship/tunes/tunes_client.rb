@@ -9,6 +9,8 @@ require_relative 'errors'
 require_relative 'iap_subscription_pricing_tier'
 require_relative 'pricing_tier'
 require_relative 'territory'
+# require_relative '../connect_api/model'
+# require_relative '../connect_api/response'
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -254,8 +256,52 @@ module Spaceship
     #####################################################
 
     def applications
-      r = request(:get, 'ra/apps/manageyourapps/summary/v2')
-      parse_response(r, 'data')['summaries']
+      #      require_relative '../connect_api/response'
+      #      r = request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions,prices&limit=10")
+      #      response = Spaceship::ConnectAPI::Response.new(
+      #        body: r.body,
+      #        status: r.status,
+      #        headers: r.headers,
+      #        client: nil
+      #      )
+      #
+      #      apps = response.all_pages do |url|
+      #        r = request(:get, url)
+      #        Spaceship::ConnectAPI::Response.new(
+      #          body: r.body,
+      #          status: r.status,
+      #          headers: r.headers,
+      #          client: nil
+      #        )
+      #      end.flat_map(&:to_models)
+
+      apps.map do |asc_app|
+        platforms = (asc_app.app_store_versions || []).map(&:platform).uniq.map do |asc_platform|
+          case asc_platform
+          when "TV_OS"
+            "appletvos"
+          when "MAC_OS"
+            "osx"
+          when "IOS"
+            "ios"
+          else
+            raise "Cannot find a matching platform for '#{asc_platform}'}"
+          end
+        end
+
+        {
+          'adamId' => asc_app.id,
+          'name' => asc_app.name,
+          'vendorId' => "",
+          'bundleId' => asc_app.bundle_id,
+          'lastModifiedDate' => nil,
+          'issuesCount' => nil,
+          'iconUrl' => nil,
+          'versionSets' => platforms.map do |platform|
+            { 'type' => 'app', 'platformString' => platform }
+          end
+        }
+      end
     end
 
     def app_details(app_id)

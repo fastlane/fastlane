@@ -18,6 +18,18 @@ class ConnectAPIStubbing
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps").
           to_return(status: 200, body: read_fixture_file('apps.json'), headers: { 'Content-Type' => 'application/json' })
 
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions,prices").
+          with(
+            headers: {
+            'Accept' => '*/*',
+            'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+            'Content-Type' => 'application/json',
+            'User-Agent' => 'Spaceship 2.207.0',
+            'X-Csrf-Itc' => '[asc-ui]'
+          }
+).
+          to_return(status: 200, body: read_fixture_file('apps.json'), headers: { 'Content-Type' => 'application/json' })
+
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?filter%5BbundleId%5D=com.joshholtz.FastlaneTest&include=appStoreVersions,prices").
           to_return(status: 200, body: read_fixture_file('apps.json'), headers: { 'Content-Type' => 'application/json' })
 

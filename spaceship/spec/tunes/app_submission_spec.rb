@@ -2,7 +2,7 @@ describe Spaceship::AppSubmission do
   before { Spaceship::Tunes.login }
 
   let(:client) { Spaceship::AppSubmission.client }
-  let(:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 
   describe "successfully creates a new app submission" do
     it "generates a new app submission from App Store Connect response" do
