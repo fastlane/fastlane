@@ -9,8 +9,7 @@ require_relative 'errors'
 require_relative 'iap_subscription_pricing_tier'
 require_relative 'pricing_tier'
 require_relative 'territory'
-# require_relative '../connect_api/model'
-# require_relative '../connect_api/response'
+require_relative '../connect_api/model/app'
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -256,25 +255,7 @@ module Spaceship
     #####################################################
 
     def applications
-      #      require_relative '../connect_api/response'
-      #      r = request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions,prices&limit=10")
-      #      response = Spaceship::ConnectAPI::Response.new(
-      #        body: r.body,
-      #        status: r.status,
-      #        headers: r.headers,
-      #        client: nil
-      #      )
-      #
-      #      apps = response.all_pages do |url|
-      #        r = request(:get, url)
-      #        Spaceship::ConnectAPI::Response.new(
-      #          body: r.body,
-      #          status: r.status,
-      #          headers: r.headers,
-      #          client: nil
-      #        )
-      #      end.flat_map(&:to_models)
-
+      apps = Spaceship::ConnectAPI::App.all
       apps.map do |asc_app|
         platforms = (asc_app.app_store_versions || []).map(&:platform).uniq.map do |asc_platform|
           case asc_platform
