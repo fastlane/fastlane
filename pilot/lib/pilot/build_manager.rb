@@ -108,10 +108,10 @@ module Pilot
 
     def wait_for_build_processing_to_be_complete(return_when_build_appears = false)
       platform = fetch_app_platform
-      if config[:ipa] && platform != "osx"
+      if config[:ipa] && platform != "osx" && !config[:distribute_only]
         app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
         app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
-      elsif config[:pkg]
+      elsif config[:pkg] && !config[:distribute_only]
         app_version = FastlaneCore::PkgFileAnalyser.fetch_app_version(config[:pkg])
         app_build = FastlaneCore::PkgFileAnalyser.fetch_app_build(config[:pkg])
       else
