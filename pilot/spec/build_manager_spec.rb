@@ -468,6 +468,24 @@ describe "Build Manager" do
       fake_build_manager.wait_for_build_processing_to_be_complete
     end
 
+    it "wait given :distribute_only" do
+      options = { pkg: "some_path.pkg", build_number: "234", app_version: "2.3.4", distribute_only: true }
+      fake_build_manager.instance_variable_set(:@config, options)
+
+      expect(fake_build_manager).to receive(:fetch_app_platform)
+      expect(FastlaneCore::IpaFileAnalyser).to_not(receive(:fetch_app_version))
+      expect(FastlaneCore::IpaFileAnalyser).to_not(receive(:fetch_app_build))
+      expect(FastlaneCore::PkgFileAnalyser).to_not(receive(:fetch_app_version))
+      expect(FastlaneCore::PkgFileAnalyser).to_not(receive(:fetch_app_build))
+
+      fake_build = double
+      expect(fake_build).to receive(:app_version).and_return("2.3.4")
+      expect(fake_build).to receive(:version).and_return("234")
+      expect(FastlaneCore::BuildWatcher).to receive(:wait_for_build_processing_to_be_complete).and_return(fake_build)
+
+      fake_build_manager.wait_for_build_processing_to_be_complete
+    end
+
     it "wait given :ipa and :pkg and platform ios" do
       options = { ipa: "some_path.ipa", pkg: "some_path.pkg" }
       fake_build_manager.instance_variable_set(:@config, options)
@@ -497,20 +515,6 @@ describe "Build Manager" do
       expect(FastlaneCore::IpaFileAnalyser).to_not(receive(:fetch_app_build))
       expect(FastlaneCore::PkgFileAnalyser).to receive(:fetch_app_version).and_return("1.2.3")
       expect(FastlaneCore::PkgFileAnalyser).to receive(:fetch_app_build).and_return("123")
-
-      fake_build = double
-      expect(fake_build).to receive(:app_version).and_return("1.2.3")
-      expect(fake_build).to receive(:version).and_return("123")
-      expect(FastlaneCore::BuildWatcher).to receive(:wait_for_build_processing_to_be_complete).and_return(fake_build)
-
-      fake_build_manager.wait_for_build_processing_to_be_complete
-    end
-
-    it "wait given :app_version and :build_number" do
-      options = { app_version: "1.2.3", build_number: "123" }
-      fake_build_manager.instance_variable_set(:@config, options)
-
-      expect(fake_build_manager).to receive(:fetch_app_platform)
 
       fake_build = double
       expect(fake_build).to receive(:app_version).and_return("1.2.3")

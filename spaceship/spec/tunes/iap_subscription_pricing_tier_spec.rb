@@ -2,8 +2,8 @@ describe Spaceship::Tunes::IAPSubscriptionPricingTier do
   before { TunesStubbing.itc_stub_iap }
   before { Spaceship::Tunes.login }
 
-  let(:client)        { Spaceship::AppVersion.client }
-  let(:app)           { Spaceship::Application.all.first }
+  let(:client) { Spaceship::AppVersion.client }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
   let(:pricing_tiers) { client.subscription_pricing_tiers(app.apple_id) }
 
   describe "In-App-Purchase Subscription Pricing Tier" do

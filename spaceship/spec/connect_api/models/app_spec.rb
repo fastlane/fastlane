@@ -16,7 +16,7 @@ describe Spaceship::ConnectAPI::App do
       response = Spaceship::ConnectAPI.get_apps
       expect(response).to be_an_instance_of(Spaceship::ConnectAPI::Response)
 
-      expect(response.count).to eq(2)
+      expect(response.count).to eq(5)
       response.each do |model|
         expect(model).to be_an_instance_of(Spaceship::ConnectAPI::App)
       end
