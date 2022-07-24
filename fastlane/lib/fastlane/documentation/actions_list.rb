@@ -135,7 +135,7 @@ module Fastlane
       if options
         puts(Terminal::Table.new(
                title: "#{name} Options".green,
-               headings: ['Key', 'Description', 'Env Var', 'Default'],
+               headings: ['Key', 'Description', 'Env Var(s)', 'Default'],
                rows: FastlaneCore::PrintTable.transform_output(options)
         ))
       else
@@ -176,7 +176,7 @@ module Fastlane
         # them as broken actions in the table, regardless of platform specification
         next if platform && action.respond_to?(:is_supported?) && !action.is_supported?(platform.to_sym)
 
-        name = symbol.to_s.gsub('Action', '').fastlane_underscore
+        name = symbol.to_s.gsub(/Action$/, '').fastlane_underscore
         yield(action, name)
       end
     end
@@ -197,7 +197,7 @@ module Fastlane
       if options.kind_of?(Array)
         options.each do |current|
           if current.kind_of?(FastlaneCore::ConfigItem)
-            rows << [current.key.to_s.yellow, current.deprecated ? current.description.red : current.description, current.env_name, current.help_default_value]
+            rows << [current.key.to_s.yellow, current.deprecated ? current.description.red : current.description, current.env_names.join(", "), current.help_default_value]
           elsif current.kind_of?(Array)
             # Legacy actions that don't use the new config manager
             UI.user_error!("Invalid number of elements in this row: #{current}. Must be 2 or 3") unless [2, 3].include?(current.count)

@@ -11,17 +11,28 @@ module Fastlane
         require 'spaceship'
 
         name = params[:name]
+        platform = params[:platform]
         udid = params[:udid]
 
-        credentials = CredentialsManager::AccountManager.new(user: params[:username])
-        Spaceship.login(credentials.user, credentials.password)
-        Spaceship.select_team
+        platform = Spaceship::ConnectAPI::BundleIdPlatform.map(platform)
+
+        if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
+          UI.message("Creating authorization token for App Store Connect API")
+          Spaceship::ConnectAPI.token = api_token
+        elsif !Spaceship::ConnectAPI.token.nil?
+          UI.message("Using existing authorization token for App Store Connect API")
+        else
+          UI.message("Login to App Store Connect (#{params[:username]})")
+          credentials = CredentialsManager::AccountManager.new(user: params[:username])
+          Spaceship::ConnectAPI.login(credentials.user, credentials.password, use_portal: true, use_tunes: false)
+          UI.message("Login successful")
+        end
 
         begin
-          Spaceship::Device.create!(name: name, udid: udid)
+          Spaceship::ConnectAPI::Device.find_or_create(udid, name: name, platform: platform)
         rescue => ex
           UI.error(ex.to_s)
-          UI.crash!("Failed to register new device (name: #{name}, UDID: #{udid})")
+          UI.crash!("Failed to register new device (name: #{name}, platform: #{platform}, UDID: #{udid})")
         end
 
         UI.success("Successfully registered new device")
@@ -35,14 +46,40 @@ module Fastlane
       def self.available_options
         user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+        platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME].to_s
 
         [
           FastlaneCore::ConfigItem.new(key: :name,
                                        env_name: "FL_REGISTER_DEVICE_NAME",
                                        description: "Provide the name of the device to register as"),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                       env_name: "FL_REGISTER_DEVICE_PLATFORM",
+                                       description: "Provide the platform of the device to register as (ios, mac)",
+                                       optional: true,
+                                       default_value: platform.empty? ? "ios" : platform,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The platform can only be ios or mac") unless %('ios', 'mac').include?(value)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :udid,
                                        env_name: "FL_REGISTER_DEVICE_UDID",
                                        description: "Provide the UDID of the device to register as"),
+          FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                       env_names: ["FL_REGISTER_DEVICE_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
+                                       description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                       optional: true,
+                                       conflicting_options: [:api_key],
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :api_key,
+                                       env_names: ["FL_REGISTER_DEVICE_API_KEY", "APP_STORE_CONNECT_API_KEY"],
+                                       description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)",
+                                       type: Hash,
+                                       default_value: Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY],
+                                       default_value_dynamic: true,
+                                       optional: true,
+                                       sensitive: true,
+                                       conflicting_options: [:api_key_path]),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                      env_name: "REGISTER_DEVICE_TEAM_ID",
                                      code_gen_sensitive: true,
@@ -66,6 +103,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
+                                       optional: true,
                                        default_value: user,
                                        default_value_dynamic: true)
         ]

@@ -13,16 +13,10 @@ module FastlaneCore
       #
       # Derived from https://stackoverflow.com/a/5471032/3005
       def which(cmd)
-        # PATHEXT contains the list of file extensions that Windows considers executable, semicolon separated.
-        # e.g. ".COM;.EXE;.BAT;.CMD"
-        exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : []
-        exts << '' # Always have an empty string (= no file extension)
-
         ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
-          exts.each do |ext|
-            cmd_path = File.join(path, "#{cmd}#{ext}")
-            return cmd_path if Helper.executable?(cmd_path)
-          end
+          cmd_path = File.join(path, cmd)
+          executable_path = Helper.get_executable_path(cmd_path)
+          return executable_path if Helper.executable?(executable_path)
         end
 
         return nil
@@ -52,6 +46,7 @@ module FastlaneCore
           status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
             command_stdout.each do |l|
               line = l.chomp
+              line = line[1..-1] if line[0] == "\r"
               output << line
 
               next unless print_all

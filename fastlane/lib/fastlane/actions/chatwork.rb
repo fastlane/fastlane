@@ -41,6 +41,7 @@ module Fastlane
                                        env_name: "CHATWORK_API_TOKEN",
                                        description: "ChatWork API Token",
                                        sensitive: true,
+                                       code_gen_sensitive: true,
                                        verify_block: proc do |value|
                                          unless value.to_s.length > 0
                                            UI.error("Please add 'ENV[\"CHATWORK_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.")
@@ -53,13 +54,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :roomid,
                                        env_name: "FL_CHATWORK_ROOMID",
                                        description: "The room ID",
-                                       is_string: false),
+                                       type: Integer),
           FastlaneCore::ConfigItem.new(key: :success,
                                        env_name: "FL_CHATWORK_SUCCESS",
                                        description: "Was this build successful? (true/false)",
                                        optional: true,
                                        default_value: true,
-                                       is_string: false)
+                                       type: Boolean)
         ]
       end
 

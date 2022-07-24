@@ -4,142 +4,342 @@ require 'ostruct'
 describe Deliver::SubmitForReview do
   let(:review_submitter) { Deliver::SubmitForReview.new }
 
-  # Create a fake app with number_of_builds candidate builds
-  # the builds will be in date ascending order
-  def make_fake_builds(number_of_builds)
-    (0...number_of_builds).map do |num|
-      OpenStruct.new({ upload_date: Time.now.utc + 60 * num, processing: false }) # minutes_from_now
+  describe 'submit app' do
+    let(:app) { double('app') }
+    let(:edit_version) do
+      double('edit_version',
+             id: '1',
+             version_string: "1.0.0")
     end
-  end
+    let(:selected_build) { double('selected_build') }
+    let(:idfa_declaration) { double('idfa_declaration') }
 
-  def make_fake_app
-    OpenStruct.new({})
-  end
-
-  def make_fake_version
-    fake_version = double('fake_version')
-    allow(fake_version).to receive(:[]).with(:app_version).and_return("1.2.3")
-    fake_version
-  end
-
-  describe :find_build do
-    context 'one build' do
-      let(:fake_builds) { make_fake_builds(1) }
-      it 'finds the one build' do
-        only_build = fake_builds.first
-        expect(review_submitter.find_build(fake_builds)).to eq(only_build)
-      end
+    let(:submission) do
+      double('submission',
+             id: '1')
     end
 
-    context 'no builds' do
-      let(:fake_builds) { make_fake_builds(0) }
-      it 'throws a UI error' do
+    before do
+      allow(Deliver).to receive(:cache).and_return({ app: app })
+    end
+
+    context 'submit fails' do
+      it 'no version' do
+        options = {
+          platform: Spaceship::ConnectAPI::Platform::IOS
+        }
+
+        expect(app).to receive(:get_edit_app_store_version).and_return(nil)
+
+        expect(UI).to receive(:user_error!).with(/Cannot submit for review - could not find an editable version for/).and_raise("boom")
+
         expect do
-          review_submitter.find_build(fake_builds)
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find any available candidate builds on App Store Connect to submit")
+          review_submitter.submit!(options)
+        end.to raise_error("boom")
+      end
+
+      it 'needs to set export_compliance_uses_encryption' do
+        options = {
+          platform: Spaceship::ConnectAPI::Platform::IOS
+        }
+
+        expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+        expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+        expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(nil)
+
+        expect(UI).to receive(:user_error!).with(/Export compliance is required to submit/).and_raise("boom")
+
+        expect do
+          review_submitter.submit!(options)
+        end.to raise_error("boom")
+      end
+
+      it 'needs to set export_compliance_uses_encryption' do
+        options = {
+          platform: Spaceship::ConnectAPI::Platform::IOS
+        }
+
+        expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+        expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+        expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+
+        expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
+        expect(edit_version).to receive(:uses_idfa).and_return(nil)
+
+        expect(UI).to receive(:user_error!).with(/Use of Advertising Identifier \(IDFA\) is required to submit/).and_raise("boom")
+
+        expect do
+          review_submitter.submit!(options)
+        end.to raise_error("boom")
       end
     end
 
-    context 'two builds' do
-      let(:fake_builds) { make_fake_builds(2) }
-      it 'finds the one build' do
-        newest_build = fake_builds.last
-        expect(review_submitter.find_build(fake_builds)).to eq(newest_build)
-      end
-    end
+    context 'submits successfully' do
+      describe 'no options' do
 
-    describe :wait_for_build do
-      context 'no candidates' do
-        let(:fake_app) { make_fake_app }
-        let(:fake_version) { make_fake_version }
-        let(:time_now) { Time.now }
+        it 'with in progress review submission' do
+          options = {
+            platform: Spaceship::ConnectAPI::Platform::IOS
+          }
 
-        # Stub Time.now to return current time on first call and 6 minutes later on second
-        before { allow(Time).to receive(:now).and_return(time_now, (time_now + 60 * 6)) }
-        it 'throws a UI error' do
-          allow(fake_app).to receive(:latest_version).and_return(fake_version)
-          allow(fake_version).to receive(:candidate_builds).and_return([])
+          expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+          expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+
+          expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
+          expect(edit_version).to receive(:uses_idfa).and_return(false)
+
+          expect(app).to receive(:get_in_progress_review_submission).and_return(submission)
+
           expect do
-            review_submitter.wait_for_build(fake_app, "1.2.3")
-          end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find any available candidate builds on App Store Connect to submit")
+            review_submitter.submit!(options)
+          end.to raise_error("Cannot submit for review - A review submission is already in progress")
+        end
+
+        it 'with empty submission' do
+          options = {
+            platform: Spaceship::ConnectAPI::Platform::IOS
+          }
+
+          expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+          expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+
+          expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
+          expect(edit_version).to receive(:uses_idfa).and_return(false)
+
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(submission)
+          expect(submission).to receive(:items).and_return([])
+          expect(app).not_to receive(:create_review_submission)
+
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
+
+          review_submitter.submit!(options)
+        end
+
+        it 'with submission containing items' do
+          options = {
+            platform: Spaceship::ConnectAPI::Platform::IOS
+          }
+
+          expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+          expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+
+          expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
+          expect(edit_version).to receive(:uses_idfa).and_return(false)
+
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(submission)
+          expect(submission).to receive(:items).and_return([double('some item')])
+
+          expect do
+            review_submitter.submit!(options)
+          end.to raise_error("Cannot submit for review - A review submission already exists with items not managed by fastlane. Please cancel or remove items from submission for the App Store Connect website")
         end
       end
 
-      context 'has candidates and one build' do
-        let(:fake_app) { make_fake_app }
-        let(:fake_version) { make_fake_version }
-        let(:fake_builds) { make_fake_builds(1) }
+      context 'export_compliance_uses_encryption' do
+        it 'sets to false' do
+          options = {
+            platform: Spaceship::ConnectAPI::Platform::IOS,
+            submission_information: {
+              export_compliance_uses_encryption: false
+            }
+          }
 
-        it 'finds the one build' do
-          allow(fake_app).to receive(:latest_version).and_return(fake_version)
-          allow(fake_version).to receive(:candidate_builds).and_return(fake_builds)
-          only_build = fake_builds.first
-          expect(review_submitter.wait_for_build(fake_app, "1.2.3")).to eq(only_build)
+          expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+          expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(nil)
+          expect(selected_build).to receive(:update).with(attributes: { usesNonExemptEncryption: false }).and_return(selected_build)
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+
+          expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
+          expect(edit_version).to receive(:uses_idfa).and_return(false)
+
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(nil)
+          expect(app).to receive(:create_review_submission).and_return(submission)
+
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
+
+          review_submitter.submit!(options)
         end
       end
 
-      context 'has candidates and one build, but no app version' do
-        let(:fake_app) { make_fake_app }
-        let(:fake_builds) do
-          build = double('fake_build')
-          allow(build).to receive(:train_version).and_return("1.2.3")
-          allow(build).to receive(:build_version).and_return(1)
-          allow(build).to receive(:upload_date).and_return(1_554_754_590)
-          expect(build).to receive(:processing).and_return(true)
-          [build]
-        end
-        let(:fake_builds_with_processed_build) do
-          build = double('fake_build')
-          allow(build).to receive(:train_version).and_return("1.2.3")
-          allow(build).to receive(:build_version).and_return(1)
-          allow(build).to receive(:upload_date).and_return(1_554_754_590)
-          expect(build).to receive(:processing).and_return(false)
-          [build]
-        end
-        let(:fake_version) do
-          fake_version = double('fake_version')
-          allow(fake_version).to receive(:app_version).and_return(nil)
-          fake_version
-        end
+      context 'content_rights_contains_third_party_content' do
+        it 'sets to true' do
+          options = {
+            platform: Spaceship::ConnectAPI::Platform::IOS,
+            submission_information: {
+              content_rights_contains_third_party_content: true
+            }
+          }
 
-        it 'finds the one build when no app version is provided' do
-          allow(fake_app).to receive(:latest_version).and_return(fake_version)
-          allow(fake_version).to receive(:candidate_builds).and_return(fake_builds, fake_builds_with_processed_build)
-          only_build = fake_builds.first
-          allow(review_submitter).to receive(:sleep)
-          expect(review_submitter.wait_for_build(fake_app, nil)).to equal(fake_builds_with_processed_build.first)
+          expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+          expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+
+          expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
+          expect(edit_version).to receive(:uses_idfa).and_return(false)
+
+          expect(app).to receive(:update).with(attributes: {
+            contentRightsDeclaration: "USES_THIRD_PARTY_CONTENT"
+          })
+
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(nil)
+          expect(app).to receive(:create_review_submission).and_return(submission)
+
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
+
+          review_submitter.submit!(options)
         end
       end
 
-      context 'has candidates and one build with a leading zero in the train version' do
-        let(:fake_app) { make_fake_app }
-        let(:fake_builds) do
-          build = double('fake_build')
-          expect(build).to receive(:train_version).and_return("1.02.3")
-          allow(build).to receive(:build_version).and_return(1)
-          allow(build).to receive(:upload_date).and_return(1_554_754_590)
-          allow(build).to receive(:processing).and_return(false)
-          [build]
-        end
-        let(:fake_builds_with_trimmed_zero) do
-          build = double('fake_build_with_trimmed_zero')
-          expect(build).to receive(:train_version).and_return("1.2.3")
-          allow(build).to receive(:build_version).and_return(1)
-          allow(build).to receive(:upload_date).and_return(1_554_754_590)
-          allow(build).to receive(:processing).and_return(true)
-          [build]
-        end
-        let(:fake_version) do
-          fake_version = double('fake_version')
-          allow(fake_version).to receive(:[]).with(:app_version).and_return("1.02.3")
-          fake_version
+      context 'IDFA' do
+        it 'submission information with idfa false with no idfa' do
+          options = {
+            platform: Spaceship::ConnectAPI::Platform::IOS,
+            submission_information: {
+              add_id_info_uses_idfa: false
+            }
+          }
+
+          expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+          expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+
+          expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
+          expect(edit_version).to receive(:update).with(attributes: { usesIdfa: false }).and_return(edit_version)
+          expect(edit_version).to receive(:uses_idfa).and_return(false).exactly(2).times
+
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(nil)
+          expect(app).to receive(:create_review_submission).and_return(submission)
+
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
+
+          review_submitter.submit!(options)
         end
 
-        it 'does not find the one build until the candidate is corrected' do
-          allow(fake_app).to receive(:latest_version).and_return(fake_version)
-          allow(fake_version).to receive(:candidate_builds).and_return(fake_builds_with_trimmed_zero, fake_builds_with_trimmed_zero, fake_builds)
-          allow(review_submitter).to receive(:sleep)
-          expect(review_submitter.wait_for_build(fake_app, "1.02.3")).to equal(fake_builds.first)
+        it 'submission information with idfa false with existing idfa' do
+          options = {
+            platform: Spaceship::ConnectAPI::Platform::IOS,
+            submission_information: {
+              add_id_info_uses_idfa: false
+            }
+          }
+
+          expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+          expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+
+          expect(edit_version).to receive(:fetch_idfa_declaration).and_return(idfa_declaration)
+          expect(edit_version).to receive(:update).with(attributes: { usesIdfa: false }).and_return(edit_version)
+          expect(edit_version).to receive(:uses_idfa).and_return(false).exactly(2).times
+          expect(idfa_declaration).to receive(:delete!)
+
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(nil)
+          expect(app).to receive(:create_review_submission).and_return(submission)
+
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
+
+          review_submitter.submit!(options)
+        end
+
+        it 'submission information with idfa true with no idfa' do
+          options = {
+            platform: Spaceship::ConnectAPI::Platform::IOS,
+            submission_information: {
+              add_id_info_uses_idfa: true,
+
+              add_id_info_limits_tracking: true,
+              add_id_info_serves_ads: true,
+              add_id_info_tracks_install: true,
+              add_id_info_tracks_action: true
+            }
+          }
+
+          expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+          expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+
+          expect(edit_version).to receive(:fetch_idfa_declaration).and_return(nil)
+          expect(edit_version).to receive(:update).with(attributes: { usesIdfa: true }).and_return(edit_version)
+          expect(edit_version).to receive(:uses_idfa).and_return(true).exactly(2).times
+
+          expect(edit_version).to receive(:create_idfa_declaration).with(attributes: {
+            honorsLimitedAdTracking: true,
+            servesAds: true,
+            attributesAppInstallationToPreviousAd: true,
+            attributesActionWithPreviousAd: true
+          })
+
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(nil)
+          expect(app).to receive(:create_review_submission).and_return(submission)
+
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
+
+          review_submitter.submit!(options)
+        end
+
+        it 'submission information with idfa true with existing idfa' do
+          options = {
+            platform: Spaceship::ConnectAPI::Platform::IOS,
+            submission_information: {
+              add_id_info_uses_idfa: true,
+
+              add_id_info_limits_tracking: true,
+              add_id_info_serves_ads: true,
+              add_id_info_tracks_install: true,
+              add_id_info_tracks_action: true
+            }
+          }
+
+          expect(app).to receive(:get_edit_app_store_version).and_return(edit_version)
+          expect(review_submitter).to receive(:select_build).and_return(selected_build)
+
+          expect(selected_build).to receive(:uses_non_exempt_encryption).and_return(false)
+
+          expect(edit_version).to receive(:fetch_idfa_declaration).and_return(idfa_declaration)
+          expect(edit_version).to receive(:update).with(attributes: { usesIdfa: true }).and_return(edit_version)
+          expect(edit_version).to receive(:uses_idfa).and_return(true).exactly(2).times
+
+          expect(idfa_declaration).to receive(:update).with(attributes: {
+            honorsLimitedAdTracking: true,
+            servesAds: true,
+            attributesAppInstallationToPreviousAd: true,
+            attributesActionWithPreviousAd: true
+          })
+
+          expect(app).to receive(:get_in_progress_review_submission).and_return(nil)
+          expect(app).to receive(:get_ready_review_submission).and_return(nil)
+          expect(app).to receive(:create_review_submission).and_return(submission)
+
+          expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(submission).to receive(:submit_for_review)
+
+          review_submitter.submit!(options)
         end
       end
     end

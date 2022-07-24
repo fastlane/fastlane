@@ -8,6 +8,7 @@ module Spaceship
       end
 
       attr_accessor :id
+      attr_accessor :reverse_attr_map
 
       def initialize(id, attributes)
         self.id = id
@@ -15,7 +16,7 @@ module Spaceship
       end
 
       def update_attributes(attributes)
-        attributes.each do |key, value|
+        (attributes || []).each do |key, value|
           method = "#{key}=".to_sym
           self.send(method, value) if self.respond_to?(method)
         end
@@ -29,6 +30,7 @@ module Spaceship
       # Creates alias for :minOsVersion to :min_os_version
       #
       def attr_mapping(attr_map)
+        self.reverse_attr_map ||= attr_map.invert.transform_keys(&:to_sym)
         attr_map.each do |key, value|
           # Actual
           reader = value.to_sym
@@ -48,6 +50,24 @@ module Spaceship
           alias_method(key_reader, reader)
           alias_method(key_writer, writer)
         end
+      end
+
+      def reverse_attr_mapping(attributes)
+        return nil if attributes.nil?
+
+        # allows for getting map from either an instance or class execution
+        map = self.reverse_attr_map || self.class.reverse_attr_map
+
+        attributes.each_with_object({}) do |(k, v), memo|
+          key = map[k.to_sym] || k.to_sym
+          memo[key] = v
+        end
+      end
+
+      def to_json(*options)
+        instance_variables.map do |var|
+          [var.to_s[1..-1], instance_variable_get(var)]
+        end.to_h.to_json(*options)
       end
     end
 
@@ -132,7 +152,7 @@ module Spaceship
               id == included_data["id"] && type == included_data["type"]
             end
 
-            inflate_model(relationship_data, included)
+            inflate_model(relationship_data, included) if relationship_data
           end
 
           # Map a hash or an array of data

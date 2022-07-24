@@ -20,6 +20,16 @@ describe Fastlane::CLIToolsDistributor do
         Fastlane::CLIToolsDistributor.take_off
       end
     end
+
+    it "runs a separate aliased tool when the tool is available and the name is not used in a lane" do
+      FastlaneSpec::Env.with_ARGV(["build_app"]) do
+        require 'gym/options'
+        require 'gym/commands_generator'
+        expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileUseToolNameAsLane").at_least(:once)
+        expect(Gym::CommandsGenerator).to receive(:start).and_return(nil)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
   end
 
   describe "update checking" do
@@ -55,6 +65,48 @@ describe Fastlane::CLIToolsDistributor do
         expect do
           Fastlane::CLIToolsDistributor.take_off
         end.to raise_error(SystemExit)
+      end
+    end
+  end
+
+  describe "dotenv loading" do
+    require 'fastlane/helper/dotenv_helper'
+
+    it "passes --env option into DotenvHelper" do
+      FastlaneSpec::Env.with_ARGV(["lanes", "--env", "one"]) do
+        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with('one')
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
+
+    it "strips --env option" do
+      FastlaneSpec::Env.with_ARGV(["lanes", "--env", "one,two"]) do
+        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with('one,two')
+        Fastlane::CLIToolsDistributor.take_off
+        expect(ARGV).to eq(["lanes"])
+      end
+    end
+
+    it "ignores --env missing a value" do
+      FastlaneSpec::Env.with_ARGV(["lanes", "--env"]) do
+        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with(nil)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
+  end
+
+  describe "map_aliased_tools" do
+    before do
+      require 'fastlane'
+    end
+
+    it "returns nil when tool_name is nil" do
+      expect(Fastlane::CLIToolsDistributor.map_aliased_tools(nil)).to eq(nil)
+    end
+
+    Fastlane::TOOL_ALIASES.each do |key, value|
+      it "returns #{value} when tool_name is #{key}" do
+        expect(Fastlane::CLIToolsDistributor.map_aliased_tools(key)).to eq(value)
       end
     end
   end

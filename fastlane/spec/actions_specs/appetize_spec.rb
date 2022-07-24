@@ -85,6 +85,18 @@ describe Fastlane do
 
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_API_HOST]).to eql(api_host)
       end
+
+      it "raises an error if an invalid timeout was given" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            appetize({
+              api_token: '#{api_token}',
+              url: '#{url}',
+              timeout: 9999
+            })
+          end").runner.execute(:test)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /value provided doesn't match any of the supported options/)
+      end
     end
   end
 end

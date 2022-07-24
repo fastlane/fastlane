@@ -7,7 +7,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath 'com.android.tools.build:gradle:4.2.1'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.20.0'
     }
 }
@@ -16,11 +16,10 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        jcenter()
     }
 }
 
-Properties loadProperties(File propsFile) {
+static Properties loadProperties(File propsFile) {
     new Properties().with { props ->
         propsFile.withInputStream { stream ->
             props.load(stream)
@@ -32,7 +31,7 @@ Properties loadProperties(File propsFile) {
 /**
  * @return an Array containing the [versionNameString, versionCodeInt]
  */
-Object[] screengrabVersion(File propsFile) {
+static Object[] screengrabVersion(File propsFile) {
     Properties versionProps = loadProperties(propsFile)
 
     int versionMajor = (versionProps['major'] ?: 0) as int

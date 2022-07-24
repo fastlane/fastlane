@@ -84,18 +84,16 @@ module Fastlane
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXTENSIONS",
                                        description: "An array of file extensions that should be searched for",
                                        optional: true,
-                                       is_string: false),
+                                       type: Array),
           FastlaneCore::ConfigItem.new(key: :exclude,
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXCLUDE",
                                        description: "Exclude a certain pattern from the search",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :exclude_dirs,
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXCLUDE_DIRS",
                                        description: "An array of dirs that should not be included in the search",
                                        optional: true,
-                                       type: Array,
-                                       is_string: false)
+                                       type: Array)
         ]
       end
 

@@ -119,6 +119,10 @@ module CredentialsManager
       setter(:itc_team_name, *args, &block)
     end
 
+    def itc_provider(*args, &block)
+      setter(:itc_provider, *args, &block)
+    end
+
     # Android
     def json_key_file(*args, &block)
       setter(:json_key_file, *args, &block)

@@ -7,10 +7,22 @@ describe Fastlane do
         end.to raise_exception("Could not find Fastfile at path './fastlane/spec/fixtures/fastfiles/fastfileNotHere'")
       end
 
-      it "raises an error if unknow method is called" do
+      it "raises an error if unknown method is called" do
         expect do
           Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileInvalid')
         end.to raise_exception("Could not find action, lane or variable 'laneasdf'. Check out the documentation for more details: https://docs.fastlane.tools/actions")
+      end
+
+      it "prints a warning if an uninstalled library is required" do
+        expect_any_instance_of(Fastlane::FastFile).to receive(:parse)
+        expect(UI).to receive(:important).with("You have required a gem, if this is a third party gem, please use `fastlane_require 'some_remote_gem'` to ensure the gem is installed locally.")
+        Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileRequireUninstalledGem')
+      end
+
+      it "does not print a warning if required library is installed" do
+        expect_any_instance_of(Fastlane::FastFile).to receive(:parse)
+        expect(UI).not_to(receive(:important))
+        Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileRequireInstalledGem')
       end
     end
 
@@ -21,24 +33,56 @@ describe Fastlane do
 
       context "with command argument" do
         it "passes command as string with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git commit", log: true, error_callback: nil)
           @ff.sh("git commit")
         end
 
         it "passes command as string and log with default error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git commit", log: true, error_callback: nil)
+          @ff.sh("git commit", log: true)
+        end
+
+        it "passes command as string, step_name, and log false with default error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("shell command").and_call_original
+
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git commit", log: false, error_callback: nil)
-          @ff.sh("git commit", log: false)
+          @ff.sh("git commit", step_name: "some_name", log: false)
+        end
+
+        it "passes command as string, step_name, and log true with default error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("some_name").and_call_original
+
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git commit", log: true, error_callback: nil)
+          @ff.sh("git commit", step_name: "some_name", log: true)
         end
 
         it "passes command as array with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git", "commit", log: true, error_callback: nil)
+          @ff.sh("git", "commit")
+        end
+
+        it "passes command as array with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git", "commit", log: true, error_callback: nil)
           @ff.sh("git", "commit")
         end
 
         it "yields the status, result and command" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
           proc = proc {}
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git", "commit", log: true, error_callback: nil) do |*args, &block|
@@ -50,24 +94,32 @@ describe Fastlane do
 
       context "with named command keyword" do
         it "passes command as string with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git commit", log: true, error_callback: nil)
           @ff.sh(command: "git commit")
         end
 
         it "passes command as string and log with default error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("shell command").and_call_original
+
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git commit", log: false, error_callback: nil)
           @ff.sh(command: "git commit", log: false)
         end
 
         it "passes command as array with default log and error_callback" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git", "commit", log: true, error_callback: nil)
           @ff.sh(command: ["git", "commit"])
         end
 
         it "yields the status, result and command" do
+          expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
+
           proc = proc {}
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git", "commit", log: true, error_callback: nil) do |*args, &block|
@@ -129,7 +181,7 @@ describe Fastlane do
         end
       end
 
-      it "raises an error if the name is on a black list" do
+      it "raises an error if the name is on a deny list" do
         expect(UI).to receive(:user_error!).with("Lane name 'run' is invalid")
         @ff.lane(:run) do
         end
@@ -207,7 +259,7 @@ describe Fastlane do
       end
 
       it "logs a warning if and unsupported action is called on an non officially supported platform" do
-        expect(FastlaneCore::UI).to receive(:important).with("Action 'frameit' isn't known to support operating system 'android'.")
+        expect(FastlaneCore::UI).to receive(:important).with("Action 'team_name' isn't known to support operating system 'android'.")
         @ff.runner.execute('unsupported_action', 'android')
       end
     end
@@ -419,7 +471,7 @@ lane :beta do
   sigh(app_identifier: "hi"
 end
 RUBY
-        expect(UI).to receive(:user_error!).with(%r{Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected (keyword_end|end), expecting '\)'})
+        expect(UI).to receive(:user_error!).with(%r{Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected (keyword_end|end|`end'), expecting '\)'})
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileSytnaxError')
       end
 
@@ -430,7 +482,7 @@ RUBY
           cases = [:abc,
         end
         RUBY
-        expect(UI).to receive(:user_error!).with(/Syntax error in your Fastfile on line 3: \(eval\):3: syntax error, unexpected (keyword_end|end), expecting '\]'\n        end\n.*/)
+        expect(UI).to receive(:user_error!).with(/Syntax error in your Fastfile on line 3: \(eval\):3: syntax error, unexpected (keyword_end|end|`end'), expecting '\]'\n        end\n.*/)
 
         ff = Fastlane::FastFile.new.parse(<<-RUBY.chomp)
         lane :test do
@@ -461,7 +513,7 @@ lane :beta do
   sigh(app_identifier: "hi"
 end
 RUBY
-        expect(UI).to receive(:user_error!).with(%r{Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected (keyword_end|end), expecting '\)'})
+        expect(UI).to receive(:user_error!).with(%r{Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected (keyword_end|end|`end'), expecting '\)'})
         ff.import('./FastfileSytnaxError')
       end
 

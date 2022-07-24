@@ -4,6 +4,7 @@ require_relative 'tunes/tunes_client'
 module Spaceship
   class Client
     def handle_two_step_or_factor(response)
+      raise "2FA can only be performed in interactive mode" if ENV["SPACESHIP_ONLY_ALLOW_INTERACTIVE_2FA"] == "true" && ENV["FASTLANE_IS_INTERACTIVE"] == "false"
       # extract `x-apple-id-session-id` and `scnt` from response, to be used by `update_request_headers`
       @x_apple_id_session_id = response["x-apple-id-session-id"]
       @scnt = response["scnt"]
@@ -131,18 +132,35 @@ module Spaceship
         puts("Environment variable `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` is set, automatically requesting 2FA token via SMS to that number")
         puts("SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER = #{env_2fa_sms_default_phone_number}")
         puts("")
+
         phone_number = env_2fa_sms_default_phone_number
         phone_id = phone_id_from_number(response.body["trustedPhoneNumbers"], phone_number)
+        push_mode = push_mode_from_number(response.body["trustedPhoneNumbers"], phone_number)
+        # don't request sms if no trusted devices and env default is the only trusted number,
+        # code was automatically sent
+        should_request_code = !sms_automatically_sent(response)
         code_type = 'phone'
-        body = request_two_factor_code_from_phone(phone_id, phone_number, code_length)
+        body = request_two_factor_code_from_phone(phone_id, phone_number, code_length, push_mode, should_request_code)
+      elsif sms_automatically_sent(response) # sms fallback, code was automatically sent
+        fallback_number = response.body["trustedPhoneNumbers"].first
+        phone_number = fallback_number["numberWithDialCode"]
+        phone_id = fallback_number["id"]
+        push_mode = fallback_number['pushMode']
+
+        code_type = 'phone'
+        body = request_two_factor_code_from_phone(phone_id, phone_number, code_length, push_mode, false)
+      elsif sms_fallback(response) # sms fallback but code wasn't sent bec > 1 phone number
+        code_type = 'phone'
+        body = request_two_factor_code_from_phone_choose(response.body["trustedPhoneNumbers"], code_length)
       else
         puts("(Input `sms` to escape this prompt and select a trusted phone number to send the code as a text message)")
         puts("")
         puts("(You can also set the environment variable `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` to automate this)")
-        puts("(Read more at: https://github.com/fastlane/fastlane/blob/master/spaceship/docs/Authentication.md#auto-select-sms-via-spaceship-2fa-sms-default-phone-number)")
+        puts("(Read more at: https://github.com/fastlane/fastlane/blob/master/spaceship/docs/Authentication.md#auto-select-sms-via-spaceship_2fa_sms_default_phone_number)")
         puts("")
-        code_type = 'trusteddevice'
+
         code = ask_for_2fa_code("Please enter the #{code_length} digit code:")
+        code_type = 'trusteddevice'
         body = { "securityCode" => { "code" => code.to_s } }.to_json
 
         # User exited by entering `sms` and wants to choose phone number for SMS
@@ -191,40 +209,33 @@ module Spaceship
       return true
     end
 
+    # For reference in case auth behavior changes:
+    # The "noTrustedDevices" field is only present
+    # in the response for `GET /appleauth/auth`
+
+    # Account is not signed into any devices that can display a verification code
+    def sms_fallback(response)
+      response.body["noTrustedDevices"]
+    end
+
+    # see `sms_fallback` + account has only one trusted number for receiving an sms
+    def sms_automatically_sent(response)
+      (response.body["trustedPhoneNumbers"] || []).count == 1 && sms_fallback(response)
+    end
+
     # extracted into its own method for testing
     def ask_for_2fa_code(text)
       ask(text)
     end
 
+    # extracted into its own method for testing
+    def choose_phone_number(opts)
+      choose(*opts)
+    end
+
     def phone_id_from_number(phone_numbers, phone_number)
-      characters_to_remove_from_phone_numbers = ' \-()"'
-
-      # start with e.g. +49 162 1234585 or +1-123-456-7866
-      phone_number = phone_number.tr(characters_to_remove_from_phone_numbers, '')
-      # cleaned: +491621234585 or +11234567866
-
       phone_numbers.each do |phone|
-        # rubocop:disable Style/AsciiComments
-        # start with: +49 •••• •••••85 or +1 (•••) •••-••66
-        number_with_dialcode_masked = phone['numberWithDialCode'].tr(characters_to_remove_from_phone_numbers, '')
-        # cleaned: +49•••••••••85 or +1••••••••66
-        # rubocop:enable Style/AsciiComments
-
-        maskings_count = number_with_dialcode_masked.count('•') # => 9 or 8
-        pattern = /^([0-9+]{2,4})([•]{#{maskings_count}})([0-9]{2})$/
-        # following regex: range from maskings_count-2 because sometimes the masked number has 1 or 2 dots more than the actual number
-        # e.g. https://github.com/fastlane/fastlane/issues/14969
-        replacement = "\\1([0-9]{#{maskings_count - 2},#{maskings_count}})\\3"
-        number_with_dialcode_regex_part = number_with_dialcode_masked.gsub(pattern, replacement)
-        # => +49([0-9]{8,9})85 or +1([0-9]{7,8})66
-
-        backslash = '\\'
-        number_with_dialcode_regex_part = backslash + number_with_dialcode_regex_part
-        number_with_dialcode_regex = /^#{number_with_dialcode_regex_part}$/
-        # => /^\+49([0-9]{8})85$/ or /^\+1([0-9]{7,8})66$/
-
-        return phone['id'] if phone_number =~ number_with_dialcode_regex
-        # +491621234585 matches /^\+49([0-9]{8})85$/
+        return phone['id'] if match_phone_to_masked_phone(phone_number, phone['numberWithDialCode'])
       end
 
       # Handle case of phone_number not existing in phone_numbers because ENV var is wrong or matcher is broken
@@ -235,10 +246,58 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
 )
     end
 
+    def push_mode_from_number(phone_numbers, phone_number)
+      phone_numbers.each do |phone|
+        return phone['pushMode'] if match_phone_to_masked_phone(phone_number, phone['numberWithDialCode'])
+      end
+
+      # If no pushMode was supplied, assume sms
+      return "sms"
+    end
+
+    def match_phone_to_masked_phone(phone_number, masked_number)
+      characters_to_remove_from_phone_numbers = ' \-()"'
+
+      # start with e.g. +49 162 1234585 or +1-123-456-7866
+      phone_number = phone_number.tr(characters_to_remove_from_phone_numbers, '')
+      # cleaned: +491621234585 or +11234567866
+
+      # rubocop:disable Style/AsciiComments
+      # start with: +49 •••• •••••85 or +1 (•••) •••-••66
+      number_with_dialcode_masked = masked_number.tr(characters_to_remove_from_phone_numbers, '')
+      # cleaned: +49•••••••••85 or +1••••••••66
+      # rubocop:enable Style/AsciiComments
+
+      maskings_count = number_with_dialcode_masked.count('•') # => 9 or 8
+      pattern = /^([0-9+]{2,4})([•]{#{maskings_count}})([0-9]{2})$/
+      # following regex: range from maskings_count-2 because sometimes the masked number has 1 or 2 dots more than the actual number
+      # e.g. https://github.com/fastlane/fastlane/issues/14969
+      replacement = "\\1([0-9]{#{maskings_count - 2},#{maskings_count}})\\3"
+      number_with_dialcode_regex_part = number_with_dialcode_masked.gsub(pattern, replacement)
+      # => +49([0-9]{8,9})85 or +1([0-9]{7,8})66
+
+      backslash = '\\'
+      number_with_dialcode_regex_part = backslash + number_with_dialcode_regex_part
+      number_with_dialcode_regex = /^#{number_with_dialcode_regex_part}$/
+      # => /^\+49([0-9]{8})85$/ or /^\+1([0-9]{7,8})66$/
+
+      return phone_number =~ number_with_dialcode_regex
+      # +491621234585 matches /^\+49([0-9]{8})85$/
+    end
+
     def phone_id_from_masked_number(phone_numbers, masked_number)
       phone_numbers.each do |phone|
         return phone['id'] if phone['numberWithDialCode'] == masked_number
       end
+    end
+
+    def push_mode_from_masked_number(phone_numbers, masked_number)
+      phone_numbers.each do |phone|
+        return phone['pushMode'] if phone['numberWithDialCode'] == masked_number
+      end
+
+      # If no pushMode was supplied, assume sms
+      return "sms"
     end
 
     def request_two_factor_code_from_phone_choose(phone_numbers, code_length)
@@ -247,31 +306,34 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
       available = phone_numbers.collect do |current|
         current['numberWithDialCode']
       end
-      chosen = choose(*available)
+      chosen = choose_phone_number(available)
       phone_id = phone_id_from_masked_number(phone_numbers, chosen)
+      push_mode = push_mode_from_masked_number(phone_numbers, chosen)
 
-      request_two_factor_code_from_phone(phone_id, chosen, code_length)
+      request_two_factor_code_from_phone(phone_id, chosen, code_length, push_mode)
     end
 
     # this is used in two places: after choosing a phone number and when a phone number is set via ENV var
-    def request_two_factor_code_from_phone(phone_id, phone_number, code_length)
-      # Request code
-      r = request(:put) do |req|
-        req.url("https://idmsa.apple.com/appleauth/auth/verify/phone")
-        req.headers['Content-Type'] = 'application/json'
-        req.body = { "phoneNumber" => { "id" => phone_id }, "mode" => "sms" }.to_json
-        update_request_headers(req)
+    def request_two_factor_code_from_phone(phone_id, phone_number, code_length, push_mode = "sms", should_request_code = true)
+      if should_request_code
+        # Request code
+        r = request(:put) do |req|
+          req.url("https://idmsa.apple.com/appleauth/auth/verify/phone")
+          req.headers['Content-Type'] = 'application/json'
+          req.body = { "phoneNumber" => { "id" => phone_id }, "mode" => push_mode }.to_json
+          update_request_headers(req)
+        end
+
+        # we use `Spaceship::TunesClient.new.handle_itc_response`
+        # since this might be from the Dev Portal, but for 2 step
+        Spaceship::TunesClient.new.handle_itc_response(r.body)
+
+        puts("Successfully requested text message to #{phone_number}")
       end
-
-      # we use `Spaceship::TunesClient.new.handle_itc_response`
-      # since this might be from the Dev Portal, but for 2 step
-      Spaceship::TunesClient.new.handle_itc_response(r.body)
-
-      puts("Successfully requested text message to #{phone_number}")
 
       code = ask_for_2fa_code("Please enter the #{code_length} digit code you received at #{phone_number}:")
 
-      return { "securityCode" => { "code" => code.to_s }, "phoneNumber" => { "id" => phone_id }, "mode" => "sms" }.to_json
+      return { "securityCode" => { "code" => code.to_s }, "phoneNumber" => { "id" => phone_id }, "mode" => push_mode }.to_json
     end
 
     def store_session

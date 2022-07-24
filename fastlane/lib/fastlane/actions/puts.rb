@@ -26,8 +26,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_PUTS_MESSAGE",
                                        description: "Message to be printed out",
-                                       optional: true,
-                                       is_string: true)
+                                       optional: true)
         ]
       end
 

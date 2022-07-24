@@ -10,6 +10,7 @@ module Spaceship
       attr_accessor :external_build_state
 
       module InternalState
+        PROCESSING = "PROCESSING"
         PROCESSING_EXCEPTION = "PROCESSING_EXCEPTION"
         MISSING_EXPORT_COMPLIANCE = "MISSING_EXPORT_COMPLIANCE"
         READY_FOR_BETA_TESTING = "READY_FOR_BETA_TESTING"
@@ -47,9 +48,21 @@ module Spaceship
       #
       # Helpers
       #
+      #
+      def ready_for_internal_testing?
+        return internal_build_state == InternalState::READY_FOR_BETA_TESTING
+      end
+
+      def processed?
+        return internal_build_state != InternalState::PROCESSING && external_build_state != ExternalState::PROCESSING
+      end
 
       def ready_for_beta_submission?
         return external_build_state == ExternalState::READY_FOR_BETA_SUBMISSION
+      end
+
+      def missing_export_compliance?
+        return external_build_state == ExternalState::MISSING_EXPORT_COMPLIANCE
       end
     end
   end

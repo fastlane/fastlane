@@ -14,6 +14,13 @@ module Match
           },
           "google_cloud" => lambda { |params|
             return nil
+          },
+          "s3" => lambda { |params|
+            params[:keychain_name] = params[:s3_bucket]
+            return Encryption::OpenSSL.configure(params)
+          },
+          "gitlab_secure_files" => lambda { |params|
+            return nil
           }
         }
       end

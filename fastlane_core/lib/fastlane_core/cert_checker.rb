@@ -10,6 +10,7 @@ module FastlaneCore
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
       ids = installed_identies(in_keychain: in_keychain)
+      ids += installed_installers(in_keychain: in_keychain)
       finger_print = sha1_fingerprint(path)
 
       return ids.include?(finger_print)
@@ -47,8 +48,35 @@ module FastlaneCore
       return ids
     end
 
+    def self.installed_installers(in_keychain: nil)
+      available = self.list_available_third_party_mac_installer(in_keychain: in_keychain)
+      available += self.list_available_developer_id_installer(in_keychain: in_keychain)
+
+      return available.scan(/^SHA-1 hash: ([[:xdigit:]]+)$/).flatten
+    end
+
     def self.list_available_identities(in_keychain: nil)
+      # -v  Show valid identities only (default is to show all identities)
+      # -p  Specify policy to evaluate
       commands = ['security find-identity -v -p codesigning']
+      commands << in_keychain if in_keychain
+      `#{commands.join(' ')}`
+    end
+
+    def self.list_available_third_party_mac_installer(in_keychain: nil)
+      # -Z  Print SHA-256 (and SHA-1) hash of the certificate
+      # -a  Find all matching certificates, not just the first one
+      # -c  Match on "name" when searching (optional)
+      commands = ['security find-certificate -Z -a -c "3rd Party Mac Developer Installer"']
+      commands << in_keychain if in_keychain
+      `#{commands.join(' ')}`
+    end
+
+    def self.list_available_developer_id_installer(in_keychain: nil)
+      # -Z  Print SHA-256 (and SHA-1) hash of the certificate
+      # -a  Find all matching certificates, not just the first one
+      # -c  Match on "name" when searching (optional)
+      commands = ['security find-certificate -Z -a -c "Developer ID Installer"']
       commands << in_keychain if in_keychain
       `#{commands.join(' ')}`
     end
@@ -56,13 +84,14 @@ module FastlaneCore
     def self.wwdr_certificate_installed?
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
       keychain = wwdr_keychain
-      response = Helper.backticks("security find-certificate -c '#{certificate_name}' #{keychain.shellescape}", print: FastlaneCore::Globals.verbose?)
-      return response.include?("attributes:")
+      response = Helper.backticks("security find-certificate -a -c '#{certificate_name}' #{keychain.shellescape}", print: FastlaneCore::Globals.verbose?)
+      certs = response.split("keychain: \"#{keychain}\"").drop(1)
+      certs.count >= 1
     end
 
     def self.install_wwdr_certificate
-      url = 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
-      file = Tempfile.new('AppleWWDRCA')
+      url = 'https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer'
+      file = Tempfile.new(File.basename(url))
       filename = file.path
       keychain = wwdr_keychain
       keychain = "-k #{keychain.shellescape}" unless keychain.empty?
@@ -91,8 +120,8 @@ module FastlaneCore
 
     def self.wwdr_keychain
       priority = [
-        "security list-keychains -d user",
-        "security default-keychain -d user"
+        "security default-keychain -d user",
+        "security list-keychains -d user"
       ]
       priority.each do |command|
         keychains = Helper.backticks(command, print: FastlaneCore::Globals.verbose?).split("\n")

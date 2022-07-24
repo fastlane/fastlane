@@ -17,6 +17,7 @@ module Fastlane
         cmd << "--danger_id=#{danger_id}" if danger_id
         cmd << "--dangerfile=#{dangerfile}" if dangerfile
         cmd << "--fail-on-errors=true" if params[:fail_on_errors]
+        cmd << "--fail-if-no-pr=true" if params[:fail_if_no_pr]
         cmd << "--new-comment" if params[:new_comment]
         cmd << "--remove-previous-comments" if params[:remove_previous_comments]
         cmd << "--base=#{base}" if base
@@ -24,6 +25,8 @@ module Fastlane
         cmd << "pr #{pr}" if pr
 
         ENV['DANGER_GITHUB_API_TOKEN'] = params[:github_api_token] if params[:github_api_token]
+        ENV['DANGER_GITHUB_HOST'] = params[:github_enterprise_host] if params[:github_enterprise_host]
+        ENV['DANGER_GITHUB_API_BASE_URL'] = params[:github_enterprise_api_base_url] if params[:github_enterprise_api_base_url]
 
         Actions.sh(cmd.join(' '))
       end
@@ -44,62 +47,74 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
                                        env_name: "FL_DANGER_USE_BUNDLE_EXEC",
                                        description: "Use bundle exec when there is a Gemfile presented",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_DANGER_VERBOSE",
                                        description: "Show more debugging information",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :danger_id,
                                        env_name: "FL_DANGER_ID",
                                        description: "The identifier of this Danger instance",
-                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :dangerfile,
                                        env_name: "FL_DANGER_DANGERFILE",
                                        description: "The location of your Dangerfile",
-                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :github_api_token,
                                        env_name: "FL_DANGER_GITHUB_API_TOKEN",
                                        description: "GitHub API token for danger",
                                        sensitive: true,
-                                       is_string: true,
+                                       code_gen_sensitive: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :github_enterprise_host,
+                                       env_name: "FL_DANGER_GITHUB_ENTERPRISE_HOST",
+                                       description: "GitHub host URL for GitHub Enterprise",
+                                       sensitive: true,
+                                       code_gen_sensitive: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :github_enterprise_api_base_url,
+                                       env_name: "FL_DANGER_GITHUB_ENTERPRISE_API_BASE_URL",
+                                       description: "GitHub API base URL for GitHub Enterprise",
+                                       sensitive: true,
+                                       code_gen_sensitive: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :fail_on_errors,
                                        env_name: "FL_DANGER_FAIL_ON_ERRORS",
                                        description: "Should always fail the build process, defaults to false",
-                                       is_string: false,
+                                       type: Boolean,
                                        optional: true,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :new_comment,
                                        env_name: "FL_DANGER_NEW_COMMENT",
                                        description: "Makes Danger post a new comment instead of editing its previous one",
-                                       is_string: false,
+                                       type: Boolean,
                                        optional: true,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :remove_previous_comments,
                                        env_name: "FL_DANGER_REMOVE_PREVIOUS_COMMENT",
                                        description: "Makes Danger remove all previous comment and create a new one in the end of the list",
-                                       is_string: false,
+                                       type: Boolean,
                                        optional: true,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :base,
                                        env_name: "FL_DANGER_BASE",
                                        description: "A branch/tag/commit to use as the base of the diff. [master|dev|stable]",
-                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :head,
                                        env_name: "FL_DANGER_HEAD",
                                        description: "A branch/tag/commit to use as the head. [master|dev|stable]",
-                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :pr,
                                        env_name: "FL_DANGER_PR",
                                        description: "Run danger on a specific pull request. e.g. \"https://github.com/danger/danger/pull/518\"",
-                                       is_string: true,
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :fail_if_no_pr,
+                                       env_name: "FL_DANGER_FAIL_IF_NO_PR",
+                                       description: "Fail Danger execution if no PR is found",
+                                       type: Boolean,
+                                       default_value: false)
         ]
       end
 

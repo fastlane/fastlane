@@ -17,6 +17,21 @@ describe FastlaneCore do
       end
     end
 
+    describe '#colors_disabled?' do
+      it "should return false if no environment variables set" do
+        stub_const('ENV', {})
+        expect(FastlaneCore::Helper.colors_disabled?).to be(false)
+      end
+      it "should return true if FASTLANE_DISABLE_COLORS" do
+        stub_const('ENV', { "FASTLANE_DISABLE_COLORS" => "true" })
+        expect(FastlaneCore::Helper.colors_disabled?).to be(true)
+      end
+      it "should return true if NO_COLORS" do
+        stub_const('ENV', { "NO_COLOR" => 1 })
+        expect(FastlaneCore::Helper.colors_disabled?).to be(true)
+      end
+    end
+
     describe '#json_file?' do
       it "should return false on invalid json file" do
         expect(FastlaneCore::Helper.json_file?("./fastlane_core/spec/fixtures/json_file/broken")).to be(false)
@@ -30,6 +45,11 @@ describe FastlaneCore do
       it "returns false when not building in a known CI environment" do
         stub_const('ENV', {})
         expect(FastlaneCore::Helper.ci?).to be(false)
+      end
+
+      it "returns true when building in CircleCI" do
+        stub_const('ENV', { 'CIRCLECI' => true })
+        expect(FastlaneCore::Helper.ci?).to be(true)
       end
 
       it "returns true when building in Jenkins" do
@@ -72,6 +92,18 @@ describe FastlaneCore do
       it "returns true when building in Azure DevOps (VSTS) " do
         stub_const('ENV', { 'TF_BUILD' => true })
         expect(FastlaneCore::Helper.ci?).to be(true)
+      end
+    end
+
+    describe "#is_circle_ci?" do
+      it "returns true when building in CircleCI" do
+        stub_const('ENV', { 'CIRCLECI' => true })
+        expect(FastlaneCore::Helper.ci?).to be(true)
+      end
+
+      it "returns false when not building in a known CI environment" do
+        stub_const('ENV', {})
+        expect(FastlaneCore::Helper.ci?).to be(false)
       end
     end
 
@@ -118,6 +150,42 @@ describe FastlaneCore do
       it "#xcode_version", requires_xcode: true do
         expect(FastlaneCore::Helper.xcode_version).to match(/^\d[\.\d]+$/)
       end
+
+      context "#user_defined_itms_path?" do
+        it "not defined", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+          expect(FastlaneCore::Helper.user_defined_itms_path?).to be(false)
+        end
+
+        it "is defined", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/some/path/to/something' })
+          expect(FastlaneCore::Helper.user_defined_itms_path?).to be(true)
+        end
+      end
+
+      context "#user_defined_itms_path" do
+        it "not defined", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+          expect(FastlaneCore::Helper.user_defined_itms_path).to be(nil)
+        end
+
+        it "is defined", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/some/path/to/something' })
+          expect(FastlaneCore::Helper.user_defined_itms_path).to eq('/some/path/to/something')
+        end
+      end
+
+      context "#itms_path" do
+        it "default", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+          expect(FastlaneCore::Helper.itms_path).to match(/itms/)
+        end
+
+        it "uses FASTLANE_ITUNES_TRANSPORTER_PATH", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/some/path/to/something' })
+          expect(FastlaneCore::Helper.itms_path).to eq('/some/path/to/something')
+        end
+      end
     end
 
     describe "#zip_directory" do
@@ -140,6 +208,50 @@ describe FastlaneCore do
         expect(FastlaneCore::UI).to receive(:command).exactly(1).times
 
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: true, print: false)
+      end
+    end
+
+    describe "#fastlane_enabled?" do
+      it "returns false when FastlaneCore::FastlaneFolder.path is nil" do
+        expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+        expect(FastlaneCore::Helper.fastlane_enabled?).to be(false)
+      end
+
+      it "returns true when FastlaneCore::FastlaneFolder.path is not nil" do
+        expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return('./fastlane')
+        expect(FastlaneCore::Helper.fastlane_enabled?).to be(true)
+      end
+    end
+
+    describe '#open_uri' do
+      before do
+        stub_request(:get, 'https://fastlane.tools').to_return(body: 'SOME_TEXT', status: 200)
+      end
+
+      it 'performs URI.open and return IO like object that can be read' do
+        expect(FastlaneCore::Helper.open_uri('https://fastlane.tools')).to respond_to(:read)
+      end
+
+      it 'performs URI.open with block' do
+        is_block_called = false
+        FastlaneCore::Helper.open_uri('https://fastlane.tools') do |content|
+          expect(content).to respond_to(:read)
+          is_block_called = true
+        end
+        expect(is_block_called).to be(true)
+      end
+
+      it 'performs URI.open with options' do
+        expect(FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb')).to respond_to(:read)
+      end
+
+      it 'performs URI.open with options and block' do
+        is_block_called = false
+        FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb') do |content|
+          expect(content).to respond_to(:read)
+          is_block_called = true
+        end
+        expect(is_block_called).to be(true)
       end
     end
   end

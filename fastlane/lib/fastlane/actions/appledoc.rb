@@ -55,7 +55,7 @@ module Fastlane
 
       def self.run(params)
         unless Helper.test?
-          UI.message("Install using `brew install homebrew/boneyard/appledoc`")
+          UI.message("Install using `brew install appledoc`")
           UI.user_error!("appledoc not installed") if `which appledoc`.length == 0
         end
 
@@ -125,63 +125,63 @@ module Fastlane
       def self.available_options
         [
           # PATHS
-          FastlaneCore::ConfigItem.new(key: :input, env_name: "FL_APPLEDOC_INPUT", description: "Path(s) to source file directories or individual source files. Accepts a single path or an array of paths", is_string: false),
-          FastlaneCore::ConfigItem.new(key: :output, env_name: "FL_APPLEDOC_OUTPUT", description: "Output path", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :templates, env_name: "FL_APPLEDOC_TEMPLATES", description: "Template files path", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_install_path, env_name: "FL_APPLEDOC_DOCSET_INSTALL_PATH", description: "DocSet installation path", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :include, env_name: "FL_APPLEDOC_INCLUDE", description: "Include static doc(s) at path", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :ignore, env_name: "FL_APPLEDOC_IGNORE", description: "Ignore given path", is_string: false, optional: true),
-          FastlaneCore::ConfigItem.new(key: :exclude_output, env_name: "FL_APPLEDOC_EXCLUDE_OUTPUT", description: "Exclude given path from output", is_string: false, optional: true),
-          FastlaneCore::ConfigItem.new(key: :index_desc, env_name: "FL_APPLEDOC_INDEX_DESC", description: "File including main index description", is_string: true, optional: true),
+          FastlaneCore::ConfigItem.new(key: :input, env_name: "FL_APPLEDOC_INPUT", description: "Path(s) to source file directories or individual source files. Accepts a single path or an array of paths", type: Array),
+          FastlaneCore::ConfigItem.new(key: :output, env_name: "FL_APPLEDOC_OUTPUT", description: "Output path", optional: true),
+          FastlaneCore::ConfigItem.new(key: :templates, env_name: "FL_APPLEDOC_TEMPLATES", description: "Template files path", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_install_path, env_name: "FL_APPLEDOC_DOCSET_INSTALL_PATH", description: "DocSet installation path", optional: true),
+          FastlaneCore::ConfigItem.new(key: :include, env_name: "FL_APPLEDOC_INCLUDE", description: "Include static doc(s) at path", optional: true),
+          FastlaneCore::ConfigItem.new(key: :ignore, env_name: "FL_APPLEDOC_IGNORE", description: "Ignore given path", type: Array, optional: true),
+          FastlaneCore::ConfigItem.new(key: :exclude_output, env_name: "FL_APPLEDOC_EXCLUDE_OUTPUT", description: "Exclude given path from output", type: Array, optional: true),
+          FastlaneCore::ConfigItem.new(key: :index_desc, env_name: "FL_APPLEDOC_INDEX_DESC", description: "File including main index description", optional: true),
 
           # PROJECT INFO
-          FastlaneCore::ConfigItem.new(key: :project_name, env_name: "FL_APPLEDOC_PROJECT_NAME", description: "Project name", is_string: true),
-          FastlaneCore::ConfigItem.new(key: :project_version, env_name: "FL_APPLEDOC_PROJECT_VERSION", description: "Project version", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :project_company, env_name: "FL_APPLEDOC_PROJECT_COMPANY", description: "Project company", is_string: true),
-          FastlaneCore::ConfigItem.new(key: :company_id, env_name: "FL_APPLEDOC_COMPANY_ID", description: "Company UTI (i.e. reverse DNS name)", is_string: true, optional: true),
+          FastlaneCore::ConfigItem.new(key: :project_name, env_name: "FL_APPLEDOC_PROJECT_NAME", description: "Project name"),
+          FastlaneCore::ConfigItem.new(key: :project_version, env_name: "FL_APPLEDOC_PROJECT_VERSION", description: "Project version", optional: true),
+          FastlaneCore::ConfigItem.new(key: :project_company, env_name: "FL_APPLEDOC_PROJECT_COMPANY", description: "Project company"),
+          FastlaneCore::ConfigItem.new(key: :company_id, env_name: "FL_APPLEDOC_COMPANY_ID", description: "Company UTI (i.e. reverse DNS name)", optional: true),
 
           # OUTPUT GENERATION
-          FastlaneCore::ConfigItem.new(key: :create_html, env_name: "FL_APPLEDOC_CREATE_HTML", description: "Create HTML", is_string: false, default_value: false),
-          FastlaneCore::ConfigItem.new(key: :create_docset, env_name: "FL_APPLEDOC_CREATE_DOCSET", description: "Create documentation set", is_string: false, default_value: false),
-          FastlaneCore::ConfigItem.new(key: :install_docset, env_name: "FL_APPLEDOC_INSTALL_DOCSET", description: "Install documentation set to Xcode", is_string: false, default_value: false),
-          FastlaneCore::ConfigItem.new(key: :publish_docset, env_name: "FL_APPLEDOC_PUBLISH_DOCSET", description: "Prepare DocSet for publishing", is_string: false, default_value: false),
-          FastlaneCore::ConfigItem.new(key: :no_create_docset, env_name: "FL_APPLEDOC_NO_CREATE_DOCSET", description: "Create HTML and skip creating a DocSet", is_string: false, default_value: false),
-          FastlaneCore::ConfigItem.new(key: :html_anchors, env_name: "FL_APPLEDOC_HTML_ANCHORS", description: "The html anchor format to use in DocSet HTML", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :clean_output, env_name: "FL_APPLEDOC_CLEAN_OUTPUT", description: "Remove contents of output path before starting", is_string: false, default_value: false),
+          FastlaneCore::ConfigItem.new(key: :create_html, env_name: "FL_APPLEDOC_CREATE_HTML", description: "Create HTML", type: Boolean, default_value: false),
+          FastlaneCore::ConfigItem.new(key: :create_docset, env_name: "FL_APPLEDOC_CREATE_DOCSET", description: "Create documentation set", type: Boolean, default_value: false),
+          FastlaneCore::ConfigItem.new(key: :install_docset, env_name: "FL_APPLEDOC_INSTALL_DOCSET", description: "Install documentation set to Xcode", type: Boolean, default_value: false),
+          FastlaneCore::ConfigItem.new(key: :publish_docset, env_name: "FL_APPLEDOC_PUBLISH_DOCSET", description: "Prepare DocSet for publishing", type: Boolean, default_value: false),
+          FastlaneCore::ConfigItem.new(key: :no_create_docset, env_name: "FL_APPLEDOC_NO_CREATE_DOCSET", description: "Create HTML and skip creating a DocSet", type: Boolean, default_value: false),
+          FastlaneCore::ConfigItem.new(key: :html_anchors, env_name: "FL_APPLEDOC_HTML_ANCHORS", description: "The html anchor format to use in DocSet HTML", optional: true),
+          FastlaneCore::ConfigItem.new(key: :clean_output, env_name: "FL_APPLEDOC_CLEAN_OUTPUT", description: "Remove contents of output path before starting", type: Boolean, default_value: false),
 
           # DOCUMENTATION SET INFO
-          FastlaneCore::ConfigItem.new(key: :docset_bundle_id, env_name: "FL_APPLEDOC_DOCSET_BUNDLE_ID", description: "DocSet bundle identifier", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_bundle_name, env_name: "FL_APPLEDOC_DOCSET_BUNDLE_NAME", description: "DocSet bundle name", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_desc, env_name: "FL_APPLEDOC_DOCSET_DESC", description: "DocSet description", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_copyright, env_name: "FL_APPLEDOC_DOCSET_COPYRIGHT", description: "DocSet copyright message", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_feed_name, env_name: "FL_APPLEDOC_DOCSET_FEED_NAME", description: "DocSet feed name", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_feed_url, env_name: "FL_APPLEDOC_DOCSET_FEED_URL", description: "DocSet feed URL", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_feed_formats, env_name: "FL_APPLEDOC_DOCSET_FEED_FORMATS", description: "DocSet feed formats. Separated by a comma [atom,xml]", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_package_url, env_name: "FL_APPLEDOC_DOCSET_PACKAGE_URL", description: "DocSet package (.xar) URL", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_fallback_url, env_name: "FL_APPLEDOC_DOCSET_FALLBACK_URL", description: "DocSet fallback URL", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_publisher_id, env_name: "FL_APPLEDOC_DOCSET_PUBLISHER_ID", description: "DocSet publisher identifier", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_publisher_name, env_name: "FL_APPLEDOC_DOCSET_PUBLISHER_NAME", description: "DocSet publisher name", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_min_xcode_version, env_name: "FL_APPLEDOC_DOCSET_MIN_XCODE_VERSION", description: "DocSet min. Xcode version", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_platform_family, env_name: "FL_APPLEDOC_DOCSET_PLATFORM_FAMILY", description: "DocSet platform family", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_cert_issuer, env_name: "FL_APPLEDOC_DOCSET_CERT_ISSUER", description: "DocSet certificate issuer", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_cert_signer, env_name: "FL_APPLEDOC_DOCSET_CERT_SIGNER", description: "DocSet certificate signer", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_bundle_filename, env_name: "FL_APPLEDOC_DOCSET_BUNDLE_FILENAME", description: "DocSet bundle filename", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_atom_filename, env_name: "FL_APPLEDOC_DOCSET_ATOM_FILENAME", description: "DocSet atom feed filename", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_xml_filename, env_name: "FL_APPLEDOC_DOCSET_XML_FILENAME", description: "DocSet xml feed filename", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docset_package_filename, env_name: "FL_APPLEDOC_DOCSET_PACKAGE_FILENAME", description: "DocSet package (.xar,.tgz) filename", is_string: true, optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_bundle_id, env_name: "FL_APPLEDOC_DOCSET_BUNDLE_ID", description: "DocSet bundle identifier", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_bundle_name, env_name: "FL_APPLEDOC_DOCSET_BUNDLE_NAME", description: "DocSet bundle name", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_desc, env_name: "FL_APPLEDOC_DOCSET_DESC", description: "DocSet description", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_copyright, env_name: "FL_APPLEDOC_DOCSET_COPYRIGHT", description: "DocSet copyright message", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_feed_name, env_name: "FL_APPLEDOC_DOCSET_FEED_NAME", description: "DocSet feed name", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_feed_url, env_name: "FL_APPLEDOC_DOCSET_FEED_URL", description: "DocSet feed URL", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_feed_formats, env_name: "FL_APPLEDOC_DOCSET_FEED_FORMATS", description: "DocSet feed formats. Separated by a comma [atom,xml]", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_package_url, env_name: "FL_APPLEDOC_DOCSET_PACKAGE_URL", description: "DocSet package (.xar) URL", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_fallback_url, env_name: "FL_APPLEDOC_DOCSET_FALLBACK_URL", description: "DocSet fallback URL", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_publisher_id, env_name: "FL_APPLEDOC_DOCSET_PUBLISHER_ID", description: "DocSet publisher identifier", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_publisher_name, env_name: "FL_APPLEDOC_DOCSET_PUBLISHER_NAME", description: "DocSet publisher name", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_min_xcode_version, env_name: "FL_APPLEDOC_DOCSET_MIN_XCODE_VERSION", description: "DocSet min. Xcode version", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_platform_family, env_name: "FL_APPLEDOC_DOCSET_PLATFORM_FAMILY", description: "DocSet platform family", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_cert_issuer, env_name: "FL_APPLEDOC_DOCSET_CERT_ISSUER", description: "DocSet certificate issuer", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_cert_signer, env_name: "FL_APPLEDOC_DOCSET_CERT_SIGNER", description: "DocSet certificate signer", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_bundle_filename, env_name: "FL_APPLEDOC_DOCSET_BUNDLE_FILENAME", description: "DocSet bundle filename", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_atom_filename, env_name: "FL_APPLEDOC_DOCSET_ATOM_FILENAME", description: "DocSet atom feed filename", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_xml_filename, env_name: "FL_APPLEDOC_DOCSET_XML_FILENAME", description: "DocSet xml feed filename", optional: true),
+          FastlaneCore::ConfigItem.new(key: :docset_package_filename, env_name: "FL_APPLEDOC_DOCSET_PACKAGE_FILENAME", description: "DocSet package (.xar,.tgz) filename", optional: true),
 
           # OPTIONS
-          FastlaneCore::ConfigItem.new(key: :options, env_name: "FL_APPLEDOC_OPTIONS", description: "Documentation generation options", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :crossref_format, env_name: "FL_APPLEDOC_OPTIONS_CROSSREF_FORMAT", description: "Cross reference template regex", is_string: true, optional: true),
-          FastlaneCore::ConfigItem.new(key: :exit_threshold, env_name: "FL_APPLEDOC_OPTIONS_EXIT_THRESHOLD", description: "Exit code threshold below which 0 is returned", is_string: false, default_value: 2, optional: true),
-          FastlaneCore::ConfigItem.new(key: :docs_section_title, env_name: "FL_APPLEDOC_OPTIONS_DOCS_SECTION_TITLE", description: "Title of the documentation section (defaults to \"Programming Guides\"", is_string: true, optional: true),
+          FastlaneCore::ConfigItem.new(key: :options, env_name: "FL_APPLEDOC_OPTIONS", description: "Documentation generation options", optional: true),
+          FastlaneCore::ConfigItem.new(key: :crossref_format, env_name: "FL_APPLEDOC_OPTIONS_CROSSREF_FORMAT", description: "Cross reference template regex", optional: true),
+          FastlaneCore::ConfigItem.new(key: :exit_threshold, env_name: "FL_APPLEDOC_OPTIONS_EXIT_THRESHOLD", description: "Exit code threshold below which 0 is returned", type: Integer, default_value: 2, optional: true),
+          FastlaneCore::ConfigItem.new(key: :docs_section_title, env_name: "FL_APPLEDOC_OPTIONS_DOCS_SECTION_TITLE", description: "Title of the documentation section (defaults to \"Programming Guides\"", optional: true),
 
           # WARNINGS
-          FastlaneCore::ConfigItem.new(key: :warnings, env_name: "FL_APPLEDOC_WARNINGS", description: "Documentation generation warnings", is_string: true, optional: true),
+          FastlaneCore::ConfigItem.new(key: :warnings, env_name: "FL_APPLEDOC_WARNINGS", description: "Documentation generation warnings", optional: true),
 
           # MISCELLANEOUS
-          FastlaneCore::ConfigItem.new(key: :logformat, env_name: "FL_APPLEDOC_LOGFORMAT", description: "Log format [0-3]", is_string: false, optional: true),
-          FastlaneCore::ConfigItem.new(key: :verbose, env_name: "FL_APPLEDOC_VERBOSE", description: "Log verbosity level [0-6,xcode]", is_string: false, optional: true)
+          FastlaneCore::ConfigItem.new(key: :logformat, env_name: "FL_APPLEDOC_LOGFORMAT", description: "Log format [0-3]", type: Integer, optional: true),
+          FastlaneCore::ConfigItem.new(key: :verbose, env_name: "FL_APPLEDOC_VERBOSE", description: "Log verbosity level [0-6,xcode]", skip_type_validation: true, optional: true) # allow Integer, String
         ]
       end
 

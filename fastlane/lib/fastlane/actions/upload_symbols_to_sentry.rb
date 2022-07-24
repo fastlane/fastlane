@@ -48,7 +48,7 @@ module Fastlane
           upload_dsym(resource, dsym)
         end
 
-        # Return uplaoded dSYM paths
+        # Return uploaded dSYM paths
         uploaded_paths
       end
 
@@ -79,7 +79,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_host,
                                        env_name: "SENTRY_HOST",
                                        description: "API host url for Sentry",
-                                       is_string: true,
                                        default_value: "https://app.getsentry.com/api/0",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :api_key,
@@ -109,20 +108,14 @@ module Fastlane
                                        description: "Path to your symbols file. For iOS and Mac provide path to app.dSYM.zip",
                                        default_value: Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH],
                                        default_value_dynamic: true,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         # validation is done in the action
-                                       end),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :dsym_paths,
                                        env_name: "SENTRY_DSYM_PATHS",
                                        description: "Path to an array of your symbols file. For iOS and Mac provide path to app.dSYM.zip",
                                        default_value: Actions.lane_context[SharedValues::DSYM_PATHS],
                                        default_value_dynamic: true,
-                                       is_string: false,
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         # validation is done in the action
-                                       end)
+                                       type: Array,
+                                       optional: true)
         ]
       end
 

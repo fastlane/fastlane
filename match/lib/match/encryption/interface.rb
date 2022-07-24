@@ -3,7 +3,7 @@ module Match
     class Interface
       # Call this method to trigger the actual
       # encryption
-      def encrypt_files
+      def encrypt_files(password: nil)
         not_implemented(__method__)
       end
 

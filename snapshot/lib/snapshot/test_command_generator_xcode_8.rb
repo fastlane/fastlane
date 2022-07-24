@@ -14,7 +14,7 @@ module Snapshot
         parts << "xcodebuild"
         parts += options(language, locale)
         parts += destination(device_type)
-        parts += build_settings
+        parts += build_settings(language, locale)
         parts += actions
         parts += suffix
         parts += pipe(device_type, language, locale)
@@ -24,7 +24,10 @@ module Snapshot
 
       def pipe(device_type, language, locale)
         log_path = xcodebuild_log_path(device_type: device_type, language: language, locale: locale)
-        return ["| tee #{log_path.shellescape} | xcpretty #{Snapshot.config[:xcpretty_args]}"]
+        pipe = ["| tee #{log_path.shellescape}"]
+        pipe << "| xcpretty #{Snapshot.config[:xcpretty_args]}"
+        pipe << "> /dev/null" if Snapshot.config[:suppress_xcode_output]
+        return pipe
       end
 
       def destination(device_name)

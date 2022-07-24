@@ -46,7 +46,7 @@ module Fastlane
 
         parts = cert_info.strip.split(/\r?\n/)
         parts.each do |part|
-          if part =~ /\AAuthority=i(Phone|OS)/
+          if part =~ /\AAuthority=(iPhone|iOS|Apple)\s(Distribution|Development)/
             type = part.split('=')[1].split(':')[0]
             values['provisioning_type'] = type.downcase =~ /distribution/i ? "distribution" : "development"
           end
@@ -92,7 +92,7 @@ module Fastlane
 
       def self.evaulate(params, values)
         if params[:provisioning_type]
-          UI.user_error!("Mismatched provisioning_type. Required: '#{params[:provisioning_type]}''; Found: '#{values['provisioning_type']}'") unless params[:provisioning_type] == values['provisioning_type']
+          UI.user_error!("Mismatched provisioning_type. Required: '#{params[:provisioning_type]}'; Found: '#{values['provisioning_type']}'") unless params[:provisioning_type] == values['provisioning_type']
         end
         if params[:provisioning_uuid]
           UI.user_error!("Mismatched provisioning_uuid. Required: '#{params[:provisioning_uuid]}'; Found: '#{values['provisioning_uuid']}'") unless params[:provisioning_uuid] == values['provisioning_uuid']
@@ -101,7 +101,7 @@ module Fastlane
           UI.user_error!("Mismatched team_identifier. Required: '#{params[:team_identifier]}'; Found: '#{values['team_identifier']}'") unless params[:team_identifier] == values['team_identifier']
         end
         if params[:team_name]
-          UI.user_error!("Mismatched team_name. Required: '#{params[:team_name]}'; Found: 'values['team_name']'") unless params[:team_name] == values['team_name']
+          UI.user_error!("Mismatched team_name. Required: '#{params[:team_name]}'; Found: '#{values['team_name']}'") unless params[:team_name] == values['team_name']
         end
         if params[:app_name]
           UI.user_error!("Mismatched app_name. Required: '#{params[:app_name]}'; Found: '#{values['app_name']}'") unless params[:app_name] == values['app_name']

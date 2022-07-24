@@ -2,8 +2,8 @@ describe Spaceship::DUClient, :du do
   before { Spaceship::Tunes.login }
 
   let(:client) { Spaceship::AppVersion.client }
-  let(:app) { Spaceship::Application.all.first }
-  let(:contentProviderId) { "1234567" }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
+  let(:contentProviderId) { "4321" }
   let(:ssoTokenForImage) { "sso token for image" }
   let(:version) { app.edit_version }
 

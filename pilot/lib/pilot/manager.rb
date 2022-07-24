@@ -13,16 +13,29 @@ module Pilot
     def start(options, should_login: true)
       return if @config # to not login multiple times
       @config = options
-      login if should_login
+
+      # we will always start with App Store Connect API login 'if possible'
+      # else fallback to 'should_login' param for 'apple_id' login
+      login if options[:api_key_path] || options[:api_key] || should_login
     end
 
     def login
-      config[:username] ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+      if (api_token = Spaceship::ConnectAPI::Token.from(hash: config[:api_key], filepath: config[:api_key_path]))
+        UI.message("Creating authorization token for App Store Connect API")
+        Spaceship::ConnectAPI.token = api_token
+      elsif !Spaceship::ConnectAPI.token.nil?
+        UI.message("Using existing authorization token for App Store Connect API")
+      else
+        config[:username] ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
-      UI.message("Login to App Store Connect (#{config[:username]})")
-      Spaceship::Tunes.login(config[:username])
-      Spaceship::Tunes.select_team(team_id: config[:team_id], team_name: config[:team_name])
-      UI.message("Login successful")
+        # Username is now optional since addition of App Store Connect API Key
+        # Force asking for username to prompt user if not already set
+        config.fetch(:username, force_ask: true)
+
+        UI.message("Login to App Store Connect (#{config[:username]})")
+        Spaceship::ConnectAPI.login(config[:username], use_portal: false, use_tunes: true, tunes_team_id: config[:team_id], team_name: config[:team_name])
+        UI.message("Login successful")
+      end
     end
 
     # The app object we're currently using
@@ -60,7 +73,8 @@ module Pilot
 
     def fetch_app_identifier
       result = config[:app_identifier]
-      result ||= FastlaneCore::IpaFileAnalyser.fetch_app_identifier(config[:ipa])
+      result ||= FastlaneCore::IpaFileAnalyser.fetch_app_identifier(config[:ipa]) if config[:ipa]
+      result ||= FastlaneCore::PkgFileAnalyser.fetch_app_identifier(config[:pkg]) if config[:pkg]
       result ||= UI.input("Please enter the app's bundle identifier: ")
       UI.verbose("App identifier (#{result})")
       return result
@@ -69,6 +83,7 @@ module Pilot
     def fetch_app_platform(required: true)
       result = config[:app_platform]
       result ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(config[:ipa]) if config[:ipa]
+      result ||= FastlaneCore::PkgFileAnalyser.fetch_app_platform(config[:pkg]) if config[:pkg]
       if required
         result ||= UI.input("Please enter the app's platform (appletvos, ios, osx): ")
         UI.user_error!("App Platform must be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include?(result)

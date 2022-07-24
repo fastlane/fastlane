@@ -5,6 +5,14 @@ module Snapshot
     require 'erb'
     require 'fastimage'
 
+    def html_path
+      if Snapshot.config[:html_template]
+        Snapshot.config[:html_template]
+      else
+        File.join(Snapshot::ROOT, "lib", "snapshot/page.html.erb")
+      end
+    end
+
     def generate
       UI.message("Generating HTML Report")
 
@@ -36,7 +44,6 @@ module Snapshot
         end
       end
 
-      html_path = File.join(Snapshot::ROOT, "lib", "snapshot/page.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
       export_path = "#{screens_path}/screenshots.html"
@@ -77,6 +84,14 @@ module Snapshot
       {
         # snapshot in Xcode 9 saves screenshots with the SIMULATOR_DEVICE_NAME
         # which includes spaces
+        'iPhone 13 Pro Max' => "iPhone 13 Pro Max",
+        'iPhone 13 Pro' => "iPhone 13 Pro",
+        'iPhone 13 mini' => "iPhone 13 mini",
+        'iPhone 13' => "iPhone 13",
+        'iPhone 12 Pro Max' => "iPhone 12 Pro Max",
+        'iPhone 12 Pro' => "iPhone 12 Pro",
+        'iPhone 12 mini' => "iPhone 12 mini",
+        'iPhone 12' => "iPhone 12",
         'iPhone 11 Pro Max' => "iPhone 11 Pro Max",
         'iPhone 11 Pro' => "iPhone 11 Pro",
         'iPhone 11' => "iPhone 11",
@@ -97,23 +112,34 @@ module Snapshot
         'iPhone SE' => "iPhone SE",
         'iPhone 4s' => "iPhone 4s (3.5-Inch)",
         'iPad 2' => 'iPad 2',
+        'iPad Air (3rd generation)' => 'iPad Air (3rd generation)',
         'iPad Air 2' => 'iPad Air 2',
         'iPad Air' => 'iPad Air',
         'iPad (5th generation)' => 'iPad (5th generation)',
+        'iPad (7th generation)' => 'iPad (7th generation)',
+        'iPad mini 2' => 'iPad mini 2',
+        'iPad mini 3' => 'iPad mini 3',
+        'iPad mini 4' => 'iPad mini 4',
+        'iPad mini (6th generation)' => 'iPad mini (6th generation)',
         'iPad Pro (9.7-inch)' => 'iPad Pro (9.7-inch)',
         'iPad Pro (9.7 inch)' => 'iPad Pro (9.7-inch)', # iOS 10.3.1 simulator
         'iPad Pro (10.5-inch)' => 'iPad Pro (10.5-inch)',
+        'iPad Pro (11-inch) (2nd generation)' => 'iPad Pro (11-inch) (2nd generation)',
         'iPad Pro (11-inch)' => 'iPad Pro (11-inch)',
+        'iPad Pro (12.9-inch) (4th generation)' => 'iPad Pro (12.9-inch) (4th generation)',
         'iPad Pro (12.9-inch) (3rd generation)' => 'iPad Pro (12.9-inch) (3rd generation)',
         'iPad Pro (12.9-inch) (2nd generation)' => 'iPad Pro (12.9-inch) (2nd generation)',
         'iPad Pro (12.9-inch)' => 'iPad Pro (12.9-inch)',
         'iPad Pro (12.9 inch)' => 'iPad Pro (12.9-inch)', # iOS 10.3.1 simulator
         'iPad Pro' => 'iPad Pro (12.9-inch)', # iOS 9.3 simulator
+        'iPod touch (7th generation)' => 'iPod touch (7th generation)',
         'Apple TV 1080p' => 'Apple TV',
         'Apple TV 4K (at 1080p)' => 'Apple TV 4K (at 1080p)',
         'Apple TV 4K' => 'Apple TV 4K',
         'Apple TV' => 'Apple TV',
-        'Mac' => 'Mac'
+        'Mac' => 'Mac',
+        'Apple Watch Series 5 - 44mm' => 'Apple Watch Series 5 - 44mm',
+        'Apple Watch Series 6 - 44mm' => 'Apple Watch Series 6 - 44mm'
       }
     end
 

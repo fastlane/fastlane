@@ -10,7 +10,7 @@ describe Fastlane do
         expect(result[:error]).to eq(nil)
       end
 
-      it "stores the action properly when an exeception occurred" do
+      it "stores the action properly when an exception occurred" do
         expect do
           Fastlane::Actions.execute_action(step_name) do
             UI.user_error!("Some error")

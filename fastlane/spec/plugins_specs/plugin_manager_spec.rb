@@ -149,21 +149,6 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_exception("The action '#{deprecated_action}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin deprecated`")
       end
-
-      it "runs the action as expected if the plugin is available" do
-        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-        # We don't need to set this, since this method shouldn't even be called when the plugin is available
-        # expect(Fastlane::Actions).to receive(:formerly_bundled_actions).and_return(["crashlytics"])
-
-        Fastlane::FastFile.new.parse("lane :test do
-          crashlytics({
-            crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
-            api_token: 'wadus',
-            build_secret: 'secret',
-            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
-          })
-        end").runner.execute(:test)
-      end
     end
 
     describe "#add_dependency" do
@@ -187,6 +172,24 @@ describe Fastlane do
 
     describe "Overwriting plugins" do
       it "shows a warning if a plugin overwrites an existing action" do
+        module Fastlane::SpaceshipStats
+        end
+
+        pm = Fastlane::PluginManager.new
+        plugin_name = "spaceship_stats"
+        expect(pm).to receive(:available_plugins).and_return([plugin_name])
+        expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).with(gem_name: plugin_name, require_gem: true)
+        expect(Fastlane::SpaceshipStats).to receive(:all_classes).and_return(["/actions/#{plugin_name}.rb"])
+        expect(UI).to receive(:important).with("Plugin 'SpaceshipStats' overwrites already loaded action '#{plugin_name}'")
+
+        expect do
+          pm.load_plugins
+        end.to_not(output(/No actions were found while loading one or more plugins/).to_stdout)
+      end
+    end
+
+    describe "Plugins not loaded" do
+      it "shows a warning if a plugin isn't loaded" do
         module Fastlane::Crashlytics
         end
 
@@ -194,9 +197,12 @@ describe Fastlane do
         plugin_name = "crashlytics"
         expect(pm).to receive(:available_plugins).and_return([plugin_name])
         expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).with(gem_name: plugin_name, require_gem: true)
-        expect(Fastlane::Crashlytics).to receive(:all_classes).and_return(["/actions/#{plugin_name}.rb"])
-        expect(UI).to receive(:important).with("Plugin 'Crashlytics' overwrites already loaded action '#{plugin_name}'")
-        pm.load_plugins
+
+        expect(pm).to receive(:store_plugin_reference).and_raise(StandardError.new)
+
+        expect do
+          pm.load_plugins
+        end.to output(/No actions were found while loading one or more plugins/).to_stdout
       end
     end
 

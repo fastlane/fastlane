@@ -1,3 +1,4 @@
+require 'open3'
 require 'zip'
 
 require_relative 'core_ext/cfpropertylist'
@@ -37,27 +38,56 @@ module FastlaneCore
 
     def self.fetch_info_plist_file(path)
       UI.user_error!("Could not find file at path '#{path}'") unless File.exist?(path)
-      Zip::File.open(path, "rb") do |zipfile|
-        file = zipfile.glob('**/Payload/*.app/Info.plist').first
-        return nil unless file
+      plist_data = self.fetch_info_plist_with_rubyzip(path)
+      if plist_data.nil?
+        # Xcode produces invalid zip files for IPAs larger than 4GB. RubyZip
+        # can't read them, but the unzip command is able to work around this.
+        plist_data = self.fetch_info_plist_with_unzip(path)
+      end
+      return nil if plist_data.nil?
 
-        # Creates a temporary directory with a unique name tagged with 'fastlane'
-        # The directory is deleted automatically at the end of the block
-        Dir.mktmpdir("fastlane") do |tmp|
-          # The XML file has to be properly unpacked first
-          tmp_path = File.join(tmp, "Info.plist")
-          File.open(tmp_path, 'wb') do |output|
-            output.write(zipfile.read(file))
-          end
-          result = CFPropertyList.native_types(CFPropertyList::List.new(file: tmp_path).value)
+      # Creates a temporary directory with a unique name tagged with 'fastlane'
+      # The directory is deleted automatically at the end of the block
+      Dir.mktmpdir("fastlane") do |tmp|
+        # The XML file has to be properly unpacked first
+        tmp_path = File.join(tmp, "Info.plist")
+        File.open(tmp_path, 'wb') do |output|
+          output.write(plist_data)
+        end
+        result = CFPropertyList.native_types(CFPropertyList::List.new(file: tmp_path).value)
 
-          if result['CFBundleIdentifier'] || result['CFBundleVersion']
-            return result
-          end
+        if result['CFBundleIdentifier'] || result['CFBundleVersion']
+          return result
         end
       end
 
       return nil
+    end
+
+    def self.fetch_info_plist_with_rubyzip(path)
+      Zip::File.open(path, "rb") do |zipfile|
+        file = zipfile.glob('**/Payload/*.app/Info.plist').first
+        return nil unless file
+        zipfile.read(file)
+      end
+    end
+
+    def self.fetch_info_plist_with_unzip(path)
+      entry, error, = Open3.capture3("unzip", "-Z", "-1", path, "*Payload/*.app/Info.plist")
+
+      # unzip can return multiple Info.plist files if is an embedded app bundle (a WatchKit app)
+      #   - ContainsWatchApp/Payload/Sample.app/Watch/Sample WatchKit App.app/Info.plist
+      #   - ContainsWatchApp/Payload/Sample.app/Info.plist
+      #
+      # we can determine the main Info.plist by the shortest path
+      entry = entry.lines.map(&:chomp).min_by(&:size)
+
+      UI.command_output(error) unless error.empty?
+      return nil if entry.nil? || entry.empty?
+      data, error, = Open3.capture3("unzip", "-p", path, entry)
+      UI.command_output(error) unless error.empty?
+      return nil if data.empty?
+      data
     end
   end
 end

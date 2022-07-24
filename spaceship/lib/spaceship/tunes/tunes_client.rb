@@ -9,7 +9,7 @@ require_relative 'errors'
 require_relative 'iap_subscription_pricing_tier'
 require_relative 'pricing_tier'
 require_relative 'territory'
-require_relative 'user_detail'
+require_relative '../connect_api/response'
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -24,6 +24,9 @@ module Spaceship
       super
 
       @du_client = DUClient.new
+
+      # Used by most WebObjects requests starting in July 2021
+      @additional_headers = { 'x-csrf-itc': 'itc' }
     end
 
     class << self
@@ -69,13 +72,13 @@ module Spaceship
         puts("Looking for App Store Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
 
         teams.each do |t|
-          t_id = t['contentProvider']['contentProviderId'].to_s if t['contentProvider']['name'].casecmp(t_name).zero?
+          t_id = t['providerId'].to_s if t['name'].casecmp(t_name).zero?
         end
 
         puts("Could not find team with name '#{t_name}', trying to fallback to default team") if t_id.length.zero?
       end
 
-      t_id = teams.first['contentProvider']['contentProviderId'].to_s if teams.count == 1
+      t_id = teams.first['providerId'].to_s if teams.count == 1
 
       if t_id.length > 0
         puts("Looking for App Store Connect Team with ID #{t_id}") if Spaceship::Globals.verbose?
@@ -89,11 +92,11 @@ module Spaceship
       loop do
         puts("Multiple #{'App Store Connect teams'.yellow} found, please enter the number of the team you want to use: ")
         if ENV["FASTLANE_HIDE_TEAM_INFORMATION"].to_s.length == 0
+          first_team = teams.first
           puts("Note: to automatically choose the team, provide either the App Store Connect Team ID, or the Team Name in your fastlane/Appfile:")
           puts("Alternatively you can pass the team name or team ID using the `FASTLANE_ITC_TEAM_ID` or `FASTLANE_ITC_TEAM_NAME` environment variable")
-          first_team = teams.first["contentProvider"]
           puts("")
-          puts("  itc_team_id \"#{first_team['contentProviderId']}\"")
+          puts("  itc_team_id \"#{first_team['providerId']}\"")
           puts("")
           puts("or")
           puts("")
@@ -103,7 +106,7 @@ module Spaceship
 
         # We're not using highline here, as spaceship doesn't have a dependency to fastlane_core or highline
         teams.each_with_index do |team, i|
-          puts("#{i + 1}) \"#{team['contentProvider']['name']}\" (#{team['contentProvider']['contentProviderId']})")
+          puts("#{i + 1}) \"#{team['name']}\" (#{team['providerId']})")
         end
 
         unless Spaceship::Client::UserInterface.interactive?
@@ -116,7 +119,7 @@ module Spaceship
         team_to_use = teams[selected] if selected >= 0
 
         if team_to_use
-          self.team_id = team_to_use['contentProvider']['contentProviderId'].to_s # actually set the team id here
+          self.team_id = team_to_use['providerId'].to_s # actually set the team id here
           return self.team_id
         end
       end
@@ -252,8 +255,68 @@ module Spaceship
     #####################################################
 
     def applications
-      r = request(:get, 'ra/apps/manageyourapps/summary/v2')
-      parse_response(r, 'data')['summaries']
+      # Doing this real bad puts for now until a more formal deprecation logic can get made
+      puts("Spaceship::Tunes::Application.all is deprecated")
+      puts("  It's using a temporary patch to keep it from raising an error but things may not work correctly")
+      puts("  Please consider switching to Spaceship::ConnectAPI if you can")
+      puts("  For more details - https://github.com/fastlane/fastlane/pull/20480")
+
+      # This legacy endpoint went offline around July 7th, 2022. This is a rough attempt
+      # at retrofitting using the newer App Store Connect API endpoints
+      #
+      # This could all be done easily with Spaceship::ConnectAPI::App.find but there were a lot of
+      # circular dependency issues that were very difficult to solve because. Spaceship::Tunes would be
+      # using Spaceship::ConnectAPI which uses Spaceship::Tunes
+      #
+      # However, using Spaceship::ConnectAPI::Response works. This will fetch multiple pages of app
+      # if it needs to
+      #
+      # https://github.com/fastlane/fastlane/pull/20480
+      r = request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions,prices")
+      response = Spaceship::ConnectAPI::Response.new(
+        body: r.body,
+        status: r.status,
+        headers: r.headers,
+        client: nil
+      )
+
+      apps = response.all_pages do |url|
+        r = request(:get, url)
+        Spaceship::ConnectAPI::Response.new(
+          body: r.body,
+          status: r.status,
+          headers: r.headers,
+          client: nil
+        )
+      end.flat_map(&:to_models)
+
+      apps.map do |asc_app|
+        platforms = (asc_app.app_store_versions || []).map(&:platform).uniq.map do |asc_platform|
+          case asc_platform
+          when "TV_OS"
+            "appletvos"
+          when "MAC_OS"
+            "osx"
+          when "IOS"
+            "ios"
+          else
+            raise "Cannot find a matching platform for '#{asc_platform}'}"
+          end
+        end
+
+        {
+          'adamId' => asc_app.id,
+          'name' => asc_app.name,
+          'vendorId' => "",
+          'bundleId' => asc_app.bundle_id,
+          'lastModifiedDate' => nil,
+          'issuesCount' => nil,
+          'iconUrl' => nil,
+          'versionSets' => platforms.map do |platform|
+            { 'type' => 'app', 'platformString' => platform }
+          end
+        }
+      end
     end
 
     def app_details(app_id)
@@ -286,7 +349,7 @@ module Spaceship
     # @param sku (String): A unique ID for your app that is not visible on the App Store.
     # @param bundle_id (String): The bundle ID must match the one you used in Xcode. It
     #   can't be changed after you submit your first build.
-    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, itunes_connect_users: nil)
+    def create_application!(name: nil, primary_language: nil, version: nil, sku: nil, bundle_id: nil, bundle_id_suffix: nil, company_name: nil, platform: nil, platforms: nil, itunes_connect_users: nil)
       puts("The `version` parameter is deprecated. Use `Spaceship::Tunes::Application.ensure_version!` method instead") if version
 
       # First, we need to fetch the data from Apple, which we then modify with the user's values
@@ -307,7 +370,7 @@ module Spaceship
       data['enabledPlatformsForCreation'] = { value: [platform] }
 
       data['initialPlatform'] = platform
-      data['enabledPlatformsForCreation'] = { value: [platform] }
+      data['enabledPlatformsForCreation'] = { value: platforms || [platform] }
 
       unless itunes_connect_users.nil?
         data['iTunesConnectUsers']['grantedAllUsers'] = false
@@ -352,6 +415,31 @@ module Spaceship
       parse_response(r, 'data')
     end
 
+    def post_resolution_center(app_id, platform, thread_id, version_id, version_number, from, message_body)
+      r = request(:post) do |req|
+        req.url("ra/apps/#{app_id}/platforms/#{platform}/resolutionCenter")
+        req.body = {
+          appNotes: {
+            threads: [{
+              id: thread_id,
+              versionId: version_id,
+              version: version_number,
+              messages: [{
+                from: from,
+                date: DateTime.now.strftime('%Q'),
+                body: message_body,
+                tokens: []
+              }]
+            }]
+          }
+        }.to_json
+        req.headers['Content-Type'] = 'application/json'
+      end
+
+      data = parse_response(r, 'data')
+      handle_itc_response(data)
+    end
+
     def get_ratings(app_id, platform, version_id = '', storefront = '')
       # if storefront or version_id is empty api fails
       rating_url = "ra/apps/#{app_id}/platforms/#{platform}/reviews/summary"
@@ -375,7 +463,7 @@ module Spaceship
         rating_url << "sort=REVIEW_SORT_ORDER_MOST_RECENT"
         rating_url << "&index=#{index}"
         rating_url << "&storefront=#{storefront}" unless storefront.empty?
-        rating_url << "&version_id=#{version_id}" unless version_id.empty?
+        rating_url << "&versionId=#{version_id}" unless version_id.empty?
 
         r = request(:get, rating_url)
         all_reviews.concat(parse_response(r, 'data')['reviews'])
@@ -554,10 +642,10 @@ module Spaceship
       }
 
       r = request(:post) do |req|
-        req.url("https://analytics.itunes.apple.com/analytics/api/v1/data/time-series")
+        req.url("https://appstoreconnect.apple.com/analytics/api/v1/data/time-series")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
-        req.headers['X-Requested-By'] = 'analytics.itunes.apple.com'
+        req.headers['X-Requested-By'] = 'appstoreconnect.apple.com'
       end
 
       data = parse_response(r)
@@ -602,7 +690,7 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
-    def transform_to_raw_pricing_intervals(app_id = nil, purchase_id = nil, pricing_intervals = nil, subscription_price_target = nil)
+    def transform_to_raw_pricing_intervals(app_id = nil, purchase_id = nil, pricing_intervals = 5, subscription_price_target = nil)
       intervals_array = []
       if pricing_intervals
         intervals_array = pricing_intervals.map do |interval|
@@ -679,9 +767,9 @@ module Spaceship
     #     ...
     # }, {
     # ...
-    def pricing_tiers
+    def pricing_tiers(app_id)
       @pricing_tiers ||= begin
-        r = request(:get, 'ra/apps/pricing/matrix')
+        r = request(:get, "ra/apps/#{app_id}/iaps/pricing/matrix")
         data = parse_response(r, 'data')['pricingTiers']
         data.map { |tier| Spaceship::Tunes::PricingTier.factory(tier) }
       end
@@ -759,11 +847,8 @@ module Spaceship
     end
 
     def available_languages
-      r = request(:get, "ra/apps/storePreview/regionCountryLanguage")
-      response = parse_response(r, 'data')
-      response.flat_map { |region| region["storeFronts"] }
-              .flat_map { |storefront| storefront["supportedLocaleCodes"] }
-              .uniq
+      r = request(:get, "ra/ref")
+      parse_response(r, 'data')['detailLocales']
     end
 
     #####################################################
@@ -925,13 +1010,6 @@ module Spaceship
       Spaceship::Tunes::AppVersionRef.factory(data)
     end
 
-    # Fetches the User Detail information from ITC. This gets called often and almost never changes
-    # so we cache it
-    # @return [UserDetail] the response
-    def user_detail_data
-      @_cached_user_detail_data ||= Spaceship::Tunes::UserDetail.factory(user_details_data, self)
-    end
-
     #####################################################
     # @!group CandiateBuilds
     #####################################################
@@ -967,7 +1045,7 @@ module Spaceship
         tries -= 1
         if tries > 0
           logger.warn("Received temporary server error from App Store Connect. Retrying the request...")
-          sleep(3) unless Object.const_defined?("SpecHelper")
+          sleep(3) unless Object.const_defined?(:SpecHelper)
           retry
         end
       end
@@ -1400,6 +1478,20 @@ module Spaceship
       handle_itc_response(r.body)
     end
 
+    # Retrieves app-specific shared secret key
+    def get_shared_secret(app_id: nil)
+      r = request(:get, "ra/apps/#{app_id}/iaps/appSharedSecret")
+      data = parse_response(r, 'data')
+      data['sharedSecret']
+    end
+
+    # Generates app-specific shared secret key
+    def generate_shared_secret(app_id: nil)
+      r = request(:post, "ra/apps/#{app_id}/iaps/appSharedSecret")
+      data = parse_response(r, 'data')
+      data['sharedSecret']
+    end
+
     #####################################################
     # @!group Sandbox Testers
     #####################################################
@@ -1521,7 +1613,7 @@ module Spaceship
         msg = "App Store Connect temporary error received: '#{ex.message}'. Retrying after #{seconds_to_sleep} seconds (remaining: #{tries})..."
         puts(msg)
         logger.warn(msg)
-        sleep(seconds_to_sleep) unless Object.const_defined?("SpecHelper")
+        sleep(seconds_to_sleep) unless Object.const_defined?(:SpecHelper)
         retry
       end
       raise ex # re-raise the exception
@@ -1531,7 +1623,7 @@ module Spaceship
         msg = "Potential server error received: '#{ex.message}'. Retrying after 10 seconds (remaining: #{potential_server_error_tries})..."
         puts(msg)
         logger.warn(msg)
-        sleep(seconds_to_sleep) unless Object.const_defined?("SpecHelper")
+        sleep(seconds_to_sleep) unless Object.const_defined?(:SpecHelper)
         retry
       end
       raise ex
@@ -1543,9 +1635,14 @@ module Spaceship
       @sso_token_for_video = nil
     end
 
-    # the contentProviderIr found in the UserDetail instance
+    # the contentProviderId found in the user details data
     def content_provider_id
-      @content_provider_id ||= user_detail_data.content_provider_id
+      return @content_provider_id if @content_provider_id
+
+      provider = user_details_data["provider"]["providerId"]
+      @content_provider_id ||= provider.to_s if provider
+
+      return @content_provider_id
     end
 
     # the ssoTokenForImage found in the AppVersionRef instance

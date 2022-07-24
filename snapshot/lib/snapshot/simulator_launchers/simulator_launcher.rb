@@ -50,7 +50,7 @@ module Snapshot
             language = language[0]
           end
 
-          # Clear logs so subsequent xcodebuild executions dont append to old ones
+          # Clear logs so subsequent xcodebuild executions don't append to old ones
           log_path = xcodebuild_log_path(language: language, locale: locale)
           File.delete(log_path) if File.exist?(log_path)
 
@@ -89,9 +89,13 @@ module Snapshot
         log_path: xcodebuild_log_path(language: language, locale: locale)
       )
 
+      devices.each { |device_type| override_status_bar(device_type, launcher_config.override_status_bar_arguments) } if launcher_config.override_status_bar
+
       UI.important("Running snapshot on: #{devices.join(', ')}")
 
       execute(command: command, language: language, locale: locale, launch_args: launch_arguments, devices: devices)
+
+      devices.each { |device_type| clear_status_bar(device_type) } if launcher_config.override_status_bar
 
       return copy_screenshots(language: language, locale: locale, launch_args: launch_arguments)
     end
@@ -190,7 +194,7 @@ module Snapshot
           hash[name] = ["No tests were executed"]
         else
           tests = Array(summary.data.first[:tests])
-          hash[name] = tests.map { |test| Array(test[:failures]).map { |failure| failure[:failure_message] } }.flatten
+          hash[name] = tests.flat_map { |test| Array(test[:failures]).map { |failure| failure[:failure_message] } }
         end
       end
     end

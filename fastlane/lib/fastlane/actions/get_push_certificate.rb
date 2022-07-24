@@ -55,12 +55,12 @@ module Fastlane
         @options << FastlaneCore::ConfigItem.new(key: :new_profile,
                                      description: "Block that is called if there is a new profile",
                                      optional: true,
-                                     is_string: false)
+                                     type: :string_callback)
         @options
       end
 
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
 
       def self.example_code

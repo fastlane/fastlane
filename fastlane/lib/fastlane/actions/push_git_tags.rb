@@ -9,7 +9,7 @@ module Fastlane
         ]
 
         if params[:tag]
-          command << "refs/tags/#{params[:tag]}"
+          command << "refs/tags/#{params[:tag].shellescape}"
         else
           command << '--tags'
         end
@@ -35,7 +35,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_PUSH_GIT_FORCE",
                                        description: "Force push to remote",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :remote,

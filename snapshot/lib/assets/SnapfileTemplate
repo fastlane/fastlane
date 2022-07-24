@@ -8,7 +8,8 @@
 #   "iPhone X",
 #   "iPad Pro (12.9-inch)",
 #   "iPad Pro (9.7-inch)",
-#   "Apple TV 1080p"
+#   "Apple TV 1080p",
+#   "Apple Watch Series 6 - 44mm"
 # ])
 
 # languages([
@@ -26,6 +27,9 @@
 
 # remove the '#' to clear all previously generated screenshots before creating new ones
 # clear_previous_screenshots(true)
+
+# Remove the '#' to set the status bar to 9:41 AM, and show full battery and reception. See also override_status_bar_arguments for custom options.
+# override_status_bar(true)
 
 # Arguments to pass to the app on launch. See https://docs.fastlane.tools/actions/snapshot/#launch-arguments
 # launch_arguments(["-favColor red"])

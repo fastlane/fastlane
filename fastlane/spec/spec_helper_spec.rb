@@ -1,5 +1,5 @@
 describe FastlaneSpec::Env do
-  # rubocop:disable Style/VariableName
+  # rubocop:disable Naming/VariableName
   describe "#with_ARGV" do
     it "temporarily overrides the ARGV values under normal usage" do
       current_ARGV = ARGV.dup
@@ -24,5 +24,5 @@ describe FastlaneSpec::Env do
       expect(ARGV).to eq(current_ARGV)
     end
   end
-  # rubocop:enable Style/VariableName
+  # rubocop:enable Naming/VariableName
 end

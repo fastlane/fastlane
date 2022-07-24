@@ -15,16 +15,37 @@ describe Deliver::AppScreenshot do
   ScreenSize = Deliver::AppScreenshot::ScreenSize
 
   describe "#initialize" do
-    context "when filename doesn't contain '(3rd generation)'" do
+    context "when filename doesn't contain 'iPad Pro (3rd generation)' or 'iPad Pro (4th generation)'" do
       it "returns iPad Pro(12.9-inch)" do
         screenshot = Deliver::AppScreenshot.new("path/to/screenshot/Screen-Name-iPad Pro (12.9-inch){2732x2048}.png", "de-DE")
         expect(screenshot.screen_size).to eq(ScreenSize::IOS_IPAD_PRO)
       end
     end
 
-    context "when filename contains '(3rd generation)'" do
+    context "when filename contains 'iPad Pro (3rd generation)'" do
       it "returns iPad Pro(12.9-inch) 3rd generation" do
         screenshot = Deliver::AppScreenshot.new("path/to/screenshot/Screen-Name-iPad Pro (12.9-inch) (3rd generation){2732x2048}.png", "de-DE")
+        expect(screenshot.screen_size).to eq(ScreenSize::IOS_IPAD_PRO_12_9)
+      end
+    end
+
+    context "when filename contains 'iPad Pro (4th generation)'" do
+      it "returns iPad Pro(12.9-inch) 3rd generation" do
+        screenshot = Deliver::AppScreenshot.new("path/to/screenshot/Screen-Name-iPad Pro (12.9-inch) (4th generation){2732x2048}.png", "de-DE")
+        expect(screenshot.screen_size).to eq(ScreenSize::IOS_IPAD_PRO_12_9)
+      end
+    end
+
+    context "when filename contains 'iPad Pro (5th generation)'" do
+      it "returns iPad Pro(12.9-inch) 3rd generation" do
+        screenshot = Deliver::AppScreenshot.new("path/to/screenshot/Screen-Name-iPad Pro (12.9-inch) (5th generation){2732x2048}.png", "de-DE")
+        expect(screenshot.screen_size).to eq(ScreenSize::IOS_IPAD_PRO_12_9)
+      end
+    end
+
+    context "when filename contains 'IPAD_PRO_3GEN_129'" do
+      it "returns iPad Pro(12.9-inch) 3rd generation" do
+        screenshot = Deliver::AppScreenshot.new("path/to/screenshot/IPAD_PRO_3GEN_129-AAABBBCCCDDD{2732x2048}.png", "de-DE")
         expect(screenshot.screen_size).to eq(ScreenSize::IOS_IPAD_PRO_12_9)
       end
     end
@@ -48,6 +69,8 @@ describe Deliver::AppScreenshot do
       it "should calculate all 6.5 inch iPhone resolutions" do
         expect_screen_size_from_file("iPhoneXSMax-Portrait{1242x2688}.jpg").to eq(ScreenSize::IOS_65)
         expect_screen_size_from_file("iPhoneXSMax-Landscape{2688x1242}.jpg").to eq(ScreenSize::IOS_65)
+        expect_screen_size_from_file("iPhone12ProMax-Portrait{1284x2778}.jpg").to eq(ScreenSize::IOS_65)
+        expect_screen_size_from_file("iPhone12ProMax-Landscape{2778x1284}.jpg").to eq(ScreenSize::IOS_65)
       end
 
       it "should calculate all 5.8 inch iPhone resolutions" do
@@ -120,6 +143,7 @@ describe Deliver::AppScreenshot do
       it "should calculate all supported Apple Watch resolutions" do
         expect_screen_size_from_file("AppleWatch-Series3{312x390}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH)
         expect_screen_size_from_file("AppleWatch-Series4{368x448}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH_SERIES4)
+        expect_screen_size_from_file("AppleWatch-Series7{396x484}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH_SERIES7)
       end
     end
 
@@ -127,6 +151,8 @@ describe Deliver::AppScreenshot do
       it "should calculate all 6.5 inch iPhone resolutions" do
         expect_screen_size_from_file("iMessage/en-GB/iPhoneXSMax-Portrait{1242x2688}.jpg").to eq(ScreenSize::IOS_65_MESSAGES)
         expect_screen_size_from_file("iMessage/en-GB/iPhoneXSMax-Landscape{2688x1242}.jpg").to eq(ScreenSize::IOS_65_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhone12ProMax-Portrait{1284x2778}.jpg").to eq(ScreenSize::IOS_65_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhone12ProMax-Landscape{2778x1284}.jpg").to eq(ScreenSize::IOS_65_MESSAGES)
       end
 
       it "should calculate all 5.8 inch iPhone resolutions" do
@@ -180,9 +206,7 @@ describe Deliver::AppScreenshot do
 
     describe "invalid screen sizes" do
       def expect_invalid_screen_size_from_file(file)
-        expect do
-          Deliver::AppScreenshot.calculate_screen_size(file)
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Unsupported screen size #{screen_size_from(file)} for path '#{file}'")
+        expect(Deliver::AppScreenshot.calculate_screen_size(file)).to be_nil
       end
 
       it "shouldn't allow native resolution 5.5 inch iPhone screenshots" do
@@ -256,72 +280,77 @@ describe Deliver::AppScreenshot do
   end
 
   describe "#device_type" do
-    before do
-      allow_any_instance_of(Deliver::AppScreenshot).to receive(:is_valid?).and_return(true)
+    def app_screenshot_with(screen_size, path = '', language = 'en-US')
+      allow(Deliver::AppScreenshot).to receive(:calculate_screen_size).and_return(screen_size)
+      Deliver::AppScreenshot.new(path, language)
     end
 
     it "should return iphone35 for 3.5 inch displays" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_35).device_type).to eq("iphone35")
+      expect(app_screenshot_with(ScreenSize::IOS_35).device_type).to eq("APP_IPHONE_35")
     end
 
     it "should return iphone4 for 4 inch displays" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_40).device_type).to eq("iphone4")
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_40_MESSAGES).device_type).to eq("iphone4")
+      expect(app_screenshot_with(ScreenSize::IOS_40).device_type).to eq("APP_IPHONE_40")
+      expect(app_screenshot_with(ScreenSize::IOS_40_MESSAGES).device_type).to eq("IMESSAGE_APP_IPHONE_40")
     end
 
     it "should return iphone6 for 4.7 inch displays" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_47).device_type).to eq("iphone6")
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_47_MESSAGES).device_type).to eq("iphone6")
+      expect(app_screenshot_with(ScreenSize::IOS_47).device_type).to eq("APP_IPHONE_47")
+      expect(app_screenshot_with(ScreenSize::IOS_47_MESSAGES).device_type).to eq("IMESSAGE_APP_IPHONE_47")
     end
 
     it "should return iphone6Plus for 5.5 inch displays" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_55).device_type).to eq("iphone6Plus")
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_55_MESSAGES).device_type).to eq("iphone6Plus")
+      expect(app_screenshot_with(ScreenSize::IOS_55).device_type).to eq("APP_IPHONE_55")
+      expect(app_screenshot_with(ScreenSize::IOS_55_MESSAGES).device_type).to eq("IMESSAGE_APP_IPHONE_55")
     end
 
     it "should return nil for 6.1 inch displays (iPhone XR)" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_61).device_type).to be_nil
+      expect(app_screenshot_with(ScreenSize::IOS_61).device_type).to be_nil
     end
 
     it "should return iphone65 for 6.5 inch displays" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_65).device_type).to eq("iphone65")
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_65_MESSAGES).device_type).to eq("iphone65")
+      expect(app_screenshot_with(ScreenSize::IOS_65).device_type).to eq("APP_IPHONE_65")
+      expect(app_screenshot_with(ScreenSize::IOS_65_MESSAGES).device_type).to eq("IMESSAGE_APP_IPHONE_65")
     end
 
     it "should return ipad for 9.7 inch displays" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_IPAD).device_type).to eq("ipad")
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_IPAD_MESSAGES).device_type).to eq("ipad")
+      expect(app_screenshot_with(ScreenSize::IOS_IPAD).device_type).to eq("APP_IPAD_97")
+      expect(app_screenshot_with(ScreenSize::IOS_IPAD_MESSAGES).device_type).to eq("IMESSAGE_APP_IPAD_97")
     end
 
     it "should return ipad105 for 10.5 inch displays" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_IPAD_10_5).device_type).to eq("ipad105")
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_IPAD_10_5_MESSAGES).device_type).to eq("ipad105")
+      expect(app_screenshot_with(ScreenSize::IOS_IPAD_10_5).device_type).to eq("APP_IPAD_105")
+      expect(app_screenshot_with(ScreenSize::IOS_IPAD_10_5_MESSAGES).device_type).to eq("IMESSAGE_APP_IPAD_105")
     end
 
     it "should return ipadPro11 for 11 inch displays" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_IPAD_11).device_type).to eq("ipadPro11")
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_IPAD_11_MESSAGES).device_type).to eq("ipadPro11")
+      expect(app_screenshot_with(ScreenSize::IOS_IPAD_11).device_type).to eq("APP_IPAD_PRO_3GEN_11")
+      expect(app_screenshot_with(ScreenSize::IOS_IPAD_11_MESSAGES).device_type).to eq("IMESSAGE_APP_IPAD_PRO_3GEN_11")
     end
 
     it "should return ipadPro for 12.9 inch displays" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_IPAD_PRO).device_type).to eq("ipadPro")
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_IPAD_PRO_MESSAGES).device_type).to eq("ipadPro")
+      expect(app_screenshot_with(ScreenSize::IOS_IPAD_PRO).device_type).to eq("APP_IPAD_PRO_129")
+      expect(app_screenshot_with(ScreenSize::IOS_IPAD_PRO_MESSAGES).device_type).to eq("IMESSAGE_APP_IPAD_PRO_129")
     end
 
     it "should return watch for original Apple Watch" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_APPLE_WATCH).device_type).to eq("watch")
+      expect(app_screenshot_with(ScreenSize::IOS_APPLE_WATCH).device_type).to eq("APP_WATCH_SERIES_3")
     end
 
     it "should return watchSeries4 for Apple Watch Series 4" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::IOS_APPLE_WATCH_SERIES4).device_type).to eq("watchSeries4")
+      expect(app_screenshot_with(ScreenSize::IOS_APPLE_WATCH_SERIES4).device_type).to eq("APP_WATCH_SERIES_4")
+    end
+
+    it "should return watchSeries7 for Apple Watch Series 7" do
+      expect(app_screenshot_with(ScreenSize::IOS_APPLE_WATCH_SERIES7).device_type).to eq("APP_WATCH_SERIES_7")
     end
 
     it "should return appleTV for Apple TV" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::APPLE_TV).device_type).to eq("appleTV")
+      expect(app_screenshot_with(ScreenSize::APPLE_TV).device_type).to eq("APP_APPLE_TV")
     end
 
     it "should return desktop for Mac" do
-      expect(Deliver::AppScreenshot.new("", "", ScreenSize::MAC).device_type).to eq("desktop")
+      expect(app_screenshot_with(ScreenSize::MAC).device_type).to eq("APP_DESKTOP")
     end
   end
 end

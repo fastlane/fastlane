@@ -1,7 +1,7 @@
 describe Spaceship::Tunes do
   describe "InsufficientPermissions" do
     before { Spaceship::Tunes.login }
-    let(:app) { Spaceship::Application.all.first }
+    let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 
     it "raises an appropriate App Store Connect error when user doesn't have enough permission to do something" do
       stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/versions/812106519").

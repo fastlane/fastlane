@@ -10,18 +10,10 @@ module Fastlane
       def self.run(options)
         return if options[:no_update] # this is used to update itself
 
-        tools_to_update = options[:tools].split(',') unless options[:tools].nil?
-        tools_to_update ||= all_installed_tools
-
-        if tools_to_update.count == 0
-          UI.error("No tools specified or couldn't find any installed fastlane.tools")
-          return
-        end
-
+        tools_to_update = ALL_TOOLS
         UI.message("Looking for updates for #{tools_to_update.join(', ')}...")
 
         updater = Gem::CommandManager.instance[:update]
-        updater.options[:prerelease] = true if options[:nightly]
         cleaner = Gem::CommandManager.instance[:cleanup]
 
         gem_dir = ENV['GEM_HOME'] || Gem.dir
@@ -49,41 +41,39 @@ module Fastlane
 
         if update_needed.count == 0
           UI.success("Nothing to update ✅")
-          show_information_about_nightly_builds unless options[:nightly]
           return
         end
 
         # suppress updater output - very noisy
-        Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
+        Gem::DefaultUserInteraction.ui = Gem::SilentUI.new unless FastlaneCore::Globals.verbose?
 
         update_needed.each do |tool_info|
-          tool = tool_info[0]
-          gem_version = tool_info[1]
+          tool = self.get_gem_name(tool_info)
           local_version = Gem::Version.new(highest_versions[tool].version)
           latest_official_version = FastlaneCore::UpdateChecker.fetch_latest(tool)
 
-          if options[:nightly]
-            UI.message("Updating #{tool} from #{local_version.to_s.yellow} to nightly build #{gem_version.to_s.yellow}... (last official release #{latest_official_version.to_s.yellow}) 🚀")
-          else
-            UI.message("Updating #{tool} from #{local_version.to_s.yellow} to #{latest_official_version.to_s.yellow}... 🚀")
-          end
+          UI.message("Updating #{tool} from #{local_version.to_s.yellow} to #{latest_official_version.to_s.yellow}... 🚀")
 
-          # Approximate_recommendation will create a string like "~> 0.10" from a version 0.10.0, e.g. one that is valid for versions >= 0.10 and <1.0
-          requirement_version = options[:nightly] ? gem_version : local_version.approximate_recommendation
-          updater.update_gem(tool, Gem::Requirement.new(requirement_version))
+          if Helper.homebrew?
+            Helper.backticks('brew upgrade fastlane')
+          else
+            # Approximate_recommendation will create a string like "~> 0.10" from a version 0.10.0, e.g. one that is valid for versions >= 0.10 and <1.0
+            requirement_version = local_version.approximate_recommendation
+            updater.update_gem(tool, Gem::Requirement.new(requirement_version))
+          end
 
           UI.success("Finished updating #{tool}")
         end
 
-        UI.message("Cleaning up old versions...")
-        cleaner.options[:args] = tools_to_update
-        cleaner.execute
+        unless Helper.homebrew?
+          UI.message("Cleaning up old versions...")
+          cleaner.options[:args] = tools_to_update
+          cleaner.execute
+        end
 
-        if options[:nightly]
-          UI.success("Thanks for using fastlane's nightly builds! This makes it easier for everyone to detect regressions earlier.")
-          UI.success("Please submit an issue on GitHub if anything behaves differently than it should 🍪")
-        else
-          show_information_about_nightly_builds
+        if FastlaneCore::FastlaneFolder.swift?
+          upgrader = SwiftRunnerUpgrader.new
+          upgrader.upgrade_if_needed!
         end
 
         UI.message("fastlane.tools successfully updated! I will now restart myself... 😴")
@@ -92,19 +82,14 @@ module Fastlane
         exec("FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join(' ')}")
       end
 
-      def self.show_information_about_nightly_builds
-        UI.message("")
-        UI.message("Please help us test early releases of fastlane by opting into nightly builds 🌃")
-        UI.message("Just replace your `update_fastlane` call with")
-        UI.message("")
-        UI.command_output("update_fastlane(nightly: true)")
-        UI.message("")
-        UI.message("Nightly builds are reviewed and tested just like the public releases 🚂")
-        UI.message("")
-      end
-
-      def self.all_installed_tools
-        Gem::Specification.select { |s| ALL_TOOLS.include?(s.name) }.map(&:name).uniq
+      def self.get_gem_name(tool_info)
+        if tool_info.kind_of?(Array)
+          return tool_info[0]
+        elsif tool_info.respond_to?(:name) # Gem::NameTuple in RubyGems >= 3.1.0
+          return tool_info.name
+        else
+          UI.crash!("Unknown gem update information returned from RubyGems. Please file a new issue for this... 🤷")
+        end
       end
 
       def self.description
@@ -134,21 +119,17 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :nightly,
-                                       env_name: "FL_UPDATE_FASTLANE_NIGHTLY",
-                                       description: "Opt-in to install and use nightly fastlane builds",
-                                       is_string: false,
-                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :no_update,
                                        env_name: "FL_NO_UPDATE",
                                        description: "Don't update during this run. This is used internally",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
-          FastlaneCore::ConfigItem.new(key: :tools,
-                                       env_name: "FL_TOOLS_TO_UPDATE",
-                                       description: "Comma separated list of fastlane tools to update (e.g. `fastlane,deliver,sigh`)",
-                                       deprecated: true,
-                                       optional: true)
+          FastlaneCore::ConfigItem.new(key: :nightly,
+                                       env_name: "FL_UPDATE_FASTLANE_NIGHTLY",
+                                       description: "Opt-in to install and use nightly fastlane builds",
+                                       type: Boolean,
+                                       default_value: false,
+                                       deprecated: "Nightly builds are no longer being made available")
         ]
       end
 
