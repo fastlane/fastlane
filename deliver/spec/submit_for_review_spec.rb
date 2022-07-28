@@ -11,6 +11,12 @@ describe Deliver::SubmitForReview do
              id: '1',
              version_string: "1.0.0")
     end
+    let(:ready_for_review_version) do
+      double('ready_for_review_version',
+             id: '1',
+             app_store_state: "READY_FOR_REVIEW",
+             version_string: "1.0.0")
+    end
     let(:selected_build) { double('selected_build') }
     let(:idfa_declaration) { double('idfa_declaration') }
 
@@ -118,6 +124,7 @@ describe Deliver::SubmitForReview do
           expect(app).not_to receive(:create_review_submission)
 
           expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(Spaceship::ConnectAPI::AppStoreVersion).to receive(:get).and_return(ready_for_review_version)
           expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
@@ -170,6 +177,7 @@ describe Deliver::SubmitForReview do
           expect(app).to receive(:create_review_submission).and_return(submission)
 
           expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(Spaceship::ConnectAPI::AppStoreVersion).to receive(:get).and_return(ready_for_review_version)
           expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
@@ -202,6 +210,7 @@ describe Deliver::SubmitForReview do
           expect(app).to receive(:create_review_submission).and_return(submission)
 
           expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(Spaceship::ConnectAPI::AppStoreVersion).to receive(:get).and_return(ready_for_review_version)
           expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
@@ -231,6 +240,7 @@ describe Deliver::SubmitForReview do
           expect(app).to receive(:create_review_submission).and_return(submission)
 
           expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(Spaceship::ConnectAPI::AppStoreVersion).to receive(:get).and_return(ready_for_review_version)
           expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
@@ -259,6 +269,7 @@ describe Deliver::SubmitForReview do
           expect(app).to receive(:create_review_submission).and_return(submission)
 
           expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(Spaceship::ConnectAPI::AppStoreVersion).to receive(:get).and_return(ready_for_review_version)
           expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
@@ -298,6 +309,7 @@ describe Deliver::SubmitForReview do
           expect(app).to receive(:create_review_submission).and_return(submission)
 
           expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(Spaceship::ConnectAPI::AppStoreVersion).to receive(:get).and_return(ready_for_review_version)
           expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
@@ -337,6 +349,7 @@ describe Deliver::SubmitForReview do
           expect(app).to receive(:create_review_submission).and_return(submission)
 
           expect(submission).to receive(:add_app_store_version_to_review_items).with(app_store_version_id: edit_version.id)
+          expect(Spaceship::ConnectAPI::AppStoreVersion).to receive(:get).and_return(ready_for_review_version)
           expect(submission).to receive(:submit_for_review)
 
           review_submitter.submit!(options)
