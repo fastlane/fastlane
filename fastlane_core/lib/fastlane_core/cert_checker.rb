@@ -84,8 +84,10 @@ module FastlaneCore
     def self.wwdr_certificate_installed?
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
       certificate_hash = "SHA-256 hash: BDD4ED6E74691F0C2BFD01BE0296197AF1379E0418E2D300EFA9C3BEF642CA30"
+
       keychain = wwdr_keychain
       response = Helper.backticks("security find-certificate -a -c '#{certificate_name}' -Z #{keychain.shellescape} | grep ^SHA-256", print: FastlaneCore::Globals.verbose?)
+
       certs = response.split("\n")
       certs.include?(certificate_hash)
     end
