@@ -68,8 +68,8 @@ module Match
       if (self.certs + self.profiles + self.files).count > 0
         unless params[:skip_confirmation]
           UI.error("---")
-          UI.error("WARNING: THIS ACTION IS HIGHLY DESTRUCTIVE")
-          UI.error("This command revokes all specified certificates on Apple's servers, not just locally!")
+          UI.error("Warning: This is a destructive action")
+          UI.error("This command revokes all specified certificates and provisioning profiles from the Apple Developer Portal and from match storage")
           UI.error("Are you sure you want to completely delete and revoke all the")
           UI.error("certificates and provisioning profiles listed above? (y/n)")
           UI.error("Warning: By nuking distribution, both App Store and Ad Hoc profiles will be deleted") if type == "distribution"
