@@ -13,23 +13,64 @@ module Snapshot
         parts << "xcodebuild"
         parts += options(language, locale)
         parts += destination(devices)
-        parts += build_settings
+        parts += build_settings(language, locale)
         parts += actions
         parts += suffix
-        parts += pipe(language: language, locale: locale, log_path: log_path)
+        parts += pipe(log_path: log_path)
 
         return parts
       end
 
-      def pipe(language: nil, locale: nil, log_path: nil)
+      def pipe(log_path: nil)
         tee_command = ['tee']
         tee_command << '-a' if log_path && File.exist?(log_path)
         tee_command << log_path.shellescape if log_path
 
+        pipe = ["| #{tee_command.join(' ')}"]
+
+        formatter = Snapshot.config[:xcodebuild_formatter].chomp
+        options = legacy_xcpretty_options
+
+        if Snapshot.config[:disable_xcpretty] || formatter == ''
+          UI.verbose("Not using an xcodebuild formatter")
+        elsif !options.empty?
+          UI.important("Detected legacy xcpretty being used so formatting wth xcpretty")
+          UI.important("Option(s) used: #{options.join(', ')}")
+          pipe += pipe_xcpretty
+        elsif formatter == 'xcpretty'
+          pipe += pipe_xcpretty
+        elsif formatter == 'xcbeautify'
+          pipe += pipe_xcbeautify
+        else
+          pipe << "| #{formatter}"
+        end
+
+        pipe
+      end
+
+      def pipe_xcbeautify
+        pipe = ['| xcbeautify']
+
+        if FastlaneCore::Helper.colors_disabled?
+          pipe << '--disable-colored-output'
+        end
+
+        return pipe
+      end
+
+      def legacy_xcpretty_options
+        options = []
+        options << "xcpretty_args" if Snapshot.config[:xcpretty_args]
+        return options
+      end
+
+      def pipe_xcpretty
+        pipe = []
         xcpretty = "xcpretty #{Snapshot.config[:xcpretty_args]}"
         xcpretty << "--no-color" if Helper.colors_disabled?
-
-        return ["| #{tee_command.join(' ')} | #{xcpretty}"]
+        pipe << "| #{xcpretty}"
+        pipe << "> /dev/null" if Snapshot.config[:suppress_xcode_output]
+        return pipe
       end
 
       def destination(devices)
@@ -39,7 +80,14 @@ module Snapshot
         # on Mac we will always run on host machine, so should specify only platform
         return ["-destination 'platform=macOS'"] if devices.first.to_s =~ /^Mac/
 
-        os = devices.first.to_s =~ /^Apple TV/ ? "tvOS" : "iOS"
+        case devices.first.to_s
+        when /^Apple TV/
+          os = 'tvOS'
+        when /^Apple Watch/
+          os = 'watchOS'
+        else
+          os = 'iOS'
+        end
 
         os_version = Snapshot.config[:ios_version] || Snapshot::LatestOsVersion.version(os)
 
@@ -63,7 +111,7 @@ module Snapshot
         # Check each device to see if it is an iOS device
         all_ios = devices.map do |device|
           device = device.downcase
-          device.include?('iphone') || device.include?('ipad')
+          device.include?('iphone') || device.include?('ipad') || device.include?('ipod')
         end
         # Return true if all devices are iOS devices
         return true unless all_ios.include?(false)
@@ -72,8 +120,15 @@ module Snapshot
           device = device.downcase
           device.include?('apple tv')
         end
-        # Return true if all devices are iOS devices
+        # Return true if all devices are tvOS devices
         return true unless all_tvos.include?(false)
+
+        all_watchos = devices.map do |device|
+          device = device.downcase
+          device.include?('apple watch')
+        end
+        # Return true if all devices are watchOS devices
+        return true unless all_watchos.include?(false)
 
         # There should only be more than 1 device type if
         # it is iOS or tvOS, therefore, if there is more than 1

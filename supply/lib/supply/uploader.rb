@@ -13,6 +13,8 @@ module Supply
       apk_version_codes.concat(upload_bundles) unless Supply.config[:skip_upload_aab]
       upload_mapping(apk_version_codes)
 
+      track_to_update = Supply.config[:track]
+
       apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
 
       if !apk_version_codes.empty?
@@ -23,13 +25,14 @@ module Supply
       else
         # Only promote or rollout if we don't have version codes
         if Supply.config[:track_promote_to]
+          track_to_update = Supply.config[:track_promote_to]
           promote_track
         elsif !Supply.config[:rollout].nil? && Supply.config[:track].to_s != ""
           update_rollout
         end
       end
 
-      perform_upload_meta(apk_version_codes)
+      perform_upload_meta(apk_version_codes, track_to_update)
 
       if Supply.config[:validate_only]
         UI.message("Validating all changes with Google Play...")
@@ -70,7 +73,7 @@ module Supply
       end
     end
 
-    def perform_upload_meta(version_codes)
+    def perform_upload_meta(version_codes, track_name)
       if (!Supply.config[:skip_upload_metadata] || !Supply.config[:skip_upload_images] || !Supply.config[:skip_upload_changelogs] || !Supply.config[:skip_upload_screenshots]) && metadata_path
         # Use version code from config if version codes is empty and no nil or empty string
         version_codes = [Supply.config[:version_code]] if version_codes.empty?
@@ -81,7 +84,7 @@ module Supply
         version_codes.each do |version_code|
           UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
-          track, release = fetch_track_and_release!(Supply.config[:track], version_code)
+          track, release = fetch_track_and_release!(track_name, version_code)
           UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
           UI.user_error!("Could not find release for version code '#{version_code}' to update changelog") unless release
 
@@ -98,7 +101,7 @@ module Supply
             release_notes << upload_changelog(language, version_code) unless Supply.config[:skip_upload_changelogs]
           end
 
-          upload_changelogs(release_notes, release, track) unless release_notes.empty?
+          upload_changelogs(release_notes, release, track, track_name) unless release_notes.empty?
         end
       end
     end
@@ -111,7 +114,7 @@ module Supply
       releases = track.releases
 
       releases = releases.select { |r| r.status == status } if status
-      releases = releases.select { |r| r.version_codes.map(&:to_s).include?(version_code.to_s) } if version_code
+      releases = releases.select { |r| (r.version_codes || []).map(&:to_s).include?(version_code.to_s) } if version_code
 
       if releases.size > 1
         UI.user_error!("More than one release found in this track. Please specify with the :version_code option to select a release.")
@@ -144,7 +147,7 @@ module Supply
     end
 
     def verify_config!
-      unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths] || Supply.config[:aab] || Supply.config[:aab_paths] || (Supply.config[:track] && Supply.config[:track_promote_to])
+      unless metadata_path || Supply.config[:apk] || Supply.config[:apk_paths] || Supply.config[:aab] || Supply.config[:aab_paths] || (Supply.config[:track] && Supply.config[:track_promote_to]) || (Supply.config[:track] && Supply.config[:rollout])
         UI.user_error!("No local metadata, apks, aab, or track to promote were found, make sure to run `fastlane supply init` to setup supply")
       end
 
@@ -159,6 +162,10 @@ module Supply
 
       if Supply.config[:release_status] == Supply::ReleaseStatus::DRAFT && Supply.config[:rollout]
         UI.user_error!(%(Cannot specify rollout percentage when the release status is set to 'draft'))
+      end
+
+      if Supply.config[:track_promote_release_status] == Supply::ReleaseStatus::DRAFT && Supply.config[:rollout]
+        UI.user_error!(%(Cannot specify rollout percentage when the track promote release status is set to 'draft'))
       end
 
       unless Supply.config[:version_codes_to_retain].nil?
@@ -179,7 +186,7 @@ module Supply
         end
       else
         releases = releases.select do |release|
-          release.status == Supply::ReleaseStatus::COMPLETED
+          release.status == Supply.config[:release_status]
         end
       end
 
@@ -192,11 +199,12 @@ module Supply
       release = releases.first
       track_to = client.tracks(Supply.config[:track_promote_to]).first
 
-      if Supply.config[:rollout]
+      rollout = (Supply.config[:rollout] || 0).to_f
+      if rollout > 0 && rollout < 1
         release.status = Supply::ReleaseStatus::IN_PROGRESS
-        release.user_fraction = Supply.config[:rollout]
+        release.user_fraction = rollout
       else
-        release.status = Supply::ReleaseStatus::COMPLETED
+        release.status = Supply.config[:track_promote_release_status]
         release.user_fraction = nil
       end
 
@@ -232,15 +240,15 @@ module Supply
         end
       end
 
-      AndroidPublisher::LocalizedText.new({
+      AndroidPublisher::LocalizedText.new(
         language: language,
         text: changelog_text
-      })
+      )
     end
 
-    def upload_changelogs(release_notes, release, track)
+    def upload_changelogs(release_notes, release, track, track_name)
       release.release_notes = release_notes
-      client.upload_changelogs(track, Supply.config[:track])
+      client.upload_changelogs(track, track_name)
     end
 
     def upload_metadata(language, listing)
@@ -301,8 +309,9 @@ module Supply
 
     def upload_mapping(apk_version_codes)
       mapping_paths = [Supply.config[:mapping]] unless (mapping_paths = Supply.config[:mapping_paths])
-      mapping_paths.zip(apk_version_codes).each do |mapping_path, version_code|
+      mapping_paths.product(apk_version_codes).each do |mapping_path, version_code|
         if mapping_path
+          UI.message("Preparing mapping at path '#{mapping_path}', version code #{version_code} for upload...")
           client.upload_mapping(mapping_path, version_code)
         end
       end
@@ -389,6 +398,10 @@ module Supply
           track_release.status = Supply::ReleaseStatus::IN_PROGRESS
           track_release.user_fraction = rollout
         end
+      end
+
+      if Supply.config[:in_app_update_priority]
+        track_release.in_app_update_priority = Supply.config[:in_app_update_priority].to_i
       end
 
       tracks = client.tracks(Supply.config[:track])

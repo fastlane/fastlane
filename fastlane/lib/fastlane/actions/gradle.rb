@@ -64,11 +64,11 @@ module Fastlane
                                 print_command_output: params[:print_command_output])
 
         # If we didn't build, then we return now, as it makes no sense to search for apk's in a non-`assemble` or non-`build` scenario
-        return result unless task =~ /\b(assemble)/ || task =~ /\b(bundle)/
+        return result unless gradle_task =~ /\b(assemble)/ || gradle_task =~ /\b(bundle)/
 
         apk_search_path = File.join(project_dir, '**', 'build', 'outputs', 'apk', '**', '*.apk')
         aab_search_path = File.join(project_dir, '**', 'build', 'outputs', 'bundle', '**', '*.aab')
-        output_json_search_path = File.join(project_dir, '**', 'build', 'outputs', 'apk', '**', 'output.json')
+        output_json_search_path = File.join(project_dir, '**', 'build', 'outputs', 'apk', '**', 'output*.json') # output.json in Android Stuido 3 and output-metadata.json in Android Studio 4
         mapping_txt_search_path = File.join(project_dir, '**', 'build', 'outputs', 'mapping', '**', 'mapping.txt')
 
         # Our apk/aab is now built, but there might actually be multiple ones that were built if a flavor was not specified in a multi-flavor project (e.g. `assembleRelease`)
@@ -146,64 +146,56 @@ module Fastlane
                                        env_name: 'FL_GRADLE_TASK',
                                        description: 'The gradle task you want to execute, e.g. `assemble`, `bundle` or `test`. For tasks such as `assembleMyFlavorRelease` you should use gradle(task: \'assemble\', flavor: \'Myflavor\', build_type: \'Release\')',
                                        conflicting_options: [:tasks],
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :flavor,
                                        env_name: 'FL_GRADLE_FLAVOR',
                                        description: 'The flavor that you want the task for, e.g. `MyFlavor`. If you are running the `assemble` task in a multi-flavor project, and you rely on Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH] then you must specify a flavor here or else this value will be undefined',
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :build_type,
                                        env_name: 'FL_GRADLE_BUILD_TYPE',
                                        description: 'The build type that you want the task for, e.g. `Release`. Useful for some tasks such as `assemble`',
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :tasks,
                                        type: Array,
                                        env_name: 'FL_GRADLE_TASKS',
                                        description: 'The multiple gradle tasks that you want to execute, e.g. `[assembleDebug, bundleDebug]`',
                                        conflicting_options: [:task],
-                                       optional: true,
-                                       is_string: false),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :flags,
                                        env_name: 'FL_GRADLE_FLAGS',
                                        description: 'All parameter flags you want to pass to the gradle command, e.g. `--exitcode --xml file.xml`',
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :project_dir,
                                        env_name: 'FL_GRADLE_PROJECT_DIR',
                                        description: 'The root directory of the gradle project',
-                                       default_value: '.',
-                                       is_string: true),
+                                       default_value: '.'),
           FastlaneCore::ConfigItem.new(key: :gradle_path,
                                        env_name: 'FL_GRADLE_PATH',
                                        description: 'The path to your `gradlew`. If you specify a relative path, it is assumed to be relative to the `project_dir`',
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :properties,
                                        env_name: 'FL_GRADLE_PROPERTIES',
                                        description: 'Gradle properties to be exposed to the gradle script',
                                        optional: true,
-                                       is_string: false),
+                                       type: Hash),
           FastlaneCore::ConfigItem.new(key: :system_properties,
                                        env_name: 'FL_GRADLE_SYSTEM_PROPERTIES',
                                        description: 'Gradle system properties to be exposed to the gradle script',
                                        optional: true,
-                                       is_string: false),
+                                       type: Hash),
           FastlaneCore::ConfigItem.new(key: :serial,
                                        env_name: 'FL_ANDROID_SERIAL',
                                        description: 'Android serial, which device should be used for this command',
-                                       is_string: true,
                                        default_value: ''),
           FastlaneCore::ConfigItem.new(key: :print_command,
                                        env_name: 'FL_GRADLE_PRINT_COMMAND',
                                        description: 'Control whether the generated Gradle command is printed as output before running it (true/false)',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :print_command_output,
                                        env_name: 'FL_GRADLE_PRINT_COMMAND_OUTPUT',
                                        description: 'Control whether the output produced by given Gradle command is printed while running (true/false)',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true)
         ]
       end
@@ -266,8 +258,21 @@ module Fastlane
             # ...
 
             properties: {
-              "versionCode" => 100,
-              "versionName" => "1.0.0",
+              "exampleNumber" => 100,
+              "exampleString" => "1.0.0",
+              # ...
+            }
+          )
+          ```
+
+          You can use this to change the version code and name of your app:
+          ```ruby
+          gradle(
+            # ...
+
+            properties: {
+              "android.injected.version.code" => 100,
+              "android.injected.version.name" => "1.0.0",
               # ...
             }
           )

@@ -26,7 +26,9 @@ module Fastlane
         # Login
         credentials = JSON.parse(json_key_data)
         callback_uri = 'https://fastlane.github.io/managed_google_play-callback/callback.html'
-        uri = "https://play.google.com/apps/publish/delegatePrivateApp?service_account=#{credentials['client_email']}&continueUrl=#{URI.escape(callback_uri)}"
+        require 'addressable/uri'
+        continueUrl = Addressable::URI.encode(callback_uri)
+        uri = "https://play.google.com/apps/publish/delegatePrivateApp?service_account=#{credentials['client_email']}&continueUrl=#{continueUrl}"
 
         UI.message("To obtain publishing rights for custom apps on Managed Play Store, open the following URL and log in:")
         UI.message("")
@@ -71,40 +73,35 @@ module Fastlane
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(
-            key: :json_key,
-            env_name: "SUPPLY_JSON_KEY",
-            short_option: "-j",
-            conflicting_options: [:json_key_data],
-            optional: true, # optional until it is possible specify either json_key OR json_key_data are required
-            description: "The path to a file containing service account JSON, used to authenticate with Google",
-            code_gen_sensitive: true,
-            default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
-            default_value_dynamic: true,
-            verify_block: proc do |value|
-              UI.user_error!("Could not find service account json file at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
-              UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
-            end
-          ),
-          FastlaneCore::ConfigItem.new(
-            key: :json_key_data,
-            env_name: "SUPPLY_JSON_KEY_DATA",
-            short_option: "-c",
-            conflicting_options: [:json_key],
-            optional: true,
-            description: "The raw service account JSON data used to authenticate with Google",
-            code_gen_sensitive: true,
-            default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
-            default_value_dynamic: true,
-            verify_block: proc do |value|
-              begin
-                JSON.parse(value)
-              rescue JSON::ParserError
-                UI.user_error!("Could not parse service account json: JSON::ParseError")
-              end
-            end
-          )
-
+          FastlaneCore::ConfigItem.new(key: :json_key,
+                                       env_name: "SUPPLY_JSON_KEY",
+                                       short_option: "-j",
+                                       conflicting_options: [:json_key_data],
+                                       optional: true, # optional until it is possible specify either json_key OR json_key_data are required
+                                       description: "The path to a file containing service account JSON, used to authenticate with Google",
+                                       code_gen_sensitive: true,
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
+                                       default_value_dynamic: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Could not find service account json file at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
+                                         UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :json_key_data,
+                                       env_name: "SUPPLY_JSON_KEY_DATA",
+                                       short_option: "-c",
+                                       conflicting_options: [:json_key],
+                                       optional: true,
+                                       description: "The raw service account JSON data used to authenticate with Google",
+                                       code_gen_sensitive: true,
+                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
+                                       default_value_dynamic: true,
+                                       verify_block: proc do |value|
+                                         begin
+                                           JSON.parse(value)
+                                         rescue JSON::ParserError
+                                           UI.user_error!("Could not parse service account json: JSON::ParseError")
+                                         end
+                                       end)
         ]
       end
 

@@ -14,17 +14,26 @@ module Match
         specific_cert_type = cert_type.to_s
       end
 
+      platform = params[:platform]
+      if platform.to_s == :catalyst.to_s
+        platform = :macos.to_s
+      end
+
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
+        platform: platform,
         development: params[:type] == "development",
         type: specific_cert_type,
         generate_apple_certs: params[:generate_apple_certs],
         output_path: output_path,
         force: true, # we don't need a certificate without its private key, we only care about a new certificate
+        api_key_path: params[:api_key_path],
+        api_key: params[:api_key],
         username: params[:username],
         team_id: params[:team_id],
         team_name: params[:team_name],
         keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name]),
-        keychain_password: params[:keychain_password]
+        keychain_password: params[:keychain_password],
+        skip_set_partition_list: params[:skip_set_partition_list]
       })
 
       Cert.config = arguments
@@ -60,7 +69,11 @@ module Match
         names << params[:platform]
       end
 
-      profile_name = names.join(" ")
+      if params[:profile_name].to_s.empty?
+        profile_name = names.join(" ")
+      else
+        profile_name = params[:profile_name]
+      end
 
       values = {
         app_identifier: app_identifier,
@@ -70,9 +83,13 @@ module Match
         cert_id: certificate_id,
         provisioning_name: profile_name,
         ignore_profiles_with_different_name: true,
+        api_key_path: params[:api_key_path],
+        api_key: params[:api_key],
         team_id: params[:team_id],
         team_name: params[:team_name],
-        template_name: params[:template_name]
+        template_name: params[:template_name],
+        fail_on_name_taken: params[:fail_on_name_taken],
+        include_all_certificates: params[:include_all_certificates],
       }
 
       values[:platform] = params[:platform]

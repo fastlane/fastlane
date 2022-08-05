@@ -4,32 +4,45 @@ require_relative 'module'
 module Match
   # Ensures the certificate and profiles are also available on App Store Connect
   class SpaceshipEnsure
-    def initialize(user, team_id, team_name)
-      # We'll try to manually fetch the password
-      # to tell the user that a password is optional
-      require 'credentials_manager/account_manager'
+    attr_accessor :team_id
 
-      keychain_entry = CredentialsManager::AccountManager.new(user: user)
-
-      if keychain_entry.password(ask_if_missing: false).to_s.length == 0
-        UI.important("You can also run `fastlane match` in readonly mode to not require any access to the")
-        UI.important("Developer Portal. This way you only share the keys and credentials")
-        UI.command("fastlane match --readonly")
-        UI.important("More information https://docs.fastlane.tools/actions/match/#access-control")
-      end
-
+    def initialize(user, team_id, team_name, api_token)
       UI.message("Verifying that the certificate and profile are still valid on the Dev Portal...")
-      Spaceship.login(user)
-      Spaceship.select_team(team_id: team_id, team_name: team_name)
+
+      if api_token
+        UI.message("Creating authorization token for App Store Connect API")
+        Spaceship::ConnectAPI.token = api_token
+        self.team_id = team_id
+      elsif !Spaceship::ConnectAPI.token.nil?
+        UI.message("Using existing authorization token for App Store Connect API")
+        self.team_id = team_id
+      else
+        # We'll try to manually fetch the password
+        # to tell the user that a password is optional
+        require 'credentials_manager/account_manager'
+
+        keychain_entry = CredentialsManager::AccountManager.new(user: user)
+
+        if keychain_entry.password(ask_if_missing: false).to_s.length == 0
+          UI.important("You can also run `fastlane match` in readonly mode to not require any access to the")
+          UI.important("Developer Portal. This way you only share the keys and credentials")
+          UI.command("fastlane match --readonly")
+          UI.important("More information https://docs.fastlane.tools/actions/match/#access-control")
+        end
+
+        # Prompts select team if multiple teams and none specified
+        Spaceship::ConnectAPI.login(user, use_portal: true, use_tunes: false, portal_team_id: team_id, team_name: team_name)
+        self.team_id = Spaceship::ConnectAPI.client.portal_team_id
+      end
     end
 
     # The team ID of the currently logged in team
     def team_id
-      return Spaceship.client.team_id
+      return @team_id
     end
 
     def bundle_identifier_exists(username: nil, app_identifier: nil, platform: nil)
-      found = Spaceship.app.find(app_identifier, mac: platform == "macos")
+      found = Spaceship::ConnectAPI::BundleId.find(app_identifier)
       return if found
 
       require 'sigh/runner'
@@ -39,14 +52,14 @@ module Match
       })
       UI.error("An app with that bundle ID needs to exist in order to create a provisioning profile for it")
       UI.error("================================================================")
-      available_apps = Spaceship.app.all.collect { |a| "#{a.bundle_id} (#{a.name})" }
+      available_apps = Spaceship::ConnectAPI::BundleId.all.collect { |a| "#{a.identifier} (#{a.name})" }
       UI.message("Available apps:\n- #{available_apps.join("\n- ")}")
       UI.error("Make sure to run `fastlane match` with the same user and team every time.")
       UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")
     end
 
-    def certificates_exists(username: nil, certificate_ids: [], platform: nil)
-      Spaceship.certificate.all(mac: platform == "macos").each do |cert|
+    def certificates_exists(username: nil, certificate_ids: [])
+      Spaceship::ConnectAPI::Certificate.all.each do |cert|
         certificate_ids.delete(cert.id)
       end
       return if certificate_ids.empty?
@@ -57,20 +70,17 @@ module Match
       UI.error("for the user #{username}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
       UI.error("Git repository. This might be caused by revoking the certificate on the Dev Portal")
+      UI.error("If missing certificate is a Developer ID Installer, you may need to auth with Apple ID instead of App Store API Key")
       UI.user_error!("To reset the certificates of your Apple account, you can use the `fastlane match nuke` feature, more information on https://docs.fastlane.tools/actions/match/")
     end
 
-    def profile_exists(username: nil, uuid: nil, platform: nil)
-      is_mac = platform == "macos"
-      found = Spaceship.provisioning_profile.all(mac: is_mac).find do |profile|
+    def profile_exists(type: nil, username: nil, uuid: nil, platform: nil)
+      # App Store Connect API does not allow filter of profile by platform or uuid (as of 2020-07-30)
+      # Need to fetch all profiles and search for uuid on client side
+      # But we can filter provisioning profiles based on their type (this, in general way faster than getting all profiles)
+      filter = { profileType: Match.profile_types(type).join(",") } if type
+      found = Spaceship::ConnectAPI::Profile.all(filter: filter).find do |profile|
         profile.uuid == uuid
-      end
-
-      # Look for iOS after looking for macOS (needed for Catalyst apps)
-      if !found && is_mac
-        found = Spaceship.provisioning_profile.all(mac: false).find do |profile|
-          profile.uuid == uuid
-        end
       end
 
       unless found

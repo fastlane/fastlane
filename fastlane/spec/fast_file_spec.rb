@@ -7,7 +7,7 @@ describe Fastlane do
         end.to raise_exception("Could not find Fastfile at path './fastlane/spec/fixtures/fastfiles/fastfileNotHere'")
       end
 
-      it "raises an error if unknow method is called" do
+      it "raises an error if unknown method is called" do
         expect do
           Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileInvalid')
         end.to raise_exception("Could not find action, lane or variable 'laneasdf'. Check out the documentation for more details: https://docs.fastlane.tools/actions")
@@ -181,7 +181,7 @@ describe Fastlane do
         end
       end
 
-      it "raises an error if the name is on a black list" do
+      it "raises an error if the name is on a deny list" do
         expect(UI).to receive(:user_error!).with("Lane name 'run' is invalid")
         @ff.lane(:run) do
         end
@@ -471,7 +471,7 @@ lane :beta do
   sigh(app_identifier: "hi"
 end
 RUBY
-        expect(UI).to receive(:user_error!).with(%r{Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected (keyword_end|end), expecting '\)'})
+        expect(UI).to receive(:user_error!).with(%r{Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected (keyword_end|end|`end'), expecting '\)'})
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileSytnaxError')
       end
 
@@ -482,7 +482,7 @@ RUBY
           cases = [:abc,
         end
         RUBY
-        expect(UI).to receive(:user_error!).with(/Syntax error in your Fastfile on line 3: \(eval\):3: syntax error, unexpected (keyword_end|end), expecting '\]'\n        end\n.*/)
+        expect(UI).to receive(:user_error!).with(/Syntax error in your Fastfile on line 3: \(eval\):3: syntax error, unexpected (keyword_end|end|`end'), expecting '\]'\n        end\n.*/)
 
         ff = Fastlane::FastFile.new.parse(<<-RUBY.chomp)
         lane :test do
@@ -513,7 +513,7 @@ lane :beta do
   sigh(app_identifier: "hi"
 end
 RUBY
-        expect(UI).to receive(:user_error!).with(%r{Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected (keyword_end|end), expecting '\)'})
+        expect(UI).to receive(:user_error!).with(%r{Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSytnaxError:17: syntax error, unexpected (keyword_end|end|`end'), expecting '\)'})
         ff.import('./FastfileSytnaxError')
       end
 

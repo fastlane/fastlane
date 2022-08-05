@@ -2,11 +2,25 @@ describe Spaceship::Tunes::IAP do
   before { TunesStubbing.itc_stub_iap }
   before { Spaceship::Tunes.login }
   let(:client) { Spaceship::Tunes.client }
-  let(:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 
   describe "returns all purchases" do
     it "returns as IAPList" do
       expect(app.in_app_purchases.all.first.class).to eq(Spaceship::Tunes::IAPList)
+    end
+
+    it "Finds shared secret key" do
+      secret = app.in_app_purchases.get_shared_secret
+      expect(secret.class).to eq(String)
+      expect(secret.length).to be(32)
+    end
+
+    it "Generates new shared secret key" do
+      old_secret = app.in_app_purchases.get_shared_secret
+      new_secret = app.in_app_purchases.generate_shared_secret
+      expect(old_secret).not_to(eq(new_secret))
+      expect(new_secret.class).to eq(String)
+      expect(new_secret.length).to be(32)
     end
 
     it "Finds a specific product" do

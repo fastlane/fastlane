@@ -18,7 +18,10 @@ class ConnectAPIStubbing
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps").
           to_return(status: 200, body: read_fixture_file('apps.json'), headers: { 'Content-Type' => 'application/json' })
 
-        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?filter%5BbundleId%5D=com.joshholtz.FastlaneTest").
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions,prices").
+          to_return(status: 200, body: read_fixture_file('apps.json'), headers: { 'Content-Type' => 'application/json' })
+
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?filter%5BbundleId%5D=com.joshholtz.FastlaneTest&include=appStoreVersions,prices").
           to_return(status: 200, body: read_fixture_file('apps.json'), headers: { 'Content-Type' => 'application/json' })
 
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/123456789").
@@ -66,6 +69,9 @@ class ConnectAPIStubbing
 
         stub_request(:post, "https://appstoreconnect.apple.com/iris/v1/betaGroups").
           to_return(status: 200, body: read_fixture_file('beta_create_group.json'), headers: { 'Content-Type' => 'application/json' })
+
+        stub_request(:delete, "https://appstoreconnect.apple.com/iris/v1/betaGroups/123456789").
+          to_return(status: 200, body: "", headers: {})
       end
 
       def stub_beta_testers
@@ -84,7 +90,7 @@ class ConnectAPIStubbing
       end
 
       def stub_build_deliveries
-        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/buildDeliveries").
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/1234/buildDeliveries").
           to_return(status: 200, body: read_fixture_file('build_deliveries.json'), headers: { 'Content-Type' => 'application/json' })
       end
 

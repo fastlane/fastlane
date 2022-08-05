@@ -4,6 +4,7 @@ module Fastlane
   module Actions
     module SharedValues
       ORIGINAL_DEFAULT_KEYCHAIN = :ORIGINAL_DEFAULT_KEYCHAIN
+      KEYCHAIN_PATH = :KEYCHAIN_PATH
     end
 
     class CreateKeychainAction < Action
@@ -32,6 +33,8 @@ module Fastlane
           UI.important("If creating a new Keychain DB is required please set the `require_create` option true to cause the action to fail")
         end
 
+        Actions.lane_context[Actions::SharedValues::KEYCHAIN_PATH] = keychain_path
+
         if params[:default_keychain]
           # if there is no default keychain - setting the original will fail - silent this error
           begin
@@ -44,7 +47,10 @@ module Fastlane
         commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{keychain_path}", log: false) if params[:unlock]
 
         command = "security set-keychain-settings"
-        command << " -t #{params[:timeout]}" if params[:timeout]
+
+        # https://ss64.com/osx/security-keychain-settings.html
+        # omitting 'timeout' option to specify "no timeout" if required
+        command << " -t #{params[:timeout]}" if params[:timeout] > 0
         command << " -l" if params[:lock_when_sleeps]
         command << " -u" if params[:lock_after_timeout]
         command << " #{keychain_path}"
@@ -91,7 +97,8 @@ module Fastlane
 
       def self.output
         [
-          ['ORIGINAL_DEFAULT_KEYCHAIN', 'The path to the default keychain']
+          ['ORIGINAL_DEFAULT_KEYCHAIN', 'The path to the default keychain'],
+          ['KEYCHAIN_PATH', 'The path of the keychain']
         ]
       end
 
@@ -101,46 +108,45 @@ module Fastlane
                                        env_name: "KEYCHAIN_NAME",
                                        description: "Keychain name",
                                        conflicting_options: [:path],
-                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "KEYCHAIN_PATH",
                                        description: "Path to keychain",
-                                       is_string: true,
                                        conflicting_options: [:name],
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "KEYCHAIN_PASSWORD",
                                        description: "Password for the keychain",
                                        sensitive: true,
+                                       code_gen_sensitive: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :default_keychain,
                                        description: 'Should the newly created Keychain be the new system default keychain',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :unlock,
                                        description: 'Unlock keychain after create',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :timeout,
-                                       description: 'timeout interval in seconds. Set `false` if you want to specify "no time-out"',
-                                       is_string: false,
+                                       description: 'timeout interval in seconds. Set `0` if you want to specify "no time-out"',
+                                       type: Integer,
                                        default_value: 300),
           FastlaneCore::ConfigItem.new(key: :lock_when_sleeps,
                                        description: 'Lock keychain when the system sleeps',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :lock_after_timeout,
                                        description: 'Lock keychain after timeout interval',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :add_to_search_list,
                                        description: 'Add keychain to search list',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :require_create,
                                        description: 'Fail the action if the Keychain already exists',
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false)
         ]
       end

@@ -50,6 +50,10 @@ module Fastlane
               set_build_setting(config, "PROVISIONING_PROFILE_SPECIFIER", params[:profile_name])
               UI.important("Set Provisioning Profile name to: #{params[:profile_name]} for target: #{target.name} for build configuration: #{config.name}")
             end
+            if params[:entitlements_file_path]
+              set_build_setting(config, "CODE_SIGN_ENTITLEMENTS", params[:entitlements_file_path])
+              UI.important("Set Entitlements file path to: #{params[:entitlements_file_path]} for target: #{target.name} for build configuration: #{config.name}")
+            end
             # Since Xcode 8, this is no longer needed, you simply use PROVISIONING_PROFILE_SPECIFIER
             if params[:profile_uuid]
               set_build_setting(config, "PROVISIONING_PROFILE", params[:profile_uuid])
@@ -123,45 +127,42 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :use_automatic_signing,
                                        env_name: "FL_PROJECT_USE_AUTOMATIC_SIGNING",
                                        description: "Defines if project should use automatic signing",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        env_name: "FASTLANE_TEAM_ID",
                                        optional: true,
-                                       description: "Team ID, is used when upgrading project",
-                                       is_string: true),
+                                       description: "Team ID, is used when upgrading project"),
           FastlaneCore::ConfigItem.new(key: :targets,
                                        env_name: "FL_PROJECT_SIGNING_TARGETS",
                                        optional: true,
                                        type: Array,
-                                       description: "Specify targets you want to toggle the signing mech. (default to all targets)",
-                                       is_string: false),
+                                       description: "Specify targets you want to toggle the signing mech. (default to all targets)"),
           FastlaneCore::ConfigItem.new(key: :build_configurations,
                                        env_name: "FL_PROJECT_SIGNING_BUILD_CONFIGURATIONS",
                                        optional: true,
                                        type: Array,
-                                       description: "Specify build_configurations you want to toggle the signing mech. (default to all targets)",
-                                       is_string: false),
+                                       description: "Specify build_configurations you want to toggle the signing mech. (default to all configurations)"),
           FastlaneCore::ConfigItem.new(key: :code_sign_identity,
                                        env_name: "FL_CODE_SIGN_IDENTITY",
                                        description: "Code signing identity type (iPhone Developer, iPhone Distribution)",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :entitlements_file_path,
+                                       env_name: "FL_CODE_SIGN_ENTITLEMENTS_FILE_PATH",
+                                       description: "Path to your entitlements file",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :profile_name,
                                        env_name: "FL_PROVISIONING_PROFILE_SPECIFIER",
                                        description: "Provisioning profile name to use for code signing",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :profile_uuid,
                                        env_name: "FL_PROVISIONING_PROFILE",
                                        description: "Provisioning profile UUID to use for code signing",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :bundle_identifier,
                                        env_name: "FL_APP_IDENTIFIER",
                                        description: "Application Product Bundle Identifier",
-                                       optional: true,
-                                       is_string: true)
+                                       optional: true)
         ]
       end
 
@@ -179,6 +180,15 @@ module Fastlane
           update_code_signing_settings(
             use_automatic_signing: true,
             path: "demo-project/demo/demo.xcodeproj"
+          )',
+          ' # more advanced manual code signing
+          update_code_signing_settings(
+            use_automatic_signing: true,
+            path: "demo-project/demo/demo.xcodeproj",
+            team_id: "QABC123DEV",
+            bundle_identifier: "com.demoapp.QABC123DEV",
+            profile_name: "Demo App Deployment Profile",
+            entitlements_file_path: "Demo App/generated/New.entitlements"
           )'
         ]
       end
@@ -192,7 +202,7 @@ module Fastlane
       end
 
       def self.authors
-        ["mathiasAichinger", "hjanuschka", "p4checo", "portellaa", "aeons", "att55"]
+        ["mathiasAichinger", "hjanuschka", "p4checo", "portellaa", "aeons", "att55", "abcdev"]
       end
 
       def self.is_supported?(platform)

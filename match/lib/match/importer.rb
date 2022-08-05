@@ -2,6 +2,7 @@ require_relative 'spaceship_ensure'
 require_relative 'encryption'
 require_relative 'storage'
 require_relative 'module'
+require_relative 'generator'
 require 'fastlane_core/provisioning_profile'
 require 'fileutils'
 
@@ -21,16 +22,28 @@ module Match
         git_branch: params[:git_branch],
         git_full_name: params[:git_full_name],
         git_user_email: params[:git_user_email],
+        git_private_key: params[:git_private_key],
+        git_basic_authorization: params[:git_basic_authorization],
+        git_bearer_authorization: params[:git_bearer_authorization],
         clone_branch_directly: params[:clone_branch_directly],
         type: params[:type].to_s,
         platform: params[:platform].to_s,
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
         google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
         google_cloud_project_id: params[:google_cloud_project_id].to_s,
+        skip_google_cloud_account_confirmation: params[:skip_google_cloud_account_confirmation],
+        s3_bucket: params[:s3_bucket],
+        s3_region: params[:s3_region],
+        s3_access_key: params[:s3_access_key],
+        s3_secret_access_key: params[:s3_secret_access_key],
+        s3_object_prefix: params[:s3_object_prefix],
+        gitlab_project: params[:gitlab_project],
         readonly: params[:readonly],
         username: params[:username],
         team_id: params[:team_id],
-        team_name: params[:team_name]
+        team_name: params[:team_name],
+        api_key_path: params[:api_key_path],
+        api_key: params[:api_key]
       })
       storage.download
 
@@ -47,35 +60,71 @@ module Match
 
       case cert_type
       when :development
-        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT + "," + Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT,
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DEVELOPMENT,
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT
+        ].join(',')
       when :distribution, :enterprise
-        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION + "," + Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION,
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DISTRIBUTION,
+          Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION
+        ].join(',')
       when :developer_id_application
-        certificate_type = Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION,
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2
+        ].join(',')
+      when :mac_installer_distribution
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION
+        ].join(',')
       else
         UI.user_error!("Cert type '#{cert_type}' is not supported")
       end
 
+      prov_type = Match.profile_type_sym(params[:type])
       output_dir_certs = File.join(storage.prefixed_working_directory, "certs", cert_type.to_s)
-      output_dir_profiles = File.join(storage.prefixed_working_directory, "profiles", cert_type.to_s)
+      output_dir_profiles = File.join(storage.prefixed_working_directory, "profiles", prov_type.to_s)
 
-      # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
-      Spaceship::Portal.login(params[:username])
-      Spaceship::Portal.select_team(team_id: params[:team_id], team_name: params[:team_name])
-      certs = Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: certificate_type })
+      should_skip_certificate_matching = params[:skip_certificate_matching]
+      # In case there is no access to Apple Developer portal but we have the certificates, keys and profiles
+      if should_skip_certificate_matching
+        cert_name = File.basename(cert_path, ".*")
+        p12_name = File.basename(p12_path, ".*")
 
-      # Base64 encode contents to find match from API to find a cert ID
-      cert_contents_base_64 = Base64.strict_encode64(File.binread(cert_path))
-      matching_cert = certs.find do |cert|
-        cert.certificate_content == cert_contents_base_64
+        # Make dir if doesn't exist
+        FileUtils.mkdir_p(output_dir_certs)
+        dest_cert_path = File.join(output_dir_certs, "#{cert_name}.cer")
+        dest_p12_path = File.join(output_dir_certs, "#{p12_name}.p12")
+      else
+        if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
+          UI.message("Creating authorization token for App Store Connect API")
+          Spaceship::ConnectAPI.token = api_token
+        elsif !Spaceship::ConnectAPI.token.nil?
+          UI.message("Using existing authorization token for App Store Connect API")
+        else
+          UI.message("Login to App Store Connect (#{params[:username]})")
+          Spaceship::ConnectAPI.login(params[:username], use_portal: true, use_tunes: false, portal_team_id: params[:team_id], team_name: params[:team_name])
+        end
+
+        # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
+        certs = Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: certificate_type })
+
+        # Base64 encode contents to find match from API to find a cert ID
+        cert_contents_base_64 = Base64.strict_encode64(File.binread(cert_path))
+        matching_cert = certs.find do |cert|
+          cert.certificate_content == cert_contents_base_64
+        end
+
+        UI.user_error!("This certificate cannot be imported - the certificate contents did not match with any available on the Developer Portal") if matching_cert.nil?
+
+        # Make dir if doesn't exist
+        FileUtils.mkdir_p(output_dir_certs)
+        dest_cert_path = File.join(output_dir_certs, "#{matching_cert.id}.cer")
+        dest_p12_path = File.join(output_dir_certs, "#{matching_cert.id}.p12")
       end
-
-      UI.user_error!("This certificate cannot be imported - the certificate contents did not match with any available on the Developer Portal") if matching_cert.nil?
-
-      # Make dir if doesn't exist
-      FileUtils.mkdir_p(output_dir_certs)
-      dest_cert_path = File.join(output_dir_certs, "#{matching_cert.id}.cer")
-      dest_p12_path = File.join(output_dir_certs, "#{matching_cert.id}.p12")
 
       files_to_commit = [dest_cert_path, dest_p12_path]
 
@@ -86,7 +135,8 @@ module Match
         FileUtils.mkdir_p(output_dir_profiles)
         bundle_id = FastlaneCore::ProvisioningProfile.bundle_id(profile_path)
         profile_extension = FastlaneCore::ProvisioningProfile.profile_extension(profile_path)
-        dest_profile_path = File.join(output_dir_profiles, "#{cert_type.to_s.capitalize}_#{bundle_id}#{profile_extension}")
+        profile_type_name = Match::Generator.profile_type_name(prov_type)
+        dest_profile_path = File.join(output_dir_profiles, "#{profile_type_name}_#{bundle_id}#{profile_extension}")
         files_to_commit.push(dest_profile_path)
         IO.copy_stream(profile_path, dest_profile_path)
       end

@@ -127,6 +127,14 @@ module Gym
         UI.build_failure!("Archive invalid")
       end
 
+      def handle_empty_ipa
+        UI.build_failure!("IPA invalid")
+      end
+
+      def handle_empty_pkg
+        UI.build_failure!("PKG invalid")
+      end
+
       private
 
       # Just to make things easier
@@ -143,7 +151,7 @@ module Gym
         # `xcodebuild` doesn't properly mark lines as failure reason or important information
         # so we assume that the last few lines show the error message that's relevant
         # (at least that's what was correct during testing)
-        log_content = File.read(log_path).split("\n")[-5..-1]
+        log_content = File.read(log_path).split("\n").last(5)
         log_content.each do |row|
           UI.command_output(row)
         end

@@ -2,6 +2,9 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Git Push to Remote Action" do
       before(:each) do
+        allow(Fastlane::Actions).to receive(:sh)
+          .with("git rev-parse --abbrev-ref HEAD", log: false)
+          .and_return(nil)
         allow(Fastlane::Actions).to receive(:git_branch).and_return("master")
       end
 
@@ -92,6 +95,102 @@ describe Fastlane do
           end").runner.execute(:test)
 
         expect(result).to eq("git push origin master:master --tags --set-upstream")
+      end
+
+      it "runs git push with 1 element in push-options" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            push_to_git_remote(
+              push_options: ['something-to-tell-remote-git-server']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("git push origin master:master --tags --push-option=something-to-tell-remote-git-server")
+      end
+
+      it "runs git push with 2 elements in push-options" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            push_to_git_remote(
+              push_options: ['something-to-tell-remote-git-server', 'something-else']
+            )
+          end").runner.execute(:test)
+
+        expect(result).to eq("git push origin master:master --tags --push-option=something-to-tell-remote-git-server --push-option=something-else")
+      end
+
+      context "runs git push using a checked out commit git branch" do
+        it "should use the checked out commit git branch" do
+          allow(Fastlane::Actions).to receive(:sh)
+            .with("git rev-parse --abbrev-ref HEAD", log: false)
+            .and_return("staging")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+              push_to_git_remote
+            end").runner.execute(:test)
+
+          expect(result).to eq("git push origin staging:staging --tags")
+        end
+      end
+
+      context "runs git push when checked out commit git branch is different than git branch name is set in CI ENV" do
+        it "should use the checked out commit git branch if different than CI ENV" do
+          allow(Fastlane::Actions).to receive(:sh)
+            .with("git rev-parse --abbrev-ref HEAD", log: false)
+            .and_return("staging")
+          allow(Fastlane::Actions).to receive(:git_branch).and_return("master")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+              push_to_git_remote
+            end").runner.execute(:test)
+
+          expect(result).to eq("git push origin staging:staging --tags")
+        end
+      end
+
+      context "runs git push when checked out commit is detached HEAD and git branch name is set in CI ENV" do
+        it "should use CI ENV git branch if checked out commit is detached HEAD" do
+          allow(Fastlane::Actions).to receive(:sh)
+            .with("git rev-parse --abbrev-ref HEAD", log: false)
+            .and_return("HEAD")
+          allow(Fastlane::Actions).to receive(:git_branch).and_return("master")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+              push_to_git_remote
+            end").runner.execute(:test)
+
+          expect(result).to eq("git push origin master:master --tags")
+        end
+      end
+
+      context "runs git push when checked out commit is detached HEAD and git branch name is not set in CI ENV" do
+        it "should raise an error" do
+          allow(Fastlane::Actions).to receive(:sh)
+            .with("git rev-parse --abbrev-ref HEAD", log: false)
+            .and_return("HEAD")
+          allow(Fastlane::Actions).to receive(:git_branch).and_return(nil)
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Failed to get the current branch.").and_call_original
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              push_to_git_remote
+            end").runner.execute(:test)
+          end.to raise_error("Failed to get the current branch.")
+        end
+      end
+
+      context "runs git push without local_branch and git branch name is not set in CI ENV" do
+        it "should raise an error if get current local branch failed and git branch name is not set in CI ENV" do
+          allow(Fastlane::Actions).to receive(:sh)
+            .with("git rev-parse --abbrev-ref HEAD", log: false)
+            .and_return(nil)
+          allow(Fastlane::Actions).to receive(:git_branch).and_return(nil)
+          expect(FastlaneCore::UI).to receive(:user_error!).with("Failed to get the current branch.").and_call_original
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              push_to_git_remote
+            end").runner.execute(:test)
+          end.to raise_error("Failed to get the current branch.")
+        end
       end
     end
   end

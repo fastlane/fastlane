@@ -13,7 +13,7 @@ module Scan
                Scan.config[:xcpretty_args])
     end
 
-    # Intialize with values from Scan.config matching these param names
+    # Initialize with values from Scan.config matching these param names
     def initialize(open_report, output_types, output_files, output_directory, use_clang_report_name, xcpretty_args)
       @open_report = open_report
       @output_types = output_types

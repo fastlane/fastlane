@@ -32,20 +32,17 @@ module Fastlane
                                        env_name: "FL_RSYNC_EXTRA", # The name of the environment variable
                                        description: "Port", # a short description of this parameter
                                        optional: true,
-                                       default_value: "-av",
-                                       is_string: true),
+                                       default_value: "-av"),
           FastlaneCore::ConfigItem.new(key: :source,
                                        short_option: "-S",
                                        env_name: "FL_RSYNC_SRC", # The name of the environment variable
                                        description: "source file/folder", # a short description of this parameter
-                                       optional: false,
-                                       is_string: true),
+                                       optional: false),
           FastlaneCore::ConfigItem.new(key: :destination,
                                        short_option: "-D",
                                        env_name: "FL_RSYNC_DST", # The name of the environment variable
                                        description: "destination file/folder", # a short description of this parameter
-                                       optional: false,
-                                       is_string: true)
+                                       optional: false)
         ]
       end
 

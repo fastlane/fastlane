@@ -21,7 +21,7 @@ module Cert
                                      optional: true,
                                      verify_block: proc do |value|
                                        value = value.to_s
-                                       types = %w(mac_installer_distribution developer_id_installer developer_id_application)
+                                       types = %w(mac_installer_distribution developer_id_installer developer_id_application developer_id_kext)
                                        UI.user_error!("Unsupported types, must be: #{types}") unless types.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :force,
@@ -35,10 +35,30 @@ module Cert
                                      type: Boolean,
                                      default_value: FastlaneCore::Helper.mac? && FastlaneCore::Helper.xcode_at_least?('11'),
                                      default_value_dynamic: true),
+
+        # App Store Connect API
+        FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                     env_names: ["CERT_API_KEY_PATH", "DELIVER_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
+                                     description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                     optional: true,
+                                     conflicting_options: [:api_key],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_names: ["CERT_API_KEY", "DELIVER_API_KEY", "APP_STORE_CONNECT_API_KEY"],
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)",
+                                     type: Hash,
+                                     optional: true,
+                                     sensitive: true,
+                                     conflicting_options: [:api_key_path]),
+
+        # Apple ID
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "CERT_USERNAME",
                                      description: "Your Apple ID Username",
+                                     optional: true,
                                      default_value: user,
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :team_id,
@@ -63,6 +83,8 @@ module Cert
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_NAME"] = value.to_s
                                      end),
+
+        # Other Options
         FastlaneCore::ConfigItem.new(key: :filename,
                                      short_option: "-q",
                                      env_name: "CERT_FILE_NAME",
@@ -88,15 +110,21 @@ module Cert
                                      short_option: "-p",
                                      env_name: "CERT_KEYCHAIN_PASSWORD",
                                      sensitive: true,
-                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your account password",
+                                     description: "This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_set_partition_list,
+                                     short_option: "-P",
+                                     env_name: "CERT_SKIP_SET_PARTITION_LIST",
+                                     description: "Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :platform,
                                      env_name: "CERT_PLATFORM",
-                                     description: "Set the provisioning profile's platform (ios, macos)",
+                                     description: "Set the provisioning profile's platform (ios, macos, tvos)",
                                      default_value: "ios",
                                      verify_block: proc do |value|
                                        value = value.to_s
-                                       pt = %w(macos ios)
+                                       pt = %w(macos ios tvos)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
                                      end)
       ]

@@ -1,3 +1,5 @@
+# rubocop:disable Metrics/ClassLength
+
 require 'fastlane_core/configuration/config_item'
 require 'credentials_manager/appfile_config'
 
@@ -49,7 +51,7 @@ module Supply
                                      end),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
-                                     description: "The percentage of the user fraction when uploading to the rollout track",
+                                     description: "The percentage of the user fraction when uploading to the rollout track (setting to 1 will complete the rollout)",
                                      optional: true,
                                      verify_block: proc do |value|
                                        min = 0.0
@@ -215,6 +217,14 @@ module Supply
                                      verify_block: proc do |value|
                                        UI.user_error!("'rollout' is no longer a valid track name - please use 'production' instead") if value.casecmp('rollout').zero?
                                      end),
+        FastlaneCore::ConfigItem.new(key: :track_promote_release_status,
+                                     env_name: "SUPPLY_TRACK_PROMOTE_RELEASE_STATUS",
+                                     optional: true,
+                                     description: "Promoted track release status (used when promoting a track) - valid values are #{Supply::ReleaseStatus::ALL.join(', ')}",
+                                     default_value: Supply::ReleaseStatus::COMPLETED,
+                                     verify_block: proc do |value|
+                                                     UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::ReleaseStatus::ALL.include?(value)
+                                                   end),
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,
@@ -223,7 +233,7 @@ module Supply
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :mapping,
                                      env_name: "SUPPLY_MAPPING",
-                                     description: "Path to the mapping file to upload",
+                                     description: "Path to the mapping file to upload (mapping.txt or native-debug-symbols.zip alike)",
                                      short_option: "-d",
                                      conflicting_options: [:mapping_paths],
                                      optional: true,
@@ -235,7 +245,7 @@ module Supply
                                      conflicting_options: [:mapping],
                                      optional: true,
                                      type: Array,
-                                     description: "An array of paths to mapping files to upload",
+                                     description: "An array of paths to mapping files to upload (mapping.txt or native-debug-symbols.zip alike)",
                                      short_option: "-s",
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
@@ -281,6 +291,25 @@ module Supply
                                          UI.user_error!("Version code '#{version_code}' is not an integer") if version_code == 0
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :changes_not_sent_for_review,
+                                     env_name: "SUPPLY_CHANGES_NOT_SENT_FOR_REVIEW",
+                                     description: "Indicates that the changes in this edit will not be reviewed until they are explicitly sent for review from the Google Play Console UI",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :rescue_changes_not_sent_for_review,
+                                     env_name: "SUPPLY_RESCUE_CHANGES_NOT_SENT_FOR_REVIEW",
+                                     description: "Catches changes_not_sent_for_review errors when an edit is committed and retries with the configuration that the error message recommended",
+                                     type: Boolean,
+                                     default_value: true),
+        FastlaneCore::ConfigItem.new(key: :in_app_update_priority,
+                                     env_name: "SUPPLY_IN_APP_UPDATE_PRIORITY",
+                                     optional: true,
+                                     type: Integer,
+                                     description: "In-app update priority for all the newly added apks in the release. Can take values between [0,5]",
+                                     verify_block: proc do |in_app_update_priority|
+                                       in_app_update_priority = in_app_update_priority.to_i
+                                       UI.user_error!("Invalid in_app_update_priority value '#{in_app_update_priority}'. Values must be between [0,5]") unless (0..5).member?(in_app_update_priority)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :obb_main_references_version,
                                      env_name: "SUPPLY_OBB_MAIN_REFERENCES_VERSION",
                                      description: "References version of 'main' expansion file",
@@ -300,7 +329,14 @@ module Supply
                                      env_name: "SUPPLY_OBB_PATCH_FILE SIZE",
                                      description: "Size of 'patch' expansion file in bytes",
                                      optional: true,
-                                     type: Numeric)
+                                     type: Numeric),
+        FastlaneCore::ConfigItem.new(key: :ack_bundle_installation_warning,
+                                     env_name: "ACK_BUNDLE_INSTALLATION_WARNING",
+                                     description: "Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 150MB",
+                                     optional: true,
+                                     type: Boolean,
+                                     default_value: false)
+
       ]
     end
     # rubocop:enable Metrics/PerceivedComplexity

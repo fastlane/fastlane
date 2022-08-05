@@ -7,11 +7,14 @@ module Snapshot
     attr_accessor :add_videos
     attr_accessor :clean
     attr_accessor :erase_simulator
+    attr_accessor :headless
     attr_accessor :localize_simulator
     attr_accessor :dark_mode
     attr_accessor :reinstall_app
     attr_accessor :app_identifier
     attr_accessor :disable_slide_to_type
+    attr_accessor :override_status_bar
+    attr_accessor :override_status_bar_arguments
 
     # xcode 8
     attr_accessor :number_of_retries
@@ -33,6 +36,7 @@ module Snapshot
       @add_videos = snapshot_config[:add_videos]
       @clean = snapshot_config[:clean]
       @erase_simulator = snapshot_config[:erase_simulator]
+      @headless = snapshot_config[:headless]
       @localize_simulator = snapshot_config[:localize_simulator]
       @dark_mode = snapshot_config[:dark_mode]
       @reinstall_app = snapshot_config[:reinstall_app]
@@ -43,6 +47,8 @@ module Snapshot
       @output_directory = snapshot_config[:output_directory]
       @concurrent_simulators = snapshot_config[:concurrent_simulators]
       @disable_slide_to_type = snapshot_config[:disable_slide_to_type]
+      @override_status_bar = snapshot_config[:override_status_bar]
+      @override_status_bar_arguments = snapshot_config[:override_status_bar_arguments]
 
       launch_arguments = Array(snapshot_config[:launch_arguments])
       # if more than 1 set of arguments, use a tuple with an index

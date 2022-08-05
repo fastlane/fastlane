@@ -1,6 +1,7 @@
 require 'fastimage'
 
 require_relative 'module'
+require 'spaceship/connect_api/models/app_screenshot_set'
 
 module Deliver
   # AppScreenshot represents one screenshots for one specific locale and
@@ -50,9 +51,9 @@ module Deliver
       # iPad iMessage
       IOS_IPAD_MESSAGES = "iOS-iPad-messages"
       # iPad 10.5 iMessage
-      IOS_IPAD_10_5_MESSAGES = "iOS-10.5-messages"
+      IOS_IPAD_10_5_MESSAGES = "iOS-iPad-10.5-messages"
       # iPad 11 iMessage
-      IOS_IPAD_11_MESSAGES = "iOS-11-messages"
+      IOS_IPAD_11_MESSAGES = "iOS-iPad-11-messages"
       # iPad Pro iMessage
       IOS_IPAD_PRO_MESSAGES = "iOS-iPad-Pro-messages"
       # iPad Pro (12.9-inch) (3rd generation) iMessage
@@ -62,6 +63,8 @@ module Deliver
       IOS_APPLE_WATCH = "iOS-Apple-Watch"
       # Apple Watch Series 4
       IOS_APPLE_WATCH_SERIES4 = "iOS-Apple-Watch-Series4"
+      # Apple Watch Series 7
+      IOS_APPLE_WATCH_SERIES7 = "iOS-Apple-Watch-Series7"
 
       # Apple TV
       APPLE_TV = "Apple-TV"
@@ -81,45 +84,43 @@ module Deliver
     # @param path (String) path to the screenshot file
     # @param language (String) Language of this screenshot (e.g. English)
     # @param screen_size (Deliver::AppScreenshot::ScreenSize) the screen size, which
-    #  will automatically be calculated when you don't set it.
+    #  will automatically be calculated when you don't set it. (Deprecated)
     def initialize(path, language, screen_size = nil)
+      UI.deprecated('`screen_size` for Deliver::AppScreenshot.new is deprecated in favor of the default behavior to calculate size automatically. Passed value is no longer validated.') if screen_size
       self.path = path
       self.language = language
-      screen_size ||= self.class.calculate_screen_size(path)
-
-      self.screen_size = screen_size
-
-      UI.error("Looks like the screenshot given (#{path}) does not match the requirements of #{screen_size}") unless self.is_valid?
+      self.screen_size = screen_size || self.class.calculate_screen_size(path)
     end
 
     # The iTC API requires a different notation for the device
     def device_type
       matching = {
-        ScreenSize::IOS_35 => "iphone35",
-        ScreenSize::IOS_40 => "iphone4",
-        ScreenSize::IOS_47 => "iphone6", # also 7 and 8
-        ScreenSize::IOS_55 => "iphone6Plus", # also 7 Plus & 8 Plus
-        ScreenSize::IOS_58 => "iphone58",
-        ScreenSize::IOS_65 => "iphone65",
-        ScreenSize::IOS_IPAD => "ipad",
-        ScreenSize::IOS_IPAD_10_5 => "ipad105",
-        ScreenSize::IOS_IPAD_11 => "ipadPro11",
-        ScreenSize::IOS_IPAD_PRO => "ipadPro",
-        ScreenSize::IOS_IPAD_PRO_12_9 => "ipadPro129",
-        ScreenSize::IOS_40_MESSAGES => "iphone4",
-        ScreenSize::IOS_47_MESSAGES => "iphone6", # also 7 & 8
-        ScreenSize::IOS_55_MESSAGES => "iphone6Plus", # also 7 Plus & 8 Plus
-        ScreenSize::IOS_58_MESSAGES => "iphone58",
-        ScreenSize::IOS_65_MESSAGES => "iphone65",
-        ScreenSize::IOS_IPAD_MESSAGES => "ipad",
-        ScreenSize::IOS_IPAD_PRO_MESSAGES => "ipadPro",
-        ScreenSize::IOS_IPAD_PRO_12_9_MESSAGES => "ipadPro129",
-        ScreenSize::IOS_IPAD_10_5_MESSAGES => "ipad105",
-        ScreenSize::IOS_IPAD_11_MESSAGES => "ipadPro11",
-        ScreenSize::MAC => "desktop",
-        ScreenSize::IOS_APPLE_WATCH => "watch",
-        ScreenSize::IOS_APPLE_WATCH_SERIES4 => "watchSeries4",
-        ScreenSize::APPLE_TV => "appleTV"
+        ScreenSize::IOS_35 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_35,
+        ScreenSize::IOS_40 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_40,
+        ScreenSize::IOS_47 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_47, # also 7 & 8
+        ScreenSize::IOS_55 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55, # also 7 Plus & 8 Plus
+        ScreenSize::IOS_58 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_58,
+        ScreenSize::IOS_65 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_65,
+        ScreenSize::IOS_IPAD => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPAD_97,
+        ScreenSize::IOS_IPAD_10_5 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPAD_105,
+        ScreenSize::IOS_IPAD_11 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPAD_PRO_3GEN_11,
+        ScreenSize::IOS_IPAD_PRO => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPAD_PRO_129,
+        ScreenSize::IOS_IPAD_PRO_12_9 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPAD_PRO_3GEN_129,
+        ScreenSize::IOS_40_MESSAGES => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::IMESSAGE_APP_IPHONE_40,
+        ScreenSize::IOS_47_MESSAGES => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::IMESSAGE_APP_IPHONE_47, # also 7 & 8
+        ScreenSize::IOS_55_MESSAGES => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::IMESSAGE_APP_IPHONE_55, # also 7 Plus & 8 Plus
+        ScreenSize::IOS_58_MESSAGES => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::IMESSAGE_APP_IPHONE_58,
+        ScreenSize::IOS_65_MESSAGES => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::IMESSAGE_APP_IPHONE_65,
+        ScreenSize::IOS_IPAD_MESSAGES => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::IMESSAGE_APP_IPAD_97,
+        ScreenSize::IOS_IPAD_PRO_MESSAGES => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::IMESSAGE_APP_IPAD_PRO_129,
+        ScreenSize::IOS_IPAD_PRO_12_9_MESSAGES => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::IMESSAGE_APP_IPAD_PRO_3GEN_129,
+        ScreenSize::IOS_IPAD_10_5_MESSAGES => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::IMESSAGE_APP_IPAD_105,
+        ScreenSize::IOS_IPAD_11_MESSAGES => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::IMESSAGE_APP_IPAD_PRO_3GEN_11,
+        ScreenSize::MAC => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_DESKTOP,
+        ScreenSize::IOS_APPLE_WATCH => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_3,
+        ScreenSize::IOS_APPLE_WATCH_SERIES4 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_4,
+        ScreenSize::IOS_APPLE_WATCH_SERIES7 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_7,
+        ScreenSize::APPLE_TV => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_APPLE_TV
       }
       return matching[self.screen_size]
     end
@@ -129,8 +130,8 @@ module Deliver
       matching = {
         ScreenSize::IOS_35 => "iPhone 4",
         ScreenSize::IOS_40 => "iPhone 5",
-        ScreenSize::IOS_47 => "iPhone 6", # and 7
-        ScreenSize::IOS_55 => "iPhone 6 Plus", # and 7 Plus
+        ScreenSize::IOS_47 => "iPhone 6", # also 7 & 8
+        ScreenSize::IOS_55 => "iPhone 6 Plus", # also 7 Plus & 8 Plus
         ScreenSize::IOS_58 => "iPhone XS",
         ScreenSize::IOS_61 => "iPhone XR",
         ScreenSize::IOS_65 => "iPhone XS Max",
@@ -153,6 +154,7 @@ module Deliver
         ScreenSize::MAC => "Mac",
         ScreenSize::IOS_APPLE_WATCH => "Watch",
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => "Watch Series4",
+        ScreenSize::IOS_APPLE_WATCH_SERIES7 => "Watch Series7",
         ScreenSize::APPLE_TV => "Apple TV"
       }
       return matching[self.screen_size]
@@ -160,6 +162,7 @@ module Deliver
 
     # Validates the given screenshots (size and format)
     def is_valid?
+      UI.deprecated('Deliver::AppScreenshot#is_valid? is deprecated in favor of Deliver::AppScreenshotValidator')
       return false unless ["png", "PNG", "jpg", "JPG", "jpeg", "JPEG"].include?(self.path.split(".").last)
 
       return self.screen_size == self.class.calculate_screen_size(self.path)
@@ -186,7 +189,9 @@ module Deliver
       return {
         ScreenSize::IOS_65_MESSAGES => [
           [1242, 2688],
-          [2688, 1242]
+          [2688, 1242],
+          [1284, 2778],
+          [2778, 1284]
         ],
         ScreenSize::IOS_61_MESSAGES => [
           [828, 1792],
@@ -194,7 +199,9 @@ module Deliver
         ],
         ScreenSize::IOS_58_MESSAGES => [
           [1125, 2436],
-          [2436, 1125]
+          [2436, 1125],
+          [1170, 2532],
+          [2532, 1170]
         ],
         ScreenSize::IOS_55_MESSAGES => [
           [1242, 2208],
@@ -242,7 +249,9 @@ module Deliver
       return {
         ScreenSize::IOS_65 => [
           [1242, 2688],
-          [2688, 1242]
+          [2688, 1242],
+          [1284, 2778],
+          [2778, 1284]
         ],
         ScreenSize::IOS_61 => [
           [828, 1792],
@@ -250,7 +259,9 @@ module Deliver
         ],
         ScreenSize::IOS_58 => [
           [1125, 2436],
-          [2436, 1125]
+          [2436, 1125],
+          [1170, 2532],
+          [2532, 1170]
         ],
         ScreenSize::IOS_55 => [
           [1242, 2208],
@@ -306,6 +317,9 @@ module Deliver
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => [
           [368, 448]
         ],
+        ScreenSize::IOS_APPLE_WATCH_SERIES7 => [
+          [396, 484]
+        ],
         ScreenSize::APPLE_TV => [
           [1920, 1080],
           [3840, 2160]
@@ -315,9 +329,11 @@ module Deliver
 
     def self.resolve_ipadpro_conflict_if_needed(screen_size, filename)
       is_3rd_gen = [
-        "iPad Pro (12.9-inch) (3rd generation)", # default simulator name has this
-        "iPad Pro (12.9-inch) (4th generation)", # default simulator name has this
-        "ipadPro129" # downloaded screenshots name has this
+        "iPad Pro (12.9-inch) (3rd generation)", # Default simulator has this name
+        "iPad Pro (12.9-inch) (4th generation)", # Default simulator has this name
+        "iPad Pro (12.9-inch) (5th generation)", # Default simulator has this name
+        "IPAD_PRO_3GEN_129", # Screenshots downloaded from App Store Connect has this name
+        "ipadPro129" # Legacy: screenshots downloaded from iTunes Connect used to have this name
       ].any? { |key| filename.include?(key) }
       if is_3rd_gen
         if screen_size == ScreenSize::IOS_IPAD_PRO
@@ -345,7 +361,7 @@ module Deliver
         end
       end
 
-      UI.user_error!("Unsupported screen size #{size} for path '#{path}'")
+      nil
     end
   end
 

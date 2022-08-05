@@ -53,6 +53,14 @@ describe Fastlane do
         expect(result).to eq("pod repo push MyRepo './fastlane/spec/fixtures/podspecs/test.podspec' --skip-import-validation --skip-tests")
       end
 
+      it "generates the correct pod push command with a repo parameter with the use json flag" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_push(path: './fastlane/spec/fixtures/podspecs/test.podspec', repo: 'MyRepo', use_json: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod repo push MyRepo './fastlane/spec/fixtures/podspecs/test.podspec' --use-json")
+      end
+
       it "generates the correct pod push command with a json file" do
         result = Fastlane::FastFile.new.parse("lane :test do
           pod_push(path: './fastlane/spec/fixtures/podspecs/test.podspec.json', repo: 'MyRepo')
@@ -90,6 +98,30 @@ describe Fastlane do
             expect(result).to eq("pod trunk push")
           end
         end
+      end
+
+      it "generates the correct pod push command with the synchronous parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_push(synchronous: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod trunk push --synchronous")
+      end
+
+      it "generates the correct pod push command with the no overwrite parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_push(no_overwrite: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod trunk push --no-overwrite")
+      end
+
+      it "generates the correct pod push command with the local only parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_push(local_only: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod trunk push --local-only")
       end
     end
   end

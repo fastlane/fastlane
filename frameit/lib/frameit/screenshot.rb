@@ -27,6 +27,7 @@ module Frameit
       #   - see Parameters in the doc
       #   - contains default values and validates values
       #   - accessed via Frameit.config[:key]
+      #   - default value is either general platform from fastfile or IOS if run directly
       #   - lowest priority
       # - commands_generator.rb
       #   - commands entered directly to CLI (e. g. fastlane frameit android)

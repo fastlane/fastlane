@@ -10,10 +10,22 @@ module FastlaneCore
       return nil
     end
 
+    # Fetches the app platform from the given pkg file.
+    def self.fetch_app_platform(path)
+      return "osx"
+    end
+
     # Fetches the app version from the given pkg file.
     def self.fetch_app_version(path)
       xml = self.fetch_distribution_xml_file(path)
       return xml.elements['installer-gui-script/product'].attributes['version'] if xml
+      return nil
+    end
+
+    # Fetches the app version from the given pkg file.
+    def self.fetch_app_build(path)
+      xml = self.fetch_distribution_xml_file(path)
+      return xml.elements['installer-gui-script/pkg-ref/bundle-version/bundle'].attributes['CFBundleVersion'] if xml
       return nil
     end
 

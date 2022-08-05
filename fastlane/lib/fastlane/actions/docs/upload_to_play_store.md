@@ -49,6 +49,8 @@ The previous p12 configuration is still currently supported.
 
 ## Quick Start
 
+> Before using _supply_ to connect to Google Play Store, you'll need to set up your app manually first by uploading at least one build to Google Play Store. See [fastlane/fastlane#14686](https://github.com/fastlane/fastlane/issues/14686) for more info.
+
 - `cd [your_project_folder]`
 - `fastlane supply init`
 - Make changes to the downloaded metadata, add images, screenshots and/or an APK
@@ -76,6 +78,12 @@ To gradually roll out a new build use
 
 ```no-highlight
 fastlane supply --apk path/app.apk --track beta --rollout 0.5
+```
+
+To set the in-app update priority level for a release, set a valid update priority (an integer value from 0 to 5) using option `in_app_update_priority`
+
+```no-highlight
+fastlane supply --apk path/app.apk --track beta --in_app_update_priority 3
 ```
 
 ### Expansion files (`.obb`)
@@ -113,6 +121,12 @@ To gradually roll out a new build use
 fastlane supply --aab path/app.aab --track beta --rollout 0.5
 ```
 
+To set the in-app update priority level for a release, set a valid update priority (an integer value from 0 to 5) using option `in_app_update_priority`
+
+```no-highlight
+fastlane supply --aab path/app.aab --track beta --in_app_update_priority 3
+```
+
 ## Images and Screenshots
 
 After running `fastlane supply init`, you will have a metadata directory. This directory contains one or more locale directories (e.g. en-US, en-GB, etc.), and inside this directory are text files such as `title.txt` and `short_description.txt`.
@@ -124,7 +138,7 @@ Inside of a given locale directory is a folder called `images`. Here you can sup
 - `promoGraphic`
 - `tvBanner`
 
-You can also supply screenshots by creating directories within the `images` directory with the following names, containing PNGs or JPEGs (image names are irrelevant):
+You can also supply screenshots by creating directories within the `images` directory with the following names, containing PNGs or JPEGs:
 
 - `phoneScreenshots/`
 - `sevenInchScreenshots/` (7-inch tablets)
@@ -132,6 +146,7 @@ You can also supply screenshots by creating directories within the `images` dire
 - `tvScreenshots/`
 - `wearScreenshots/`
 
+You may name images anything you like, but screenshots will appear in the Play Store in alphanumerical filename order.
 Note that these will replace the current images and screenshots on the play store listing, not add to them.
 
 ## Changelogs (What's new)
@@ -159,9 +174,10 @@ A common Play publishing scenario might involve uploading an APK version to a te
 
 This can be done using the `--track_promote_to` parameter. The `--track_promote_to` parameter works with the `--track` parameter to command the Play API to promote existing Play track APK version(s) (those active on the track identified by the `--track` param value) to a new track (`--track_promote_to` value).
 
-## Retrieve Track Version Codes
+## Retrieve Track Release Names & Version Codes
 
-Before performing a new APK upload you may want to check existing track version codes, or you may simply want to provide an informational lane that displays the currently promoted version codes for the production track. You can use the `google_play_track_version_codes` action to retrieve existing version codes for a package and track. For more information, see `fastlane action google_play_track_version_codes` help output.
+Before performing a new APK upload you may want to check existing track version codes or release names, or you may simply want to provide an informational lane that displays the currently promoted version codes or release name for the production track. You can use the `google_play_track_version_codes` action to retrieve existing version codes for a package and track. You can use the `google_play_track_release_names` action to retrieve existing release names for a package and track.
+For more information, see the `fastlane action google_play_track_version_codes` and `fastlane action google_play_track_release_names` help output.
 
 ## Migration from AndroidPublisherV2 to AndroidPublisherV3 in _fastlane_ 2.135.0
 
@@ -183,6 +199,6 @@ Before performing a new APK upload you may want to check existing track version 
 - `:check_superseded_tracks`
   - Google Play will automatically remove releases that are superseded now
 - `:deactivate_on_promote`
-  - Google Play will automatically deactive a release from its previous track on promote
+  - Google Play will automatically deactivate a release from its previous track on promote
 
 :

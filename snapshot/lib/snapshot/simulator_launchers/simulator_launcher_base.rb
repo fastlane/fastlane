@@ -1,4 +1,5 @@
 require 'plist'
+require 'time'
 
 require_relative '../module'
 require_relative '../test_command_generator'
@@ -17,6 +18,7 @@ module Snapshot
 
     def initialize(launcher_configuration: nil)
       @launcher_config = launcher_configuration
+      @device_boot_datetime = DateTime.now
     end
 
     def collected_errors
@@ -58,20 +60,28 @@ module Snapshot
 
       device_types.each do |type|
         if launcher_config.erase_simulator || launcher_config.localize_simulator || !launcher_config.dark_mode.nil?
-          erase_simulator(type)
+          if launcher_config.erase_simulator
+            erase_simulator(type)
+          end
           if launcher_config.localize_simulator
             localize_simulator(type, language, locale)
           end
           unless launcher_config.dark_mode.nil?
             interface_style(type, launcher_config.dark_mode)
           end
-        elsif launcher_config.reinstall_app
+        end
+        if launcher_config.reinstall_app && !launcher_config.erase_simulator
           # no need to reinstall if device has been erased
           uninstall_app(type)
         end
         if launcher_config.disable_slide_to_type
           disable_slide_to_type(type)
         end
+      end
+
+      unless launcher_config.headless
+        simulator_path = File.join(Helper.xcode_path, 'Applications', 'Simulator.app')
+        Helper.backticks("open -a #{simulator_path} -g", print: FastlaneCore::Globals.verbose?)
       end
     end
 
@@ -84,7 +94,11 @@ module Snapshot
         device_udid = TestCommandGenerator.device_udid(device_type)
 
         UI.message("Launch Simulator #{device_type}")
-        Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+        if FastlaneCore::Helper.xcode_at_least?("13")
+          Helper.backticks("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
+        else
+          Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+        end
 
         paths.each do |path|
           UI.message("Adding '#{path}'")
@@ -100,6 +114,41 @@ module Snapshot
           end
         end
       end
+    end
+
+    def override_status_bar(device_type, arguments = nil)
+      device_udid = TestCommandGenerator.device_udid(device_type)
+
+      UI.message("Launch Simulator #{device_type}")
+      # Boot the simulator and wait for it to finish booting
+      Helper.backticks("xcrun simctl bootstatus #{device_udid} -b &> /dev/null")
+
+      # "Booted" status is not enough for to adjust the status bar
+      # Simulator could stil be booting with Apple logo
+      # Need to wait "some amount of time" until home screen shows
+      boot_sleep = ENV["SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT"].to_i || 10
+      UI.message("Waiting #{boot_sleep} seconds for device to fully boot before overriding status bar... Set 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable to adjust timeout")
+      sleep(boot_sleep) if boot_sleep > 0
+
+      UI.message("Overriding Status Bar")
+
+      if arguments.nil? || arguments.empty?
+        # The time needs to be passed as ISO8601 so the simulator formats it correctly
+        time = Time.new(2007, 1, 9, 9, 41, 0)
+
+        # If you don't override the operator name, you'll get "Carrier" in the status bar on no-notch devices such as iPhone 8. Pass an empty string to blank it out.
+
+        arguments = "--time #{time.iso8601} --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --operatorName '' --cellularBars 4 --batteryState charged --batteryLevel 100"
+      end
+
+      Helper.backticks("xcrun simctl status_bar #{device_udid} override #{arguments} &> /dev/null")
+    end
+
+    def clear_status_bar(device_type)
+      device_udid = TestCommandGenerator.device_udid(device_type)
+
+      UI.message("Clearing Status Bar Override")
+      Helper.backticks("xcrun simctl status_bar #{device_udid} clear &> /dev/null")
     end
 
     def uninstall_app(device_type)
@@ -164,7 +213,7 @@ module Snapshot
 
         UI.header("Collecting system logs #{device_name} - #{language}")
         log_identity = Digest::MD5.hexdigest(components.join("-"))
-        FastlaneCore::Simulator.copy_logs(device, log_identity, language_folder)
+        FastlaneCore::Simulator.copy_logs(device, log_identity, language_folder, @device_boot_datetime)
       end
     end
   end

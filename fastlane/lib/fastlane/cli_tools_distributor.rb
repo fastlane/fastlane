@@ -23,7 +23,7 @@ module Fastlane
       def take_off
         before_import_time = Time.now
 
-        if !ENV["FASTLANE_DISABLE_ANIMATION"]
+        if ENV["FASTLANE_DISABLE_ANIMATION"].nil?
           # Usually in the fastlane code base we use
           #
           #   Helper.show_loading_indicator
@@ -44,6 +44,12 @@ module Fastlane
         else
           require "fastlane"
         end
+
+        # Loading any .env files before any lanes are called since
+        # variables like FASTLANE_HIDE_CHANGELOG, SKIP_SLOW_FASTLANE_WARNING
+        # and FASTLANE_DISABLE_COLORS need to be set early on in execution
+        load_dot_env
+
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
         unless running_version_command? || running_init_command?
           print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
@@ -59,22 +65,20 @@ module Fastlane
           end
         end
 
-        # Loading any .env files before any lanes are called since
-        # variables like FASTLANE_HIDE_CHANGELOG and FASTLANE_DISABLE_COLORS
-        # need to be set early on in execution
-        require 'fastlane/helper/dotenv_helper'
-        Fastlane::Helper::DotenvHelper.load_dot_env(nil)
-
         # Needs to go after load_dot_env for variable FASTLANE_SKIP_UPDATE_CHECK
         FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
 
         # Disabling colors if environment variable set
         require 'fastlane_core/ui/disable_colors' if FastlaneCore::Helper.colors_disabled?
 
+        # Set interactive environment variable for spaceship (which can't require fastlane_core)
+        ENV["FASTLANE_IS_INTERACTIVE"] = FastlaneCore::UI.interactive?.to_s
+
         ARGV.unshift("spaceship") if ARGV.first == "spaceauth"
         tool_name = ARGV.first ? ARGV.first.downcase : nil
 
         tool_name = process_emojis(tool_name)
+        tool_name = map_aliased_tools(tool_name)
 
         if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
           # Triggering a specific tool
@@ -120,6 +124,32 @@ module Fastlane
         end
       ensure
         FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+      end
+
+      def map_aliased_tools(tool_name)
+        Fastlane::TOOL_ALIASES[tool_name&.to_sym] || tool_name
+      end
+
+      # Since loading dotenv should respect additional environments passed using
+      # --env, we must extract the arguments out of ARGV and process them before
+      # calling into commander. This is required since the ENV must be configured
+      # before running any other commands in order to correctly respect variables
+      # like FASTLANE_HIDE_CHANGELOG and FASTLANE_DISABLE_COLORS
+      def load_dot_env
+        env_cl_param = lambda do
+          index = ARGV.index("--env")
+          return nil if index.nil?
+          ARGV.delete_at(index)
+
+          return nil if ARGV[index].nil?
+          value = ARGV[index]
+          ARGV.delete_at(index)
+
+          value
+        end
+
+        require 'fastlane/helper/dotenv_helper'
+        Fastlane::Helper::DotenvHelper.load_dot_env(env_cl_param.call)
       end
 
       # Since fastlane also supports the rocket and biceps emoji as executable

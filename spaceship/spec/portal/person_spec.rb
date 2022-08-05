@@ -32,7 +32,7 @@ describe Spaceship::Portal::Persons do
     expect(person.joined).to eq(joined)
   end
 
-  it "should be OK if person date format is unparseable" do
+  it "should be OK if person date format is unparsable" do
     joined = "This is clearly not a timestamp"
     attrs = {
       "personId" => "1234",

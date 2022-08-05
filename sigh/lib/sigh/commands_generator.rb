@@ -1,5 +1,6 @@
 require 'commander'
 require 'fastlane/version'
+require 'fastlane_core/ui/help_formatter'
 
 require_relative 'options'
 require_relative 'resign'
@@ -23,9 +24,10 @@ module Sigh
       program :help, 'Author', 'Felix Krause <sigh@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'Documentation', 'https://docs.fastlane.tools/actions/sigh/'
-      program :help_formatter, :compact
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
+      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       command :renew do |c|
         c.syntax = 'fastlane sigh renew'

@@ -53,7 +53,7 @@ module Frameit
 
     def print_disclaimer
       UI.header("Device frames disclaimer")
-      UI.important("All used device frames are available via Facebook Design: http://facebook.design/devices")
+      UI.important("All used device frames are available via Facebook Design: https://design.facebook.com/toolsandresources/devices/")
       UI.message("----------------------------------------")
       UI.message("While Facebook has redrawn and shares these assets for the benefit")
       UI.message("of the design community, Facebook does not own any of the underlying")
@@ -71,8 +71,9 @@ module Frameit
     def download_file(path, txt: "file")
       require 'uri'
       require 'excon'
+      require 'addressable/uri'
 
-      url = File.join(HOST_URL, Frameit.frames_version, URI.escape(path))
+      url = File.join(HOST_URL, Frameit.frames_version, Addressable::URI.encode(path))
       UI.message("Downloading #{txt} from '#{url}' ...")
       body = Excon.get(url).body
       raise body if body.include?("<Error>")

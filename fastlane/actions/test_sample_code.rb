@@ -38,7 +38,7 @@ module Fastlane
 
       # Is used to look if the method is implemented as an action
       def self.method_missing(method_sym, *arguments, &_block)
-        return if blacklist.include?(method_sym)
+        return if denylist.include?(method_sym)
 
         class_ref = self.runner.class_reference_from_action_name(method_sym)
         unless class_ref
@@ -65,6 +65,8 @@ module Fastlane
 
             if config_item.data_type == Fastlane::Boolean
               config_item.ensure_boolean_type_passes_validation(value)
+            elsif config_item.data_type == Array
+              config_item.ensure_array_type_passes_validation(value)
             else
               config_item.ensure_generic_type_passes_validation(value)
             end
@@ -80,7 +82,7 @@ module Fastlane
       # This will still verify the syntax though
       # The actions listed here are still legacy actions, so
       # they don't use the fastlane configuration system
-      def self.blacklist
+      def self.denylist
         [
           :import,
           :xcode_select,

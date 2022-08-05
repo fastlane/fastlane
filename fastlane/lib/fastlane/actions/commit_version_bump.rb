@@ -164,20 +164,19 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_FORCE_COMMIT",
                                        description: "Forces the commit, even if other files than the ones containing the version number have been modified",
+                                       type: Boolean,
                                        optional: true,
-                                       default_value: false,
-                                       is_string: false),
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :settings,
                                        env_name: "FL_COMMIT_INCLUDE_SETTINGS",
                                        description: "Include Settings.bundle/Root.plist with version bump",
+                                       skip_type_validation: true, # allows Boolean, String, Array
                                        optional: true,
-                                       default_value: false,
-                                       is_string: false),
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :ignore,
                                        description: "A regular expression used to filter matched plist files to be modified",
-                                       optional: true,
-                                       default_value: nil,
-                                       is_string: false),
+                                       skip_type_validation: true, # allows Regex
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :include,
                                        description: "A list of extra files to be included in the version bump (string array or comma-separated string)",
                                        optional: true,
@@ -220,7 +219,7 @@ module Fastlane
           'commit_version_bump',
           'commit_version_bump(
             message: "Version Bump",                    # create a commit with a custom message
-            xcodeproj: "./path/to/MyProject.xcodeproj", # optional, if you have multiple Xcode project files, you must specify your main project here
+            xcodeproj: "./path/to/MyProject.xcodeproj"  # optional, if you have multiple Xcode project files, you must specify your main project here
           )',
           'commit_version_bump(
             settings: true # Include Settings.bundle/Root.plist

@@ -69,6 +69,20 @@
 # new features March 2019
 # 1. two more fixes for only creating the archived-expanded-entitlements.xcent file if the version of Xcode < 9.3 as Xcode 10 does not create it.
 #
+# new features June 2020
+# 1. enable (re)signing of OnDemandResources when ipa has been built for the appstore
+#
+# new features August 2020
+# 1. fixes usage for users with GNU-sed in their $PATH
+#
+# new features May 2021
+# 1. fix entitlements merging when changing team
+#
+# new features June 2021
+# 1. fix the way app entitlements are extracted
+#
+# new features October 2021
+# 1. change codesign signatue to use --generate-entitlement-der to include DER encoded entitlements
 
 # Logging functions
 
@@ -340,7 +354,7 @@ function provision_for_bundle_id {
 }
 
 # Find the bundle identifier contained inside a provisioning profile
-function bundle_id_for_provison {
+function bundle_id_for_provision {
 
     local FULL_BUNDLE_ID=$(PlistBuddy -c 'Print :Entitlements:application-identifier' /dev/stdin <<< "$(security cms -D -i "$1")")
     checkStatus
@@ -378,7 +392,7 @@ function add_provision {
         error "Provisioning profile '$PROVISION' file does not exist"
     fi
 
-    local BUNDLE_ID=$(bundle_id_for_provison "$PROVISION")
+    local BUNDLE_ID=$(bundle_id_for_provision "$PROVISION")
     add_provision_for_bundle_id "$PROVISION" "$BUNDLE_ID"
 }
 
@@ -428,7 +442,7 @@ function resign {
         error "Use the -p option (example: -p com.example.app=xxxx.mobileprovision)"
     fi
 
-    local PROVISION_BUNDLE_IDENTIFIER=$(bundle_id_for_provison "$NEW_PROVISION")
+    local PROVISION_BUNDLE_IDENTIFIER=$(bundle_id_for_provision "$NEW_PROVISION")
 
     # Use provisioning profile's bundle identifier
     if [ "$BUNDLE_IDENTIFIER" == "" ]; then
@@ -528,6 +542,21 @@ function resign {
         PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$APP_PATH/Info.plist"
     fi
 
+    # Check for and resign OnDemandResource folders
+    ODR_DIR="$(dirname "$APP_PATH")/OnDemandResources"
+    if [ -d "$ODR_DIR" ]; then
+        for assetpack in "$ODR_DIR"/*
+        do
+            if [[ "$assetpack" == *.assetpack ]]; then
+                rm -rf $assetpack/_CodeSignature
+                /usr/bin/codesign ${VERBOSE} --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$assetpack"
+                checkStatus
+            else
+                log "Ignoring non-assetpack: $assetpack"
+            fi
+        done
+    fi
+
     # Check for and resign any embedded frameworks (new feature for iOS 8 and above apps)
     FRAMEWORKS_DIR="$APP_PATH/Frameworks"
     if [ -d "$FRAMEWORKS_DIR" ]; then
@@ -542,7 +571,7 @@ function resign {
                 log "Resigning '$framework'"
                 # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
                 # shellcheck disable=SC2086
-                /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
+                /usr/bin/codesign ${VERBOSE} --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
                 checkStatus
             else
                 log "Ignoring non-framework: $framework"
@@ -559,7 +588,7 @@ function resign {
             # Found a reference bundle id, now get the corresponding provisioning profile for this bundle id
             REF_PROVISION=$(provision_for_bundle_id "$REF_BUNDLE_ID")
             # Map to the new bundle id
-            NEW_REF_BUNDLE_ID=$(bundle_id_for_provison "$REF_PROVISION")
+            NEW_REF_BUNDLE_ID=$(bundle_id_for_provision "$REF_PROVISION")
             # Change if not the same and if doesn't contain wildcard
             # shellcheck disable=SC2049
             if [[ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ]] && ! [[ "$NEW_REF_BUNDLE_ID" =~ \* ]]; then
@@ -596,7 +625,7 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
+        /usr/bin/codesign ${VERBOSE} --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
         checkStatus
     elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]]; then
         # Extract entitlements from provisioning profile and from the app binary
@@ -615,78 +644,6 @@ function resign {
         log "\nApp entitlements for ${APP_PATH}:"
         log "$(cat "$APP_ENTITLEMENTS")"
 
-        log "Patching profile entitlements with values from app entitlements"
-        PATCHED_ENTITLEMENTS="$TEMP_DIR/patchedEntitlements"
-        # Start with using what comes in provisioning profile entitlements before patching
-        cp -f "$PROFILE_ENTITLEMENTS" "$PATCHED_ENTITLEMENTS"
-
-        log "Removing blacklisted keys from patched profile"
-        # See https://github.com/facebook/buck/issues/798 and https://github.com/facebook/buck/pull/802/files
-
-        # Update in https://github.com/facebook/buck/commit/99c0fbc3ab5ecf04d186913374f660683deccdef
-        # Update in https://github.com/facebook/buck/commit/36db188da9f6acbb9df419dc1904315ab00c4e19
-
-        # Buck changes referenced above are not self-explanatory and do not seem exhaustive or up-to-date
-        # Comments below explain the rules applied to each key in order to make realignment with future Xcode export logic easier
-        BLACKLISTED_KEYS=(\
-            # PP list identifiers inconsistent with app-defined ones and this key does not seem to appear in IPA entitlements, so ignore it
-            "com.apple.developer.icloud-container-development-container-identifiers" \
-            # This key has an invalid generic value in PP (actual value is set by Xcode during export), see dedicated processing a few blocks below
-            "com.apple.developer.icloud-container-environment" \
-            # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
-            "com.apple.developer.icloud-container-identifiers" \
-            # PP enable all available services and not app-defined ones, must use App entitlements value
-            "com.apple.developer.icloud-services" \
-            # Was already blacklisted in previous version, but has someone ever seen this key in a PP?
-            "com.apple.developer.restricted-resource-mode" \
-            # If actually used by the App, this value will be set in its entitlements
-            "com.apple.developer.nfc.readersession.formats" \
-            # PP list a single TeamID.* identifier and not app-defined ones, must use App entitlements value
-            "com.apple.developer.pass-type-identifiers" \
-            # If actually used by the App, this value will be set in its entitlements
-            "com.apple.developer.siri" \
-            # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
-            "com.apple.developer.ubiquity-container-identifiers" \
-            # PP define a generic TeamID.* identifier and not the app-defined one, must use App entitlements value
-            "com.apple.developer.ubiquity-kvstore-identifier" \
-            # If actually used by the App, this value will be set in its entitlements
-            "inter-app-audio" \
-            # PP define a generic TeamID.* identifier and not the app-defined one, must use App entitlements value
-            "keychain-access-groups" \
-            # If actually used by the App, this value will be set in its entitlements
-            "com.apple.developer.homekit" \
-            # If actually used by the App, this value will be set in its entitlements
-            "com.apple.developer.healthkit" \
-            # If actually used by the App, this value will be set in its entitlements
-            "com.apple.developer.healthkit.access" \
-            # PP list identifiers inconsistent with app-defined ones, must use App entitlements value
-            "com.apple.developer.in-app-payments" \
-            # If actually used by the App, this value will be set in its entitlements
-            "com.apple.developer.networking.vpn.api" \
-            # If actually used by the App, this value will be set in its entitlements
-            "com.apple.developer.networking.HotspotConfiguration" \
-            # PP list all available extensions and not app-defined ones, must use App entitlements value
-            "com.apple.developer.networking.networkextension" \
-            # If actually used by the App, this value will be set in its entitlements
-            "com.apple.developer.networking.multipath" \
-            # PP enable all domains via a non-AppStore-compliant '*' value, must use App entitlements value
-            "com.apple.developer.associated-domains" \
-            # If actually used by the App, this value will be set in its entitlements
-            "com.apple.developer.default-data-protection" \
-            # PP seem to list the same groups as the App, but use App entitlements value to be sure
-            "com.apple.security.application-groups" \
-            # Was already blacklisted in previous version, seems to be an artifact from an old Xcode release
-            "com.apple.developer.maps" \
-            # If actually used by the App, this value will be set in its entitlements
-            "com.apple.external-accessory.wireless-configuration"
-        )
-
-        # Blacklisted keys must not be included into new profile, so remove them from patched profile
-        for KEY in "${BLACKLISTED_KEYS[@]}"; do
-            log "Removing blacklisted key: $KEY"
-            PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
-        done
-
         # Get the old and new app identifier (prefix)
         APP_ID_KEY="application-identifier"
         # Extract just the identifier from the value
@@ -701,12 +658,95 @@ function resign {
         # New team ID is part of profile entitlements
         NEW_TEAM_ID=$(PlistBuddy -c "Print com.apple.developer.team-identifier" "$PROFILE_ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
 
+        log "Patching profile entitlements with values from app entitlements"
+        PATCHED_ENTITLEMENTS="$TEMP_DIR/patchedEntitlements"
+        # Start with using what comes in provisioning profile entitlements before patching
+        cp -f "$PROFILE_ENTITLEMENTS" "$PATCHED_ENTITLEMENTS"
+
+        log "Removing denylisted keys from patched profile"
+        # See https://github.com/facebook/buck/issues/798 and https://github.com/facebook/buck/pull/802/files
+
+        # Update in https://github.com/facebook/buck/commit/99c0fbc3ab5ecf04d186913374f660683deccdef
+        # Update in https://github.com/facebook/buck/commit/36db188da9f6acbb9df419dc1904315ab00c4e19
+
+        # Buck changes referenced above are not self-explanatory and do not seem exhaustive or up-to-date
+        # Comments below explain the rules applied to each key in order to make realignment with future Xcode export logic easier
+        DENYLISTED_KEYS=(\
+            # PP list identifiers inconsistent with app-defined ones and this key does not seem to appear in IPA entitlements, so ignore it
+            "com.apple.developer.icloud-container-development-container-identifiers" \
+            # This key has an invalid generic value in PP (actual value is set by Xcode during export), see dedicated processing a few blocks below
+            "com.apple.developer.icloud-container-environment" \
+            # PP enable all available services and not app-defined ones, must use App entitlements value
+            "com.apple.developer.icloud-services" \
+            # Was already denylisted in previous version, but has someone ever seen this key in a PP?
+            "com.apple.developer.restricted-resource-mode" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.nfc.readersession.formats" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.siri" \
+            # PP define a generic TeamID.* identifier and not the app-defined one, must use App entitlements value
+            "com.apple.developer.ubiquity-kvstore-identifier" \
+            # If actually used by the App, this value will be set in its entitlements
+            "inter-app-audio" \
+            # PP define a generic TeamID.* identifier and not the app-defined one, must use App entitlements value
+            "keychain-access-groups" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.homekit" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.healthkit" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.healthkit.access" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.networking.vpn.api" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.networking.HotspotConfiguration" \
+            # PP list all available extensions and not app-defined ones, must use App entitlements value
+            "com.apple.developer.networking.networkextension" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.networking.multipath" \
+            # PP enable all domains via a non-AppStore-compliant '*' value, must use App entitlements value
+            "com.apple.developer.associated-domains" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.developer.default-data-protection" \
+            # Was already denylisted in previous version, seems to be an artifact from an old Xcode release
+            "com.apple.developer.maps" \
+            # If actually used by the App, this value will be set in its entitlements
+            "com.apple.external-accessory.wireless-configuration"
+        )
+
+        # If we change team while resigning, we have no other choice than to use the following entitlements from the PP instead of the App
+        # because they are based on unique identifiers (defined in the developer portal) that can't be shared between teams
+        if [[ "$OLD_TEAM_ID" != "$NEW_TEAM_ID" ]]; then
+            warning "WARNING: Changing team while resigning"
+            warning "WARNING: Using these entitlements from the provisioning profile instead of the existing app:"
+            warning "WARNING: App Groups, Merchant IDs (Apple Pay In-App Payments), iCloud Containers, Pass Type IDs (Wallet)"
+            warning "WARNING: If these capabilities are enabled, make sure AppID and provisioning profile are properly configured"
+            # For Pass Types, PP only list a single TeamID.* identifier and not the potential restricted list defined in the existing App
+            # but we can't guess the new identifiers to be used, so this generic value is better than nothing and should be fine for most apps
+            warning "WARNING: Resigned app will allow all pass types from the new team, even if old app only allowed a restricted list"
+        else
+            DENYLISTED_KEYS+=(\
+                "com.apple.security.application-groups" \
+                "com.apple.developer.in-app-payments" \
+                "com.apple.developer.ubiquity-container-identifiers" \
+                "com.apple.developer.icloud-container-identifiers" \
+                "com.apple.developer.pass-type-identifiers" \
+            )
+        fi
+
+        # Denylisted keys must not be included into new profile, so remove them from patched profile
+        for KEY in "${DENYLISTED_KEYS[@]}"; do
+            log "Removing denylisted key: $KEY"
+            PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
+        done
+
         # List of rules for transferring entitlements from app to profile plist
         # The format for each enty is "KEY[|ID_TYPE]"
         # Where KEY is the plist key, e.g. "keychain-access-groups"
         # and ID_TYPE is optional part separated by '|' that specifies what value to patch:
         # TEAM_ID - patch the TeamIdentifierPrefix
         # APP_ID - patch the AppIdentifierPrefix
+        # ICLOUD_ENV - patch the target iCloud Environment
         # Patching means replacing old value from app entitlements with new value from provisioning profile
         # For example, for KEY=keychain-access-groups the ID_TYPE=APP_ID
         # Which means that old app ID prefix in keychain-access-groups will be replaced with new app ID prefix
@@ -719,23 +759,32 @@ function resign {
             "com.apple.developer.healthkit" \
             "com.apple.developer.healthkit.access" \
             "com.apple.developer.homekit" \
-            "com.apple.developer.icloud-container-environment" \
-            "com.apple.developer.icloud-container-identifiers" \
+            "com.apple.developer.icloud-container-environment|ICLOUD_ENV" \
             "com.apple.developer.icloud-services" \
-            "com.apple.developer.in-app-payments" \
             "com.apple.developer.networking.HotspotConfiguration" \
             "com.apple.developer.networking.multipath" \
             "com.apple.developer.networking.networkextension" \
             "com.apple.developer.networking.vpn.api" \
             "com.apple.developer.nfc.readersession.formats" \
-            "com.apple.developer.pass-type-identifiers|TEAM_ID" \
             "com.apple.developer.siri" \
-            "com.apple.developer.ubiquity-container-identifiers" \
             "com.apple.developer.ubiquity-kvstore-identifier|TEAM_ID" \
             "com.apple.external-accessory.wireless-configuration" \
-            "com.apple.security.application-groups" \
             "inter-app-audio" \
-            "keychain-access-groups|APP_ID")
+            "keychain-access-groups|APP_ID" \
+        )
+
+        # If we change team while resigning, we have no other choice than to use the following entitlements from the PP instead of the App
+        # because they are based on unique identifiers (defined in the developer portal) that can't be shared between teams
+        # If we don't change team while resigning, we should use the following entitlements from the existing App and not from the PP
+        if [[ "$OLD_TEAM_ID" == "$NEW_TEAM_ID" ]]; then
+            ENTITLEMENTS_TRANSFER_RULES+=(\
+                "com.apple.security.application-groups" \
+                "com.apple.developer.in-app-payments" \
+                "com.apple.developer.ubiquity-container-identifiers" \
+                "com.apple.developer.icloud-container-identifiers" \
+                "com.apple.developer.pass-type-identifiers|TEAM_ID" \
+            )
+        fi
 
         # Loop over all the entitlement keys that need to be transferred from app entitlements
         for RULE in "${ENTITLEMENTS_TRANSFER_RULES[@]}"; do
@@ -744,13 +793,25 @@ function resign {
 
             # Get the entry from app's entitlements
             # Read it with PlistBuddy as XML, then strip the header and <plist></plist> part
-            ENTITLEMENTS_VALUE="$(PlistBuddy -x -c "Print $KEY" "$APP_ENTITLEMENTS" 2>/dev/null | sed -e 's,.*<plist[^>]*>\(.*\)</plist>,\1,g')"
+            ENTITLEMENTS_VALUE="$(PlistBuddy -x -c "Print $KEY" "$APP_ENTITLEMENTS" 2>/dev/null | tr -d '\n' | /usr/bin/sed -e 's,.*<plist[^>]*>\(.*\)</plist>,\1,g')"
             if [[ -z "$ENTITLEMENTS_VALUE" ]]; then
                 log "No value for '$KEY'"
                 continue
             fi
 
-            if [[ "$KEY" == "com.apple.developer.icloud-container-environment" ]]; then
+            log "App entitlements value for key '$KEY':"
+            log "$ENTITLEMENTS_VALUE"
+
+            # Patch the ID value if specified
+            if [[ "$ID_TYPE" == "APP_ID" ]]; then
+                # Replace old value with new value in patched entitlements
+                log "Replacing old app ID '$OLD_APP_ID' with new app ID '$NEW_APP_ID'"
+                ENTITLEMENTS_VALUE=$(echo "$ENTITLEMENTS_VALUE" | /usr/bin/sed -e "s/$OLD_APP_ID/$NEW_APP_ID/g")
+            elif [[ "$ID_TYPE" == "TEAM_ID" ]]; then
+                # Replace old team identifier with new value
+                log "Replacing old team ID '$OLD_TEAM_ID' with new team ID '$NEW_TEAM_ID'"
+                ENTITLEMENTS_VALUE=$(echo "$ENTITLEMENTS_VALUE" | /usr/bin/sed -e "s/$OLD_TEAM_ID/$NEW_TEAM_ID/g")
+            elif [[ "$ID_TYPE" == "ICLOUD_ENV" ]]; then
                 # Add specific iCloud Environment key to patched entitlements
                 # This value is set by Xcode during export (manually selected for Development and AdHoc, automatically set to Production for Store)
                 # Would need an additional dedicated option to specify the iCloud environment to be used (Development or Production)
@@ -762,24 +823,20 @@ function resign {
                     log "Certificate $CERTIFICATE matches a SHA1 pattern"
                     local certificate_matches="$( security find-identity -v -p codesigning | grep -m 1 "$CERTIFICATE" )"
                     if [ -n "$certificate_matches" ]; then
-                        certificate_name="$( sed -E s/[^\"]+\"\([^\"]+\)\".*/\\1/ <<< $certificate_matches )"
+                        certificate_name="$(/usr/bin/sed -E s/[^\"]+\"\([^\"]+\)\".*/\\1/ <<< $certificate_matches )"
                         log "Certificate name: $certificate_name"
                     fi
                 fi
 
+                OLD_ICLOUD_ENV=$(echo "$ENTITLEMENTS_VALUE" | /usr/bin/sed -e 's,<string>\(.*\)</string>,\1,g')
                 if [[ "$certificate_name" =~ "Distribution:" ]]; then
-                    ICLOUD_ENV="Production"
+                    NEW_ICLOUD_ENV="Production"
                 else
-                    ICLOUD_ENV="Development"
+                    NEW_ICLOUD_ENV="Development"
                 fi
-                log "Overriding value for $KEY"
-                log "Old value: $ENTITLEMENTS_VALUE"
-                log "New value: $ICLOUD_ENV"
-                ENTITLEMENTS_VALUE="$ICLOUD_ENV"
+                log "Replacing iCloud environment '$OLD_ICLOUD_ENV' with '$NEW_ICLOUD_ENV'"
+                ENTITLEMENTS_VALUE=$(echo "$ENTITLEMENTS_VALUE" | /usr/bin/sed -e "s/$OLD_ICLOUD_ENV/$NEW_ICLOUD_ENV/g")
             fi
-
-            log "App entitlements value for key '$KEY':"
-            log "$ENTITLEMENTS_VALUE"
 
             # Remove the entry for current key from profisioning profile entitlements (if exists)
             PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
@@ -789,27 +846,14 @@ function resign {
             # otherwise it interprets they key path as nested keys
             # TODO: Should be able to replace with echo ${KEY//\./\\\\.} and remove shellcheck disable directive
             # shellcheck disable=SC2001
-            PLUTIL_KEY=$(echo "$KEY" | sed 's/\./\\\./g')
+            PLUTIL_KEY=$(echo "$KEY" | /usr/bin/sed -e 's/\./\\\./g')
             plutil -insert "$PLUTIL_KEY" -xml "$ENTITLEMENTS_VALUE" "$PATCHED_ENTITLEMENTS"
-
-            # Patch the ID value if specified
-            if [[ "$ID_TYPE" == "APP_ID" ]]; then
-                # Replace old value with new value in patched entitlements
-                log "Replacing old app identifier prefix '$OLD_APP_ID' with new value '$NEW_APP_ID'"
-                sed -i .bak "s/$OLD_APP_ID/$NEW_APP_ID/g" "$PATCHED_ENTITLEMENTS"
-            elif [[ "$ID_TYPE" == "TEAM_ID" ]]; then
-                # Replace old team identifier with new value
-                log "Replacing old team ID '$OLD_TEAM_ID' with new team ID: '$NEW_TEAM_ID'"
-                sed -i .bak "s/$OLD_TEAM_ID/$NEW_TEAM_ID/g" "$PATCHED_ENTITLEMENTS"
-            else
-                continue
-            fi
         done
 
         # Replace old bundle ID with new bundle ID in patched entitlements
         # Read old bundle ID from the old Info.plist which was saved for this purpose
         OLD_BUNDLE_ID="$(PlistBuddy -c "Print :CFBundleIdentifier" "$TEMP_DIR/oldInfo.plist")"
-        NEW_BUNDLE_ID="$(bundle_id_for_provison "$NEW_PROVISION")"
+        NEW_BUNDLE_ID="$(bundle_id_for_provision "$NEW_PROVISION")"
         log "Replacing old bundle ID '$OLD_BUNDLE_ID' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
         # Note: ideally we'd match against the opening <string> tag too, but this isn't possible
         # because $OLD_BUNDLE_ID and $NEW_BUNDLE_ID do not include the team ID prefix which is
@@ -817,7 +861,7 @@ function resign {
         # e.g. <string>AB1GP98Q19.com.example.foo</string>
         #         vs
         #      com.example.foo
-        sed -i .bak "s!${OLD_BUNDLE_ID}</string>!${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
+        /usr/bin/sed -i .bak "s!${OLD_BUNDLE_ID}</string>!${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
 
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
@@ -826,7 +870,7 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        /usr/bin/codesign ${VERBOSE} -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
+        /usr/bin/codesign ${VERBOSE} --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
         checkStatus
     else
         log "Extracting entitlements from provisioning profile"
@@ -840,7 +884,7 @@ function resign {
         fi
         # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
         # shellcheck disable=SC2086
-        /usr/bin/codesign ${VERBOSE} ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
+        /usr/bin/codesign ${VERBOSE} --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
         checkStatus
     fi
 

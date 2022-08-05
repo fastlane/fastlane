@@ -12,7 +12,7 @@ module Fastlane
           setup_output_paths
         end
 
-        setup_keychain
+        setup_keychain(params)
       end
 
       def self.should_run?(params)
@@ -23,7 +23,12 @@ module Fastlane
         params[:provider] || (Helper.is_circle_ci? ? 'circleci' : nil)
       end
 
-      def self.setup_keychain
+      def self.setup_keychain(params)
+        unless Helper.mac?
+          UI.message("Skipping Keychain setup on non-macOS CI Agent")
+          return
+        end
+
         unless ENV["MATCH_KEYCHAIN_NAME"].nil?
           UI.message("Skipping Keychain setup as a keychain was already specified")
           return
@@ -38,7 +43,7 @@ module Fastlane
           name: keychain_name,
           default_keychain: true,
           unlock: true,
-          timeout: 3600,
+          timeout: params[:timeout],
           lock_when_sleeps: true,
           password: "",
           add_to_search_list: true
@@ -87,19 +92,23 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_SETUP_CI_FORCE",
                                        description: "Force setup, even if not executed by CI",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :provider,
                                        env_name: "FL_SETUP_CI_PROVIDER",
                                        description: "CI provider. If none is set, the provider is detected automatically",
-                                       is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          value = value.to_s
                                          # Validate both 'travis' and 'circleci' for backwards compatibility, even
                                          # though only the latter receives special treatment by this action
                                          UI.user_error!("A given CI provider '#{value}' is not supported. Available CI providers: 'travis', 'circleci'") unless ["travis", "circleci"].include?(value)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :timeout,
+                                       env_name: "FL_SETUP_CI_TIMEOUT",
+                                       description: "Set a custom timeout in seconds for keychain.  Set `0` if you want to specify 'no time-out'",
+                                       type: Integer,
+                                       default_value: 3600)
         ]
       end
 
@@ -115,6 +124,10 @@ module Fastlane
         [
           'setup_ci(
             provider: "circleci"
+          )',
+          'setup_ci(
+            provider: "circleci",
+            timeout: 0
           )'
         ]
       end

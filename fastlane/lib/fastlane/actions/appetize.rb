@@ -31,6 +31,10 @@ module Fastlane
 
         params[:note] = options[:note] if options[:note].to_s.length > 0
 
+        if options[:timeout]
+          params[:timeout] = options[:timeout]
+        end
+
         uri = URI.parse(appetize_url(options))
         req = create_request(uri, params)
         req.basic_auth(options[:api_token], nil)
@@ -105,7 +109,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_host,
                                        env_name: "APPETIZE_API_HOST",
                                        description: "Appetize API host",
-                                       is_string: true,
                                        default_value: 'api.appetize.io',
                                        verify_block: proc do |value|
                                          UI.user_error!("API host should not contain the scheme e.g. `https`") if value.start_with?('https')
@@ -114,29 +117,24 @@ module Fastlane
                                        env_name: "APPETIZE_API_TOKEN",
                                        sensitive: true,
                                        description: "Appetize.io API Token",
-                                       is_string: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("No API Token for Appetize.io given, pass using `api_token: 'token'`") unless value.to_s.length > 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :url,
                                        env_name: "APPETIZE_URL",
                                        description: "URL from which the ipa file can be fetched. Alternative to :path",
-                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "APPETIZE_PLATFORM",
                                        description: "Platform. Either `ios` or `android`",
-                                       is_string: true,
                                        default_value: 'ios'),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "APPETIZE_FILE_PATH",
                                        description: "Path to zipped build on the local filesystem. Either this or `url` must be specified",
-                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :public_key,
                                        env_name: "APPETIZE_PUBLICKEY",
                                        description: "If not provided, a new app will be created. If provided, the existing build will be overwritten",
-                                       is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          if value.start_with?("private_")
@@ -146,8 +144,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :note,
                                        env_name: "APPETIZE_NOTE",
                                        description: "Notes you wish to add to the uploaded app",
-                                       is_string: true,
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :timeout,
+                                       env_name: "APPETIZE_TIMEOUT",
+                                       description: "The number of seconds to wait until automatically ending the session due to user inactivity. Must be 30, 60, 90, 120, 180, 300, 600, 1800, 3600 or 7200. Default is 120",
+                                       type: Integer,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The value provided doesn't match any of the supported options.") unless [30, 60, 90, 120, 180, 300, 600, 1800, 3600, 7200].include?(value)
+                                       end)
         ]
       end
 

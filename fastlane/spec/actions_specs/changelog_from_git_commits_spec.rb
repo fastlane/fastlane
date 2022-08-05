@@ -174,7 +174,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         tag_name = %W(git rev-list --tags=#{tag_match_pattern} --max-count=1).shelljoin
-        describe = %W(git describe --tags #{tag_name}).shelljoin
+        describe = %W(git describe --tags #{tag_name} --match #{tag_match_pattern}).shelljoin
         changelog = %W(git log --pretty=%B #{describe}...HEAD).shelljoin
         expect(result).to eq(changelog)
       end
@@ -207,7 +207,7 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
             changelog_from_git_commits(between: 'abcd1234')
           end").runner.execute(:test)
-        end.to raise_error(":between must contain comma")
+        end.to raise_error(":between must be an array of size 2")
       end
     end
   end

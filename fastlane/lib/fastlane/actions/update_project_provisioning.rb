@@ -21,9 +21,8 @@ module Fastlane
         # download certificate
         unless File.exist?(params[:certificate])
           UI.message("Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'")
-          require 'open-uri'
           File.open(params[:certificate], "w:ASCII-8BIT") do |file|
-            file.write(open(ROOT_CERTIFICATE_URL, "rb").read)
+            file.write(FastlaneCore::Helper.open_uri(ROOT_CERTIFICATE_URL, "rb").read)
           end
         end
 
@@ -35,7 +34,9 @@ module Fastlane
         UI.user_error!("Could not find valid certificate at '#{params[:certificate]}'") unless File.size(params[:certificate]) > 0
         cert = OpenSSL::X509::Certificate.new(File.read(params[:certificate]))
         store.add_cert(cert)
+
         p7.verify([cert], store)
+        check_verify!(p7)
         data = Plist.parse_xml(p7.data)
 
         target_filter = params[:target_filter] || params[:build_configuration_filter]
@@ -82,6 +83,13 @@ module Fastlane
         UI.success("Successfully updated project settings in '#{folder}'")
       end
 
+      def self.check_verify!(p7)
+        failed_to_verify = (p7.data.nil? || p7.data == "") && !(p7.error_string || "").empty?
+        if failed_to_verify
+          UI.crash!("Profile could not be verified with error: '#{p7.error_string}'. Try regenerating provisioning profile.")
+        end
+      end
+
       def self.description
         "Update projects code signing settings from your provisioning profile"
       end
@@ -118,7 +126,7 @@ module Fastlane
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_TARGET_FILTER",
                                        description: "A filter for the target name. Use a standard regex",
                                        optional: true,
-                                       is_string: false,
+                                       skip_type_validation: true, # allow Regexp, String
                                        verify_block: proc do |value|
                                          UI.user_error!("target_filter should be Regexp or String") unless [Regexp, String].any? { |type| value.kind_of?(type) }
                                        end),
@@ -130,7 +138,7 @@ module Fastlane
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_BUILD_CONFIGURATION",
                                        description: "A filter for the build configuration name. Use a standard regex. Applied to all configurations if not specified",
                                        optional: true,
-                                       is_string: false,
+                                       skip_type_validation: true, # allow Regexp, String
                                        verify_block: proc do |value|
                                          UI.user_error!("build_configuration should be Regexp or String") unless [Regexp, String].any? { |type| value.kind_of?(type) }
                                        end),

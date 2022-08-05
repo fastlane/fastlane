@@ -298,7 +298,7 @@ module Frameit
       resize_text(keyword)
 
       vertical_padding = vertical_frame_padding # assign padding to variable
-      spacing_between_title_and_keyword = (actual_font_size / 2)
+      spacing_between_title_and_keyword = (actual_font_size('keyword') / 2)
       title_left_space = (background.width / 2.0 - title.width / 2.0).round
       keyword_left_space = (background.width / 2.0 - keyword.width / 2.0).round
 
@@ -359,7 +359,7 @@ module Frameit
       vertical_padding = vertical_frame_padding # assign padding to variable
       left_space = (background.width / 2.0 - sum_width / 2.0).round
 
-      self.space_to_device += actual_font_size + vertical_padding
+      self.space_to_device += actual_font_size('title') + vertical_padding
 
       if title_below_image
         title_top = background.height - effective_text_height / 2 - title.height / 2
@@ -385,7 +385,10 @@ module Frameit
       background
     end
 
-    def actual_font_size
+    def actual_font_size(key)
+      font_size = @config[key.to_s]['font_size']
+      return font_size if !font_size.nil? && font_size > 0
+
       font_scale_factor = @config['font_scale_factor'] || 0.1
       UI.user_error!("Parameter 'font_scale_factor' can not be 0. Please provide a value larger than 0.0 (default = 0.1).") if font_scale_factor == 0.0
       [@image.width * font_scale_factor].max.round
@@ -393,7 +396,7 @@ module Frameit
 
     # The space between the keyword and the title
     def keyword_padding
-      (actual_font_size / 3.0).round
+      (actual_font_size('keyword') / 3.0).round
     end
 
     # This will build up to 2 individual images with the title and optional keyword, which will then be added to the real image
@@ -426,8 +429,9 @@ module Frameit
         # Add the actual title
         text_image.combine_options do |i|
           i.font(current_font) if current_font
+          i.weight(@config[key.to_s]['font_weight']) if @config[key.to_s]['font_weight']
           i.gravity("Center")
-          i.pointsize(actual_font_size)
+          i.pointsize(actual_font_size(key))
           i.draw("text 0,0 '#{text}'")
           i.interline_spacing(interline_spacing) if interline_spacing
           i.fill(@config[key.to_s]['color'])
@@ -463,26 +467,24 @@ module Frameit
         # Get matching trim box:
         trim_box = trim_boxes[key]
 
-        # For side-by-side text images (e.g. stack_title is false) adjust the trim box based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain the text baseline:
-        unless stack_title
-          # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
-          # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
-          if trim_box.offset_y > top_vertical_trim_offset
-            # Increase the height of the trim box with the difference in vertical top offset:
-            trim_box.height += trim_box.offset_y - top_vertical_trim_offset
-            # Change the vertical top offset to match that of the others:
-            trim_box.offset_y = top_vertical_trim_offset
+        # Adjust the trim box based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain the text baseline:
+        # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
+        # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
+        if trim_box.offset_y > top_vertical_trim_offset
+          # Increase the height of the trim box with the difference in vertical top offset:
+          trim_box.height += trim_box.offset_y - top_vertical_trim_offset
+          # Change the vertical top offset to match that of the others:
+          trim_box.offset_y = top_vertical_trim_offset
 
-            UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box}\n")
-          end
+          UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box.json_string_format}")
+        end
 
-          # Check if the height needs to be adjusted to reach the bottom offset:
-          if (trim_box.offset_y + trim_box.height) < bottom_vertical_trim_offset
-            # Set the height of the trim box to the difference between vertical bottom and top offset:
-            trim_box.height = bottom_vertical_trim_offset - trim_box.offset_y
+        # Check if the height needs to be adjusted to reach the bottom offset:
+        if (trim_box.offset_y + trim_box.height) < bottom_vertical_trim_offset
+          # Set the height of the trim box to the difference between vertical bottom and top offset:
+          trim_box.height = bottom_vertical_trim_offset - trim_box.offset_y
 
-            UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box}\n")
-          end
+          UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box.json_string_format}")
         end
 
         # Crop image with (adjusted) trim box parameters in MiniMagick string format:
@@ -497,7 +499,9 @@ module Frameit
       UI.user_error!("Valid parameters :keyword, :title") unless [:keyword, :title].include?(type)
 
       # Try to get it from a keyword.strings or title.strings file
-      strings_path = File.join(File.expand_path("..", screenshot.path), "#{type}.strings")
+      strings_path = File.join(File.expand_path("../", screenshot.path), "#{type}.strings")
+      strings_path = File.join(File.expand_path("../../", screenshot.path), "#{type}.strings") unless File.exist?(strings_path)
+      strings_path = File.join(File.expand_path("../../../", screenshot.path), "#{type}.strings") unless File.exist?(strings_path)
       if File.exist?(strings_path)
         parsed = StringsParser.parse(strings_path)
         text_array = parsed.find { |k, v| screenshot.path.upcase.include?(k.upcase) }

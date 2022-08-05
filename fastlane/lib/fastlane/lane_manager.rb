@@ -7,7 +7,6 @@ module Fastlane
     # @param parameters [Hash] The parameters passed from the command line to the lane
     # @param env Dot Env Information
     # @param A custom Fastfile path, this is used by fastlane.ci
-    # rubocop:disable Metrics/PerceivedComplexity
     def self.cruise_lane(platform, lane, parameters = nil, env = nil, fastfile_path = nil)
       UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
       UI.user_error!("platform must be a string") unless platform.kind_of?(String) || platform.nil?
@@ -42,14 +41,6 @@ module Fastlane
 
       platform, lane = choose_lane(ff, platform) unless lane
 
-      # xcodeproj has a bug in certain versions that causes it to change directories
-      # and not return to the original working directory
-      # https://github.com/CocoaPods/Xcodeproj/issues/426
-      # Setting this environment variable causes xcodeproj to work around the problem
-      ENV["FORK_XCODE_WRITING"] = "true" unless platform == 'android'
-
-      Fastlane::Helper::DotenvHelper.load_dot_env(env)
-
       started = Time.now
       e = nil
       begin
@@ -77,7 +68,6 @@ module Fastlane
 
       return ff
     end
-    # rubocop:enable Metrics/PerceivedComplexity
 
     def self.skip_docs?
       Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
@@ -117,12 +107,13 @@ module Fastlane
 
       puts(table)
 
-      i = UI.input("Which number would you like run?")
+      fastlane_command = Helper.bundler? ? "bundle exec fastlane" : "fastlane"
+      i = UI.input("Which number would you like to run?")
 
       i = i.to_i - 1
       if i >= 0 && available[i]
         selection = available[i].last.pretty_name
-        UI.important("Running lane `#{selection}`. Next time you can do this by directly typing `fastlane #{selection}` 🚀.")
+        UI.important("Running lane `#{selection}`. Next time you can do this by directly typing `#{fastlane_command} #{selection}` 🚀.")
         platform = selection.split(' ')[0]
         lane_name = selection.split(' ')[1]
 
@@ -133,7 +124,7 @@ module Fastlane
 
         return platform, lane_name # yeah
       else
-        UI.user_error!("Run `fastlane` the next time you need to build, test or release your app 🚀")
+        UI.user_error!("Run `#{fastlane_command}` the next time you need to build, test or release your app 🚀")
       end
     end
   end

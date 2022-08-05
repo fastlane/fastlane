@@ -18,6 +18,13 @@ describe FastlaneCore do
       end
     end
 
+    describe '#install_wwdr_certificate' do
+      it 'should install only the latest official WWDR certificate' do
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate)
+        FastlaneCore::CertChecker.install_wwdr_certificate
+      end
+    end
+
     describe 'shell escaping' do
       let(:keychain_name) { "keychain with spaces.keychain" }
       let(:shell_escaped_name) { keychain_name.shellescape }
@@ -35,7 +42,7 @@ describe FastlaneCore do
         `ls`
 
         keychain = "keychain with spaces.keychain"
-        cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://developer\.apple\.com/certificationauthority/AppleWWDRCA.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
+        cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
         require "open3"
 
         expect(Open3).to receive(:capture3).with(cmd).and_return("")

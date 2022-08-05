@@ -2,7 +2,7 @@ describe Spaceship::Tunes::AppDetails do
   before { Spaceship::Tunes.login }
 
   let(:client) { Spaceship::AppVersion.client }
-  let(:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 
   describe "App Details are properly loaded" do
     it "contains all the relevant information" do

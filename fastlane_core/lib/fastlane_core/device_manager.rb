@@ -118,7 +118,7 @@ module FastlaneCore
           discover_devices(child_item, device_types, discovered_device_udids)
         end
 
-        is_supported_device = device_types.any? { |device_type| usb_item['_name'] == device_type }
+        is_supported_device = device_types.any?(usb_item['_name'])
         serial_num = usb_item['serial_num'] || ''
         has_serial_number = serial_num.length == 40 || serial_num.length == 24
 
@@ -199,18 +199,37 @@ module FastlaneCore
         self.name
       end
 
+      def boot
+        return unless is_simulator
+        return unless os_type == "iOS"
+        return if self.state == 'Booted'
+
+        UI.message("Booting #{self}")
+
+        `xcrun simctl boot #{self.udid} 2>/dev/null`
+        self.state = 'Booted'
+      end
+
+      def shutdown
+        return unless is_simulator
+        return unless os_type == "iOS"
+        return if self.state != 'Booted'
+
+        UI.message("Shutting down #{self.udid}")
+        `xcrun simctl shutdown #{self.udid} 2>/dev/null`
+        self.state = 'Shutdown'
+      end
+
       def reset
         UI.message("Resetting #{self}")
-        `xcrun simctl shutdown #{self.udid}` if self.state == "Booted"
+        shutdown
         `xcrun simctl erase #{self.udid}`
-        return
       end
 
       def delete
         UI.message("Deleting #{self}")
-        `xcrun simctl shutdown #{self.udid}` unless self.state == "Shutdown"
+        shutdown
         `xcrun simctl delete #{self.udid}`
-        return
       end
 
       def disable_slide_to_type
@@ -282,7 +301,7 @@ module FastlaneCore
         Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
       end
 
-      def copy_logs(device, log_identity, logs_destination_dir)
+      def copy_logs(device, log_identity, logs_destination_dir, log_collection_start_time)
         logs_destination_dir = File.expand_path(logs_destination_dir)
         os_version = FastlaneCore::CommandExecutor.execute(command: 'sw_vers -productVersion', print_all: false, print_command: false)
 
@@ -291,7 +310,7 @@ module FastlaneCore
 
         are_logarchives_supported = device_supports_logarchives && host_computer_supports_logarchives
         if are_logarchives_supported
-          copy_logarchive(device, log_identity, logs_destination_dir)
+          copy_logarchive(device, log_identity, logs_destination_dir, log_collection_start_time)
         else
           copy_logfile(device, log_identity, logs_destination_dir)
         end
@@ -301,7 +320,11 @@ module FastlaneCore
         UI.verbose("Uninstalling app '#{app_identifier}' from #{device_type}...")
 
         UI.message("Launch Simulator #{device_type}")
-        Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+        if FastlaneCore::Helper.xcode_at_least?("13")
+          Helper.backticks("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
+        else
+          Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+        end
 
         UI.message("Uninstall application #{app_identifier}")
         Helper.backticks("xcrun simctl uninstall #{device_udid} #{app_identifier} &> /dev/null")
@@ -321,13 +344,17 @@ module FastlaneCore
         UI.success("Copying file '#{logfile_src}' to '#{logfile_dst}'...")
       end
 
-      def copy_logarchive(device, log_identity, logs_destination_dir)
+      def copy_logarchive(device, log_identity, logs_destination_dir, log_collection_start_time)
         require 'shellwords'
 
-        logarchive_dst = File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive").shellescape
+        logarchive_dst = File.join(logs_destination_dir, "system_logs-#{log_identity}.logarchive")
         FileUtils.rm_rf(logarchive_dst)
         FileUtils.mkdir_p(File.expand_path("..", logarchive_dst))
-        command = "xcrun simctl spawn --standalone #{device.udid} log collect --output #{logarchive_dst} 2>/dev/null"
+
+        logs_collection_start = log_collection_start_time.strftime('%Y-%m-%d %H:%M:%S')
+        command = "xcrun simctl spawn #{device.udid} log collect "
+        command << "--start '#{logs_collection_start}' "
+        command << "--output #{logarchive_dst.shellescape} 2>/dev/null"
         FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
       end
     end

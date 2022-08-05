@@ -48,14 +48,13 @@ describe Match do
       repo_dir = Dir.mktmpdir
       setup_fake_storage(repo_dir, config)
 
-      expect(Spaceship::Portal).to receive(:login)
-      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI).to receive(:login)
       expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.cer"),
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.p12"),
-          File.join(repo_dir, "profiles", "distribution", "Distribution_tools.fastlane.app.mobileprovision")
+          File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.mobileprovision")
         ]
       )
 
@@ -66,14 +65,13 @@ describe Match do
       repo_dir = Dir.mktmpdir
       setup_fake_storage(repo_dir, config)
 
-      expect(Spaceship::Portal).to receive(:login)
-      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI).to receive(:login)
       expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.cer"),
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.p12"),
-          File.join(repo_dir, "profiles", "distribution", "Distribution_tools.fastlane.app.provisionprofile")
+          File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.provisionprofile")
         ]
       )
 
@@ -85,8 +83,7 @@ describe Match do
       setup_fake_storage(repo_dir, config)
 
       expect(UI).to receive(:input).and_return("")
-      expect(Spaceship::Portal).to receive(:login)
-      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI).to receive(:login)
       expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
@@ -105,8 +102,7 @@ describe Match do
       setup_fake_storage(repo_dir, developer_id_config)
 
       expect(UI).to receive(:input).and_return("")
-      expect(Spaceship::Portal).to receive(:login)
-      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI).to receive(:login)
       expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
@@ -126,16 +122,28 @@ describe Match do
         git_branch: "master",
         git_full_name: nil,
         git_user_email: nil,
+        git_private_key: nil,
+        git_basic_authorization: nil,
+        git_bearer_authorization: nil,
         clone_branch_directly: false,
         type: config[:type],
         platform: config[:platform],
         google_cloud_bucket_name: "",
         google_cloud_keys_file: "",
         google_cloud_project_id: "",
+        skip_google_cloud_account_confirmation: false,
+        s3_bucket: nil,
+        s3_region: nil,
+        s3_access_key: nil,
+        s3_secret_access_key: nil,
+        s3_object_prefix: nil,
+        gitlab_project: nil,
         readonly: false,
         username: config[:username],
         team_id: nil,
-        team_name: nil
+        team_name: nil,
+        api_key_path: nil,
+        api_key: nil
       ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
