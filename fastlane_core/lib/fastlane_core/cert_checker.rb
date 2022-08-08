@@ -104,7 +104,7 @@ module FastlaneCore
 
     def self.install_missing_wwdr_certificates
       # Install all Worldwide Developer Relations Intermediate Certificates listed here: https://www.apple.com/certificateauthority/
-      missing = %w[G2 G3 G4 G5 G6] - installed_wwdr_certificates
+      missing = ['Apple Worldwide Developer Relations', 'G2', 'G3', 'G4', 'G5', 'G6'] - installed_wwdr_certificates
       missing.each do |ou|
         install_wwdr_certificate(ou)
       end
@@ -112,7 +112,11 @@ module FastlaneCore
     end
 
     def self.install_wwdr_certificate(ou)
-      url = "https://www.apple.com/certificateauthority/AppleWWDRCA#{ou}.cer"
+      if ou == 'Apple Worldwide Developer Relations'
+        url = "https://developer.apple.com/certificationauthority/AppleWWDRCA.cer"
+      else
+        url = "https://www.apple.com/certificateauthority/AppleWWDRCA#{ou}.cer"
+      end
       file = Tempfile.new(File.basename(url))
       filename = file.path
       keychain = wwdr_keychain
