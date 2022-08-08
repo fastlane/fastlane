@@ -22,7 +22,7 @@ module FastlaneCore
     end
 
     def self.installed_identies(in_keychain: nil)
-      install_wwdr_certificate unless wwdr_certificate_installed?
+      install_missing_wwdr_certificates
 
       available = list_available_identities(in_keychain: in_keychain)
       # Match for this text against word boundaries to avoid edge cases around multiples of 10 identities!
@@ -81,19 +81,48 @@ module FastlaneCore
       `#{commands.join(' ')}`
     end
 
-    def self.wwdr_certificate_installed?
+    def self.installed_wwdr_certificates
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
-      certificate_hash = "SHA-256 hash: BDD4ED6E74691F0C2BFD01BE0296197AF1379E0418E2D300EFA9C3BEF642CA30"
 
-      keychain = wwdr_keychain
-      response = Helper.backticks("security find-certificate -a -c '#{certificate_name}' -Z #{keychain.shellescape} | grep ^SHA-256", print: FastlaneCore::Globals.verbose?)
+      # Find all installed WWDRCA certificates
+      installed_certs = []
+      Helper.backticks("security find-certificate -a -c '#{certificate_name}' -p #{wwdr_keychain.shellescape}")
+            .lines
+            .each do |line|
+        if line.start_with?('-----BEGIN CERTIFICATE-----')
+          installed_certs << line
+        else
+          installed_certs.last << line
+        end
+      end
 
-      certs = response.split("\n")
-      certs.include?(certificate_hash)
+      # Get "Subject" of the installed WWDRCA certificates
+      return installed_certs.map do |pem|
+        # An example of this command output:
+        #  subject= /CN=Apple Worldwide Developer Relations Certification Authority/OU=G6/O=Apple Inc./C=US
+        Helper.backticks("echo '#{pem}' | /usr/bin/openssl x509 -noout -subject -inform pem")
+              .lines
+              .find { |line| line.start_with?('subject=') }
+              .sub('subject=', '')
+              .split('/')
+              .map { |part| part.split('=') }
+              .select { |pair| pair.count == 2 }
+              .to_h
+              .fetch('OU')
+      end
     end
 
-    def self.install_wwdr_certificate
-      url = 'https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer'
+    def self.install_missing_wwdr_certificates
+      # Install all Worldwide Developer Relations Intermediate Certificates listed here: https://www.apple.com/certificateauthority/
+      missing = %w[G2 G3 G4 G5 G6] - installed_wwdr_certificates
+      missing.each do |ou|
+        install_wwdr_certificate(ou)
+      end
+      missing.count
+    end
+
+    def self.install_wwdr_certificate(ou)
+      url = "https://www.apple.com/certificateauthority/AppleWWDRCA#{ou}.cer"
       file = Tempfile.new(File.basename(url))
       filename = file.path
       keychain = wwdr_keychain
