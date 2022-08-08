@@ -96,19 +96,9 @@ module FastlaneCore
         end
       end
 
-      # Get "Subject" of the installed WWDRCA certificates
-      return installed_certs.map do |pem|
-        # An example of this command output:
-        #  subject= /CN=Apple Worldwide Developer Relations Certification Authority/OU=G6/O=Apple Inc./C=US
-        Helper.backticks("echo '#{pem}' | /usr/bin/openssl x509 -noout -subject -inform pem")
-              .lines
-              .find { |line| line.start_with?('subject=') }
-              .sub('subject=', '')
-              .split('/')
-              .map { |part| part.split('=') }
-              .select { |pair| pair.count == 2 }
-              .to_h
-              .fetch('OU')
+      # Get 'organisational unit' of the installed WWDRCA certificates
+      installed_certs.map do |pem|
+        OpenSSL::X509::Certificate.new(pem).subject.to_a.find { |part| part[0] == 'OU' }[1]
       end
     end
 

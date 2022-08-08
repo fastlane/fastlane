@@ -21,8 +21,14 @@ describe FastlaneCore do
     describe '#installed_wwdr_certificates' do
       it "should return installed certificate's OrganizationalUnit" do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
+
         allow(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate/).and_return("-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")
-        allow(FastlaneCore::Helper).to receive(:backticks).with(/openssl x509/).and_return("subject= /CN=Apple Worldwide Developer Relations Certification Authority/OU=G6/O=Apple Inc./C=US\n")
+
+        cert = OpenSSL::X509::Certificate.new
+        cert_subject = OpenSSL::X509::Name.parse('/CN=Apple Worldwide Developer Relations Certification Authority/OU=G6/O=Apple Inc./C=US')
+        allow(cert).to receive(:subject).and_return(cert_subject)
+        allow(OpenSSL::X509::Certificate).to receive(:new).and_return(cert)
+
         expect(FastlaneCore::CertChecker.installed_wwdr_certificates).to eq(['G6'])
       end
     end
