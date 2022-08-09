@@ -54,7 +54,8 @@ module Fastlane
         Open3.popen2e(*command) do |stdin, io, thread|
           io.sync = true
           io.each do |line|
-            UI.command_output(line.strip) if print_command_output
+            # make sure string that will be stripped has valid utf8, otherwise will replace with invalid character.
+            UI.command_output(line.encode('UTF-8', :invalid => :replace).strip) if print_command_output
             result << line
           end
           exit_status = thread.value
