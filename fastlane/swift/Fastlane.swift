@@ -661,7 +661,7 @@ public func appledoc(input: [String],
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
-   - syncScreenshots: Sync screenshots with local ones. This is currently beta optionso set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
+   - syncScreenshots: Sync screenshots with local ones. This is currently beta option so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
    - verifyOnly: Verifies archive with App Store Connect without uploading
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
@@ -3681,7 +3681,7 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
-   - syncScreenshots: Sync screenshots with local ones. This is currently beta optionso set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
+   - syncScreenshots: Sync screenshots with local ones. This is currently beta option so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
    - verifyOnly: Verifies archive with App Store Connect without uploading
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
@@ -7869,6 +7869,8 @@ public func podLibLint(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefau
    - verbose: Show more debugging information
    - useModularHeaders: Use modular headers option during validation
    - synchronous: If validation depends on other recently pushed pods, synchronize
+   - noOverwrite: Disallow pushing that would overwrite an existing spec
+   - localOnly: Does not perform the step of pushing REPO to its remote
  */
 public func podPush(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     path: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -7882,7 +7884,9 @@ public func podPush(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefault(
                     useJson: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     useModularHeaders: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                    synchronous: OptionalConfigValue<Bool?> = .fastlaneDefault(nil))
+                    synchronous: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                    noOverwrite: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                    localOnly: OptionalConfigValue<Bool?> = .fastlaneDefault(nil))
 {
     let useBundleExecArg = useBundleExec.asRubyArgument(name: "use_bundle_exec", type: nil)
     let pathArg = path.asRubyArgument(name: "path", type: nil)
@@ -7897,6 +7901,8 @@ public func podPush(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefault(
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let useModularHeadersArg = useModularHeaders.asRubyArgument(name: "use_modular_headers", type: nil)
     let synchronousArg = synchronous.asRubyArgument(name: "synchronous", type: nil)
+    let noOverwriteArg = noOverwrite.asRubyArgument(name: "no_overwrite", type: nil)
+    let localOnlyArg = localOnly.asRubyArgument(name: "local_only", type: nil)
     let array: [RubyCommand.Argument?] = [useBundleExecArg,
                                           pathArg,
                                           repoArg,
@@ -7909,7 +7915,9 @@ public func podPush(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefault(
                                           useJsonArg,
                                           verboseArg,
                                           useModularHeadersArg,
-                                          synchronousArg]
+                                          synchronousArg,
+                                          noOverwriteArg,
+                                          localOnlyArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -12256,7 +12264,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
-   - syncScreenshots: Sync screenshots with local ones. This is currently beta optionso set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
+   - syncScreenshots: Sync screenshots with local ones. This is currently beta option so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
    - verifyOnly: Verifies archive with App Store Connect without uploading
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
@@ -13478,4 +13486,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.160]
+// FastlaneRunnerAPIVersion [0.9.161]
