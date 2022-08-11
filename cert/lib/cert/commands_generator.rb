@@ -17,6 +17,12 @@ module Cert
       self.new.run
     end
 
+    def convert_options(options)
+      o = options.__hash__.dup
+      o.delete(:capture_output)
+      o
+    end
+
     def run
       program :name, 'cert'
       program :version, Fastlane::VERSION
@@ -27,6 +33,7 @@ module Cert
       program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
+      global_option('--capture_output') { FastlaneCore::Globals.capture_output = true }
       global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       command :create do |c|
@@ -36,7 +43,7 @@ module Cert
         FastlaneCore::CommanderGenerator.new.generate(Cert::Options.available_options, command: c)
 
         c.action do |args, options|
-          Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options.__hash__)
+          Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, convert_options(options))
           Cert::Runner.new.launch
         end
       end
@@ -48,7 +55,7 @@ module Cert
         FastlaneCore::CommanderGenerator.new.generate(Cert::Options.available_options, command: c)
 
         c.action do |args, options|
-          Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options.__hash__)
+          Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, convert_options(options))
           Cert::Runner.new.revoke_expired_certs!
         end
       end

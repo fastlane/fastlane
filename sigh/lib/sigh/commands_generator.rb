@@ -17,6 +17,12 @@ module Sigh
       self.new.run
     end
 
+    def convert_options(options)
+      o = options.__hash__.dup
+      o.delete(:capture_output)
+      o
+    end
+
     def run
       program :name, 'sigh'
       program :version, Fastlane::VERSION
@@ -27,6 +33,7 @@ module Sigh
       program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
+      global_option('--capture_output') { FastlaneCore::Globals.capture_output = true }
       global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       command :renew do |c|
@@ -36,7 +43,7 @@ module Sigh
         FastlaneCore::CommanderGenerator.new.generate(Sigh::Options.available_options, command: c)
 
         c.action do |args, options|
-          user_input = options.__hash__
+          user_input = convert_options(options)
 
           # The user might run sigh using
           #
