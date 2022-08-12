@@ -48,11 +48,13 @@ module Match
         google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
         google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
         google_cloud_project_id: params[:google_cloud_project_id].to_s,
+        skip_google_cloud_account_confirmation: params[:skip_google_cloud_account_confirmation],
         s3_region: params[:s3_region],
         s3_access_key: params[:s3_access_key],
         s3_secret_access_key: params[:s3_secret_access_key],
         s3_bucket: params[:s3_bucket],
         s3_object_prefix: params[:s3_object_prefix],
+        gitlab_project: params[:gitlab_project],
         readonly: params[:readonly],
         username: params[:readonly] ? nil : params[:username], # only pass username if not readonly
         team_id: params[:team_id],
@@ -285,7 +287,10 @@ module Match
         FileUtils.cp(profile, params[:output_path])
       end
 
-      if spaceship && !spaceship.profile_exists(username: params[:username], uuid: uuid, platform: params[:platform])
+      if spaceship && !spaceship.profile_exists(type: prov_type,
+                                                username: params[:username],
+                                                uuid: uuid,
+                                                platform: params[:platform])
         # This profile is invalid, let's remove the local file and generate a new one
         File.delete(profile)
         # This method will be called again, no need to modify `files_to_commit`
@@ -303,6 +308,12 @@ module Match
                                                                                type: prov_type,
                                                                            platform: params[:platform]),
                              parsed["TeamIdentifier"].first)
+
+      cert_info = Utils.get_cert_info(parsed["DeveloperCertificates"].first.string).to_h
+      Utils.fill_environment(Utils.environment_variable_name_certificate_name(app_identifier: app_identifier,
+                                                                                        type: prov_type,
+                                                                                    platform: params[:platform]),
+                             cert_info["Common Name"])
 
       Utils.fill_environment(Utils.environment_variable_name_profile_name(app_identifier: app_identifier,
                                                                                     type: prov_type,

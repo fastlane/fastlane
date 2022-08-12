@@ -2,7 +2,7 @@ describe Spaceship::Tunes::IAP do
   before { TunesStubbing.itc_stub_iap }
   before { Spaceship::Tunes.login }
   let(:client) { Spaceship::Tunes.client }
-  let(:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 
   describe "returns all purchases" do
     it "returns as IAPList" do

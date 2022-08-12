@@ -194,6 +194,11 @@ module Match
                                      env_name: "MATCH_GOOGLE_CLOUD_PROJECT_ID",
                                      description: "ID of the Google Cloud project to use for authentication",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :skip_google_cloud_account_confirmation,
+                                     env_name: "MATCH_SKIP_GOOGLE_CLOUD_ACCOUNT_CONFIRMATION",
+                                     description: "Skips confirming to use the system google account",
+                                     type: Boolean,
+                                     default_value: false),
 
         # Storage: S3
         FastlaneCore::ConfigItem.new(key: :s3_region,
@@ -216,6 +221,12 @@ module Match
         FastlaneCore::ConfigItem.new(key: :s3_object_prefix,
                                      env_name: "MATCH_S3_OBJECT_PREFIX",
                                      description: "Prefix to be used on all objects uploaded to S3",
+                                     optional: true),
+
+        # Storage: GitLab Secure Files
+        FastlaneCore::ConfigItem.new(key: :gitlab_project,
+                                     env_name: "MATCH_GITLAB_PROJECT",
+                                     description: "GitLab Project Path (i.e. 'gitlab-org/gitlab')",
                                      optional: true),
 
         # Keychain

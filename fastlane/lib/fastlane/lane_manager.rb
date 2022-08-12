@@ -108,7 +108,7 @@ module Fastlane
       puts(table)
 
       fastlane_command = Helper.bundler? ? "bundle exec fastlane" : "fastlane"
-      i = UI.input("Which number would you like run?")
+      i = UI.input("Which number would you like to run?")
 
       i = i.to_i - 1
       if i >= 0 && available[i]

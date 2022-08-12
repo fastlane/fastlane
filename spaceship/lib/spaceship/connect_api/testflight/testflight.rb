@@ -290,6 +290,28 @@ module Spaceship
           test_flight_request_client.post("bulkBetaTesterAssignments", body)
         end
 
+        # attributes - {email: "", firstName: "", lastName: ""}
+        def post_beta_tester_assignment(beta_group_ids: [], attributes: {})
+          body = {
+            data: {
+              attributes: attributes,
+              relationships: {
+                betaGroups: {
+                  data: beta_group_ids.map do |id|
+                    {
+                      type: "betaGroups",
+                      id: id
+                    }
+                  end
+                }
+              },
+              type: "betaTesters"
+            }
+          }
+
+          test_flight_request_client.post("betaTesters", body)
+        end
+
         def add_beta_tester_to_group(beta_group_id: nil, beta_tester_ids: nil)
           beta_tester_ids || []
           body = {
@@ -448,9 +470,9 @@ module Spaceship
         # buildDeliveries
         #
 
-        def get_build_deliveries(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_build_deliveries(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("buildDeliveries", params)
+          test_flight_request_client.get("apps/#{app_id}/buildDeliveries", params)
         end
 
         #

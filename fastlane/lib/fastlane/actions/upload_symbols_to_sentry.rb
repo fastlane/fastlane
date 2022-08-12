@@ -48,7 +48,7 @@ module Fastlane
           upload_dsym(resource, dsym)
         end
 
-        # Return uplaoded dSYM paths
+        # Return uploaded dSYM paths
         uploaded_paths
       end
 

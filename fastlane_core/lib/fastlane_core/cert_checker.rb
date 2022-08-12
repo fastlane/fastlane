@@ -22,7 +22,7 @@ module FastlaneCore
     end
 
     def self.installed_identies(in_keychain: nil)
-      install_wwdr_certificates unless wwdr_certificates_installed?
+      install_wwdr_certificate unless wwdr_certificate_installed?
 
       available = list_available_identities(in_keychain: in_keychain)
       # Match for this text against word boundaries to avoid edge cases around multiples of 10 identities!
@@ -81,20 +81,19 @@ module FastlaneCore
       `#{commands.join(' ')}`
     end
 
-    def self.wwdr_certificates_installed?
+    def self.wwdr_certificate_installed?
       certificate_name = "Apple Worldwide Developer Relations Certification Authority"
+      certificate_hash = "SHA-256 hash: BDD4ED6E74691F0C2BFD01BE0296197AF1379E0418E2D300EFA9C3BEF642CA30"
+
       keychain = wwdr_keychain
-      response = Helper.backticks("security find-certificate -a -c '#{certificate_name}' #{keychain.shellescape}", print: FastlaneCore::Globals.verbose?)
-      certs = response.split("keychain: \"#{keychain}\"").drop(1)
-      certs.count == 2
+      response = Helper.backticks("security find-certificate -a -c '#{certificate_name}' -Z #{keychain.shellescape} | grep ^SHA-256", print: FastlaneCore::Globals.verbose?)
+
+      certs = response.split("\n")
+      certs.include?(certificate_hash)
     end
 
-    def self.install_wwdr_certificates
-      install_wwdr_certificate('https://developer.apple.com/certificationauthority/AppleWWDRCA.cer')
-      install_wwdr_certificate('https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer')
-    end
-
-    def self.install_wwdr_certificate(url)
+    def self.install_wwdr_certificate
+      url = 'https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer'
       file = Tempfile.new(File.basename(url))
       filename = file.path
       keychain = wwdr_keychain
@@ -124,8 +123,8 @@ module FastlaneCore
 
     def self.wwdr_keychain
       priority = [
-        "security list-keychains -d user",
-        "security default-keychain -d user"
+        "security default-keychain -d user",
+        "security list-keychains -d user"
       ]
       priority.each do |command|
         keychains = Helper.backticks(command, print: FastlaneCore::Globals.verbose?).split("\n")

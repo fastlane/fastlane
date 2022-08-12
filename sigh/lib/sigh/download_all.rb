@@ -40,12 +40,26 @@ module Sigh
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT,
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT
         ]
+
+        # As of 2022-06-25, only available with Apple ID auth
+        if Spaceship::ConnectAPI.token
+          UI.important("Skipping #{Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE}... only available with Apple ID auth")
+        else
+          profile_types << Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE
+        end
       when 'catalyst'
         profile_types = [
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE,
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT,
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
         ]
+
+        # As of 2022-06-25, only available with Apple ID auth
+        if Spaceship::ConnectAPI.token
+          UI.important("Skipping #{Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE}... only available with Apple ID auth")
+        else
+          profile_types << Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE
+        end
       when 'tvos'
         profile_types = [
           Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_STORE,
@@ -55,8 +69,6 @@ module Sigh
         ]
       end
 
-      # Filtering on 'profileType' seems to be undocumented as of 2020-07-30
-      # but works on both web session and official API
       profiles = Spaceship::ConnectAPI::Profile.all(filter: { profileType: profile_types.join(",") }, includes: "bundleId")
       download_profiles(profiles)
     end

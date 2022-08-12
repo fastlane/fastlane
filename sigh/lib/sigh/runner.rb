@@ -82,10 +82,12 @@ module Sigh
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT if Sigh.config[:development]
       when "macos"
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE if Spaceship::ConnectAPI.client.in_house?
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT if Sigh.config[:development]
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT if Sigh.config[:developer_id]
       when "catalyst"
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
+        @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE if Spaceship::ConnectAPI.client.in_house?
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT if Sigh.config[:development]
         @profile_type = Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT if Sigh.config[:developer_id]
       end
@@ -251,7 +253,13 @@ module Sigh
           ]
         elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
           types = [
-            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION,
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2
+          ]
+        elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE
+          # Enterprise accounts don't have access to Apple Distribution certificates
+          types = [
+            Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DISTRIBUTION
           ]
         else
           types = [

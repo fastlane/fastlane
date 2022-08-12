@@ -134,7 +134,15 @@ module Spaceship
           tunes_request_client.post("apps", body)
         end
 
-        def patch_app(app_id: nil, attributes: {}, app_price_tier_id: nil, territory_ids: nil)
+        # Updates app attributes, price tier, visibility in regions or countries.
+        # Use territory_ids with allow_removing_from_sale to remove app from sale
+        # @param territory_ids updates app visibility in regions or countries.
+        #   Possible values:
+        #   empty array will remove app from sale if allow_removing_from_sale is true,
+        #   array with territory ids will set availability to territories with those ids,
+        #   nil will leave app availability on AppStore as is
+        # @param allow_removing_from_sale allows for removing app from sale when territory_ids is an empty array
+        def patch_app(app_id: nil, attributes: {}, app_price_tier_id: nil, territory_ids: nil, allow_removing_from_sale: false)
           relationships = {}
           included = []
 
@@ -173,13 +181,15 @@ module Spaceship
           end
 
           # Territories
-          territories_data = (territory_ids || []).map do |id|
-            { type: "territories", id: id }
-          end
-          unless territories_data.empty?
-            relationships[:availableTerritories] = {
-              data: territories_data
-            }
+          unless territory_ids.nil?
+            territories_data = territory_ids.map do |id|
+              { type: "territories", id: id }
+            end
+            if !territories_data.empty? || allow_removing_from_sale
+              relationships[:availableTerritories] = {
+                data: territories_data
+              }
+            end
           end
 
           # Data

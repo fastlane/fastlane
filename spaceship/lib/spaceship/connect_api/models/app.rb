@@ -101,10 +101,12 @@ module Spaceship
         return client.get_app(app_id: app_id, includes: includes).first
       end
 
-      def update(client: nil, attributes: nil, app_price_tier_id: nil, territory_ids: nil)
+      # Updates app attributes, price tier and availability of an app in territories
+      # Check Tunes patch_app method for explanation how to use territory_ids parameter with allow_removing_from_sale to remove app from sale
+      def update(client: nil, attributes: nil, app_price_tier_id: nil, territory_ids: nil, allow_removing_from_sale: false)
         client ||= Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
-        return client.patch_app(app_id: id, attributes: attributes, app_price_tier_id: app_price_tier_id, territory_ids: territory_ids)
+        return client.patch_app(app_id: id, attributes: attributes, app_price_tier_id: app_price_tier_id, territory_ids: territory_ids, allow_removing_from_sale: allow_removing_from_sale)
       end
 
       #
@@ -362,9 +364,8 @@ module Spaceship
       def get_build_deliveries(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         filter ||= {}
-        filter[:app] = id
 
-        resps = client.get_build_deliveries(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        resps = client.get_build_deliveries(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
 

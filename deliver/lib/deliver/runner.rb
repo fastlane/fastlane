@@ -46,6 +46,12 @@ module Deliver
     end
 
     def run
+      if options[:verify_only]
+        UI.important("Verify flag is set, only package validation will take place and no submission will be made")
+        verify_binary
+        return
+      end
+
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
 
       # Rejecting before upload meta
@@ -155,38 +161,73 @@ module Deliver
       UploadPriceTier.new.upload(options)
     end
 
+    # Verify the binary with App Store Connect
+    def verify_binary
+      UI.message("Verifying binary with App Store Connect")
+
+      ipa_path = options[:ipa]
+      pkg_path = options[:pkg]
+
+      platform = options[:platform]
+      transporter = transporter_for_selected_team
+
+      case platform
+      when "ios", "appletvos"
+        package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
+          app_id: Deliver.cache[:app].id,
+          ipa_path: ipa_path,
+          package_path: "/tmp",
+          platform: platform
+        )
+        result = transporter.verify(package_path: package_path)
+      when "osx"
+        package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
+          app_id: Deliver.cache[:app].id,
+          pkg_path: pkg_path,
+          package_path: "/tmp",
+          platform: platform
+        )
+        result = transporter.verify(package_path: package_path)
+      else
+        UI.user_error!("No suitable file found for verify for platform: #{options[:platform]}")
+      end
+
+      unless result
+        transporter_errors = transporter.displayable_errors
+        UI.user_error!("Error verifying the binary file: \n #{transporter_errors}")
+      end
+    end
+
     # Upload the binary to App Store Connect
     def upload_binary
       UI.message("Uploading binary to App Store Connect")
 
-      upload_ipa = options[:ipa]
-      upload_pkg = options[:pkg]
+      ipa_path = options[:ipa]
+      pkg_path = options[:pkg]
 
-      # 2020-01-27
-      # Only verify platform if if both ipa and pkg exists (for backwards support)
-      if upload_ipa && upload_pkg
-        upload_ipa = ["ios", "appletvos"].include?(options[:platform])
-        upload_pkg = options[:platform] == "osx"
-      end
+      platform = options[:platform]
+      transporter = transporter_for_selected_team
 
-      if upload_ipa
+      case platform
+      when "ios", "appletvos"
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
-          ipa_path: options[:ipa],
+          ipa_path: ipa_path,
           package_path: "/tmp",
-          platform: options[:platform]
+          platform: platform
         )
-      elsif upload_pkg
+        result = transporter.upload(package_path: package_path, asset_path: ipa_path)
+      when "osx"
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
-          pkg_path: options[:pkg],
+          pkg_path: pkg_path,
           package_path: "/tmp",
-          platform: options[:platform]
+          platform: platform
         )
+        result = transporter.upload(package_path: package_path, asset_path: pkg_path)
+      else
+        UI.user_error!("No suitable file found for upload for platform: #{options[:platform]}")
       end
-
-      transporter = transporter_for_selected_team
-      result = transporter.upload(package_path: package_path, asset_path: upload_ipa || upload_pkg)
 
       unless result
         transporter_errors = transporter.displayable_errors

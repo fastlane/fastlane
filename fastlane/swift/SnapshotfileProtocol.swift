@@ -53,7 +53,7 @@ public protocol SnapshotfileProtocol: AnyObject {
     /// Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception (Adjust 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable if override status bar is not working. Might be because simulator is not fully booted. Defaults to 10 seconds)
     var overrideStatusBar: Bool { get }
 
-    /// Fully customize the status bar by setting each option here. See `xcrun simctl status_bar --help`
+    /// Fully customize the status bar by setting each option here. Requires `override_status_bar` to be set to `true`. See `xcrun simctl status_bar --help`
     var overrideStatusBarArguments: String? { get }
 
     /// Enabling this option will configure the Simulator's system language
@@ -204,4 +204,4 @@ public extension SnapshotfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.94]
+// FastlaneRunnerAPIVersion [0.9.100]

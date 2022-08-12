@@ -9,6 +9,16 @@ describe Fastlane do
         end.to raise_error("Please pass a path to the `import_from_git` action")
       end
 
+      # (2.32.0)
+      # (2.32.0).win.1
+      # (3)
+      def git_version
+        output = `git --version`
+        m = output.match(/(?<version>\d+(?:\.\d+)*)/)
+        raise "Couldn't parse git version in '#{output}'" unless m
+        m['version']
+      end
+
       describe "with caching" do
         let(:caching_message) { "Eligible for caching" }
 
@@ -24,7 +34,11 @@ describe Fastlane do
           source_directory_path = Dir.mktmpdir("fl_spec_import_from_git_source")
 
           Dir.chdir(source_directory_path) do
-            `git init`
+            if Gem::Version.new(git_version) >= Gem::Version.new("2.28.0")
+              `git init -b master`
+            else
+              `git init`
+            end
             `git config user.email "you@example.com"`
             `git config user.name "Your Name"`
 

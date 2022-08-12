@@ -24,7 +24,9 @@ module Sigh
         Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC
         "AdHoc"
       when Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE,
-        Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
+        Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE,
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE,
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE
         "InHouse"
       when Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT,
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT

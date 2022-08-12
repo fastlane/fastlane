@@ -34,11 +34,13 @@ describe Sigh do
         },
         "macos" => {
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE => { in_house: false, options: { platform: "macos" } },
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE => { in_house: true, options: { platform: "macos" } },
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT => { in_house: false, options: { platform: "macos", development: true } },
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT => { in_house: false, options: { platform: "macos", developer_id: true } }
         },
         "catalyst" => {
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE => { in_house: false, options: { platform: "catalyst" } },
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE => { in_house: true, options: { platform: "catalyst" } },
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT => { in_house: false, options: { platform: "catalyst", development: true } },
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT => { in_house: false, options: { platform: "catalyst", developer_id: true } }
         }
@@ -193,9 +195,11 @@ describe Sigh do
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE => "AppStore",
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT => "Development",
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT => "Direct",
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE => "InHouse",
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE => "AppStore",
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT => "Development",
-        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT => "Direct"
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT => "Direct",
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE => "InHouse"
       }
 
       # Creates test for each profile type

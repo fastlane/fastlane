@@ -74,6 +74,9 @@ public protocol MatchfileProtocol: AnyObject {
     /// ID of the Google Cloud project to use for authentication
     var googleCloudProjectId: String? { get }
 
+    /// Skips confirming to use the system google account
+    var skipGoogleCloudAccountConfirmation: Bool { get }
+
     /// Name of the S3 region
     var s3Region: String? { get }
 
@@ -88,6 +91,9 @@ public protocol MatchfileProtocol: AnyObject {
 
     /// Prefix to be used on all objects uploaded to S3
     var s3ObjectPrefix: String? { get }
+
+    /// GitLab Project Path (i.e. 'gitlab-org/gitlab')
+    var gitlabProject: String? { get }
 
     /// Keychain the items should be imported to
     var keychainName: String { get }
@@ -169,11 +175,13 @@ public extension MatchfileProtocol {
     var googleCloudBucketName: String? { return nil }
     var googleCloudKeysFile: String? { return nil }
     var googleCloudProjectId: String? { return nil }
+    var skipGoogleCloudAccountConfirmation: Bool { return false }
     var s3Region: String? { return nil }
     var s3AccessKey: String? { return nil }
     var s3SecretAccessKey: String? { return nil }
     var s3Bucket: String? { return nil }
     var s3ObjectPrefix: String? { return nil }
+    var gitlabProject: String? { return nil }
     var keychainName: String { return "login.keychain" }
     var keychainPassword: String? { return nil }
     var force: Bool { return false }
@@ -196,4 +204,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.99]
+// FastlaneRunnerAPIVersion [0.9.105]
