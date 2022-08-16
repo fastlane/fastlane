@@ -39,6 +39,10 @@ open class LaneFile: NSObject, LaneFileProtocol {
     private static func trimLaneWithOptionsFromName(laneName: String) -> String {
         return String(laneName.prefix(laneName.count - 12))
     }
+    
+    open func beforeAll(with lane: String) {}
+    
+    open func afterAll(with lane: String) {}
 
     open func onError(currentLane: String, errorInfo _: String, errorClass _: String?, errorMessage _: String?) {
         LaneFile.onErrorCalled.insert(currentLane)
