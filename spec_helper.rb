@@ -37,6 +37,10 @@ end
 
 my_main = self
 RSpec.configure do |config|
+  unless ENV.key?("CI")
+    config.filter_run focus: true
+    config.run_all_when_everything_filtered = true
+  end
   config.before(:each) do |current_test|
     # We don't want to call the RubyGems API at any point
     # This was a request that was added with Ruby 2.4.0

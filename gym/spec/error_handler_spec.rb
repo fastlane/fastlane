@@ -11,7 +11,7 @@ describe Gym do
 %)
   end
 
-  describe Gym::ErrorHandler, requires_xcodebuild: true do
+  describe Gym::ErrorHandler, { requires_xcodebuild: true, focus: true } do
     before(:each) { Gym.config = @config }
 
     def mock_gym_path(content)
