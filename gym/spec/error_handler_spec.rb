@@ -11,7 +11,7 @@ describe Gym do
 %)
   end
 
-  describe Gym::ErrorHandler, { requires_xcodebuild: true, focus: true } do
+  describe Gym::ErrorHandler, requires_xcodebuild: true do
     before(:each) { Gym.config = @config }
 
     def mock_gym_path(content)
@@ -82,6 +82,35 @@ Code signing is required for product type 'Application' in SDK 'iOS 11.0'
       expect(UI).to receive(:error).with(/There seems to be a mismatch between/).never
       allow(UI).to receive(:error)
 
+      Gym::ErrorHandler.handle_build_error(@output)
+    end
+
+    it "does not print xcode path instructions if single xcode installation" do
+      mock_gym_path(@output)
+      allow(Dir).to receive(:glob).and_return(["/Applications/Xcode-13.4.1.app"])
+      allow(File).to receive(:symlink?).and_return(false)
+      expect(UI).to receive(:important).with("Maybe the error shown is caused by using the wrong version of Xcode").never
+      expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: @output)
+      Gym::ErrorHandler.handle_build_error(@output)
+    end
+
+    it "prints xcode path instructions if multiple xcode installations" do
+      mock_gym_path(@output)
+      allow(Dir).to receive(:glob).and_return(["/Applications/Xcode-13.4.1.app", "/Applications/Xcode-14-beta.app"])
+      allow(File).to receive(:symlink?).and_return(false)
+      expect(UI).to receive(:important).with("Maybe the error shown is caused by using the wrong version of Xcode").once
+      expect(UI).to receive(:important).exactly(6).times
+      expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: @output)
+      Gym::ErrorHandler.handle_build_error(@output)
+    end
+
+    it "ignores symlinks when checking for xcode installations" do
+      mock_gym_path(@output)
+      allow(Dir).to receive(:glob).and_return(["/Applications/Xcode-13.4.1.app", "/Applications/Xcode-14-beta.app"])
+      allow(File).to receive(:symlink?).with("/Applications/Xcode-13.4.1.app").and_return(false)
+      allow(File).to receive(:symlink?).with("/Applications/Xcode-14-beta.app").and_return(true)
+      expect(UI).to receive(:important).with("Maybe the error shown is caused by using the wrong version of Xcode").never
+      expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: @output)
       Gym::ErrorHandler.handle_build_error(@output)
     end
   end

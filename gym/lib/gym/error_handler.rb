@@ -202,7 +202,7 @@ module Gym
         xcode_path = File.expand_path("../..", FastlaneCore::Helper.xcode_path)
         default_xcode_path = "/Applications/"
 
-        xcode_installations_in_default_path = Dir[File.join(default_xcode_path, "Xcode*.app")].reject { |filepath| File.symlink?(filepath) }
+        xcode_installations_in_default_path = Dir.glob(File.join(default_xcode_path, "Xcode*.app")).reject { |filepath| File.symlink?(filepath) }
         return unless xcode_installations_in_default_path.count > 1
         UI.message("")
         UI.important("Maybe the error shown is caused by using the wrong version of Xcode")
