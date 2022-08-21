@@ -3,6 +3,40 @@ require 'openssl'
 
 require_relative 'helper'
 
+# WWDR Intermediate Certificates in https://www.apple.com/certificateauthority/
+WWDRCA_CERTIFICATES = [
+  {
+    alias: 'G1',
+    sha256: 'ce057691d730f89ca25e916f7335f4c8a15713dcd273a658c024023f8eb809c2',
+    url: 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
+  },
+  {
+    alias: 'G2',
+    sha256: '9ed4b3b88c6a339cf1387895bda9ca6ea31a6b5ce9edf7511845923b0c8ac94c',
+    url: 'https://www.apple.com/certificateauthority/AppleWWDRCAG2.cer'
+  },
+  {
+    alias: 'G3',
+    sha256: 'dcf21878c77f4198e4b4614f03d696d89c66c66008d4244e1b99161aac91601f',
+    url: 'https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer'
+  },
+  {
+    alias: 'G4',
+    sha256: 'ea4757885538dd8cb59ff4556f676087d83c85e70902c122e42c0808b5bce14c',
+    url: 'https://www.apple.com/certificateauthority/AppleWWDRCAG4.cer'
+  },
+  {
+    alias: 'G5',
+    sha256: '53fd008278e5a595fe1e908ae9c5e5675f26243264a5a6438c023e3ce2870760',
+    url: 'https://www.apple.com/certificateauthority/AppleWWDRCAG5.cer'
+  },
+  {
+    alias: 'G6',
+    sha256: 'bdd4ed6e74691f0c2bfd01be0296197af1379e0418e2d300efa9c3bef642ca30',
+    url: 'https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer'
+  }
+]
+
 module FastlaneCore
   # This class checks if a specific certificate is installed on the current mac
   class CertChecker
@@ -96,30 +130,26 @@ module FastlaneCore
         end
       end
 
-      # Get 'organisational unit' of the installed WWDRCA certificates
-      installed_certs.map do |pem|
-        OpenSSL::X509::Certificate.new(pem).subject.to_a.find { |part| part[0] == 'OU' }[1]
-      end
+      # Get the alias (see `WWDRCA_CERTIFICATES`) of the installed WWDRCA certificates
+      installed_certs
+        .map do |pem|
+          sha256 = Digest::SHA256.hexdigest(OpenSSL::X509::Certificate.new(pem).to_der)
+          WWDRCA_CERTIFICATES.find { |c| c[:sha256].casecmp?(sha256) }&.fetch(:alias)
+        end
+        .compact
     end
 
     def self.install_missing_wwdr_certificates
       # Install all Worldwide Developer Relations Intermediate Certificates listed here: https://www.apple.com/certificateauthority/
-      missing = ['Apple Worldwide Developer Relations', 'Apple Certification Authority', 'G3', 'G4', 'G5', 'G6'] - installed_wwdr_certificates
-      missing.each do |ou|
-        install_wwdr_certificate(ou)
+      missing = WWDRCA_CERTIFICATES.map { |c| c[:alias] } - installed_wwdr_certificates
+      missing.each do |cert_alias|
+        install_wwdr_certificate(cert_alias)
       end
       missing.count
     end
 
-    def self.install_wwdr_certificate(ou)
-      case ou
-      when 'Apple Worldwide Developer Relations' # G1
-        url = "https://developer.apple.com/certificationauthority/AppleWWDRCA.cer"
-      when 'Apple Certification Authority' # G2
-        url = "https://www.apple.com/certificateauthority/AppleWWDRCAG2.cer"
-      else
-        url = "https://www.apple.com/certificateauthority/AppleWWDRCA#{ou}.cer"
-      end
+    def self.install_wwdr_certificate(cert_alias)
+      url = WWDRCA_CERTIFICATES.find { |c| c[:alias] == cert_alias }.fetch(:url)
       file = Tempfile.new(File.basename(url))
       filename = file.path
       keychain = wwdr_keychain

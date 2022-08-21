@@ -2,7 +2,7 @@ describe FastlaneCore do
   describe FastlaneCore::CertChecker do
     describe '#installed_identies' do
       it 'should print an error when no local code signing identities are found' do
-        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['Apple Worldwide Developer Relations', 'Apple Certification Authority', 'G3', 'G4', 'G5', 'G6'])
+        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G1', 'G2', 'G3', 'G4', 'G5', 'G6'])
         allow(FastlaneCore::CertChecker).to receive(:list_available_identities).and_return("     0 valid identities found\n")
         expect(FastlaneCore::UI).to receive(:error).with(/There are no local code signing identities found/)
 
@@ -10,7 +10,7 @@ describe FastlaneCore do
       end
 
       it 'should not be fooled by 10 local code signing identities available' do
-        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['Apple Worldwide Developer Relations', 'Apple Certification Authority', 'G3', 'G4', 'G5', 'G6'])
+        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G1', 'G2', 'G3', 'G4', 'G5', 'G6'])
         allow(FastlaneCore::CertChecker).to receive(:list_available_identities).and_return("     10 valid identities found\n")
         expect(FastlaneCore::UI).not_to(receive(:error))
 
@@ -19,25 +19,35 @@ describe FastlaneCore do
     end
 
     describe '#installed_wwdr_certificates' do
-      it "should return installed certificate's OrganizationalUnit" do
+      it "should return installed certificate's alias" do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
 
         allow(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate/).and_return("-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")
 
         cert = OpenSSL::X509::Certificate.new
-        cert_subject = OpenSSL::X509::Name.parse('/CN=Apple Worldwide Developer Relations Certification Authority/OU=G6/O=Apple Inc./C=US')
-        allow(cert).to receive(:subject).and_return(cert_subject)
+        allow(Digest::SHA256).to receive(:hexdigest).with(cert.to_der).and_return('bdd4ed6e74691f0c2bfd01be0296197af1379e0418e2d300efa9c3bef642ca30')
         allow(OpenSSL::X509::Certificate).to receive(:new).and_return(cert)
 
         expect(FastlaneCore::CertChecker.installed_wwdr_certificates).to eq(['G6'])
+      end
+
+      it "should return an empty array if unknown WWDR certificates are found" do
+        expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
+
+        allow(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate/).and_return("-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")
+
+        cert = OpenSSL::X509::Certificate.new
+        allow(OpenSSL::X509::Certificate).to receive(:new).and_return(cert)
+
+        expect(FastlaneCore::CertChecker.installed_wwdr_certificates).to eq([])
       end
     end
 
     describe '#install_missing_wwdr_certificates' do
       it 'should install all official WWDR certificates' do
         allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return([])
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('Apple Worldwide Developer Relations')
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('Apple Certification Authority')
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G1')
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G2')
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G3')
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G4')
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G5')
@@ -46,8 +56,8 @@ describe FastlaneCore do
       end
 
       it 'should install the missing official WWDR certificate' do
-        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['Apple Certification Authority', 'G3', 'G4', 'G5'])
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('Apple Worldwide Developer Relations')
+        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5'])
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G1')
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G6')
         FastlaneCore::CertChecker.install_missing_wwdr_certificates
       end
@@ -56,10 +66,10 @@ describe FastlaneCore do
         allow(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
 
         expect(Open3).to receive(:capture3).with(include('https://developer.apple.com/certificationauthority/AppleWWDRCA.cer')).and_return("")
-        FastlaneCore::CertChecker.install_wwdr_certificate('Apple Worldwide Developer Relations')
+        FastlaneCore::CertChecker.install_wwdr_certificate('G1')
 
         expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG2.cer')).and_return("")
-        FastlaneCore::CertChecker.install_wwdr_certificate('Apple Certification Authority')
+        FastlaneCore::CertChecker.install_wwdr_certificate('G2')
 
         expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer')).and_return("")
         FastlaneCore::CertChecker.install_wwdr_certificate('G3')
@@ -98,7 +108,7 @@ describe FastlaneCore do
         expect(Open3).to receive(:capture3).with(cmd).and_return("")
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
-        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['Apple Worldwide Developer Relations', 'Apple Certification Authority', 'G3', 'G4', 'G5'])
+        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G1', 'G2', 'G3', 'G4', 'G5'])
         expect(FastlaneCore::CertChecker.install_missing_wwdr_certificates).to be(1)
       end
     end
