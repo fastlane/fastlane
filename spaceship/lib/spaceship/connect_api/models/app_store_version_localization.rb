@@ -44,7 +44,7 @@ module Spaceship
         resp = client.get_app_store_version_localization(app_store_version_localization_id: app_store_version_localization_id, filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       rescue
-        raise "An exception occured for language '#{@locale}'"
+        raise "An exception occurred for language '#{@locale}'"
       end
 
       def self.all(client: nil, app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
@@ -52,7 +52,7 @@ module Spaceship
         resp = client.get_app_store_version_localizations(app_store_version_id: app_store_version_id, filter: filter, includes: includes, limit: limit, sort: sort)
         return resp.to_models
       rescue
-        raise "An exception occured for language '#{@locale}'"
+        raise "An exception occurred for language '#{@locale}'"
       end
 
       def update(client: nil, attributes: nil)
@@ -60,14 +60,14 @@ module Spaceship
         attributes = reverse_attr_mapping(attributes)
         client.patch_app_store_version_localization(app_store_version_localization_id: id, attributes: attributes)
       rescue
-        raise "An exception occured for language '#{@locale}'"
+        raise "An exception occurred for language '#{@locale}'"
       end
 
       def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         client.delete_app_store_version_localization(app_store_version_localization_id: id)
       rescue
-        raise "An exception occured for language '#{@locale}'"
+        raise "An exception occurred for language '#{@locale}'"
       end
 
       #
@@ -80,7 +80,7 @@ module Spaceship
         filter["appStoreVersionLocalization"] = id
         return Spaceship::ConnectAPI::AppPreviewSet.all(client: client, filter: filter, includes: includes, limit: limit, sort: sort)
       rescue
-        raise "An exception occured for language '#{@locale}'"
+        raise "An exception occurred for language '#{@locale}'"
       end
 
       def create_app_preview_set(client: nil, attributes: nil)
@@ -88,7 +88,7 @@ module Spaceship
         resp = client.post_app_preview_set(app_store_version_localization_id: id, attributes: attributes)
         return resp.to_models.first
       rescue
-        raise "An exception occured for language '#{@locale}'"
+        raise "An exception occurred for language '#{@locale}'"
       end
 
       #
@@ -99,7 +99,7 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         return Spaceship::ConnectAPI::AppScreenshotSet.all(client: client, app_store_version_localization_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
       rescue
-        raise "An exception occured for language '#{@locale}'"
+        raise "An exception occurred for language '#{@locale}'"
       end
 
       def create_app_screenshot_set(client: nil, attributes: nil)
@@ -107,7 +107,7 @@ module Spaceship
         resp = client.post_app_screenshot_set(app_store_version_localization_id: id, attributes: attributes)
         return resp.to_models.first
       rescue
-        raise "An exception occured for language '#{@locale}'"
+        raise "An exception occurred for language '#{@locale}'"
       end
     end
   end
