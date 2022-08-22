@@ -87,6 +87,7 @@ jobs:
       _RUBY_VERSION: << parameters.ruby_version >>
       GITHUB_USER_NAME: $CI_RELEASE_GITHUB_USER
       GITHUB_API_TOKEN: $CI_RELEASE_GITHUB_API_TOKEN
+      FL_GITHUB_RELEASE_API_TOKEN: $CI_RELEASE_GITHUB_API_TOKEN
     shell: '/bin/bash --login -eo pipefail'
     steps:
       - *cache_restore_git
