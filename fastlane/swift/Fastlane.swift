@@ -3433,7 +3433,7 @@ public func createPullRequest(apiToken: OptionalConfigValue<String?> = .fastlane
                               draft: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                               labels: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                               milestone: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                              head: String = "master",
+                              head: String = "joshdholtz-ci-bump-on-tag-creation",
                               base: String = "master",
                               apiUrl: String = "https://api.github.com",
                               assignees: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -13486,4 +13486,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.162]
+// FastlaneRunnerAPIVersion [0.9.163]
