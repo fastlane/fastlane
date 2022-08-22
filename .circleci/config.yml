@@ -4,6 +4,11 @@ version: 2.1
 orbs:
     shellcheck: circleci/shellcheck@2.2.2 # brew install shellcheck stopped working so using this
 
+parameters:
+  new_version:
+    type: string
+    default: ''
+
 aliases:
   # common - cache
   - &cache_restore_git
