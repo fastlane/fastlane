@@ -7,7 +7,7 @@ orbs:
 parameters:
   new_version:
     type: string
-    default: ''
+    default: ""
 
 aliases:
   # common - cache
