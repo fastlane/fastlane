@@ -102,7 +102,7 @@ end
 
 desc "Increment the version number of this gem, after generating new Swift API"
 lane :bump do |options|
-  verify_env_variables
+  verify_env_variables(skip_rubygems: true)
 
   new_version = options[:new_version]
 
@@ -551,10 +551,12 @@ end
 
 desc "Ensure all the requirement environment variables are provided"
 desc "this way the deployment script will fail early (and often)"
-private_lane :verify_env_variables do
+private_lane :verify_env_variables do |options|
   ensure_env_vars(env_vars: ['GITHUB_USER_NAME', 'GITHUB_API_TOKEN'])
 
-  UI.user_error!("You're not logged in RubyGems. Log in using `gem push` if using RubyGems < 2.7.0 or `gem signin` if using RubyGems >=2.7.0") unless File.file?(File.expand_path("~/.gem/credentials"))
+  unless options[:skip_rubygems]
+    UI.user_error!("You're not logged in RubyGems. Log in using `gem push` if using RubyGems < 2.7.0 or `gem signin` if using RubyGems >=2.7.0") unless File.file?(File.expand_path("~/.gem/credentials"))
+  end
 end
 
 desc "Get the local version number per version.rb"
