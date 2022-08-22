@@ -61,7 +61,7 @@ aliases:
         bundle check || bundle install --jobs=4 --retry=3
 
 jobs:
-  tests_macos: &tests_macos_base
+  prepare_release: &tests_macos_base
     description: 'Prepare Release'
     macos:
       xcode: << parameters.xcode_version >>
