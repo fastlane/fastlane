@@ -62,6 +62,69 @@ aliases:
 
 jobs:
   tests_macos: &tests_macos_base
+    description: 'Prepare Release'
+    macos:
+      xcode: << parameters.xcode_version >>
+    parameters:
+      xcode_version:
+        type: string
+      ruby_version:
+        type: string
+      ruby_opt:
+        type: string
+        default: ''
+    environment:
+      CIRCLE_TEST_REPORTS: '~/test-reports'
+      LC_ALL: 'en_US.UTF-8'
+      LANG: 'en_US.UTF-8'
+      _RUBY_VERSION: << parameters.ruby_version >>
+    shell: '/bin/bash --login -eo pipefail'
+    steps:
+      - *cache_restore_git
+      - checkout
+      - *cache_save_git
+      - *cache_restore_bundler
+      - *set_ruby
+      - run:
+          name: debug | ruby version
+          command: |
+            ruby -v
+      - run:
+          name: Setup Build
+          command: |
+            mkdir -p ~/test-reports
+      - *bundle_install
+      - *cache_save_bundler
+      - run:
+          name: Check PR Metadata
+          command: bundle exec danger || echo "danger failed"
+      - *cache_restore_rubocop
+      - run:
+          name: bundle exec fastlane bump
+          command: |
+            bundle exec fastlane snapshot reset_simulators --force
+            RUBYOPT=<< parameters.ruby_opt >> bundle exec fastlane execute_tests
+      - *cache_save_rubocop
+      - run:
+          name: Check compatibility with Ruby 3.0
+          command: |
+            touch ~/test-reports/ruby_warnings.txt
+            ! cat ~/test-reports/ruby_warnings.txt | grep -E "warning:\s.*(deprecated).*$" && echo "No deprecation message found."
+            ! cat ~/test-reports/ruby_warnings.txt | grep -E "warning:\s.*(obsolete).*$" && echo "No obsolete message found."
+      - store_test_results:
+          path: ~/test-reports
+      - store_artifacts:
+          path: ~/test-reports/rspec
+          destination: test-reports
+      - store_artifacts:
+          path: ~/test-reports/ruby_warnings.txt
+          destination: ruby_warnings.txt
+      - run:
+          name: Post Test Results to GitHub
+          command: bundle exec danger || echo "danger failed"
+          when: always  # Run this even when tests fail
+
+  tests_macos: &tests_macos_base
     description: 'Execute tests on macOS with given Xcode and Ruby version'
     macos:
       xcode: << parameters.xcode_version >>
@@ -254,6 +317,14 @@ workflows:
   version: 2
   build:
     jobs:
+      - prepare_release:
+          name: 'Prepare Release'
+          xcode_version: '13.0.0'
+          ruby_version: '3.0'
+          ruby_opt: -W:deprecated
+          filters:
+              tags:
+                only: /^(\d+\.)?(\d+\.)?(\*|\d+)$/
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 11.7.0, Ruby 2.6)'
           xcode_version: '11.7.0'
