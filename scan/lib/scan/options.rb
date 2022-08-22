@@ -467,6 +467,11 @@ module Scan
                                      description: "Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack",
                                      optional: true,
                                      type: Array),
+        FastlaneCore::ConfigItem.new(key: :thread_timestamp,
+                                     env_name: "SCAN_SLACK_THREAD_TIMESTAMP",
+                                     description: "Timestamp of the message to reply",
+                                     is_string: true,
+                                     optional: true),
 
         # misc
         FastlaneCore::ConfigItem.new(key: :destination,
