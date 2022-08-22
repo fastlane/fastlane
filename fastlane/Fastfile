@@ -105,7 +105,7 @@ lane :bump do |options|
   verify_env_variables
 
   new_version = options[:new_version]
-  
+
   ensure_git_branch(branch: "master") if new_version.nil?
   ensure_git_status_clean
 
