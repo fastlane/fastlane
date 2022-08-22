@@ -329,6 +329,7 @@ workflows:
           xcode_version: '13.0.0'
           ruby_version: '3.0'
           ruby_opt: -W:deprecated
+          new_version: << pipeline.parameters.new_version >>
     when:
       and: 
         - not:
