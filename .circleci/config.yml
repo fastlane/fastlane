@@ -367,4 +367,4 @@ workflows:
           ruby_version: 'circleci/ruby:2.6'
     when:
       and: 
-        equal: ["", << pipeline.parameters.new_version >>]
+        - equal: ["", << pipeline.parameters.new_version >>]
