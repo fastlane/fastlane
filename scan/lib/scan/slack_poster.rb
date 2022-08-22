@@ -50,6 +50,7 @@ module Scan
         slack_url: Scan.config[:slack_url].to_s,
         success: results[:build_errors].to_i == 0 && results[:failures].to_i == 0,
         username: username,
+        thread_timestamp: Scan.config[:thread_timestamp],
         icon_url: icon_url,
         payload: {},
         default_payloads: Scan.config[:slack_default_payloads],
