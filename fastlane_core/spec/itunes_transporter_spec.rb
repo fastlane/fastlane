@@ -13,7 +13,7 @@ describe FastlaneCore do
     end
 
     def shell_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false)
-      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
+      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.my_app.ipa" : "-f /tmp/my.app.id.itmsp"
 
       escaped_password = password.shellescape
       unless FastlaneCore::Helper.windows?
@@ -94,7 +94,7 @@ describe FastlaneCore do
     end
 
     def java_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, classpath: true, use_asset_path: false)
-      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
+      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.my_app.ipa" : "-f /tmp/my.app.id.itmsp"
 
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
@@ -189,7 +189,7 @@ describe FastlaneCore do
     end
 
     def java_upload_command_9(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false)
-      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
+      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.my_app.ipa" : "-f /tmp/my.app.id.itmsp"
 
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
@@ -258,7 +258,7 @@ describe FastlaneCore do
     end
 
     def xcrun_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false)
-      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
+      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.my_app.ipa" : "-f /tmp/my.app.id.itmsp"
 
       [
         ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.nil?),
