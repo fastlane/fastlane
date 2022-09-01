@@ -57,7 +57,7 @@ module Fastlane
       end
 
       def self.return_value
-        'Outputs has of results with :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries'
+        'Outputs hash of results with the following keys: :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries'
       end
 
       def self.return_type

@@ -164,7 +164,7 @@ module Spaceship
         body = { "securityCode" => { "code" => code.to_s } }.to_json
 
         # User exited by entering `sms` and wants to choose phone number for SMS
-        if code == 'sms'
+        if code.casecmp?("sms")
           code_type = 'phone'
           body = request_two_factor_code_from_phone_choose(response.body["trustedPhoneNumbers"], code_length)
         end
