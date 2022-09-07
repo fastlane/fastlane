@@ -141,6 +141,13 @@ module FastlaneCore
           UI.success("iTunes Transporter successfully finished its job")
         end
       end
+
+      if !hide_output && line =~ OUTPUT_REGEX
+        # General logging for debug purposes
+        unless output_done
+          UI.verbose("[Transporter]: #{$1}")
+        end
+      end
     end
 
     def file_upload_option(source)
@@ -288,7 +295,7 @@ module FastlaneCore
         output_done = true
       end
 
-      if !hide_output && line =~ OUTPUT_REGEX
+      if !hide_output
         # General logging for debug purposes
         unless output_done
           UI.verbose("[altool]: #{$1}")
