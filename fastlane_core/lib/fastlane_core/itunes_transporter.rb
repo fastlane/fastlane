@@ -280,7 +280,6 @@ module FastlaneCore
       output_done = false
 
       if line =~ ERROR_REGEX
-        UI.message("catched #{$1}")
         @errors << $1
 
         # Check if it's a login error
@@ -295,7 +294,7 @@ module FastlaneCore
         output_done = true
       end
 
-      if !hide_output
+      unless hide_output
         # General logging for debug purposes
         unless output_done
           UI.verbose("[altool]: #{$1}")
