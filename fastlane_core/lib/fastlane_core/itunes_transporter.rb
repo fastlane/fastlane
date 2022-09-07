@@ -180,9 +180,137 @@ module FastlaneCore
     end
   end
 
+  # Generates commands and executes the altool.
+  class AltoolTransporterExecutor < TransporterExecutor
+    ERROR_REGEX = /.*\*\*\*\sError:\s+(.+)/
+
+    private_constant :ERROR_REGEX
+
+    def execute(command, hide_output)
+      if Helper.test?
+        yield(nil) if block_given?
+        return command
+      end
+
+      @errors = []
+      @warnings = []
+      @all_lines = []
+
+      if hide_output
+        # Show a one time message instead
+        UI.success("Waiting for App Store Connect transporter to be finished.")
+        UI.success("Application Loader progress... this might take a few minutes...")
+      end
+
+      begin
+        exit_status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
+          begin
+            command_stdout.each do |line|
+              @all_lines << line
+              parse_line(line, hide_output) # this is where the parsing happens
+            end
+          end
+        end
+      rescue => ex
+        # FastlanePty adds exit_status on to StandardError so every error will have a status code
+        exit_status = ex.exit_status
+        @errors << ex.to_s
+      end
+
+      unless exit_status.zero?
+        @errors << "The call to the altool completed with a non-zero exit status: #{exit_status}. This indicates a failure."
+      end
+
+      if @warnings.count > 0
+        UI.important(@warnings.join("\n"))
+      end
+
+      if @errors.count > 0 && @all_lines.count > 0
+        # Print out the last 18 lines, this is key for non-verbose mode
+        @all_lines.last(18).each do |line|
+          UI.important("[altool] #{line}")
+        end
+        UI.message("Application Loader output above ^")
+        UI.error(@errors.join("\n"))
+      end
+
+      yield(@all_lines) if block_given?
+      return exit_status.zero?
+    end
+
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil)
+      use_jwt = !jwt.to_s.empty?
+      [
+        "xcrun altool",
+        "--upload-app",
+        ("-u #{username.shellescape}" unless use_jwt),
+        ("-p #{password.shellescape}" unless use_jwt),
+        ("--appKey #{jwt}" if use_jwt),
+        "-t #{platform}",
+        file_upload_option(source),
+        additional_upload_parameters,
+        "-k 100000",
+      ].compact.join(' ')
+    end
+
+    def additional_upload_parameters
+      env_deliver_additional_params = ENV["DELIVER_ALTOOL_ADDITIONAL_UPLOAD_PARAMETERS"]
+      if env_deliver_additional_params.to_s.strip.empty?
+        return nil
+      end
+
+      return env_deliver_additional_params.to_s.strip
+    end
+
+    def file_upload_option(source)
+      return "-f #{source.shellescape}"
+    end
+
+    def handle_error(password)
+      UI.error("Could not download/upload from App Store Connect!")
+    end
+
+    def displayable_errors
+      @errors.map { |error| "[Application Loader Error Output]: #{error}" }.join("\n").gsub!(/"/, "")
+    end
+
+    private
+
+    def parse_line(line, hide_output)
+      output_done = false
+
+      re = Regexp.union(SKIP_ERRORS)
+      if line.match(re)
+        # Those lines will not be handled like errors or warnings
+
+      elsif line =~ ERROR_REGEX
+        UI.message("catched #{$1}")
+        @errors << $1
+
+        # Check if it's a login error
+        if $1.include?("Failed to get authorization for username")
+
+          unless Helper.test?
+            CredentialsManager::AccountManager.new(user: @user).invalid_credentials
+            UI.error("Please run this tool again to apply the new password")
+          end
+        end
+
+        output_done = true
+      end
+
+      if !hide_output && line =~ OUTPUT_REGEX
+        # General logging for debug purposes
+        unless output_done
+          UI.verbose("[altool]: #{$1}")
+        end
+      end
+    end
+  end
+
   # Generates commands and executes the iTMSTransporter through the shell script it provides by the same name
   class ShellScriptTransporterExecutor < TransporterExecutor
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil)
       use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
@@ -278,7 +406,7 @@ module FastlaneCore
   # Generates commands and executes the iTMSTransporter by invoking its Java app directly, to avoid the crazy parameter
   # escaping problems in its accompanying shell script.
   class JavaTransporterExecutor < TransporterExecutor
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil)
       use_jwt = !jwt.to_s.empty?
       if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
@@ -476,7 +604,7 @@ module FastlaneCore
     #                            see: https://github.com/fastlane/fastlane/issues/1524#issuecomment-196370628
     #                            for more information about how to use the iTMSTransporter to list your provider
     #                            short names
-    def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil)
+    def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil, upload: false)
       # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
       # we can't default to using the newer direct Java invocation strategy for those versions.
       use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.')
@@ -490,7 +618,14 @@ module FastlaneCore
 
       @jwt = jwt
 
-      @transporter_executor = use_shell_script ? ShellScriptTransporterExecutor.new : JavaTransporterExecutor.new
+      if !use_shell_script && upload && !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(14)
+        UI.verbose("Use altool as transporter.")
+        @transporter_executor = AltoolTransporterExecutor.new
+      else
+        UI.verbose("Use iTMSTransporter as transporter")
+        @transporter_executor = use_shell_script ? ShellScriptTransporterExecutor.new : JavaTransporterExecutor.new
+      end
+
       @provider_short_name = provider_short_name
     end
 
@@ -539,7 +674,7 @@ module FastlaneCore
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transferring
-    def upload(app_id = nil, dir = nil, package_path: nil, asset_path: nil)
+    def upload(app_id = nil, dir = nil, package_path: nil, asset_path: nil, platform: nil)
       raise "app_id and dir are required or package_path or asset_path is required" if (app_id.nil? || dir.nil?) && package_path.nil? && asset_path.nil?
 
       # Transport can upload .ipa, .dmg, and .pkg files directly with -assetFile
@@ -569,8 +704,8 @@ module FastlaneCore
       password_placeholder = @jwt.nil? ? 'YourPassword' : nil
       jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
 
-      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt)
-      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder))
+      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform)
+      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)

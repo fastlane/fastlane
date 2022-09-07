@@ -206,7 +206,7 @@ module Deliver
       pkg_path = options[:pkg]
 
       platform = options[:platform]
-      transporter = transporter_for_selected_team
+      transporter = transporter_for_selected_team(true)
 
       case platform
       when "ios", "appletvos"
@@ -216,7 +216,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.upload(package_path: package_path, asset_path: ipa_path)
+        result = transporter.upload(package_path: package_path, asset_path: ipa_path, platform: platform)
       when "osx"
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
@@ -224,7 +224,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.upload(package_path: package_path, asset_path: pkg_path)
+        result = transporter.upload(package_path: package_path, asset_path: pkg_pat, platform: "macos")
       else
         UI.user_error!("No suitable file found for upload for platform: #{options[:platform]}")
       end
@@ -270,17 +270,17 @@ module Deliver
     # If itc_provider was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
-    def transporter_for_selected_team
+    def transporter_for_selected_team(upload = false)
       # Use JWT auth
       api_token = Spaceship::ConnectAPI.token
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, upload: upload)
       end
 
       tunes_client = Spaceship::ConnectAPI.client.tunes_client
 
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], upload: upload)
       return generic_transporter unless options[:itc_provider].nil? && tunes_client.teams.count > 1
 
       begin
@@ -288,7 +288,7 @@ module Deliver
         name = team['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
-        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
+        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id, upload: upload)
       rescue => ex
         UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")
         return generic_transporter
