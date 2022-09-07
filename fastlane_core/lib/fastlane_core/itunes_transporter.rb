@@ -141,13 +141,6 @@ module FastlaneCore
           UI.success("iTunes Transporter successfully finished its job")
         end
       end
-
-      if !hide_output && line =~ OUTPUT_REGEX
-        # General logging for debug purposes
-        unless output_done
-          UI.verbose("[Transporter]: #{$1}")
-        end
-      end
     end
 
     def file_upload_option(source)
@@ -249,7 +242,7 @@ module FastlaneCore
         "-t #{platform}",
         file_upload_option(source),
         additional_upload_parameters,
-        "-k 100000",
+        "-k 100000"
       ].compact.join(' ')
     end
 
@@ -279,11 +272,7 @@ module FastlaneCore
     def parse_line(line, hide_output)
       output_done = false
 
-      re = Regexp.union(SKIP_ERRORS)
-      if line.match(re)
-        # Those lines will not be handled like errors or warnings
-
-      elsif line =~ ERROR_REGEX
+      if line =~ ERROR_REGEX
         UI.message("catched #{$1}")
         @errors << $1
 
