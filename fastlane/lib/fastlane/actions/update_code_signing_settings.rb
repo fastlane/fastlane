@@ -183,7 +183,7 @@ module Fastlane
           )',
           ' # more advanced manual code signing
           update_code_signing_settings(
-            use_automatic_signing: true,
+            use_automatic_signing: false,
             path: "demo-project/demo/demo.xcodeproj",
             team_id: "QABC123DEV",
             bundle_identifier: "com.demoapp.QABC123DEV",
