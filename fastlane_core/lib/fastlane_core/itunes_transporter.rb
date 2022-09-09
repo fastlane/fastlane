@@ -189,7 +189,7 @@ module FastlaneCore
     def execute(command, hide_output)
       if Helper.test?
         yield(nil) if block_given?
-        return command
+        command
       end
 
       @errors = []
@@ -235,7 +235,7 @@ module FastlaneCore
       end
 
       yield(@all_lines) if block_given?
-      return exit_status.zero?
+      exit_status.zero?
     end
 
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil)
