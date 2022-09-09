@@ -224,7 +224,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.upload(package_path: package_path, asset_path: pkg_pat, platform: "macos")
+        result = transporter.upload(package_path: package_path, asset_path: pkg_path, platform: platform)
       else
         UI.user_error!("No suitable file found for upload for platform: #{options[:platform]}")
       end

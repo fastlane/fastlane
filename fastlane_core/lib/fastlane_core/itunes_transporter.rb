@@ -246,7 +246,7 @@ module FastlaneCore
         ("-u #{username.shellescape}" unless use_jwt),
         ("-p #{password.shellescape}" unless use_jwt),
         ("--appKey #{jwt}" if use_jwt),
-        "-t #{platform}",
+        platform_option(platform),
         file_upload_option(source),
         additional_upload_parameters,
         "-k 100000"
@@ -262,10 +262,6 @@ module FastlaneCore
       return env_deliver_additional_params.to_s.strip
     end
 
-    def file_upload_option(source)
-      return "-f #{source.shellescape}"
-    end
-
     def handle_error(password)
       UI.error("Could not download/upload from App Store Connect!")
     end
@@ -275,6 +271,14 @@ module FastlaneCore
     end
 
     private
+
+    def file_upload_option(source)
+      "-f #{source.shellescape}"
+    end
+
+    def platform_option(platform)
+      "-t #{platform == "osx" ? "macox": platform}"
+    end
 
     def parse_line(line, hide_output)
       output_done = false
