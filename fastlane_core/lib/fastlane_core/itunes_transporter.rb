@@ -217,7 +217,7 @@ module FastlaneCore
         @errors << ex.to_s
       end
 
-        @errors << "The call to the altool completed with a non-zero exit status: #{exit_status}. This indicates a failure." unless exit_status.zero?
+      @errors << "The call to the altool completed with a non-zero exit status: #{exit_status}. This indicates a failure." unless exit_status.zero?
 
       UI.important(@warnings.join("\n")) unless @warnings.empty?
 
