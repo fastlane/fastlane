@@ -235,14 +235,15 @@ module FastlaneCore
     end
 
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+      use_api_key = !api_key.nil?
       [
-        ("API_PRIVATE_KEYS_DIR=#{api_key[:key_filepath]}" if api_key),
+        ("API_PRIVATE_KEYS_DIR=#{api_key[:key_filepath]}" if use_api_key),
         "xcrun altool",
         "--upload-app",
-        ("-u #{username.shellescape}" unless api_key),
-        ("-p #{password.shellescape}" unless api_key),
-        ("--apiKey #{api_key[:key_id]}" if api_key),
-        ("--apiIssuer #{api_key[:issuer_id]}" if api_key),
+        ("-u #{username.shellescape}" unless use_api_key),
+        ("-p #{password.shellescape}" unless use_api_key),
+        ("--apiKey #{api_key[:key_id]}" if use_api_key),
+        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
         platform_option(platform),
         file_upload_option(source),
         additional_upload_parameters,
@@ -690,8 +691,8 @@ module FastlaneCore
 
       password_placeholder = @jwt.nil? ? 'YourPassword' : nil
       jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
-      api_key_placeholder = nil unless @api_key.nil?
-      api_key_placeholder = { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_filepath: "YourKeyFilepath" } if @api_key.nil?
+      api_key_placeholder = nil unless !@api_key.nil?
+      api_key_placeholder = { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_filepath: "YourKeyFilepath" } if !@api_key.nil?
 
       command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, @api_key)
       UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_placeholder))
