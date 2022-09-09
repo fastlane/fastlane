@@ -234,14 +234,16 @@ module FastlaneCore
       exit_status.zero?
     end
 
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil)
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
       use_jwt = !jwt.to_s.empty?
       [
+        ("API_PRIVATE_KEYS_DIR=#{api_key[:key_filepath]}" if use_jwt && api_key),
         "xcrun altool",
         "--upload-app",
-        ("-u #{username.shellescape}" unless use_jwt),
-        ("-p #{password.shellescape}" unless use_jwt),
-        ("--appKey #{jwt}" if use_jwt),
+        ("-u #{username.shellescape}" unless api_key),
+        ("-p #{password.shellescape}" unless api_key),
+        ("--apiKey #{api_key[:key_id]}" if api_key),
+        ("--apiIssuer #{api_key[:issuer_id]}" if api_key),
         platform_option(platform),
         file_upload_option(source),
         additional_upload_parameters,
@@ -295,7 +297,7 @@ module FastlaneCore
 
   # Generates commands and executes the iTMSTransporter through the shell script it provides by the same name
   class ShellScriptTransporterExecutor < TransporterExecutor
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil)
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
       use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
@@ -391,7 +393,7 @@ module FastlaneCore
   # Generates commands and executes the iTMSTransporter by invoking its Java app directly, to avoid the crazy parameter
   # escaping problems in its accompanying shell script.
   class JavaTransporterExecutor < TransporterExecutor
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil)
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
       use_jwt = !jwt.to_s.empty?
       if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
@@ -589,7 +591,7 @@ module FastlaneCore
     #                            see: https://github.com/fastlane/fastlane/issues/1524#issuecomment-196370628
     #                            for more information about how to use the iTMSTransporter to list your provider
     #                            short names
-    def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil, upload: false)
+    def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil, upload: false, api_key: nil)
       # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
       # we can't default to using the newer direct Java invocation strategy for those versions.
       use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.')
@@ -602,6 +604,7 @@ module FastlaneCore
       end
 
       @jwt = jwt
+      @api_key = api_key
 
       if should_use_altool(upload, use_shell_script)
         UI.verbose("Use altool as transporter.")
@@ -688,9 +691,14 @@ module FastlaneCore
 
       password_placeholder = @jwt.nil? ? 'YourPassword' : nil
       jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
+      api_key_plaseholder = @api_key.nil? ? nil : {
+        key_id: "YourKeyID",
+        issuer_id: "YourIssuerID",
+        key_filepath: "YourKeyFilepath"
+      }
 
-      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform)
-      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform))
+      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, @api_key)
+      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_plaseholder))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
