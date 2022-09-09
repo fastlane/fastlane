@@ -47,7 +47,7 @@ module Pilot
       end
 
       transporter = transporter_for_selected_team(options)
-      result = transporter.upload(package_path: package_path, asset_path: asset_path, platform: platform == "osx" ? "macos" : platform)
+      result = transporter.upload(package_path: package_path, asset_path: asset_path, platform: platform)
 
       unless result
         transporter_errors = transporter.displayable_errors
