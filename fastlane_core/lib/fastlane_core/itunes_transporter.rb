@@ -237,7 +237,7 @@ module FastlaneCore
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
       use_jwt = !jwt.to_s.empty?
       [
-        ("API_PRIVATE_KEYS_DIR=#{api_key[:key_filepath]}" if use_jwt && api_key),
+        ("API_PRIVATE_KEYS_DIR=#{api_key[:key_filepath]}" if api_key),
         "xcrun altool",
         "--upload-app",
         ("-u #{username.shellescape}" unless api_key),
