@@ -606,7 +606,7 @@ module FastlaneCore
       @jwt = jwt
       @api_key = api_key
 
-      if should_use_altool(upload, use_shell_script)
+      if should_use_altool?(upload, use_shell_script)
         UI.verbose("Use altool as transporter.")
         @transporter_executor = AltoolTransporterExecutor.new
       else
@@ -786,7 +786,7 @@ module FastlaneCore
     TWO_FACTOR_ENV_VARIABLE = "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"
 
     # Returns whether altool should be used or ItunesTransporter should be used
-    def should_use_altool(upload, use_shell_script)
+    def should_use_altool?(upload, use_shell_script)
       # Xcode 14 no longer supports iTMSTransporter. Use altool instead
       !use_shell_script && upload && !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(14)
     end
