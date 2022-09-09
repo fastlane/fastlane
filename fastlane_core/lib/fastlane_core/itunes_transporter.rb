@@ -182,7 +182,7 @@ module FastlaneCore
 
   # Generates commands and executes the altool.
   class AltoolTransporterExecutor < TransporterExecutor
-    ERROR_REGEX = /.*\*\*\*\sError:\s+(.+)/
+    ERROR_REGEX = /\sNSLocalizedFailureReason\s=\s"+(.+)"/
 
     private_constant :ERROR_REGEX
 
@@ -263,7 +263,7 @@ module FastlaneCore
     end
 
     def displayable_errors
-      @errors.map { |error| "[Application Loader Error Output]: #{error}" }.join("\n").gsub!(/"/, "")
+      @errors.map { |error| "[Application Loader Error Output]: #{error}" }.join("\n")
     end
 
     private
@@ -281,16 +281,6 @@ module FastlaneCore
 
       if line =~ ERROR_REGEX
         @errors << $1
-
-        # Check if it's a login error
-        if $1.include?("Failed to get authorization for username")
-
-          unless Helper.test?
-            CredentialsManager::AccountManager.new(user: @user).invalid_credentials
-            UI.error("Please run this tool again to apply the new password")
-          end
-        end
-
         output_done = true
       end
 
