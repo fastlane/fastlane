@@ -690,11 +690,11 @@ module FastlaneCore
 
       password_placeholder = @jwt.nil? ? 'YourPassword' : nil
       jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
-      api_key_plaseholder = nil unless @api_key.nil?
-      api_key_plaseholder = { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_filepath: "YourKeyFilepath" } if @api_key.nil?
+      api_key_placeholder = nil unless @api_key.nil?
+      api_key_placeholder = { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_filepath: "YourKeyFilepath" } if @api_key.nil?
 
       command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, @api_key)
-      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_plaseholder))
+      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_placeholder))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
