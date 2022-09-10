@@ -275,7 +275,7 @@ module FastlaneCore
     end
 
     def platform_option(platform)
-      "-t #{platform == 'osx' ? 'macox' : platform}"
+      "-t #{platform == 'osx' ? 'macos' : platform}"
     end
 
     def parse_line(line, hide_output)
