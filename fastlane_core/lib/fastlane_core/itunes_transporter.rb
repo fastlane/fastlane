@@ -204,11 +204,9 @@ module FastlaneCore
 
       begin
         exit_status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
-          begin
-            command_stdout.each do |line|
-              @all_lines << line
-              parse_line(line, hide_output) # this is where the parsing happens
-            end
+          command_stdout.each do |line|
+            @all_lines << line
+            parse_line(line, hide_output) # this is where the parsing happens
           end
         end
       rescue => ex
