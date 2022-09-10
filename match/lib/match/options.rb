@@ -4,6 +4,7 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Match
+  # rubocop:disable Metrics/ClassLength
   class Options
     # This is match specific, as users can append storage specific options
     def self.append_option(option)
@@ -374,4 +375,5 @@ module Match
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

@@ -13,7 +13,7 @@ module Match
     PROFILE_NAME_KEY = "PROVISIONING_PROFILE_SPECIFIER"
 
     def self.update_signing(app_identifier, profile_name, team_id, certificate_name)
-      get_all_xcodeprojs.each do |project|
+      all_xcode_projects.each do |project|
         should_save = false
         project.targets.each do |target|
           target.build_configurations.each do |config|
@@ -72,7 +72,7 @@ module Match
       return plist_data[BUNDLE_ID_KEY]
     end
 
-    def self.get_all_xcodeprojs
+    def self.all_xcode_projects
       project = Match.project
       if project.workspace?
         workspace = project.workspace
