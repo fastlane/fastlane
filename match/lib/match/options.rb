@@ -332,7 +332,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      env_name: "MATCH_WORKSPACE",
                                      optional: true,
-                                     description: "Path to the workspace file",
+                                     description: "Path to the workspace file that you would like match to update (see update_xcode_targets)",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Workspace file not found at path '#{v}'") unless File.exist?(v)
@@ -346,7 +346,7 @@ module Match
         FastlaneCore::ConfigItem.new(key: :project,
                                      optional: true,
                                      env_name: "MATCH_PROJECT",
-                                     description: "Path to the project file",
+                                     description: "Path to the project file that you would like match to update (see update_xcode_targets)",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Project file not found at path '#{v}'") unless File.exist?(v)
