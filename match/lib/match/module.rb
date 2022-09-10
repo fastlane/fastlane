@@ -82,4 +82,8 @@ module Match
       raise "Unknown provisioning type '#{prov_type}'"
     end
   end
+
+  class << self
+    attr_accessor :project
+  end
 end
