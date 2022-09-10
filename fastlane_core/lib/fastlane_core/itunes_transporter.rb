@@ -217,10 +217,10 @@ module FastlaneCore
       @errors << "The call to the altool completed with a non-zero exit status: #{exit_status}. This indicates a failure." unless exit_status.zero?
 
       unless @errors.empty? || @all_lines.empty?
-        # Print out the last lines until shows error
+        # Print the last lines that appear after the last error from the logs
         # If error text is not detected, it will be 20 lines
         # This is key for non-verbose mode
-        error_line_index = @all_lines.each_index.select { |i| ERROR_REGEX.match?(@all_lines[i]) }.last
+        error_line_index = @all_lines.rindex { |line| ERROR_REGEX.match?(line) }
         @all_lines.last(error_line_index.nil? ? 20 : (@all_lines.length - error_line_index + 1)).each do |line|
           UI.important("[altool] #{line}")
         end
