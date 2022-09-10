@@ -219,7 +219,7 @@ module FastlaneCore
 
       UI.important(@warnings.join("\n")) unless @warnings.empty?
 
-      if @errors.count > 0 && @all_lines.count > 0
+      unless @errors.empty? || @all_lines.empty?
         # Print out the last 18 lines, this is key for non-verbose mode
         @all_lines.last(18).each do |line|
           UI.important("[altool] #{line}")
