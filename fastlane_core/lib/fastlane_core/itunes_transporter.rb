@@ -607,10 +607,10 @@ module FastlaneCore
       @api_key = api_key
 
       if should_use_altool?(upload, use_shell_script)
-        UI.verbose("Use altool as transporter.")
+        UI.verbose("Using altool as transporter.")
         @transporter_executor = AltoolTransporterExecutor.new
       else
-        UI.verbose("Use iTMSTransporter as transporter")
+        UI.verbose("Using iTMSTransporter as transporter.")
         @transporter_executor = use_shell_script ? ShellScriptTransporterExecutor.new : JavaTransporterExecutor.new
       end
 
