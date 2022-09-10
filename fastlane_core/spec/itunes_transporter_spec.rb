@@ -1110,6 +1110,7 @@ describe FastlaneCore do
     describe "with `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` set" do
       before(:each) do
         ENV["FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT"] = "1"
+        allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
         allow(File).to receive(:exist?).with("C:/Program Files (x86)/itms").and_return(true) if FastlaneCore::Helper.windows?
       end
 
@@ -1139,6 +1140,7 @@ describe FastlaneCore do
 
     describe "with no special configuration" do
       before(:each) do
+        allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
         allow(File).to receive(:exist?).and_return(true) unless FastlaneCore::Helper.mac?
         ENV.delete("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT")
       end
@@ -1273,6 +1275,7 @@ describe FastlaneCore do
     describe "with simulated no-test environment" do
       before(:each) do
         allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
         @transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
       end
 
