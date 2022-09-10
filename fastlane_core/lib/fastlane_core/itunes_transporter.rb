@@ -182,7 +182,7 @@ module FastlaneCore
 
   # Generates commands and executes the altool.
   class AltoolTransporterExecutor < TransporterExecutor
-    ERROR_REGEX = /\sNSLocalizedFailureReason\s=\s"+(.+)"/
+    ERROR_REGEX = /\*\*\* Error:\s+(.+)/
 
     private_constant :ERROR_REGEX
 
@@ -217,8 +217,11 @@ module FastlaneCore
       @errors << "The call to the altool completed with a non-zero exit status: #{exit_status}. This indicates a failure." unless exit_status.zero?
 
       unless @errors.empty? || @all_lines.empty?
-        # Print out the last 18 lines, this is key for non-verbose mode
-        @all_lines.last(18).each do |line|
+        # Print out the last lines until shows error
+        # If error text is not detected, it will be 20 lines
+        # This is key for non-verbose mode
+        error_line_index = @all_lines.each_index.select { |i| ERROR_REGEX.match?(@all_lines[i]) }.last
+        @all_lines.last(error_line_index.nil? ? 20 : (@all_lines.length - error_line_index + 1)).each do |line|
           UI.important("[altool] #{line}")
         end
         UI.message("Application Loader output above ^")
@@ -284,7 +287,7 @@ module FastlaneCore
       unless hide_output
         # General logging for debug purposes
         unless output_done
-          UI.verbose("[altool]: #{$1}")
+          UI.verbose("[altool]: #{line}")
         end
       end
     end
