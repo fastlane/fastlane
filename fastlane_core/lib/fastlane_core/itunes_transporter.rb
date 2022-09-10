@@ -701,7 +701,8 @@ module FastlaneCore
         # Specified p8 needs to be generated to call altool
         tmp_p8_file_path = File.join(Dir.tmpdir, "AuthKey_#{@api_key[:key_id]}.p8")
         p8 = File.open(tmp_p8_file_path, "w")
-        p8.write(@api_key[:key])
+        key_content = @api_key[:is_key_content_base64] ? Base64.decode64(@api_key[:key]) : @api_key[:key]
+        p8.write(key_content)
         p8.close
       end
 
