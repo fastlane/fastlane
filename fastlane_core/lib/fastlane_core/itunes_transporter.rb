@@ -193,7 +193,6 @@ module FastlaneCore
       end
 
       @errors = []
-      @warnings = []
       @all_lines = []
 
       if hide_output
@@ -216,8 +215,6 @@ module FastlaneCore
       end
 
       @errors << "The call to the altool completed with a non-zero exit status: #{exit_status}. This indicates a failure." unless exit_status.zero?
-
-      UI.important(@warnings.join("\n")) unless @warnings.empty?
 
       unless @errors.empty? || @all_lines.empty?
         # Print out the last 18 lines, this is key for non-verbose mode
