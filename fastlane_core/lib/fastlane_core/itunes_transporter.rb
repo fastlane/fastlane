@@ -225,7 +225,7 @@ module FastlaneCore
           UI.important("[altool] #{line}")
         end
         UI.message("Application Loader output above ^")
-        UI.error(@errors.join("\n"))
+        @errors.each { |error| UI.error(error) }
       end
 
       yield(@all_lines) if block_given?
