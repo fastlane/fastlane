@@ -255,7 +255,7 @@ module FastlaneCore
         return nil
       end
 
-      return env_deliver_additional_params.to_s.strip
+      env_deliver_additional_params.to_s.strip
     end
 
     def handle_error(password)
