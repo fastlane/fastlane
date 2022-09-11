@@ -221,7 +221,7 @@ module FastlaneCore
         # If error text is not detected, it will be 20 lines
         # This is key for non-verbose mode
         error_line_index = @all_lines.rindex { |line| ERROR_REGEX.match?(line) }
-        @all_lines.last(error_line_index.nil? ? 20 : (@all_lines.length - error_line_index + 1)).each do |line|
+        @all_lines[(error_line_index || -20)..-1].each do |line|
           UI.important("[altool] #{line}")
         end
         UI.message("Application Loader output above ^")
