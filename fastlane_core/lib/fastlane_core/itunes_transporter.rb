@@ -189,7 +189,7 @@ module FastlaneCore
     def execute(command, hide_output)
       if Helper.test?
         yield(nil) if block_given?
-        command
+        return command
       end
 
       @errors = []
