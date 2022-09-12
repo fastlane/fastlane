@@ -1172,7 +1172,7 @@ describe FastlaneCore do
           describe "upload command generation" do
             it 'generates a call to altool' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true, api_key: api_key)
-              expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_upload_command(api_key: api_key))}")              
+              expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_upload_command(api_key: api_key))}")
               expect(transporter.upload('my.app.id', '/tmp', platform: "osx")).to match(expected)
             end
           end
