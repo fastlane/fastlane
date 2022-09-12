@@ -232,10 +232,10 @@ module FastlaneCore
       exit_status.zero?
     end
 
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil, p8_dir = nil)
       use_api_key = !api_key.nil?
       [
-        ("API_PRIVATE_KEYS_DIR=#{Dir.tmpdir}" if use_api_key),
+        ("API_PRIVATE_KEYS_DIR=#{p8_dir}" if use_api_key),
         "xcrun altool",
         "--upload-app",
         ("-u #{username.shellescape}" unless use_api_key),
@@ -295,7 +295,7 @@ module FastlaneCore
 
   # Generates commands and executes the iTMSTransporter through the shell script it provides by the same name
   class ShellScriptTransporterExecutor < TransporterExecutor
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil, p8_dir = nil)
       use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
@@ -391,7 +391,7 @@ module FastlaneCore
   # Generates commands and executes the iTMSTransporter by invoking its Java app directly, to avoid the crazy parameter
   # escaping problems in its accompanying shell script.
   class JavaTransporterExecutor < TransporterExecutor
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil, p8_dir = nil)
       use_jwt = !jwt.to_s.empty?
       if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
@@ -692,20 +692,20 @@ module FastlaneCore
 
       # Handle AppStore Connect API
       use_api_key = !@api_key.nil?
-      api_key_placeholder = nil unless use_api_key
-      api_key_placeholder = { key_id: "YourKeyID", issuer_id: "YourIssuerID" } if use_api_key
+      api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID" } : nil
 
+      tmp_p8_dir_path = nil
       if use_api_key
+        tmp_p8_dir_path = Dir.mktmpdir("deliver-")
         # Specified p8 needs to be generated to call altool
-        tmp_p8_file_path = File.join(Dir.tmpdir, "AuthKey_#{@api_key[:key_id]}.p8")
-        File.open(tmp_p8_file_path, "w") do |p8|
+        File.open(File.join(tmp_p8_dir_path, "AuthKey_#{@api_key[:key_id]}.p8"), "w") do |p8|
           key_content = @api_key[:is_key_content_base64] ? Base64.decode64(@api_key[:key]) : @api_key[:key]
           p8.write(key_content)
         end
       end
 
-      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, @api_key)
-      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_placeholder))
+      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, @api_key, tmp_p8_dir_path)
+      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_placeholder, tmp_p8_dir_path))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
@@ -714,8 +714,7 @@ module FastlaneCore
         return upload(app_id, dir, package_path: package_path, asset_path: asset_path)
       ensure
         if use_api_key
-          tmp_p8_file_path = File.join(Dir.tmpdir, "AuthKey_#{@api_key[:key_id]}.p8")
-          FileUtils.rm_f(tmp_p8_file_path)
+          FileUtils.rm_rf(tmp_p8_dir_path) unless tmp_p8_dir_path.nil?
         end
       end
 
