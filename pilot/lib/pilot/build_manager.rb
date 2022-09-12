@@ -129,7 +129,7 @@ module Pilot
         return_when_build_appears: return_when_build_appears,
         return_spaceship_testflight_build: false,
         select_latest: config[:distribute_only],
-        wait_for_build_beta_detail_processing: true
+        wait_for_build_beta_detail_processing: platform != "ios"
       )
 
       unless latest_build.app_version == app_version && latest_build.version == app_build
