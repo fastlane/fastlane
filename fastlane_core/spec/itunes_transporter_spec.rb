@@ -5,6 +5,7 @@ describe FastlaneCore do
   let(:password) { "!> p@$s_-+=w'o%rd\"&#*<" }
   let(:email) { 'fabric.devtools@gmail.com' }
   let(:jwt) { '409jjl43j90ghjqoineio49024' }
+  let(:api_key) { { key_id: "TESTAPIK2HW", issuer_id: "11223344-1122-aabb-aabb-uuvvwwxxyyzz" } }
 
   describe FastlaneCore::ItunesTransporter do
     let(:random_uuid) { '2a912f38-5dbc-4fc3-a5b3-1bf184b2b021' }
@@ -1152,7 +1153,7 @@ describe FastlaneCore do
             stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/tmp' })
           end
           describe "upload command generation" do
-            it 'generates a call to altool' do
+            it 'generates a call to xcrun iTMSTransporter instead altool' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
               expect(transporter.upload('my.app.id', '/tmp', platform: "osx")).to eq(java_upload_command(provider_short_name: 'abcd123', classpath: false))
             end
@@ -1168,8 +1169,7 @@ describe FastlaneCore do
             allow(FastlaneCore::Helper).to receive(:itms_path).and_return(nil)
             stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
           end
-          describe "upload command generation" do            
-            api_key = { key_id: "TESTAPIK2HW", issuer_id: "11223344-1122-aabb-aabb-uuvvwwxxyyzz" }
+          describe "upload command generation" do
             it 'generates a call to altool' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true, api_key: api_key)
               expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_upload_command(api_key: api_key))}")              
