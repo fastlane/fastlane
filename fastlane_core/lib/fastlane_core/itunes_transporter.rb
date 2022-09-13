@@ -220,7 +220,17 @@ module FastlaneCore
         # Print the last lines that appear after the last error from the logs
         # If error text is not detected, it will be 20 lines
         # This is key for non-verbose mode
+
+        # The format of altool's result with error is like below
+        # > *** Error: Error uploading '...'.
+        # > *** Error: ...
+        # > {
+        # >     NSLocalizedDescription = "...",
+        # >     ...
+        # > }
+        # So this line tries to find the line which has "*** Error:" prefix from bottom of log
         error_line_index = @all_lines.rindex { |line| ERROR_REGEX.match?(line) }
+
         @all_lines[(error_line_index || -20)..-1].each do |line|
           UI.important("[altool] #{line}")
         end
