@@ -261,9 +261,7 @@ module FastlaneCore
 
     def additional_upload_parameters
       env_deliver_additional_params = ENV["DELIVER_ALTOOL_ADDITIONAL_UPLOAD_PARAMETERS"]
-      if env_deliver_additional_params.to_s.strip.empty?
-        return nil
-      end
+      return nil if env_deliver_additional_params.to_s.strip.empty?
 
       env_deliver_additional_params.to_s.strip
     end
