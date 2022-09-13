@@ -389,9 +389,14 @@ module Pilot
     def transporter_for_selected_team(options)
       # Use JWT auth
       api_token = Spaceship::ConnectAPI.token
-      api_key = options[:api_key]
-      # Load api key info if user set api_key_path, not api_key
-      api_key = { key_id: api_token.key_id, issuer_id: api_token.issuer_id, key: api_token.key_raw, is_key_content_base64: api_token.is_key_content_base64 } if api_key.nil? && !options[:api_key_path].nil?
+      api_key = if options[:api_key].nil? && !options[:api_key_path].nil?
+          # Load api key info if user set api_key_path, not api_key
+          { key_id: api_token.key_id, issuer_id: api_token.issuer_id, key: api_token.key_raw, is_key_content_base64: api_token.is_key_content_base64 }
+        elsif !options[:api_key].nil?
+          options[:api_key]
+        else
+          nil
+        end
 
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
