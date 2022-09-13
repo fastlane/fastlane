@@ -1126,20 +1126,20 @@ describe FastlaneCore do
       end
     end
 
-    describe "with Xcode 14.x installed" do
+    context "with Xcode 14.x installed" do
       before(:each) do
         allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('14.0')
         allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
         allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
       end
 
-      describe "with username and password" do
-        describe "with default itms_path" do
+      context "with username and password" do
+        context "with default itms_path" do
           before(:each) do
             allow(FastlaneCore::Helper).to receive(:itms_path).and_return(nil)
             stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
           end
-          describe "upload command generation" do
+          context "upload command generation" do
             it 'generates a call to altool' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
               expect(transporter.upload('my.app.id', '/tmp', package_path: '/tmp/my.app.id.itmsp', platform: "osx")).to eq(altool_upload_command)
@@ -1147,12 +1147,12 @@ describe FastlaneCore do
           end
         end
 
-        describe "with user defined itms_path" do
+        context "with user defined itms_path" do
           before(:each) do
             allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
             stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/tmp' })
           end
-          describe "upload command generation" do
+          context "upload command generation" do
             it 'generates a call to xcrun iTMSTransporter instead altool' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
               expect(transporter.upload('my.app.id', '/tmp', platform: "osx")).to eq(java_upload_command(provider_short_name: 'abcd123', classpath: false))
@@ -1163,13 +1163,13 @@ describe FastlaneCore do
         after(:each) { ENV.delete("FASTLANE_ITUNES_TRANSPORTER_PATH") }
       end
 
-      describe "with api_key" do
-        describe "with default itms_path" do
+      context "with api_key" do
+        context "with default itms_path" do
           before(:each) do
             allow(FastlaneCore::Helper).to receive(:itms_path).and_return(nil)
             stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
           end
-          describe "upload command generation" do
+          context "upload command generation" do
             it 'generates a call to altool' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true, api_key: api_key)
               expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_upload_command(api_key: api_key))}")
