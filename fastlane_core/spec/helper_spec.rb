@@ -183,7 +183,7 @@ describe FastlaneCore do
 
           if FastlaneCore::Helper.xcode_at_least?("14")
             expect(FastlaneCore::UI).to receive(:user_error!).with(/Could not find transporter/)
-            FastlaneCore::Helper.itms_path
+            expect { FastlaneCore::Helper.itms_path }.not_to raise_error
           else
             expect(FastlaneCore::Helper.itms_path).to match(/itms/)
           end
