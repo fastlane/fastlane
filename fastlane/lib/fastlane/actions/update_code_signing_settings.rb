@@ -36,9 +36,9 @@ module Fastlane
             end
 
             style_value = params[:use_automatic_signing] ? 'Automatic' : 'Manual'
-            development_team_setting = params[:sdk] ? "\"DEVELOPMENT_TEAM[sdk=#{params[:sdk]}]\"" : "DEVELOPMENT_TEAM"
-            code_sign_identity_setting = params[:sdk] ? "\"CODE_SIGN_IDENTITY[sdk=#{params[:sdk]}]\"" : "CODE_SIGN_IDENTITY"
-            provisioning_profile_setting = params[:sdk] ? "\"PROVISIONING_PROFILE_SPECIFIER[sdk=#{params[:sdk]}]\"" : "PROVISIONING_PROFILE_SPECIFIER"
+            development_team_setting = params[:sdk] ? "DEVELOPMENT_TEAM[sdk=#{params[:sdk]}]" : "DEVELOPMENT_TEAM"
+            code_sign_identity_setting = params[:sdk] ? "CODE_SIGN_IDENTITY[sdk=#{params[:sdk]}]" : "CODE_SIGN_IDENTITY"
+            provisioning_profile_setting = params[:sdk] ? "PROVISIONING_PROFILE_SPECIFIER[sdk=#{params[:sdk]}]" : "PROVISIONING_PROFILE_SPECIFIER"
 
             set_build_setting(config, "CODE_SIGN_STYLE", style_value)
 
