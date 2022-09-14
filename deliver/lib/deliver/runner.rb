@@ -276,7 +276,7 @@ module Deliver
       api_key = if options[:api_key].nil? && !api_token.nil?
                   # Load api key info if user set api_key_path, not api_key
                   { key_id: api_token.key_id, issuer_id: api_token.issuer_id, key: api_token.key_raw, is_key_content_base64: api_token.is_key_content_base64 }
-                else
+                elsif !options[:api_key].nil?
                   options[:api_key].transform_keys(&:to_sym)
                 end
 
