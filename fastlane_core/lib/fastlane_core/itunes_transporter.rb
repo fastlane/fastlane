@@ -939,7 +939,7 @@ module FastlaneCore
       # Check lines after separators
       lines[separator_index + 1..-1].each do |line|
         # Get provider name by Index of First separator
-        provider_name = line[0..provider_name_index]
+        provider_name = line[0..provider_name_index - 1]
         # Get short name by Index of Second separator
         short_name = line[provider_name_index + 1..short_name_index - 1]
         break if provider_name.nil? || short_name.nil?
