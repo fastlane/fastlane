@@ -113,6 +113,20 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
+    def altool_provider_id_command(api_key: nil)
+      use_api_key = !api_key.nil?
+      escaped_password = password.shellescape
+
+      [
+        "xcrun altool",
+        "--list-providers",
+        ("-u #{email.shellescape}" unless use_api_key),
+        ("-p #{escaped_password}" unless use_api_key),
+        ("--apiKey #{api_key[:key_id]}" if use_api_key),
+        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key)
+      ].compact.join(' ')
+    end
+
     def java_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, classpath: true, use_asset_path: false)
       upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
 
@@ -1146,6 +1160,13 @@ describe FastlaneCore do
               expect(transporter.upload('my.app.id', '/tmp', package_path: '/tmp/my.app.id.itmsp', platform: "osx")).to eq(altool_upload_command(provider_short_name: 'abcd123'))
             end
           end
+
+          context "provider IDs command generation" do
+            it 'generates a call to altool' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
+              expect(transporter.provider_ids).to eq(altool_provider_id_command)
+            end
+          end
         end
 
         context "with user defined itms_path" do
@@ -1175,6 +1196,14 @@ describe FastlaneCore do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true, api_key: api_key)
               expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_upload_command(api_key: api_key, provider_short_name: 'abcd123'))}")
               expect(transporter.upload('my.app.id', '/tmp', platform: "osx")).to match(expected)
+            end
+          end
+
+          context "provider IDs command generation" do
+            it 'generates a call to altool' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true, api_key: api_key)
+              expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_provider_id_command(api_key: api_key))}")
+              expect(transporter.provider_ids).to match(expected)
             end
           end
         end
