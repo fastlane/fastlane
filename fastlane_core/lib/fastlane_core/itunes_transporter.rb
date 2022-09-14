@@ -828,6 +828,7 @@ module FastlaneCore
 
     TWO_FACTOR_ENV_VARIABLE = "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"
 
+    # Create .p8 file from api_key and provide api key info which contains .p8 file path
     def api_key_with_p8_file_path(original_api_key)
       api_key = original_api_key.clone
       api_key[:key_dir] = Dir.mktmpdir("deliver-")
@@ -914,12 +915,17 @@ module FastlaneCore
     end
 
     def parse_altool_provider_info(lines)
+      # This tries parsing the provider id from altool output to detect provider list
       provider_info = {}
       separator_index = lines.index { |line| line =~ ALTOOL_SEPARATOR_PROVIDER_REGEX }
       return provider_info unless separator_index
+      # The actual length of provider and its short name can be detect by the separator's ('----') length
+      # First separator
       provider_name_index = lines[separator_index].index(/\s/, 0)
+      # Second separator
       short_name_index = lines[separator_index].index(/\s/, provider_name_index + 1)
 
+      # Check lines after separators
       lines[separator_index + 1..-1].each do |line|
         provider_name = line[0, provider_name_index]
         short_name = line[provider_name_index + 1, short_name_index - provider_name_index]
