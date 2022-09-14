@@ -39,15 +39,15 @@ module Fastlane
             set_build_setting(config, "CODE_SIGN_STYLE", style_value)
 
             if params[:team_id]
-              set_build_setting(config, "DEVELOPMENT_TEAM", params[:team_id])
+              set_build_setting(config, params[:sdk] ? "\"DEVELOPMENT_TEAM[sdk=#{params[:sdk]}]\"" : "DEVELOPMENT_TEAM", params[:team_id])
               UI.important("Set Team id to: #{params[:team_id]} for target: #{target.name} for build configuration: #{config.name}")
             end
             if params[:code_sign_identity]
-              set_build_setting(config, "CODE_SIGN_IDENTITY", params[:code_sign_identity])
+              set_build_setting(config, params[:sdk] ? "\"CODE_SIGN_IDENTITY[sdk=#{params[:sdk]}]\"" : "CODE_SIGN_IDENTITY", params[:code_sign_identity])
               UI.important("Set Code Sign identity to: #{params[:code_sign_identity]} for target: #{target.name} for build configuration: #{config.name}")
             end
             if params[:profile_name]
-              set_build_setting(config, "PROVISIONING_PROFILE_SPECIFIER", params[:profile_name])
+              set_build_setting(config, params[:sdk] ? "\"PROVISIONING_PROFILE_SPECIFIER[sdk=#{params[:sdk]}]\"" : "PROVISIONING_PROFILE_SPECIFIER", params[:profile_name])
               UI.important("Set Provisioning Profile name to: #{params[:profile_name]} for target: #{target.name} for build configuration: #{config.name}")
             end
             if params[:entitlements_file_path]
@@ -183,10 +183,12 @@ module Fastlane
           )',
           ' # more advanced manual code signing
           update_code_signing_settings(
-            use_automatic_signing: true,
+            use_automatic_signing: false,
             path: "demo-project/demo/demo.xcodeproj",
             team_id: "QABC123DEV",
             bundle_identifier: "com.demoapp.QABC123DEV",
+            code_sign_identity: "iPhone Distribution",
+            sdk: "iphoneos*",
             profile_name: "Demo App Deployment Profile",
             entitlements_file_path: "Demo App/generated/New.entitlements"
           )'
