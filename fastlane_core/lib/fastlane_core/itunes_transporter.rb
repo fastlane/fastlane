@@ -269,7 +269,8 @@ module FastlaneCore
         ("-u #{username.shellescape}" unless use_api_key),
         ("-p #{password.shellescape}" unless use_api_key),
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
-        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key)
+        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        "--output-format json"
       ].compact.join(' ')
     end
 
@@ -588,10 +589,6 @@ module FastlaneCore
   class ItunesTransporter
     # Matches a line in the iTMSTransporter provider table: "12  Initech Systems Inc     LG89CQY559"
     ITMS_PROVIDER_REGEX = /^\d+\s{2,}.+\s{2,}[^\s]+$/
-    # Matches a line in the altool provider table's separator
-    # ------------------- ----------------- ------------------------------------ ----------
-    # Initech Systems Inc LG89CQY559        xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx LG89CQY559
-    ALTOOL_SEPARATOR_PROVIDER_REGEX = /^\-{1,}\s{1}\-{1,}\s{1}\-{1,}\s{1}\-{1,}\s+$/
     TWO_STEP_HOST_PREFIX = "deliver.appspecific"
 
     # This will be called from the Deliverfile, and disables the logging of the transporter output
@@ -917,33 +914,12 @@ module FastlaneCore
     def parse_altool_provider_info(lines)
       # This tries parsing the provider id from altool output to detect provider list
       provider_info = {}
-      # The actual length of provider and its short name can be detect by the separator's ('----') length
-
-      # Below is example, let's see with it
-      # ------------------- ----------------- ------------------------------------ ----------
-      # Initech Systems Inc LG89CQY559        xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx LG89CQY559
-
-      # Detect line of "------------------- ----------------- ------------------------------------ ----------" from output
-      separator_index = lines.index { |line| line =~ ALTOOL_SEPARATOR_PROVIDER_REGEX }
-      return provider_info unless separator_index
-
-      # First separator
-      # -------------------
-      # Initech Systems Inc
-      provider_name_index = lines[separator_index].index(/\s/, 0)
-      # Second separator (e.g. LG89CQY559)
-      # -----------------
-      # LG89CQY559
-      short_name_index = lines[separator_index].index(/\s/, provider_name_index + 1)
-
-      # Check lines after separators
-      lines[separator_index + 1..-1].each do |line|
-        # Get provider name by Index of First separator
-        provider_name = line[0..provider_name_index - 1]
-        # Get short name by Index of Second separator
-        short_name = line[provider_name_index + 1..short_name_index - 1]
-        break if provider_name.nil? || short_name.nil?
-        provider_info[provider_name.strip] = short_name.strip
+      json_body = lines[-2] # altool outputs result in second line from last
+      return provider_info if json_body.nil?
+      providers = JSON.parse(json_body)["providers"]
+      return provider_info if providers.nil?
+      providers.each do |provider|
+        provider_info[provider["ProviderName"]] = provider["ProviderShortname"]
       end
       provider_info
     end

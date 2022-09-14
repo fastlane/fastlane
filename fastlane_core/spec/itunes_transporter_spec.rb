@@ -123,7 +123,8 @@ describe FastlaneCore do
         ("-u #{email.shellescape}" unless use_api_key),
         ("-p #{escaped_password}" unless use_api_key),
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
-        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key)
+        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        "--output-format json"
       ].compact.join(' ')
     end
 
