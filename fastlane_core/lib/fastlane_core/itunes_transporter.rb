@@ -588,7 +588,7 @@ module FastlaneCore
   class ItunesTransporter
     # Matches a line in the iTMSTransporter provider table: "12  Initech Systems Inc     LG89CQY559"
     ITMS_PROVIDER_REGEX = /^\d+\s{2,}.+\s{2,}[^\s]+$/
-    # Matches a line in the altool provider talble's separator
+    # Matches a line in the altool provider table's separator
     # ------------------- ----------------- ------------------------------------ ----------
     # Initech Systems Inc LG89CQY559        xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx LG89CQY559
     ALTOOL_SEPARATOR_PROVIDER_REGEX = /^\-{1,}\s{1}\-{1,}\s{1}\-{1,}\s{1}\-{1,}\s+$/
