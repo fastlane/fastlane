@@ -917,17 +917,30 @@ module FastlaneCore
     def parse_altool_provider_info(lines)
       # This tries parsing the provider id from altool output to detect provider list
       provider_info = {}
+      # The actual length of provider and its short name can be detect by the separator's ('----') length
+
+      # Below is example, let's see with it
+      # ------------------- ----------------- ------------------------------------ ----------
+      # Initech Systems Inc LG89CQY559        xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx LG89CQY559
+
+      # Detect line of "------------------- ----------------- ------------------------------------ ----------" from output
       separator_index = lines.index { |line| line =~ ALTOOL_SEPARATOR_PROVIDER_REGEX }
       return provider_info unless separator_index
-      # The actual length of provider and its short name can be detect by the separator's ('----') length
+
       # First separator
+      # -------------------
+      # Initech Systems Inc
       provider_name_index = lines[separator_index].index(/\s/, 0)
-      # Second separator
+      # Second separator (e.g. LG89CQY559)
+      # -----------------
+      # LG89CQY559
       short_name_index = lines[separator_index].index(/\s/, provider_name_index + 1)
 
       # Check lines after separators
       lines[separator_index + 1..-1].each do |line|
+        # Get provider name by Index of First separator
         provider_name = line[0, provider_name_index]
+        # Get short name by Index of Second separator
         short_name = line[provider_name_index + 1, short_name_index - provider_name_index]
         break if provider_name.nil? || short_name.nil?
         provider_info[provider_name.strip] = short_name.strip
