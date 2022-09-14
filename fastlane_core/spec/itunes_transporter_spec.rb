@@ -94,7 +94,7 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
-    def altool_upload_command(api_key: nil, platform: "macos")
+    def altool_upload_command(api_key: nil, platform: "macos", provider_short_name: "")
       use_api_key = !api_key.nil?
       upload_part = "-f /tmp/my.app.id.itmsp"
       escaped_password = password.shellescape
@@ -106,6 +106,7 @@ describe FastlaneCore do
         ("-p #{escaped_password}" unless use_api_key),
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        ("--asc-provider #{provider_short_name}" if !use_api_key && !provider_short_name.to_s.empty?),
         ("-t #{platform}"),
         upload_part,
         "-k 100000"
@@ -1142,7 +1143,7 @@ describe FastlaneCore do
           context "upload command generation" do
             it 'generates a call to altool' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
-              expect(transporter.upload('my.app.id', '/tmp', package_path: '/tmp/my.app.id.itmsp', platform: "osx")).to eq(altool_upload_command)
+              expect(transporter.upload('my.app.id', '/tmp', package_path: '/tmp/my.app.id.itmsp', platform: "osx")).to eq(altool_upload_command(provider_short_name: 'abcd123'))
             end
           end
         end
@@ -1172,7 +1173,7 @@ describe FastlaneCore do
           context "upload command generation" do
             it 'generates a call to altool' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true, api_key: api_key)
-              expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_upload_command(api_key: api_key))}")
+              expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_upload_command(api_key: api_key, provider_short_name: 'abcd123'))}")
               expect(transporter.upload('my.app.id', '/tmp', platform: "osx")).to match(expected)
             end
           end

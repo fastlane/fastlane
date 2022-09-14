@@ -252,10 +252,24 @@ module FastlaneCore
         ("-p #{password.shellescape}" unless use_api_key),
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        ("--asc-provider #{provider_short_name}" if !use_api_key && !provider_short_name.to_s.empty?),
         platform_option(platform),
         file_upload_option(source),
         additional_upload_parameters,
         "-k 100000"
+      ].compact.join(' ')
+    end
+
+    def build_provider_ids_command(username, password, jwt = nil, api_key = nil)
+      use_api_key = !api_key.nil?
+      [
+        ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
+        "xcrun altool",
+        "--list-providers",
+        ("-u #{username.shellescape}" unless use_api_key),
+        ("-p #{password.shellescape}" unless use_api_key),
+        ("--apiKey #{api_key[:key_id]}" if use_api_key),
+        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key)
       ].compact.join(' ')
     end
 
@@ -333,7 +347,7 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
-    def build_provider_ids_command(username, password, jwt = nil)
+    def build_provider_ids_command(username, password, jwt = nil, api_key = nil)
       use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
@@ -513,7 +527,7 @@ module FastlaneCore
       end
     end
 
-    def build_provider_ids_command(username, password, jwt = nil)
+    def build_provider_ids_command(username, password, jwt = nil, api_key = nil)
       use_jwt = !jwt.to_s.empty?
       if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
@@ -572,8 +586,12 @@ module FastlaneCore
   end
 
   class ItunesTransporter
-    # Matches a line in the provider table: "12  Initech Systems Inc     LG89CQY559"
-    PROVIDER_REGEX = /^\d+\s{2,}.+\s{2,}[^\s]+$/
+    # Matches a line in the iTMSTransporter provider table: "12  Initech Systems Inc     LG89CQY559"
+    ITMS_PROVIDER_REGEX = /^\d+\s{2,}.+\s{2,}[^\s]+$/
+    # Matches a line in the altool provider talble's separator
+    # ------------------- ----------------- ------------------------------------ ----------
+    # Initech Systems Inc LG89CQY559        xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx LG89CQY559
+    ALTOOL_SEPARATOR_PROVIDER_REGEX = /^\-{1,}\s{1}\-{1,}\s{1}\-{1,}\s{1}\-{1,}\s+$/
     TWO_STEP_HOST_PREFIX = "deliver.appspecific"
 
     # This will be called from the Deliverfile, and disables the logging of the transporter output
@@ -611,10 +629,12 @@ module FastlaneCore
 
       @jwt = jwt
       @api_key = api_key
+      @is_altool = false
 
       if should_use_altool?(upload, use_shell_script)
         UI.verbose("Using altool as transporter.")
         @transporter_executor = AltoolTransporterExecutor.new
+        @is_altool = true
       else
         UI.verbose("Using iTMSTransporter as transporter.")
         @transporter_executor = use_shell_script ? ShellScriptTransporterExecutor.new : JavaTransporterExecutor.new
@@ -703,15 +723,7 @@ module FastlaneCore
       api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
 
       api_key = nil
-      if use_api_key
-        api_key = @api_key.clone
-        api_key[:key_dir] = Dir.mktmpdir("deliver-")
-        # Specified p8 needs to be generated to call altool
-        File.open(File.join(api_key[:key_dir], "AuthKey_#{api_key[:key_id]}.p8"), "wb") do |p8|
-          key_content = api_key[:is_key_content_base64] ? Base64.decode64(api_key[:key]) : @api_key[:key]
-          p8.write(key_content)
-        end
-      end
+      api_key = api_key_with_p8_file_path(@api_key) if use_api_key
 
       command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, api_key)
       UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_placeholder))
@@ -786,8 +798,15 @@ module FastlaneCore
       password_placeholder = @jwt.nil? ? 'YourPassword' : nil
       jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
 
-      command = @transporter_executor.build_provider_ids_command(@user, @password, @jwt)
-      UI.verbose(@transporter_executor.build_provider_ids_command(@user, password_placeholder, jwt_placeholder))
+      # Handle AppStore Connect API
+      use_api_key = !@api_key.nil?
+      api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
+
+      api_key = nil
+      api_key = api_key_with_p8_file_path(@api_key) if use_api_key
+
+      command = @transporter_executor.build_provider_ids_command(@user, @password, @jwt, api_key)
+      UI.verbose(@transporter_executor.build_provider_ids_command(@user, password_placeholder, jwt_placeholder, api_key_placeholder))
 
       lines = []
       begin
@@ -796,14 +815,29 @@ module FastlaneCore
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return provider_ids
+      ensure
+        if use_api_key
+          FileUtils.rm_rf(api_key[:key_dir]) unless api_key.nil?
+        end
       end
 
-      lines.map { |line| provider_pair(line) }.compact.to_h
+      @is_altool ? parse_altool_provider_info(lines) : parse_itsm_provider_info(lines)
     end
 
     private
 
     TWO_FACTOR_ENV_VARIABLE = "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"
+
+    def api_key_with_p8_file_path(original_api_key)
+      api_key = original_api_key.clone
+      api_key[:key_dir] = Dir.mktmpdir("deliver-")
+      # Specified p8 needs to be generated to call altool
+      File.open(File.join(api_key[:key_dir], "AuthKey_#{api_key[:key_id]}.p8"), "wb") do |p8|
+        key_content = api_key[:is_key_content_base64] ? Base64.decode64(api_key[:key]) : api_key[:key]
+        p8.write(key_content)
+      end
+      api_key
+    end
 
     # Returns whether altool should be used or ItunesTransporter should be used
     def should_use_altool?(upload, use_shell_script)
@@ -869,10 +903,30 @@ module FastlaneCore
       @transporter_executor.handle_error(password)
     end
 
-    def provider_pair(line)
+    def itms_provider_pair(line)
       line = line.strip
-      return nil unless line =~ PROVIDER_REGEX
+      return nil unless line =~ ITMS_PROVIDER_REGEX
       line.split(/\s{2,}/).drop(1)
+    end
+
+    def parse_itsm_provider_info(lines)
+      lines.map { |line| itms_provider_pair(line) }.compact.to_h
+    end
+
+    def parse_altool_provider_info(lines)
+      provider_info = {}
+      separator_index = lines.index { |line| line =~ ALTOOL_SEPARATOR_PROVIDER_REGEX }
+      return provider_info unless separator_index
+      provider_name_index = lines[separator_index].index(/\s/, 0)
+      short_name_index = lines[separator_index].index(/\s/, provider_name_index + 1)
+
+      lines[separator_index + 1..-1].each do |line|
+        provider_name = line[0, provider_name_index]
+        short_name = line[provider_name_index + 1, short_name_index - provider_name_index]
+        break if provider_name.nil? || short_name.nil?
+        provider_info[provider_name.strip] = short_name.strip
+      end
+      provider_info
     end
   end
 end
