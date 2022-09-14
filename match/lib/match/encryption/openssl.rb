@@ -50,7 +50,7 @@ module Match
           rescue => ex
             UI.verbose(ex.to_s)
             UI.error("Couldn't decrypt the repo, please make sure you enter the right password!")
-            UI.user_error!("Invalid password passed via  'MATCH_PASSWORD'") if ENV["MATCH_PASSWORD"]
+            UI.user_error!("Invalid password passed via 'MATCH_PASSWORD'") if ENV["MATCH_PASSWORD"]
             clear_password
             self.decrypt_files # Call itself
             return
