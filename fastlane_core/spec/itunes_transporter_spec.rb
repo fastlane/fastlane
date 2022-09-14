@@ -106,7 +106,7 @@ describe FastlaneCore do
         ("-p #{escaped_password}" unless use_api_key),
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
-        ("--asc-provider #{provider_short_name}" if !use_api_key && !provider_short_name.to_s.empty?),
+        ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
         ("-t #{platform}"),
         upload_part,
         "-k 100000"
