@@ -28,6 +28,9 @@ module FastlaneCore
     OUTPUT_REGEX = />\s+(.+)/
     RETURN_VALUE_REGEX = />\sDBG-X:\sReturning\s+(\d+)/
 
+    # Matches a line in the iTMSTransporter provider table: "12  Initech Systems Inc     LG89CQY559"
+    ITMS_PROVIDER_REGEX = /^\d+\s{2,}.+\s{2,}[^\s]+$/
+
     SKIP_ERRORS = ["ERROR: An exception has occurred: Scheduling automatic restart in 1 minute"]
 
     private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX, :RETURN_VALUE_REGEX, :SKIP_ERRORS
@@ -100,7 +103,17 @@ module FastlaneCore
       @errors.map { |error| "[Transporter Error Output]: #{error}" }.join("\n").gsub!(/"/, "")
     end
 
+    def parse_provider_info(lines)
+      lines.map { |line| itms_provider_pair(line) }.compact.to_h
+    end
+
     private
+
+    def itms_provider_pair(line)
+      line = line.strip
+      return nil unless line =~ ITMS_PROVIDER_REGEX
+      line.split(/\s{2,}/).drop(1)
+    end
 
     def parse_line(line, hide_output)
       # Taken from https://github.com/sshaw/itunes_store_transporter/blob/master/lib/itunes/store/transporter/output_parser.rb
@@ -287,6 +300,19 @@ module FastlaneCore
 
     def displayable_errors
       @errors.map { |error| "[Application Loader Error Output]: #{error}" }.join("\n")
+    end
+
+    def parse_provider_info(lines)
+      # This tries parsing the provider id from altool output to detect provider list
+      provider_info = {}
+      json_body = lines[-2] # altool outputs result in second line from last
+      return provider_info if json_body.nil?
+      providers = JSON.parse(json_body)["providers"]
+      return provider_info if providers.nil?
+      providers.each do |provider|
+        provider_info[provider["ProviderName"]] = provider["ProviderShortname"]
+      end
+      provider_info
     end
 
     private
@@ -587,8 +613,6 @@ module FastlaneCore
   end
 
   class ItunesTransporter
-    # Matches a line in the iTMSTransporter provider table: "12  Initech Systems Inc     LG89CQY559"
-    ITMS_PROVIDER_REGEX = /^\d+\s{2,}.+\s{2,}[^\s]+$/
     TWO_STEP_HOST_PREFIX = "deliver.appspecific"
 
     # This will be called from the Deliverfile, and disables the logging of the transporter output
@@ -626,12 +650,10 @@ module FastlaneCore
 
       @jwt = jwt
       @api_key = api_key
-      @is_altool = false
 
       if should_use_altool?(upload, use_shell_script)
         UI.verbose("Using altool as transporter.")
         @transporter_executor = AltoolTransporterExecutor.new
-        @is_altool = true
       else
         UI.verbose("Using iTMSTransporter as transporter.")
         @transporter_executor = use_shell_script ? ShellScriptTransporterExecutor.new : JavaTransporterExecutor.new
@@ -818,7 +840,7 @@ module FastlaneCore
         end
       end
 
-      @is_altool ? parse_altool_provider_info(lines) : parse_itsm_provider_info(lines)
+      @transporter_executor.parse_provider_info(lines)
     end
 
     private
@@ -899,29 +921,6 @@ module FastlaneCore
 
     def handle_error(password)
       @transporter_executor.handle_error(password)
-    end
-
-    def itms_provider_pair(line)
-      line = line.strip
-      return nil unless line =~ ITMS_PROVIDER_REGEX
-      line.split(/\s{2,}/).drop(1)
-    end
-
-    def parse_itsm_provider_info(lines)
-      lines.map { |line| itms_provider_pair(line) }.compact.to_h
-    end
-
-    def parse_altool_provider_info(lines)
-      # This tries parsing the provider id from altool output to detect provider list
-      provider_info = {}
-      json_body = lines[-2] # altool outputs result in second line from last
-      return provider_info if json_body.nil?
-      providers = JSON.parse(json_body)["providers"]
-      return provider_info if providers.nil?
-      providers.each do |provider|
-        provider_info[provider["ProviderName"]] = provider["ProviderShortname"]
-      end
-      provider_info
     end
   end
 end
