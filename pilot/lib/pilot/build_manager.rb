@@ -47,7 +47,7 @@ module Pilot
       end
 
       transporter = transporter_for_selected_team(options)
-      result = transporter.upload(package_path: package_path, asset_path: asset_path)
+      result = transporter.upload(package_path: package_path, asset_path: asset_path, platform: platform)
 
       unless result
         transporter_errors = transporter.displayable_errors
@@ -389,15 +389,22 @@ module Pilot
     def transporter_for_selected_team(options)
       # Use JWT auth
       api_token = Spaceship::ConnectAPI.token
+      api_key = if options[:api_key].nil? && !api_token.nil?
+                  # Load api key info if user set api_key_path, not api_key
+                  { key_id: api_token.key_id, issuer_id: api_token.issuer_id, key: api_token.key_raw, is_key_content_base64: api_token.is_key_content_base64 }
+                elsif !options[:api_key].nil?
+                  options[:api_key].transform_keys(&:to_sym)
+                end
+
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, upload: true, api_key: api_key)
       end
 
       # Otherwise use username and password
       tunes_client = Spaceship::ConnectAPI.client ? Spaceship::ConnectAPI.client.tunes_client : nil
 
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], upload: true, api_key: api_key)
       return generic_transporter if options[:itc_provider] || tunes_client.nil?
       return generic_transporter unless tunes_client.teams.count > 1
 
@@ -406,7 +413,7 @@ module Pilot
         name = team['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
-        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
+        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id, upload: true, api_key: api_key)
       rescue => ex
         STDERR.puts(ex.to_s)
         UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")

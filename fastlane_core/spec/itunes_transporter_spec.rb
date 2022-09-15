@@ -5,6 +5,7 @@ describe FastlaneCore do
   let(:password) { "!> p@$s_-+=w'o%rd\"&#*<" }
   let(:email) { 'fabric.devtools@gmail.com' }
   let(:jwt) { '409jjl43j90ghjqoineio49024' }
+  let(:api_key) { { key_id: "TESTAPIK2HW", issuer_id: "11223344-1122-aabb-aabb-uuvvwwxxyyzz" } }
 
   describe FastlaneCore::ItunesTransporter do
     let(:random_uuid) { '2a912f38-5dbc-4fc3-a5b3-1bf184b2b021' }
@@ -90,6 +91,40 @@ describe FastlaneCore do
         ('-u "fabric.devtools@gmail.com"' if jwt.nil?),
         ("-p #{escaped_password}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?)
+      ].compact.join(' ')
+    end
+
+    def altool_upload_command(api_key: nil, platform: "macos", provider_short_name: "")
+      use_api_key = !api_key.nil?
+      upload_part = "-f /tmp/my.app.id.itmsp"
+      escaped_password = password.shellescape
+
+      [
+        "xcrun altool",
+        "--upload-app",
+        ("-u #{email.shellescape}" unless use_api_key),
+        ("-p #{escaped_password}" unless use_api_key),
+        ("--apiKey #{api_key[:key_id]}" if use_api_key),
+        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
+        ("-t #{platform}"),
+        upload_part,
+        "-k 100000"
+      ].compact.join(' ')
+    end
+
+    def altool_provider_id_command(api_key: nil)
+      use_api_key = !api_key.nil?
+      escaped_password = password.shellescape
+
+      [
+        "xcrun altool",
+        "--list-providers",
+        ("-u #{email.shellescape}" unless use_api_key),
+        ("-p #{escaped_password}" unless use_api_key),
+        ("--apiKey #{api_key[:key_id]}" if use_api_key),
+        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        "--output-format json"
       ].compact.join(' ')
     end
 
@@ -1101,6 +1136,75 @@ describe FastlaneCore do
 
               transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
               expect(transporter.upload(asset_path: '/tmp/my_app.ipa')).to eq(xcrun_upload_command(jwt: jwt, use_asset_path: true))
+            end
+          end
+        end
+      end
+    end
+
+    context "with Xcode 14.x installed" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('14.0')
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+      end
+
+      context "with username and password" do
+        context "with default itms_path" do
+          before(:each) do
+            allow(FastlaneCore::Helper).to receive(:itms_path).and_return(nil)
+            stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+          end
+          context "upload command generation" do
+            it 'generates a call to altool' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
+              expect(transporter.upload('my.app.id', '/tmp', package_path: '/tmp/my.app.id.itmsp', platform: "osx")).to eq(altool_upload_command(provider_short_name: 'abcd123'))
+            end
+          end
+
+          context "provider IDs command generation" do
+            it 'generates a call to altool' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
+              expect(transporter.provider_ids).to eq(altool_provider_id_command)
+            end
+          end
+        end
+
+        context "with user defined itms_path" do
+          before(:each) do
+            allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
+            stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/tmp' })
+          end
+          context "upload command generation" do
+            it 'generates a call to xcrun iTMSTransporter instead altool' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
+              expect(transporter.upload('my.app.id', '/tmp', platform: "osx")).to eq(java_upload_command(provider_short_name: 'abcd123', classpath: false))
+            end
+          end
+        end
+
+        after(:each) { ENV.delete("FASTLANE_ITUNES_TRANSPORTER_PATH") }
+      end
+
+      context "with api_key" do
+        context "with default itms_path" do
+          before(:each) do
+            allow(FastlaneCore::Helper).to receive(:itms_path).and_return(nil)
+            stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+          end
+          context "upload command generation" do
+            it 'generates a call to altool' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true, api_key: api_key)
+              expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_upload_command(api_key: api_key, provider_short_name: 'abcd123'))}")
+              expect(transporter.upload('my.app.id', '/tmp', platform: "osx")).to match(expected)
+            end
+          end
+
+          context "provider IDs command generation" do
+            it 'generates a call to altool' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true, api_key: api_key)
+              expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_provider_id_command(api_key: api_key))}")
+              expect(transporter.provider_ids).to match(expected)
             end
           end
         end
