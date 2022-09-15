@@ -35,6 +35,22 @@ module FastlaneCore
 
     private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX, :RETURN_VALUE_REGEX, :SKIP_ERRORS
 
+    def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "", jwt = nil)
+      not_implemented(__method__)
+    end
+
+    def build_provider_ids_command(username, password, jwt = nil, api_key = nil)
+      not_implemented(__method__)
+    end
+
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+      not_implemented(__method__)
+    end
+
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+      not_implemented(__method__)
+    end
+
     def execute(command, hide_output)
       if Helper.test?
         yield(nil) if block_given?
