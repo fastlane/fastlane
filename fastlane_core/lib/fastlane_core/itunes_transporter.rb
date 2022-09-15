@@ -303,6 +303,14 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
+    def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "", jwt = nil)
+      raise "This feature has not been implemented yet with altool for Xcode 14"
+    end
+
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+      raise "This feature has not been implemented yet with altool for Xcode 14"
+    end
+
     def additional_upload_parameters
       env_deliver_additional_params = ENV["DELIVER_ALTOOL_ADDITIONAL_UPLOAD_PARAMETERS"]
       return nil if env_deliver_additional_params.to_s.strip.empty?
