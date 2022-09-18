@@ -2,6 +2,7 @@ module Fastlane
   module Actions
     class EnsureXcodeVersionAction < Action
       def self.run(params)
+        # TODO: Deprecate this action by adding strict and non-strict version check capabilities to `xcodes` action, now that the `xcode-install` gem has been sunset.
         Actions.verify_gem!('xcode-install')
         required_version = params[:version]
         strict = params[:strict]
