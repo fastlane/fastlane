@@ -10,7 +10,8 @@ module Fastlane
         ENV["XCODES_USERNAME"] = params[:username]
         ENV["XCODES_PASSWORD"] = params[:password]
         binary = params[:binary_path]
-        if update_list = params[:update_list]
+        select_only = params[:select_only]
+        if update_list = params[:update_list] && !select_only
           command = []
           command << binary
           command << "update"
@@ -22,6 +23,9 @@ module Fastlane
         command << binary
         if xcodes_args = params[:xcodes_args]
           command << xcodes_args
+        elsif select_only
+          command << "select"
+          command << "'#{params[:version]}'"
         else
           command << "install"
           command << "'#{params[:version]}'"
@@ -78,6 +82,11 @@ module Fastlane
                                        description: "Whether the list of available Xcode versions should be updated before running the install command",
                                        type: Boolean,
                                        default_value: true),
+          FastlaneCore::ConfigItem.new(key: :select_only,
+                                       env_name: "FL_XCODES_SELECT_ONLY",
+                                       description: "Whether the action should just select the version passed, instead of installing it if needed. When true, if the version isn't installed, an error will be raised",
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :binary_path,
                                        env_name: "FL_XCODES_BINARY_PATH",
                                        description: "Where the xcodes binary lives on your system (full path)",
