@@ -34,7 +34,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_XCODE_VERSION",
-                                       description: "The version of Xcode to select specified as a Gem::Version requirement string (e.g. '~> 7.1.0')",
+                                       description: "The version of Xcode to select specified as a Gem::Version requirement string (e.g. '~> 7.1.0'). Defaults to the value specified in the .xcode-version file ",
                                        default_value: Helper::XcodesHelper.read_xcode_version_file,
                                        default_value_dynamic: true,
                                        verify_block: Helper::XcodesHelper::Verify.method(:requirement))
@@ -48,7 +48,8 @@ module Fastlane
       def self.example_code
         [
           'xcversion(version: "8.1") # Selects Xcode 8.1.0',
-          'xcversion(version: "~> 8.1.0") # Selects the latest installed version from the 8.1.x set'
+          'xcversion(version: "~> 8.1.0") # Selects the latest installed version from the 8.1.x set',
+          'xcversion # When missing, the version value defaults to the value specified in the .xcode-version file'
         ]
       end
 
