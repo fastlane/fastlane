@@ -33,9 +33,9 @@ describe Fastlane do
       end
 
       it "doesn't invoke 'update' nor 'install', and invokes 'select', when select_only argument is true" do
-        expect(Fastlane::Actions).to_not receive(:sh).with("#{xcodes_binary_path} update")
+        expect(Fastlane::Actions).to_not(receive(:sh).with("#{xcodes_binary_path} update"))
         expect(Fastlane::Actions).to receive(:sh).with("#{xcodes_binary_path} select '14'")
-        expect(Fastlane::Actions).to_not receive(:sh).with("#{xcodes_binary_path} install '14'")
+        expect(Fastlane::Actions).to_not(receive(:sh).with("#{xcodes_binary_path} install '14'"))
         Fastlane::FastFile.new.parse("lane :test do
           xcodes(version: '14', select_only: true)
         end").runner.execute(:test)

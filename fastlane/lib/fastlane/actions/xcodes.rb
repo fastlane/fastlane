@@ -35,7 +35,7 @@ module Fastlane
 
         # Prints something like /Applications/Xcode-14.app/Contents/Developer/
         xcode_path = FastlaneCore::Helper.xcode_path
-        UI.message("Using Xcode #{params[:version]} on path '#{xcode_path.chomp("/Contents/Developer/")}'")
+        UI.message("Using Xcode #{params[:version]} on path '#{xcode_path.chomp('/Contents/Developer/')}'")
         ENV["DEVELOPER_DIR"] = xcode_path
         Actions.lane_context[SharedValues::XCODE_INSTALL_XCODE_PATH] = xcode_path
         return xcode_path
