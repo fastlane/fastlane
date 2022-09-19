@@ -11,7 +11,7 @@ module Fastlane
         ENV["XCODES_PASSWORD"] = params[:password]
         binary = params[:binary_path]
         select_only = params[:select_only]
-        if update_list = params[:update_list] && !select_only
+        if params[:update_list] && !select_only
           command = []
           command << binary
           command << "update"
@@ -21,7 +21,7 @@ module Fastlane
         end
         command = []
         command << binary
-        if xcodes_args = params[:xcodes_args]
+        if (xcodes_args = params[:xcodes_args])
           command << xcodes_args
         elsif select_only
           command << "select"
