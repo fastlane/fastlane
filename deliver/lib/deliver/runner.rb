@@ -278,10 +278,8 @@ module Deliver
                   { key_id: api_token.key_id, issuer_id: api_token.issuer_id, key: api_token.key_raw }
                 elsif !options[:api_key].nil?
                   api_key = options[:api_key].transform_keys(&:to_sym).dup
-                  if api_key[:is_key_content_base64]
-                    # key is still base 64 style if api_key is loaded from option
-                    api_key[:key] = Base64.decode64(api_key[:key])
-                  end
+                  # key is still base 64 style if api_key is loaded from option                    
+                  api_key[:key] = Base64.decode64(api_key[:key]) if api_key[:is_key_content_base64]
                   api_key
                 end
 
