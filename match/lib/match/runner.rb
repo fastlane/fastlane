@@ -366,7 +366,7 @@ module Match
               Spaceship::ConnectAPI::Device::DeviceClass::IPAD,
               Spaceship::ConnectAPI::Device::DeviceClass::IPHONE,
               Spaceship::ConnectAPI::Device::DeviceClass::IPOD,
-              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH,
+              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH
             ]
           when :tvos
             [
@@ -382,7 +382,7 @@ module Match
         if platform == :ios && include_mac_in_profiles
           device_classes += [Spaceship::ConnectAPI::Device::DeviceClass::APPLE_SILICON_MAC]
         end
-        
+
         devices = Spaceship::ConnectAPI::Device.all
         unless device_classes.empty?
           devices = devices.select do |device|
