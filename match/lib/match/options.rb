@@ -254,7 +254,7 @@ module Match
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :include_mac_in_profiles,
-                                     env_name: "INCLUDE_MAC_IN_PROFILES",
+                                     env_name: "MATCH_INCLUDE_MAC_IN_PROFILES",
                                      description: "Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps",
                                      type: Boolean,
                                      default_value: false),
