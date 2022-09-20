@@ -29,6 +29,7 @@ module Spaceship
         IPOD = "IPOD"
         APPLE_TV = "APPLE_TV"
         MAC = "MAC"
+        APPLE_SILICON_MAC = "APPLE_SILICON_MAC"
       end
 
       module Status
