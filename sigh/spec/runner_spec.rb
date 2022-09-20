@@ -151,6 +151,23 @@ describe Sigh do
         expect(devices.size).to eq(1)
       end
 
+      it "devices for development with apple silicon" do
+        options = { development: true, include_mac_in_profiles: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+        ios_device = "ios_device"
+        allow(ios_device).to receive(:id).and_return(1)
+        allow(ios_device).to receive(:device_class).and_return(Spaceship::ConnectAPI::Device::DeviceClass::IPHONE)
+        as_device = "as_device"
+        allow(as_device).to receive(:id).and_return(2)
+        allow(as_device).to receive(:device_class).and_return(Spaceship::ConnectAPI::Device::DeviceClass::APPLE_SILICON_MAC)
+
+        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return([ios_device, as_device])
+
+        devices = fake_runner.devices_to_use
+        expect(devices.size).to eq(2)
+      end
+
       it "devices for adhoc" do
         options = { adhoc: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
