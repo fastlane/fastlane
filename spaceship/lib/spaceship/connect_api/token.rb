@@ -22,7 +22,6 @@ module Spaceship
       attr_reader :expiration
 
       attr_reader :key_raw
-      attr_reader :is_key_content_base64
 
       # Temporary attribute not needed to create the JWT text
       # There is no way to determine if the team associated with this
@@ -72,19 +71,17 @@ module Spaceship
           key: OpenSSL::PKey::EC.new(key),
           key_raw: key,
           duration: duration,
-          in_house: in_house,
-          is_key_content_base64: is_key_content_base64
+          in_house: in_house
         )
       end
 
-      def initialize(key_id: nil, issuer_id: nil, key: nil, key_raw: nil, duration: nil, in_house: nil, is_key_content_base64: nil)
+      def initialize(key_id: nil, issuer_id: nil, key: nil, key_raw: nil, duration: nil, in_house: nil)
         @key_id = key_id
         @key = key
         @key_raw = key_raw
         @issuer_id = issuer_id
         @duration = duration
         @in_house = in_house
-        @is_key_content_base64 = is_key_content_base64
 
         @duration ||= DEFAULT_TOKEN_DURATION
         @duration = @duration.to_i if @duration
