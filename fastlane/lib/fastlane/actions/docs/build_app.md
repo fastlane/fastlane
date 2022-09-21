@@ -74,7 +74,7 @@ That's all you need to build your application. If you want more control, here ar
 fastlane gym --workspace "Example.xcworkspace" --scheme "AppName" --clean
 ```
 
-If you need to use a different Xcode installation, use `xcode-select` or define `DEVELOPER_DIR`:
+If you need to use a different Xcode installation, use `[xcodes](http://docs.fastlane.tools/actions/xcodes)` or define `DEVELOPER_DIR`:
 
 ```no-highlight
 DEVELOPER_DIR="/Applications/Xcode6.2.app" fastlane gym
@@ -150,7 +150,7 @@ build_app(
   scheme: "Release",
   export_method: "app-store",
   export_options: {
-    provisioningProfiles: { 
+    provisioningProfiles: {
       "com.example.bundleid" => "Provisioning Profile Name",
       "com.example.bundleid2" => "Provisioning Profile Name 2"
     }
@@ -184,10 +184,10 @@ end
 error do |lane, exception|
   slack(
     # message with short human friendly message
-    message: exception.to_s, 
-    success: false, 
+    message: exception.to_s,
+    success: false,
     # Output containing extended log output
-    payload: { "Output" => exception.error_info.to_s } 
+    payload: { "Output" => exception.error_info.to_s }
   )
 end
 ```

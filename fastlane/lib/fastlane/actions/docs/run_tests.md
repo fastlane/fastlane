@@ -100,7 +100,7 @@ That's all you need to run your tests. If you want more control, here are some a
 fastlane scan --workspace "Example.xcworkspace" --scheme "AppName" --device "iPhone 6" --clean
 ```
 
-If you need to use a different Xcode install, use `xcode-select` or define `DEVELOPER_DIR`:
+If you need to use a different Xcode install, use `[xcodes](http://docs.fastlane.tools/actions/xcodes)` or define `DEVELOPER_DIR`:
 
 ```no-highlight
 DEVELOPER_DIR="/Applications/Xcode6.2.app" scan
