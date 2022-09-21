@@ -74,7 +74,7 @@ That's all you need to build your application. If you want more control, here ar
 fastlane gym --workspace "Example.xcworkspace" --scheme "AppName" --clean
 ```
 
-If you need to use a different Xcode installation, use `[xcodes](http://docs.fastlane.tools/actions/xcodes)` or define `DEVELOPER_DIR`:
+If you need to use a different Xcode installation, use `[xcodes](https://docs.fastlane.tools/actions/xcodes)` or define `DEVELOPER_DIR`:
 
 ```no-highlight
 DEVELOPER_DIR="/Applications/Xcode6.2.app" fastlane gym
