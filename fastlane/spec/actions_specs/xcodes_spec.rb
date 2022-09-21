@@ -1,14 +1,16 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "xcodes" do
-      let(:xcode_path) { "/valid/path/to/xcode.app/Contents/Developer/" }
+      let(:xcode_path) { "/valid/path/to/xcode.app" }
+      let(:xcode_developer_path) { "#{xcode_path}/Contents/Developer/" }
       let(:xcodes_binary_path) { "/path/to/bin/xcodes" }
 
       before(:each) do
-        allow(FastlaneCore::Helper).to receive(:xcode_path).and_return(xcode_path)
         allow(Fastlane::Helper::XcodesHelper).to receive(:find_xcodes_binary_path).and_return(xcodes_binary_path)
         allow(File).to receive(:exist?).and_call_original
         allow(File).to receive(:exist?).with(xcodes_binary_path).and_return(true)
+        allow(Fastlane::Actions).to receive(:sh).and_call_original
+        allow(Fastlane::Actions).to receive(:sh).with("#{xcodes_binary_path} installed '14'").and_return(xcode_path)
       end
 
       after(:each) do
@@ -32,12 +34,11 @@ describe Fastlane do
         end
       end
 
-      it "doesn't invoke 'update' nor 'install', and invokes 'select', when select_only argument is true" do
+      it "doesn't invoke 'update' nor 'install' when select_for_current_build_only argument is true" do
         expect(Fastlane::Actions).to_not(receive(:sh).with("#{xcodes_binary_path} update"))
-        expect(Fastlane::Actions).to receive(:sh).with("#{xcodes_binary_path} select '14'")
         expect(Fastlane::Actions).to_not(receive(:sh).with("#{xcodes_binary_path} install '14'"))
         Fastlane::FastFile.new.parse("lane :test do
-          xcodes(version: '14', select_only: true)
+          xcodes(version: '14', select_for_current_build_only: true)
         end").runner.execute(:test)
       end
 
@@ -92,14 +93,14 @@ describe Fastlane do
         Fastlane::FastFile.new.parse("lane :test do
           xcodes(version: '14')
         end").runner.execute(:test)
-        expect(ENV["DEVELOPER_DIR"]).to eq(xcode_path)
+        expect(ENV["DEVELOPER_DIR"]).to eq(xcode_developer_path)
       end
 
-      it "sets the SharedValues::XCODE_INSTALL_XCODE_PATH lane context" do
+      it "sets the SharedValues::XCODES_XCODE_PATH lane context" do
         Fastlane::FastFile.new.parse("lane :test do
           xcodes(version: '14')
         end").runner.execute(:test)
-        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::XCODE_INSTALL_XCODE_PATH]).to eql(xcode_path)
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::XCODES_XCODE_PATH]).to eql(xcode_developer_path)
       end
     end
   end

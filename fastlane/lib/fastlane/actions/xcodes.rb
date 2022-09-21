@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      XCODE_INSTALL_XCODE_PATH = :XCODE_INSTALL_XCODE_PATH
+      XCODES_XCODE_PATH = :XCODES_XCODE_PATH
     end
 
     class XcodesAction < Action
@@ -10,8 +10,9 @@ module Fastlane
         ENV["XCODES_USERNAME"] = params[:username]
         ENV["XCODES_PASSWORD"] = params[:password]
         binary = params[:binary_path]
-        select_only = params[:select_only]
-        if params[:update_list] && !select_only
+        select_for_current_build_only = params[:select_for_current_build_only]
+        version = params[:version]
+        if params[:update_list] && !select_for_current_build_only
           command = []
           command << binary
           command << "update"
@@ -19,25 +20,34 @@ module Fastlane
           UI.message("Available versions:")
           Actions.sh(shell_command)
         end
+
+        if (xcodes_args = params[:xcodes_args])
+          command = []
+          command << binary
+          command << xcodes_args
+          shell_command = command.join(' ')
+          Actions.sh(shell_command)
+        elsif !select_for_current_build_only
+          command = []
+          command << binary
+          command << "install"
+          command << "'#{version}'"
+          shell_command = command.join(' ')
+          Actions.sh(shell_command)
+        end
+
         command = []
         command << binary
-        if (xcodes_args = params[:xcodes_args])
-          command << xcodes_args
-        elsif select_only
-          command << "select"
-          command << "'#{params[:version]}'"
-        else
-          command << "install"
-          command << "'#{params[:version]}'"
-        end
+        command << "installed"
+        command << "'#{version}'"
         shell_command = command.join(' ')
-        Actions.sh(shell_command)
+        # Prints something like /Applications/Xcode-14.app
+        xcode_path = Actions.sh(shell_command).strip
+        xcode_developer_path = xcode_path + "/Contents/Developer/"
 
-        # Prints something like /Applications/Xcode-14.app/Contents/Developer/
-        xcode_path = FastlaneCore::Helper.xcode_path
-        UI.message("Using Xcode #{params[:version]} on path '#{xcode_path.chomp('/Contents/Developer/')}'")
-        ENV["DEVELOPER_DIR"] = xcode_path
-        Actions.lane_context[SharedValues::XCODE_INSTALL_XCODE_PATH] = xcode_path
+        UI.message("Setting Xcode version '#{version}' at '#{xcode_path}' for all build steps")
+        ENV["DEVELOPER_DIR"] = xcode_developer_path
+        Actions.lane_context[SharedValues::XCODES_XCODE_PATH] = xcode_developer_path
         return xcode_path
       end
 
@@ -82,9 +92,9 @@ module Fastlane
                                        description: "Whether the list of available Xcode versions should be updated before running the install command",
                                        type: Boolean,
                                        default_value: true),
-          FastlaneCore::ConfigItem.new(key: :select_only,
-                                       env_name: "FL_XCODES_SELECT_ONLY",
-                                       description: "Whether the action should just select the version passed, instead of installing it if needed. When true, if the version isn't installed, an error will be raised",
+          FastlaneCore::ConfigItem.new(key: :select_for_current_build_only,
+                                       env_name: "FL_XCODES_SELECT_FOR_CURRENT_BUILD_ONLY",
+                                       description: "When true, it won't attempt to install an Xcode version, just find the installed Xcode version that best matches the passed version argument, and select it for the current build steps. It doesn't change the global Xcode version (e.g. via 'xcrun xcode-select'), which would require sudo permissions — when this option is true, this action doesn't require sudo permissions",
                                        type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :binary_path,
@@ -105,7 +115,7 @@ module Fastlane
 
       def self.output
         [
-          ['XCODE_INSTALL_XCODE_PATH', 'The path to the newly installed Xcode']
+          ['XCODES_XCODE_PATH', 'The path to the newly installed Xcode']
         ]
       end
 
