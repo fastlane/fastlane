@@ -38,7 +38,6 @@ module Fastlane
       def self.download_app_data_usages(params, app)
         UI.message("Downloading App Data Usage")
 
-        # Delete all existing usages for new ones
         Spaceship::ConnectAPI::AppDataUsage.all(app_id: app.id, includes: "category,grouping,purpose,dataProtection", limit: 500)
       end
 
