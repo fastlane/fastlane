@@ -134,7 +134,6 @@ module Fastlane
         UI.message("Preparing to upload App Data Usage")
 
         remote_usages = Spaceship::ConnectAPI::AppDataUsage.all(app_id: app.id, includes: "category,grouping,purpose,dataProtection", limit: 500)
-        remote_usages_include_advertising_data = remote_usages.any? { |usage| usage.category.id == Spaceship::ConnectAPI::AppDataUsageCategory::ID::ADVERTISING_DATA }
         remote_usages_config_hash = Fastlane::Helper::AppPrivacyDetailsHelper.usages_config_from_raw_usages(raw_usages: remote_usages)
 
         remote_advertising_data_config = remote_usages_config_hash.find do |config|
@@ -143,7 +142,7 @@ module Fastlane
         local_advertising_data_config = usages_config.find do |config|
           config["category"] == Spaceship::ConnectAPI::AppDataUsageCategory::ID::ADVERTISING_DATA
         end
-        local_usages_include_advertising_data = local_advertising_data_config != nil
+        local_usages_include_advertising_data = !local_advertising_data_config.nil?
         local_and_remote_advertising_data_config_are_identical = local_advertising_data_config == remote_advertising_data_config
         skipped_advertising_data_deletion = false
 
