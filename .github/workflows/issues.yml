@@ -3,6 +3,9 @@ on:
   issues:
     types: [opened]
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:   
   fastlane-env:
     name: fastlane env reminder
