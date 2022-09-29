@@ -25,7 +25,7 @@ module Deliver
       IOS_65 = "iOS-6.5-in"
       # iPhone 14 Pro Max
       IOS_67 = "iOS-6.7-in"
-      
+
       # iPad
       IOS_IPAD = "iOS-iPad"
       # iPad 10.5
@@ -51,7 +51,7 @@ module Deliver
       IOS_65_MESSAGES = "iOS-6.5-in-messages"
       # iPhone 14 Pro Max iMessage
       IOS_67_MESSAGES = "iOS-6.7-in-messages"
-      
+
       # iPad iMessage
       IOS_IPAD_MESSAGES = "iOS-iPad-messages"
       # iPad 10.5 iMessage
@@ -261,9 +261,9 @@ module Deliver
       # because it has same resoluation as IOS_IPAD_PRO and will clobber
       return {
          ScreenSize::IOS_67 => [
-          [1290, 2796],
-          [2796, 1290]
-        ],
+           [1290, 2796],
+           [2796, 1290]
+         ],
         ScreenSize::IOS_65 => [
           [1242, 2688],
           [2688, 1242],

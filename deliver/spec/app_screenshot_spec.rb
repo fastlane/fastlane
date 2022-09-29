@@ -66,11 +66,11 @@ describe Deliver::AppScreenshot do
     end
 
     describe "valid screen sizes" do
-        it "should calculate all 6.7 inch iPhone resolutions" do
-          expect_screen_size_from_file("iPhone14ProMax-Portrait{1290x2796}.jpg").to eq(ScreenSize::IOS_67)
-          expect_screen_size_from_file("iPhone14ProMax-Landscape{2796x1290}.jpg").to eq(ScreenSize::IOS_67)
-        end
-        
+      it "should calculate all 6.7 inch iPhone resolutions" do
+        expect_screen_size_from_file("iPhone14ProMax-Portrait{1290x2796}.jpg").to eq(ScreenSize::IOS_67)
+        expect_screen_size_from_file("iPhone14ProMax-Landscape{2796x1290}.jpg").to eq(ScreenSize::IOS_67)
+      end
+
       it "should calculate all 6.5 inch iPhone resolutions" do
         expect_screen_size_from_file("iPhoneXSMax-Portrait{1242x2688}.jpg").to eq(ScreenSize::IOS_65)
         expect_screen_size_from_file("iPhoneXSMax-Landscape{2688x1242}.jpg").to eq(ScreenSize::IOS_65)
@@ -157,7 +157,7 @@ describe Deliver::AppScreenshot do
         expect_screen_size_from_file("iMessage/en-GB/iPhone14ProMax-Portrait{1290x2796}.jpg").to eq(ScreenSize::IOS_67_MESSAGES)
         expect_screen_size_from_file("iMessage/en-GB/iPhone14ProMax-Landscape{2796x1290}.jpg").to eq(ScreenSize::IOS_67_MESSAGES)
       end
-          
+
       it "should calculate all 6.5 inch iPhone resolutions" do
         expect_screen_size_from_file("iMessage/en-GB/iPhoneXSMax-Portrait{1242x2688}.jpg").to eq(ScreenSize::IOS_65_MESSAGES)
         expect_screen_size_from_file("iMessage/en-GB/iPhoneXSMax-Landscape{2688x1242}.jpg").to eq(ScreenSize::IOS_65_MESSAGES)
