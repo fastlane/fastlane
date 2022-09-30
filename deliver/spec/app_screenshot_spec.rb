@@ -153,7 +153,7 @@ describe Deliver::AppScreenshot do
     end
 
     describe "valid iMessage app screen sizes" do
-      it "should calculate all 6.5 inch iPhone resolutions" do
+      it "should calculate all 6.7 inch iPhone resolutions" do
         expect_screen_size_from_file("iMessage/en-GB/iPhone14ProMax-Portrait{1290x2796}.jpg").to eq(ScreenSize::IOS_67_MESSAGES)
         expect_screen_size_from_file("iMessage/en-GB/iPhone14ProMax-Landscape{2796x1290}.jpg").to eq(ScreenSize::IOS_67_MESSAGES)
       end
