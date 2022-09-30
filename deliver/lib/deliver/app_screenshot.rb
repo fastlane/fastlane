@@ -262,7 +262,7 @@ module Deliver
       return {
          ScreenSize::IOS_67 => [
            [1290, 2796],
-           [2796, 1290]
+           [2796, 1290],
          ],
         ScreenSize::IOS_65 => [
           [1242, 2688],
