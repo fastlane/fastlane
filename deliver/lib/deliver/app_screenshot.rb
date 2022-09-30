@@ -260,10 +260,10 @@ module Deliver
       # This list does not include iPad Pro 12.9-inch (3rd generation)
       # because it has same resoluation as IOS_IPAD_PRO and will clobber
       return {
-         ScreenSize::IOS_67 => [
-           [1290, 2796],
-           [2796, 1290]
-         ],
+        ScreenSize::IOS_67 => [
+          [1290, 2796],
+          [2796, 1290]
+        ],
         ScreenSize::IOS_65 => [
           [1242, 2688],
           [2688, 1242],
