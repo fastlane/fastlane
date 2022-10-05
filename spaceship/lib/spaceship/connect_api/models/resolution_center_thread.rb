@@ -51,6 +51,18 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
+      def fetch_messages(client: nil, filter: {}, includes: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_resolution_center_messages(thread_id: id, filter: filter, includes: includes).all_pages
+        return resps.flat_map(&:to_models)
+      end
+
+      def fetch_rejection_reasons(client: nil, includes: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_review_rejection(filter: { 'resolutionCenterMessage.resolutionCenterThread': id }, includes: includes)
+        return resp.to_models
+      end
+
     end
   end
 end
