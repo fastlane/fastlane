@@ -62,7 +62,6 @@ module Spaceship
         resp = client.get_review_rejection(filter: { 'resolutionCenterMessage.resolutionCenterThread': id }, includes: includes)
         return resp.to_models
       end
-
     end
   end
 end

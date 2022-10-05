@@ -1256,7 +1256,7 @@ module Spaceship
         #
         # resolutionCenter
         #
-        
+
         def get_resolution_center_threads(filter: {}, includes: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes)
           tunes_request_client.get('resolutionCenterThreads', params)
