@@ -1252,6 +1252,15 @@ module Spaceship
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
           tunes_request_client.get("territories", params)
         end
+
+        #
+        # resolutionCenter
+        #
+
+        def get_resolution_center_threads(filter:, includes: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes)
+          tunes_request_client.get('resolutionCenterThreads', params)
+        end
       end
     end
   end
