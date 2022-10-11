@@ -671,7 +671,7 @@ module FastlaneCore
     #                            see: https://github.com/fastlane/fastlane/issues/1524#issuecomment-196370628
     #                            for more information about how to use the iTMSTransporter to list your provider
     #                            short names
-    def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil, upload: false, api_key: nil)
+    def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil, altool_compatible_command: false, api_key: nil)
       # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
       # we can't default to using the newer direct Java invocation strategy for those versions.
       use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.')
@@ -686,7 +686,7 @@ module FastlaneCore
       @jwt = jwt
       @api_key = api_key
 
-      if should_use_altool?(upload, use_shell_script)
+      if should_use_altool?(altool_compatible_command, use_shell_script)
         UI.verbose("Using altool as transporter.")
         @transporter_executor = AltoolTransporterExecutor.new
       else
@@ -894,9 +894,9 @@ module FastlaneCore
     end
 
     # Returns whether altool should be used or ItunesTransporter should be used
-    def should_use_altool?(upload, use_shell_script)
+    def should_use_altool?(altool_compatible_command, use_shell_script)
       # Xcode 14 no longer supports iTMSTransporter. Use altool instead
-      !use_shell_script && upload && !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(14)
+      !use_shell_script && altool_compatible_command && !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(14)
     end
 
     # Returns the password to be used with the transporter
