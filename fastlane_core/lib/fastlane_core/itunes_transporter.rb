@@ -812,10 +812,20 @@ module FastlaneCore
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transferring
-    def verify(app_id = nil, dir = nil, package_path: nil, platform: nil)
-      raise "Either a combination of app id and directory or a package_path are required" if (app_id.nil? || dir.nil?) && package_path.nil?
+    def verify(app_id = nil, dir = nil, package_path: nil, asset_path: nil, platform: nil)
+      raise "app_id and dir are required or package_path or asset_path is required" if (app_id.nil? || dir.nil?) && package_path.nil? && asset_path.nil?
 
-      actual_dir = if package_path
+      force_itmsp = FastlaneCore::Env.truthy?("ITMSTRANSPORTER_FORCE_ITMS_PACKAGE_UPLOAD")
+      can_use_asset_path = Helper.is_mac? && asset_path
+
+      actual_dir = if can_use_asset_path && !force_itmsp
+                     # The asset gets deleted upon completion so copying to a temp directory
+                     # (with randomized filename, for multibyte-mixed filename upload fails)
+                     new_file_name = "#{SecureRandom.uuid}#{File.extname(asset_path)}"
+                     tmp_asset_path = File.join(Dir.tmpdir, new_file_name)
+                     FileUtils.cp(asset_path, tmp_asset_path)
+                     tmp_asset_path
+                   elsif package_path
                      package_path
                    else
                      File.join(dir, "#{app_id}.itmsp")

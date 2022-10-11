@@ -179,7 +179,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.verify(package_path: package_path, platform: platform)
+        result = transporter.verify(package_path: package_path, asset_path: ipa_path, platform: platform)
       when "osx"
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
@@ -187,7 +187,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.verify(package_path: package_path, platform: platform)
+        result = transporter.verify(package_path: package_path, asset_path: pkg_path, platform: platform)
       else
         UI.user_error!("No suitable file found for verify for platform: #{options[:platform]}")
       end
