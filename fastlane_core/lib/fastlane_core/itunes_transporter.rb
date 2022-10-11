@@ -319,7 +319,7 @@ module FastlaneCore
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
         platform_option(platform),
-        file_upload_option(source),
+        file_upload_option(source)
       ].compact.join(' ')
     end
 
