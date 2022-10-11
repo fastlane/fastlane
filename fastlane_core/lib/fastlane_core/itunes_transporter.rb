@@ -47,7 +47,7 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
       not_implemented(__method__)
     end
 
@@ -421,7 +421,7 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
       use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
@@ -516,7 +516,7 @@ module FastlaneCore
       end
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
       use_jwt = !jwt.to_s.empty?
       if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
