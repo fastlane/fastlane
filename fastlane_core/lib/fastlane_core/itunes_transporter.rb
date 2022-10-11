@@ -308,7 +308,18 @@ module FastlaneCore
     end
 
     def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
-      raise "This feature has not been implemented yet with altool for Xcode 14"
+      use_api_key = !api_key.nil?
+      [
+        ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
+        "xcrun altool",
+        "--validate-app",
+        ("-u #{username.shellescape}" unless use_api_key),
+        ("-p #{password.shellescape}" unless use_api_key),
+        ("--apiKey #{api_key[:key_id]}" if use_api_key),
+        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
+        file_upload_option(source),
+      ].compact.join(' ')
     end
 
     def additional_upload_parameters
