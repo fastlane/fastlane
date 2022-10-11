@@ -179,7 +179,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.verify(package_path: package_path)
+        result = transporter.verify(package_path: package_path, platform: platform)
       when "osx"
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
@@ -187,7 +187,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.verify(package_path: package_path)
+        result = transporter.verify(package_path: package_path, platform: platform)
       else
         UI.user_error!("No suitable file found for verify for platform: #{options[:platform]}")
       end
@@ -285,12 +285,12 @@ module Deliver
 
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: upload, api_key: api_key)
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: altool_compatible_command, api_key: api_key)
       end
 
       tunes_client = Spaceship::ConnectAPI.client.tunes_client
 
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], upload: upload, api_key: api_key)
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: altool_compatible_command, api_key: api_key)
       return generic_transporter unless options[:itc_provider].nil? && tunes_client.teams.count > 1
 
       begin

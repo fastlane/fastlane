@@ -307,7 +307,7 @@ module FastlaneCore
       raise "This feature has not been implemented yet with altool for Xcode 14"
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
       use_api_key = !api_key.nil?
       [
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
@@ -318,6 +318,7 @@ module FastlaneCore
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
+        platform_option(platform),
         file_upload_option(source),
       ].compact.join(' ')
     end
@@ -811,7 +812,7 @@ module FastlaneCore
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transferring
-    def verify(app_id = nil, dir = nil, package_path: nil)
+    def verify(app_id = nil, dir = nil, package_path: nil, platform: nil)
       raise "Either a combination of app id and directory or a package_path are required" if (app_id.nil? || dir.nil?) && package_path.nil?
 
       actual_dir = if package_path
@@ -823,8 +824,15 @@ module FastlaneCore
       password_placeholder = @jwt.nil? ? 'YourPassword' : nil
       jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
 
-      command = @transporter_executor.build_verify_command(@user, @password, actual_dir, @provider_short_name, @jwt)
-      UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder))
+      # Handle AppStore Connect API
+      use_api_key = !@api_key.nil?
+      api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
+
+      api_key = nil
+      api_key = api_key_with_p8_file_path(@api_key) if use_api_key
+
+      command = @transporter_executor.build_verify_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, api_key)
+      UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_placeholder))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
