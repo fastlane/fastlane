@@ -1,5 +1,5 @@
 describe Fastlane::Helper::XcodesHelper do
-  describe "#read_xcode_version_file" do
+  describe ".read_xcode_version_file" do
     let(:xcode_version_path) { ".xcode-version" }
 
     context ".xcode-version file exists" do
@@ -24,7 +24,7 @@ describe Fastlane::Helper::XcodesHelper do
     end
   end
 
-  describe "#find_xcodes_binary_path" do
+  describe ".find_xcodes_binary_path" do
     it "returns the binary path when it's installed" do
       expect(subject.class).to receive(:find_xcodes_binary_path).and_return("/path/to/bin/xcodes")
       expect(subject.class.find_xcodes_binary_path).to eq("/path/to/bin/xcodes")
@@ -37,7 +37,7 @@ describe Fastlane::Helper::XcodesHelper do
   end
 
   describe "Verify" do
-    describe "#requirement" do
+    describe ".requirement" do
       context "when argument is missing or empty" do
         let(:argument) { nil }
 
