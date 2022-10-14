@@ -60,7 +60,11 @@ module Fastlane
       end
 
       def self.details
-        "Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by [xcodes](https://github.com/RobotsAndPencils/xcodes). This will make sure to use the correct Xcode version for later actions."
+        [
+          "Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by [xcodes](https://github.com/RobotsAndPencils/xcodes).",
+          "This will make sure to use the correct Xcode version for later actions.",
+          "Note that this action depends on [xcodes](https://github.com/RobotsAndPencils/xcodes) CLI, so make sure you have it installed in your environment. For the installation guide, see: https://github.com/RobotsAndPencils/xcodes#installation"
+        ].join("\n")
       end
 
       def self.available_options
@@ -103,6 +107,7 @@ module Fastlane
                                        default_value: Helper::XcodesHelper.find_xcodes_binary_path,
                                        default_value_dynamic: true,
                                        verify_block: proc do |value|
+                                         UI.user_error!("'xcodes' doesn't seem to be installed. Please follow the installation guide at https://github.com/RobotsAndPencils/xcodes#installation before proceeding") if value.empty?
                                          UI.user_error!("Couldn't find xcodes binary at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :xcodes_args,
