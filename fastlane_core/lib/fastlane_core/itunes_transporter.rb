@@ -877,8 +877,7 @@ module FastlaneCore
       api_key[:key_dir] = Dir.mktmpdir("deliver-")
       # Specified p8 needs to be generated to call altool
       File.open(File.join(api_key[:key_dir], "AuthKey_#{api_key[:key_id]}.p8"), "wb") do |p8|
-        key_content = api_key[:is_key_content_base64] ? Base64.decode64(api_key[:key]) : api_key[:key]
-        p8.write(key_content)
+        p8.write(api_key[:key])
       end
       api_key
     end
