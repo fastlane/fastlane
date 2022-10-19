@@ -266,7 +266,7 @@ module FastlaneCore
       # Reset simulator by UDID or name and OS version
       # Latter is useful when combined with -destination option of xcodebuild
       def reset(udid: nil, name: nil, os_version: nil)
-        match = all.detect { |device| device.udid == udid || (device.name == name && device.os_version == os_version) }
+        match = all.detect { |device| device.udid == udid || device.name == name && device.os_version == os_version }
         match.reset if match
       end
 
@@ -283,7 +283,7 @@ module FastlaneCore
       # Disable 'Slide to Type' by UDID or name and OS version
       # Latter is useful when combined with -destination option of xcodebuild
       def disable_slide_to_type(udid: nil, name: nil, os_version: nil)
-        match = all.detect { |device| device.udid == udid || (device.name == name && device.os_version == os_version) }
+        match = all.detect { |device| device.udid == udid || device.name == name && device.os_version == os_version }
         match.disable_slide_to_type if match
       end
 

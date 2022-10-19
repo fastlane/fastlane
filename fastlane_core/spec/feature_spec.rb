@@ -80,10 +80,10 @@ describe FastlaneCore do
       it "Calls disabled class method with disabled environment variable" do
         FastlaneSpec::Env.with_env_values('TEST_ENV_VAR_FOR_METHOD_TESTS' => '0') do
           FastlaneCore::Feature.register_class_method(klass: FeatureHelper,
-                                                      symbol: :test_method,
-                                                      disabled_symbol: :disabled_class_method,
-                                                      enabled_symbol: :enabled_class_method,
-                                                      env_var: 'TEST_ENV_VAR_FOR_METHOD_TESTS')
+                                                     symbol: :test_method,
+                                            disabled_symbol: :disabled_class_method,
+                                             enabled_symbol: :enabled_class_method,
+                                                    env_var: 'TEST_ENV_VAR_FOR_METHOD_TESTS')
 
           expect(FeatureHelper).to receive(:disabled_class_method)
           FeatureHelper.test_method
@@ -94,10 +94,10 @@ describe FastlaneCore do
       it "Calls enabled class method with enabled environment variable" do
         FastlaneSpec::Env.with_env_values('TEST_ENV_VAR_FOR_METHOD_TESTS' => '1') do
           FastlaneCore::Feature.register_class_method(klass: FeatureHelper,
-                                                      symbol: :test_method,
-                                                      disabled_symbol: :disabled_class_method,
-                                                      enabled_symbol: :enabled_class_method,
-                                                      env_var: 'TEST_ENV_VAR_FOR_METHOD_TESTS')
+                                                     symbol: :test_method,
+                                            disabled_symbol: :disabled_class_method,
+                                             enabled_symbol: :enabled_class_method,
+                                                    env_var: 'TEST_ENV_VAR_FOR_METHOD_TESTS')
 
           expect(FeatureHelper).to receive(:enabled_class_method)
           FeatureHelper.test_method
@@ -109,10 +109,10 @@ describe FastlaneCore do
         FastlaneSpec::Env.with_env_values('TEST_ENV_VAR_FOR_METHOD_TESTS' => '0') do
           instance = FeatureHelper.new
           FastlaneCore::Feature.register_instance_method(klass: FeatureHelper,
-                                                         symbol: :test_method,
-                                                         disabled_symbol: :disabled_instance_method,
-                                                         enabled_symbol: :enabled_instance_method,
-                                                         env_var: 'TEST_ENV_VAR_FOR_METHOD_TESTS')
+                                                        symbol: :test_method,
+                                               disabled_symbol: :disabled_instance_method,
+                                                enabled_symbol: :enabled_instance_method,
+                                                       env_var: 'TEST_ENV_VAR_FOR_METHOD_TESTS')
 
           expect(instance).to receive(:disabled_instance_method)
           instance.test_method
@@ -124,10 +124,10 @@ describe FastlaneCore do
         FastlaneSpec::Env.with_env_values('TEST_ENV_VAR_FOR_METHOD_TESTS' => '1') do
           instance = FeatureHelper.new
           FastlaneCore::Feature.register_instance_method(klass: FeatureHelper,
-                                                         symbol: :test_method,
-                                                         disabled_symbol: :disabled_instance_method,
-                                                         enabled_symbol: :enabled_instance_method,
-                                                         env_var: 'TEST_ENV_VAR_FOR_METHOD_TESTS')
+                                                        symbol: :test_method,
+                                               disabled_symbol: :disabled_instance_method,
+                                                enabled_symbol: :enabled_instance_method,
+                                                       env_var: 'TEST_ENV_VAR_FOR_METHOD_TESTS')
 
           expect(instance).to receive(:enabled_instance_method)
           instance.test_method

@@ -50,7 +50,7 @@ module Fastlane
 
         json_headers = { 'Content-Type' => 'application/json', 'Authorization' => "Basic #{auth_token}" }
         url = +'https://onesignal.com/api/v1/apps'
-        url << ('/' + app_id) if is_update
+        url << '/' + app_id if is_update
         uri = URI.parse(url)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true

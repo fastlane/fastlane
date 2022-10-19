@@ -81,15 +81,15 @@ module Fastlane
                                        sensitive: true,
                                        conflicting_options: [:api_key_path]),
           FastlaneCore::ConfigItem.new(key: :team_id,
-                                       env_name: "REGISTER_DEVICE_TEAM_ID",
-                                       code_gen_sensitive: true,
-                                       default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
+                                     env_name: "REGISTER_DEVICE_TEAM_ID",
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
                                        default_value_dynamic: true,
-                                       description: "The ID of your Developer Portal team if you're in multiple teams",
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         ENV["FASTLANE_TEAM_ID"] = value.to_s
-                                       end),
+                                     description: "The ID of your Developer Portal team if you're in multiple teams",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       ENV["FASTLANE_TEAM_ID"] = value.to_s
+                                     end),
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        env_name: "REGISTER_DEVICE_TEAM_NAME",
                                        description: "The name of your Developer Portal team if you're in multiple teams",

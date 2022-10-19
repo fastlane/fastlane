@@ -123,9 +123,9 @@ module Spaceship
 
       def details
         response = client.build_details(app_id: self.apple_id,
-                                        train: self.train_version,
-                                        build_number: self.build_version,
-                                        platform: self.platform)
+                                         train: self.train_version,
+                                  build_number: self.build_version,
+                                      platform: self.platform)
         response['apple_id'] = self.apple_id
         BuildDetails.factory(response)
       end
@@ -206,9 +206,9 @@ module Spaceship
       # This will cancel the review process for this TestFlight build
       def cancel_beta_review!
         client.remove_testflight_build_from_review!(app_id: self.apple_id,
-                                                    train: self.train_version,
-                                                    build_number: self.build_version,
-                                                    platform: self.platform)
+                                                     train: self.train_version,
+                                              build_number: self.build_version,
+                                                  platform: self.platform)
       end
     end
   end

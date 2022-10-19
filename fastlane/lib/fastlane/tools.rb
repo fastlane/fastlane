@@ -33,18 +33,18 @@ module Fastlane
   ]
 
   TOOL_ALIASES = {
-    'get_certificates': "cert",
-    'upload_to_app_store': "deliver",
-    'frame_screenshots': "frameit",
-    'build_app': "gym",
-    'build_ios_app': "gym",
-    'build_mac_app': "gym",
-    'sync_code_signing': "match",
-    'get_push_certificate': "pem",
-    'check_app_store_metadata': "precheck",
-    'capture_android_screenshots': "screengrab",
-    'get_provisioning_profile': "sigh",
-    'capture_ios_screenshots': "snapshot",
-    'upload_to_play_store': "supply"
+    "get_certificates": "cert",
+    "upload_to_app_store": "deliver",
+    "frame_screenshots": "frameit",
+    "build_app": "gym",
+    "build_ios_app": "gym",
+    "build_mac_app": "gym",
+    "sync_code_signing": "match",
+    "get_push_certificate": "pem",
+    "check_app_store_metadata": "precheck",
+    "capture_android_screenshots": "screengrab",
+    "get_provisioning_profile": "sigh",
+    "capture_ios_screenshots": "snapshot",
+    "upload_to_play_store": "supply"
   }
 end

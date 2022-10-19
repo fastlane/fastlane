@@ -169,8 +169,8 @@ module Pilot
                                      short_option: "-z",
                                      env_name: "PILOT_SKIP_WAITING_FOR_BUILD_PROCESSING",
                                      description: "If set to true, the `distribute_external` option won't work and no build will be distributed to testers. " \
-                                                  "(You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). " \
-                                                  "If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps",
+                                      "(You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). " \
+                                      "If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps",
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :update_build_info_on_upload,
@@ -200,10 +200,10 @@ module Pilot
                                      description: "Should the build be distributed to external testers? If set to true, use of `groups` option is required",
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :notify_external_testers,
-                                     is_string: false,
-                                     env_name: "PILOT_NOTIFY_EXTERNAL_TESTERS",
-                                     description: "Should notify external testers? (Not setting a value will use App Store Connect's default which is to notify)",
-                                     optional: true),
+                                    is_string: false,
+                                    env_name: "PILOT_NOTIFY_EXTERNAL_TESTERS",
+                                    description: "Should notify external testers? (Not setting a value will use App Store Connect's default which is to notify)",
+                                    optional: true),
         FastlaneCore::ConfigItem.new(key: :app_version,
                                      env_name: "PILOT_APP_VERSION",
                                      description: "The version number of the application build to distribute. If the version number is not specified, then the most recent build uploaded to TestFlight will be distributed. If specified, the most recent build for the version number will be distributed",

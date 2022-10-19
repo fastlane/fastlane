@@ -622,7 +622,7 @@ module FastlaneCore
       unless File.exist?(Helper.transporter_java_jar_path)
         UI.error("The iTMSTransporter Java app was not found at '#{Helper.transporter_java_jar_path}'.")
         UI.error("If you're using Xcode 6, please select the shell script executor by setting the environment variable "\
-                 "FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT=1")
+          "FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT=1")
       end
     end
 
@@ -898,7 +898,7 @@ module FastlaneCore
       end
       #   2) TWO_STEP_HOST_PREFIX from keychain
       account_manager = CredentialsManager::AccountManager.new(user: @user,
-                                                               prefix: TWO_STEP_HOST_PREFIX,
+                                                             prefix: TWO_STEP_HOST_PREFIX,
                                                                note: "application-specific")
       password = account_manager.password(ask_if_missing: false)
       return password if password.to_s.length > 0
@@ -920,7 +920,7 @@ module FastlaneCore
       end
 
       a = CredentialsManager::AccountManager.new(user: @user,
-                                                 prefix: TWO_STEP_HOST_PREFIX,
+                                               prefix: TWO_STEP_HOST_PREFIX,
                                                  note: "application-specific")
       if a.password(ask_if_missing: false).to_s.length > 0
         # user already entered one.. delete the old one

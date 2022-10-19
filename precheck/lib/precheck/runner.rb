@@ -15,8 +15,8 @@ module Precheck
       Precheck.config.load_configuration_file(Precheck.precheckfile_name)
 
       FastlaneCore::PrintTable.print_values(config: Precheck.config,
-                                            hide_keys: [:output_path],
-                                            title: "Summary for precheck #{Fastlane::VERSION}")
+                                         hide_keys: [:output_path],
+                                             title: "Summary for precheck #{Fastlane::VERSION}")
 
       api_token = if (token = Spaceship::ConnectAPI::Token.from(hash: Precheck.config[:api_key], filepath: Precheck.config[:api_key_path]))
                     UI.message("Creating authorization token for App Store Connect API")

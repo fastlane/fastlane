@@ -155,7 +155,7 @@ module Spaceship
         until product
           if try_number > max_tries
             raise PotentialServerError.new, "Failed to find the product with id=#{product_id}. "\
-                                            "This can be caused either by a server error or due to the removal of the product."
+            "This can be caused either by a server error or due to the removal of the product."
           end
           product = find(product_id)
           try_number += 1

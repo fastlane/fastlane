@@ -74,26 +74,26 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
         end
         it 'should make a request to turn DATA_PROTECTION complete' do
           client.patch_bundle_id_capability(bundle_id_id: "ABCD1234", seed_id: "XXXXXXXXXX", enabled: true, capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::DATA_PROTECTION,
-                                            settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings::DATA_PROTECTION_PERMISSION_LEVEL, options: [ { key: Spaceship::ConnectAPI::BundleIdCapability::Options::COMPLETE_PROTECTION } ] }])
+settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings::DATA_PROTECTION_PERMISSION_LEVEL, options: [ { key: Spaceship::ConnectAPI::BundleIdCapability::Options::COMPLETE_PROTECTION } ] }])
         end
         it 'should make a request to turn DATA_PROTECTION unless_open' do
           client.patch_bundle_id_capability(bundle_id_id: "ABCD1234", seed_id: "XXXXXXXXXX", enabled: true, capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::DATA_PROTECTION,
-                                            settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings::DATA_PROTECTION_PERMISSION_LEVEL, options: [ { key: Spaceship::ConnectAPI::BundleIdCapability::Options::PROTECTED_UNLESS_OPEN } ] }])
+settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings::DATA_PROTECTION_PERMISSION_LEVEL, options: [ { key: Spaceship::ConnectAPI::BundleIdCapability::Options::PROTECTED_UNLESS_OPEN } ] }])
         end
         it 'should make a request to turn DATA_PROTECTION until_first_auth' do
           client.patch_bundle_id_capability(bundle_id_id: "ABCD1234", seed_id: "XXXXXXXXXX", enabled: true, capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::DATA_PROTECTION,
-                                            settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings::DATA_PROTECTION_PERMISSION_LEVEL, options: [ { key: Spaceship::ConnectAPI::BundleIdCapability::Options::PROTECTED_UNTIL_FIRST_USER_AUTH } ] }])
+settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings::DATA_PROTECTION_PERMISSION_LEVEL, options: [ { key: Spaceship::ConnectAPI::BundleIdCapability::Options::PROTECTED_UNTIL_FIRST_USER_AUTH } ] }])
         end
         it 'should make a request to turn DATA_PROTECTION off' do
           client.patch_bundle_id_capability(bundle_id_id: "ABCD1234", seed_id: "XXXXXXXXXX", enabled: false, capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::DATA_PROTECTION)
         end
         it 'should make a request to turn ICLOUD xcode6_compatible' do
           client.patch_bundle_id_capability(bundle_id_id: "ABCD1234", seed_id: "XXXXXXXXXX", enabled: true, capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::ICLOUD,
-                                            settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings::ICLOUD_VERSION, options: [ { key: Spaceship::ConnectAPI::BundleIdCapability::Options::XCODE_5 } ] }])
+settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings::ICLOUD_VERSION, options: [ { key: Spaceship::ConnectAPI::BundleIdCapability::Options::XCODE_5 } ] }])
         end
         it 'should make a request to turn ICLOUD xcode5_compatible' do
           client.patch_bundle_id_capability(bundle_id_id: "ABCD1234", seed_id: "XXXXXXXXXX", enabled: true, capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::ICLOUD,
-                                            settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings::ICLOUD_VERSION, options: [ { key: Spaceship::ConnectAPI::BundleIdCapability::Options::XCODE_6 } ] }])
+settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings::ICLOUD_VERSION, options: [ { key: Spaceship::ConnectAPI::BundleIdCapability::Options::XCODE_6 } ] }])
         end
         it 'should make a request to turn ICLOUD off' do
           client.patch_bundle_id_capability(bundle_id_id: "ABCD1234", seed_id: "XXXXXXXXXX", enabled: false, capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::ICLOUD)

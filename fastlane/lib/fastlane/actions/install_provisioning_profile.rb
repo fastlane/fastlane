@@ -31,16 +31,16 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :path,
-                                       env_name: "FL_INSTALL_PROVISIONING_PROFILE_PATH",
-                                       description: "Path to provisioning profile",
-                                       optional: false,
-                                       type: String,
-                                       verify_block: proc do |value|
-                                         absolute_path = File.expand_path(value)
-                                         unless File.exist?(absolute_path)
-                                           UI.user_error!("Could not find provisioning profile at path: '#{value}'")
-                                         end
-                                       end)
+                                  env_name: "FL_INSTALL_PROVISIONING_PROFILE_PATH",
+                               description: "Path to provisioning profile",
+                                  optional: false,
+                                      type: String,
+                              verify_block: proc do |value|
+                                absolute_path = File.expand_path(value)
+                                unless File.exist?(absolute_path)
+                                  UI.user_error!("Could not find provisioning profile at path: '#{value}'")
+                                end
+                              end)
         ]
       end
 

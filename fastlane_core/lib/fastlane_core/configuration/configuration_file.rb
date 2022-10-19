@@ -36,9 +36,9 @@ module FastlaneCore
       # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
       if content.tr!('“”‘’‛', %(""'''))
         UI.error("Your #{File.basename(path)} has had smart quotes sanitised. " \
-                 'To avoid issues in the future, you should not use ' \
-                 'TextEdit for editing it. If you are not using TextEdit, ' \
-                 'you should turn off smart quotes in your editor of choice.')
+                  'To avoid issues in the future, you should not use ' \
+                  'TextEdit for editing it. If you are not using TextEdit, ' \
+                  'you should turn off smart quotes in your editor of choice.')
       end
 
       begin
@@ -73,7 +73,7 @@ module FastlaneCore
 
       puts("")
       puts(Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),
-                               title: "Detected Values from '#{self.configfile_path}'"))
+                              title: "Detected Values from '#{self.configfile_path}'"))
       puts("")
     end
 

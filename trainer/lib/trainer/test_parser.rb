@@ -26,7 +26,7 @@ module Trainer
     def self.auto_convert(config)
       unless config[:silent]
         FastlaneCore::PrintTable.print_values(config: config,
-                                              title: "Summary for trainer #{Fastlane::VERSION}")
+                                               title: "Summary for trainer #{Fastlane::VERSION}")
       end
 
       containing_dir = config[:path]

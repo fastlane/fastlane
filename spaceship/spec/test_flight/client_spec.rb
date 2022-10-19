@@ -219,10 +219,10 @@ describe Spaceship::TestFlight::Client do
       MockAPI::TestFlightServer.post('/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers') {}
       tester = OpenStruct.new({ first_name: "Josh", last_name: "Taquitos", email: "taquitos@google.com" })
       subject.post_tester_to_group(app_id: app_id,
-                                   email: tester.email,
-                                   first_name: tester.first_name,
-                                   last_name: tester.last_name,
-                                   group_id: 'fake-group-id')
+                                    email: tester.email,
+                               first_name: tester.first_name,
+                                last_name: tester.last_name,
+                                 group_id: 'fake-group-id')
       expect(WebMock).to have_requested(:post, 'https://appstoreconnect.apple.com/testflight/v2/providers/fake-team-id/apps/some-app-id/groups/fake-group-id/testers').
         with(body: '[{"email":"taquitos@google.com","firstName":"Josh","lastName":"Taquitos"}]')
     end

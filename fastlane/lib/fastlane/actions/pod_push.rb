@@ -83,10 +83,10 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
-                                       description: "Use bundle exec when there is a Gemfile presented",
-                                       type: Boolean,
-                                       default_value: false,
-                                       env_name: "FL_POD_PUSH_USE_BUNDLE_EXEC"),
+                                         description: "Use bundle exec when there is a Gemfile presented",
+                                         type: Boolean,
+                                         default_value: false,
+                                         env_name: "FL_POD_PUSH_USE_BUNDLE_EXEC"),
           FastlaneCore::ConfigItem.new(key: :path,
                                        description: "The Podspec you want to push",
                                        optional: true,

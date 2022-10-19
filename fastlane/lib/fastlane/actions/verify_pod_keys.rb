@@ -22,8 +22,8 @@ module Fastlane
       def self.validate(key, target)
         if value(key, target).length < 2
           message = "Did not pass validation for key #{key}. " \
-                    "Run `[bundle exec] pod keys get #{key} #{target}` to see what it is. " \
-                    "It's likely this is running with empty/OSS keys."
+            "Run `[bundle exec] pod keys get #{key} #{target}` to see what it is. " \
+            "It's likely this is running with empty/OSS keys."
           raise message
         end
       end

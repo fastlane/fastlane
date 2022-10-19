@@ -177,7 +177,7 @@ describe Fastlane do
 
       it "raises an error if name contains spaces" do
         expect(UI).to receive(:user_error!).with("lane name must not contain any spaces")
-        @ff.lane(:'my name') do
+        @ff.lane(:"my name") do
         end
       end
 

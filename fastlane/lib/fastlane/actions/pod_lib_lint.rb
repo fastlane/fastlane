@@ -87,7 +87,7 @@ module Fastlane
                                        env_name: "FL_POD_LIB_LINT_INCLUDE_PODSPECS"),
           FastlaneCore::ConfigItem.new(key: :external_podspecs,
                                        description: "A Glob of additional ancillary podspecs which are used for linting via :podspec. If there"\
-                                                    " are --include-podspecs, then these are removed from them (available since cocoapods >= 1.7)",
+                                         " are --include-podspecs, then these are removed from them (available since cocoapods >= 1.7)",
                                        type: String,
                                        optional: true,
                                        env_name: "FL_POD_LIB_LINT_EXTERNAL_PODSPECS"),
@@ -133,7 +133,7 @@ module Fastlane
                                        env_name: "FL_POD_LIB_LINT_NO_SUBSPECS"),
           FastlaneCore::ConfigItem.new(key: :platforms,
                                        description: "Lint against specific platforms (defaults to all platforms supported by "\
-                                                    "the podspec). Multiple platforms must be comma-delimited (available since cocoapods >= 1.6)",
+                                          "the podspec). Multiple platforms must be comma-delimited (available since cocoapods >= 1.6)",
                                        optional: true,
                                        env_name: "FL_POD_LIB_LINT_PLATFORMS"),
           FastlaneCore::ConfigItem.new(key: :skip_import_validation,

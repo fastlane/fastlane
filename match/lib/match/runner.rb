@@ -26,7 +26,7 @@ module Match
       FileUtils.mkdir_p(params[:output_path]) if params[:output_path]
 
       FastlaneCore::PrintTable.print_values(config: params,
-                                            title: "Summary for match #{Fastlane::VERSION}")
+                                             title: "Summary for match #{Fastlane::VERSION}")
 
       update_optional_values_depending_on_storage_type(params)
 
@@ -112,9 +112,9 @@ module Match
         app_identifiers.each do |app_identifier|
           loop do
             break if fetch_provisioning_profile(params: params,
-                                                certificate_id: cert_id,
-                                                app_identifier: app_identifier,
-                                                working_directory: storage.working_directory)
+                                        certificate_id: cert_id,
+                                        app_identifier: app_identifier,
+                                    working_directory: storage.working_directory)
           end
         end
       end
@@ -269,11 +269,11 @@ module Match
         end
 
         profile = Generator.generate_provisioning_profile(params: params,
-                                                          prov_type: prov_type,
-                                                          certificate_id: certificate_id,
-                                                          app_identifier: app_identifier,
-                                                          force: force,
-                                                          working_directory: prefixed_working_directory)
+                                                       prov_type: prov_type,
+                                                  certificate_id: certificate_id,
+                                                  app_identifier: app_identifier,
+                                                           force: force,
+                                               working_directory: prefixed_working_directory)
         self.files_to_commit << profile
       end
 
@@ -298,31 +298,31 @@ module Match
       end
 
       Utils.fill_environment(Utils.environment_variable_name(app_identifier: app_identifier,
-                                                             type: prov_type,
-                                                             platform: params[:platform]),
+                                                                       type: prov_type,
+                                                                   platform: params[:platform]),
 
                              uuid)
 
       # TeamIdentifier is returned as an array, but we're not sure why there could be more than one
       Utils.fill_environment(Utils.environment_variable_name_team_id(app_identifier: app_identifier,
-                                                                     type: prov_type,
-                                                                     platform: params[:platform]),
+                                                                               type: prov_type,
+                                                                           platform: params[:platform]),
                              parsed["TeamIdentifier"].first)
 
       cert_info = Utils.get_cert_info(parsed["DeveloperCertificates"].first.string).to_h
       Utils.fill_environment(Utils.environment_variable_name_certificate_name(app_identifier: app_identifier,
-                                                                              type: prov_type,
-                                                                              platform: params[:platform]),
+                                                                                        type: prov_type,
+                                                                                    platform: params[:platform]),
                              cert_info["Common Name"])
 
       Utils.fill_environment(Utils.environment_variable_name_profile_name(app_identifier: app_identifier,
-                                                                          type: prov_type,
-                                                                          platform: params[:platform]),
+                                                                                    type: prov_type,
+                                                                                platform: params[:platform]),
                              parsed["Name"])
 
       Utils.fill_environment(Utils.environment_variable_name_profile_path(app_identifier: app_identifier,
-                                                                          type: prov_type,
-                                                                          platform: params[:platform]),
+                                                                                    type: prov_type,
+                                                                                platform: params[:platform]),
                              installed_profile)
 
       return uuid

@@ -194,8 +194,8 @@ module Gym
         values[:sdk] = File.basename(sdk_path) if sdk_path.to_s.length > 0
 
         FastlaneCore::PrintTable.print_values(config: values,
-                                              hide_keys: [],
-                                              title: "Build environment".yellow)
+                                           hide_keys: [],
+                                               title: "Build environment".yellow)
       end
 
       def print_xcode_path_instructions

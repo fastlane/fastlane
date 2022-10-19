@@ -21,9 +21,9 @@ module Fastlane
       # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
       if content.tr!('“”‘’‛', %(""'''))
         UI.error("Your #{File.basename(path)} has had smart quotes sanitised. " \
-                 'To avoid issues in the future, you should not use ' \
-                 'TextEdit for editing it. If you are not using TextEdit, ' \
-                 'you should turn off smart quotes in your editor of choice.')
+                'To avoid issues in the future, you should not use ' \
+                'TextEdit for editing it. If you are not using TextEdit, ' \
+                'you should turn off smart quotes in your editor of choice.')
       end
 
       content.scan(/^\s*require ["'](.*?)["']/).each do |current|
@@ -84,10 +84,10 @@ module Fastlane
       UI.user_error!("You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.") unless block
 
       self.runner.add_lane(Lane.new(platform: self.current_platform,
-                                    block: block,
-                                    description: desc_collection,
-                                    name: lane_name,
-                                    is_private: false))
+                                       block: block,
+                                 description: desc_collection,
+                                        name: lane_name,
+                                  is_private: false))
 
       @desc_collection = nil # reset the collected description again for the next lane
     end
@@ -97,10 +97,10 @@ module Fastlane
       UI.user_error!("You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.") unless block
 
       self.runner.add_lane(Lane.new(platform: self.current_platform,
-                                    block: block,
-                                    description: desc_collection,
-                                    name: lane_name,
-                                    is_private: true))
+                                       block: block,
+                                 description: desc_collection,
+                                        name: lane_name,
+                                  is_private: true))
 
       @desc_collection = nil # reset the collected description again for the next lane
     end
@@ -110,10 +110,10 @@ module Fastlane
       UI.user_error!("You have to pass a block using 'do' for lane '#{lane_name}'. Make sure you read the docs on GitHub.") unless block
 
       self.runner.add_lane(Lane.new(platform: self.current_platform,
-                                    block: block,
-                                    description: desc_collection,
-                                    name: lane_name,
-                                    is_private: false), true)
+                                       block: block,
+                                 description: desc_collection,
+                                        name: lane_name,
+                                  is_private: false), true)
 
       @desc_collection = nil # reset the collected description again for the next lane
     end

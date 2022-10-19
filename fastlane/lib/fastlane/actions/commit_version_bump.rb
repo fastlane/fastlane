@@ -183,10 +183,10 @@ module Fastlane
                                        default_value: [],
                                        type: Array),
           FastlaneCore::ConfigItem.new(key: :no_verify,
-                                       env_name: "FL_GIT_PUSH_USE_NO_VERIFY",
-                                       description: "Whether or not to use --no-verify",
-                                       type: Boolean,
-                                       default_value: false)
+                                      env_name: "FL_GIT_PUSH_USE_NO_VERIFY",
+                                      description: "Whether or not to use --no-verify",
+                                      type: Boolean,
+                                      default_value: false)
         ]
       end
 

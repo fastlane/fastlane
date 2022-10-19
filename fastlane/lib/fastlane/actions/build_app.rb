@@ -31,8 +31,8 @@ module Fastlane
             # Be smart about how we merge those mappings in case there are conflicts
             mapping_object = Gym::CodeSigningMapping.new
             hash_to_use = mapping_object.merge_profile_mapping(primary_mapping: existing_mapping,
-                                                               secondary_mapping: match_mapping,
-                                                               export_method: values[:export_method])
+                                                             secondary_mapping: match_mapping,
+                                                                export_method: values[:export_method])
 
             values[:export_options][:provisioningProfiles] = hash_to_use
           else

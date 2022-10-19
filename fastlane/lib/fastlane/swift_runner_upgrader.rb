@@ -255,7 +255,7 @@ module Fastlane
 
         # Set "Code sign on copy" flag on Xcode for fastlane_runner_target
         targetBinaryReference.build_files.each { |target_binary_build_file_reference|
-          target_binary_build_file_reference.settings = { 'ATTRIBUTES': ["CodeSignOnCopy"] }
+          target_binary_build_file_reference.settings = { "ATTRIBUTES": ["CodeSignOnCopy"] }
         }
       end
 

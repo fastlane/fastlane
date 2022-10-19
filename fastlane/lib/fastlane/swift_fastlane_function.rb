@@ -195,7 +195,7 @@ module Fastlane
         else
           if type == "((String) -> Void)?"
             "#{param}: #{type} = nil"
-          elsif (optional && type.end_with?('?') && !type.start_with?('Any')) || type.start_with?('Bool')
+          elsif optional && type.end_with?('?') && !type.start_with?('Any') || type.start_with?('Bool')
             "#{param}: OptionalConfigValue<#{type}> = .fastlaneDefault(#{default_value})"
           else
             "#{param}: #{type} = #{default_value}"
@@ -286,7 +286,7 @@ module Fastlane
         sanitized_name = sanitize_reserved_word(word: sanitized_name)
         type_string = type_override == :string_callback ? ".stringClosure" : "nil"
 
-        if !(type_override == :string_callback || !((is_optional && default_value.nil? && !type.start_with?('Any')) || type.start_with?('Bool')))
+        if !(type_override == :string_callback || !(is_optional && default_value.nil? && !type.start_with?('Any') || type.start_with?('Bool')))
           { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = #{sanitized_name}.asRubyArgument(name: \"#{name}\", type: #{type_string})" }
         else
           { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}, type: #{type_string})" }
@@ -363,7 +363,7 @@ module Fastlane
         end
 
         "\n#{documentation}"\
-          "  var #{static_var_for_parameter_name}: #{type} { get }"
+        "  var #{static_var_for_parameter_name}: #{type} { get }"
       end
 
       return swift_vars

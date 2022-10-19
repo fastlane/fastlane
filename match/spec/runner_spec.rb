@@ -78,11 +78,11 @@ describe Match do
           allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
           expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(cert_path)
           expect(Match::Generator).to receive(:generate_provisioning_profile).with(params: config,
-                                                                                   prov_type: :appstore,
-                                                                                   certificate_id: "something",
-                                                                                   app_identifier: values[:app_identifier],
-                                                                                   force: false,
-                                                                                   working_directory: fake_storage.working_directory).and_return(profile_path)
+                                                                                prov_type: :appstore,
+                                                                           certificate_id: "something",
+                                                                           app_identifier: values[:app_identifier],
+                                                                                    force: false,
+                                                                       working_directory: fake_storage.working_directory).and_return(profile_path)
           expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path, keychain_path).and_return(destination)
           expect(fake_storage).to receive(:save_changes!).with(
             files_to_commit: [

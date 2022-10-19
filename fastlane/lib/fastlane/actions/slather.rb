@@ -255,10 +255,10 @@ module Fastlane
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :use_bundle_exec,
-                                       env_name: "FL_SLATHER_USE_BUNDLE_EXEC",
-                                       description: "Use bundle exec to execute slather. Make sure it is in the Gemfile",
-                                       type: Boolean,
-                                       default_value: false),
+                                      env_name: "FL_SLATHER_USE_BUNDLE_EXEC",
+                                      description: "Use bundle exec to execute slather. Make sure it is in the Gemfile",
+                                      type: Boolean,
+                                      default_value: false),
           FastlaneCore::ConfigItem.new(key: :binary_basename,
                                        env_name: "FL_SLATHER_BINARY_BASENAME",
                                        description: "Basename of the binary file, this should match the name of your bundle excluding its extension (i.e. YourApp [for YourApp.app bundle])",
@@ -281,11 +281,11 @@ module Fastlane
                                        default_value: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :decimals,
-                                       env_name: "FL_SLATHER_DECIMALS",
-                                       description: "The amount of decimals to use for % coverage reporting",
-                                       skip_type_validation: true, # allow Integer, String
-                                       default_value: false,
-                                       optional: true)
+                                      env_name: "FL_SLATHER_DECIMALS",
+                                      description: "The amount of decimals to use for % coverage reporting",
+                                      skip_type_validation: true, # allow Integer, String
+                                      default_value: false,
+                                      optional: true)
         ]
       end
 

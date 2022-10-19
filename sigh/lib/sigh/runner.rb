@@ -14,8 +14,8 @@ module Sigh
     # returns the path the newly created provisioning profile (in /tmp usually)
     def run
       FastlaneCore::PrintTable.print_values(config: Sigh.config,
-                                            hide_keys: [:output_path],
-                                            title: "Summary for sigh #{Fastlane::VERSION}")
+                                         hide_keys: [:output_path],
+                                             title: "Summary for sigh #{Fastlane::VERSION}")
 
       if (api_token = Spaceship::ConnectAPI::Token.from(hash: Sigh.config[:api_key], filepath: Sigh.config[:api_key_path]))
         UI.message("Creating authorization token for App Store Connect API")

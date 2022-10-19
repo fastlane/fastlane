@@ -70,8 +70,8 @@ module Match
       had_app_identifier = self.params.fetch(:app_identifier, ask: false)
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
-                                            hide_keys: [:app_identifier],
-                                            title: "Summary for match nuke #{Fastlane::VERSION}")
+                                         hide_keys: [:app_identifier],
+                                             title: "Summary for match nuke #{Fastlane::VERSION}")
 
       self.safe_remove_certs = params[:safe_remove_certs] || false
 

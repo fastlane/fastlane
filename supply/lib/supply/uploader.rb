@@ -273,7 +273,7 @@ module Supply
         UI.message("Uploading image file #{path}...")
         client.upload_image(image_path: File.expand_path(path),
                             image_type: image_type,
-                            language: language)
+                              language: language)
       end
     end
 
@@ -289,7 +289,7 @@ module Supply
           UI.message("Uploading screenshot #{path}...")
           client.upload_image(image_path: File.expand_path(path),
                               image_type: screenshot_type,
-                              language: language)
+                                language: language)
         end
       end
     end

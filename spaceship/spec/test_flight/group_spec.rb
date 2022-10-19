@@ -124,10 +124,10 @@ describe Spaceship::TestFlight::Group do
           .and_return('id' => 'some-tester-id')
         expect(mock_client).to receive(:post_tester_to_group)
           .with(group_id: 2,
-                email: tester.email,
-                first_name: tester.first_name,
-                last_name: tester.last_name,
-                app_id: 1)
+                   email: tester.email,
+              first_name: tester.first_name,
+               last_name: tester.last_name,
+                  app_id: 1)
         group.add_tester!(tester)
       end
     end

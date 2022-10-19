@@ -167,7 +167,7 @@ module Frameit
         put_into_frame
 
         # Decrease the size of the framed screenshot to fit into the defined padding + background
-        frame_width = background.width - (horizontal_frame_padding * 2)
+        frame_width = background.width - horizontal_frame_padding * 2
         frame_height = background.height - effective_text_height - vertical_frame_padding
 
         if @config['show_complete_frame']
@@ -260,7 +260,7 @@ module Frameit
     end
 
     def put_device_into_background(background)
-      left_space = ((background.width / 2.0) - (image.width / 2.0)).round
+      left_space = (background.width / 2.0 - image.width / 2.0).round
 
       @image = background.composite(image, "png") do |c|
         colorspace = image.data["colorspace"]
@@ -285,7 +285,7 @@ module Frameit
 
     def resize_text(text)
       width = text.width
-      ratio = width / (image.width.to_f - (horizontal_frame_padding * 2))
+      ratio = width / (image.width.to_f - horizontal_frame_padding * 2)
       if ratio > 1.0
         # too large - resizing now
         text.resize("#{((1.0 / ratio) * text.width).round}x")
@@ -299,15 +299,15 @@ module Frameit
 
       vertical_padding = vertical_frame_padding # assign padding to variable
       spacing_between_title_and_keyword = (actual_font_size('keyword') / 2)
-      title_left_space = ((background.width / 2.0) - (title.width / 2.0)).round
-      keyword_left_space = ((background.width / 2.0) - (keyword.width / 2.0)).round
+      title_left_space = (background.width / 2.0 - title.width / 2.0).round
+      keyword_left_space = (background.width / 2.0 - keyword.width / 2.0).round
 
       self.space_to_device += title.height + keyword.height + spacing_between_title_and_keyword + vertical_padding
 
       if title_below_image
-        keyword_top = background.height - (effective_text_height / 2) - ((keyword.height + spacing_between_title_and_keyword + title.height) / 2)
+        keyword_top = background.height - effective_text_height / 2 - (keyword.height + spacing_between_title_and_keyword + title.height) / 2
       else
-        keyword_top = (device_top(background) / 2) - (spacing_between_title_and_keyword / 2) - keyword.height
+        keyword_top = device_top(background) / 2 - spacing_between_title_and_keyword / 2 - keyword.height
       end
       title_top = keyword_top + keyword.height + spacing_between_title_and_keyword
 
@@ -325,7 +325,7 @@ module Frameit
     end
 
     def put_title_into_background(background, stack_title)
-      text_images = build_text_images(image.width - (2 * horizontal_frame_padding), image.height - (2 * vertical_frame_padding), stack_title)
+      text_images = build_text_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding, stack_title)
 
       keyword = text_images[:keyword]
       title = text_images[:title]
@@ -343,7 +343,7 @@ module Frameit
 
       # Resize the 2 labels if they exceed the available space either horizontally or vertically:
       image_scale_factor = 1.0 # default
-      ratio_horizontal = sum_width / (image.width.to_f - (horizontal_frame_padding * 2)) # The fraction of the text images compared to the left and right padding
+      ratio_horizontal = sum_width / (image.width.to_f - horizontal_frame_padding * 2) # The fraction of the text images compared to the left and right padding
       ratio_vertical = title.height.to_f / effective_text_height # The fraction of the actual height of the images compared to the available space
       if ratio_horizontal > 1.0 || ratio_vertical > 1.0
         # If either is too large, resize with the maximum ratio:
@@ -357,14 +357,14 @@ module Frameit
       end
 
       vertical_padding = vertical_frame_padding # assign padding to variable
-      left_space = ((background.width / 2.0) - (sum_width / 2.0)).round
+      left_space = (background.width / 2.0 - sum_width / 2.0).round
 
       self.space_to_device += actual_font_size('title') + vertical_padding
 
       if title_below_image
-        title_top = background.height - (effective_text_height / 2) - (title.height / 2)
+        title_top = background.height - effective_text_height / 2 - title.height / 2
       else
-        title_top = (device_top(background) / 2) - (title.height / 2)
+        title_top = device_top(background) / 2 - title.height / 2
       end
 
       # First, put the keyword on top of the screenshot, if we have one

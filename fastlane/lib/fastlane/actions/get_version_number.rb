@@ -157,22 +157,22 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
-                                       env_name: "FL_VERSION_NUMBER_PROJECT",
-                                       description: "Path to the Xcode project to read version number from, or its containing directory, optional. If omitted, or if a directory is passed instead, it will use the first Xcode project found within the given directory, or the project root directory if none is passed",
-                                       optional: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Please pass the path to the project or its containing directory, not the workspace path") if value.end_with?(".xcworkspace")
-                                         UI.user_error!("Could not find file or directory at path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                         UI.user_error!("Could not find Xcode project in directory at path '#{File.expand_path(value)}'") if File.extname(value) != ".xcodeproj" && Dir.glob("#{value}/*.xcodeproj").empty?
-                                       end),
+                             env_name: "FL_VERSION_NUMBER_PROJECT",
+                             description: "Path to the Xcode project to read version number from, or its containing directory, optional. If omitted, or if a directory is passed instead, it will use the first Xcode project found within the given directory, or the project root directory if none is passed",
+                             optional: true,
+                             verify_block: proc do |value|
+                               UI.user_error!("Please pass the path to the project or its containing directory, not the workspace path") if value.end_with?(".xcworkspace")
+                               UI.user_error!("Could not find file or directory at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                               UI.user_error!("Could not find Xcode project in directory at path '#{File.expand_path(value)}'") if File.extname(value) != ".xcodeproj" && Dir.glob("#{value}/*.xcodeproj").empty?
+                             end),
           FastlaneCore::ConfigItem.new(key: :target,
-                                       env_name: "FL_VERSION_NUMBER_TARGET",
-                                       description: "Target name, optional. Will be needed if you have more than one non-test target to avoid being prompted to select one",
-                                       optional: true),
+                             env_name: "FL_VERSION_NUMBER_TARGET",
+                             description: "Target name, optional. Will be needed if you have more than one non-test target to avoid being prompted to select one",
+                             optional: true),
           FastlaneCore::ConfigItem.new(key: :configuration,
-                                       env_name: "FL_VERSION_NUMBER_CONFIGURATION",
-                                       description: "Configuration name, optional. Will be needed if you have altered the configurations from the default or your version number depends on the configuration selected",
-                                       optional: true)
+                             env_name: "FL_VERSION_NUMBER_CONFIGURATION",
+                             description: "Configuration name, optional. Will be needed if you have altered the configurations from the default or your version number depends on the configuration selected",
+                             optional: true)
         ]
       end
 

@@ -9,7 +9,7 @@ module Fastlane
 
       def self.description
         'This is ' \
-          'multi line description.'
+        'multi line description.'
       end
 
       def self.available_options

@@ -108,11 +108,11 @@ module Gym
       command = BuildCommandGenerator.generate
       print_command(command, "Generated Build Command") if FastlaneCore::Globals.verbose?
       FastlaneCore::CommandExecutor.execute(command: command,
-                                            print_all: true,
-                                            print_command: !Gym.config[:silent],
-                                            error: proc do |output|
-                                              ErrorHandler.handle_build_error(output)
-                                            end)
+                                          print_all: true,
+                                      print_command: !Gym.config[:silent],
+                                              error: proc do |output|
+                                                ErrorHandler.handle_build_error(output)
+                                              end)
 
       unless Gym.config[:skip_archive]
         mark_archive_as_built_by_gym(BuildCommandGenerator.archive_path)
@@ -131,11 +131,11 @@ module Gym
 
       print_command(command, "Generated Post-Build Command") if FastlaneCore::Globals.verbose?
       FastlaneCore::CommandExecutor.execute(command: command,
-                                            print_all: true,
-                                            print_command: !Gym.config[:silent],
-                                            error: proc do |output|
-                                              ErrorHandler.handle_build_error(output)
-                                            end)
+                                          print_all: true,
+                                      print_command: !Gym.config[:silent],
+                                              error: proc do |output|
+                                                ErrorHandler.handle_build_error(output)
+                                              end)
     end
 
     # Makes sure the archive is there and valid
@@ -151,11 +151,11 @@ module Gym
       print_command(command, "Generated Package Command") if FastlaneCore::Globals.verbose?
 
       FastlaneCore::CommandExecutor.execute(command: command,
-                                            print_all: false,
-                                            print_command: !Gym.config[:silent],
-                                            error: proc do |output|
-                                              ErrorHandler.handle_package_error(output)
-                                            end)
+                                          print_all: false,
+                                      print_command: !Gym.config[:silent],
+                                              error: proc do |output|
+                                                ErrorHandler.handle_package_error(output)
+                                              end)
     end
 
     def compress_and_move_dsym

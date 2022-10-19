@@ -160,8 +160,8 @@ module Scan
               potential_emptiness_error = lambda do |sims|
                 if sims.empty?
                   UI.error("No simulators found that are equal to the version " \
-                           "of specifier (#{version}) and greater than or equal to the version " \
-                           "of deployment target (#{deployment_target_version})")
+                  "of specifier (#{version}) and greater than or equal to the version " \
+                  "of deployment target (#{deployment_target_version})")
                 end
               end
               filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)

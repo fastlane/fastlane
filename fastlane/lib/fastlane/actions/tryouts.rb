@@ -68,51 +68,51 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :app_id,
-                                       env_name: "TRYOUTS_APP_ID",
-                                       description: "Tryouts application hash",
-                                       verify_block: proc do |value|
-                                         UI.user_error!("No application identifier for Tryouts given, pass using `app_id: 'application id'`") unless value && !value.empty?
-                                       end),
+                                     env_name: "TRYOUTS_APP_ID",
+                                     description: "Tryouts application hash",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("No application identifier for Tryouts given, pass using `app_id: 'application id'`") unless value && !value.empty?
+                                     end),
           FastlaneCore::ConfigItem.new(key: :api_token,
-                                       env_name: "TRYOUTS_API_TOKEN",
-                                       sensitive: true,
-                                       description: "API Token (api_key:api_secret) for Tryouts Access",
-                                       verify_block: proc do |value|
-                                         UI.user_error!("No API token for Tryouts given, pass using `api_token: 'token'`") unless value && !value.empty?
-                                       end),
+                                     env_name: "TRYOUTS_API_TOKEN",
+                                     sensitive: true,
+                                     description: "API Token (api_key:api_secret) for Tryouts Access",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("No API token for Tryouts given, pass using `api_token: 'token'`") unless value && !value.empty?
+                                     end),
           FastlaneCore::ConfigItem.new(key: :build_file,
-                                       env_name: "TRYOUTS_BUILD_FILE",
-                                       description: "Path to your IPA or APK file. Optional if you use the _gym_ or _xcodebuild_ action",
-                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                     env_name: "TRYOUTS_BUILD_FILE",
+                                     description: "Path to your IPA or APK file. Optional if you use the _gym_ or _xcodebuild_ action",
+                                     default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
                                        default_value_dynamic: true,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Couldn't find build file at path '#{value}'") unless File.exist?(value)
-                                       end),
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find build file at path '#{value}'") unless File.exist?(value)
+                                     end),
           FastlaneCore::ConfigItem.new(key: :notes,
-                                       env_name: "TRYOUTS_NOTES",
-                                       description: "Release notes",
-                                       optional: true),
+                                     env_name: "TRYOUTS_NOTES",
+                                     description: "Release notes",
+                                     optional: true),
           FastlaneCore::ConfigItem.new(key: :notes_path,
-                                       env_name: "TRYOUTS_NOTES_PATH",
-                                       description: "Release notes text file path. Overrides the :notes parameter",
-                                       verify_block: proc do |value|
-                                         UI.user_error!("Couldn't find notes file at path '#{value}'") unless File.exist?(value)
-                                       end,
-                                       optional: true),
+                                     env_name: "TRYOUTS_NOTES_PATH",
+                                     description: "Release notes text file path. Overrides the :notes parameter",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find notes file at path '#{value}'") unless File.exist?(value)
+                                     end,
+                                     optional: true),
           FastlaneCore::ConfigItem.new(key: :notify,
-                                       env_name: "TRYOUTS_NOTIFY",
-                                       description: "Notify testers? 0 for no",
-                                       type: Integer,
-                                       default_value: 1),
+                                     env_name: "TRYOUTS_NOTIFY",
+                                     description: "Notify testers? 0 for no",
+                                     type: Integer,
+                                     default_value: 1),
           FastlaneCore::ConfigItem.new(key: :status,
-                                       env_name: "TRYOUTS_STATUS",
-                                       description: "2 to make your release public. Release will be distributed to available testers. 1 to make your release private. Release won't be distributed to testers. This also prevents release from showing up for SDK update",
-                                       verify_block: proc do |value|
-                                         available_options = ["1", "2"]
-                                         UI.user_error!("'#{value}' is not a valid 'status' value. Available options are #{available_options.join(', ')}") unless available_options.include?(value.to_s)
-                                       end,
-                                       type: Integer,
-                                       default_value: 2)
+                                     env_name: "TRYOUTS_STATUS",
+                                     description: "2 to make your release public. Release will be distributed to available testers. 1 to make your release private. Release won't be distributed to testers. This also prevents release from showing up for SDK update",
+                                     verify_block: proc do |value|
+                                       available_options = ["1", "2"]
+                                       UI.user_error!("'#{value}' is not a valid 'status' value. Available options are #{available_options.join(', ')}") unless available_options.include?(value.to_s)
+                                     end,
+                                     type: Integer,
+                                     default_value: 2)
         ]
       end
 

@@ -16,7 +16,7 @@ module Fastlane
         UI.user_error!("Couldn't find app") unless app_path
 
         zipped_bundle = Actions::ZipAction.run(path: app_path,
-                                               output_path: File.join(tmp_path, "Result.zip"))
+                                        output_path: File.join(tmp_path, "Result.zip"))
 
         other_action.appetize(path: zipped_bundle,
                               api_token: params[:api_token],

@@ -83,7 +83,7 @@ describe Spaceship::ConnectAPI::APIClient do
 
     def stub_client_request(uri, status, body)
       stub_request(:get, uri).
-        to_return(status: status, body: body, headers: { 'Content-Type': "application/json" })
+        to_return(status: status, body: body, headers: { "Content-Type": "application/json" })
     end
 
     before(:each) do
@@ -92,14 +92,14 @@ describe Spaceship::ConnectAPI::APIClient do
     end
 
     it 'not raise on 200' do
-      body = JSON.generate({ 'data': { 'hello': "world" } })
+      body = JSON.generate({ "data": { "hello": "world" } })
       stub_client_request(client.hostname, 200, body)
 
       client.get('')
     end
 
     it 'raise on 401' do
-      body = JSON.generate({ 'errors': [] })
+      body = JSON.generate({ "errors": [] })
       stub_client_request(client.hostname, 401, body)
 
       expect(mock_token).to receive(:refresh!).exactly(4).times
@@ -110,7 +110,7 @@ describe Spaceship::ConnectAPI::APIClient do
     end
 
     it 'raise on 403 with program license agreement updated' do
-      body = JSON.generate({ 'errors': [{ 'code': "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED" }] })
+      body = JSON.generate({ "errors": [{ "code": "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED" }] })
       stub_client_request(client.hostname, 403, body)
 
       expect do
@@ -119,7 +119,7 @@ describe Spaceship::ConnectAPI::APIClient do
     end
 
     it 'raise on 403' do
-      body = JSON.generate({ 'errors': [] })
+      body = JSON.generate({ "errors": [] })
       stub_client_request(client.hostname, 403, body)
 
       expect do

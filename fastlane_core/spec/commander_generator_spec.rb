@@ -5,14 +5,14 @@ describe FastlaneCore do
         it 'should not return `true` for String options with no short flag' do
           config_items = [
             FastlaneCore::ConfigItem.new(key: :long_option_only_string,
-                                         description: "desc",
-                                         is_string: true,
-                                         default_value: "blah",
-                                         optional: true),
+                                 description: "desc",
+                                   is_string: true,
+                               default_value: "blah",
+                                    optional: true),
             FastlaneCore::ConfigItem.new(key: :bool,
-                                         description: "desc",
-                                         default_value: false,
-                                         is_string: false)
+                                 description: "desc",
+                               default_value: false,
+                                   is_string: false)
           ]
 
           stub_commander_runner_args(['--long_option_only_string', 'value', '--bool', 'false'])
@@ -31,9 +31,9 @@ describe FastlaneCore do
 
           program = TestCommanderProgram.run([
                                                FastlaneCore::ConfigItem.new(key: :boolean_1,
-                                                                            short_option: '-b',
-                                                                            description: 'Boolean 1',
-                                                                            is_string: false)
+                                                                   short_option: '-b',
+                                                                    description: 'Boolean 1',
+                                                                      is_string: false)
                                              ])
 
           expect(program.args).to eq(['other'])
@@ -44,9 +44,9 @@ describe FastlaneCore do
         let(:config_items) do
           [
             FastlaneCore::ConfigItem.new(key: :string_1,
-                                         short_option: '-s',
-                                         description: 'String 1',
-                                         is_string: true)
+                                short_option: '-s',
+                                 description: 'String 1',
+                                   is_string: true)
           ]
         end
 
@@ -83,9 +83,9 @@ describe FastlaneCore do
         let(:config_items) do
           [
             FastlaneCore::ConfigItem.new(key: :shell_string_1,
-                                         short_option: '-s',
-                                         description: 'Shell String 1',
-                                         type: :shell_string)
+                                short_option: '-s',
+                                 description: 'Shell String 1',
+                                        type: :shell_string)
           ]
         end
 
@@ -122,10 +122,10 @@ describe FastlaneCore do
         let(:config_items) do
           [
             FastlaneCore::ConfigItem.new(key: :integer_1,
-                                         short_option: '-i',
-                                         description: 'Integer 1',
-                                         is_string: false,
-                                         type: Integer)
+                                short_option: '-i',
+                                 description: 'Integer 1',
+                                   is_string: false,
+                                        type: Integer)
           ]
         end
 
@@ -162,10 +162,10 @@ describe FastlaneCore do
         let(:config_items) do
           [
             FastlaneCore::ConfigItem.new(key: :float_1,
-                                         short_option: '-f',
-                                         description: 'Float 1',
-                                         is_string: false,
-                                         type: Float)
+                                short_option: '-f',
+                                 description: 'Float 1',
+                                   is_string: false,
+                                        type: Float)
           ]
         end
 
@@ -202,9 +202,9 @@ describe FastlaneCore do
         let(:config_items) do
           [
             FastlaneCore::ConfigItem.new(key: :boolean_1,
-                                         short_option: '-a',
-                                         description: 'Boolean 1',
-                                         is_string: false)
+                                short_option: '-a',
+                                 description: 'Boolean 1',
+                                   is_string: false)
           ]
         end
 
@@ -269,10 +269,10 @@ describe FastlaneCore do
         let(:config_items) do
           [
             FastlaneCore::ConfigItem.new(key: :array_1,
-                                         short_option: '-a',
-                                         description: 'Array 1',
-                                         is_string: false,
-                                         type: Array)
+                                short_option: '-a',
+                                 description: 'Array 1',
+                                   is_string: false,
+                                        type: Array)
           ]
         end
 
@@ -309,28 +309,28 @@ describe FastlaneCore do
         let(:config_items) do
           [
             FastlaneCore::ConfigItem.new(key: :string_1,
-                                         short_option: '-s',
-                                         description: 'String 1',
-                                         is_string: true),
+                                short_option: '-s',
+                                 description: 'String 1',
+                                   is_string: true),
             FastlaneCore::ConfigItem.new(key: :array_1,
-                                         short_option: '-a',
-                                         description: 'Array 1',
-                                         is_string: false,
-                                         type: Array),
+                                short_option: '-a',
+                                 description: 'Array 1',
+                                   is_string: false,
+                                        type: Array),
             FastlaneCore::ConfigItem.new(key: :integer_1,
-                                         short_option: '-i',
-                                         description: 'Integer 1',
-                                         is_string: false,
-                                         type: Integer),
+                                short_option: '-i',
+                                 description: 'Integer 1',
+                                   is_string: false,
+                                        type: Integer),
             FastlaneCore::ConfigItem.new(key: :float_1,
-                                         short_option: '-f',
-                                         description: 'Float 1',
-                                         is_string: false,
-                                         type: Float),
+                                short_option: '-f',
+                                 description: 'Float 1',
+                                   is_string: false,
+                                        type: Float),
             FastlaneCore::ConfigItem.new(key: :boolean_1,
-                                         short_option: '-b',
-                                         description: 'Boolean 1',
-                                         is_string: false)
+                                short_option: '-b',
+                                 description: 'Boolean 1',
+                                   is_string: false)
           ]
         end
 

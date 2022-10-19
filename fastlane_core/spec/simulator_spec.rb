@@ -30,10 +30,10 @@ describe FastlaneCore do
     it "can launch Simulator.app for a simulator device" do
       device = FastlaneCore::DeviceManager::Device.new(name: 'iPhone 5s',
                                                        udid: '3E67398C-AF70-4D77-A22C-D43AA8623FE3',
-                                                       os_type: 'iOS',
-                                                       os_version: '10.0',
-                                                       state: 'Shutdown',
-                                                       is_simulator: true)
+                                                    os_type: 'iOS',
+                                                 os_version: '10.0',
+                                                      state: 'Shutdown',
+                                               is_simulator: true)
 
       simulator_path = File.join(FastlaneCore::Helper.xcode_path, 'Applications', 'Simulator.app')
       expected_command = "open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}"
@@ -46,10 +46,10 @@ describe FastlaneCore do
     it "does not launch Simulator.app for a non-simulator device" do
       device = FastlaneCore::DeviceManager::Device.new(name: 'iPhone 5s',
                                                        udid: '3E67398C-AF70-4D77-A22C-D43AA8623FE3',
-                                                       os_type: 'iOS',
-                                                       os_version: '10.0',
-                                                       state: 'Shutdown',
-                                                       is_simulator: false)
+                                                    os_type: 'iOS',
+                                                 os_version: '10.0',
+                                                      state: 'Shutdown',
+                                               is_simulator: false)
 
       expect(FastlaneCore::Helper).not_to(receive(:backticks))
 

@@ -18,7 +18,7 @@ module Fastlane
             json = JSON.parse(Net::HTTP.get(jenkins_api_url))
             json['changeSet']['items'].each do |item|
               comment = params[:include_commit_body] ? item['comment'] : item['msg']
-              changelog << (comment.strip + "\n")
+              changelog << comment.strip + "\n"
             end
           rescue => ex
             UI.error("Unable to read/parse changelog from jenkins: #{ex.message}")

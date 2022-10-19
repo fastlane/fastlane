@@ -70,15 +70,15 @@ module Spaceship::TestFlight
       # This post request creates an account-level tester and then makes it available to the app, or just makes
       # it available to the app if it already exists
       client.create_app_level_tester(app_id: self.app_id,
-                                     first_name: tester.first_name,
-                                     last_name: tester.last_name,
-                                     email: tester.email)
+                                 first_name: tester.first_name,
+                                  last_name: tester.last_name,
+                                      email: tester.email)
       # This put request adds the tester to the group
       client.post_tester_to_group(group_id: self.id,
-                                  email: tester.email,
-                                  first_name: tester.first_name,
-                                  last_name: tester.last_name,
-                                  app_id: self.app_id)
+                                     email: tester.email,
+                                first_name: tester.first_name,
+                                 last_name: tester.last_name,
+                                    app_id: self.app_id)
     end
 
     def remove_tester!(tester)

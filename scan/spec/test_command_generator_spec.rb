@@ -454,7 +454,7 @@ describe Scan do
               with(command: %r{xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null}, print_all: false, print_command: true)
 
             allow(Trainer::TestParser).to receive(:auto_convert).and_return({
-              'some/path': {
+              "some/path": {
                 successful: true,
                 number_of_tests: 100,
                 number_of_failures: 0,

@@ -95,9 +95,9 @@ module Produce
         UI.message("Creating new app '#{app_name}' on the Apple Dev Center")
 
         app = Spaceship.app.create!(bundle_id: app_identifier,
-                                    name: app_name,
-                                    enable_services: enable_services,
-                                    mac: platform == "osx")
+                                         name: app_name,
+                                         enable_services: enable_services,
+                                         mac: platform == "osx")
 
         if app.name != Produce.config[:app_name]
           UI.important("Your app name includes non-ASCII characters, which are not supported by the Apple Developer Portal.")

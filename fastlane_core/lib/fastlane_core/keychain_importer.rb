@@ -68,8 +68,8 @@ module FastlaneCore
 
               UI.important("")
               UI.important("Could not configure imported keychain item (certificate) to prevent UI permission popup when code signing\n" \
-                           "Check if you supplied the correct `keychain_password` for keychain: `#{keychain_path}`\n" \
-                           "#{err}")
+                       "Check if you supplied the correct `keychain_password` for keychain: `#{keychain_path}`\n" \
+                       "#{err}")
               UI.important("")
               UI.important("Please look at the following docs to see how to set a keychain password:")
               UI.important(" - https://docs.fastlane.tools/actions/sync_code_signing")
