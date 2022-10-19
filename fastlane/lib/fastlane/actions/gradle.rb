@@ -73,7 +73,7 @@ module Fastlane
 
         # Our apk/aab is now built, but there might actually be multiple ones that were built if a flavor was not specified in a multi-flavor project (e.g. `assembleRelease`)
         # However, we're not interested in unaligned apk's...
-        new_apks = Dir[apk_search_path].reject { |path| path =~ /^.*-unaligned.apk$/i }
+        new_apks = Dir[apk_search_path].grep_v(/^.*-unaligned.apk$/i)
         new_apks = new_apks.map { |path| File.expand_path(path) }
         new_aabs = Dir[aab_search_path]
         new_aabs = new_aabs.map { |path| File.expand_path(path) }

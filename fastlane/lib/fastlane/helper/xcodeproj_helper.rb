@@ -5,7 +5,7 @@ module Fastlane
 
       def self.find(dir)
         xcodeproj_paths = Dir[File.expand_path(File.join(dir, '**/*.xcodeproj'))]
-        xcodeproj_paths.reject { |path| %r{/(#{DEPENDENCY_MANAGER_DIRS.join('|')})/.*.xcodeproj} =~ path }
+        xcodeproj_paths.grep_v(%r{/(#{DEPENDENCY_MANAGER_DIRS.join('|')})/.*.xcodeproj})
       end
     end
   end
