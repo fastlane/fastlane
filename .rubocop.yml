@@ -262,6 +262,9 @@ Layout/SpaceAroundOperators:
   Exclude:
     - '**/spec/actions_specs/xcodebuild_spec.rb'
 
+Layout/BlockAlignment:
+  Enabled: false
+
 # They have not to be snake_case
 Naming/FileName:
   Exclude:
