@@ -134,26 +134,26 @@ module Precheck
       app_info_localizations = app_info.get_app_info_localizations
       app_info_localizations.each do |localization|
         items << collect_text_items_from_language_item(locale: localization.locale,
-                                                        value: localization.name,
-                                                    item_name: :app_name,
-                                        friendly_name_postfix: "app name")
+                                                       value: localization.name,
+                                                       item_name: :app_name,
+                                                       friendly_name_postfix: "app name")
 
         items << collect_text_items_from_language_item(locale: localization.locale,
-                                                        value: localization.subtitle,
-                                                    item_name: :app_subtitle,
-                                        friendly_name_postfix: "app name subtitle",
-                                                  is_optional: true)
+                                                       value: localization.subtitle,
+                                                       item_name: :app_subtitle,
+                                                       friendly_name_postfix: "app name subtitle",
+                                                       is_optional: true)
 
         items << collect_text_items_from_language_item(locale: localization.locale,
-                                                        value: localization.privacy_policy_text,
-                                                    item_name: :privacy_policy_text,
-                                        friendly_name_postfix: " tv privacy policy")
+                                                       value: localization.privacy_policy_text,
+                                                       item_name: :privacy_policy_text,
+                                                       friendly_name_postfix: " tv privacy policy")
 
         items << collect_urls_from_language_item(locale: localization.locale,
-                                                        value: localization.privacy_policy_url,
-                                                    item_name: :privacy_policy_url,
-                                        friendly_name_postfix: "privacy URL",
-                                                  is_optional: true)
+                                                 value: localization.privacy_policy_url,
+                                                 item_name: :privacy_policy_url,
+                                                 friendly_name_postfix: "privacy URL",
+                                                 is_optional: true)
       end
 
       should_include_iap = Precheck.config[:include_in_app_purchases]
@@ -180,29 +180,29 @@ module Precheck
       version_localizations = app_version.get_app_store_version_localizations
       version_localizations.each do |localization|
         items << collect_text_items_from_language_item(locale: localization.locale,
-                                                        value: localization.keywords,
-                                                    item_name: :keywords,
-                                        friendly_name_postfix: "keywords")
+                                                       value: localization.keywords,
+                                                       item_name: :keywords,
+                                                       friendly_name_postfix: "keywords")
 
         items << collect_text_items_from_language_item(locale: localization.locale,
-                                                        value: localization.description,
-                                                    item_name: :description,
-                                        friendly_name_postfix: "description")
+                                                       value: localization.description,
+                                                       item_name: :description,
+                                                       friendly_name_postfix: "description")
 
         items << collect_text_items_from_language_item(locale: localization.locale,
-                                                        value: localization.whats_new,
-                                                    item_name: :release_notes,
-                                        friendly_name_postfix: "what's new")
+                                                       value: localization.whats_new,
+                                                       item_name: :release_notes,
+                                                       friendly_name_postfix: "what's new")
 
         items << collect_urls_from_language_item(locale: localization.locale,
-                                                        value: localization.support_url,
-                                                    item_name: :support_url,
-                                        friendly_name_postfix: "support URL")
+                                                 value: localization.support_url,
+                                                 item_name: :support_url,
+                                                 friendly_name_postfix: "support URL")
 
         items << collect_urls_from_language_item(locale: localization.locale,
-                                                        value: localization.marketing_url,
-                                                    item_name: :marketing_url,
-                                        friendly_name_postfix: "marketing URL",
+                                                 value: localization.marketing_url,
+                                                 item_name: :marketing_url,
+                                                 friendly_name_postfix: "marketing URL",
                                                  is_optional: true)
       end
 

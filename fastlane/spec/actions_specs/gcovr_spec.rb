@@ -31,10 +31,10 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("gcovr --object-directory \"object_directory_value\" -o \"output_value\" " \
-          "-k -d -f \"filter_value\" -e \"exclude_value\" --gcov-filter \"gcov_filter_value\"" \
-          " --gcov-exclude \"gcov_exclude_value\" -r \"root_value\" -x --xml-pretty --html --html-details" \
-          " --html-absolute-paths -b -u -p --gcov-executable \"gcov_executable_value\" --exclude-unreachable-branches" \
-          " -g -s")
+                             "-k -d -f \"filter_value\" -e \"exclude_value\" --gcov-filter \"gcov_filter_value\"" \
+                             " --gcov-exclude \"gcov_exclude_value\" -r \"root_value\" -x --xml-pretty --html --html-details" \
+                             " --html-absolute-paths -b -u -p --gcov-executable \"gcov_executable_value\" --exclude-unreachable-branches" \
+                             " -g -s")
       end
 
       context "output directory does not exist" do

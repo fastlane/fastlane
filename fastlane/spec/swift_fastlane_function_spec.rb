@@ -19,8 +19,8 @@ describe Fastlane do
         swift_function = Fastlane::SwiftFunction.new(keys: ['param_one', 'param_two'], key_descriptions: ['desc for param one', 'desc for param two'])
         result = swift_function.swift_parameter_documentation
         expected = " - parameters:\n"\
-          "   - paramOne: desc for param one\n"\
-          '   - paramTwo: desc for param two'
+                   "   - paramOne: desc for param one\n"\
+                   '   - paramTwo: desc for param two'
 
         expect(result).to eq(expected)
       end
@@ -61,8 +61,8 @@ describe Fastlane do
         swift_function = Fastlane::SwiftFunction.new(keys: ['param_one'], key_descriptions: ['desc for param one'])
         result = swift_function.swift_documentation
         expected = "/**\n"\
-          " - parameter paramOne: desc for param one\n"\
-          "*/\n"
+                   " - parameter paramOne: desc for param one\n"\
+                   "*/\n"
 
         expect(result).to eq(expected)
       end
@@ -71,8 +71,8 @@ describe Fastlane do
         swift_function = Fastlane::SwiftFunction.new(action_details: 'details')
         result = swift_function.swift_documentation
         expected = "/**\n"\
-          " details\n"\
-          "*/\n"
+                   " details\n"\
+                   "*/\n"
 
         expect(result).to eq(expected)
       end
@@ -81,8 +81,8 @@ describe Fastlane do
         swift_function = Fastlane::SwiftFunction.new(action_description: 'description')
         result = swift_function.swift_documentation
         expected = "/**\n"\
-          " description\n"\
-          "*/\n"
+                   " description\n"\
+                   "*/\n"
 
         expect(result).to eq(expected)
       end
@@ -91,10 +91,10 @@ describe Fastlane do
         swift_function = Fastlane::SwiftFunction.new(action_details: 'details', keys: ['param_one'], key_descriptions: ['desc for param one'])
         result = swift_function.swift_documentation
         expected = "/**\n"\
-          " - parameter paramOne: desc for param one\n"\
-          "\n"\
-          " details\n"\
-          "*/\n"
+                   " - parameter paramOne: desc for param one\n"\
+                   "\n"\
+                   " details\n"\
+                   "*/\n"
 
         expect(result).to eq(expected)
       end
@@ -103,12 +103,12 @@ describe Fastlane do
         swift_function = Fastlane::SwiftFunction.new(action_details: 'details', action_description: "description", keys: ['param_one'], key_descriptions: ['desc for param one'])
         result = swift_function.swift_documentation
         expected = "/**\n"\
-          " description\n"\
-          "\n"\
-          " - parameter paramOne: desc for param one\n"\
-          "\n"\
-          " details\n"\
-          "*/\n"
+                   " description\n"\
+                   "\n"\
+                   " - parameter paramOne: desc for param one\n"\
+                   "\n"\
+                   " details\n"\
+                   "*/\n"
 
         expect(result).to eq(expected)
       end
@@ -117,10 +117,10 @@ describe Fastlane do
         swift_function = Fastlane::SwiftFunction.new(keys: ['param_one'], key_descriptions: ['desc for param one'], return_value: 'return value')
         result = swift_function.swift_documentation
         expected = "/**\n"\
-          " - parameter paramOne: desc for param one\n"\
-          "\n"\
-          " - returns: return value\n"\
-          "*/\n"
+                   " - parameter paramOne: desc for param one\n"\
+                   "\n"\
+                   " - returns: return value\n"\
+                   "*/\n"
 
         expect(result).to eq(expected)
       end

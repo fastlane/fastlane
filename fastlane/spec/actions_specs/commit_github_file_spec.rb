@@ -7,11 +7,11 @@ describe Fastlane do
         before do
           stub_request(:put, "https://api.github.com/repos/fastlane/fastlane/contents/test/assets/TEST_FILE.md").
             with(body: "{\"path\":\"/test/assets/TEST_FILE.md\",\"message\":\"Add my new file\",\"content\":\"dGVzdA==\\n\",\"branch\":\"master\"}",
-              headers: {
-                'Authorization' => 'Basic MTIzNDVhYmNkZQ==',
-                'Host' => 'api.github.com:443',
-                'User-Agent' => 'fastlane-github_api'
-              }).
+                 headers: {
+                   'Authorization' => 'Basic MTIzNDVhYmNkZQ==',
+                   'Host' => 'api.github.com:443',
+                   'User-Agent' => 'fastlane-github_api'
+                 }).
             to_return(status: 200, body: response_body, headers: {})
         end
 

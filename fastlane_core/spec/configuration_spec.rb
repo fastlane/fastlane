@@ -29,8 +29,8 @@ describe FastlaneCore do
         expect do
           FastlaneCore::Configuration.create([FastlaneCore::ConfigItem.new(
             key: :cert_name,
-       env_name: "asdf",
-    description: "Set the profile name."
+            env_name: "asdf",
+            description: "Set the profile name."
           )], {})
         end.to raise_error("Do not let descriptions end with a '.', since it's used for user inputs as well for key :cert_name")
       end
@@ -40,11 +40,11 @@ describe FastlaneCore do
           expect do
             FastlaneCore::Configuration.create([FastlaneCore::ConfigItem.new(
               key: :cert_name,
-         env_name: "asdf"
+              env_name: "asdf"
             ),
                                                 FastlaneCore::ConfigItem.new(
                                                   key: :cert_name,
-                                             env_name: "asdf"
+                                                  env_name: "asdf"
                                                 )], {})
           end.to raise_error("Multiple entries for configuration key 'cert_name' found!")
         end
@@ -385,12 +385,12 @@ describe FastlaneCore do
 
         it "verifies the default value as well" do
           c = FastlaneCore::ConfigItem.new(key: :output,
-                                    env_name: "SIGH_OUTPUT_PATH",
-                                 description: "Directory in which the profile should be stored",
-                               default_value: "notExistent",
-                                verify_block: proc do |value|
-                                  UI.user_error!("Could not find output directory '#{value}'")
-                                end)
+                                           env_name: "SIGH_OUTPUT_PATH",
+                                           description: "Directory in which the profile should be stored",
+                                           default_value: "notExistent",
+                                           verify_block: proc do |value|
+                                             UI.user_error!("Could not find output directory '#{value}'")
+                                           end)
           expect do
             @config = FastlaneCore::Configuration.create([c], {})
           end.to raise_error("Invalid default value for output, doesn't match verify_block")
@@ -398,12 +398,12 @@ describe FastlaneCore do
 
         it "calls verify_block for non nil values" do
           c = FastlaneCore::ConfigItem.new(key: :param,
-                                      env_name: "PARAM",
-                                   description: "Description",
-                                          type: Object,
-                                  verify_block: proc do |value|
-                                    UI.user_error!("'#{value}' is not valid!")
-                                  end)
+                                           env_name: "PARAM",
+                                           description: "Description",
+                                           type: Object,
+                                           verify_block: proc do |value|
+                                             UI.user_error!("'#{value}' is not valid!")
+                                           end)
           [true, false, '', 'a string', ['an array'], {}, :hash].each do |value|
             expect do
               c.valid?(value)
@@ -413,20 +413,20 @@ describe FastlaneCore do
 
         it "passes for nil values" do
           c = FastlaneCore::ConfigItem.new(key: :param,
-                                      env_name: "param",
-                                   description: "Description",
-                                  verify_block: proc do |value|
-                                    UI.user_error!("'#{value}' is not valid!")
-                                  end)
+                                           env_name: "param",
+                                           description: "Description",
+                                           verify_block: proc do |value|
+                                             UI.user_error!("'#{value}' is not valid!")
+                                           end)
 
           expect(c.valid?(nil)).to eq(true)
         end
 
         it "verifies type" do
           c = FastlaneCore::ConfigItem.new(key: :param,
-                                      env_name: "param",
-                                          type: Float,
-                                   description: "Description")
+                                           env_name: "param",
+                                           type: Float,
+                                           description: "Description")
           expect do
             c.valid?('a string')
           end.to raise_error("'param' value must be a Float! Found String instead.")
@@ -434,20 +434,20 @@ describe FastlaneCore do
 
         it "skips type verification" do
           c = FastlaneCore::ConfigItem.new(key: :param,
-                                      env_name: "param",
-                                          type: Float,
-                          skip_type_validation: true,
-                                   description: "Description")
+                                           env_name: "param",
+                                           type: Float,
+                                           skip_type_validation: true,
+                                           description: "Description")
           expect(c.valid?('a string')).to eq(true)
         end
 
         it "fails verification for a improper value set as an environment variable" do
           c = FastlaneCore::ConfigItem.new(key: :test_key,
-                                    env_name: "TEST_KEY",
-                                 description: "A test key",
-                                verify_block: proc do |value|
-                                  UI.user_error!("Invalid value") unless value.start_with?('a')
-                                end)
+                                           env_name: "TEST_KEY",
+                                           description: "A test key",
+                                           verify_block: proc do |value|
+                                             UI.user_error!("Invalid value") unless value.start_with?('a')
+                                           end)
           expect do
             @config = FastlaneCore::Configuration.create([c], {})
             ENV["TEST_KEY"] = "does_not_start_with_a"
@@ -457,11 +457,11 @@ describe FastlaneCore do
 
         it "passes verification for a proper value set as an environment variable" do
           c = FastlaneCore::ConfigItem.new(key: :test_key,
-                                    env_name: "TEST_KEY",
-                                 description: "A test key",
-                                verify_block: proc do |value|
-                                  UI.user_error!("Invalid value") unless value.start_with?('a')
-                                end)
+                                           env_name: "TEST_KEY",
+                                           description: "A test key",
+                                           verify_block: proc do |value|
+                                             UI.user_error!("Invalid value") unless value.start_with?('a')
+                                           end)
           @config = FastlaneCore::Configuration.create([c], {})
           ENV["TEST_KEY"] = "a_good_value"
           expect(@config[:test_key]).to eq('a_good_value')
@@ -529,20 +529,20 @@ describe FastlaneCore do
       describe "misc features" do
         it "makes it non optional by default" do
           c = FastlaneCore::ConfigItem.new(key: :test,
-                                 default_value: '123')
+                                           default_value: '123')
           expect(c.optional).to eq(false)
         end
 
         it "supports options without 'env_name'" do
           c = FastlaneCore::ConfigItem.new(key: :test,
-                                 default_value: '123')
+                                           default_value: '123')
           config = FastlaneCore::Configuration.create([c], {})
           expect(config.values[:test]).to eq('123')
         end
 
         it "takes the values from the environment if available" do
           c = FastlaneCore::ConfigItem.new(key: :test,
-                                      env_name: "FL_TEST")
+                                           env_name: "FL_TEST")
           config = FastlaneCore::Configuration.create([c], {})
           ENV["FL_TEST"] = "123value"
           expect(config.values[:test]).to eq('123value')
@@ -551,7 +551,7 @@ describe FastlaneCore do
 
         it "supports modifying the value after taken from the environment" do
           c = FastlaneCore::ConfigItem.new(key: :test,
-                                      env_name: "FL_TEST")
+                                           env_name: "FL_TEST")
           config = FastlaneCore::Configuration.create([c], {})
           ENV["FL_TEST"] = "123value"
           config.values[:test].gsub!("123", "456")
@@ -604,7 +604,7 @@ describe FastlaneCore do
         it "doesn't remove --verbose if it's a valid option" do
           options = [
             FastlaneCore::ConfigItem.new(key: :verbose,
-                                   is_string: false)
+                                         is_string: false)
           ]
           config = FastlaneCore::Configuration.create(options, { verbose: true })
           expect(config[:verbose]).to eq(true)
@@ -615,26 +615,26 @@ describe FastlaneCore do
         before do
           @options = [
             FastlaneCore::ConfigItem.new(key: :cert_name,
-                                    env_name: "SIGH_PROVISIONING_PROFILE_NAME",
-                                 description: "Set the profile name",
-                               default_value: "production_default",
-                                verify_block: nil),
+                                         env_name: "SIGH_PROVISIONING_PROFILE_NAME",
+                                         description: "Set the profile name",
+                                         default_value: "production_default",
+                                         verify_block: nil),
             FastlaneCore::ConfigItem.new(key: :output,
-                                    env_name: "SIGH_OUTPUT_PATH",
-                                 description: "Directory in which the profile should be stored",
-                               default_value: ".",
-                                verify_block: proc do |value|
-                                  UI.user_error!("Could not find output directory '#{value}'") unless File.exist?(value)
-                                end),
+                                         env_name: "SIGH_OUTPUT_PATH",
+                                         description: "Directory in which the profile should be stored",
+                                         default_value: ".",
+                                         verify_block: proc do |value|
+                                           UI.user_error!("Could not find output directory '#{value}'") unless File.exist?(value)
+                                         end),
             FastlaneCore::ConfigItem.new(key: :wait_processing_interval,
-                                short_option: "-k",
-                                    env_name: "PILOT_WAIT_PROCESSING_INTERVAL",
-                                 description: "Interval in seconds to wait for App Store Connect processing",
-                               default_value: 30,
-                                        type: Integer,
-                                verify_block: proc do |value|
-                                  UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
-                                end)
+                                         short_option: "-k",
+                                         env_name: "PILOT_WAIT_PROCESSING_INTERVAL",
+                                         description: "Interval in seconds to wait for App Store Connect processing",
+                                         default_value: 30,
+                                         type: Integer,
+                                         verify_block: proc do |value|
+                                           UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
+                                         end)
           ]
           @values = {
             cert_name: "asdf",
@@ -817,7 +817,7 @@ describe FastlaneCore do
           it "prioritizes env_names after env_name" do
             ENV["abc"] = "val env"
             ENV["def"] = "val env wrong"
-            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", "env_names": ["def"], default_value: "val default")
+            config_item = FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", 'env_names': ["def"], default_value: "val default")
             config = FastlaneCore::Configuration.create([config_item], {})
             config.config_file_options = { item: "val config" }
 

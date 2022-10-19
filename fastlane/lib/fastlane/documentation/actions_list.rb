@@ -162,7 +162,7 @@ module Fastlane
       return unless action.return_value
 
       puts(Terminal::Table.new(title: "#{name} Return Value".green,
-                                rows: FastlaneCore::PrintTable.transform_output([[action.return_value]])))
+                               rows: FastlaneCore::PrintTable.transform_output([[action.return_value]])))
       puts("")
     end
 

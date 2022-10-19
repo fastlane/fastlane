@@ -49,8 +49,8 @@ module Fastlane
         #   Array([1, 2]) # => [1, 2]
         Array(params[:app_identifier]).each do |app_identifier|
           env_variable_name = Match::Utils.environment_variable_name_profile_name(app_identifier: app_identifier,
-                                                                                            type: Match.profile_type_sym(params[:type]),
-                                                                                        platform: params[:platform])
+                                                                                  type: Match.profile_type_sym(params[:type]),
+                                                                                  platform: params[:platform])
 
           if params[:derive_catalyst_app_identifier]
             app_identifier = "maccatalyst.#{app_identifier}"

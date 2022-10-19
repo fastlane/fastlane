@@ -71,13 +71,13 @@ describe Fastlane do
 
       it "proxy options are set correctly" do
         expect(Fastlane::Actions::SplunkmintAction.proxy_options(proxy_address: "",
-          proxy_port: nil, proxy_username: nil, proxy_password: nil)).to eq([])
+                                                                 proxy_port: nil, proxy_username: nil, proxy_password: nil)).to eq([])
         expect(Fastlane::Actions::SplunkmintAction.proxy_options(proxy_address: nil,
-          proxy_port: "", proxy_username: nil, proxy_password: nil)).to eq([])
+                                                                 proxy_port: "", proxy_username: nil, proxy_password: nil)).to eq([])
         expect(Fastlane::Actions::SplunkmintAction.proxy_options(proxy_address: nil,
-          proxy_port: nil, proxy_username: "", proxy_password: "")).to eq([])
+                                                                 proxy_port: nil, proxy_username: "", proxy_password: "")).to eq([])
         expect(Fastlane::Actions::SplunkmintAction.proxy_options(proxy_address: "http://1",
-          proxy_port: "2", proxy_username: "3", proxy_password: "4")).to eq(["-x http://1:2", "--proxy-user 3:4"])
+                                                                 proxy_port: "2", proxy_username: "3", proxy_password: "4")).to eq(["-x http://1:2", "--proxy-user 3:4"])
       end
 
       it "raises an error if file does not exist" do

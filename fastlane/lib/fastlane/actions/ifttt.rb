@@ -38,26 +38,26 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :api_key,
-                                      env_name: "IFTTT_API_KEY",
-                                      sensitive: true,
-                                      description: "API key",
-                                      verify_block: proc do |value|
-                                        raise UI.error("No API key given, pass using `api_key: 'key'`") if value.to_s.empty?
-                                      end),
+                                       env_name: "IFTTT_API_KEY",
+                                       sensitive: true,
+                                       description: "API key",
+                                       verify_block: proc do |value|
+                                         raise UI.error("No API key given, pass using `api_key: 'key'`") if value.to_s.empty?
+                                       end),
           FastlaneCore::ConfigItem.new(key: :event_name,
-                                      env_name: "IFTTT_EVENT_NAME",
-                                      description: "The name of the event that will be triggered",
-                                      verify_block: proc do |value|
-                                        raise UI.error("No event name given, pass using `event_name: 'name'`") if value.to_s.empty?
-                                      end),
+                                       env_name: "IFTTT_EVENT_NAME",
+                                       description: "The name of the event that will be triggered",
+                                       verify_block: proc do |value|
+                                         raise UI.error("No event name given, pass using `event_name: 'name'`") if value.to_s.empty?
+                                       end),
           FastlaneCore::ConfigItem.new(key: :value1,
                                        env_name: "IFTTT_VALUE1",
                                        description: "Extra data sent with the event",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :value2,
-                                      env_name: "IFTTT_VALUE2",
-                                      description: "Extra data sent with the event",
-                                      optional: true),
+                                       env_name: "IFTTT_VALUE2",
+                                       description: "Extra data sent with the event",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :value3,
                                        env_name: "IFTTT_VALUE3",
                                        description: "Extra data sent with the event",

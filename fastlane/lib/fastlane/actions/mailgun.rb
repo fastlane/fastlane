@@ -117,7 +117,7 @@ module Fastlane
           html: mail_template(options)
         }
         unless options[:reply_to].nil?
-          params.store(:"h:Reply-To", options[:reply_to])
+          params.store(:'h:Reply-To', options[:reply_to])
         end
 
         unless options[:attachment].nil?

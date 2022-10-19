@@ -415,9 +415,9 @@ module Screengrab
       begin
         errout = nil
         cmdout = @executor.execute(command: @android_env.adb_path + " " + host + command,
-                                  print_all: print_all,
-                                  print_command: print_command,
-                                  error: raise_errors ? nil : proc { |out, status| errout = out }) || ''
+                                   print_all: print_all,
+                                   print_command: print_command,
+                                   error: raise_errors ? nil : proc { |out, status| errout = out }) || ''
         output = errout || cmdout
       rescue => ex
         if raise_errors

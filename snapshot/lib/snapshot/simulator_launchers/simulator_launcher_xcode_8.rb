@@ -18,7 +18,7 @@ module Snapshot
             end
             results[device] ||= {}
 
-            current_run = device_index * launcher_config.languages.count + language_index + 1
+            current_run = (device_index * launcher_config.languages.count) + language_index + 1
             number_of_runs = launcher_config.languages.count * launcher_config.devices.count
             UI.message("snapshot run #{current_run} of #{number_of_runs}")
             results[device][language] = run_for_device_and_language(language, locale, device, launch_args)
@@ -83,24 +83,24 @@ module Snapshot
         }
       ]
       FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: true,
-                                      print_command: true,
-                                             prefix: prefix_hash,
+                                            print_all: true,
+                                            print_command: true,
+                                            prefix: prefix_hash,
                                             loading: "Loading...",
-                                              error: proc do |output, return_code|
-                                                ErrorHandler.handle_test_error(output, return_code)
+                                            error: proc do |output, return_code|
+                                              ErrorHandler.handle_test_error(output, return_code)
 
-                                                # no exception raised... that means we need to retry
-                                                UI.error("Caught error... #{return_code}")
+                                              # no exception raised... that means we need to retry
+                                              UI.error("Caught error... #{return_code}")
 
-                                                self.current_number_of_retries_due_to_failing_simulator += 1
-                                                if self.current_number_of_retries_due_to_failing_simulator < 20
-                                                  launch_one_at_a_time(language, locale, device_type, launch_arguments)
-                                                else
-                                                  # It's important to raise an error, as we don't want to collect the screenshots
-                                                  UI.crash!("Too many errors... no more retries...")
-                                                end
-                                              end)
+                                              self.current_number_of_retries_due_to_failing_simulator += 1
+                                              if self.current_number_of_retries_due_to_failing_simulator < 20
+                                                launch_one_at_a_time(language, locale, device_type, launch_arguments)
+                                              else
+                                                # It's important to raise an error, as we don't want to collect the screenshots
+                                                UI.crash!("Too many errors... no more retries...")
+                                              end
+                                            end)
     end
 
     def open_simulator_for_device(device_name)

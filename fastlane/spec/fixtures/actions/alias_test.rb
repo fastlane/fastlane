@@ -20,15 +20,15 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :example,
-                                     short_option: "-e",
-                                     description: "Example Param",
-                                     optional: true,
-                                     default_value: "Test String"),
+                                       short_option: "-e",
+                                       description: "Example Param",
+                                       optional: true,
+                                       default_value: "Test String"),
           FastlaneCore::ConfigItem.new(key: :example_two,
-                                     short_option: "-t",
-                                     description: "Example Param",
-                                     optional: true,
-                                     default_value: "Test String")
+                                       short_option: "-t",
+                                       description: "Example Param",
+                                       optional: true,
+                                       default_value: "Test String")
         ]
       end
     end

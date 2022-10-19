@@ -87,7 +87,7 @@ module Fastlane
 
       def self.print_values(values)
         FastlaneCore::PrintTable.print_values(config: values,
-                                             title: "Summary for verify_build #{Fastlane::VERSION}")
+                                              title: "Summary for verify_build #{Fastlane::VERSION}")
       end
 
       def self.evaulate(params, values)

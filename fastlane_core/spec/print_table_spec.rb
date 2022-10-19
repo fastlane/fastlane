@@ -3,16 +3,16 @@ describe FastlaneCore do
     before do
       @options = [
         FastlaneCore::ConfigItem.new(key: :cert_name,
-                                env_name: "SIGH_PROVISIONING_PROFILE_NAME",
-                             description: "Set the profile name",
-                            verify_block: nil),
+                                     env_name: "SIGH_PROVISIONING_PROFILE_NAME",
+                                     description: "Set the profile name",
+                                     verify_block: nil),
         FastlaneCore::ConfigItem.new(key: :output,
-                                env_name: "SIGH_OUTPUT_PATH",
-                             description: "Directory in which the profile should be stored",
-                           default_value: ".",
-                            verify_block: proc do |value|
-                              UI.user_error!("Could not find output directory '#{value}'") unless File.exist?(value)
-                            end),
+                                     env_name: "SIGH_OUTPUT_PATH",
+                                     description: "Directory in which the profile should be stored",
+                                     default_value: ".",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not find output directory '#{value}'") unless File.exist?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :a_bool,
                                      description: "Metadata: A bool",
                                      optional: true,

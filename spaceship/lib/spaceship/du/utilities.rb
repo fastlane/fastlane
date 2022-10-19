@@ -3,7 +3,7 @@ require "English"
 
 module Spaceship
   # Set of utility methods useful to work with media files
-  module Utilities #:nodoc:
+  module Utilities # :nodoc:
     # Identifies the content_type of a file based on its file name extension.
     # Supports all formats required by DU-UTC right now (video, images and json)
     # @param path (String) the path to the file

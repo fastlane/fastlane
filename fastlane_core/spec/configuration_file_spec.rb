@@ -147,9 +147,11 @@ describe FastlaneCore do
               expect do
                 block.call(arguments.first, "custom")
               end.to raise_error("Yeah: parameter custom")
-            else UI.user_error!("no")
+            else
+              UI.user_error!("no")
             end
-          else UI.user_error!("no")
+          else
+            UI.user_error!("no")
           end
         end)
       end

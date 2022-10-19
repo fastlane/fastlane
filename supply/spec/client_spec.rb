@@ -24,7 +24,7 @@ describe Supply do
       client.begin_edit(package_name: 'test-app')
       client.upload_image(image_path: fixture_file("playstore-icon.png"),
                           image_type: "icon",
-                            language: "en-US")
+                          language: "en-US")
     end
 
     describe "AndroidPublisher" do

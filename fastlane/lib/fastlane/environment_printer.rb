@@ -41,7 +41,7 @@ module Fastlane
         final_output << "<details><summary>Output/Log</summary>\n\n```\n\n#{FastlaneCore::Globals.captured_output}\n\n```\n\n</details>\n\n"
       end
 
-      final_output << env_header + env_output + env_tail
+      final_output << (env_header + env_output + env_tail)
     end
 
     def self.print_date

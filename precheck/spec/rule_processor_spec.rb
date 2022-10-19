@@ -9,7 +9,7 @@ describe Precheck do
     let(:fake_happy_app_info) { "fake_app_info_object" }
     let(:fake_in_app_purchase) { "fake_in_app_purchase" }
     let(:fake_in_app_purchase_edit) { "fake_in_app_purchase_edit" }
-    let(:fake_in_app_purchase_edit_version) { { "de-DE": { name: "iap name", description: "iap desc" } } }
+    let(:fake_in_app_purchase_edit_version) { { 'de-DE': { name: "iap name", description: "iap desc" } } }
     let(:fake_in_app_purchases) { [fake_in_app_purchase] }
 
     before do

@@ -255,7 +255,7 @@ module Fastlane
         fastlane_folder_name = "fastlane"
       end
       "plugins_path = File.join(File.dirname(__FILE__), '#{fastlane_folder_name}', '#{PluginManager::PLUGINFILE_NAME}')\n" \
-      "eval_gemfile(plugins_path) if File.exist?(plugins_path)"
+        "eval_gemfile(plugins_path) if File.exist?(plugins_path)"
     end
 
     # Makes sure, the user's Gemfile actually loads the Plugins file

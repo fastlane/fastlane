@@ -97,8 +97,8 @@ describe Pilot::TesterManager do
         end
 
         expect(Terminal::Table).to receive(:new).with(title: "All Testers (2)".green,
-                                                   headings: headings,
-                                                       rows: rows)
+                                                      headings: headings,
+                                                      rows: rows)
 
         tester_manager.list_testers(app_identifier: 'com.whatever')
       end

@@ -60,16 +60,16 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :url,
-                                      env_name: "FL_JIRA_SITE",
-                                      description: "URL for Jira instance",
+                                       env_name: "FL_JIRA_SITE",
+                                       description: "URL for Jira instance",
                                        verify_block: proc do |value|
                                          UI.user_error!("No url for Jira given, pass using `url: 'url'`") if value.to_s.length == 0
                                        end),
           FastlaneCore::ConfigItem.new(key: :context_path,
-                                      env_name: "FL_JIRA_CONTEXT_PATH",
-                                      description: "Appends to the url (ex: \"/jira\")",
-                                      optional: true,
-                                      default_value: ""),
+                                       env_name: "FL_JIRA_CONTEXT_PATH",
+                                       description: "Appends to the url (ex: \"/jira\")",
+                                       optional: true,
+                                       default_value: ""),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "FL_JIRA_USERNAME",
                                        description: "Username for Jira instance",

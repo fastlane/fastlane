@@ -34,16 +34,16 @@ module Pilot
       if ipa_path && platform != 'osx'
         asset_path = ipa_path
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_app_id,
-                                                                      ipa_path: ipa_path,
-                                                                  package_path: dir,
-                                                                      platform: platform)
+                                                                          ipa_path: ipa_path,
+                                                                          package_path: dir,
+                                                                          platform: platform)
       else
         pkg_path = options[:pkg]
         asset_path = pkg_path
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(app_id: fetch_app_id,
-                                                                        pkg_path: pkg_path,
-                                                                    package_path: dir,
-                                                                        platform: platform)
+                                                                          pkg_path: pkg_path,
+                                                                          package_path: dir,
+                                                                          platform: platform)
       end
 
       transporter = transporter_for_selected_team(options)

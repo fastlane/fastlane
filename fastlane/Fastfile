@@ -225,9 +225,9 @@ desc "This includes running tests and verifying the GitHub release"
 lane :release do
   verify_env_variables
   slack_train_start(distance: 2,
-                       train: "🚀",
-           reverse_direction: true,
-                        rail: "✨")
+                    train: "🚀",
+                    reverse_direction: true,
+                    rail: "✨")
 
   update_fastlane
   slack_train
@@ -474,8 +474,8 @@ lane :update_docs do |options|
       plugins_path = "docs/plugins/available-plugins.md"
       unless options[:skip_plugin_scores]
         plugin_scores(template_path: template_path,
-                        output_path: plugins_path,
-                         cache_path: plugin_scores_cache_path)
+                      output_path: plugins_path,
+                      cache_path: plugin_scores_cache_path)
       end
 
       next if debug
@@ -485,7 +485,7 @@ lane :update_docs do |options|
         changes_to_commit = [plugin_scores_cache_path, actions_md_path, "Gemfile.lock", plugins_path, yml_path] + action_docs + custom_assets
         git_add(path: changes_to_commit)
         git_commit(path: changes_to_commit,
-                message: "Update docs for latest fastlane release #{version} (actions.md, available-plugins.md) 🚀")
+                   message: "Update docs for latest fastlane release #{version} (actions.md, available-plugins.md) 🚀")
         # Push them to the git remote
         push_to_git_remote
 

@@ -61,7 +61,7 @@ module FastlaneCore
 
     # @return true if the currently running program is a unit test
     def self.test?
-      Object.const_defined?("SpecHelper")
+      Object.const_defined?(:SpecHelper)
     end
 
     # @return true if it is enabled to execute external commands

@@ -100,8 +100,8 @@ module Match
           # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
           Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
             FastlaneCore::CommandExecutor.execute(command: command,
-                                                print_all: FastlaneCore::Globals.verbose?,
-                                            print_command: FastlaneCore::Globals.verbose?)
+                                                  print_all: FastlaneCore::Globals.verbose?,
+                                                  print_command: FastlaneCore::Globals.verbose?)
           end
         rescue
           UI.error("Error cloning certificates repo, please make sure you have read access to the repository you want to use")
@@ -241,8 +241,8 @@ module Match
         Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
           commands.each do |command|
             FastlaneCore::CommandExecutor.execute(command: command,
-                                                print_all: FastlaneCore::Globals.verbose?,
-                                            print_command: FastlaneCore::Globals.verbose?)
+                                                  print_all: FastlaneCore::Globals.verbose?,
+                                                  print_command: FastlaneCore::Globals.verbose?)
           end
         end
       rescue => ex

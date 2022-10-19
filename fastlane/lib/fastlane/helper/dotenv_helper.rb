@@ -14,7 +14,7 @@ module Fastlane
       def self.find_dotenv_directory
         path = FastlaneCore::FastlaneFolder.path
         search_paths = [path]
-        search_paths << path + "/.." unless path.nil?
+        search_paths << (path + "/..") unless path.nil?
         search_paths.compact!
         search_paths.find do |dir|
           Dir.glob(File.join(dir, '*.env*'), File::FNM_DOTMATCH).count > 0

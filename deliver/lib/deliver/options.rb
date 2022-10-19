@@ -211,11 +211,11 @@ module Deliver
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :reset_ratings,
-                                    env_name: "DELIVER_RESET_RATINGS",
-                                    description: "Reset the summary rating when you release a new version of the application",
-                                    optional: true,
-                                    type: Boolean,
-                                    default_value: false),
+                                     env_name: "DELIVER_RESET_RATINGS",
+                                     description: "Reset the summary rating when you release a new version of the application",
+                                     optional: true,
+                                     type: Boolean,
+                                     default_value: false),
 
         # other app configuration
         FastlaneCore::ConfigItem.new(key: :price_tier,

@@ -8,11 +8,11 @@ describe Fastlane do
 
       it "sets upload url correctly for Nexus 2" do
         expect(Fastlane::Actions::NexusUploadAction.upload_url(endpoint: "http://localhost:8081",
-          mount_path: "/nexus", nexus_version: 2)).to eq("http://localhost:8081/nexus/service/local/artifact/maven/content")
+                                                               mount_path: "/nexus", nexus_version: 2)).to eq("http://localhost:8081/nexus/service/local/artifact/maven/content")
         expect(Fastlane::Actions::NexusUploadAction.upload_url(endpoint: "http://localhost:8081",
-          mount_path: "/custom-nexus", nexus_version: 2)).to eq("http://localhost:8081/custom-nexus/service/local/artifact/maven/content")
+                                                               mount_path: "/custom-nexus", nexus_version: 2)).to eq("http://localhost:8081/custom-nexus/service/local/artifact/maven/content")
         expect(Fastlane::Actions::NexusUploadAction.upload_url(endpoint: "http://localhost:8081",
-          mount_path: "", nexus_version: 2)).to eq("http://localhost:8081/service/local/artifact/maven/content")
+                                                               mount_path: "", nexus_version: 2)).to eq("http://localhost:8081/service/local/artifact/maven/content")
       end
 
       it "sets upload url correctly for Nexus 3 with all required parameters" do
@@ -22,13 +22,13 @@ describe Fastlane do
 
         expect(Fastlane::Actions::NexusUploadAction.upload_url(
                  endpoint: 'http://localhost:8081',
-                   mount_path: '/nexus',
-                   nexus_version: 3,
+                 mount_path: '/nexus',
+                 nexus_version: 3,
                  repo_id: 'artefacts',
                  repo_group_id: 'com.fastlane',
                  repo_project_name: 'myproject',
                  repo_project_version: '1.12',
-                   file: file_path.to_s
+                 file: file_path.to_s
         )).to eq("http://localhost:8081/nexus/repository/artefacts/com/fastlane/myproject/1.12/myproject-1.12.ipa")
       end
 
@@ -39,14 +39,14 @@ describe Fastlane do
 
         expect(Fastlane::Actions::NexusUploadAction.upload_url(
                  endpoint: 'http://localhost:8081',
-                   mount_path: '/nexus',
-                   nexus_version: 3,
+                 mount_path: '/nexus',
+                 nexus_version: 3,
                  repo_id: 'artefacts',
                  repo_group_id: 'com.fastlane',
                  repo_project_name: 'myproject',
                  repo_project_version: '1.12',
-                   file: file_path.to_s,
-                   repo_classifier: 'ipa'
+                 file: file_path.to_s,
+                 repo_classifier: 'ipa'
         )).to eq("http://localhost:8081/nexus/repository/artefacts/com/fastlane/myproject/1.12/myproject-1.12-ipa.ipa")
       end
 
@@ -57,13 +57,13 @@ describe Fastlane do
 
         result = Fastlane::Actions::NexusUploadAction.upload_options(
           nexus_version: 2,
-        repo_id: 'artefacts',
-        repo_group_id: 'com.fastlane',
-        repo_project_name: 'myproject',
-        repo_project_version: '1.12',
+          repo_id: 'artefacts',
+          repo_group_id: 'com.fastlane',
+          repo_project_name: 'myproject',
+          repo_project_version: '1.12',
           file: file_path.to_s,
-                        username: 'admin',
-                        password: 'admin123'
+          username: 'admin',
+          password: 'admin123'
         )
 
         expect(result).to include('-F p=zip')
@@ -84,14 +84,14 @@ describe Fastlane do
 
         result = Fastlane::Actions::NexusUploadAction.upload_options(
           nexus_version: 2,
-        repo_id: 'artefacts',
-        repo_group_id: 'com.fastlane',
-        repo_project_name: 'myproject',
-        repo_project_version: '1.12',
+          repo_id: 'artefacts',
+          repo_group_id: 'com.fastlane',
+          repo_project_name: 'myproject',
+          repo_project_version: '1.12',
           file: file_path.to_s,
-                        username: 'admin',
-                        password: 'admin123',
-                        repo_classifier: 'dSYM'
+          username: 'admin',
+          password: 'admin123',
+          repo_classifier: 'dSYM'
         )
 
         expect(result).to include('-F p=zip')
@@ -114,8 +114,8 @@ describe Fastlane do
         result = Fastlane::Actions::NexusUploadAction.upload_options(
           nexus_version: 3,
           file: file_path.to_s,
-                        username: 'admin',
-                        password: 'admin123'
+          username: 'admin',
+          password: 'admin123'
         )
 
         expect(result).to include("--upload-file #{file_path}")
@@ -129,13 +129,13 @@ describe Fastlane do
 
       it "sets proxy options correctly" do
         expect(Fastlane::Actions::NexusUploadAction.proxy_options(proxy_address: "",
-          proxy_port: nil, proxy_username: nil, proxy_password: nil)).to eq([])
+                                                                  proxy_port: nil, proxy_username: nil, proxy_password: nil)).to eq([])
         expect(Fastlane::Actions::NexusUploadAction.proxy_options(proxy_address: nil,
-          proxy_port: "", proxy_username: nil, proxy_password: nil)).to eq([])
+                                                                  proxy_port: "", proxy_username: nil, proxy_password: nil)).to eq([])
         expect(Fastlane::Actions::NexusUploadAction.proxy_options(proxy_address: nil,
-          proxy_port: nil, proxy_username: "", proxy_password: "")).to eq([])
+                                                                  proxy_port: nil, proxy_username: "", proxy_password: "")).to eq([])
         expect(Fastlane::Actions::NexusUploadAction.proxy_options(proxy_address: "http://1",
-          proxy_port: "2", proxy_username: "3", proxy_password: "4")).to eq(["-x http://1:2", "--proxy-user 3:4"])
+                                                                  proxy_port: "2", proxy_username: "3", proxy_password: "4")).to eq(["-x http://1:2", "--proxy-user 3:4"])
       end
 
       it "raises an error if file does not exist" do

@@ -48,7 +48,7 @@ Code signing is required for product type 'Application' in SDK 'iOS 11.0'
       mock_gym_path(code_signing_output)
       expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: code_signing_output)
       expect(UI).to receive(:command_output).with("No profile for team 'N8X438SEU2' matching 'match AppStore me.themoji.app.beta' found:  Xcode couldn't find any provisioning profiles matching 'N8X438SEU2/match AppStore me.themoji.app.beta'. " \
-        "Install the profile (by dragging and dropping it onto Xcode's dock item) or select a different one in the General tab of the target editor.")
+                                                  "Install the profile (by dragging and dropping it onto Xcode's dock item) or select a different one in the General tab of the target editor.")
       expect(UI).to receive(:command_output).with("Code signing is required for product type 'Application' in SDK 'iOS 11.0'")
       expect(UI).to receive(:command_output).at_least(:once) # as this is called multiple times before
 

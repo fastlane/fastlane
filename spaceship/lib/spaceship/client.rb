@@ -163,7 +163,7 @@ module Spaceship
 
       response = request(:post) do |req|
         req.url("https://appstoreconnect.apple.com/olympus/v1/session")
-        req.body = { "provider": { "providerId": result[:team_id] } }.to_json
+        req.body = { 'provider': { 'providerId': result[:team_id] } }.to_json
         req.headers['Content-Type'] = 'application/json'
         req.headers['X-Requested-With'] = 'olympus-ui'
       end
@@ -676,7 +676,7 @@ module Spaceship
         puts(msg) if Spaceship::Globals.verbose?
         logger.warn(msg)
 
-        sleep(3) unless Object.const_defined?("SpecHelper")
+        sleep(3) unless Object.const_defined?(:SpecHelper)
         retry
       end
       raise ex # re-raise the exception
@@ -687,7 +687,7 @@ module Spaceship
         puts(msg) if Spaceship::Globals.verbose?
         logger.warn(msg)
 
-        sleep(ex.retry_after) unless Object.const_defined?("SpecHelper")
+        sleep(ex.retry_after) unless Object.const_defined?(:SpecHelper)
         retry
       end
       raise ex # re-raise the exception
@@ -700,7 +700,7 @@ module Spaceship
         puts(msg) if Spaceship::Globals.verbose?
         logger.warn(msg)
 
-        sleep(3) unless Object.const_defined?("SpecHelper")
+        sleep(3) unless Object.const_defined?(:SpecHelper)
         retry
       end
       raise ex # re-raise the exception
@@ -715,7 +715,7 @@ module Spaceship
         end
 
         do_login(self.user, @password)
-        sleep(3) unless Object.const_defined?("SpecHelper")
+        sleep(3) unless Object.const_defined?(:SpecHelper)
         retry
       end
       raise ex # re-raise the exception

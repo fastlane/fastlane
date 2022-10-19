@@ -53,9 +53,9 @@ module Fastlane
 
         @options = PEM::Options.available_options
         @options << FastlaneCore::ConfigItem.new(key: :new_profile,
-                                     description: "Block that is called if there is a new profile",
-                                     optional: true,
-                                     type: :string_callback)
+                                                 description: "Block that is called if there is a new profile",
+                                                 optional: true,
+                                                 type: :string_callback)
         @options
       end
 

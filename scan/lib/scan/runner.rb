@@ -78,27 +78,27 @@ module Scan
       exit_status = 0
 
       FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: true,
-                                      print_command: true,
-                                             prefix: prefix_hash,
+                                            print_all: true,
+                                            print_command: true,
+                                            prefix: prefix_hash,
                                             loading: "Loading...",
-                                    suppress_output: Scan.config[:suppress_xcode_output],
-                                              error: proc do |error_output|
-                                                begin
-                                                  exit_status = $?.exitstatus
-                                                  if retries > 0
-                                                    # If there are retries remaining, run the tests again
-                                                    return retry_execute(retries: retries, error_output: error_output)
-                                                  else
-                                                    ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
-                                                  end
-                                                rescue => ex
-                                                  SlackPoster.new.run({
-                                                    build_errors: 1
-                                                  })
-                                                  raise ex
+                                            suppress_output: Scan.config[:suppress_xcode_output],
+                                            error: proc do |error_output|
+                                              begin
+                                                exit_status = $?.exitstatus
+                                                if retries > 0
+                                                  # If there are retries remaining, run the tests again
+                                                  return retry_execute(retries: retries, error_output: error_output)
+                                                else
+                                                  ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
                                                 end
-                                              end)
+                                              rescue => ex
+                                                SlackPoster.new.run({
+                                                  build_errors: 1
+                                                })
+                                                raise ex
+                                              end
+                                            end)
 
       exit_status
     end

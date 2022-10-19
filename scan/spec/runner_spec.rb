@@ -17,7 +17,7 @@ describe Scan do
         allow(mock_test_result_parser).to receive(:parse_result).and_return({ tests: 100, failures: 0 })
 
         allow(Trainer::TestParser).to receive(:auto_convert).and_return({
-          "some/path": {
+          'some/path': {
             successful: true,
             number_of_tests: 10,
             number_of_failures: 0,
@@ -78,7 +78,7 @@ describe Scan do
             Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
 
             allow(Trainer::TestParser).to receive(:auto_convert).and_return({
-              "some/path": {
+              'some/path': {
                 successful: true,
                 number_of_tests: 10,
                 number_of_failures: 1,
@@ -105,7 +105,7 @@ describe Scan do
           Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
 
           allow(Trainer::TestParser).to receive(:auto_convert).and_return({
-            "some/path": {
+            'some/path': {
               successful: true,
               number_of_tests: 10,
               number_of_failures: 1,
