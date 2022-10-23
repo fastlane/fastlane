@@ -86,6 +86,9 @@ module Match
       UI.success("You can also remove the `git_url`, as well as any other git related configurations from your Fastfile and Matchfile")
       UI.message("")
       UI.input("Please make sure to read the above and confirm with enter")
+    ensure
+      google_cloud_storage.clear_changes if google_cloud_storage
+      git_storage.clear_changes if git_storage
     end
 
     def api_token(params)
