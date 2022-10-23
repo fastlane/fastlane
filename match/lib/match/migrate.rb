@@ -7,7 +7,7 @@ require 'fileutils'
 
 module Match
   class Migrate
-    def migrate(args, options)
+    def migrate(options)
       params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
       loaded_matchfile = params.load_configuration_file("Matchfile")
 

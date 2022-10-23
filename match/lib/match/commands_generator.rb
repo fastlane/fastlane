@@ -155,7 +155,7 @@ module Match
         FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
 
         c.action do |args, options|
-          Match::Migrate.new.migrate(args, options)
+          Match::Migrate.new.migrate(options)
         end
       end
 
