@@ -1,4 +1,3 @@
-require_relative 'options'
 require_relative 'spaceship_ensure'
 require_relative 'encryption'
 require_relative 'storage'
@@ -7,8 +6,7 @@ require 'fileutils'
 
 module Match
   class Migrate
-    def migrate(options)
-      params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
+    def migrate(params)
       loaded_matchfile = params.load_configuration_file("Matchfile")
 
       ensure_parameters_are_valid(params)
