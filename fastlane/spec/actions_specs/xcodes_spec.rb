@@ -30,7 +30,7 @@ describe Fastlane do
 
         it "doesn't invoke update command when false" do
           expect(Fastlane::Actions).to receive(:sh).with("#{xcodes_binary_path} install '14' --select")
-          expect(Fastlane::Actions).to_not receive(:sh).with(/--update/)
+          expect(Fastlane::Actions).to_not(receive(:sh).with(/--update/))
           Fastlane::FastFile.new.parse("lane :test do
             xcodes(version: '14', update_list: false)
           end").runner.execute(:test)
@@ -38,7 +38,7 @@ describe Fastlane do
       end
 
       it "doesn't invoke 'update' nor 'install' when select_for_current_build_only argument is true" do
-        expect(Fastlane::Actions).to_not receive(:sh).with(/--update|--install/)
+        expect(Fastlane::Actions).to_not(receive(:sh).with(/--update|--install/))
         expect(Fastlane::Actions).to receive(:sh).with(/installed/)
         Fastlane::FastFile.new.parse("lane :test do
           xcodes(version: '14', select_for_current_build_only: true)
