@@ -61,9 +61,6 @@ module Fastlane
       end
 
       def self.available_options
-        user = CredentialsManager::AppfileConfig.try_fetch_value(:apple_dev_portal_id)
-        user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
-
         [
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_XCODE_VERSION",
