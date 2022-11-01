@@ -10,7 +10,7 @@ module Fastlane
         xcodes_raw_version = Actions.sh("#{binary} version", log: false)
         xcodes_version = Gem::Version.new(xcodes_raw_version)
         UI.message("Running xcodes version #{xcodes_version}")
-        UI.user_error!("xcodes action requires the minimum version of xcodes binary to be v1.1.0. Please update xcodes. If you installed it via Homebrew, this can be done via 'brew upgrade xcodes'") if xcodes_version < "1.1.0"
+        UI.user_error!("xcodes action requires the minimum version of xcodes binary to be v1.1.0. Please update xcodes. If you installed it via Homebrew, this can be done via 'brew upgrade xcodes'") if xcodes_version < Gem::Version.new("1.1.0")
 
         version = params[:version]
         command = []
