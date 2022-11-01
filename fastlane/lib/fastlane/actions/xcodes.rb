@@ -6,9 +6,6 @@ module Fastlane
 
     class XcodesAction < Action
       def self.run(params)
-        # Provide xcodes with the necessary env vars
-        ENV["XCODES_USERNAME"] = params[:username]
-        ENV["XCODES_PASSWORD"] = params[:password]
         binary = params[:binary_path]
         select_for_current_build_only = params[:select_for_current_build_only]
         version = params[:version]
@@ -78,19 +75,6 @@ module Fastlane
                                        default_value: Helper::XcodesHelper.read_xcode_version_file,
                                        default_value_dynamic: true,
                                        verify_block: Helper::XcodesHelper::Verify.method(:requirement)),
-          FastlaneCore::ConfigItem.new(key: :username,
-                                       short_option: "-u",
-                                       env_names: ["FL_XCODES_USERNAME", "XCODES_USERNAME"],
-                                       description: "Your Apple ID username",
-                                       default_value: user,
-                                       default_value_dynamic: true,
-                                       optional: true),
-          FastlaneCore::ConfigItem.new(key: :password,
-                                       short_option: "-p",
-                                       env_names: ["FASTLANE_PASSWORD", "XCODES_PASSWORD"],
-                                       description: "Your Apple ID password",
-                                       code_gen_sensitive: true,
-                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :update_list,
                                        env_name: "FL_XCODES_UPDATE_LIST",
                                        description: "Whether the list of available Xcode versions should be updated before running the install command",
