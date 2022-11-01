@@ -10,7 +10,12 @@ module Fastlane
         xcodes_raw_version = Actions.sh("#{binary} version", log: false)
         xcodes_version = Gem::Version.new(xcodes_raw_version)
         UI.message("Running xcodes version #{xcodes_version}")
-        UI.user_error!("xcodes action requires the minimum version of xcodes binary to be v1.1.0. Please update xcodes. If you installed it via Homebrew, this can be done via 'brew upgrade xcodes'") if xcodes_version < Gem::Version.new("1.1.0")
+        if xcodes_version < Gem::Version.new("1.1.0")
+          UI.user_error!([
+            "xcodes action requires the minimum version of xcodes binary to be v1.1.0.",
+            "Please update xcodes. If you installed it via Homebrew, this can be done via 'brew upgrade xcodes'"
+          ].join(" "))
+        end
 
         version = params[:version]
         command = []
@@ -75,7 +80,10 @@ module Fastlane
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :select_for_current_build_only,
                                        env_name: "FL_XCODES_SELECT_FOR_CURRENT_BUILD_ONLY",
-                                       description: "When true, it won't attempt to install an Xcode version, just find the installed Xcode version that best matches the passed version argument, and select it for the current build steps. It doesn't change the global Xcode version (e.g. via 'xcrun xcode-select'), which would require sudo permissions — when this option is true, this action doesn't require sudo permissions",
+                                       description: [
+                                         "When true, it won't attempt to install an Xcode version, just find the installed Xcode version that best matches the passed version argument, and select it for the current build steps.",
+                                         "It doesn't change the global Xcode version (e.g. via 'xcrun xcode-select'), which would require sudo permissions — when this option is true, this action doesn't require sudo permissions"
+                                       ].join(" "),
                                        type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :binary_path,
