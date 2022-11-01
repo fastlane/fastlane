@@ -7,28 +7,24 @@ module Fastlane
     class XcodesAction < Action
       def self.run(params)
         binary = params[:binary_path]
-        select_for_current_build_only = params[:select_for_current_build_only]
+        xcodes_raw_version = Actions.sh("#{binary} version", log: false)
+        xcodes_version = Gem::Version.new(xcodes_raw_version)
+        UI.message("Running xcodes version #{xcodes_version}")
+        UI.user_error!("xcodes action requires the minimum version of xcodes binary to be v1.1.0. Please update xcodes. If you installed it via Homebrew, this can be done via 'brew upgrade xcodes'") if xcodes_version < "1.1.0"
+
         version = params[:version]
-        if params[:update_list] && !select_for_current_build_only
-          command = []
-          command << binary
-          command << "update"
-          shell_command = command.join(' ')
-          UI.message("Available versions:")
-          Actions.sh(shell_command)
-        end
+        command = []
+        command << binary
 
         if (xcodes_args = params[:xcodes_args])
-          command = []
-          command << binary
           command << xcodes_args
           shell_command = command.join(' ')
           Actions.sh(shell_command)
-        elsif !select_for_current_build_only
-          command = []
-          command << binary
+        elsif !params[:select_for_current_build_only]
           command << "install"
           command << "'#{version}'"
+          command << "--update" if params[:update_list]
+          command << "--select"
           shell_command = command.join(' ')
           Actions.sh(shell_command)
         end
