@@ -38,7 +38,7 @@ module Fastlane
         command << "'#{version}'"
         # Prints something like /Applications/Xcode-14.app
         xcode_path = Actions.sh(command.join(" ")).strip
-        xcode_developer_path = xcode_path + "/Contents/Developer/"
+        xcode_developer_path = xcode_path + "/Contents/Developer"
 
         UI.message("Setting Xcode version '#{version}' at '#{xcode_path}' for all build steps")
         ENV["DEVELOPER_DIR"] = xcode_developer_path

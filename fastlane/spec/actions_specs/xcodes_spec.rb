@@ -2,7 +2,7 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "xcodes" do
       let(:xcode_path) { "/valid/path/to/xcode.app" }
-      let(:xcode_developer_path) { "#{xcode_path}/Contents/Developer/" }
+      let(:xcode_developer_path) { "#{xcode_path}/Contents/Developer" }
       let(:xcodes_binary_path) { "/path/to/bin/xcodes" }
       let(:valid_xcodes_version) { "1.1.0" }
       let(:outdated_xcodes_version) { "1.0.0" }
