@@ -5,6 +5,7 @@ module Fastlane
         cmd = ["swift"]
 
         cmd << (package_commands.include?(params[:command]) ? "package" : params[:command])
+        cmd << "--scratch-path #{params[:scratch_path]}" if params[:scratch_path]
         cmd << "--build-path #{params[:build_path]}" if params[:build_path]
         cmd << "--package-path #{params[:package_path]}" if params[:package_path]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
@@ -50,9 +51,13 @@ module Fastlane
                                        description: "Enables code coverage for the generated Xcode project when using the 'generate-xcodeproj' and the 'test' command",
                                        type: Boolean,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :scratch_path,
+                                       env_name: "FL_SPM_SCRATCH_PATH",
+                                       description: "Specify build/cache directory [default: ./.build]",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :build_path,
                                        env_name: "FL_SPM_BUILD_PATH",
-                                       description: "Specify build/cache directory [default: ./.build]",
+                                       description: "Specify build/cache directory [default: ./.build] Warning: build_path option is depecrated, use scratch_path instead",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :package_path,
                                        env_name: "FL_SPM_PACKAGE_PATH",
@@ -110,7 +115,7 @@ module Fastlane
           'spm',
           'spm(
             command: "build",
-            build_path: "./build",
+            scratch_path: "./build",
             configuration: "release"
           )',
           'spm(
