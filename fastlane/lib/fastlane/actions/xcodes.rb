@@ -23,24 +23,21 @@ module Fastlane
 
         if (xcodes_args = params[:xcodes_args])
           command << xcodes_args
-          shell_command = command.join(' ')
-          Actions.sh(shell_command)
+          Actions.sh(command.join(" "))
         elsif !params[:select_for_current_build_only]
           command << "install"
           command << "'#{version}'"
           command << "--update" if params[:update_list]
           command << "--select"
-          shell_command = command.join(' ')
-          Actions.sh(shell_command)
+          Actions.sh(command.join(" "))
         end
 
         command = []
         command << binary
         command << "installed"
         command << "'#{version}'"
-        shell_command = command.join(' ')
         # Prints something like /Applications/Xcode-14.app
-        xcode_path = Actions.sh(shell_command).strip
+        xcode_path = Actions.sh(command.join(" ")).strip
         xcode_developer_path = xcode_path + "/Contents/Developer/"
 
         UI.message("Setting Xcode version '#{version}' at '#{xcode_path}' for all build steps")
