@@ -12,7 +12,7 @@ module Fastlane
       end
 
       def self.find_xcodes_binary_path
-        Actions.sh("which xcodes", log: false).strip
+        `which xcodes`.strip
       end
 
       module Verify
