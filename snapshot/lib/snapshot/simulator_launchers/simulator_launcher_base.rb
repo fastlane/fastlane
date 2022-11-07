@@ -85,6 +85,15 @@ module Snapshot
       end
     end
 
+    def wait_for_boot(message)
+      # "Booted" status is not enough for to adjust the status bar
+      # Simulator could stil be booting with Apple logo
+      # Need to wait "some amount of time" until home screen shows
+      boot_sleep = (ENV["SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT"] || 10).to_i
+      UI.message("Waiting #{boot_sleep} seconds for device to fully boot before #{message}... Set 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable to adjust timeout")
+      sleep(boot_sleep) if boot_sleep > 0
+    end
+
     # pass an array of device types
     def add_media(device_types, media_type, paths)
       media_type = media_type.to_s
@@ -99,6 +108,8 @@ module Snapshot
         else
           Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
         end
+
+        wait_for_boot("adding media")
 
         paths.each do |path|
           UI.message("Adding '#{path}'")
@@ -123,12 +134,7 @@ module Snapshot
       # Boot the simulator and wait for it to finish booting
       Helper.backticks("xcrun simctl bootstatus #{device_udid} -b &> /dev/null")
 
-      # "Booted" status is not enough for to adjust the status bar
-      # Simulator could stil be booting with Apple logo
-      # Need to wait "some amount of time" until home screen shows
-      boot_sleep = ENV["SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT"].to_i || 10
-      UI.message("Waiting #{boot_sleep} seconds for device to fully boot before overriding status bar... Set 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable to adjust timeout")
-      sleep(boot_sleep) if boot_sleep > 0
+      wait_for_boot("overriding status bar")
 
       UI.message("Overriding Status Bar")
 
