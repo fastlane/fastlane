@@ -72,7 +72,7 @@ module Spaceship
 
       def fetch_resolution_center_threads(client: nil)
         client ||= Spaceship::ConnectAPI
-        resp = client.get_resolution_center_threads(filter: {reviewSubmission: id}, includes: 'reviewSubmission')
+        resp = client.get_resolution_center_threads(filter: { reviewSubmission: id }, includes: 'reviewSubmission')
         return resp.to_models
       end
 
