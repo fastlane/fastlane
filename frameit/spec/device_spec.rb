@@ -34,8 +34,8 @@ describe Frameit::Device do
       end
 
       it "should detect iPhone 13 in portrait and landscape based on priority" do
-        expect_screen_size_from_file("screenshot-Portrait{1170x2532}.jpg", Platform::IOS).to eq(Devices::IPHONE_13)
-        expect_screen_size_from_file("screenshot-Landscape{2532x1170}.jpg", Platform::IOS).to eq(Devices::IPHONE_13)
+        expect_screen_size_from_file("screenshot-Portrait{1170x2532}.jpg", Platform::IOS).to eq(Devices::IPHONE_13_PRO)
+        expect_screen_size_from_file("screenshot-Landscape{2532x1170}.jpg", Platform::IOS).to eq(Devices::IPHONE_13_PRO)
       end
 
       it "should detect iPhone X instead of iPhone XS because of the file name containing device name" do

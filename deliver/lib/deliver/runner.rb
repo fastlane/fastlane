@@ -206,7 +206,7 @@ module Deliver
       pkg_path = options[:pkg]
 
       platform = options[:platform]
-      transporter = transporter_for_selected_team
+      transporter = transporter_for_selected_team(upload: true)
 
       case platform
       when "ios", "appletvos"
@@ -216,7 +216,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.upload(package_path: package_path, asset_path: ipa_path)
+        result = transporter.upload(package_path: package_path, asset_path: ipa_path, platform: platform)
       when "osx"
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
@@ -224,7 +224,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.upload(package_path: package_path, asset_path: pkg_path)
+        result = transporter.upload(package_path: package_path, asset_path: pkg_path, platform: platform)
       else
         UI.user_error!("No suitable file found for upload for platform: #{options[:platform]}")
       end
@@ -270,17 +270,27 @@ module Deliver
     # If itc_provider was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
-    def transporter_for_selected_team
+    def transporter_for_selected_team(upload: false)
       # Use JWT auth
       api_token = Spaceship::ConnectAPI.token
+      api_key = if options[:api_key].nil? && !api_token.nil?
+                  # Load api key info if user set api_key_path, not api_key
+                  { key_id: api_token.key_id, issuer_id: api_token.issuer_id, key: api_token.key_raw }
+                elsif !options[:api_key].nil?
+                  api_key = options[:api_key].transform_keys(&:to_sym).dup
+                  # key is still base 64 style if api_key is loaded from option
+                  api_key[:key] = Base64.decode64(api_key[:key]) if api_key[:is_key_content_base64]
+                  api_key
+                end
+
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, upload: upload, api_key: api_key)
       end
 
       tunes_client = Spaceship::ConnectAPI.client.tunes_client
 
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], upload: upload, api_key: api_key)
       return generic_transporter unless options[:itc_provider].nil? && tunes_client.teams.count > 1
 
       begin
@@ -288,7 +298,7 @@ module Deliver
         name = team['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
-        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
+        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id, upload: upload, api_key: api_key)
       rescue => ex
         UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")
         return generic_transporter
