@@ -290,6 +290,15 @@ You can set the app age ratings using _deliver_. You'll have to create and store
 
 The keys/values on the top allow one of 3 strings: "NONE", "INFREQUENT_OR_MILD" or "FREQUENT_OR_INTENSE", and the items on the bottom allow false or true. More information in [#reference](#reference).
 
+##### app_clip_header_images_path
+
+A path to a folder containing subfolders for each language. These images will be used for the [default App Clip experience](https://developer.apple.com/documentation/app_clips/configuring_the_launch_experience_of_your_app_clip/#3604096) for this particular release.
+
+All of these images must be exactly 1800x1200px.
+
+See the [App Clip docs](#app-clips) for more info.
+
+![/img/actions/deliver_screenshots.png](/img/actions/deliver_screenshots.png)
 
 ## Metadata
 
@@ -376,6 +385,11 @@ The available options:
 - 'appletvos'
 - 'osx'
 
+##### app_clip_default_experience_subtitle
+
+The subtitle that shows up for the default App Clip experience.
+
+See the [App Clip docs](#app-clips) for more info.
 
 ### Non-Localized
 
@@ -404,6 +418,16 @@ The english name of the secondary first sub category you want to set
 
 ##### secondary_second_sub_category
 The english name of the secondary second sub category you want to set
+
+##### app_clip_default_experience_action
+
+The action button that shows up for the default App Clip experience. The valid options are listed below:
+
+- `OPEN`
+- `VIEW`
+- `PLAY`
+
+See the [App Clip docs](#app-clips) for more info.
 </details>
 
 # Submit Build
@@ -746,3 +770,33 @@ Change syntax highlighting to *Ruby*.
 
 ## Provider Short Name
 If you are on multiple App Store Connect teams, _deliver_ needs a provider short name to know where to upload your binary. _deliver_ will try to use the long name of the selected team to detect the provider short name. To override the detected value with an explicit one, use the `itc_provider` option.
+
+## App Clips
+
+You can optionally specify the default App Clip experience using the following options:
+- `app_clip_default_experience_action`
+- `app_clip_default_experience_subtitle`
+- `app_clip_header_images_path`
+
+The default App Store Connect behavior is to not carry-over the previous version's default App Clip
+experience metadata. This is a contradictory behavior because it automatically carries over all
+other version metadata when creating a new version.
+
+_deliver_ fixes this issue by default carrying over the previous version's default App Clip
+experience metadata even if the options above are not specified.
+
+Example usage in your `Deliverfile`:
+
+```ruby-skip-tests
+deliver(
+  app_clip_default_experience_action: "PLAY",
+  app_clip_default_experience_subtitle: {
+    "en-US": "this is a test from fastlane",
+    "es-MX": "está es una prueba de fastlane"
+  },
+  app_clip_header_images_path: "./fastlane/app-clip-header-images"
+)
+```
+
+Note that the **default** App Clip experience and the **advanced** App Clip experiences are
+different, [Apple explains this here](https://developer.apple.com/documentation/app_clips/configuring_the_launch_experience_of_your_app_clip/#3671988).
