@@ -69,6 +69,18 @@ module Spaceship
         resp = client.post_review_submission_item(review_submission_id: id, app_store_version_id: app_store_version_id)
         return resp.to_models.first
       end
+
+      def fetch_resolution_center_threads(client: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_resolution_center_threads(filter: {reviewSubmission: id}, includes: 'reviewSubmission')
+        return resp.to_models
+      end
+
+      def latest_resolution_center_messages(client: nil)
+        client ||= Spaceship::ConnectAPI
+        threads = fetch_resolution_center_threads(client: client)
+        threads.first.fetch_messages(client: client)
+      end
     end
   end
 end
