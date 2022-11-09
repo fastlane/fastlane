@@ -34,7 +34,7 @@ module Spaceship
 
       def update(client: nil, attributes:)
         client ||= Spaceship::ConnectAPI
-        return client.patch_app_clip_default_experience(default_experience_id: id, attributes: { action: action })
+        return client.patch_app_clip_default_experience(default_experience_id: id, attributes: attributes)
       end
     end
   end
