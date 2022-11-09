@@ -131,6 +131,10 @@ module Deliver
                                      env_name: "APP_CLIP_HEADER_IMAGES_PATH",
                                      description: "Path to the folder containing the app clip header images",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :app_clip_default_experience_metadata_path,
+                                     env_name: "APP_CLIP_DEFAULT_EXPERIENCE_METADATA_PATH",
+                                     description: "Path to the folder containing the app clip default experience metadata",
+                                     optional: true),
 
         # skip
         FastlaneCore::ConfigItem.new(key: :skip_binary_upload,

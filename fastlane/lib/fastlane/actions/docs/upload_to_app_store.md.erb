@@ -182,6 +182,11 @@ Path to the metadata you want to use. The folder has to be structured like this
 
 If you run `deliver init` this will automatically be created for you.
 
+##### app_clip_default_experience_metadata_path
+Path to the App Clip metadata you want to use. The folder has to be structured like this
+
+![/img/actions/deliver_metadata.png](/img/actions/deliver_app_clip_metadata_from_folder.png)
+
 ##### force
 
 ```ruby-skip-tests
@@ -518,6 +523,26 @@ Key | Editable While Live | Directory | Filename | Deprecated Filename
 ----|--------|--------|--------|--------
 <%- Deliver::UploadMetadata::REVIEW_INFORMATION_VALUES_LEGACY.each do |key, value| -%>
   `<%= value %>` | Yes | `<metadata_path>/<%= Deliver::UploadMetadata::REVIEW_INFORMATION_DIR %>` | `<%= value %>.txt` | `<%= key %>.txt`
+<%- end %>
+
+## Available App Clip Metadata Folder Options
+
+_deliver_ allows for metadata to be set through `.txt` files in the App Clip metadata folder. This folder can be set using `app_clip_default_experience_metadata_path`. Below are all allowed metadata options.
+
+### Non-Localized Metadata
+
+Key | Editable While Live | Directory | Filename
+----|--------|--------|--------
+<%- Deliver::UploadAppClipDefaultExperienceMetadata::NON_LOCALISED_APP_CLIP_DEFAULT_EXPERIENCE_VALUES.keys.each do |value| -%>
+  `<%= value %>` | No | `<app_clip_metadata_path>` | `<%= value %>.txt`
+<%- end %>
+
+### Localized Metadata
+
+Key | Editable While Live | Directory | Filename
+----|--------|--------|--------
+<%- Deliver::UploadAppClipDefaultExperienceMetadata::LOCALISED_APP_CLIP_DEFAULT_EXPERIENCE_VALUES.keys.each do |value| -%>
+  `<%= value %>` | No | `<app_clip_metadata_path>/<lang>/` | `<%= value %>.txt`
 <%- end %>
 
 ## Reference

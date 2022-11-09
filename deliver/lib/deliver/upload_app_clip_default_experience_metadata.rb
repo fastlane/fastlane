@@ -6,11 +6,22 @@ require_relative 'module'
 module Deliver
   # rubocop:disable Metrics/ClassLength
   class UploadAppClipDefaultExperienceMetadata
+    LOCALISED_APP_CLIP_DEFAULT_EXPERIENCE_VALUES = {
+      app_clip_default_experience_subtitle: "app_clip_default_experience_subtitle"
+    }
+
+    NON_LOCALISED_APP_CLIP_DEFAULT_EXPERIENCE_VALUES = {
+      app_clip_default_experience_action: "app_clip_default_experience_action"
+    }
+
     require_relative 'loader'
 
     def upload_metadata(options)
       # app clip default experience metadata is not editable in a live version
       return if options[:edit_live]
+
+      # load the metadata from the filesystem before uploading
+      load_from_filesystem(options)
 
       app = Deliver.cache[:app]
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
@@ -54,6 +65,33 @@ module Deliver
 
       # update the subtitle localizations
       upload_subtitle_localizations(app_clip_default_experience: default_experience, subtitle_localizations: subtitle_localized)
+    end
+
+    # Loads the app clip default experience metadata files and stores them into the options object
+    def load_from_filesystem(options)
+      metadata_path = options[:app_clip_default_experience_metadata_path]
+
+      # Load localised data
+      ignore_validation = options[:ignore_language_directory_validation]
+      Loader.language_folders(metadata_path, ignore_validation).each do |lang_folder|
+        LOCALISED_APP_CLIP_DEFAULT_EXPERIENCE_VALUES.keys.each do |key|
+          path = File.join(lang_folder.path, "#{key}.txt")
+          next unless File.exist?(path)
+
+          UI.message("Loading '#{path}'...")
+          options[key] ||= {}
+          options[key][lang_folder.basename] ||= File.read(path).strip
+        end
+      end
+
+      # Load non localised data
+      NON_LOCALISED_APP_CLIP_DEFAULT_EXPERIENCE_VALUES.keys.each do |key|
+        path = File.join(metadata_path, "#{key}.txt")
+        next unless File.exist?(path)
+
+        UI.message("Loading '#{path}'...")
+        options[key] ||= File.read(path).strip
+      end
     end
 
     # from upload_metadata.rb
