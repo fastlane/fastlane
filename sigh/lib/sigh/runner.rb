@@ -289,7 +289,9 @@ module Sigh
                        when 'macos', 'catalyst'
                          [Spaceship::ConnectAPI::Device::DeviceClass::MAC]
                        end
-
+      if Sigh.config[:platform].to_s == 'ios' && Sigh.config[:include_mac_in_profiles]
+        device_classes += [Spaceship::ConnectAPI::Device::DeviceClass::APPLE_SILICON_MAC]
+      end
       if Spaceship::ConnectAPI.token
         return Spaceship::ConnectAPI::Device.all.select do |device|
           device_classes.include?(device.device_class)
