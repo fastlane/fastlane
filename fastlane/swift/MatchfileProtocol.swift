@@ -107,6 +107,9 @@ public protocol MatchfileProtocol: AnyObject {
     /// Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
     var forceForNewDevices: Bool { get }
 
+    /// Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
+    var includeMacInProfiles: Bool { get }
+
     /// Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
     var includeAllCertificates: Bool { get }
 
@@ -186,6 +189,7 @@ public extension MatchfileProtocol {
     var keychainPassword: String? { return nil }
     var force: Bool { return false }
     var forceForNewDevices: Bool { return false }
+    var includeMacInProfiles: Bool { return false }
     var includeAllCertificates: Bool { return false }
     var forceForNewCertificates: Bool { return false }
     var skipConfirmation: Bool { return false }
@@ -204,4 +208,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.108]
+// FastlaneRunnerAPIVersion [0.9.109]
