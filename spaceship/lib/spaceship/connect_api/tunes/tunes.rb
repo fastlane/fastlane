@@ -1256,6 +1256,10 @@ module Spaceship
         #
         # resolutionCenter
         #
+        # As of 2022-11-11:
+        # This is not official available throught the App Store Connect API using an API Key.
+        # This is only works with Apple ID auth.
+        #
 
         def get_resolution_center_threads(filter: {}, includes: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes)
