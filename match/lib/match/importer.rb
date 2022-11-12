@@ -144,6 +144,8 @@ module Match
       # Encrypt and commit
       encryption.encrypt_files if encryption
       storage.save_changes!(files_to_commit: files_to_commit)
+    ensure
+      storage.clear_changes if storage
     end
 
     def ensure_valid_file_path(file_path, file_description, file_extension, optional: false)
