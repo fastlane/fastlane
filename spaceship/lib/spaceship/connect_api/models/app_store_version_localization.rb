@@ -19,16 +19,16 @@ module Spaceship
       attr_accessor :app_preview_sets
 
       attr_mapping({
-        "description" =>  "description",
-        "locale" =>  "locale",
-        "keywords" =>  "keywords",
-        "marketingUrl" =>  "marketing_url",
-        "promotionalText" =>  "promotional_text",
-        "supportUrl" =>  "support_url",
-        "whatsNew" =>  "whats_new",
+        "description" => "description",
+        "locale" => "locale",
+        "keywords" => "keywords",
+        "marketingUrl" => "marketing_url",
+        "promotionalText" => "promotional_text",
+        "supportUrl" => "support_url",
+        "whatsNew" => "whats_new",
 
-        "appScreenshotSets" =>  "app_screenshot_sets",
-        "appPreviewSets" =>  "app_preview_sets"
+        "appScreenshotSets" => "app_screenshot_sets",
+        "appPreviewSets" => "app_preview_sets"
       })
 
       def self.type
