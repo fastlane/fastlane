@@ -18,8 +18,10 @@ module Fastlane
 
     attr_accessor :target_project # project we'll be updating
     attr_accessor :fastlane_runner_target # FastlaneRunner xcodeproj target
-    attr_accessor :manifest_hash # hash of file names to group names they belong to
-    attr_accessor :manifest_groups # unique list of group names that came from the manifest
+    attr_accessor :manifest_hash # hash of user definded file names to group names they belong to
+    attr_accessor :manifest_groups # unique list of group names that came from the user definded manifest
+    attr_accessor :source_manifest_hash # hash of file names to group names they belong to
+    attr_accessor :source_manifest_groups # unique list of group names that came from the manifest
     attr_accessor :target_swift_code_file_folder_path # location in filesystem where all swift files should exist when we're done
     attr_accessor :source_swift_code_file_folder_path # source location of where we're copying file from during the upgrade process
 
@@ -31,10 +33,13 @@ module Fastlane
 
       Fastlane::Setup.setup_swift_support
 
-      manifest_file = File.join(@source_swift_code_file_folder_path, "/upgrade_manifest.json")
+      manifest_file = File.join(@target_swift_code_file_folder_path, "/upgrade_manifest.json")
       UI.success("loading manifest: #{manifest_file}")
+      source_manifest_file = File.join(@source_swift_code_file_folder_path, "/upgrade_manifest.json")
       @manifest_hash = JSON.parse(File.read(manifest_file))
       @manifest_groups = @manifest_hash.values.uniq
+      @source_manifest_hash = JSON.parse(File.read(source_manifest_file))
+      @source_manifest_groups = @source_manifest_hash.values.uniq
 
       runner_project_path = FastlaneCore::FastlaneFolder.swift_runner_project_path
       @target_project = Xcodeproj::Project.open(runner_project_path)
@@ -88,8 +93,9 @@ module Fastlane
       source = File.join(self.source_swift_code_file_folder_path, "/#{filename}")
       target = File.join(self.target_swift_code_file_folder_path, "/#{filename}")
 
-      # target doesn't have the file yet, so ya, I'd say it needs to be updated
+      # target or source doesn't have the file yet, so ya, I'd say it needs to be updated
       return true unless File.exist?(target)
+      return true unless File.exist?(source)
 
       source_file_content = File.read(source)
       target_file_content = File.read(target)
@@ -130,6 +136,9 @@ module Fastlane
       source = File.join(self.source_swift_code_file_folder_path, "/#{filename}")
       target = File.join(self.target_swift_code_file_folder_path, "/#{filename}")
 
+      # skip copy if source does not have the file
+      return false unless File.exist?(source)
+
       FileUtils.cp(source, target)
       UI.verbose("Copied #{source} to #{target}")
       return true
@@ -167,7 +176,8 @@ module Fastlane
         manifest_group_filenames.each do |filename|
           # current group is missing a file from the manifest, need to add it
           next if existing_group_files_set.include?(filename)
-
+          # file is from target manifest, no need to copy
+          next unless group_in_source_manifest!(group_name: group_name)
           UI.verbose("Adding new file #{filename} to group: `#{group.name}`")
           new_file_reference = group.new_file("#{RELATIVE_SOURCE_FILE_PATH}#{filename}")
 
@@ -260,6 +270,13 @@ module Fastlane
       end
 
       target_project.save
+    end
+
+    def group_in_source_manifest!(group_name: nil)
+      self.source_manifest_groups.each do |group|
+        return true if group.downcase == group_name
+      end
+      return false
     end
   end
 end
