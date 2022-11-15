@@ -416,7 +416,7 @@ module Spaceship
         # buildBundles
         #
 
-        def get_build_bundle_build_bundle_file_sizes(build_bundle_id:, limit: nil)
+        def get_build_bundles_build_bundle_file_sizes(build_bundle_id:, limit: nil)
           params = test_flight_request_client.build_params(filter: nil, includes: nil, limit: limit, sort: nil, cursor: nil)
           test_flight_request_client.get("buildBundles/#{build_bundle_id}/buildBundleFileSizes", params)
         end

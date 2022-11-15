@@ -26,7 +26,7 @@ module Spaceship
 
       def self.all(client: nil, build_bundle_id: nil, limit: 30)
         client ||= Spaceship::ConnectAPI
-        resps = client.get_build_bundle_build_bundle_file_sizes(build_bundle_id: build_bundle_id).all_pages
+        resps = client.get_build_bundles_build_bundle_file_sizes(build_bundle_id: build_bundle_id).all_pages
         resps.flat_map(&:to_models)
       end
     end

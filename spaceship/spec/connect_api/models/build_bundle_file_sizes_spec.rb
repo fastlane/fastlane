@@ -2,8 +2,8 @@ describe Spaceship::ConnectAPI::BuildBundleFileSizes do
   before { Spaceship::Tunes.login }
 
   describe '#Spaceship::ConnectAPI' do
-    it '#get_build_bundle_build_bundle_file_sizes' do
-      response = Spaceship::ConnectAPI.get_build_bundle_build_bundle_file_sizes(build_bundle_id: '48a9bb1f-5f0f-4133-8c72-3fb93e92603a')
+    it '#get_build_bundles_build_bundle_file_sizes' do
+      response = Spaceship::ConnectAPI.get_build_bundles_build_bundle_file_sizes(build_bundle_id: '48a9bb1f-5f0f-4133-8c72-3fb93e92603a')
       expect(response).to be_an_instance_of(Spaceship::ConnectAPI::Response)
 
       expect(response.count).to eq(50)
