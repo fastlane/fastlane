@@ -80,6 +80,10 @@ module Match
         certificate_type = [
           Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION
         ].join(',')
+      when :developer_id_installer
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_INSTALLER
+        ].join(',')
       else
         UI.user_error!("Cert type '#{cert_type}' is not supported")
       end
