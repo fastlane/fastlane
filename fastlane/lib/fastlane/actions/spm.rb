@@ -57,7 +57,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :build_path,
                                        env_name: "FL_SPM_BUILD_PATH",
-                                       description: "Specify build/cache directory [default: ./.build] Warning: build_path option is depecrated, use scratch_path instead",
+                                       description: "Specify build/cache directory [default: ./.build]",
                                        deprecated: "`build_path` option is deprecated, use `scratch_path` instead",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :package_path,
