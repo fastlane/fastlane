@@ -37,12 +37,14 @@ describe Fastlane do
         end
       end
 
-      it "doesn't invoke 'update' nor 'install' when select_for_current_build_only argument is true" do
-        expect(Fastlane::Actions).to_not(receive(:sh).with(/--update|--install/))
-        expect(Fastlane::Actions).to receive(:sh).with(/installed/)
-        Fastlane::FastFile.new.parse("lane :test do
-          xcodes(version: '14', select_for_current_build_only: true)
-        end").runner.execute(:test)
+      context "when select_for_current_build_only is true" do
+        it "doesn't invoke 'update' nor 'install'" do
+          expect(Fastlane::Actions).to_not(receive(:sh).with(/--update|--install/))
+          expect(Fastlane::Actions).to receive(:sh).with(/installed/)
+          Fastlane::FastFile.new.parse("lane :test do
+            xcodes(version: '14', select_for_current_build_only: true)
+          end").runner.execute(:test)
+        end
       end
 
       it "passes any received string to the command if xcodes_args is passed" do
