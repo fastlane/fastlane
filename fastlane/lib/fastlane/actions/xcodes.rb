@@ -36,8 +36,18 @@ module Fastlane
         command << binary
         command << "installed"
         command << "'#{version}'"
-        # Prints something like /Applications/Xcode-14.app
-        xcode_path = Actions.sh(command.join(" ")).strip
+
+        xcode_path = Actions.sh(command.join(" ")) do |status, result, sh_command|
+          formatted_result = result.chomp
+
+          unless status.success?
+            UI.user_error!("Command `#{sh_command}` failed with status #{status.exitstatus} and message: #{formatted_result}")
+          end
+
+          # Prints something like /Applications/Xcode-14.app
+          formatted_result
+        end
+
         xcode_developer_path = File.join(xcode_path, "/Contents/Developer")
 
         UI.message("Setting Xcode version '#{version}' at '#{xcode_path}' for all build steps")
