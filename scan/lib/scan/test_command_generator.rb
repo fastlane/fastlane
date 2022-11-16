@@ -53,7 +53,12 @@ module Scan
       if config[:use_system_scm] && !options.include?("-scmProvider system")
         options << "-scmProvider system"
       end
-      options << "-resultBundlePath '#{result_bundle_path(true)}'" if config[:result_bundle]
+      if config[:result_bundle_path]
+        options << "-resultBundlePath '#{config[:result_bundle_path].shellescape}'"
+        Scan.cache[:result_bundle_path] = config[:result_bundle_path]
+      elsif config[:result_bundle]
+        options << "-resultBundlePath '#{result_bundle_path(true)}'"
+      end
       if FastlaneCore::Helper.xcode_at_least?(10)
         options << "-parallel-testing-enabled #{config[:parallel_testing] ? 'YES' : 'NO'}" unless config[:parallel_testing].nil?
         options << "-parallel-testing-worker-count #{config[:concurrent_workers]}" if config[:concurrent_workers]
