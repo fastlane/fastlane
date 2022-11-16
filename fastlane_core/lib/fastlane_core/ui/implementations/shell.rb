@@ -86,11 +86,13 @@ module FastlaneCore
 
     def header(message)
       format = format_string
-      if message.length + 8 < TTY::Screen.width - format.length
+      # clamp to zero to prevent negative argument error below
+      available_width = [0, TTY::Screen.width - format.length].max
+      if message.length + 8 < available_width
         message = "--- #{message} ---"
         i = message.length
       else
-        i = TTY::Screen.width - format.length
+        i = available_width
       end
       success("-" * i)
       success(message)
