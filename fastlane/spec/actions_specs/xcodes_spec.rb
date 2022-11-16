@@ -45,6 +45,25 @@ describe Fastlane do
             xcodes(version: '14', select_for_current_build_only: true)
           end").runner.execute(:test)
         end
+
+        it "errors when there is no matching Xcode version" do
+          # Note that this test is very tied to the code's implementation as it
+          # relies on the action using `sh` with the block syntax.
+          allow(Fastlane::Actions).to receive(:sh).with("#{xcodes_binary_path} installed '14'") do |_, _, &block|
+            # Simulate the `xcodes installed` call failing
+            fake_status = instance_double(Process::Status)
+            allow(fake_status).to receive(:success?).and_return(false)
+            allow(fake_status).to receive(:exitstatus).and_return('fake status')
+
+            block.call(fake_status, 'fake result', 'fake command')
+          end
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              xcodes(version: '14', select_for_current_build_only: true)
+            end").runner.execute(:test)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Command `fake command` failed with status fake status and message: fake result')
+        end
       end
 
       it "passes any received string to the command if xcodes_args is passed" do
