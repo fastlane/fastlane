@@ -50,7 +50,7 @@ describe Fastlane do
             FASTFILE
             `git add .`
             `git commit --message "Version 1"`
-            `git tag "1"`
+            `git tag "1" --message "Version 1"`
 
             File.write('fastlane/FastfileExtra', <<-FASTFILE)
               lane :works_extra do
@@ -59,7 +59,7 @@ describe Fastlane do
             FASTFILE
             `git add .`
             `git commit --message "Version 2"`
-            `git tag "2"`
+            `git tag "2" --message "Version 2"`
 
             File.write('FastfileRoot', <<-FASTFILE)
               lane :works_root do
@@ -68,7 +68,7 @@ describe Fastlane do
             FASTFILE
             `git add .`
             `git commit --message "Version 3"`
-            `git tag "3"`
+            `git tag "3" --message "Version 3"`
 
             `mkdir fastlane/actions`
             FileUtils.mkdir_p('fastlane/actions')
@@ -89,7 +89,7 @@ describe Fastlane do
             FASTFILE
             `git add .`
             `git commit --message "Version 4"`
-            `git tag "4"`
+            `git tag "4" --message "Version 4"`
 
             `git checkout tags/2 -b version-2.1 2>&1`
             File.write('fastlane/Fastfile', <<-FASTFILE)
@@ -183,7 +183,7 @@ describe Fastlane do
             FASTFILE
             `git add .`
             `git commit --message "Version 5"`
-            `git tag "5"`
+            `git tag "5" --message "Version 5"`
           end
 
           allow(UI).to receive(:message)
@@ -259,7 +259,7 @@ describe Fastlane do
             FASTFILE
             `git add .`
             `git commit --message "Version 6"`
-            `git tag "6"`
+            `git tag "6" --message "Version 6"`
           end
 
           allow(UI).to receive(:message)

@@ -1,4 +1,3 @@
-require_relative 'options'
 require_relative 'spaceship_ensure'
 require_relative 'encryption'
 require_relative 'storage'
@@ -7,8 +6,7 @@ require 'fileutils'
 
 module Match
   class Migrate
-    def migrate(args, options)
-      params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
+    def migrate(params)
       loaded_matchfile = params.load_configuration_file("Matchfile")
 
       ensure_parameters_are_valid(params)
@@ -88,6 +86,9 @@ module Match
       UI.success("You can also remove the `git_url`, as well as any other git related configurations from your Fastfile and Matchfile")
       UI.message("")
       UI.input("Please make sure to read the above and confirm with enter")
+    ensure
+      google_cloud_storage.clear_changes if google_cloud_storage
+      git_storage.clear_changes if git_storage
     end
 
     def api_token(params)

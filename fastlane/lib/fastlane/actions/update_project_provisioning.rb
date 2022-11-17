@@ -19,7 +19,7 @@ module Fastlane
         UI.user_error!("Could not find path to project config '#{project_file_path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_file_path)
 
         # download certificate
-        unless File.exist?(params[:certificate])
+        unless File.exist?(params[:certificate]) && File.size(params[:certificate]) > 0
           UI.message("Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'")
           File.open(params[:certificate], "w:ASCII-8BIT") do |file|
             file.write(FastlaneCore::Helper.open_uri(ROOT_CERTIFICATE_URL, "rb").read)

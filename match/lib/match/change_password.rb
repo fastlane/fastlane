@@ -42,6 +42,8 @@ module Match
       message = "[fastlane] Changed passphrase"
       files_to_commit = encryption.encrypt_files(password: new_password)
       storage.save_changes!(files_to_commit: files_to_commit, custom_message: message)
+    ensure
+      storage.clear_changes if storage
     end
 
     def self.ensure_ui_interactive
