@@ -11,7 +11,7 @@ module Match
   DESCRIPTION = "Easily sync your certificates and profiles across your team"
 
   def self.environments
-    return %w(appstore adhoc development enterprise developer_id mac_installer_distribution)
+    return %w(appstore adhoc development enterprise developer_id mac_installer_distribution developer_id_installer)
   end
 
   def self.storage_modes

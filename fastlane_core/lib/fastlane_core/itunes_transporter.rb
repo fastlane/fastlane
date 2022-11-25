@@ -902,7 +902,7 @@ module FastlaneCore
 
     # Create .p8 file from api_key and provide api key info which contains .p8 file path
     def api_key_with_p8_file_path(original_api_key)
-      api_key = original_api_key.clone
+      api_key = original_api_key.dup
       api_key[:key_dir] = Dir.mktmpdir("deliver-")
       # Specified p8 needs to be generated to call altool
       File.open(File.join(api_key[:key_dir], "AuthKey_#{api_key[:key_id]}.p8"), "wb") do |p8|
