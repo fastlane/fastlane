@@ -241,9 +241,9 @@ module Gym
 
         FastlaneCore::ConfigItem.new(key: :build_timing_summary,
                                      env_name: "GYM_BUILD_TIMING_SUMMARY",
-                                     description: "Create a build timing summary.",
+                                     description: "Create a build timing summary",
                                      type: Boolean,
-                                     optional: false),
+                                     optional: true),
 
         # xcpretty
         FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
