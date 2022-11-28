@@ -273,6 +273,21 @@ describe Fastlane do
           end").runner.execute(:test)
         end
 
+        it "doesn't superfluously executes checkout" do
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:message).with(caching_message)
+          expect(UI).to receive(:important).with('Works until v6')
+          allow(Fastlane::Actions).to receive(:sh).and_call_original
+
+          Fastlane::FastFile.new.parse("lane :test do
+            import_from_git(url: '#{source_directory_path}', version: '6', cache_path: '#{cache_directory_path}')
+
+            works
+          end").runner.execute(:test)
+
+          expect(Fastlane::Actions).not_to have_received(:sh).with(/git checkout/)
+        end
+
         after :all do
           ENV.delete("FORCE_SH_DURING_TESTS")
 

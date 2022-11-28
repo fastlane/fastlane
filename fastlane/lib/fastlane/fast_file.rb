@@ -345,7 +345,13 @@ module Fastlane
               Actions.sh("cd #{clone_folder.shellescape} && git fetch --all --quiet && git checkout #{checkout_param.shellescape} #{checkout_path} && git reset --hard && git rebase")
             end
           else
-            Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{checkout_path}")
+            # https://stackoverflow.com/a/11489642/865175
+            current_tag_sed = 's/^\([^^~]\{1,\}\)\(\^0\)\{0,1\}$/\1/p'
+            current_tag = Actions.sh("cd #{clone_folder.shellescape} && git name-rev --name-only --tags --no-undefined HEAD | sed -n '#{current_tag_sed}'").strip
+
+            if !version.nil? && current_tag != version
+              Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{checkout_path}")
+            end
           end
 
           # Knowing that we check out all the files and directories when the
