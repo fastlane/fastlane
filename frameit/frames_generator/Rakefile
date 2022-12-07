@@ -88,7 +88,7 @@ task(:generate_device_frames) do
 
   puts("Download and extract the latest devices from Facebook")
   puts("")
-  puts("  https://facebook.design/devices")
+  puts("  https://design.facebook.com/toolsandresources/devices/")
   puts("")
   confirm
   puts("Currently the script renames iPad files according to the following scheme:")
