@@ -109,7 +109,7 @@ module Frameit
         end
       end
 
-      @image = frame.composite(image, "png") do |c|
+      @image = frame.composite(image, "png", frame) do |c|
         c.compose("DstOver")
         c.geometry(offset['offset'])
       end
