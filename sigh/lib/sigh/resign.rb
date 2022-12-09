@@ -132,7 +132,7 @@ module Sigh
       identities.key(signing_identity)
     end
 
-   def create_entitlements_options(entitlements)
+    def create_entitlements_options(entitlements)
       # entitlements is passed as an array (to be able to resign extensions/nested apps):
       # (resign.sh also takes "-e /folder/mobile.mobileprovision" as a param)
       #   [
@@ -142,8 +142,7 @@ module Sigh
         entitlement_file = File.expand_path(entitlement)
         "-e #{entitlement_file.shellescape}"
       end.join(' ')
-   end
-
+    end
 
     def create_provisioning_options(provisioning_profiles)
       # provisioning_profiles is passed either a hash (to be able to resign extensions/nested apps):
