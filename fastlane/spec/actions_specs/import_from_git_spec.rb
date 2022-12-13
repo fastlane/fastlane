@@ -273,7 +273,7 @@ describe Fastlane do
           end").runner.execute(:test)
         end
 
-        it "doesn't superfluously executes checkout" do
+        it "doesn't superfluously execute checkout" do
           allow(UI).to receive(:message)
           expect(UI).to receive(:message).with(caching_message)
           expect(UI).to receive(:important).with('Works until v6')
