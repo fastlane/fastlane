@@ -93,11 +93,10 @@ module Spaceship
       # @param client [ConnectAPI] ConnectAPI client.
       # @param enabled [Boolean] New enabled value. true - if device must be enabled, `false` - to disable device. nil if no status change needed.
       # @param new_name [String] A new name for the device. nil if no name change needed.
-      # @param platform [String] The platform of the device.
       # @return (Device) Modified device based on the UDID of the device. nil if no device was found.
-      def self.modify(device_udid, client: nil, enabled: nil, new_name: nil, platform: nil)
+      def self.modify(device_udid, client: nil, enabled: nil, new_name: nil)
         client ||= Spaceship::ConnectAPI
-        existing = self.find_by_udid(device_udid, client: client, platform: platform, include_disabled: true)
+        existing = self.find_by_udid(device_udid, client: client, include_disabled: true)
         return nil if existing.nil?
 
         enabled = existing.enabled? if enabled.nil?
@@ -111,27 +110,24 @@ module Spaceship
 
       # @param device_udid [String] Device Provisioning UDID that needs to be enabled.
       # @param client [ConnectAPI] ConnectAPI client.
-      # @param platform [String] The platform of the device.
       # @return (Device) Modified device based on the UDID of the device. nil if no device was found.
-      def self.enable(device_udid, client: nil, platform: nil)
-        self.modify(device_udid, client: client, enabled: true, platform: platform)
+      def self.enable(device_udid, client: nil)
+        self.modify(device_udid, client: client, enabled: true)
       end
 
       # @param device_udid [String] Device Provisioning UDID that needs to be disabled.
       # @param client [ConnectAPI] ConnectAPI client.
-      # @param platform [String] The platform of the device.
       # @return (Device) Modified device based on the UDID of the device. nil if no device was found.
-      def self.disable(device_udid, client: nil, platform: nil)
-        self.modify(device_udid, client: client, enabled: false, platform: platform)
+      def self.disable(device_udid, client: nil)
+        self.modify(device_udid, client: client, enabled: false)
       end
 
       # @param device_udid [String] Device Provisioning UDID that needs to be renamed.
       # @param new_name [String] A new name for the device.
       # @param client [ConnectAPI] ConnectAPI client.
-      # @param platform [String] The platform of the device.
       # @return (Device) Modified device based on the UDID of the device. nil if no device was found.
-      def self.rename(device_udid, new_name, client: nil, platform: nil)
-        self.modify(device_udid, client: client, new_name: new_name, platform: platform)
+      def self.rename(device_udid, new_name, client: nil)
+        self.modify(device_udid, client: client, new_name: new_name)
       end
     end
   end
