@@ -61,7 +61,7 @@ module Spaceship
       # @param platform [String] The platform of the device.
       # @param include_disabled [Bool] Whether to include disable devices. false by default.
       # @return (Device) Find a device based on the UDID of the device. nil if no device was found.
-      def self.find_by_udid(device_udid, client: nil, platform: nil, include_disabled: false)
+      def self.find_by_udid(device_udid, client: nil, include_disabled: false)
         self.all(client: client).find do |device|
           device.udid.casecmp(device_udid) == 0 && (include_disabled ? true : device.enabled?)
         end
@@ -70,10 +70,9 @@ module Spaceship
       # @param client [ConnectAPI] ConnectAPI client.
       # @param name [String] The name to be assigned to the device, if it needs to be created.
       # @param platform [String] The platform of the device.
-      # @param include_disabled [Bool] Whether to include disable devices. false by default.
       # @return (Device) Find a device based on the UDID of the device. If no device was found,  nil if no device was found.
-      def self.find_or_create(device_udid, client: nil, name: nil, platform: nil, include_disabled: false)
-        existing = self.find_by_udid(device_udid, client: client, platform: platform)
+      def self.find_or_create(device_udid, client: nil, name: nil, platform: nil)
+        existing = self.find_by_udid(device_udid, client: client)
         return existing if existing
         return self.create(client: client, name: name, platform: platform, udid: device_udid)
       end
