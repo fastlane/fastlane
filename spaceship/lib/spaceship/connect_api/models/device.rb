@@ -103,8 +103,9 @@ module Spaceship
         enabled = existing.enabled? if enabled.nil?
         new_name ||= existing.name
         return existing if existing.name == new_name && existing.enabled? == enabled
+        new_status = enabled ? Status::ENABLED : Status::DISABLED
 
-        resp = client.patch_device(id: existing.id, new_name: new_name, status: enabled ? Status::ENABLED : Status::DISABLED)
+        resp = client.patch_device(id: existing.id, new_name: new_name, status: new_status)
         return resp.to_models.first
       end
 
