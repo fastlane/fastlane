@@ -476,6 +476,27 @@ module Spaceship
           client.delete_user_visible_apps(user_id: user_id, app_ids: [id])
         end
       end
+
+      #
+      # In-App Purchases
+      #
+
+      def get_in_app_purchases(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_in_app_purchases(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.flat_map(&:to_models)
+      end
+
+      #
+      # Subscriptions
+      #
+
+      def get_subscription_groups(client: nil, filter: {}, includes: Spaceship::ConnectAPI::SubscriptionGroup::ESSENTIAL_INCLUDES, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_subscription_groups(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.flat_map(&:to_models)
+      end
+
     end
   end
 end
