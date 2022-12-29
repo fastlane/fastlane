@@ -131,25 +131,7 @@ module Deliver
         updated_idfa = true
       end
 
-      # Error if uses_idfa not set
-      if version.uses_idfa.nil?
-        message = [
-          "Use of Advertising Identifier (IDFA) is required to submit",
-          "Add information to the :submission_information option...",
-          "  Docs: http://docs.fastlane.tools/actions/deliver/#compliance-and-idfa-settings",
-          "  Example: submission_information: { add_id_info_uses_idfa: false }",
-          "  Example: submission_information: {",
-          "    add_id_info_uses_idfa: true,",
-          "    add_id_info_serves_ads: false,",
-          "    add_id_info_tracks_install: true,",
-          "    add_id_info_tracks_action: true,",
-          "    add_id_info_limits_tracking: true",
-          "  }",
-          "  Example CLI:",
-          "    --submission_information \"{\\\"add_id_info_uses_idfa\\\": false}\""
-        ].join("\n")
-        UI.user_error!(message)
-      end
+      return if version.uses_idfa.nil?
 
       # Create, update, or delete IDFA declaration
       if uses_idfa == false
