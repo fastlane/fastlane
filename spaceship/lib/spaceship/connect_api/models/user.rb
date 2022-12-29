@@ -57,6 +57,30 @@ module Spaceship
         return all(client: client, filter: { email: email }, includes: includes)
       end
 
+      # @param client [ConnectAPI] ConnectAPI client.
+      # @param all_apps_visible [Boolean] If all apps must be visible to a user. true - if a user must see all apps, you must not provide visible_app_ids, `false` - a user must see only a limited list of apps, and you must provide visible_app_ids. nil if no change is needed.
+      # @param provisioning_allowed [Bool] If a user with a Developer or App Manager role must have access to Certificates, Identifiers & Profiles. true - if a user must be able to create new certificates and provisioning profiles, `false` - otherwise. nil if no change is needed.
+      # @param roles [Array] Array of strings describing user roles. Possible values: https://developer.apple.com/documentation/appstoreconnectapi/userrole.nil if no change is needed.
+      # @param visible_app_ids [Array] Array of strings with application identifiers user needs have access to. nil if no apps change is needed or user must have access to all apps.
+      # @return (User) Modified user.
+      def update(client: nil, all_apps_visible: nil, provisioning_allowed: nil, roles: nil, visible_app_ids: nil)
+        client ||= Spaceship::ConnectAPI
+
+        all_apps_visible = all_apps_visible.nil? ? self.all_apps_visible : all_apps_visible
+        provisioning_allowed = provisioning_allowed.nil? ? self.provisioning_allowed : provisioning_allowed
+        roles ||= self.roles
+        visible_app_ids ||= self.visible_apps.map(&:id)
+
+        resp = client.patch_user(
+          user_id: self.id,
+          all_apps_visible: all_apps_visible,
+          provisioning_allowed: provisioning_allowed,
+          roles: roles,
+          visible_app_ids: visible_app_ids
+        )
+        return resp.to_models.first
+      end
+
       def delete!(client: nil)
         client ||= Spaceship::ConnectAPI
         client.delete_user(user_id: id)

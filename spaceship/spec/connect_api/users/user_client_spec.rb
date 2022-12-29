@@ -65,6 +65,58 @@ describe Spaceship::ConnectAPI::Users::Client do
         end
       end
 
+      context 'patch_user' do
+        let(:user_id) { "123" }
+        let(:all_apps_visible) { false }
+        let(:provisioning_allowed) { true }
+        let(:roles) { ["ADMIN"] }
+        let(:path) { "users/#{user_id}" }
+        let(:app_ids) { ["456", "789"] }
+        let(:body) do
+          {
+            data: {
+              type: 'users',
+              id: user_id,
+              attributes: {
+                allAppsVisible: all_apps_visible,
+                provisioningAllowed: provisioning_allowed,
+                roles: roles
+              },
+              relationships: {
+                visibleApps: {
+                  data: app_ids.map do |app_id|
+                    {
+                      type: "apps",
+                      id: app_id
+                    }
+                  end
+                }
+              }
+            }
+          }
+        end
+
+        it 'succeeds_with_list_of_apps' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:patch).and_yield(req_mock).and_return(req_mock)
+          client.patch_user(user_id: user_id, all_apps_visible: all_apps_visible, provisioning_allowed: provisioning_allowed, roles: roles, visible_app_ids: app_ids)
+        end
+
+        it 'succeeds_with_all_apps' do
+          body_all_apps = body.clone
+          body_all_apps[:data][:attributes][:allAppsVisible] = true
+          body_all_apps[:data].delete(:relationships)
+
+          url = path
+          req_mock = test_request_body(url, body_all_apps)
+
+          expect(client).to receive(:request).with(:patch).and_yield(req_mock).and_return(req_mock)
+          client.patch_user(user_id: user_id, all_apps_visible: true, provisioning_allowed: provisioning_allowed, roles: roles, visible_app_ids: app_ids)
+        end
+      end
+
       context 'delete_user' do
         let(:user_id) { "123" }
         let(:path) { "users/#{user_id}" }
