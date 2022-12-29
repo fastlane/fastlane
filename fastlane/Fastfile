@@ -365,16 +365,36 @@ private_lane :github_changelog do |options|
     body = JSON.parse(pr_resp[:body])
     items = body["items"]
 
-    if items.size == 1
-      item = items.first
+    item_infos = items.map do |item|
       message = "#{item['title']} (##{item['number']})"
       username = item["user"]["login"]
+
+      [message, username]
+    end
+
+    if item_infos.size == 0
+      if UI.confirm("Error generating changelog. No commit found for #{sha}. Skip?")
+        next
+      else
+        UI.user_error!("Cannot generate changelog. No commit found for #{sha}")
+      end
+    elsif item_infos.size == 1
+      message = item_infos[0][0]
+      username = item_infos[0][1]
     else
-      UI.user_error!("Cannot generate changelog. Multiple commits found for #{sha}")
+      options = item_infos.map do |item|
+        "#{item[1]} - #{item[0]})"
+      end
+
+      option = UI.select("Which changelog?", options)
+      index = options.index(option)
+
+      message = item_infos[index][0]
+      username = item_infos[index][1]
     end
 
     "* #{message} via #{name} (@#{username})"
-  end.join("\n")
+  end.compact.join("\n")
 
   formatted
 end

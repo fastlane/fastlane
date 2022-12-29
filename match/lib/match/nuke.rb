@@ -103,6 +103,8 @@ module Match
       else
         UI.success("No relevant certificates or provisioning profiles found, nothing to nuke here :)")
       end
+    ensure
+      self.storage.clear_changes if self.storage
     end
 
     # Be smart about optional values here
