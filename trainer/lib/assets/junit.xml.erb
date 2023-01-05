@@ -7,11 +7,17 @@
 <testsuites tests="<%= number_of_tests %>" failures="<%= number_of_failures %>">
   <% @results.each do |testsuite| %>
     <testsuite name=<%= (testsuite[:target_name].nil? ? testsuite[:test_name] : testsuite[:target_name]).encode(:xml => :attr) %> tests="<%= testsuite[:number_of_tests_excluding_retries] %>" failures="<%= testsuite[:number_of_failures_excluding_retries] %>" <% if testsuite[:number_of_skipped] %>skipped="<%= testsuite[:number_of_skipped] %>" <% end %>time="<%= testsuite[:duration] %>">
-      <% unless testsuite[:configuration_name].nil? %>
-        <properties>
-          <property name="Configuration" value="<%= testsuite[:configuration_name] %>"/>
-        </properties>
-      <% end %>
+        <% unless testsuite[:configuration_name].nil? && testsuite[:destination_name].nil? && testsuite[:destination_os_version].nil? %><properties>
+          <% unless testsuite[:configuration_name].nil? %>
+            <property name="Configuration" value="<%= testsuite[:configuration_name] %>"/>
+          <% end %>
+          <% unless testsuite[:destination_name].nil? %>
+            <property name="Destination name" value="<%= testsuite[:destination_name] %>"/>
+          <% end %>
+          <% unless testsuite[:destination_os_version].nil? %>
+            <property name="Destination OS version" value="<%= testsuite[:destination_os_version] %>"/>
+          <% end %>
+        </properties><% end %>
       <% testsuite[:tests].each do |test| %>
         <testcase classname=<%= test[:test_group].encode(:xml => :attr) %> name=<%= test[:name].encode(:xml => :attr) %> time="<%= test[:duration] %>">
           <% (test[:failures] || []).each do |failure| %>
