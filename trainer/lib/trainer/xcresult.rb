@@ -222,6 +222,44 @@ module Trainer
       end
     end
 
+    # - ActionSDKRecord
+    #   * Kind: object
+    #   * Properties:
+    #     + identifier: String
+    #     + name: String
+    #     + operatingSystemVersion: String
+    class ActionSDKRecord < AbstractObject
+      attr_accessor :identifier
+      attr_accessor :name
+      attr_accessor :operating_system_version
+
+      def initialize(data)
+        self.identifier = fetch_value(data, "identifier")
+        self.name = fetch_value(data, "name")
+        self.operating_system_version = fetch_value(data, "operatingSystemVersion")
+        super
+      end
+    end
+
+    # - ActionRunDestinationRecord
+    #   * Kind: object
+    #   * Properties:
+    #     + displayName: String
+    #     + localComputerRecord: ActionDeviceRecord
+    #     + targetArchitecture: String
+    #     + targetDeviceRecord: ActionDeviceRecord
+    #     + targetSDKRecord: ActionSDKRecord
+    class ActionRunDestinationRecord < AbstractObject
+      attr_accessor :display_name
+      attr_accessor :target_sdk_record
+
+      def initialize(data)
+        self.display_name = fetch_value(data, "displayName")
+        self.target_sdk_record = ActionSDKRecord.new(data["targetSDKRecord"])
+        super
+      end
+    end
+
     # - ActionRecord
     #   * Kind: object
     #   * Properties:
@@ -239,12 +277,14 @@ module Trainer
       attr_accessor :title
       attr_accessor :build_result
       attr_accessor :action_result
+      attr_accessor :run_destination
       def initialize(data)
         self.scheme_command_name = fetch_value(data, "schemeCommandName")
         self.scheme_task_name = fetch_value(data, "schemeTaskName")
         self.title = fetch_value(data, "title")
         self.build_result = ActionResult.new(data["buildResult"])
         self.action_result = ActionResult.new(data["actionResult"])
+        self.run_destination = ActionRunDestinationRecord.new(data["runDestination"])
         super
       end
     end
