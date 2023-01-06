@@ -102,6 +102,10 @@ module Match
         self.working_directory = Dir.mktmpdir
 
         s3_client.find_bucket!(s3_bucket).objects(prefix: s3_object_prefix).each do |object|
+
+          # prevent download if file_path is a dir
+          next if object.key.end_with?("/")
+
           file_path = strip_s3_object_prefix(object.key) # :s3_object_prefix:team_id/path/to/file
 
           # strip s3_prefix from file_path
