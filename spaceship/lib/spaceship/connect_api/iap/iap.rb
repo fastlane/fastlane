@@ -26,6 +26,11 @@ module Spaceship
         # subscriptionGroups
         #
 
+        def get_subscription_group(family_id:, includes: nil)
+          params = iap_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
+          iap_request_client.get("subscriptionGroups/#{family_id}", params)
+        end
+
         def get_subscription_groups(app_id:, filter: nil, includes: nil, limit: nil, sort: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
           iap_request_client.get("apps/#{app_id}/subscriptionGroups", params)

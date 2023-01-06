@@ -491,6 +491,12 @@ module Spaceship
       # Subscriptions
       #
 
+      def get_subscription_group(client: nil, family_id:, includes: Spaceship::ConnectAPI::SubscriptionGroup::ESSENTIAL_INCLUDES)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_subscription_group(family_id: family_id, includes: includes).all_pages
+        return resps.flat_map(&:to_models).first
+      end
+
       def get_subscription_groups(client: nil, filter: {}, includes: Spaceship::ConnectAPI::SubscriptionGroup::ESSENTIAL_INCLUDES, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_subscription_groups(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
