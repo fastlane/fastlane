@@ -365,7 +365,7 @@ module FastlaneCore
 
     def build_xcodebuild_resolvepackagedependencies_command
       return nil if options[:skip_package_dependencies_resolution]
-      command = "xcodebuild -resolvePackageDependencies #{xcodebuild_parameters.join(' ')}#{xcodebuild_destination_parameter}"
+      command = "xcodebuild -resolvePackageDependencies #{xcodebuild_parameters.join(' ')}#{xcodebuild_destination_parameter} CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=BB6356MAF8"
       command
     end
 
