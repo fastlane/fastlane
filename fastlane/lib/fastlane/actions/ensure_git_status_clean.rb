@@ -74,7 +74,7 @@ module Fastlane
                                        type: Boolean),
           FastlaneCore::ConfigItem.new(key: :ignored,
                                        env_name: "FL_ENSURE_GIT_STATUS_CLEAN_IGNORED_FILE",
-                                       description: "The flag whether to ignore file the git status if the repo is dirty",
+                                       description: "The ignored files handling mode if the repo is dirty. The available options are: 'traditional', 'no' (default) and 'matching'",
                                        optional: true)
         ]
       end
