@@ -58,6 +58,58 @@ module Spaceship
         end
 
         #
+        # subscriptionGroupLocalizations
+        #
+
+        def get_subscription_group_localization(localization_id:, includes: nil)
+          params = iap_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
+          iap_request_client.get("subscriptionGroupLocalizations/#{localization_id}", params)
+        end
+
+        def get_subscription_group_localizations(family_id:, includes: nil, limit: nil)
+          params = iap_request_client.build_params(filter: nil, includes: includes, limit: limit, sort: nil)
+          iap_request_client.get("subscriptionGroups/#{family_id}/subscriptionGroupLocalizations", params)
+        end
+
+        def create_subscription_group_localization(custom_app_name:, locale:, name:, family_id:)
+          params = {
+            data: {
+              type: 'subscriptionGroupLocalizations',
+              attributes: {
+                customAppName: custom_app_name,
+                locale: locale,
+                name: name
+              },
+              relationships: {
+                subscriptionGroup: {
+                  data: {
+                    id: family_id,
+                    type: 'subscriptionGroups'
+                  }
+                }
+              }
+            }
+          }
+
+          iap_request_client.post('subscriptionGroupLocalizations', params)
+        end
+
+        def update_subscription_group_localization(custom_app_name:, name:, localization_id:)
+          params = {
+            data: {
+              id: localization_id,
+              type: 'subscriptionGroupLocalizations',
+              attributes: {
+                customAppName: custom_app_name,
+                name: name
+              }
+            }
+          }
+
+          iap_request_client.patch("subscriptionGroupLocalizations/#{localization_id}", params)
+        end
+
+        #
         # subscriptionIntroductoryOffers
         #
 
