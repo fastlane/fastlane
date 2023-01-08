@@ -24,7 +24,7 @@ module Spaceship
       end
 
       #
-      # subscriptionGroupLocalizations
+      # Subscription Group Localizations
       #
 
       def get_subscription_group_localization(client: nil, localization_id:, includes: nil)
