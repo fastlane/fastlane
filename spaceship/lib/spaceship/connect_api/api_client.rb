@@ -333,7 +333,10 @@ module Spaceship
           formatted_errors << "Unknown error"
         end
 
-        return formatted_errors
+        return {
+          'errors' => formatted_errors,
+          'resultString' => formatted_errors
+        }
       end
 
       private
