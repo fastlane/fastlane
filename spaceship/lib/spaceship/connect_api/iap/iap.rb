@@ -36,6 +36,27 @@ module Spaceship
           iap_request_client.get("apps/#{app_id}/subscriptionGroups", params)
         end
 
+        def create_subscription_group(reference_name:, app_id:)
+          params = {
+            data: {
+              type: 'subscriptionGroups', # Hard coded value
+              attributes: {
+                referenceName: reference_name
+              },
+              relationships: {
+                app: {
+                  data: {
+                    id: app_id,
+                    type: 'apps' # Hard coded value
+                  }
+                }
+              },
+            }
+          }
+
+          iap_request_client.post('subscriptionGroups', params)
+        end
+
         #
         # subscriptionIntroductoryOffers
         #

@@ -503,6 +503,12 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
+      def create_subscription_group(client: nil, reference_name:)
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_subscription_group(reference_name: reference_name, app_id: id)
+        return resps.to_models.first
+      end
+
     end
   end
 end
