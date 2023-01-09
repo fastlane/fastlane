@@ -23,6 +23,50 @@ module Spaceship
         end
 
         #
+        # subscriptions
+        #
+
+        def get_subscription(purchase_id:, includes: nil)
+          params = iap_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
+          iap_request_client.get("subscriptions/#{purchase_id}", params)
+        end
+
+        def get_subscriptions(family_id:, filter: nil, includes: nil, limit: nil, sort: nil)
+          params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          iap_request_client.get("subscriptionGroups/#{family_id}/subscriptions", params)
+        end
+
+        def create_subscription(name:, product_id:, family_id:, available_in_all_territories: nil, family_sharable: nil, review_note: nil, subscription_period: nil, group_level: nil)
+          attributes = {
+            name: name,
+            productId: product_id
+          }
+
+          # Optional Params
+          attributes[:availableInAllTerritories] = available_in_all_territories unless available_in_all_territories.nil?
+          attributes[:familySharable] = family_sharable unless family_sharable.nil?
+          attributes[:reviewNote] = review_note unless review_note.nil?
+          attributes[:subscriptionPeriod] = subscription_period unless subscription_period.nil?
+
+          params = {
+            data: {
+              type: 'subscriptions', # Hard coded value
+              attributes: attributes,
+              relationships: {
+                group: {
+                  data: {
+                    id: family_id,
+                    type: 'subscriptionGroups' # Hard coded value
+                  }
+                }
+              }
+            }
+          }
+
+          iap_request_client.post('subscriptions', params)
+        end
+
+        #
         # subscriptionGroups
         #
 
