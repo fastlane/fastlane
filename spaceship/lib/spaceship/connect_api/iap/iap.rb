@@ -47,6 +47,7 @@ module Spaceship
           attributes[:familySharable] = family_sharable unless family_sharable.nil?
           attributes[:reviewNote] = review_note unless review_note.nil?
           attributes[:subscriptionPeriod] = subscription_period unless subscription_period.nil?
+          attributes[:groupLevel] = group_level unless group_level.nil?
 
           params = {
             data: {
