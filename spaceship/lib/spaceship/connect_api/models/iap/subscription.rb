@@ -79,11 +79,27 @@ module Spaceship
       # Subscription Localizations
       #
 
+      def get_subscription_localizations(client: nil, limit: nil, includes: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_subscription_localizations(purchase_id: id, includes: includes, limit: limit).all_pages
+        models = resps.flat_map(&:to_models)
+        (self.subscription_localizations ||= []).concat(models).uniq! { |sub_loc| sub_loc.id }
+        models
+      end
+
+      def get_subscription_localization(client: nil, localization_id:, includes: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_subscription_localization(localization_id: localization_id, includes: includes)
+        model = resps.to_models.first
+        ((self.subscription_localizations ||= []) << model).uniq! { |sub_loc| sub_loc.id }
+        model
+      end
+
       def create_subscription_localization(client: nil, locale:, name:, description: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.create_subscription_localization(purchase_id: id, locale: locale, name: name, description: description)
         model = resps.to_models.first
-        (self.subscription_localizations ||= []) << model
+        ((self.subscription_localizations ||= []) << model).uniq! { |sub_loc| sub_loc.id }
         model
       end
 

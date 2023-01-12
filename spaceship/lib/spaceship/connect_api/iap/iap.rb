@@ -176,6 +176,16 @@ module Spaceship
         # subscriptionLocalizations
         #
 
+        def get_subscription_localizations(purchase_id:, includes: nil, limit: nil)
+          params = iap_request_client.build_params(includes: includes, limit: limit)
+          iap_request_client.get("subscriptions/#{purchase_id}/subscriptionLocalizations", params)
+        end
+
+        def get_subscription_localization(localization_id:, includes: nil)
+          params = iap_request_client.build_params(includes: includes)
+          iap_request_client.get("subscriptionLocalizations/#{localization_id}", params)
+        end
+
         def create_subscription_localization(purchase_id:, locale:, name:, description: nil)
           attributes = {
             name: name,
@@ -201,6 +211,10 @@ module Spaceship
           }
 
           iap_request_client.post('subscriptionLocalizations', params)
+        end
+
+        def delete_subscription_localization(localization_id:)
+          iap_request_client.delete("subscriptionLocalizations/#{localization_id}")
         end
 
         # def patch_age_rating_declaration(age_rating_declaration_id: nil, attributes: nil)

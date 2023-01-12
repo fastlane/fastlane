@@ -27,6 +27,16 @@ module Spaceship
       def self.type
         return 'subscriptionLocalizations'
       end
+
+      #
+      # Delete
+      #
+
+      def delete(client: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_subscription_localization(localization_id: id)
+      end
+
     end
   end
 end
