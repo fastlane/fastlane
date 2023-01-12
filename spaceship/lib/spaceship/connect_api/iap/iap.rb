@@ -172,6 +172,37 @@ module Spaceship
           iap_request_client.get("subscriptions/#{app_id}/prices", params)
         end
 
+        #
+        # subscriptionLocalizations
+        #
+
+        def create_subscription_localization(purchase_id:, locale:, name:, description: nil)
+          attributes = {
+            name: name,
+            locale: locale
+          }
+
+          # Optional Attributes
+          attributes[:description] = description unless description.nil?
+
+          params = {
+            data: {
+              type: 'subscriptionLocalizations',
+              attributes: attributes,
+              relationships: {
+                subscription: {
+                  data: {
+                    id: purchase_id,
+                    type: 'subscriptions'
+                  }
+                }
+              }
+            }
+          }
+
+          iap_request_client.post('subscriptionLocalizations', params)
+        end
+
         # def patch_age_rating_declaration(age_rating_declaration_id: nil, attributes: nil)
         #   body = {
         #     data: {

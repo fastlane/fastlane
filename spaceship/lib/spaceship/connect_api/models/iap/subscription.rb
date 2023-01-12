@@ -4,14 +4,18 @@ module Spaceship
     class Subscription
       include Spaceship::ConnectAPI::Model
 
-      attr_accessor :available_in_all_territories
-      attr_accessor :family_sharable
-      attr_accessor :name
-      attr_accessor :product_id
-      attr_accessor :review_note
-      attr_accessor :state
-      attr_accessor :subscription_period
-      attr_accessor :group_level
+      # Fields
+      attr_accessor :available_in_all_territories,
+                    :family_sharable,
+                    :name,
+                    :product_id,
+                    :review_note,
+                    :state,
+                    :subscription_period,
+                    :group_level
+
+      # Relations
+      attr_accessor :subscription_localizations
 
       module Period
         ONE_WEEK = "ONE_WEEK"
@@ -43,7 +47,8 @@ module Spaceship
         reviewNote: 'review_note',
         state: 'state',
         subscriptionPeriod: 'subscription_period',
-        groupLevel: 'group_level'
+        groupLevel: 'group_level',
+        subscriptionLocalizations: 'subscription_localizations'
       })
 
       def self.type
@@ -68,6 +73,18 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         resps = client.get_subscription_prices(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
+      end
+
+      #
+      # Subscription Localizations
+      #
+
+      def create_subscription_localization(client: nil, locale:, name:, description: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_subscription_localization(purchase_id: id, locale: locale, name: name, description: description)
+        model = resps.to_models.first
+        (self.subscription_localizations ||= []) << model
+        model
       end
 
     end
