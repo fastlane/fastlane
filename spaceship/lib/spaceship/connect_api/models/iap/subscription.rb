@@ -15,7 +15,8 @@ module Spaceship
                     :group_level
 
       # Relations
-      attr_accessor :subscription_localizations
+      attr_accessor :prices,
+                    :subscription_localizations
 
       module Period
         ONE_WEEK = "ONE_WEEK"
@@ -72,7 +73,27 @@ module Spaceship
       def get_prices(client: nil, filter: {}, includes: Spaceship::ConnectAPI::SubscriptionPrice::ESSENTIAL_INCLUDES, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_subscription_prices(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.flat_map(&:to_models)
+        models = resps.flat_map(&:to_models)
+        (self.prices ||= []).concat(models).uniq! { |price| price.id }
+        models
+      end
+
+      def create_price(client: nil, price_point_id:, territory_id: nil, preserve_current_price: nil, start_date: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_subscription_price(purchase_id: id, price_point_id: price_point_id, territory_id: territory_id, preserve_current_price: preserve_current_price, start_date: start_date)
+        model = resps.to_models.first
+        ((self.prices ||= []) << model).uniq! { |price| price.id }
+        model
+      end
+
+      #
+      # PricePoints
+      #
+
+      def get_price_points(client: nil, filter: {}, includes: Spaceship::ConnectAPI::SubscriptionPricePoint::ESSENTIAL_INCLUDES, limit: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_subscription_price_points(purchase_id: id, filter: filter, includes: includes, limit: limit).all_pages
+        resps.flat_map(&:to_models)
       end
 
       #

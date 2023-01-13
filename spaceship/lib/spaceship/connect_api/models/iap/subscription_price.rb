@@ -26,6 +26,15 @@ module Spaceship
       def self.type
         return 'subscriptionPrices'
       end
+
+      #
+      # Delete
+      #
+
+      def delete(client: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_subscription_price(subscription_price_id: id)
+      end
     end
   end
 end

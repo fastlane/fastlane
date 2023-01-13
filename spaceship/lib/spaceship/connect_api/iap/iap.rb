@@ -172,6 +172,62 @@ module Spaceship
           iap_request_client.get("subscriptions/#{app_id}/prices", params)
         end
 
+        def create_subscription_price(purchase_id:, price_point_id:, territory_id: nil, preserve_current_price: nil, start_date: nil)
+          attributes = {}
+
+          relationships = {
+            subscription: {
+              data: {
+                id: purchase_id,
+                type: 'subscriptions'
+              }
+            },
+            subscriptionPricePoint: {
+              data: {
+                id: price_point_id,
+                type: 'subscriptionPricePoints'
+              }
+            }
+          }
+
+          # Optional Relationships
+          if territory_id
+            relationships[:territory] = {
+              data: {
+                id: territory_id,
+                type: 'territories'
+              }
+            }
+          end
+
+          # Optional Attributes
+          attributes[:preserveCurrentPrice] = preserve_current_price unless preserve_current_price.nil?
+          attributes[:startDate] = start_date unless start_date.nil?
+
+          params = {
+            data: {
+              type: 'subscriptionPrices',
+              attributes: attributes,
+              relationships: relationships
+            }
+          }
+
+          iap_request_client.post('subscriptionPrices', params)
+        end
+
+        def delete_subscription_price(subscription_price_id:)
+          iap_request_client.delete("subscriptionPrices/#{subscription_price_id}")
+        end
+
+        #
+        # subscriptionPricePoints
+        #
+
+        def get_subscription_price_points(purchase_id:, filter: nil, includes: nil, limit: nil)
+          params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit)
+          iap_request_client.get("subscriptions/#{purchase_id}/pricePoints", params)
+        end
+
         #
         # subscriptionLocalizations
         #

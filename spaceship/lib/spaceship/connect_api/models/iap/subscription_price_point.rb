@@ -8,6 +8,8 @@ module Spaceship
       attr_accessor :proceeds
       attr_accessor :proceeds_year2
 
+      attr_accessor :territory
+
       attr_mapping({
         customerPrice: 'customer_price',
         proceeds: 'proceeds',
@@ -17,6 +19,11 @@ module Spaceship
       def self.type
         return 'subscriptionPricePoints'
       end
+
+      ESSENTIAL_INCLUDES = [
+        "territory"
+      ].join(",")
+
     end
   end
 end
