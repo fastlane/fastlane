@@ -57,6 +57,32 @@ module Spaceship
       end
 
       #
+      # Update
+      #
+
+      def update(
+            client: nil,
+            name: nil,
+            available_in_all_territories: nil,
+            family_sharable: nil,
+            review_note: nil,
+            subscription_period: nil,
+            group_level: nil
+          )
+        client ||= Spaceship::ConnectAPI
+        resps = client.update_subscription(
+          purchase_id: id,
+          name: name,
+          available_in_all_territories: available_in_all_territories,
+          family_sharable: family_sharable,
+          review_note: review_note,
+          subscription_period: subscription_period,
+          group_level: group_level
+        )
+        return resps.to_models.first
+      end
+
+      #
       # Introductory Offers
       #
 

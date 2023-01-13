@@ -67,6 +67,36 @@ module Spaceship
           iap_request_client.post('subscriptions', params)
         end
 
+        def update_subscription(
+              purchase_id:,
+              name: nil,
+              available_in_all_territories: nil,
+              family_sharable: nil,
+              review_note: nil,
+              subscription_period: nil,
+              group_level: nil
+            )
+          attributes = {}
+
+          # Optional Params
+          attributes[:name] = name unless name.nil?
+          attributes[:availableInAllTerritories] = available_in_all_territories unless available_in_all_territories.nil?
+          attributes[:familySharable] = family_sharable unless family_sharable.nil?
+          attributes[:reviewNote] = review_note unless review_note.nil?
+          attributes[:subscriptionPeriod] = subscription_period unless subscription_period.nil?
+          attributes[:groupLevel] = group_level unless group_level.nil?
+
+          params = {
+            data: {
+              id: purchase_id,
+              type: 'subscriptions', # Hard coded value
+              attributes: attributes
+            }
+          }
+
+          iap_request_client.patch("subscriptions/#{purchase_id}", params)
+        end
+
         #
         # subscriptionGroups
         #
