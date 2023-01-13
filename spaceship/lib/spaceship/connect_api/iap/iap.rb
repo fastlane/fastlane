@@ -228,6 +228,11 @@ module Spaceship
           iap_request_client.get("subscriptions/#{purchase_id}/pricePoints", params)
         end
 
+        def get_subscription_price_point_equalizations(price_point_id:, filter: nil, includes: nil, limit: nil)
+          params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit)
+          iap_request_client.get("subscriptionPricePoints/#{price_point_id}/equalizations", params)
+        end
+
         #
         # subscriptionLocalizations
         #
