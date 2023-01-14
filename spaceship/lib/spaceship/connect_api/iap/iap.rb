@@ -308,6 +308,54 @@ module Spaceship
           iap_request_client.delete("subscriptionLocalizations/#{localization_id}")
         end
 
+        #
+        # subscriptionAppStoreReviewScreenshots
+        #
+
+        def create_subscription_app_store_review_screenshot(purchase_id:, file_name:, file_size:)
+          params = {
+            data: {
+              type: 'subscriptionAppStoreReviewScreenshots',
+              attributes: {
+                fileName: file_name,
+                fileSize: file_size
+              },
+              relationships: {
+                subscription: {
+                  data: {
+                    id: purchase_id,
+                    type: 'subscriptions'
+                  }
+                }
+              }
+            }
+          }
+
+          iap_request_client.post('subscriptionAppStoreReviewScreenshots', params)
+        end
+
+        def update_subscription_app_store_review_screenshot(screenshot_id:, source_file_checksum: nil, uploaded: nil)
+          attributes = {}
+
+          # Optional attributes
+          attributes[:sourceFileChecksum] = source_file_checksum if source_file_checksum
+          attributes[:uploaded] = uploaded if uploaded
+
+          params = {
+            data: {
+              id: screenshot_id,
+              type: 'subscriptionAppStoreReviewScreenshots',
+              attributes: attributes
+            }
+          }
+
+          iap_request_client.patch("subscriptionAppStoreReviewScreenshots/#{screenshot_id}", params)
+        end
+
+        def delete_subscription_app_store_review_screenshot(screenshot_id:)
+          iap_request_client.delete("subscriptionAppStoreReviewScreenshots/#{screenshot_id}")
+        end
+
         # def patch_age_rating_declaration(age_rating_declaration_id: nil, attributes: nil)
         #   body = {
         #     data: {

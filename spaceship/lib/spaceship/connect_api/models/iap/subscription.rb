@@ -16,7 +16,8 @@ module Spaceship
 
       # Relations
       attr_accessor :prices,
-                    :subscription_localizations
+                    :subscription_localizations,
+                    :subscription_app_store_review_screenshot
 
       module Period
         ONE_WEEK = "ONE_WEEK"
@@ -49,7 +50,8 @@ module Spaceship
         state: 'state',
         subscriptionPeriod: 'subscription_period',
         groupLevel: 'group_level',
-        subscriptionLocalizations: 'subscription_localizations'
+        subscriptionLocalizations: 'subscription_localizations',
+        appStoreReviewScreenshot: 'subscription_app_store_review_screenshot'
       })
 
       def self.type
@@ -148,6 +150,34 @@ module Spaceship
         model = resps.to_models.first
         ((self.subscription_localizations ||= []) << model).uniq! { |sub_loc| sub_loc.id }
         model
+      end
+
+      #
+      # Subscription App Store Review Screenshot
+      #
+
+      def upload_app_store_review_screenshot(client: nil, path:)
+        client ||= Spaceship::ConnectAPI
+        file_name = File.basename(path)
+        file_size = File.size(path)
+        bytes = File.binread(path)
+
+        # Create Placeholder
+        screenshot = create_app_store_review_screenshot(client: client, file_name: file_name, file_size: file_size)
+        self.subscription_app_store_review_screenshot = screenshot
+
+        # Upload Image
+        screenshot.upload_image(client: client, bytes: bytes)
+
+        # Commit Image
+        screenshot = screenshot.update(client: client, source_file_checksum: Digest::MD5.hexdigest(bytes), uploaded: true)
+        self.subscription_app_store_review_screenshot = screenshot
+      end
+
+      def create_app_store_review_screenshot(client: nil, file_name:, file_size:)
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_subscription_app_store_review_screenshot(purchase_id: id, file_name: file_name, file_size: file_size)
+        resps.to_models.first
       end
 
     end
