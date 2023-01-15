@@ -243,6 +243,23 @@ module Spaceship
           iap_request_client.post('subscriptionIntroductoryOffers', params)
         end
 
+        def update_subscription_introductory_offer(introductory_offer_id:, end_date: nil)
+          attributes = {}
+
+          # Optional Attributes
+          attributes[:endDate] = end_date unless end_date.nil?
+
+          params = {
+            data: {
+              id: introductory_offer_id,
+              type: 'subscriptionIntroductoryOffers',
+              attributes: attributes
+            }
+          }
+
+          iap_request_client.patch("subscriptionIntroductoryOffers/#{introductory_offer_id}", params)
+        end
+
         def delete_subscription_introductory_offer(introductory_offer_id:)
           iap_request_client.delete("subscriptionIntroductoryOffers/#{introductory_offer_id}")
         end

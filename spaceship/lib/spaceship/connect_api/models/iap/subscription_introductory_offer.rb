@@ -98,6 +98,16 @@ module Spaceship
       end
 
       #
+      # Update
+      #
+
+      def update(client: nil, end_date: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.update_subscription_introductory_offer(introductory_offer_id: id, end_date: end_date)
+        resp.to_models.first # self
+      end
+
+      #
       # Delete
       #
 
