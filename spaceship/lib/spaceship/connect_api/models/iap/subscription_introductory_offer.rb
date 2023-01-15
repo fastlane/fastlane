@@ -50,6 +50,62 @@ module Spaceship
       def self.type
         return 'subscriptionIntroductoryOffers'
       end
+
+      def self.duration_from_days(days)
+        case days
+        when 1
+          Duration::ONE_DAY
+        when 3
+          Duration::THREE_DAYS
+        when 7
+          Duration::ONE_WEEK
+        when 14
+          Duration::TWO_WEEKS
+        when 30
+          Duration::ONE_MONTH
+        when 60
+          Duration::TWO_MONTHS
+        when 90
+          Duration::THREE_MONTHS
+        when 180
+          Duration::SIX_MONTHS
+        when 365
+          Duration::ONE_YEAR
+        end
+      end
+
+      def duration_in_days
+        case duration
+        when Duration::ONE_DAY
+          1
+        when Duration::THREE_DAYS
+          3
+        when Duration::ONE_WEEK
+          7
+        when Duration::TWO_WEEKS
+          14
+        when Duration::ONE_MONTH
+          30
+        when Duration::TWO_MONTHS
+          60
+        when Duration::THREE_MONTHS
+          90
+        when Duration::SIX_MONTHS
+          180
+        when Duration::ONE_YEAR
+          365
+        end
+      end
+
+      #
+      # Delete
+      #
+
+      def delete(client: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_subscription_introductory_offer(introductory_offer_id: id)
+      end
+
     end
   end
 end

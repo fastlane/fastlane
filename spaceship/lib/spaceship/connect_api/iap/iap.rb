@@ -193,6 +193,60 @@ module Spaceship
           iap_request_client.get("subscriptions/#{app_id}/introductoryOffers", params)
         end
 
+        def create_subscription_introductory_offer(purchase_id:, duration:, number_of_periods:, offer_mode:, start_date: nil, end_date: nil, territory_id: nil, subscription_price_point_id: nil)
+          attributes = {
+            duration: duration,
+            numberOfPeriods: number_of_periods,
+            offerMode: offer_mode
+          }
+
+          relationships = {
+            subscription: {
+              data: {
+                id: purchase_id,
+                type: 'subscriptions'
+              }
+            }
+          }
+
+          # Optional Relationships
+          if territory_id
+            relationships[:territory] = {
+              data: {
+                id: territory_id,
+                type: 'territories'
+              }
+            }
+          end
+
+          if subscription_price_point_id
+            relationships[:subscriptionPricePoint] = {
+              data: {
+                id: subscription_price_point_id,
+                type: 'subscriptionPricePoints'
+              }
+            }
+          end
+
+          # Optional Attributes
+          attributes[:startDate] = start_date unless start_date.nil?
+          attributes[:endDate] = end_date unless end_date.nil?
+
+          params = {
+            data: {
+              type: 'subscriptionIntroductoryOffers',
+              attributes: attributes,
+              relationships: relationships
+            }
+          }
+
+          iap_request_client.post('subscriptionIntroductoryOffers', params)
+        end
+
+        def delete_subscription_introductory_offer(introductory_offer_id:)
+          iap_request_client.delete("subscriptionIntroductoryOffers/#{introductory_offer_id}")
+        end
+
         #
         # subscriptionPrices
         #

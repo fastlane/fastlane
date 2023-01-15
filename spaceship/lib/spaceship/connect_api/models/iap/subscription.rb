@@ -17,7 +17,8 @@ module Spaceship
       # Relations
       attr_accessor :prices,
                     :subscription_localizations,
-                    :app_store_review_screenshot
+                    :app_store_review_screenshot,
+                    :introductory_offers
 
       module Period
         ONE_WEEK = "ONE_WEEK"
@@ -51,7 +52,8 @@ module Spaceship
         subscriptionPeriod: 'subscription_period',
         groupLevel: 'group_level',
         subscriptionLocalizations: 'subscription_localizations',
-        appStoreReviewScreenshot: 'app_store_review_screenshot'
+        appStoreReviewScreenshot: 'app_store_review_screenshot',
+        introductoryOffers: 'introductory_offers'
       })
 
       def self.type
@@ -91,7 +93,17 @@ module Spaceship
       def get_introductory_offers(client: nil, filter: {}, includes: Spaceship::ConnectAPI::SubscriptionIntroductoryOffer::ESSENTIAL_INCLUDES, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_subscription_introductory_offers(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.flat_map(&:to_models)
+        models = resps.flat_map(&:to_models)
+        (self.introductory_offers ||= []).concat(models).uniq! { |offer| offer.id }
+        models
+      end
+
+      def create_introductory_offer(client: nil, duration:, number_of_periods:, offer_mode:, start_date: nil, end_date: nil, territory_id: nil, subscription_price_point_id: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_subscription_introductory_offer(purchase_id: id, duration: duration, number_of_periods: number_of_periods, offer_mode: offer_mode, start_date: start_date, end_date: end_date, territory_id: territory_id, subscription_price_point_id: subscription_price_point_id)
+        model = resps.to_models.first
+        ((self.introductory_offers ||= []) << model).uniq! { |offer| offer.id }
+        model
       end
 
       #
