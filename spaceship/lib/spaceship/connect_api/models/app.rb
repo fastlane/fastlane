@@ -487,6 +487,12 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
+      def create_in_app_purchase(client: nil, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_in_app_purchase(app_id: id, name: name, product_id: product_id, in_app_purchase_type: in_app_purchase_type, review_note: review_note, family_sharable: family_sharable, available_in_all_territories: available_in_all_territories)
+        return resps.to_models.first
+      end
+
       #
       # Subscription Groups
       #

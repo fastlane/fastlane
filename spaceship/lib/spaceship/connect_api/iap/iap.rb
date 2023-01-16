@@ -22,6 +22,36 @@ module Spaceship
           iap_request_client.get("apps/#{app_id}/inAppPurchasesV2", params)
         end
 
+        def create_in_app_purchase(app_id:, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
+          attributes = {
+            name: name,
+            productId: product_id
+          }
+
+          # Optional Params
+          attributes[:availableInAllTerritories] = available_in_all_territories unless available_in_all_territories.nil?
+          attributes[:familySharable] = family_sharable unless family_sharable.nil?
+          attributes[:reviewNote] = review_note unless review_note.nil?
+
+          params = {
+            data: {
+              type: 'inAppPurchases', # Hard coded value
+              attributes: attributes,
+              relationships: {
+                app: {
+                  data: {
+                    id: app_id,
+                    type: 'apps' # Hard coded value
+                  }
+                }
+              }
+            }
+          }
+
+          # This endpoint is on `v2`
+          iap_request_client.post('https://api.appstoreconnect.apple.com/v2/inAppPurchases', params)
+        end
+
         #
         # subscriptions
         #
