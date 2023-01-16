@@ -97,6 +97,14 @@ module Spaceship
         end
       end
 
+      def start_date_as_date
+        Date.strptime(start_date, "%Y-%m-%d") if start_date
+      end
+
+      def end_date_as_date
+        Date.strptime(end_date, "%Y-%m-%d") if end_date
+      end
+
       #
       # Update
       #
