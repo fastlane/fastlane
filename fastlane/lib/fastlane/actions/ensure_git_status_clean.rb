@@ -9,7 +9,7 @@ module Fastlane
       def self.run(params)
         if params[:ignored]
           ignored_mode = params[:ignored]
-          repo_status = Actions.sh("git status --porcelain --ignored #{ignored_mode}")
+          repo_status = Actions.sh("git status --porcelain --ignored='#{ignored_mode}'")
         else
           repo_status = Actions.sh("git status --porcelain")
         end
