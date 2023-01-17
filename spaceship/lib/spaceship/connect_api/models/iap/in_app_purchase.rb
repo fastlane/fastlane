@@ -68,6 +68,15 @@ module Spaceship
       end
 
       #
+      # Delete
+      #
+
+      def delete(client: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_in_app_purchase(purchase_id: id)
+      end
+
+      #
       # In App Purchase Localizations
       #
 

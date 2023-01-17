@@ -24,6 +24,15 @@ module Spaceship
       end
 
       #
+      # Delete
+      #
+
+      def delete(client: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_subscription_group(family_id: id)
+      end
+
+      #
       # Subscription Group Localizations
       #
 

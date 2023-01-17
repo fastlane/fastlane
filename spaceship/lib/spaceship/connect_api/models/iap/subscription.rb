@@ -87,6 +87,15 @@ module Spaceship
       end
 
       #
+      # Delete
+      #
+
+      def delete(client: nil)
+        client ||= Spaceship::ConnectAPI
+        client.delete_subscription(purchase_id: id)
+      end
+
+      #
       # Introductory Offers
       #
 
