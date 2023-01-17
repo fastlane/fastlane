@@ -16,7 +16,8 @@ module Spaceship
 
       # Relations
       attr_accessor :prices,
-                    :localizations
+                    :localizations,
+                    :app_store_review_screenshot
 
       module Type
         CONSUMABLE = "CONSUMABLE"
@@ -49,6 +50,7 @@ module Spaceship
         reviewNote: 'review_note',
         state: 'state',
         inAppPurchaseLocalizations: 'localizations',
+        appStoreReviewScreenshot: 'app_store_review_screenshot'
       })
 
       def self.type
@@ -128,6 +130,34 @@ module Spaceship
         resps = client.get_in_app_purchase_prices(purchase_id: id, filter: filter, includes: includes, limit: limit, fields: fields).all_pages
         ((self.prices ||= []) << model).uniq! { |price| price.id }
         resps.flat_map(&:to_models)
+      end
+
+      #
+      # In App Purchase App Store Review Screenshot
+      #
+
+      def upload_app_store_review_screenshot(client: nil, path:)
+        client ||= Spaceship::ConnectAPI
+        file_name = File.basename(path)
+        file_size = File.size(path)
+        bytes = File.binread(path)
+
+        # Create Placeholder
+        screenshot = create_app_store_review_screenshot(client: client, file_name: file_name, file_size: file_size)
+        self.app_store_review_screenshot = screenshot
+
+        # Upload Image
+        screenshot.upload_image(client: client, bytes: bytes)
+
+        # Commit Image
+        screenshot = screenshot.update(client: client, source_file_checksum: Digest::MD5.hexdigest(bytes), uploaded: true)
+        self.app_store_review_screenshot = screenshot
+      end
+
+      def create_app_store_review_screenshot(client: nil, file_name:, file_size:)
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_in_app_purchase_app_store_review_screenshot(purchase_id: id, file_name: file_name, file_size: file_size)
+        resps.to_models.first
       end
 
     end

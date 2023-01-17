@@ -202,6 +202,54 @@ module Spaceship
         end
 
         #
+        # inAppPurchaseAppStoreReviewScreenshots
+        #
+
+        def create_in_app_purchase_app_store_review_screenshot(purchase_id:, file_name:, file_size:)
+          params = {
+            data: {
+              type: 'inAppPurchaseAppStoreReviewScreenshots',
+              attributes: {
+                fileName: file_name,
+                fileSize: file_size
+              },
+              relationships: {
+                inAppPurchaseV2: {
+                  data: {
+                    id: purchase_id,
+                    type: 'inAppPurchases'
+                  }
+                }
+              }
+            }
+          }
+
+          iap_request_client.post('inAppPurchaseAppStoreReviewScreenshots', params)
+        end
+
+        def update_in_app_purchase_app_store_review_screenshot(screenshot_id:, source_file_checksum: nil, uploaded: nil)
+          attributes = {}
+
+          # Optional attributes
+          attributes[:sourceFileChecksum] = source_file_checksum if source_file_checksum
+          attributes[:uploaded] = uploaded if uploaded
+
+          params = {
+            data: {
+              id: screenshot_id,
+              type: 'inAppPurchaseAppStoreReviewScreenshots',
+              attributes: attributes
+            }
+          }
+
+          iap_request_client.patch("inAppPurchaseAppStoreReviewScreenshots/#{screenshot_id}", params)
+        end
+
+        def delete_in_app_purchase_app_store_review_screenshot(screenshot_id:)
+          iap_request_client.delete("inAppPurchaseAppStoreReviewScreenshots/#{screenshot_id}")
+        end
+
+        #
         # subscriptions
         #
 
