@@ -53,6 +53,51 @@ module Spaceship
         end
 
         #
+        # inAppPurchaseLocalizations
+        #
+
+        def get_in_app_purchase_localizations(purchase_id:, includes: nil, limit: nil)
+          params = iap_request_client.build_params(includes: includes, limit: limit)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v2/inAppPurchases/#{purchase_id}/inAppPurchaseLocalizations", params)
+        end
+
+        def get_in_app_purchase_localization(localization_id:, includes: nil)
+          params = iap_request_client.build_params(includes: includes)
+          iap_request_client.get("inAppPurchaseLocalizations/#{localization_id}", params)
+        end
+
+        def create_in_app_purchase_localization(purchase_id:, locale:, name:, description: nil)
+          attributes = {
+            name: name,
+            locale: locale
+          }
+
+          # Optional Attributes
+          attributes[:description] = description unless description.nil?
+
+          params = {
+            data: {
+              type: 'inAppPurchaseLocalizations',
+              attributes: attributes,
+              relationships: {
+                inAppPurchaseV2: {
+                  data: {
+                    id: purchase_id,
+                    type: 'inAppPurchases'
+                  }
+                }
+              }
+            }
+          }
+
+          iap_request_client.post('inAppPurchaseLocalizations', params)
+        end
+
+        def delete_in_app_purchase_localization(localization_id:)
+          iap_request_client.delete("inAppPurchaseLocalizations/#{localization_id}")
+        end
+
+        #
         # subscriptions
         #
 
