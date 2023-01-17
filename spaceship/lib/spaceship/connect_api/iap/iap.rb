@@ -144,6 +144,63 @@ module Spaceship
           iap_request_client.get("inAppPurchasePriceSchedules/#{purchase_id}/manualPrices", params)
         end
 
+        def create_in_app_purchase_price_schedule(purchase_id:, in_app_purchase_price_point_id:, start_date: nil)
+          params = {
+            data: {
+              type: 'inAppPurchasePriceSchedules',
+              relationships: {
+                inAppPurchase: {
+                  data: {
+                    id: purchase_id,
+                    type: 'inAppPurchases'
+                  }
+                },
+
+                manualPrices: {
+                  data: [] # Filled with loop below
+                }
+              }
+            },
+            included: [] # Filled with loop below
+          }
+
+          entry_count = 1
+          [in_app_purchase_price_point_id].each do |in_app_purchase_price_point_id|
+            create_id = "${price#{entry_count}}"
+
+            # Add to relationships
+            params[:data][:relationships][:manualPrices][:data] << { id: create_id, type: 'inAppPurchasePrices' }
+
+            # Add to included
+            attributes = {}
+            attributes[:startDate] = start_date unless start_date.nil? # Optional Attributes
+
+            params[:included] << {
+              id: create_id,
+              type: 'inAppPurchasePrices',
+              attributes: attributes,
+              relationships: {
+                inAppPurchaseV2: {
+                  data: {
+                    id: purchase_id,
+                    type: 'inAppPurchases'
+                  }
+                },
+                inAppPurchasePricePoint: {
+                  data: {
+                    id: in_app_purchase_price_point_id,
+                    type: 'inAppPurchasePricePoints'
+                  }
+                }
+              }
+            }
+
+            entry_count += 1
+          end
+
+          iap_request_client.post('inAppPurchasePriceSchedules', params)
+        end
+
         #
         # subscriptions
         #
