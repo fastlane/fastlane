@@ -27,7 +27,7 @@ describe Fastlane do
 
         context "with show_uncommitted_changes flag" do
           context "true" do
-            it "outputs reach error message" do
+            it "outputs rich error message" do
               expect(FastlaneCore::UI).to receive(:user_error!).with("Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.\nUncommitted changes:\nM fastlane/lib/fastlane/actions/ensure_git_status_clean.rb")
               Fastlane::FastFile.new.parse("lane :test do
                 ensure_git_status_clean(show_uncommitted_changes: true)
@@ -56,7 +56,7 @@ describe Fastlane do
 
         context "with show_diff flag" do
           context "true" do
-            it "outputs reach error message" do
+            it "outputs rich error message" do
               expect(FastlaneCore::UI).to receive(:user_error!).with("Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.\nGit diff: \n+ \"this is a new line\"")
               Fastlane::FastFile.new.parse("lane :test do
                 ensure_git_status_clean(show_diff: true)
