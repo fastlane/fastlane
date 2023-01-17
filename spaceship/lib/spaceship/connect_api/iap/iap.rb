@@ -30,7 +30,8 @@ module Spaceship
         def create_in_app_purchase(app_id:, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
           attributes = {
             name: name,
-            productId: product_id
+            productId: product_id,
+            inAppPurchaseType: in_app_purchase_type
           }
 
           # Optional Params
