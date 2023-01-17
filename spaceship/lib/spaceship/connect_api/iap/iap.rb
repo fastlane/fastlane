@@ -58,6 +58,26 @@ module Spaceship
           iap_request_client.post('https://api.appstoreconnect.apple.com/v2/inAppPurchases', params)
         end
 
+        def update_in_app_purchase(purchase_id:, name: nil, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
+          attributes = {}
+
+          # Optional attributes
+          attributes[:name] = name unless name.nil?
+          attributes[:reviewNote] = review_note unless review_note.nil?
+          attributes[:familySharable] = family_sharable unless family_sharable.nil?
+          attributes[:availableInAllTerritories] = available_in_all_territories unless available_in_all_territories.nil?
+
+          params = {
+            data: {
+              id: purchase_id,
+              type: 'inAppPurchases',
+              attributes: attributes
+            }
+          }
+
+          iap_request_client.patch("https://api.appstoreconnect.apple.com/v2/inAppPurchases/#{purchase_id}", params)
+        end
+
         #
         # inAppPurchaseLocalizations
         #

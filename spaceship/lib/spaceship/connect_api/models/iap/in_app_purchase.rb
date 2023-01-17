@@ -56,6 +56,16 @@ module Spaceship
       end
 
       #
+      # Update
+      #
+
+      def update(client: nil, name: nil, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.update_in_app_purchase(purchase_id: id, name: name, review_note: review_note, family_sharable: family_sharable, available_in_all_territories: available_in_all_territories)
+        models = resps.to_models.first # self
+      end
+
+      #
       # In App Purchase Localizations
       #
 
