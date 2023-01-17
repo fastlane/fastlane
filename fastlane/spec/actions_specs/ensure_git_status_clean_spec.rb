@@ -53,6 +53,7 @@ describe Fastlane do
             end").runner.execute(:test)
           end
         end
+
         context "with show_diff flag" do
           context "true" do
             it "outputs reach error message" do
@@ -70,15 +71,6 @@ describe Fastlane do
                 ensure_git_status_clean(show_diff: false)
               end").runner.execute(:test)
             end
-          end
-        end
-
-        context "without show_uncommitted_changes flag" do
-          it "outputs short error message" do
-            expect(FastlaneCore::UI).to receive(:user_error!).with("Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.")
-            Fastlane::FastFile.new.parse("lane :test do
-              ensure_git_status_clean
-            end").runner.execute(:test)
           end
         end
       end
