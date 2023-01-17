@@ -188,7 +188,7 @@ module Spaceship
 
       def create_app_store_review_screenshot(client: nil, file_name:, file_size:)
         client ||= Spaceship::ConnectAPI
-        resps = client.create_app_store_review_screenshot(purchase_id: id, file_name: file_name, file_size: file_size)
+        resps = client.create_subscription_app_store_review_screenshot(purchase_id: id, file_name: file_name, file_size: file_size)
         resps.to_models.first
       end
 
