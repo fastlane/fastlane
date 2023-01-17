@@ -8,8 +8,8 @@ module Fastlane
     class EnsureGitStatusCleanAction < Action
       def self.run(params)
         if params[:ignored]
-          ignored_file = params[:ignored]
-          repo_status = Actions.sh("git status --porcelain --ignored #{ignored_file}")
+          ignored_mode = params[:ignored]
+          repo_status = Actions.sh("git status --porcelain --ignored #{ignored_mode}")
         else
           repo_status = Actions.sh("git status --porcelain")
         end
