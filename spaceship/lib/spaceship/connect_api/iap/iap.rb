@@ -17,6 +17,11 @@ module Spaceship
         # inAppPurchases
         #
 
+        def get_in_app_purchase(purchase_id:, includes: nil)
+          params = iap_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v2/inAppPurchases/#{purchase_id}", params)
+        end
+
         def get_in_app_purchases(app_id:, filter: nil, includes: nil, limit: nil, sort: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
           iap_request_client.get("apps/#{app_id}/inAppPurchasesV2", params)

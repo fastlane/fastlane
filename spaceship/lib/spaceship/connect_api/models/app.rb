@@ -481,6 +481,12 @@ module Spaceship
       # In-App Purchases
       #
 
+      def get_in_app_purchase(client: nil, purchase_id:, includes: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_in_app_purchase(purchase_id: purchase_id, includes: includes)
+        return resps.to_models.first
+      end
+
       def get_in_app_purchases(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_in_app_purchases(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
