@@ -249,6 +249,10 @@ module Spaceship
           iap_request_client.delete("inAppPurchaseAppStoreReviewScreenshots/#{screenshot_id}")
         end
 
+        def delete_in_app_purchase(purchase_id:)
+          iap_request_client.delete("https://api.appstoreconnect.apple.com/v2/inAppPurchases/#{purchase_id}")
+        end
+
         #
         # subscriptions
         #
@@ -324,6 +328,10 @@ module Spaceship
           iap_request_client.patch("subscriptions/#{purchase_id}", params)
         end
 
+        def delete_subscription(purchase_id:)
+          iap_request_client.delete("subscriptions/#{purchase_id}")
+        end
+
         #
         # subscriptionGroups
         #
@@ -357,6 +365,10 @@ module Spaceship
           }
 
           iap_request_client.post('subscriptionGroups', params)
+        end
+
+        def delete_subscription_group(family_id:)
+          iap_request_client.delete("subscriptionGroups/#{family_id}")
         end
 
         #
