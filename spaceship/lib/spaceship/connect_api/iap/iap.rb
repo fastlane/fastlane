@@ -104,6 +104,27 @@ module Spaceship
         end
 
         #
+        # inAppPurchasePricePoints
+        #
+
+        def get_in_app_purchase_price_points(purchase_id:, filter: nil, includes: nil, limit: nil)
+          params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v2/inAppPurchases/#{purchase_id}/pricePoints", params)
+        end
+
+        def get_in_app_purchase_price_schedules(purchase_id:, includes: nil, limit: nil, fields: nil)
+          params = iap_request_client.build_params(includes: includes, limit: limit)
+          params[:fields] = fields unless fields.nil?
+          iap_request_client.get("inAppPurchasePriceSchedules/#{purchase_id}", params)
+        end
+
+        def get_in_app_purchase_prices(purchase_id:, filter: nil, includes: nil, limit: nil, fields: nil)
+          params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit)
+          params[:fields] = fields unless fields.nil?
+          iap_request_client.get("inAppPurchasePriceSchedules/#{purchase_id}/manualPrices", params)
+        end
+
+        #
         # subscriptions
         #
 

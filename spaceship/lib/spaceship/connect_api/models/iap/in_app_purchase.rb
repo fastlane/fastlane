@@ -15,7 +15,8 @@ module Spaceship
                     :state
 
       # Relations
-      attr_accessor :localizations
+      attr_accessor :prices,
+                    :localizations
 
       module Type
         CONSUMABLE = "CONSUMABLE"
@@ -80,6 +81,43 @@ module Spaceship
         model = resps.to_models.first
         ((self.localizations ||= []) << model).uniq! { |sub_loc| sub_loc.id }
         model
+      end
+
+      #
+      # In-App Purchase Price Points
+      #
+
+      def get_price_points(client: nil, filter: {}, includes: Spaceship::ConnectAPI::InAppPurchasePricePoint::ESSENTIAL_INCLUDES, limit: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_in_app_purchase_price_points(purchase_id: id, filter: filter, includes: includes, limit: limit).all_pages
+        resps.flat_map(&:to_models)
+      end
+
+      #
+      # In-App Purchase Price Schedules
+      #
+
+      def create_price_schedule(client: nil, in_app_purchase_price_point_id:, start_date: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_in_app_purchase_price_schedule(purchase_id: id, in_app_purchase_price_point_id: in_app_purchase_price_point_id, start_date: start_date)
+        resps.to_models.first
+      end
+
+      def get_price_schedules(client: nil, includes: Spaceship::ConnectAPI::InAppPurchasePriceSchedule::ESSENTIAL_INCLUDES, limit: nil, fields: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_in_app_purchase_price_schedules(purchase_id: id, includes: includes, limit: limit, fields: fields).all_pages
+        resps.flat_map(&:to_models)
+      end
+
+      #
+      # In-App Purchase Prices
+      #
+
+      def get_prices(client: nil, filter: nil, includes: Spaceship::ConnectAPI::InAppPurchasePrice::ESSENTIAL_INCLUDES, limit: nil, fields: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_in_app_purchase_prices(purchase_id: id, filter: filter, includes: includes, limit: limit, fields: fields).all_pages
+        ((self.prices ||= []) << model).uniq! { |price| price.id }
+        resps.flat_map(&:to_models)
       end
 
     end
