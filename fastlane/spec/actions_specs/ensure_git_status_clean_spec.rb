@@ -87,11 +87,11 @@ describe Fastlane do
             end
           end
 
-          context "no" do
+          context "none" do
             it "outputs error message without ignored files" do
               expect(FastlaneCore::UI).to receive(:user_error!).with("Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.\nUncommitted changes:\nM fastlane/lib/fastlane/actions/ensure_git_status_clean.rb")
               Fastlane::FastFile.new.parse("lane :test do
-                ensure_git_status_clean(show_uncommitted_changes: true, ignored: 'no')
+                ensure_git_status_clean(show_uncommitted_changes: true, ignored: 'none')
               end").runner.execute(:test)
             end
           end
