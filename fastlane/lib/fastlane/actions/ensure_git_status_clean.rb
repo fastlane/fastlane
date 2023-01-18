@@ -76,7 +76,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ignored,
                                        env_name: "FL_ENSURE_GIT_STATUS_CLEAN_IGNORED_FILE",
                                        description: "The ignored files handling mode if the repo is dirty. The available options are: 'traditional', 'none' (default) and 'matching'",
-                                       optional: true)
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         mode = value.to_s
+                                         modes = %w(traditional none matching)
+
+                                         UI.user_error!("Unsupported mode, must be: #{modes}") unless modes.include?(mode)
+                                       end)
         ]
       end
 
