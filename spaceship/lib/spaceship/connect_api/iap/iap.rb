@@ -78,6 +78,24 @@ module Spaceship
           iap_request_client.patch("https://api.appstoreconnect.apple.com/v2/inAppPurchases/#{purchase_id}", params)
         end
 
+        def submit_in_app_purchase(purchase_id:)
+          params = {
+            data: {
+              type: 'inAppPurchaseSubmissions', # Hard coded value
+              relationships: {
+                inAppPurchaseV2: {
+                  data: {
+                    id: purchase_id,
+                    type: 'inAppPurchases'
+                  }
+                }
+              }
+            }
+          }
+
+          iap_request_client.post("inAppPurchaseSubmissions", params)
+        end
+
         #
         # inAppPurchaseLocalizations
         #
@@ -326,6 +344,24 @@ module Spaceship
           }
 
           iap_request_client.patch("subscriptions/#{purchase_id}", params)
+        end
+
+        def submit_subscription(purchase_id:)
+          params = {
+            data: {
+              type: 'subscriptionSubmissions', # Hard coded value
+              relationships: {
+                subscription: {
+                  data: {
+                    id: purchase_id,
+                    type: 'subscriptions'
+                  }
+                }
+              }
+            }
+          }
+
+          iap_request_client.post("subscriptionSubmissions", params)
         end
 
         def delete_subscription(purchase_id:)

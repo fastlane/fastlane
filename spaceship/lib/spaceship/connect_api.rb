@@ -75,6 +75,7 @@ require 'spaceship/connect_api/models/review_rejection'
 require 'spaceship/connect_api/models/actor'
 
 require 'spaceship/connect_api/models/iap/in_app_purchase'
+require 'spaceship/connect_api/models/iap/in_app_purchase_submission'
 require 'spaceship/connect_api/models/iap/in_app_purchase_localization'
 require 'spaceship/connect_api/models/iap/in_app_purchase_price_point'
 require 'spaceship/connect_api/models/iap/in_app_purchase_price'
@@ -88,6 +89,7 @@ require 'spaceship/connect_api/models/iap/subscription_price_point'
 require 'spaceship/connect_api/models/iap/subscription_price'
 require 'spaceship/connect_api/models/iap/subscription_localization'
 require 'spaceship/connect_api/models/iap/subscription'
+require 'spaceship/connect_api/models/iap/subscription_submission'
 
 module Spaceship
   class ConnectAPI

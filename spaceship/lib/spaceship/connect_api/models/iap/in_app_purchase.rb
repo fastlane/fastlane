@@ -68,6 +68,16 @@ module Spaceship
       end
 
       #
+      # Submit
+      #
+
+      def submit(client: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.submit_in_app_purchase(purchase_id: id)
+        resp.to_models.first
+      end
+
+      #
       # Delete
       #
 
