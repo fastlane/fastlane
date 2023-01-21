@@ -75,7 +75,7 @@ module Fastlane
                                        type: Boolean),
           FastlaneCore::ConfigItem.new(key: :ignored,
                                        env_name: "FL_ENSURE_GIT_STATUS_CLEAN_IGNORED_FILE",
-                                       description: "The ignored files handling mode if the repo is dirty. The available options are: 'traditional', 'none' (default) and 'matching'",
+                                       description: "The handling mode of the ignored files. The available options are: `'traditional'`, `'none'` (default) and `'matching'`. Specifying `'none'` to this parameter is the same as not specifying the parameter at all, which means that no ignored file will be used to check if the repo is dirty or not. Specifying `'traditional'` or `'matching'` causes some ignored files to be used to check if the repo is dirty or not (more info in the official docs: https://git-scm.com/docs/git-status#Documentation/git-status.txt---ignoredltmodegt)",
                                        optional: true,
                                        verify_block: proc do |value|
                                          mode = value.to_s
