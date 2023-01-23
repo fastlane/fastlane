@@ -243,6 +243,7 @@ module Gym
                                      env_name: "GYM_BUILD_TIMING_SUMMARY",
                                      description: "Create a build timing summary",
                                      type: Boolean,
+                                     default_value: false,
                                      optional: true),
 
         # xcpretty
