@@ -44,6 +44,7 @@ describe Match do
         s3_secret_access_key: "",
         s3_bucket: "",
         s3_object_prefix: "",
+        s3_skip_encryption: false,
         gitlab_project: nil,
         team_id: nil
       ).and_return(fake_storage)

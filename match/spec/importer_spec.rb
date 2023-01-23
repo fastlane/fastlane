@@ -145,6 +145,7 @@ describe Match do
         s3_access_key: nil,
         s3_secret_access_key: nil,
         s3_object_prefix: nil,
+        s3_skip_encryption: false,
         gitlab_project: nil,
         readonly: false,
         username: config[:username],

@@ -222,6 +222,11 @@ module Match
                                      env_name: "MATCH_S3_OBJECT_PREFIX",
                                      description: "Prefix to be used on all objects uploaded to S3",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :s3_skip_encryption,
+                                     env_name: "MATCH_S3_SKIP_ENCRYPTION",
+                                     description: "Skip encryption of all objects uploaded to S3",
+                                     type: Boolean,
+                                     default_value: false),
 
         # Storage: GitLab Secure Files
         FastlaneCore::ConfigItem.new(key: :gitlab_project,
