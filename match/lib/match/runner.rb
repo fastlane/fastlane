@@ -282,12 +282,14 @@ module Match
       end
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
+      name = parsed["Name"]
 
       if params[:output_path]
         FileUtils.cp(profile, params[:output_path])
       end
 
       if spaceship && !spaceship.profile_exists(type: prov_type,
+                                                name: name,
                                                 username: params[:username],
                                                 uuid: uuid,
                                                 platform: params[:platform])
@@ -352,8 +354,10 @@ module Match
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
+      name = parsed["Name"]
 
-      all_profiles = Spaceship::ConnectAPI::Profile.all(includes: "devices")
+      # Filtering by name allows us to filter out profiles way faster than querying all profiles
+      all_profiles = Spaceship::ConnectAPI::Profile.all(filter: { name: name }, includes: "devices")
       portal_profile = all_profiles.detect { |i| i.uuid == uuid }
 
       if portal_profile
@@ -427,8 +431,10 @@ module Match
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
       uuid = parsed["UUID"]
+      name = parsed["Name"]
 
-      all_profiles = Spaceship::ConnectAPI::Profile.all(includes: "certificates")
+      # Filtering by name allows us to filter out profiles way faster than querying all profiles
+      all_profiles = Spaceship::ConnectAPI::Profile.all(filter: { name: name }, includes: "certificates")
       portal_profile = all_profiles.detect { |i| i.uuid == uuid }
 
       return false unless portal_profile

@@ -99,9 +99,11 @@ module Sigh
     def fetch_profiles
       UI.message("Fetching profiles...")
 
-      # Filtering on 'profileType' seems to be undocumented as of 2020-07-30
-      # but works on both web session and official API
-      results = Spaceship::ConnectAPI::Profile.all(filter: { profileType: profile_type }, includes: "bundleId,certificates").select do |profile|
+      filter = { profileType: profile_type }
+      # We can greatly speed up the search by filtering on the provisioning profile name
+      filter[:name] = Sigh.config[:provisioning_name] if Sigh.config[:provisioning_name].to_s.length > 0
+
+      results = Spaceship::ConnectAPI::Profile.all(filter: filter, includes: "bundleId,certificates").select do |profile|
         profile.bundle_id.identifier == Sigh.config[:app_identifier]
       end
 
@@ -166,7 +168,9 @@ module Sigh
       name = Sigh.config[:provisioning_name] || [app_identifier, profile_type_pretty_type].join(' ')
 
       unless Sigh.config[:skip_fetch_profiles]
-        profile = Spaceship::ConnectAPI::Profile.all.find { |p| p.name == name }
+        # We can greatly speed up the search by filtering on the provisioning profile name
+        # It seems that there's no way to search for exact match using the API, so we'll need to run additional checks afterwards
+        profile = Spaceship::ConnectAPI::Profile.all(filter: { name: name }).find { |p| p.name == name }
         if profile
           UI.user_error!("The name '#{name}' is already taken, and fail_on_name_taken is true") if Sigh.config[:fail_on_name_taken]
           UI.error("The name '#{name}' is already taken, using another one.")

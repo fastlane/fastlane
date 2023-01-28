@@ -74,11 +74,13 @@ module Match
       UI.user_error!("To reset the certificates of your Apple account, you can use the `fastlane match nuke` feature, more information on https://docs.fastlane.tools/actions/match/")
     end
 
-    def profile_exists(type: nil, username: nil, uuid: nil, platform: nil)
+    def profile_exists(type: nil, name: nil, username: nil, uuid: nil, platform: nil)
       # App Store Connect API does not allow filter of profile by platform or uuid (as of 2020-07-30)
       # Need to fetch all profiles and search for uuid on client side
       # But we can filter provisioning profiles based on their type (this, in general way faster than getting all profiles)
-      filter = { profileType: Match.profile_types(type).join(",") } if type
+      filter = {}
+      filter[:profileType] = Match.profile_types(type).join(",") if type
+      filter[:name] = name if name
       found = Spaceship::ConnectAPI::Profile.all(filter: filter).find do |profile|
         profile.uuid == uuid
       end
