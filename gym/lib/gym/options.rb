@@ -239,6 +239,13 @@ module Gym
                                      default_value: Fastlane::Helper::XcodebuildFormatterHelper.xcbeautify_installed? ? 'xcbeautify' : 'xcpretty',
                                      default_value_dynamic: true),
 
+        FastlaneCore::ConfigItem.new(key: :build_timing_summary,
+                                     env_name: "GYM_BUILD_TIMING_SUMMARY",
+                                     description: "Create a build timing summary",
+                                     type: Boolean,
+                                     default_value: false,
+                                     optional: true),
+
         # xcpretty
         FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
                                      env_name: "DISABLE_XCPRETTY",
