@@ -364,9 +364,9 @@ module Spaceship
         # appPreviewSets
         #
 
-        def get_app_preview_sets(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_app_preview_sets(app_store_version_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appPreviewSets", params)
+          tunes_request_client.get("appStoreVersionLocalizations/#{app_store_version_localization_id}/appPreviewSets", params)
         end
 
         def get_app_preview_set(app_preview_set_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
