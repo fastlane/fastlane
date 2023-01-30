@@ -37,6 +37,7 @@ module Match
         s3_access_key: params[:s3_access_key],
         s3_secret_access_key: params[:s3_secret_access_key],
         s3_object_prefix: params[:s3_object_prefix],
+        s3_skip_encryption: params[:s3_skip_encryption],
         gitlab_project: params[:gitlab_project],
         readonly: params[:readonly],
         username: params[:username],

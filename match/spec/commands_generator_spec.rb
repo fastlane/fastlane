@@ -89,6 +89,8 @@ describe Match::CommandsGenerator do
 
       expect(Match::Encryption).to receive(:for_storage_mode).with("git", {
         git_url: git_url,
+        s3_bucket: nil,
+        s3_skip_encryption: false,
         working_directory: fake_working_directory
       }).and_return(fake_encryption)
 
