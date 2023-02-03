@@ -17,7 +17,7 @@ module Fastlane
         require 'faraday'
         require 'faraday_middleware'
 
-        connection = Faraday.new(url: DEPLOYGATE_URL_BASE, request: { timeout: 120 }) do |builder|
+        connection = Faraday.new(url: DEPLOYGATE_URL_BASE, request: { timeout: options[:upload_timeout] }) do |builder|
           builder.request(:multipart)
           builder.request(:json)
           builder.response(:json, content_type: /\bjson$/)
@@ -164,7 +164,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :distribution_name,
                                        optional: true,
                                        env_name: "DEPLOYGATE_DISTRIBUTION_NAME",
-                                       description: "Target Distribution Name")
+                                       description: "Target Distribution Name"),
+          FastlaneCore::ConfigItem.new(key: :upload_timeout,
+                                       optional: true,
+                                       env_name: "DEPLOYGATE_UPLOAD_TIMEOUT",
+                                       type: Integer,
+                                       default_value: 120,
+                                       description: "Timeout seconds at DeployGate upload")
         ]
       end
 
