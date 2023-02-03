@@ -6,6 +6,7 @@ PATH
       addressable (>= 2.8, < 3.0.0)
       artifactory (~> 3.0)
       aws-sdk-s3 (~> 1.0)
+      aws-sdk-secretsmanager (~> 1.0)
       babosa (>= 1.0.3, < 2.0.0)
       bundler (>= 1.12.0, < 3.0.0)
       colored
@@ -64,7 +65,10 @@ GEM
       aws-sdk-core (~> 3, >= 3.165.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.4)
-    aws-sigv4 (1.5.2)
+    aws-sdk-secretsmanager (1.65.0)
+      aws-sdk-core (~> 3, >= 3.127.0)
+      aws-sigv4 (~> 1.1)
+    aws-sigv4 (1.5.1)
       aws-eventstream (~> 1, >= 1.0.2)
     babosa (1.0.4)
     binding_of_caller (0.8.0)
@@ -391,4 +395,4 @@ DEPENDENCIES
   yard (~> 0.9.11)
 
 BUNDLED WITH
-   2.3.14
+   2.3.11
