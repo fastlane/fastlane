@@ -4933,6 +4933,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
    - development: Renew the development certificate instead of the production one
    - skipInstall: By default, the certificate will be added to your local machine. Setting this flag will skip this action
    - force: Renew provisioning profiles regardless of its state - to automatically add all devices for ad hoc profiles
+   - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - appIdentifier: The bundle identifier of your app
    - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
@@ -4962,6 +4963,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
                                                       development: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                       skipInstall: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                       force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                                      includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                       appIdentifier: String,
                                                       apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                       apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -4987,6 +4989,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
     let developmentArg = development.asRubyArgument(name: "development", type: nil)
     let skipInstallArg = skipInstall.asRubyArgument(name: "skip_install", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
+    let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let appIdentifierArg = RubyCommand.Argument(name: "app_identifier", value: appIdentifier, type: nil)
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -5011,6 +5014,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
                                           developmentArg,
                                           skipInstallArg,
                                           forceArg,
+                                          includeMacInProfilesArg,
                                           appIdentifierArg,
                                           apiKeyPathArg,
                                           apiKeyArg,
@@ -6660,6 +6664,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
+   - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
    - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
@@ -6712,6 +6717,7 @@ public func match(type: String = matchfile.type,
                   keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.keychainPassword),
                   force: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.force),
                   forceForNewDevices: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceForNewDevices),
+                  includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.includeMacInProfiles),
                   includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.includeAllCertificates),
                   forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceForNewCertificates),
                   skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipConfirmation),
@@ -6762,6 +6768,7 @@ public func match(type: String = matchfile.type,
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let forceForNewDevicesArg = forceForNewDevices.asRubyArgument(name: "force_for_new_devices", type: nil)
+    let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
@@ -6811,6 +6818,7 @@ public func match(type: String = matchfile.type,
                                           keychainPasswordArg,
                                           forceArg,
                                           forceForNewDevicesArg,
+                                          includeMacInProfilesArg,
                                           includeAllCertificatesArg,
                                           forceForNewCertificatesArg,
                                           skipConfirmationArg,
@@ -6871,6 +6879,7 @@ public func match(type: String = matchfile.type,
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
+   - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
    - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
@@ -6927,6 +6936,7 @@ public func matchNuke(type: String = "development",
                       keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       forceForNewDevices: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                      includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -6977,6 +6987,7 @@ public func matchNuke(type: String = "development",
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let forceForNewDevicesArg = forceForNewDevices.asRubyArgument(name: "force_for_new_devices", type: nil)
+    let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
@@ -7026,6 +7037,7 @@ public func matchNuke(type: String = "development",
                                           keychainPasswordArg,
                                           forceArg,
                                           forceForNewDevicesArg,
+                                          includeMacInProfilesArg,
                                           includeAllCertificatesArg,
                                           forceForNewCertificatesArg,
                                           skipConfirmationArg,
@@ -8685,7 +8697,7 @@ public func rubyVersion() {
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
- - returns: Outputs has of results with :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
+ - returns: Outputs hash of results with the following keys: :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
 
  More information: https://docs.fastlane.tools/actions/scan/
  */
@@ -9108,7 +9120,7 @@ public func say(text: [String],
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
 
- - returns: Outputs has of results with :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
+ - returns: Outputs hash of results with the following keys: :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
 
  More information: https://docs.fastlane.tools/actions/scan/
  */
@@ -9876,6 +9888,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
    - development: Renew the development certificate instead of the production one
    - skipInstall: By default, the certificate will be added to your local machine. Setting this flag will skip this action
    - force: Renew provisioning profiles regardless of its state - to automatically add all devices for ad hoc profiles
+   - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - appIdentifier: The bundle identifier of your app
    - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
@@ -9905,6 +9918,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
                                     development: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                     skipInstall: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                     force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                    includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                     appIdentifier: String,
                                     apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                     apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -9930,6 +9944,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
     let developmentArg = development.asRubyArgument(name: "development", type: nil)
     let skipInstallArg = skipInstall.asRubyArgument(name: "skip_install", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
+    let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let appIdentifierArg = RubyCommand.Argument(name: "app_identifier", value: appIdentifier, type: nil)
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -9954,6 +9969,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
                                           developmentArg,
                                           skipInstallArg,
                                           forceArg,
+                                          includeMacInProfilesArg,
                                           appIdentifierArg,
                                           apiKeyPathArg,
                                           apiKeyArg,
@@ -11081,6 +11097,7 @@ public func swiftlint(mode: String = "lint",
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
+   - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
    - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
@@ -11133,6 +11150,7 @@ public func syncCodeSigning(type: String = "development",
                             keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             forceForNewDevices: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                            includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11183,6 +11201,7 @@ public func syncCodeSigning(type: String = "development",
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let forceForNewDevicesArg = forceForNewDevices.asRubyArgument(name: "force_for_new_devices", type: nil)
+    let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
@@ -11232,6 +11251,7 @@ public func syncCodeSigning(type: String = "development",
                                           keychainPasswordArg,
                                           forceArg,
                                           forceForNewDevicesArg,
+                                          includeMacInProfilesArg,
                                           includeAllCertificatesArg,
                                           forceForNewCertificatesArg,
                                           skipConfirmationArg,
@@ -11732,6 +11752,7 @@ public func updateAppIdentifier(xcodeproj: String,
  - parameters:
    - path: Path to your Xcode project
    - useAutomaticSigning: Defines if project should use automatic signing
+   - sdk: Build target SDKs (iphoneos*, macosx*, iphonesimulator*)
    - teamId: Team ID, is used when upgrading project
    - targets: Specify targets you want to toggle the signing mech. (default to all targets)
    - buildConfigurations: Specify build_configurations you want to toggle the signing mech. (default to all configurations)
@@ -11747,6 +11768,7 @@ public func updateAppIdentifier(xcodeproj: String,
  */
 public func updateCodeSigningSettings(path: String,
                                       useAutomaticSigning: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                      sdk: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                       teamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                       targets: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                                       buildConfigurations: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -11758,6 +11780,7 @@ public func updateCodeSigningSettings(path: String,
 {
     let pathArg = RubyCommand.Argument(name: "path", value: path, type: nil)
     let useAutomaticSigningArg = useAutomaticSigning.asRubyArgument(name: "use_automatic_signing", type: nil)
+    let sdkArg = sdk.asRubyArgument(name: "sdk", type: nil)
     let teamIdArg = teamId.asRubyArgument(name: "team_id", type: nil)
     let targetsArg = targets.asRubyArgument(name: "targets", type: nil)
     let buildConfigurationsArg = buildConfigurations.asRubyArgument(name: "build_configurations", type: nil)
@@ -11768,6 +11791,7 @@ public func updateCodeSigningSettings(path: String,
     let bundleIdentifierArg = bundleIdentifier.asRubyArgument(name: "bundle_identifier", type: nil)
     let array: [RubyCommand.Argument?] = [pathArg,
                                           useAutomaticSigningArg,
+                                          sdkArg,
                                           teamIdArg,
                                           targetsArg,
                                           buildConfigurationsArg,
@@ -13151,7 +13175,7 @@ public func xcexport() {
  Change the xcode-path to use. Useful for beta versions of Xcode
 
  Select and build with the Xcode installed at the provided path.
- Use the `xcversion` action if you want to select an Xcode:
+ Use the `xcodes` action if you want to select an Xcode:
  - Based on a version specifier or
  - You don't have known, stable paths, as may happen in a CI environment.
  */
@@ -13219,6 +13243,45 @@ public func xcodebuild() {
     let args: [RubyCommand.Argument] = []
     let command = RubyCommand(commandID: "", methodName: "xcodebuild", className: nil, args: args)
     _ = runner.executeCommand(command)
+}
+
+/**
+ Make sure a certain version of Xcode is installed, installing it only if needed
+
+ - parameters:
+   - version: The version number of the version of Xcode to install. Defaults to the value specified in the .xcode-version file
+   - updateList: Whether the list of available Xcode versions should be updated before running the install command
+   - selectForCurrentBuildOnly: When true, it won't attempt to install an Xcode version, just find the installed Xcode version that best matches the passed version argument, and select it for the current build steps. It doesn't change the global Xcode version (e.g. via 'xcrun xcode-select'), which would require sudo permissions — when this option is true, this action doesn't require sudo permissions
+   - binaryPath: Where the xcodes binary lives on your system (full path)
+   - xcodesArgs: Pass in xcodes command line arguments directly. When present, other parameters are ignored and only this parameter is used to build the command to be executed
+
+ - returns: The path to the newly installed Xcode version
+
+ Makes sure a specific version of Xcode is installed. If that's not the case, it will automatically be downloaded by [xcodes](https://github.com/RobotsAndPencils/xcodes).
+ This will make sure to use the correct Xcode version for later actions.
+ Note that this action depends on [xcodes](https://github.com/RobotsAndPencils/xcodes) CLI, so make sure you have it installed in your environment. For the installation guide, see: https://github.com/RobotsAndPencils/xcodes#installation
+ */
+@discardableResult public func xcodes(version: String,
+                                      updateList: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                                      selectForCurrentBuildOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                      binaryPath: String = "/opt/homebrew/bin/xcodes",
+                                      xcodesArgs: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> String
+{
+    let versionArg = RubyCommand.Argument(name: "version", value: version, type: nil)
+    let updateListArg = updateList.asRubyArgument(name: "update_list", type: nil)
+    let selectForCurrentBuildOnlyArg = selectForCurrentBuildOnly.asRubyArgument(name: "select_for_current_build_only", type: nil)
+    let binaryPathArg = RubyCommand.Argument(name: "binary_path", value: binaryPath, type: nil)
+    let xcodesArgsArg = xcodesArgs.asRubyArgument(name: "xcodes_args", type: nil)
+    let array: [RubyCommand.Argument?] = [versionArg,
+                                          updateListArg,
+                                          selectForCurrentBuildOnlyArg,
+                                          binaryPathArg,
+                                          xcodesArgsArg]
+    let args: [RubyCommand.Argument] = array
+        .filter { $0?.value != nil }
+        .compactMap { $0 }
+    let command = RubyCommand(commandID: "", methodName: "xcodes", className: nil, args: args)
+    return runner.executeCommand(command)
 }
 
 /**
@@ -13374,7 +13437,7 @@ public func xctool() {
 /**
  Select an Xcode to use by version specifier
 
- - parameter version: The version of Xcode to select specified as a Gem::Version requirement string (e.g. '~> 7.1.0')
+ - parameter version: The version of Xcode to select specified as a Gem::Version requirement string (e.g. '~> 7.1.0'). Defaults to the value specified in the .xcode-version file
 
  Finds and selects a version of an installed Xcode that best matches the provided [`Gem::Version` requirement specifier](http://www.rubydoc.info/github/rubygems/rubygems/Gem/Version)
  You can either manually provide a specific version using `version:` or you make use of the `.xcode-version` file.
@@ -13486,4 +13549,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.162]
+// FastlaneRunnerAPIVersion [0.9.165]

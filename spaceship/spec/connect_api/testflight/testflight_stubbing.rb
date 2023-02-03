@@ -89,6 +89,11 @@ class ConnectAPIStubbing
           to_return(status: 200, body: read_fixture_file('build_beta_details.json'), headers: { 'Content-Type' => 'application/json' })
       end
 
+      def stub_build_bundles
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/buildBundles/48a9bb1f-5f0f-4133-8c72-3fb93e92603a/buildBundleFileSizes").
+          to_return(status: 200, body: read_fixture_file('build_bundles_build_bundle_file_sizes.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
       def stub_build_deliveries
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/1234/buildDeliveries").
           to_return(status: 200, body: read_fixture_file('build_deliveries.json'), headers: { 'Content-Type' => 'application/json' })

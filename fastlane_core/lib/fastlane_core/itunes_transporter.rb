@@ -28,9 +28,28 @@ module FastlaneCore
     OUTPUT_REGEX = />\s+(.+)/
     RETURN_VALUE_REGEX = />\sDBG-X:\sReturning\s+(\d+)/
 
+    # Matches a line in the iTMSTransporter provider table: "12  Initech Systems Inc     LG89CQY559"
+    ITMS_PROVIDER_REGEX = /^\d+\s{2,}.+\s{2,}[^\s]+$/
+
     SKIP_ERRORS = ["ERROR: An exception has occurred: Scheduling automatic restart in 1 minute"]
 
     private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX, :RETURN_VALUE_REGEX, :SKIP_ERRORS
+
+    def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "", jwt = nil)
+      not_implemented(__method__)
+    end
+
+    def build_provider_ids_command(username, password, jwt = nil, api_key = nil)
+      not_implemented(__method__)
+    end
+
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+      not_implemented(__method__)
+    end
+
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+      not_implemented(__method__)
+    end
 
     def execute(command, hide_output)
       if Helper.test?
@@ -100,7 +119,17 @@ module FastlaneCore
       @errors.map { |error| "[Transporter Error Output]: #{error}" }.join("\n").gsub!(/"/, "")
     end
 
+    def parse_provider_info(lines)
+      lines.map { |line| itms_provider_pair(line) }.compact.to_h
+    end
+
     private
+
+    def itms_provider_pair(line)
+      line = line.strip
+      return nil unless line =~ ITMS_PROVIDER_REGEX
+      line.split(/\s{2,}/).drop(1)
+    end
 
     def parse_line(line, hide_output)
       # Taken from https://github.com/sshaw/itunes_store_transporter/blob/master/lib/itunes/store/transporter/output_parser.rb
@@ -180,9 +209,166 @@ module FastlaneCore
     end
   end
 
+  # Generates commands and executes the altool.
+  class AltoolTransporterExecutor < TransporterExecutor
+    ERROR_REGEX = /\*\*\* Error:\s+(.+)/
+
+    private_constant :ERROR_REGEX
+
+    def execute(command, hide_output)
+      if Helper.test?
+        yield(nil) if block_given?
+        return command
+      end
+
+      @errors = []
+      @all_lines = []
+
+      if hide_output
+        # Show a one time message instead
+        UI.success("Waiting for App Store Connect transporter to be finished.")
+        UI.success("Application Loader progress... this might take a few minutes...")
+      end
+
+      begin
+        exit_status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
+          command_stdout.each do |line|
+            @all_lines << line
+            parse_line(line, hide_output) # this is where the parsing happens
+          end
+        end
+      rescue => ex
+        # FastlanePty adds exit_status on to StandardError so every error will have a status code
+        exit_status = ex.exit_status
+        @errors << ex.to_s
+      end
+
+      @errors << "The call to the altool completed with a non-zero exit status: #{exit_status}. This indicates a failure." unless exit_status.zero?
+
+      unless @errors.empty? || @all_lines.empty?
+        # Print the last lines that appear after the last error from the logs
+        # If error text is not detected, it will be 20 lines
+        # This is key for non-verbose mode
+
+        # The format of altool's result with error is like below
+        # > *** Error: Error uploading '...'.
+        # > *** Error: ...
+        # > {
+        # >     NSLocalizedDescription = "...",
+        # >     ...
+        # > }
+        # So this line tries to find the line which has "*** Error:" prefix from bottom of log
+        error_line_index = @all_lines.rindex { |line| ERROR_REGEX.match?(line) }
+
+        @all_lines[(error_line_index || -20)..-1].each do |line|
+          UI.important("[altool] #{line}")
+        end
+        UI.message("Application Loader output above ^")
+        @errors.each { |error| UI.error(error) }
+      end
+
+      yield(@all_lines) if block_given?
+      exit_status.zero?
+    end
+
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+      use_api_key = !api_key.nil?
+      [
+        ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
+        "xcrun altool",
+        "--upload-app",
+        ("-u #{username.shellescape}" unless use_api_key),
+        ("-p #{password.shellescape}" unless use_api_key),
+        ("--apiKey #{api_key[:key_id]}" if use_api_key),
+        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
+        platform_option(platform),
+        file_upload_option(source),
+        additional_upload_parameters,
+        "-k 100000"
+      ].compact.join(' ')
+    end
+
+    def build_provider_ids_command(username, password, jwt = nil, api_key = nil)
+      use_api_key = !api_key.nil?
+      [
+        ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
+        "xcrun altool",
+        "--list-providers",
+        ("-u #{username.shellescape}" unless use_api_key),
+        ("-p #{password.shellescape}" unless use_api_key),
+        ("--apiKey #{api_key[:key_id]}" if use_api_key),
+        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        "--output-format json"
+      ].compact.join(' ')
+    end
+
+    def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "", jwt = nil)
+      raise "This feature has not been implemented yet with altool for Xcode 14"
+    end
+
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+      raise "This feature has not been implemented yet with altool for Xcode 14"
+    end
+
+    def additional_upload_parameters
+      env_deliver_additional_params = ENV["DELIVER_ALTOOL_ADDITIONAL_UPLOAD_PARAMETERS"]
+      return nil if env_deliver_additional_params.to_s.strip.empty?
+
+      env_deliver_additional_params.to_s.strip
+    end
+
+    def handle_error(password)
+      UI.error("Could not download/upload from App Store Connect!")
+    end
+
+    def displayable_errors
+      @errors.map { |error| "[Application Loader Error Output]: #{error}" }.join("\n")
+    end
+
+    def parse_provider_info(lines)
+      # This tries parsing the provider id from altool output to detect provider list
+      provider_info = {}
+      json_body = lines[-2] # altool outputs result in second line from last
+      return provider_info if json_body.nil?
+      providers = JSON.parse(json_body)["providers"]
+      return provider_info if providers.nil?
+      providers.each do |provider|
+        provider_info[provider["ProviderName"]] = provider["ProviderShortname"]
+      end
+      provider_info
+    end
+
+    private
+
+    def file_upload_option(source)
+      "-f #{source.shellescape}"
+    end
+
+    def platform_option(platform)
+      "-t #{platform == 'osx' ? 'macos' : platform}"
+    end
+
+    def parse_line(line, hide_output)
+      output_done = false
+
+      if line =~ ERROR_REGEX
+        @errors << $1
+        output_done = true
+      end
+
+      unless hide_output
+        # General logging for debug purposes
+        unless output_done
+          UI.verbose("[altool]: #{line}")
+        end
+      end
+    end
+  end
+
   # Generates commands and executes the iTMSTransporter through the shell script it provides by the same name
   class ShellScriptTransporterExecutor < TransporterExecutor
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
       use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
@@ -212,7 +398,7 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
-    def build_provider_ids_command(username, password, jwt = nil)
+    def build_provider_ids_command(username, password, jwt = nil, api_key = nil)
       use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
@@ -278,7 +464,7 @@ module FastlaneCore
   # Generates commands and executes the iTMSTransporter by invoking its Java app directly, to avoid the crazy parameter
   # escaping problems in its accompanying shell script.
   class JavaTransporterExecutor < TransporterExecutor
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
       use_jwt = !jwt.to_s.empty?
       if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
@@ -392,7 +578,7 @@ module FastlaneCore
       end
     end
 
-    def build_provider_ids_command(username, password, jwt = nil)
+    def build_provider_ids_command(username, password, jwt = nil, api_key = nil)
       use_jwt = !jwt.to_s.empty?
       if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
@@ -451,8 +637,6 @@ module FastlaneCore
   end
 
   class ItunesTransporter
-    # Matches a line in the provider table: "12  Initech Systems Inc     LG89CQY559"
-    PROVIDER_REGEX = /^\d+\s{2,}.+\s{2,}[^\s]+$/
     TWO_STEP_HOST_PREFIX = "deliver.appspecific"
 
     # This will be called from the Deliverfile, and disables the logging of the transporter output
@@ -476,7 +660,7 @@ module FastlaneCore
     #                            see: https://github.com/fastlane/fastlane/issues/1524#issuecomment-196370628
     #                            for more information about how to use the iTMSTransporter to list your provider
     #                            short names
-    def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil)
+    def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil, upload: false, api_key: nil)
       # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
       # we can't default to using the newer direct Java invocation strategy for those versions.
       use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.')
@@ -489,8 +673,16 @@ module FastlaneCore
       end
 
       @jwt = jwt
+      @api_key = api_key
 
-      @transporter_executor = use_shell_script ? ShellScriptTransporterExecutor.new : JavaTransporterExecutor.new
+      if should_use_altool?(upload, use_shell_script)
+        UI.verbose("Using altool as transporter.")
+        @transporter_executor = AltoolTransporterExecutor.new
+      else
+        UI.verbose("Using iTMSTransporter as transporter.")
+        @transporter_executor = use_shell_script ? ShellScriptTransporterExecutor.new : JavaTransporterExecutor.new
+      end
+
       @provider_short_name = provider_short_name
     end
 
@@ -539,7 +731,7 @@ module FastlaneCore
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transferring
-    def upload(app_id = nil, dir = nil, package_path: nil, asset_path: nil)
+    def upload(app_id = nil, dir = nil, package_path: nil, asset_path: nil, platform: nil)
       raise "app_id and dir are required or package_path or asset_path is required" if (app_id.nil? || dir.nil?) && package_path.nil? && asset_path.nil?
 
       # Transport can upload .ipa, .dmg, and .pkg files directly with -assetFile
@@ -569,14 +761,25 @@ module FastlaneCore
       password_placeholder = @jwt.nil? ? 'YourPassword' : nil
       jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
 
-      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt)
-      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder))
+      # Handle AppStore Connect API
+      use_api_key = !@api_key.nil?
+      api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
+
+      api_key = nil
+      api_key = api_key_with_p8_file_path(@api_key) if use_api_key
+
+      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, api_key)
+      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_placeholder))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return upload(app_id, dir, package_path: package_path, asset_path: asset_path)
+      ensure
+        if use_api_key
+          FileUtils.rm_rf(api_key[:key_dir]) unless api_key.nil?
+        end
       end
 
       if result
@@ -638,8 +841,15 @@ module FastlaneCore
       password_placeholder = @jwt.nil? ? 'YourPassword' : nil
       jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
 
-      command = @transporter_executor.build_provider_ids_command(@user, @password, @jwt)
-      UI.verbose(@transporter_executor.build_provider_ids_command(@user, password_placeholder, jwt_placeholder))
+      # Handle AppStore Connect API
+      use_api_key = !@api_key.nil?
+      api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
+
+      api_key = nil
+      api_key = api_key_with_p8_file_path(@api_key) if use_api_key
+
+      command = @transporter_executor.build_provider_ids_command(@user, @password, @jwt, api_key)
+      UI.verbose(@transporter_executor.build_provider_ids_command(@user, password_placeholder, jwt_placeholder, api_key_placeholder))
 
       lines = []
       begin
@@ -648,14 +858,35 @@ module FastlaneCore
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return provider_ids
+      ensure
+        if use_api_key
+          FileUtils.rm_rf(api_key[:key_dir]) unless api_key.nil?
+        end
       end
 
-      lines.map { |line| provider_pair(line) }.compact.to_h
+      @transporter_executor.parse_provider_info(lines)
     end
 
     private
 
     TWO_FACTOR_ENV_VARIABLE = "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"
+
+    # Create .p8 file from api_key and provide api key info which contains .p8 file path
+    def api_key_with_p8_file_path(original_api_key)
+      api_key = original_api_key.dup
+      api_key[:key_dir] = Dir.mktmpdir("deliver-")
+      # Specified p8 needs to be generated to call altool
+      File.open(File.join(api_key[:key_dir], "AuthKey_#{api_key[:key_id]}.p8"), "wb") do |p8|
+        p8.write(api_key[:key])
+      end
+      api_key
+    end
+
+    # Returns whether altool should be used or ItunesTransporter should be used
+    def should_use_altool?(upload, use_shell_script)
+      # Xcode 14 no longer supports iTMSTransporter. Use altool instead
+      !use_shell_script && upload && !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(14)
+    end
 
     # Returns the password to be used with the transporter
     def load_password_for_transporter
@@ -713,12 +944,6 @@ module FastlaneCore
 
     def handle_error(password)
       @transporter_executor.handle_error(password)
-    end
-
-    def provider_pair(line)
-      line = line.strip
-      return nil unless line =~ PROVIDER_REGEX
-      line.split(/\s{2,}/).drop(1)
     end
   end
 end

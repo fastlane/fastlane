@@ -4,6 +4,7 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Match
+  # ignore class length, as this is just a list of options
   # rubocop:disable Metrics/ClassLength
   class Options
     # This is match specific, as users can append storage specific options
@@ -280,6 +281,11 @@ module Match
                                      description: "Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :include_mac_in_profiles,
+                                     env_name: "MATCH_INCLUDE_MAC_IN_PROFILES",
+                                     description: "Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :include_all_certificates,
                                      env_name: "MATCH_INCLUDE_ALL_CERTIFICATES",
                                      description: "Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type",
@@ -343,6 +349,24 @@ module Match
                                      optional: true,
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :cert_path,
+                                     env_name: "MATCH_DEPLOYMENT_CERTIFICATE_PATH",
+                                     sensitive: false,
+                                     description: "The certificate to import. Only works with match import action",
+                                     optional: true,
+                                     default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :p12_path,
+                                     env_name: "MATCH_PRIVATE_KEY_PATH",
+                                     sensitive: false,
+                                     description: "The private key to import.  Only works with match import action",
+                                     optional: true,
+                                     default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :profile_path,
+                                     env_name: "MATCH_PROVISIONING_PROFILE_PATH",
+                                     sensitive: false,
+                                     description: "The provisioning profile to import.  Only works with match import action",
+                                     optional: true,
+                                     default_value: nil),
         FastlaneCore::ConfigItem.new(key: :output_path,
                                      env_name: "MATCH_OUTPUT_PATH",
                                      description: "Path in which to export certificates, key and profile",

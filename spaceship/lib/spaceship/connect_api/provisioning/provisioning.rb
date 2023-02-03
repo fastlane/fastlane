@@ -190,6 +190,25 @@ module Spaceship
           provisioning_request_client.post("devices", body)
         end
 
+        def patch_device(id: nil, status: nil, new_name: nil)
+          raise "Device id is nil" if id.nil?
+
+          attributes = {
+            name: new_name,
+            status: status
+          }
+
+          body = {
+            data: {
+              attributes: attributes,
+              id: id,
+              type: "devices"
+            }
+          }
+
+          provisioning_request_client.patch("devices/#{id}", body)
+        end
+
         #
         # profiles
         #

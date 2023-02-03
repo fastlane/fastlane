@@ -7,6 +7,8 @@ describe Match do
       allow(value).to receive(:success?).and_return(true)
       allow(thread).to receive(:value).and_return(value)
 
+      allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
+
       allow(Security::InternetPassword).to receive(:find).and_return(nil)
 
       allow(FastlaneCore::Helper).to receive(:backticks).with('security -h | grep set-key-partition-list', print: false).and_return('    set-key-partition-list               Set the partition list of a key.')
