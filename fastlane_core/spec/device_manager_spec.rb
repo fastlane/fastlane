@@ -512,6 +512,14 @@ describe FastlaneCore do
 
         device.disable_slide_to_type
       end
+
+      it "boots the simulator" do
+        device = FastlaneCore::DeviceManager::Device.new(os_type: "iOS", os_version: "13.0", is_simulator: true, state: nil)
+
+        device.boot
+
+        expect(device.state).to eq('Booted')
+      end
     end
   end
 end
