@@ -51,7 +51,7 @@ describe Match::Encryption do
         working_directory: working_directory
       })
 
-      expect(encryption).to_not be_nil
+      expect(encryption).to_not(be_nil)
       expect(encryption).to be_kind_of(Match::Encryption::OpenSSL)
       expect(encryption.keychain_name).to be(git_url)
       expect(encryption.working_directory).to be(working_directory)
@@ -69,7 +69,7 @@ describe Match::Encryption do
         working_directory: working_directory
       })
 
-      expect(encryption).to_not be_nil
+      expect(encryption).to_not(be_nil)
       expect(encryption).to be_kind_of(Match::Encryption::OpenSSL)
       expect(encryption.keychain_name).to be(s3_bucket)
       expect(encryption.working_directory).to be(working_directory)
