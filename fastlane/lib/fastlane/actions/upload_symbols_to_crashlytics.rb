@@ -174,6 +174,7 @@ module Fastlane
                                        description: "The path to the upload-symbols file of the Fabric app",
                                        optional: true,
                                        verify_block: proc do |value|
+                                         value = File.expand_path(value)
                                          UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :platform,
