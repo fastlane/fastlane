@@ -1,6 +1,7 @@
 require 'tempfile'
 require 'openssl'
 
+require_relative 'features'
 require_relative 'helper'
 
 # WWDR Intermediate Certificates in https://www.apple.com/certificateauthority/
@@ -155,11 +156,17 @@ module FastlaneCore
       keychain = wwdr_keychain
       keychain = "-k #{keychain.shellescape}" unless keychain.empty?
 
-      require 'open3'
+      # Attempts to fix an issue installing WWDR cert tends to fail on CIs
+      # https://github.com/fastlane/fastlane/issues/20960
+      curl_extras = ""
+      if FastlaneCore::Feature.enabled?('FASTLANE_WWDR_USE_HTTP1_AND_RETRIES')
+        curl_extras = "--http1.1 --retry 3 --retry-all-errors "
+      end
 
-      import_command = "curl -f -o #{filename} #{url} && security import #{filename} #{keychain}"
+      import_command = "curl #{curl_extras}-f -o #{filename} #{url} && security import #{filename} #{keychain}"
       UI.verbose("Installing WWDR Cert: #{import_command}")
 
+      require 'open3'
       stdout, stderr, status = Open3.capture3(import_command)
       if FastlaneCore::Globals.verbose?
         UI.command_output(stdout)
