@@ -141,8 +141,8 @@ module Match
             secret_id: secret.arn
           })
           if retrieved_secret.secret_binary.nil?
-             next
-           end
+            next
+          end
           decoded_secret = Zlib::Inflate.inflate(Base64.decode64(retrieved_secret.secret_binary))
           stripped_secret_name = strip_secrets_manager_object_prefix(secret.name)
           download_path = File.join(self.working_directory, stripped_secret_name)
@@ -245,7 +245,7 @@ module Match
       end
 
       def currently_used_team_id
-        if self.readonly
+        if @readonly
           # In readonly mode, we still want to see if the user provided a team_id
           # see `prefixed_working_directory` comments for more details
           return self.team_id
