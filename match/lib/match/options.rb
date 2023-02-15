@@ -222,6 +222,14 @@ module Match
                                      env_name: "MATCH_S3_OBJECT_PREFIX",
                                      description: "Prefix to be used on all objects uploaded to S3",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :s3_endpoint,
+                                     env_name: "MATCH_S3_ENDPOINT",
+                                     description: "Custom endpoint to be used for S3",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :s3_force_path_style,
+                                     env_name: "MATCH_S3_FORCE_PATH_STYLE",
+                                     description: "Force path style for S3",
+                                     optional: true),
 
         # Storage: GitLab Secure Files
         FastlaneCore::ConfigItem.new(key: :gitlab_project,

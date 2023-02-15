@@ -28,6 +28,8 @@ module Match
         s3_secret_access_key = params[:s3_secret_access_key]
         s3_bucket = params[:s3_bucket]
         s3_object_prefix = params[:s3_object_prefix]
+        s3_endpoint = params[:s3_endpoint]
+        s3_force_path_style = params[:s3_force_path_style]
 
         if params[:git_url].to_s.length > 0
           UI.important("Looks like you still define a `git_url` somewhere, even though")
@@ -36,12 +38,18 @@ module Match
           UI.message("The above is just a warning, fastlane will continue as usual now...")
         end
 
+        if (s3_endpoint.to_s.length > 0) && !s3_force_path_style
+          UI.message("When you use a custom S3 endpoint, in most cases you also need to set `force_path_style` to `true`")
+        end
+
         return self.new(
           s3_region: s3_region,
           s3_access_key: s3_access_key,
           s3_secret_access_key: s3_secret_access_key,
           s3_bucket: s3_bucket,
           s3_object_prefix: s3_object_prefix,
+          s3_endpoint: s3_endpoint,
+          s3_force_path_style: s3_force_path_style,
           readonly: params[:readonly],
           username: params[:username],
           team_id: params[:team_id],
@@ -56,6 +64,8 @@ module Match
                      s3_secret_access_key: nil,
                      s3_bucket: nil,
                      s3_object_prefix: nil,
+                     s3_endpoint: nil,
+                     s3_force_path_style: false,
                      readonly: nil,
                      username: nil,
                      team_id: nil,
@@ -64,7 +74,7 @@ module Match
                      api_key: nil)
         @s3_bucket = s3_bucket
         @s3_region = s3_region
-        @s3_client = Fastlane::Helper::S3ClientHelper.new(access_key: s3_access_key, secret_access_key: s3_secret_access_key, region: s3_region)
+        @s3_client = Fastlane::Helper::S3ClientHelper.new(access_key: s3_access_key, secret_access_key: s3_secret_access_key, region: s3_region, endpoint: s3_endpoint, force_path_style: s3_force_path_style)
         @s3_object_prefix = s3_object_prefix.to_s
         @readonly = readonly
         @username = username
