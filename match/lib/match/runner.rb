@@ -1,5 +1,6 @@
 require 'fastlane_core/cert_checker'
 require 'fastlane_core/provisioning_profile'
+require 'fastlane_core/certificate'
 require 'fastlane_core/print_table'
 require 'spaceship/client'
 require_relative 'generator'
@@ -102,23 +103,23 @@ module Match
       end
 
       # Certificate
-      cert_id = fetch_certificate(params: params, working_directory: storage.working_directory)
+      parsed_cert = fetch_certificate(params: params, working_directory: storage.working_directory)
 
       # Mac Installer Distribution Certificate
       additional_cert_types = params[:additional_cert_types] || []
-      cert_ids = additional_cert_types.map do |additional_cert_type|
+      parsed_certs = additional_cert_types.map do |additional_cert_type|
         fetch_certificate(params: params, working_directory: storage.working_directory, specific_cert_type: additional_cert_type)
       end
 
-      cert_ids << cert_id
-      spaceship.certificates_exists(username: params[:username], certificate_ids: cert_ids) if spaceship
+      parsed_certs << parsed_cert
+      spaceship.certificates_exists(username: params[:username], certificates: parsed_certs) if spaceship
 
       # Provisioning Profiles
       unless params[:skip_provisioning_profiles]
         app_identifiers.each do |app_identifier|
           loop do
             break if fetch_provisioning_profile(params: params,
-                                        certificate_id: cert_id,
+                                        certificate_id: parsed_cert["FileName"],
                                         app_identifier: app_identifier,
                                     working_directory: storage.working_directory)
           end
@@ -220,7 +221,7 @@ module Match
         TablePrinter.print_certificate_info(cert_info: info)
       end
 
-      return File.basename(cert_path).gsub(".cer", "") # Certificate ID
+      return FastlaneCore::Certificate.parse(cert_path)
     end
 
     # rubocop:disable Metrics/PerceivedComplexity

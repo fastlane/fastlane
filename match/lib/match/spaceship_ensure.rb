@@ -58,14 +58,22 @@ module Match
       UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")
     end
 
-    def certificates_exists(username: nil, certificate_ids: [])
+    def certificates_exists(username: nil, certificates: [])
+      UI.verbose("Checking if certificates exist on the Dev Portal...")
+      # TODO this needs to be smarter - check something else instead of just the cert name
+      # cert names are not reliable because they can be imported which
+      # means their name is random
+      # TODTODOOTDODTOTDOTODTODOTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTttttttttttttttttttttttt
       Spaceship::ConnectAPI::Certificate.all.each do |cert|
-        certificate_ids.delete(cert.id)
+        UI.verbose("Found certificate '#{cert.name}' (#{cert.id}) [#{cert.serial_number}]")
+        certificates = certificates.delete_if do |certificate|
+          certificate["SerialNumber"] == cert.serial_number
+        end
       end
-      return if certificate_ids.empty?
+      return if certificates.empty?
 
-      certificate_ids.each do |certificate_id|
-        UI.error("Certificate '#{certificate_id}' (stored in your storage) is not available on the Developer Portal")
+      certificates.each do |certificate|
+        UI.error("Certificate '#{certificate["FileName"]}' (stored in your storage) is not available on the Developer Portal")
       end
       UI.error("for the user #{username}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
