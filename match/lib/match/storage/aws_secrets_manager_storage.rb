@@ -245,7 +245,7 @@ module Match
       end
 
       def currently_used_team_id
-        if @readonly
+        if self.readonly
           # In readonly mode, we still want to see if the user provided a team_id
           # see `prefixed_working_directory` comments for more details
           return self.team_id
