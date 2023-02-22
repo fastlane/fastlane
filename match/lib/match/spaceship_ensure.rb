@@ -67,13 +67,13 @@ module Match
       Spaceship::ConnectAPI::Certificate.all.each do |cert|
         UI.verbose("Found certificate '#{cert.name}' (#{cert.id}) [#{cert.serial_number}]")
         certificates = certificates.delete_if do |certificate|
-          certificate["SerialNumber"] == cert.serial_number
+          certificate["SerialNumber"].include?(cert.serial_number)
         end
       end
       return if certificates.empty?
 
       certificates.each do |certificate|
-        UI.error("Certificate '#{certificate["FileName"]}' (stored in your storage) is not available on the Developer Portal")
+        UI.error("Certificate '#{certificate['FileName']}' (stored in your storage) is not available on the Developer Portal")
       end
       UI.error("for the user #{username}")
       UI.error("Make sure to use the same user and team every time you run 'match' for this")
