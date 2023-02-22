@@ -221,7 +221,7 @@ module Match
         TablePrinter.print_certificate_info(cert_info: info)
       end
 
-      return FastlaneCore::Certificate.parse(cert_path)
+      return FastlaneCore::Certificate.parse_from_file(cert_path)
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
