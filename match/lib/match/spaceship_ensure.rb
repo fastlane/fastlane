@@ -60,10 +60,6 @@ module Match
 
     def certificates_exists(username: nil, certificates: [])
       UI.verbose("Checking if certificates exist on the Dev Portal...")
-      # TODO this needs to be smarter - check something else instead of just the cert name
-      # cert names are not reliable because they can be imported which
-      # means their name is random
-      # TODTODOOTDODTOTDOTODTODOTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTttttttttttttttttttttttt
       Spaceship::ConnectAPI::Certificate.all.each do |cert|
         UI.verbose("Found certificate '#{cert.name}' (#{cert.id}) [#{cert.serial_number}]")
         certificates = certificates.delete_if do |certificate|
