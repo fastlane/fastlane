@@ -200,5 +200,11 @@ module FastlaneCore
       UI.error(error)
       UI.user_error!("Error parsing certificate '#{path}'")
     end
+
+    def self.certificate_key_match?(cert_path, key_path)
+      cert_md5 = Helper.backticks("openssl x509 -inform der -noout -modulus -in '#{cert_path}' | openssl md5", print: FastlaneCore::Globals.verbose?).strip
+      key_md5 = Helper.backticks("openssl rsa -noout -modulus -in '#{key_path}' | openssl md5", print: FastlaneCore::Globals.verbose?).strip
+      return cert_md5 == key_md5
+    end
   end
 end

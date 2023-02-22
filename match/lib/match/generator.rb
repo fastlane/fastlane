@@ -81,6 +81,7 @@ module Match
         username: params[:username],
         force: force,
         cert_id: certificate_id,
+        cert_serial_number: certificate_serial_number,
         provisioning_name: profile_name,
         ignore_profiles_with_different_name: true,
         api_key_path: params[:api_key_path],

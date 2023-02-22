@@ -103,15 +103,14 @@ module Match
       end
 
       # Certificate
-      parsed_cert = fetch_certificate(params: params, working_directory: storage.working_directory)
+      parsed_certs = fetch_certificates(params: params, working_directory: storage.working_directory)
 
       # Mac Installer Distribution Certificate
       additional_cert_types = params[:additional_cert_types] || []
-      parsed_certs = additional_cert_types.map do |additional_cert_type|
-        fetch_certificate(params: params, working_directory: storage.working_directory, specific_cert_type: additional_cert_type)
+      parsed_certs << additional_cert_types.flat_map do |additional_cert_type|
+        fetch_certificates(params: params, working_directory: storage.working_directory, specific_cert_type: additional_cert_type)
       end
 
-      parsed_certs << parsed_cert
       spaceship.certificates_exists(username: params[:username], certificates: parsed_certs) if spaceship
 
       # Provisioning Profiles
@@ -119,7 +118,7 @@ module Match
         app_identifiers.each do |app_identifier|
           loop do
             break if fetch_provisioning_profile(params: params,
-                                        certificate_id: parsed_cert["FileName"],
+                                        certificates: parsed_certs,
                                         app_identifier: app_identifier,
                                     working_directory: storage.working_directory)
           end
@@ -181,52 +180,65 @@ module Match
         self.files_to_commit << cert_path
         self.files_to_commit << private_key_path
       else
-        cert_path = certs.last
-
-        # Check validity of certificate
-        if Utils.is_cert_valid?(cert_path)
-          UI.verbose("Your certificate '#{File.basename(cert_path)}' is valid")
-        else
-          UI.user_error!("Your certificate '#{File.basename(cert_path)}' is not valid, please check end date and renew it if necessary")
-        end
-
-        if Helper.mac?
-          UI.message("Installing certificate...")
-
-          # Only looking for cert in "custom" (non login.keychain) keychain
-          # Doing this for backwards compatibility
-          keychain_name = params[:keychain_name] == "login.keychain" ? nil : params[:keychain_name]
-
-          if FastlaneCore::CertChecker.installed?(cert_path, in_keychain: keychain_name)
-            UI.verbose("Certificate '#{File.basename(cert_path)}' is already installed on this machine")
-          else
-            Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
-
-            # Import the private key
-            # there seems to be no good way to check if it's already installed - so just install it
-            # Key will only be added to the partition list if it isn't already installed
-            Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+        cert_key_pairs = certs.map(
+          lambda do |cert_path|
+            matching_key = keys.find { |key_path| FastlaneCore::CertChecker.certificate_key_match?(cert_path, key_path) }
+            UI.user_error!("Could not find matching key for certificate '#{cert_path}'") unless matching_key
+            {
+              cert_path: cert_path,
+              key_path: matching_key
+            }
           end
-        else
-          UI.message("Skipping installation of certificate as it would not work on this operating system.")
-        end
+        )
+        cert_key_pairs.each do |cert_key_pair|
+          # Check validity of certificate
+          if Utils.is_cert_valid?(cert_key_pair.cert_path)
+            UI.verbose("Your certificate '#{File.basename(cert_key_pair.cert_path)}' is valid")
+            valid_certs_paths << cert_key_pair.cert_path
+          else
+            UI.user_error!("Your certificate '#{File.basename(cert_key_pair.cert_path)}' is not valid, please check end date and renew it if necessary")
+          end
 
-        if params[:output_path]
-          FileUtils.cp(cert_path, params[:output_path])
-          FileUtils.cp(keys.last, params[:output_path])
-        end
+          if Helper.mac?
+            UI.message("Installing certificate...")
 
-        # Get and print info of certificate
-        info = Utils.get_cert_info(cert_path)
-        TablePrinter.print_certificate_info(cert_info: info)
+            # Only looking for cert in "custom" (non login.keychain) keychain
+            # Doing this for backwards compatibility
+            keychain_name = params[:keychain_name] == "login.keychain" ? nil : params[:keychain_name]
+
+            if FastlaneCore::CertChecker.installed?(cert_key_pair.cert_path, in_keychain: keychain_name)
+              UI.verbose("Certificate '#{File.basename(cert_key_pair.cert_path)}' is already installed on this machine")
+            else
+              Utils.import(cert_key_pair.cert_path, params[:keychain_name], password: params[:keychain_password])
+
+              # find private key for this certificate using openssl
+
+              # Import the private key
+              # there seems to be no good way to check if it's already installed - so just install it
+              # Key will only be added to the partition list if it isn't already installed
+              Utils.import(cert_key_pair.key_path, params[:keychain_name], password: params[:keychain_password])
+            end
+          else
+            UI.message("Skipping installation of certificate as it would not work on this operating system.")
+          end
+
+          if params[:output_path]
+            FileUtils.cp(cert_key_pair.cert_path, params[:output_path])
+            FileUtils.cp(cert_key_pair.key_path, params[:output_path])
+          end
+
+          # Get and print info of certificate
+          info = Utils.get_cert_info(cert_key_pair.cert_path)
+          TablePrinter.print_certificate_info(cert_info: info)
+        end
       end
 
-      return FastlaneCore::Certificate.parse_from_file(cert_path)
+      return FastlaneCore::Certificate.order_by_expiration(valid_certs_paths.map { |path| FastlaneCore::Certificate.parse_from_file(path) })
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
     # @return [String] The UUID of the provisioning profile so we can verify it with the Apple Developer Portal
-    def fetch_provisioning_profile(params: nil, certificate_id: nil, app_identifier: nil, working_directory: nil)
+    def fetch_provisioning_profile(params: nil, certificates: nil, app_identifier: nil, working_directory: nil)
       prov_type = Match.profile_type_sym(params[:type])
 
       names = [Match::Generator.profile_type_name(prov_type), app_identifier]
@@ -248,9 +260,20 @@ module Match
         keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) unless params[:keychain_name].nil?
       end
 
-      # Install the provisioning profiles
-      profile = profiles.last
+      # Find the profile that matches the given certificate
+      profile = profiles.filter do |profile_path|
+        # Check if it matched any of the certificates
+        certificates.each do |certificate|
+          if FastlaneCore::ProvisioningProfile.includes_certificate?(profile_path: profile_path, certificate: certificate)
+            UI.verbose("Found matching provisioning profile for certificate '#{File.basename(certificate_path)}'")
+            return true
+          end
+        end
+        false
+      end.first
       force = params[:force]
+
+      certificate_serial_number = FastlaneCore::Certificate.order_by_expiration(certificates).last["SerialNumber"]
 
       if params[:force_for_new_devices]
         force = should_force_include_all_devices(params: params, prov_type: prov_type, profile: profile, keychain_path: keychain_path) unless force
@@ -259,6 +282,7 @@ module Match
       if params[:include_all_certificates]
         # Clearing specified certificate id which will prevent a profile being created with only one certificate
         certificate_id = nil
+        certificate_serial_number = nil
         force = should_force_include_all_certificates(params: params, prov_type: prov_type, profile: profile, keychain_path: keychain_path) unless force
       end
 
@@ -278,6 +302,7 @@ module Match
         profile = Generator.generate_provisioning_profile(params: params,
                                                        prov_type: prov_type,
                                                   certificate_id: certificate_id,
+                                                  certificate_serial_number: certificate_serial_number,
                                                   app_identifier: app_identifier,
                                                            force: force,
                                                working_directory: prefixed_working_directory)

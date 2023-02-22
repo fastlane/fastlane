@@ -1,4 +1,5 @@
 require_relative 'ui/ui'
+require_relative 'certificate'
 
 module FastlaneCore
   class ProvisioningProfile
@@ -31,6 +32,15 @@ module FastlaneCore
           plist
         else
           UI.crash!("Error parsing provisioning profile at path '#{path}'")
+        end
+      end
+
+      def includes_certificate?(profile_path: nil, profile_keychain_path: nil, certificate_path: nil, certificate: nil)
+        certificate ||= FastlaneCore::Certificate.parse_from_file(certificate_path)
+        profile = parse(path, keychain_path)
+        profile["DeveloperCertificates"].each do |encoded_cert|
+          decoded_cert = FastlaneCore::Certificate.parse_from_b64(encoded_cert)
+          return true if decoded_cert["SerialNumber"] == certificate["SerialNumber"]
         end
       end
 
