@@ -107,9 +107,9 @@ module Match
 
       # Mac Installer Distribution Certificate
       additional_cert_types = params[:additional_cert_types] || []
-      parsed_certs << additional_cert_types.flat_map do |additional_cert_type|
+      (parsed_certs << additional_cert_types.flat_map do |additional_cert_type|
         fetch_certificates(params: params, working_directory: storage.working_directory, specific_cert_type: additional_cert_type)
-      end
+      end).flatten!
 
       spaceship.certificates_exists(username: params[:username], certificates: parsed_certs) if spaceship
 
@@ -171,32 +171,33 @@ module Match
       certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.p12")]
 
+      valid_certs_paths = []
+
       if certs.count == 0 || keys.count == 0
         UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
         cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory, specific_cert_type: specific_cert_type)
         private_key_path = cert_path.gsub(".cer", ".p12")
 
+        valid_certs_paths << cert_path
         self.files_to_commit << cert_path
         self.files_to_commit << private_key_path
       else
-        cert_key_pairs = certs.map(
-          lambda do |cert_path|
-            matching_key = keys.find { |key_path| FastlaneCore::CertChecker.certificate_key_match?(cert_path, key_path) }
-            UI.user_error!("Could not find matching key for certificate '#{cert_path}'") unless matching_key
-            {
-              cert_path: cert_path,
-              key_path: matching_key
-            }
-          end
-        )
+        cert_key_pairs = certs.map do |cert_path|
+          matching_key = keys.find { |key_path| FastlaneCore::CertChecker.certificate_key_match?(cert_path, key_path) }
+          UI.user_error!("Could not find matching key for certificate '#{cert_path}'") unless matching_key
+          {
+            cert_path: cert_path,
+            key_path: matching_key
+          }
+        end
         cert_key_pairs.each do |cert_key_pair|
           # Check validity of certificate
-          if Utils.is_cert_valid?(cert_key_pair.cert_path)
-            UI.verbose("Your certificate '#{File.basename(cert_key_pair.cert_path)}' is valid")
-            valid_certs_paths << cert_key_pair.cert_path
+          if Utils.is_cert_valid?(cert_key_pair[:cert_path])
+            UI.verbose("Your certificate '#{File.basename(cert_key_pair[:cert_path])}' is valid")
+            valid_certs_paths << cert_key_pair[:cert_path]
           else
-            UI.user_error!("Your certificate '#{File.basename(cert_key_pair.cert_path)}' is not valid, please check end date and renew it if necessary")
+            UI.user_error!("Your certificate '#{File.basename(cert_key_pair[:cert_path])}' is not valid, please check end date and renew it if necessary")
           end
 
           if Helper.mac?
@@ -206,29 +207,29 @@ module Match
             # Doing this for backwards compatibility
             keychain_name = params[:keychain_name] == "login.keychain" ? nil : params[:keychain_name]
 
-            if FastlaneCore::CertChecker.installed?(cert_key_pair.cert_path, in_keychain: keychain_name)
-              UI.verbose("Certificate '#{File.basename(cert_key_pair.cert_path)}' is already installed on this machine")
+            if FastlaneCore::CertChecker.installed?(cert_key_pair[:cert_path], in_keychain: keychain_name)
+              UI.verbose("Certificate '#{File.basename(cert_key_pair[:cert_path])}' is already installed on this machine")
             else
-              Utils.import(cert_key_pair.cert_path, params[:keychain_name], password: params[:keychain_password])
+              Utils.import(cert_key_pair[:key_path], params[:keychain_name], password: params[:keychain_password])
 
               # find private key for this certificate using openssl
 
               # Import the private key
               # there seems to be no good way to check if it's already installed - so just install it
               # Key will only be added to the partition list if it isn't already installed
-              Utils.import(cert_key_pair.key_path, params[:keychain_name], password: params[:keychain_password])
+              Utils.import(cert_key_pair[:cert_path], params[:keychain_name], password: params[:keychain_password])
             end
           else
             UI.message("Skipping installation of certificate as it would not work on this operating system.")
           end
 
           if params[:output_path]
-            FileUtils.cp(cert_key_pair.cert_path, params[:output_path])
-            FileUtils.cp(cert_key_pair.key_path, params[:output_path])
+            FileUtils.cp(cert_key_pair[:cert_path], params[:output_path])
+            FileUtils.cp(cert_key_pair[:key_path], params[:output_path])
           end
 
           # Get and print info of certificate
-          info = Utils.get_cert_info(cert_key_pair.cert_path)
+          info = Utils.get_cert_info(cert_key_pair[:cert_path])
           TablePrinter.print_certificate_info(cert_info: info)
         end
       end
@@ -263,17 +264,20 @@ module Match
       # Find the profile that matches the given certificate
       profile = profiles.filter do |profile_path|
         # Check if it matched any of the certificates
+        found = false
         certificates.each do |certificate|
-          if FastlaneCore::ProvisioningProfile.includes_certificate?(profile_path: profile_path, certificate: certificate)
-            UI.verbose("Found matching provisioning profile for certificate '#{File.basename(certificate_path)}'")
-            return true
-          end
+          next unless FastlaneCore::ProvisioningProfile.includes_certificate?(profile_path: profile_path, certificate: certificate)
+          UI.verbose("Found matching provisioning profile for certificate '#{certificate['FileName']}'")
+          found = true
+          break
         end
-        false
+        found
       end.first
       force = params[:force]
 
-      certificate_serial_number = FastlaneCore::Certificate.order_by_expiration(certificates).last["SerialNumber"]
+      last_expiring_certificate = FastlaneCore::Certificate.order_by_expiration(certificates).last
+      certificate_id = last_expiring_certificate["FileName"]
+      certificate_serial_number = last_expiring_certificate["SerialNumber"]
 
       if params[:force_for_new_devices]
         force = should_force_include_all_devices(params: params, prov_type: prov_type, profile: profile, keychain_path: keychain_path) unless force

@@ -9,14 +9,14 @@ module FastlaneCore
       #  "NotAfter"=>"Feb 21 16:39:53 2024 GMT",
       #  "NotBefore"=>"Feb 21 16:39:53 2023 GMT"}
       def order_by_expiration(certs, ascending = true)
-        certs.sort_by { |c| c["NotAfter"] }.reverse! unless ascending
-        certs.sort_by { |c| c["NotAfter"] }
+        certs.sort_by { |c| c["NotAfter"].to_i }.reverse! unless ascending
+        certs.sort_by { |c| c["NotAfter"].to_i }
       end
 
       def parse_from_b64(b64_content)
-        serial_number = `echo #{b64_content} | base64 --decode | openssl x509 -inform der -noout -serial`.split("=").last.strip
-        not_before = Time.parse(`echo #{b64_content} | base64 --decode | openssl x509 -inform der -noout -startdate`.split("=").last.strip)
-        not_after = Time.parse(`echo #{b64_content} | base64 --decode | openssl x509 -inform der -noout -enddate`.split("=").last.strip)
+        serial_number = `echo '#{b64_content}' | base64 --decode | openssl x509 -inform der -noout -serial`.split("=").last.strip
+        not_before = Time.parse(`echo '#{b64_content}' | base64 --decode | openssl x509 -inform der -noout -startdate`.split("=").last.strip)
+        not_after = Time.parse(`echo '#{b64_content}' | base64 --decode | openssl x509 -inform der -noout -enddate`.split("=").last.strip)
         {
           "SerialNumber" => serial_number,
           "NotBefore" => not_before,

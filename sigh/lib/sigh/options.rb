@@ -133,7 +133,7 @@ module Sigh
         FastlaneCore::ConfigItem.new(key: :cert_serial_number,
                                     short_option: "-s",
                                     env_name: "SIGH_CERTIFICATE_SERIAL_NUMBER",
-                                    description: "The Serial Number of the code signing certificate to use (e.g. 06:9f:ba:78:51:58:dc:46:d9:a6:60:3e:af:5a:13:16). Takes precedence over cert_id. For advanced use only.",
+                                    description: "The Serial Number of the code signing certificate to use (e.g. 06:9f:ba:78:51:58:dc:46:d9:a6:60:3e:af:5a:13:16). Takes precedence over cert_id. For advanced use only",
                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :cert_owner_name,
                                      short_option: "-c",
