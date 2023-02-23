@@ -165,7 +165,7 @@ module Match
       end
     end
 
-    def fetch_certificate(params: nil, working_directory: nil, specific_cert_type: nil)
+    def fetch_certificates(params: nil, working_directory: nil, specific_cert_type: nil)
       cert_type = Match.cert_type_sym(specific_cert_type || params[:type])
 
       certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
