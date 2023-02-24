@@ -13,7 +13,6 @@ describe Spaceship::Client do
     end
 
     it 'raises an exception if authentication failed' do
-      allow(subject).to receive(:itc_service_key).and_return("12345")
       expect do
         subject.login('bad-username', 'bad-password')
       end.to raise_exception(Spaceship::Client::InvalidUserCredentialsError)

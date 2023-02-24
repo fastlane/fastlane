@@ -1,7 +1,6 @@
 describe Spaceship::TunesClient do
   describe '#login' do
     it 'raises an exception if authentication failed' do
-      allow(subject).to receive(:itc_service_key).and_return("12345")
       expect do
         subject.login('bad-username', 'bad-password')
       end.to raise_exception(Spaceship::Client::InvalidUserCredentialsError, "Invalid username and password combination. Used 'bad-username' as the username.")
@@ -10,7 +9,6 @@ describe Spaceship::TunesClient do
 
   describe 'client' do
     it 'exposes the session cookie' do
-      allow(subject).to receive(:itc_service_key).and_return("12345")
       begin
         subject.login('bad-username', 'bad-password')
       rescue Spaceship::Client::InvalidUserCredentialsError
