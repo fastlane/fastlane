@@ -202,21 +202,16 @@ module FastlaneCore
     end
 
     def self.certificate_key_match?(cert_path, key_path)
-      cert_md5 = Helper.backticks("openssl x509 -inform der -noout -modulus -in '#{cert_path}' | openssl md5", print: FastlaneCore::Globals.verbose?).strip
-      key_md5 = nil
-      begin
-        key_md5 = Helper.backticks("openssl rsa -noout -modulus -in '#{key_path}' | openssl md5", print: FastlaneCore::Globals.verbose?).strip
-        if key_md5.include?("unable to load Private Key")
-          raise "Could not decode .p12 private key #{key_path} using rsa."
-        end
-      rescue => error
-        UI.verbose(error)
-        temp_key_path = File.join(File.dirname(key_path), "-temp-key")
-        `openssl pkcs12 -in #{key_path} -nocerts -passin pass: -nodes -out #{temp_key_path}`
-        key_md5 = `openssl rsa -noout -modulus -in #{temp_key_path} | openssl md5`
-        `rm #{temp_key_path}`
-      end
-      return cert_md5 == key_md5
+      cert_md5 = `openssl x509 -inform der -noout -modulus -in '#{cert_path}' | openssl md5`.strip
+      key_md5_rsa = `openssl rsa -noout -modulus -in '#{key_path}' | openssl md5`.strip
+      temp_key_path = File.join(File.dirname(key_path), "-temp-key")
+      `openssl pkcs12 -in #{key_path} -nocerts -passin pass: -nodes -out #{temp_key_path}`
+      key_md5_pkcs12 = `openssl rsa -noout -modulus -in #{temp_key_path} | openssl md5`.strip
+      `rm #{temp_key_path}`
+      puts("cert_md5: #{cert_md5}")
+      puts("key_md5_rsa: #{key_md5_rsa}")
+      puts("key_md5_pkcs12: #{key_md5_pkcs12}")
+      return (cert_md5 == key_md5_rsa) || (cert_md5 == key_md5_pkcs12)
     end
   end
 end
