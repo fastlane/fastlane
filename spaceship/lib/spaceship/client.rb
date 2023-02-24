@@ -494,6 +494,7 @@ module Spaceship
         # Fixes issue https://github.com/fastlane/fastlane/issues/21071
         # On 2023-02-23, Apple added a custom implementation
         # of hashcash to their auth flow
+        # hashcash = nil
         hashcash = self.fetch_hashcash
 
         response = request(:post) do |req|
@@ -504,7 +505,7 @@ module Spaceship
           req.headers['X-Apple-Widget-Key'] = self.itc_service_key
           req.headers['Accept'] = 'application/json, text/javascript'
           req.headers["Cookie"] = modified_cookie if modified_cookie
-          req.headers["X-APPLE-HC"] = hashcash if hashcash
+          req.headers["X-Apple-HC"] = hashcash if hashcash
         end
       rescue UnauthorizedAccessError
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
@@ -556,11 +557,11 @@ module Spaceship
       response = request(:get, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{self.itc_service_key}")
       headers = response.headers
 
-      bits = headers["x-apple-hc-bits"]
-      challenge = headers["x-apple-hc-challenge"]
+      bits = headers["X-Apple-HC-Bits"]
+      challenge = headers["X-Apple-HC-Challenge"]
 
       if bits.nil? || challenge.nil?
-        puts("Unable to find 'x-apple-hc-bits' and 'x-apple-hc-challenge' to make hashcash")
+        puts("Unable to find 'X-Apple-HC-Bits' and 'X-Apple-HC-Challenge' to make hashcash")
         return nil
       end
 
