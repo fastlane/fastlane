@@ -59,16 +59,17 @@ module Match
     end
 
     def certificates_exists(username: nil, certificates: [])
+      certs = certificates.dup
       UI.verbose("Checking if certificates exist on the Dev Portal...")
       Spaceship::ConnectAPI::Certificate.all.each do |cert|
         UI.verbose("Found certificate '#{cert.name}' (#{cert.id}) [#{cert.serial_number}]")
-        certificates = certificates.delete_if do |certificate|
+        certs = certs.delete_if do |certificate|
           certificate["SerialNumber"].include?(cert.serial_number)
         end
       end
-      return if certificates.empty?
+      return if certs.empty?
 
-      certificates.each do |certificate|
+      certs.each do |certificate|
         UI.error("Certificate '#{certificate['FileName']}' (stored in your storage) is not available on the Developer Portal")
       end
       UI.error("for the user #{username}")

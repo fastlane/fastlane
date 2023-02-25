@@ -107,9 +107,9 @@ module Match
 
       # Mac Installer Distribution Certificate
       additional_cert_types = params[:additional_cert_types] || []
-      (parsed_certs << additional_cert_types.flat_map do |additional_cert_type|
+      parsed_certs += additional_cert_types.flat_map do |additional_cert_type|
         fetch_certificates(params: params, working_directory: storage.working_directory, specific_cert_type: additional_cert_type)
-      end).flatten!
+      end
 
       spaceship.certificates_exists(username: params[:username], certificates: parsed_certs) if spaceship
 
@@ -234,7 +234,7 @@ module Match
         end
       end
 
-      return FastlaneCore::Certificate.order_by_expiration(valid_certs_paths.map { |path| FastlaneCore::Certificate.parse_from_file(path) })
+      return valid_certs_paths.map { |path| FastlaneCore::Certificate.parse_from_file(path) }
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
@@ -266,6 +266,7 @@ module Match
         # Check if it matched any of the certificates
         found = false
         certificates.each do |certificate|
+          UI.verbose("Checking if profile '#{profile_path}' includes certificate '#{certificate['FileName']}'")
           next unless FastlaneCore::ProvisioningProfile.includes_certificate?(profile_path: profile_path, certificate: certificate)
           UI.verbose("Found matching provisioning profile for certificate '#{certificate['FileName']}'")
           found = true
