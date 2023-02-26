@@ -262,18 +262,7 @@ module Match
       end
 
       # Find the profile that matches the given certificate
-      profile = profiles.filter do |profile_path|
-        # Check if it matched any of the certificates
-        found = false
-        certificates.each do |certificate|
-          UI.verbose("Checking if profile '#{profile_path}' includes certificate '#{certificate['FileName']}'")
-          next unless FastlaneCore::ProvisioningProfile.includes_certificate?(profile_path: profile_path, certificate: certificate)
-          UI.verbose("Found matching provisioning profile for certificate '#{certificate['FileName']}'")
-          found = true
-          break
-        end
-        found
-      end.first
+      profile = find_matching_profile(profiles, certificates)
       force = params[:force]
 
       last_expiring_certificate = FastlaneCore::Certificate.order_by_expiration(certificates).last
@@ -351,6 +340,10 @@ module Match
                                                                                         type: prov_type,
                                                                                     platform: params[:platform]),
                              cert_info["Common Name"])
+      Utils.fill_environment(Utils.environment_variable_name_certificate_serial_number(app_identifier: app_identifier,
+                                                                                                type: prov_type,
+                                                                                              platform: params[:platform]),
+                             cert_info["Serial Number"])
 
       Utils.fill_environment(Utils.environment_variable_name_profile_name(app_identifier: app_identifier,
                                                                                     type: prov_type,
@@ -365,6 +358,23 @@ module Match
       return uuid
     end
     # rubocop:enable Metrics/PerceivedComplexity
+
+    def find_matching_profile(profiles, certificates, spaceship = nil)
+      profiles.filter do |profile_path|
+        # Check if it matched any of the certificates
+        found = false
+        certificates.each do |certificate|
+          UI.verbose("Checking if profile '#{profile_path}' includes certificate '#{certificate['FileName']}'")
+          next unless FastlaneCore::ProvisioningProfile.includes_certificate?(profile_path: profile_path, certificate: certificate)
+          UI.verbose("Checking if profile is valid on dev portal")
+          next unless 
+          UI.verbose("Found matching provisioning profile for certificate '#{certificate['FileName']}'")
+          found = true
+          break
+        end
+        found
+      end.first
+    end
 
     def should_force_include_all_devices(params: nil, prov_type: nil, profile: nil, keychain_path: nil)
       return false unless params[:force_for_new_devices] && !params[:readonly]
