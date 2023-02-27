@@ -6,6 +6,7 @@ module Match
   class TargetUpdater
     INFOPLIST_FILE_KEY = "INFOPLIST_FILE"
     BUNDLE_ID_KEY = "CFBundleIdentifier"
+    PRODUCT_BUNDLE_ID_KEY = "PRODUCT_BUNDLE_IDENTIFIER"
     CODE_SIGN_STYLE_KEY = "CODE_SIGN_STYLE"
     CODE_SIGN_STYLE_VALUE = "Manual"
     CODE_SIGN_IDENTITY_KEY = "CODE_SIGN_IDENTITY"
@@ -69,7 +70,15 @@ module Match
       end
 
       plist_data = Xcodeproj::Plist.read_from_path(infoplist_path)
-      return plist_data[BUNDLE_ID_KEY]
+      bundle_id = plist_data[BUNDLE_ID_KEY]
+
+      # bundle_id from info plist might just be $(PRODUCT_BUNDLE_IDENTIFIER).
+      # If this is the case, check the value in build_settings
+      if bundle_id&.include?(PRODUCT_BUNDLE_ID_KEY)
+        bundle_id = build_configuration.build_settings[PRODUCT_BUNDLE_ID_KEY]
+      end
+
+      return bundle_id
     end
 
     def self.all_xcode_projects
