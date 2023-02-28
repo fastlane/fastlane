@@ -140,6 +140,9 @@ module Match
           retrieved_secret = aws_sm_client.get_secret_value({
             secret_id: secret.arn
           })
+          if retrieved_secret.secret_binary.nil?
+            next
+          end
           decoded_secret = Zlib::Inflate.inflate(Base64.decode64(retrieved_secret.secret_binary))
           stripped_secret_name = strip_secrets_manager_object_prefix(secret.name)
           download_path = File.join(self.working_directory, stripped_secret_name)
