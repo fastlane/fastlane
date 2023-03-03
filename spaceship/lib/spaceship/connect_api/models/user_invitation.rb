@@ -1,4 +1,6 @@
 require_relative '../model'
+require_relative 'user'
+
 module Spaceship
   class ConnectAPI
     class UserInvitation
@@ -28,19 +30,7 @@ module Spaceship
         "visibleApps"
       ].join(",")
 
-      module UserRole
-        ADMIN = "ADMIN"
-        FINANCE = "FINANCE"
-        TECHNICAL = "TECHNICAL"
-        SALES = "SALES"
-        MARKETING = "MARKETING"
-        DEVELOPER = "DEVELOPER"
-        ACCOUNT_HOLDER = "ACCOUNT_HOLDER"
-        READ_ONLY = "READ_ONLY"
-        APP_MANAGER = "APP_MANAGER"
-        ACCESS_TO_REPORTS = "ACCESS_TO_REPORTS"
-        CUSTOMER_SUPPORT = "CUSTOMER_SUPPORT"
-      end
+      UserRole = Spaceship::ConnectAPI::User::UserRole
 
       def self.type
         return "userInvitations"

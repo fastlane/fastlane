@@ -42,6 +42,20 @@ module Spaceship
         return "users"
       end
 
+      module UserRole
+        ADMIN = "ADMIN"
+        FINANCE = "FINANCE"
+        TECHNICAL = "TECHNICAL"
+        SALES = "SALES"
+        MARKETING = "MARKETING"
+        DEVELOPER = "DEVELOPER"
+        ACCOUNT_HOLDER = "ACCOUNT_HOLDER"
+        READ_ONLY = "READ_ONLY"
+        APP_MANAGER = "APP_MANAGER"
+        ACCESS_TO_REPORTS = "ACCESS_TO_REPORTS"
+        CUSTOMER_SUPPORT = "CUSTOMER_SUPPORT"
+      end
+
       #
       # API
       #
