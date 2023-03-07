@@ -147,8 +147,9 @@ module Spaceship
       def get_prices(client: nil, filter: nil, includes: Spaceship::ConnectAPI::InAppPurchasePrice::ESSENTIAL_INCLUDES, limit: nil, fields: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_in_app_purchase_prices(purchase_id: id, filter: filter, includes: includes, limit: limit, fields: fields).all_pages
-        ((self.prices ||= []) << model).uniq! { |price| price.id }
-        resps.flat_map(&:to_models)
+        models = resps.flat_map(&:to_models)
+        (self.prices ||= []).concat(models).uniq! { |price| price.id }
+        models
       end
 
       #
