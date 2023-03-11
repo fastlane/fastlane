@@ -10,6 +10,7 @@ module Fastlane
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--disable-sandbox" if params[:disable_sandbox]
         cmd << "--verbose" if params[:verbose]
+        cmd << "--very-verbose" if params[:very_verbose]
         cmd << params[:command] if package_commands.include?(params[:command])
         cmd << "--enable-code-coverage" if params[:enable_code_coverage] && (params[:command] == 'generate-xcodeproj' || params[:command] == 'test')
         if params[:xcconfig]
@@ -92,6 +93,12 @@ module Fastlane
                                        short_option: "-v",
                                        env_name: "FL_SPM_VERBOSE",
                                        description: "Increase verbosity of informational output",
+                                       type: Boolean,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :very_verbose,
+                                       short_option: "-vv",
+                                       env_name: "FL_SPM_VERY_VERBOSE",
+                                       description: "Increase verbosity to include debug output",
                                        type: Boolean,
                                        default_value: false)
         ]
