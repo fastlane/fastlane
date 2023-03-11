@@ -9,6 +9,7 @@ module Fastlane
         cmd << "--package-path #{params[:package_path]}" if params[:package_path]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--disable-sandbox" if params[:disable_sandbox]
+        cmd << "--skip-update" if params[:skip_update]
         cmd << "--verbose" if params[:verbose]
         cmd << params[:command] if package_commands.include?(params[:command])
         cmd << "--enable-code-coverage" if params[:enable_code_coverage] && (params[:command] == 'generate-xcodeproj' || params[:command] == 'test')
@@ -88,6 +89,12 @@ module Fastlane
                                        description: "Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf'), requires xcpretty_output to be specified also",
                                        type: String,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :skip_update,
+                                       env_name: "FL_SPM_SKIP_UPDATE",
+                                       description: "Skip updating dependencies from their remote during a resolution",
+                                       optional: true,
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        short_option: "-v",
                                        env_name: "FL_SPM_VERBOSE",
