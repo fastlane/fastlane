@@ -96,7 +96,6 @@ module Fastlane
                                        type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :very_verbose,
-                                       short_option: "-vv",
                                        env_name: "FL_SPM_VERY_VERBOSE",
                                        description: "Increase verbosity to include debug output",
                                        type: Boolean,
