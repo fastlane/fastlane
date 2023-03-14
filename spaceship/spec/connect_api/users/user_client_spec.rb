@@ -96,7 +96,7 @@ describe Spaceship::ConnectAPI::Users::Client do
           }
         end
 
-        it 'succeeds_with_list_of_apps' do
+        it 'succeeds with list of apps' do
           url = path
           req_mock = test_request_body(url, body)
 
@@ -104,7 +104,7 @@ describe Spaceship::ConnectAPI::Users::Client do
           client.patch_user(user_id: user_id, all_apps_visible: all_apps_visible, provisioning_allowed: provisioning_allowed, roles: roles, visible_app_ids: app_ids)
         end
 
-        it 'succeeds_with_all_apps' do
+        it 'succeeds with all apps' do
           body_all_apps = body.clone
           body_all_apps[:data][:attributes][:allAppsVisible] = true
           body_all_apps[:data].delete(:relationships)
