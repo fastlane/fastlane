@@ -224,7 +224,7 @@ module Match
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :s3_skip_encryption,
                                      env_name: "MATCH_S3_SKIP_ENCRYPTION",
-                                     description: "Skip encryption of all objects uploaded to S3",
+                                     description: "Skip encryption of all objects uploaded to S3. WARNING: only enable this on S3 buckets with sufficiently restricted permissions and server-side encryption enabled. See https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html",
                                      type: Boolean,
                                      default_value: false),
 
