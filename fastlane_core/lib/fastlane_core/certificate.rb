@@ -14,26 +14,22 @@ module FastlaneCore
       end
 
       def parse_from_b64(b64_content)
-        serial_number = `echo '#{b64_content}' | base64 --decode | openssl x509 -inform der -noout -serial`.split("=").last.strip
-        not_before = Time.parse(`echo '#{b64_content}' | base64 --decode | openssl x509 -inform der -noout -startdate`.split("=").last.strip)
-        not_after = Time.parse(`echo '#{b64_content}' | base64 --decode | openssl x509 -inform der -noout -enddate`.split("=").last.strip)
+        openssl_object = OpenSSL::X509::Certificate.new(Base64.decode64(b64_content))
         {
-          "SerialNumber" => serial_number,
-          "NotBefore" => not_before,
-          "NotAfter" => not_after
+          "SerialNumber" => openssl_object.serial.to_s(16).upcase,
+          "NotBefore" => openssl_object.not_before,
+          "NotAfter" => openssl_object.not_after
         }
       end
 
       def parse_from_file(path)
-        serial_number = `openssl x509 -inform der -noout -serial -in '#{path}'`.split("=").last.strip
         file_name = File.basename(path).gsub(".cer", "").gsub(".p12", "").gsub(".pem", "")
-        not_before = Time.parse(`openssl x509 -inform der -noout -startdate -in '#{path}'`.split("=").last.strip)
-        not_after = Time.parse(`openssl x509 -inform der -noout -enddate -in '#{path}'`.split("=").last.strip)
+        openssl_object = OpenSSL::X509::Certificate.new(File.read(path))
         {
-            "SerialNumber" => serial_number,
+            "SerialNumber" => openssl_object.serial.to_s(16).upcase,
             "FileName" => file_name,
-            "NotBefore" => not_before,
-            "NotAfter" => not_after
+            "NotBefore" => openssl_object.not_before,
+            "NotAfter" => openssl_object.not_after
         }
       end
     end

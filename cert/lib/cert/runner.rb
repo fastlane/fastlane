@@ -12,11 +12,11 @@ module Cert
     def launch
       run
 
-      installed = FastlaneCore::CertChecker.installed?(ENV["CER_FILE_PATH"], in_keychain: ENV["CER_KEYCHAIN_PATH"])
+      installed = FastlaneCore::CertChecker.installed?(ENV.fetch("CER_FILE_PATH", nil), in_keychain: ENV.fetch("CER_KEYCHAIN_PATH", nil))
       UI.message("Verifying the certificate is properly installed locally...")
       UI.user_error!("Could not find the newly generated certificate installed", show_github_issues: true) unless installed
-      UI.success("Successfully installed certificate #{ENV['CER_CERTIFICATE_ID']}")
-      return ENV["CER_FILE_PATH"]
+      UI.success("Successfully installed certificate #{ENV.fetch('CER_CERTIFICATE_ID', nil)}")
+      return ENV.fetch("CER_FILE_PATH", nil)
     end
 
     def login
@@ -114,8 +114,8 @@ module Cert
           return path
         elsif File.exist?(private_key_path)
           password = Cert.config[:keychain_password]
-          FastlaneCore::KeychainImporter.import_file(path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
           FastlaneCore::KeychainImporter.import_file(private_key_path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
+          FastlaneCore::KeychainImporter.import_file(path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
 
           ENV["CER_CERTIFICATE_ID"] = certificate.id
           ENV["CER_FILE_PATH"] = path
@@ -226,8 +226,8 @@ module Cert
       # Import all the things into the Keychain
       keychain = File.expand_path(Cert.config[:keychain_path])
       password = Cert.config[:keychain_password]
-      FastlaneCore::KeychainImporter.import_file(cert_path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
       FastlaneCore::KeychainImporter.import_file(private_key_path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
+      FastlaneCore::KeychainImporter.import_file(cert_path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
 
       # Environment variables for the fastlane action
       ENV["CER_CERTIFICATE_ID"] = certificate.id

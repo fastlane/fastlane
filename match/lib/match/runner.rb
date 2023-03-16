@@ -27,7 +27,7 @@ module Match
       FileUtils.mkdir_p(params[:output_path]) if params[:output_path]
 
       FastlaneCore::PrintTable.print_values(config: params,
-                                             title: "Summary for match #{Fastlane::VERSION}")
+                                            title: "Summary for match #{Fastlane::VERSION}")
 
       update_optional_values_depending_on_storage_type(params)
 
@@ -118,9 +118,9 @@ module Match
         app_identifiers.each do |app_identifier|
           loop do
             break if fetch_provisioning_profile(params: params,
-                                        certificates: parsed_certs,
-                                        app_identifier: app_identifier,
-                                    working_directory: storage.working_directory)
+                                                certificates: parsed_certs,
+                                                app_identifier: app_identifier,
+                                                working_directory: storage.working_directory)
           end
         end
       end
@@ -185,12 +185,17 @@ module Match
       else
         cert_key_pairs = certs.map do |cert_path|
           matching_key = keys.find { |key_path| FastlaneCore::CertChecker.certificate_key_match?(cert_path, key_path) }
-          UI.user_error!("Could not find matching key for certificate '#{cert_path}'") unless matching_key
-          {
-            cert_path: cert_path,
-            key_path: matching_key
-          }
+          if !matching_key
+            UI.error("Could not find matching key for certificate '#{cert_path}'")
+            nil
+          else
+            {
+              cert_path: cert_path,
+              key_path: matching_key
+            }
+          end
         end
+        cert_key_pairs = cert_key_pairs.compact
         cert_key_pairs.each do |cert_key_pair|
           # Check validity of certificate
           if Utils.is_cert_valid?(cert_key_pair[:cert_path])
@@ -294,12 +299,12 @@ module Match
         end
 
         profile = Generator.generate_provisioning_profile(params: params,
-                                                       prov_type: prov_type,
-                                                  certificate_id: certificate_id,
-                                                  certificate_serial_number: certificate_serial_number,
-                                                  app_identifier: app_identifier,
-                                                           force: force,
-                                               working_directory: prefixed_working_directory)
+                                                          prov_type: prov_type,
+                                                          certificate_id: certificate_id,
+                                                          certificate_serial_number: certificate_serial_number,
+                                                          app_identifier: app_identifier,
+                                                          force: force,
+                                                          working_directory: prefixed_working_directory)
         self.files_to_commit << profile
       end
 
@@ -324,35 +329,35 @@ module Match
       end
 
       Utils.fill_environment(Utils.environment_variable_name(app_identifier: app_identifier,
-                                                                       type: prov_type,
-                                                                   platform: params[:platform]),
+                                                             type: prov_type,
+                                                             platform: params[:platform]),
 
                              uuid)
 
       # TeamIdentifier is returned as an array, but we're not sure why there could be more than one
       Utils.fill_environment(Utils.environment_variable_name_team_id(app_identifier: app_identifier,
-                                                                               type: prov_type,
-                                                                           platform: params[:platform]),
+                                                                     type: prov_type,
+                                                                     platform: params[:platform]),
                              parsed["TeamIdentifier"].first)
 
       cert_info = Utils.get_cert_info(parsed["DeveloperCertificates"].first.string).to_h
       Utils.fill_environment(Utils.environment_variable_name_certificate_name(app_identifier: app_identifier,
-                                                                                        type: prov_type,
-                                                                                    platform: params[:platform]),
+                                                                              type: prov_type,
+                                                                              platform: params[:platform]),
                              cert_info["Common Name"])
       Utils.fill_environment(Utils.environment_variable_name_certificate_serial_number(app_identifier: app_identifier,
-                                                                                                type: prov_type,
-                                                                                              platform: params[:platform]),
+                                                                                       type: prov_type,
+                                                                                       platform: params[:platform]),
                              cert_info["Serial Number"])
 
       Utils.fill_environment(Utils.environment_variable_name_profile_name(app_identifier: app_identifier,
-                                                                                    type: prov_type,
-                                                                                platform: params[:platform]),
+                                                                          type: prov_type,
+                                                                          platform: params[:platform]),
                              parsed["Name"])
 
       Utils.fill_environment(Utils.environment_variable_name_profile_path(app_identifier: app_identifier,
-                                                                                    type: prov_type,
-                                                                                platform: params[:platform]),
+                                                                          type: prov_type,
+                                                                          platform: params[:platform]),
                              installed_profile)
 
       return uuid
@@ -366,8 +371,6 @@ module Match
         certificates.each do |certificate|
           UI.verbose("Checking if profile '#{profile_path}' includes certificate '#{certificate['FileName']}'")
           next unless FastlaneCore::ProvisioningProfile.includes_certificate?(profile_path: profile_path, certificate: certificate)
-          UI.verbose("Checking if profile is valid on dev portal")
-          next unless 
           UI.verbose("Found matching provisioning profile for certificate '#{certificate['FileName']}'")
           found = true
           break
