@@ -61,6 +61,7 @@ describe FastlaneCore do
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G4')
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G5')
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G6')
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G7')
         FastlaneCore::CertChecker.install_missing_wwdr_certificates
       end
 
@@ -68,6 +69,7 @@ describe FastlaneCore do
         allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5'])
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G1')
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G6')
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G7')
         FastlaneCore::CertChecker.install_missing_wwdr_certificates
       end
 
@@ -112,13 +114,13 @@ describe FastlaneCore do
           `ls`
 
           keychain = "keychain with spaces.keychain"
-          cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
+          cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://www\.apple\.com/certificateauthority/AppleWWDRCAG7\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
           require "open3"
 
           expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])
           expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
-          allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G1', 'G2', 'G3', 'G4', 'G5'])
+          allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G1', 'G2', 'G3', 'G4', 'G5', 'G6'])
           expect(FastlaneCore::CertChecker.install_missing_wwdr_certificates).to be(1)
         end
 
@@ -129,13 +131,13 @@ describe FastlaneCore do
           stub_const('ENV', { "FASTLANE_WWDR_USE_HTTP1_AND_RETRIES" => "true" })
 
           keychain = "keychain with spaces.keychain"
-          cmd = %r{curl --http1.1 --retry 3 --retry-all-errors -f -o (([A-Z]\:)?\/.+) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
+          cmd = %r{curl --http1.1 --retry 3 --retry-all-errors -f -o (([A-Z]\:)?\/.+) https://www\.apple\.com/certificateauthority/AppleWWDRCAG7\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
           require "open3"
 
           expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])
           expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
-          allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G1', 'G2', 'G3', 'G4', 'G5'])
+          allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G1', 'G2', 'G3', 'G4', 'G5', 'G6'])
           expect(FastlaneCore::CertChecker.install_missing_wwdr_certificates).to be(1)
         end
       end

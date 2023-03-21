@@ -35,6 +35,11 @@ WWDRCA_CERTIFICATES = [
     alias: 'G6',
     sha256: 'bdd4ed6e74691f0c2bfd01be0296197af1379e0418e2d300efa9c3bef642ca30',
     url: 'https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer'
+  },
+  {
+    alias: 'G7',
+    sha256: '0f570d7502373a2102e2106faaa8fa4844944a07ee676198484f4d6ce15bea47',
+    url: 'https://www.apple.com/certificateauthority/AppleWWDRCAG7.cer'
   }
 ]
 
