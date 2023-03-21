@@ -48,7 +48,7 @@ module Deliver
 
       submission.add_app_store_version_to_review_items(app_store_version_id: version.id)
 
-      loop do
+      10.times do
         version_with_latest_info = Spaceship::ConnectAPI::AppStoreVersion.get(app_store_version_id: version.id)
 
         if version_with_latest_info.app_store_state == Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_REVIEW
