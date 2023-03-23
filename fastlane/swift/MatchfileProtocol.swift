@@ -1,8 +1,8 @@
 // MatchfileProtocol.swift
-// Copyright (c) 2022 FastlaneTools
+// Copyright (c) 2023 FastlaneTools
 
 public protocol MatchfileProtocol: AnyObject {
-    /// Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution
+    /// Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution, developer_id_installer
     var type: String { get }
 
     /// Create additional cert types needed for macOS installers (valid values: mac_installer_distribution, developer_id_installer)
@@ -208,4 +208,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.109]
+// FastlaneRunnerAPIVersion [0.9.111]

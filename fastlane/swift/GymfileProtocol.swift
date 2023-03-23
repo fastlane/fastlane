@@ -1,5 +1,5 @@
 // GymfileProtocol.swift
-// Copyright (c) 2022 FastlaneTools
+// Copyright (c) 2023 FastlaneTools
 
 public protocol GymfileProtocol: AnyObject {
     /// Path to the workspace file
@@ -107,6 +107,9 @@ public protocol GymfileProtocol: AnyObject {
     /// xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
     var xcodebuildFormatter: String { get }
 
+    /// Create a build timing summary
+    var buildTimingSummary: Bool { get }
+
     /// **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Disable xcpretty formatting of build output
     var disableXcpretty: Bool? { get }
 
@@ -186,6 +189,7 @@ public extension GymfileProtocol {
     var xcconfig: String? { return nil }
     var suppressXcodeOutput: Bool? { return nil }
     var xcodebuildFormatter: String { return "xcbeautify" }
+    var buildTimingSummary: Bool { return false }
     var disableXcpretty: Bool? { return nil }
     var xcprettyTestFormat: Bool? { return nil }
     var xcprettyFormatter: String? { return nil }
@@ -204,4 +208,4 @@ public extension GymfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.115]
+// FastlaneRunnerAPIVersion [0.9.117]

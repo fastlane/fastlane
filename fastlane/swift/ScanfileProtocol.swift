@@ -1,5 +1,5 @@
 // ScanfileProtocol.swift
-// Copyright (c) 2022 FastlaneTools
+// Copyright (c) 2023 FastlaneTools
 
 public protocol ScanfileProtocol: AnyObject {
     /// Path to the workspace file
@@ -127,6 +127,9 @@ public protocol ScanfileProtocol: AnyObject {
 
     /// Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
     var outputXctestrun: Bool { get }
+
+    /// Custom path for the result bundle, overrides result_bundle
+    var resultBundlePath: String? { get }
 
     /// Should an Xcode result bundle be generated in the output directory
     var resultBundle: Bool { get }
@@ -274,6 +277,7 @@ public extension ScanfileProtocol {
     var derivedDataPath: String? { return nil }
     var shouldZipBuildProducts: Bool { return false }
     var outputXctestrun: Bool { return false }
+    var resultBundlePath: String? { return nil }
     var resultBundle: Bool { return false }
     var useClangReportName: Bool { return false }
     var parallelTesting: Bool? { return nil }
@@ -312,4 +316,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.120]
+// FastlaneRunnerAPIVersion [0.9.122]

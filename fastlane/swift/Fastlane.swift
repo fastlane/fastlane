@@ -1,5 +1,5 @@
 // Fastlane.swift
-// Copyright (c) 2022 FastlaneTools
+// Copyright (c) 2023 FastlaneTools
 
 import Foundation
 /**
@@ -1318,6 +1318,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - xcconfig: Use an extra XCCONFIG file to build your app
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+   - buildTimingSummary: Create a build timing summary
    - disableXcpretty: **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Disable xcpretty formatting of build output
    - xcprettyTestFormat: Use the test (RSpec style) format for build output
    - xcprettyFormatter: A custom xcpretty formatter to use
@@ -1372,6 +1373,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                         xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                         xcodebuildFormatter: String = "xcbeautify",
+                                        buildTimingSummary: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                         xcprettyTestFormat: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                         xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -1422,6 +1424,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let xcconfigArg = xcconfig.asRubyArgument(name: "xcconfig", type: nil)
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
+    let buildTimingSummaryArg = buildTimingSummary.asRubyArgument(name: "build_timing_summary", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let xcprettyTestFormatArg = xcprettyTestFormat.asRubyArgument(name: "xcpretty_test_format", type: nil)
     let xcprettyFormatterArg = xcprettyFormatter.asRubyArgument(name: "xcpretty_formatter", type: nil)
@@ -1471,6 +1474,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           xcconfigArg,
                                           suppressXcodeOutputArg,
                                           xcodebuildFormatterArg,
+                                          buildTimingSummaryArg,
                                           disableXcprettyArg,
                                           xcprettyTestFormatArg,
                                           xcprettyFormatterArg,
@@ -1528,6 +1532,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - xcconfig: Use an extra XCCONFIG file to build your app
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+   - buildTimingSummary: Create a build timing summary
    - disableXcpretty: **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Disable xcpretty formatting of build output
    - xcprettyTestFormat: Use the test (RSpec style) format for build output
    - xcprettyFormatter: A custom xcpretty formatter to use
@@ -1579,6 +1584,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcodebuildFormatter: String = "xcbeautify",
+                                           buildTimingSummary: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcprettyTestFormat: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -1626,6 +1632,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let xcconfigArg = xcconfig.asRubyArgument(name: "xcconfig", type: nil)
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
+    let buildTimingSummaryArg = buildTimingSummary.asRubyArgument(name: "build_timing_summary", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let xcprettyTestFormatArg = xcprettyTestFormat.asRubyArgument(name: "xcpretty_test_format", type: nil)
     let xcprettyFormatterArg = xcprettyFormatter.asRubyArgument(name: "xcpretty_formatter", type: nil)
@@ -1672,6 +1679,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           xcconfigArg,
                                           suppressXcodeOutputArg,
                                           xcodebuildFormatterArg,
+                                          buildTimingSummaryArg,
                                           disableXcprettyArg,
                                           xcprettyTestFormatArg,
                                           xcprettyFormatterArg,
@@ -1730,6 +1738,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - xcconfig: Use an extra XCCONFIG file to build your app
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+   - buildTimingSummary: Create a build timing summary
    - disableXcpretty: **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Disable xcpretty formatting of build output
    - xcprettyTestFormat: Use the test (RSpec style) format for build output
    - xcprettyFormatter: A custom xcpretty formatter to use
@@ -1782,6 +1791,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcodebuildFormatter: String = "xcbeautify",
+                                           buildTimingSummary: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcprettyTestFormat: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -1830,6 +1840,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let xcconfigArg = xcconfig.asRubyArgument(name: "xcconfig", type: nil)
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
+    let buildTimingSummaryArg = buildTimingSummary.asRubyArgument(name: "build_timing_summary", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let xcprettyTestFormatArg = xcprettyTestFormat.asRubyArgument(name: "xcpretty_test_format", type: nil)
     let xcprettyFormatterArg = xcprettyFormatter.asRubyArgument(name: "xcpretty_formatter", type: nil)
@@ -1877,6 +1888,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           xcconfigArg,
                                           suppressXcodeOutputArg,
                                           xcodebuildFormatterArg,
+                                          buildTimingSummaryArg,
                                           disableXcprettyArg,
                                           xcprettyTestFormatArg,
                                           xcprettyFormatterArg,
@@ -5569,6 +5581,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - xcconfig: Use an extra XCCONFIG file to build your app
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+   - buildTimingSummary: Create a build timing summary
    - disableXcpretty: **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Disable xcpretty formatting of build output
    - xcprettyTestFormat: Use the test (RSpec style) format for build output
    - xcprettyFormatter: A custom xcpretty formatter to use
@@ -5623,6 +5636,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                    xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.xcconfig),
                                    suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(gymfile.suppressXcodeOutput),
                                    xcodebuildFormatter: String = gymfile.xcodebuildFormatter,
+                                   buildTimingSummary: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.buildTimingSummary),
                                    disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(gymfile.disableXcpretty),
                                    xcprettyTestFormat: OptionalConfigValue<Bool?> = .fastlaneDefault(gymfile.xcprettyTestFormat),
                                    xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.xcprettyFormatter),
@@ -5673,6 +5687,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let xcconfigArg = xcconfig.asRubyArgument(name: "xcconfig", type: nil)
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
+    let buildTimingSummaryArg = buildTimingSummary.asRubyArgument(name: "build_timing_summary", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let xcprettyTestFormatArg = xcprettyTestFormat.asRubyArgument(name: "xcpretty_test_format", type: nil)
     let xcprettyFormatterArg = xcprettyFormatter.asRubyArgument(name: "xcpretty_formatter", type: nil)
@@ -5722,6 +5737,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                           xcconfigArg,
                                           suppressXcodeOutputArg,
                                           xcodebuildFormatterArg,
+                                          buildTimingSummaryArg,
                                           disableXcprettyArg,
                                           xcprettyTestFormatArg,
                                           xcprettyFormatterArg,
@@ -6629,7 +6645,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
  Alias for the `sync_code_signing` action
 
  - parameters:
-   - type: Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution
+   - type: Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution, developer_id_installer
    - additionalCertTypes: Create additional cert types needed for macOS installers (valid values: mac_installer_distribution, developer_id_installer)
    - readonly: Only fetch existing certificates and profiles, don't generate new ones
    - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
@@ -6844,7 +6860,7 @@ public func match(type: String = matchfile.type,
  Easily nuke your certificate and provisioning profiles (via _match_)
 
  - parameters:
-   - type: Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution
+   - type: Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution, developer_id_installer
    - additionalCertTypes: Create additional cert types needed for macOS installers (valid values: mac_installer_distribution, developer_id_installer)
    - readonly: Only fetch existing certificates and profiles, don't generate new ones
    - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
@@ -8662,6 +8678,7 @@ public func rubyVersion() {
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
    - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
+   - resultBundlePath: Custom path for the result bundle, overrides result_bundle
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - parallelTesting: Optionally override the per-target setting in the scheme for running tests in parallel. Equivalent to -parallel-testing-enabled
@@ -8743,6 +8760,7 @@ public func rubyVersion() {
                                         derivedDataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         shouldZipBuildProducts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         outputXctestrun: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        resultBundlePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         resultBundle: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         useClangReportName: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         parallelTesting: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
@@ -8820,6 +8838,7 @@ public func rubyVersion() {
     let derivedDataPathArg = derivedDataPath.asRubyArgument(name: "derived_data_path", type: nil)
     let shouldZipBuildProductsArg = shouldZipBuildProducts.asRubyArgument(name: "should_zip_build_products", type: nil)
     let outputXctestrunArg = outputXctestrun.asRubyArgument(name: "output_xctestrun", type: nil)
+    let resultBundlePathArg = resultBundlePath.asRubyArgument(name: "result_bundle_path", type: nil)
     let resultBundleArg = resultBundle.asRubyArgument(name: "result_bundle", type: nil)
     let useClangReportNameArg = useClangReportName.asRubyArgument(name: "use_clang_report_name", type: nil)
     let parallelTestingArg = parallelTesting.asRubyArgument(name: "parallel_testing", type: nil)
@@ -8896,6 +8915,7 @@ public func rubyVersion() {
                                           derivedDataPathArg,
                                           shouldZipBuildProductsArg,
                                           outputXctestrunArg,
+                                          resultBundlePathArg,
                                           resultBundleArg,
                                           useClangReportNameArg,
                                           parallelTestingArg,
@@ -9085,6 +9105,7 @@ public func say(text: [String],
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
    - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
+   - resultBundlePath: Custom path for the result bundle, overrides result_bundle
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - parallelTesting: Optionally override the per-target setting in the scheme for running tests in parallel. Equivalent to -parallel-testing-enabled
@@ -9166,6 +9187,7 @@ public func say(text: [String],
                                     derivedDataPath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.derivedDataPath),
                                     shouldZipBuildProducts: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.shouldZipBuildProducts),
                                     outputXctestrun: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.outputXctestrun),
+                                    resultBundlePath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.resultBundlePath),
                                     resultBundle: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.resultBundle),
                                     useClangReportName: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.useClangReportName),
                                     parallelTesting: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.parallelTesting),
@@ -9243,6 +9265,7 @@ public func say(text: [String],
     let derivedDataPathArg = derivedDataPath.asRubyArgument(name: "derived_data_path", type: nil)
     let shouldZipBuildProductsArg = shouldZipBuildProducts.asRubyArgument(name: "should_zip_build_products", type: nil)
     let outputXctestrunArg = outputXctestrun.asRubyArgument(name: "output_xctestrun", type: nil)
+    let resultBundlePathArg = resultBundlePath.asRubyArgument(name: "result_bundle_path", type: nil)
     let resultBundleArg = resultBundle.asRubyArgument(name: "result_bundle", type: nil)
     let useClangReportNameArg = useClangReportName.asRubyArgument(name: "use_clang_report_name", type: nil)
     let parallelTestingArg = parallelTesting.asRubyArgument(name: "parallel_testing", type: nil)
@@ -9319,6 +9342,7 @@ public func say(text: [String],
                                           derivedDataPathArg,
                                           shouldZipBuildProductsArg,
                                           outputXctestrunArg,
+                                          resultBundlePathArg,
                                           resultBundleArg,
                                           useClangReportNameArg,
                                           parallelTestingArg,
@@ -11062,7 +11086,7 @@ public func swiftlint(mode: String = "lint",
  Easily sync your certificates and profiles across your team (via _match_)
 
  - parameters:
-   - type: Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution
+   - type: Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution, developer_id_installer
    - additionalCertTypes: Create additional cert types needed for macOS installers (valid values: mac_installer_distribution, developer_id_installer)
    - readonly: Only fetch existing certificates and profiles, don't generate new ones
    - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
@@ -13346,7 +13370,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode-13.4.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-14.1.0.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13549,4 +13573,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.165]
+// FastlaneRunnerAPIVersion [0.9.167]

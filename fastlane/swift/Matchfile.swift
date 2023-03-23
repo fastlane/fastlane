@@ -1,5 +1,5 @@
 // Matchfile.swift
-// Copyright (c) 2022 FastlaneTools
+// Copyright (c) 2023 FastlaneTools
 
 // This class is automatically included in FastlaneRunner during build
 
@@ -17,4 +17,4 @@ public class Matchfile: MatchfileProtocol {
     // during the `init` process, and you won't see this message
 }
 
-// Generated with fastlane 2.211.0
+// Generated with fastlane 2.212.1
