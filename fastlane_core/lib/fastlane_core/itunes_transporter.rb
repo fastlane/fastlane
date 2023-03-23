@@ -47,7 +47,7 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
       not_implemented(__method__)
     end
 
@@ -307,7 +307,9 @@ module FastlaneCore
       raise "This feature has not been implemented yet with altool for Xcode 14"
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
+      api_key = kwargs[:api_key]
+      platform = kwargs[:platform]
       use_api_key = !api_key.nil?
       [
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
@@ -318,7 +320,7 @@ module FastlaneCore
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
-        platform_option(platform),
+        platform_option(kwargs[:platform]),
         file_upload_option(source)
       ].compact.join(' ')
     end
@@ -421,7 +423,8 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
+      jwt = kwargs[:jwt]
       use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
@@ -516,7 +519,8 @@ module FastlaneCore
       end
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
+      jwt = kwargs[:jwt]
       use_jwt = !jwt.to_s.empty?
       if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
@@ -838,11 +842,10 @@ module FastlaneCore
       use_api_key = !@api_key.nil?
       api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
 
-      api_key = nil
       api_key = api_key_with_p8_file_path(@api_key) if use_api_key
 
-      command = @transporter_executor.build_verify_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, api_key)
-      UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_placeholder))
+      command = @transporter_executor.build_verify_command(@user, @password, actual_dir, @provider_short_name, jwt: @jwt, platform: platform, api_key: api_key)
+      UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt: jwt_placeholder, platform: platform, api_key: api_key_placeholder))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
