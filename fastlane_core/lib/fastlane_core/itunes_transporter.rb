@@ -825,8 +825,7 @@ module FastlaneCore
       actual_dir = if can_use_asset_path && !force_itmsp
                      # The asset gets deleted upon completion so copying to a temp directory
                      # (with randomized filename, for multibyte-mixed filename upload fails)
-                     new_file_name = "#{SecureRandom.uuid}#{File.extname(asset_path)}"
-                     tmp_asset_path = File.join(Dir.tmpdir, new_file_name)
+                     tmp_asset_path = Dir.mktmpdir
                      FileUtils.cp(asset_path, tmp_asset_path)
                      tmp_asset_path
                    elsif package_path
@@ -840,6 +839,8 @@ module FastlaneCore
 
       # Handle AppStore Connect API
       use_api_key = !@api_key.nil?
+
+      # Masking credentials for verbose outputs
       api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
 
       api_key = api_key_with_p8_file_path(@api_key) if use_api_key
