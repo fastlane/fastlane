@@ -1,22 +1,21 @@
 describe Match do
   describe Match::Storage::AWSSecretsManagerStorage do
-    stub_request(:put, "http://169.254.169.254/latest/api/token").
-      with(
-        headers: {
-        'Accept' => '*/*',
-        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-        'User-Agent' => 'aws-sdk-ruby3/3.167.0',
-        'X-Aws-Ec2-Metadata-Token-Ttl-Seconds' => '21600'
-        }
-    ).
-      to_return(status: 200, body: "", headers: {})
-
     subject { described_class.new(aws_secrets_manager_region: nil, aws_secrets_manager_access_key: nil, aws_secrets_manager_secret_access_key: nil, team_id: 'test_team_id') }
     let(:working_directory) { '/var/folders/px/abcdefghijklmnop/T/d20181026-96528-1av4gge' }
 
     before do
       allow(subject).to receive(:working_directory).and_return(working_directory)
       allow(subject).to receive(:aws_sm_client).and_return(aws_sm_client)
+      stub_request(:put, "http://169.254.169.254/latest/api/token").
+        with(
+          headers: {
+          'Accept' => '*/*',
+          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent' => 'aws-sdk-ruby3/3.167.0',
+          'X-Aws-Ec2-Metadata-Token-Ttl-Seconds' => '21600'
+          }
+      ).
+        to_return(status: 200, body: "", headers: {})
     end
 
     describe '#upload_files' do
