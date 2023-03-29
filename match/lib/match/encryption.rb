@@ -21,9 +21,6 @@ module Match
           },
           "gitlab_secure_files" => lambda { |params|
             return nil
-          },
-          "aws_secrets_manager" => lambda { |params|
-            return nil
           }
         }
       end

@@ -231,32 +231,6 @@ module Match
                                      description: "GitLab Project Path (i.e. 'gitlab-org/gitlab')",
                                      optional: true),
 
-        # Storage: AWS Secrets manager
-        FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_region,
-                                     env_name: "MATCH_AWS_SECRETS_MANAGER_REGION",
-                                     description: "Name of the AWS Secrets Manager region",
-                                     optional: true),
-        FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_prefix,
-                                     env_name: "MATCH_AWS_SECRETS_MANAGER_PREFIX",
-                                     description: "Prefix to be used on all secrets uploaded to AWS Secrets Manager",
-                                     optional: true),
-        FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_force_delete_without_recovery,
-                                     env_name: "MATCH_AWS_SECRETS_MANAGER_FORCE_DELETE_WITHOUT_RECOVERY",
-                                     description: "Force delete the secrets without recovery",
-                                     optional: true),
-        FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_recovery_window_days,
-                                     env_name: "MATCH_AWS_SECRETS_MANAGER_RECOVERY_WINDOW_DAYS",
-                                     description: "The number of days that Secrets Manager waits before it can delete the secret (Minimum 7, Default 30)",
-                                     optional: true),
-        FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_access_key,
-                                     env_name: "MATCH_AWS_SECRETS_MANAGER_ACCESS_KEY",
-                                     description: "AWS Secrets Manager access key",
-                                     optional: true),
-        FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_secret_access_key,
-                                     env_name: "MATCH_AWS_SECRETS_MANAGER_SECRET_ACCESS_KEY",
-                                     description: "AWS Secrets Manager secret access key",
-                                     optional: true),
-
         # Keychain
         FastlaneCore::ConfigItem.new(key: :keychain_name,
                                      short_option: "-s",
@@ -390,5 +364,4 @@ module Match
       ]
     end
   end
-  # rubocop:enable Metrics/ClassLength
 end
