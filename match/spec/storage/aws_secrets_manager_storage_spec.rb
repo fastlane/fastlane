@@ -12,7 +12,7 @@ describe Match do
         }
     ).
       to_return(status: 200, body: "", headers: {})
-    subject { described_class.new(aws_secrets_manager_region: nil, aws_secrets_manager_access_key: nil, aws_secrets_manager_secret_access_key: nil, team_id: 'test_team_id') }
+    subject { described_class.new(aws_secrets_manager_region: 'us-west-2', aws_secrets_manager_access_key: nil, aws_secrets_manager_secret_access_key: nil, team_id: 'test_team_id') }
     let(:working_directory) { '/var/folders/px/abcdefghijklmnop/T/d20181026-96528-1av4gge' }
 
     before do
