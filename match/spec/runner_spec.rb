@@ -121,7 +121,7 @@ describe Match do
         it "uses existing certificates and profiles if they exist", requires_security: true do
           git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
           values = {
-            app_identifier: "com.jigx.test.ios",
+            app_identifier: "tools.fastlane.app",
             type: "appstore",
             git_url: git_url,
             username: "flapple@something.com"
@@ -195,16 +195,16 @@ describe Match do
 
           Match::Runner.new.run(config)
 
-          expect(ENV[Match::Utils.environment_variable_name(app_identifier: "com.jigx.test.ios",
-                                                            type: "appstore")]).to eql('2746d535-7d21-403f-8718-5deee23b2366')
-          expect(ENV[Match::Utils.environment_variable_name_team_id(app_identifier: "com.jigx.test.ios",
+          expect(ENV[Match::Utils.environment_variable_name(app_identifier: "tools.fastlane.app",
+                                                            type: "appstore")]).to eql('a0b45501-0c52-41cb-b52e-124edf937135')
+          expect(ENV[Match::Utils.environment_variable_name_team_id(app_identifier: "tools.fastlane.app",
                                                                     type: "appstore")]).to eql('VQVYM88YJ2')
-          expect(ENV[Match::Utils.environment_variable_name_profile_name(app_identifier: "com.jigx.test.ios",
+          expect(ENV[Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
                                                                          type: "appstore")]).to eql('Jigx Test AppStore')
-          profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/2746d535-7d21-403f-8718-5deee23b2366.mobileprovision')
-          expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "com.jigx.test.ios",
+          profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/a0b45501-0c52-41cb-b52e-124edf937135.mobileprovision')
+          expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
                                                                          type: "appstore")]).to eql(profile_path)
-          expect(ENV[Match::Utils.environment_variable_name_certificate_name(app_identifier: "com.jigx.test.ios",
+          expect(ENV[Match::Utils.environment_variable_name_certificate_name(app_identifier: "tools.fastlane.app",
                                                                              type: "appstore")]).to eql("fastlane certificate name")
         end
 
