@@ -43,7 +43,13 @@ module Match
         team_id: params[:team_id],
         team_name: params[:team_name],
         api_key_path: params[:api_key_path],
-        api_key: params[:api_key]
+        api_key: params[:api_key],
+        aws_secrets_manager_region: params[:aws_secrets_manager_region],
+        aws_secrets_manager_prefix: params[:aws_secrets_manager_prefix],
+        aws_secrets_manager_force_delete_without_recovery: params[:aws_secrets_manager_force_delete_without_recovery],
+        aws_secrets_manager_recovery_window_days: params[:aws_secrets_manager_recovery_window_days],
+        aws_secrets_manager_access_key: params[:aws_secrets_manager_access_key],
+        aws_secrets_manager_secret_access_key: params[:aws_secrets_manager_secret_access_key]
       })
       storage.download
 
