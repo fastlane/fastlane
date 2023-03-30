@@ -8,7 +8,3 @@ def before_each_match
   ENV["DELIVER_USER"] = "flapple@krausefx.com"
   ENV["DELIVER_PASSWORD"] = "so_secret"
 end
-
-def stub_request(*args)
-  WebMock::API.stub_request(*args)
-end
