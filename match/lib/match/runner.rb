@@ -178,7 +178,7 @@ module Match
         self.files_to_commit << private_key_path
       else
         cert_key_pairs = certs.map do |existing_cert_path|
-          matching_key = keys.find { |key_path| FastlaneCore::CertChecker.certificate_key_match?(cert_path, key_path) }
+          matching_key = keys.find { |key_path| FastlaneCore::CertChecker.certificate_key_match?(existing_cert_path, key_path) }
           if !matching_key
             UI.error("Could not find matching key for certificate '#{existing_cert_path}'")
             nil
