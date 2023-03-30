@@ -1,3 +1,5 @@
+require_relative '../mock_servers.rb'
+
 describe Match do
   describe Match::Storage::AWSSecretsManagerStorage do
     stub_request(:put, "http://169.254.169.254/latest/api/token").
