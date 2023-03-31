@@ -18,7 +18,7 @@ module Deliver
 
     def upload_metadata(options)
       # app clip default experience metadata is not editable in a live version
-      return if options[:edit_live]
+      return if options[:edit_live] || options[:skip_metadata]
 
       # load the metadata from the filesystem before uploading
       load_from_filesystem(options)
@@ -69,6 +69,7 @@ module Deliver
 
     # Loads the app clip default experience metadata files and stores them into the options object
     def load_from_filesystem(options)
+      return if options[:skip_metadata]
       metadata_path = options[:app_clip_default_experience_metadata_path]
 
       # Load localised data
