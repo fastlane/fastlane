@@ -65,8 +65,8 @@ module Fastlane
           'update_plist( # Updates the CLIENT_ID and GOOGLE_APP_ID string entries in the plist-file
             plist_path: "path/to/your_plist_file.plist",
             block: proc do |plist|
-              plist[:CLIENT_ID] = "new_client_id"
-              plist[:GOOGLE_APP_ID] = "new_google_app_id"
+              plist['CLIENT_ID'] = "new_client_id"
+              plist['GOOGLE_APP_ID'] = "new_google_app_id"
             end
           )',
           'update_plist( # Sets a boolean entry
