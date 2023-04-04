@@ -653,15 +653,18 @@ module Deliver
 
       info = info.transform_keys(&:to_sym)
       UI.user_error!("`app_clip_review_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
-
       attributes = {}
       APP_CLIP_REVIEW_INFORMATION_VALUES.each do |key, attribute_name|
-        strip_value = info[key].to_s.strip
-        attributes[attribute_name] = strip_value unless strip_value.empty?
+        if info[key].kind_of?(Array)
+          attributes[attribute_name] = info[key].map { |value| value.to_s.strip } unless info[key].empty?
+        else
+          strip_value = info[key].to_s.strip
+          attributes[attribute_name] = strip_value unless strip_value.empty?
+        end
       end
 
-      unless attributes["invocation_urls"].to_s.empty?
-        attributes["invocation_urls"] = attributes["invocation_urls"].split("\n")
+      if attributes["invocation_urls"].kind_of?(String)
+        attributes["invocation_urls"] = attributes["invocation_urls"].split(", ")
       end
 
       UI.message("Uploading app clip review information to App Store Connect")
