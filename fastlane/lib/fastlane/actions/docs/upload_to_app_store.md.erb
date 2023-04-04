@@ -242,6 +242,26 @@ app_review_information(
 
 You can also provide these values by creating files in a `metadata/review_information/` directory. The file names must match the pattern `<key>.txt` (e.g. `first_name.txt`, `notes.txt` etc.). The contents of each file will be used as the value for the matching key. Values provided in the `Deliverfile` or `Fastfile` will be take priority over values from these files.
 
+##### app_clip_review_information
+Review information on the app clips for the app review team. Available options: `invocation_urls`
+
+
+```ruby-skip-tests
+app_clip_review_information(
+  invocation_urls: ["http://localhost.com"]
+)
+```
+
+You can also provide these values by creating files in a `metadata/app_clip_review_information/` directory. The file names must match the pattern `<key>.txt` (e.g. `invocation_urls`). The contents of each file will be used as the value for the matching key. Values provided in the `Deliverfile` or `Fastfile` will be take priority over values from these files.
+
+Example of the `invocation_urls.txt` file:
+
+
+```
+http://localhost.com/1, http://localhost.com/2
+```
+
+
 ##### app_review_attachment_file
 You can provide additional information to the app review team as a file attachment. As of this writing, Apple supports following file attachment formats: .pdf, .doc, .docx, .rtf, .pages, .xls, .xlsx, .numbers, .zip, .rar, .plist, .crash, .jpg, .png, .mp4, or .avi.
 

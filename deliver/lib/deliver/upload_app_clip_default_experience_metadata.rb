@@ -71,7 +71,7 @@ module Deliver
     def load_from_filesystem(options)
       metadata_path = options[:app_clip_default_experience_metadata_path]
       return if options[:skip_metadata] || metadata_path.nil?
-      
+
       # Load localised data
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(metadata_path, ignore_validation).each do |lang_folder|
