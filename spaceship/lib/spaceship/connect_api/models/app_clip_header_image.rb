@@ -99,7 +99,6 @@ module Spaceship
             attributes: post_attributes
           ).first
         rescue => error
-          # TODO: handle this error like how `app_screenshot` model does it
           puts("ERROR: Unable to create app clip header image reservation, error: #{error}")
         end
 

@@ -29,7 +29,7 @@ module Deliver
 
       UI.important("Will begin uploading app clip default experience metadata for '#{version.version_string}' on App Store Connect")
 
-      # TODO: support handling more than one app clip target per app
+      # Currently only one app clip target per app is supported
       app_clips = app.get_app_clips
       app_clip = app_clips.first
 
