@@ -80,7 +80,6 @@ module Deliver
       Helper.show_loading_indicator("Waiting for all the app clip header images to finish being processed...")
       wait_for_complete(app_clip_default_experience.id)
       Helper.hide_loading_indicator
-      # TODO: implement function similar to AppScreenshot's `retry_upload_screenshots_if_needed` for robustness
 
       UI.message("Successfully uploaded all app clip header images")
     end
