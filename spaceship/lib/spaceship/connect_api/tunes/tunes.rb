@@ -161,7 +161,7 @@ module Spaceship
               type: "appPrices",
               id: "${price1}",
               attributes: {
-               // startDate: nil
+               # startDate: nil
               },
               relationships: {
                 app: {
