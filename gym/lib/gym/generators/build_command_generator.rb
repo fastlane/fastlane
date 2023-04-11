@@ -39,6 +39,7 @@ module Gym
         options << "-destination '#{config[:destination]}'" if config[:destination]
         options << "-archivePath #{archive_path.shellescape}" unless config[:skip_archive]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
+        options << "-showBuildTimingSummary" if config[:build_timing_summary]
         if config[:use_system_scm] && !options.include?("-scmProvider system")
           options << "-scmProvider system"
         end
