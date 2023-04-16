@@ -9,7 +9,7 @@ aliases:
     filters:
       branches:
         only:
-          - main
+          - master
           - /^version\-bump\-.*/
   # common - cache
   - &cache_restore_git
