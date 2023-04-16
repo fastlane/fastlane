@@ -400,7 +400,7 @@ By using the `force_for_new_devices` parameter, _match_ will check if the (enabl
 
 _**Important:** The `force_for_new_devices` parameter is ignored for App Store provisioning profiles since they don't contain any device information._
 
-If you're not using _fastlane_, you can also use the `force_for_new_devices` option from the command line:
+If you're not using `Fastfile`, you can also use the `force_for_new_devices` option from the command line:
 
 ```no-highlight
 fastlane match adhoc --force_for_new_devices
