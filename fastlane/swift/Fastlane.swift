@@ -4299,7 +4299,7 @@ public func ensureGitBranch(branch: String = "master") {
  - parameters:
    - showUncommittedChanges: The flag whether to show uncommitted changes if the repo is dirty
    - showDiff: The flag whether to show the git diff if the repo is dirty
-   - ignored: The flag whether to ignore file the git status if the repo is dirty
+   - ignored: The handling mode of the ignored files. The available options are: `'traditional'`, `'none'` (default) and `'matching'`. Specifying `'none'` to this parameter is the same as not specifying the parameter at all, which means that no ignored file will be used to check if the repo is dirty or not. Specifying `'traditional'` or `'matching'` causes some ignored files to be used to check if the repo is dirty or not (more info in the official docs: https://git-scm.com/docs/git-status#Documentation/git-status.txt---ignoredltmodegt)
 
  A sanity check to make sure you are working in a repo that is clean.
  Especially useful to put at the beginning of your Fastfile in the `before_all` block, if some of your other actions will touch your filesystem, do things to your git repo, or just as a general reminder to save your work.
@@ -13573,4 +13573,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.167]
+// FastlaneRunnerAPIVersion [0.9.168]
