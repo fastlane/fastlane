@@ -460,6 +460,41 @@ module Spaceship
         end
 
         #
+        # SubscriptionAvailability
+        #
+
+        def get_subscription_availabilities(purchase_id:, filter: nil, includes: nil, limit: nil)
+          params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: nil)
+          iap_request_client.get("subscriptionAvailabilities/#{purchase_id}", params)
+        end
+
+        def create_subscription_availability(purchase_id:, available_in_new_territories:, available_territory_ids:)
+          params = {
+            data: {
+              type: 'subscriptionAvailabilities',
+              attributes: {
+                availableInNewTerritories: available_in_new_territories
+              },
+              relationships: {
+                subscription: {
+                  data: {
+                    id: purchase_id,
+                    type: 'subscriptions'
+                  }
+                },
+                availableTerritories: {
+                  data: available_territory_ids.map do |id|
+                    { id: id, type: 'territories' }
+                  end
+                }
+              }
+            }
+          }
+
+          iap_request_client.post('subscriptionAvailabilities', params)
+        end
+
+        #
         # subscriptionIntroductoryOffers
         #
 

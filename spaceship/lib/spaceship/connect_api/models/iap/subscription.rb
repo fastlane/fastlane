@@ -18,7 +18,8 @@ module Spaceship
       attr_accessor :prices,
                     :subscription_localizations,
                     :app_store_review_screenshot,
-                    :introductory_offers
+                    :introductory_offers,
+                    :subscription_availabilities
 
       module Period
         ONE_WEEK = "ONE_WEEK"
@@ -103,6 +104,26 @@ module Spaceship
       def delete(client: nil)
         client ||= Spaceship::ConnectAPI
         client.delete_subscription(purchase_id: id)
+      end
+
+      #
+      # Subscription Availability
+      #
+
+      def get_subscription_availabilities(client: nil, includes: Spaceship::ConnectAPI::SubscriptionAvailability::ESSENTIAL_INCLUDES, limit: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_subscription_availabilities(purchase_id: id, includes: includes, limit: limit).all_pages
+        models = resps.flat_map(&:to_models)
+        (self.subscription_availabilities ||= []).concat(models).uniq! { |availability| availability.id }
+        models
+      end
+
+      def create_subscription_availability(client: nil, available_in_new_territories: nil, available_territory_ids: [])
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_subscription_availability(purchase_id: id, available_in_new_territories: available_in_new_territories, available_territory_ids: available_territory_ids)
+        model = resps.to_models.first
+        ((self.subscription_availabilities ||= []) << model).uniq! { |availability| availability.id }
+        model
       end
 
       #
