@@ -139,7 +139,6 @@ module Snapshot
         'iPad Pro (11-inch) (4th generation) (16GB)' => 'iPad Pro (11-inch) (4th generation) (16GB)',
         'iPad Pro (11-inch) (4th generation)' => 'iPad Pro (11-inch) (4th generation)',
         'iPad Pro (11-inch) (3rd generation)' => 'iPad Pro (11-inch) (3rd generation)',
-        'iPad Pro (11-inch) (3rd generation)' => 'iPad Pro (11-inch) (3rd generation)',
         'iPad Pro (11-inch) (2nd generation)' => 'iPad Pro (11-inch) (2nd generation)',
         'iPad Pro (11-inch) (1st generation)' => 'iPad Pro (11-inch) (1st generation)',
         'iPad Pro (11-inch)' => 'iPad Pro (11-inch)',
