@@ -26,6 +26,7 @@ module Fastlane
         payload['name'] = params[:name] if params[:name]
         payload['body'] = params[:description] if params[:description]
         payload['target_commitish'] = params[:commitish] if params[:commitish]
+        payload['previous_tag_name'] = params[:previous_tag_name] if params[:previous_tag_name]
 
         GithubApiAction.run(
           server_url: server_url,
@@ -227,6 +228,11 @@ module Fastlane
                                        optional: true,
                                        default_value: false,
                                        type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :previous_tag_name,
+                                       env_name: "FL_SET_GITHUB_RELEASE_PREVIOUS_TAG_NAME",
+                                       description: "The name of the previous tag to use as the starting point for the release notes. Use to manually specify the range for the set of changes considered as part this release",
+                                       optional: true,
+                                       default_value: nil),
           FastlaneCore::ConfigItem.new(key: :upload_assets,
                                        env_name: "FL_SET_GITHUB_RELEASE_UPLOAD_ASSETS",
                                        description: "Path to assets to be uploaded with the release",
