@@ -1244,6 +1244,27 @@ module Spaceship
           tunes_request_client.delete("sandboxTesters/#{sandbox_tester_id}", params)
         end
 
+        def clear_sandbox_tester_purchase_history(sandbox_tester_id: nil)
+          relationships = {
+            sandboxTesters: {
+              data: [
+                {
+                  type: "sandboxTesters",
+                  id: sandbox_tester_id
+                }
+              ]
+            }
+          }
+          body = {
+            data: {
+              type: "sandboxTestersClearPurchaseHistoryRequest",
+              relationships: relationships
+            }
+          }
+          url_or_path = tunes_request_client.token.nil? ? "sandboxTestersClearPurchaseHistoryRequest" : "https://api.appstoreconnect.apple.com/v2/sandboxTestersClearPurchaseHistoryRequest"
+          tunes_request_client.post(url_or_path, body)
+        end
+
         #
         # territories
         #
