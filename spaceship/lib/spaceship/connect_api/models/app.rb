@@ -154,6 +154,16 @@ module Spaceship
       end
 
       #
+      # App Base Territory
+      #
+
+      def fetch_base_territory(client: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_app_base_territory(app_id: id)
+        return resp.to_models.first
+      end
+
+      #
       # Available Territories
       #
 
