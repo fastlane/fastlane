@@ -116,6 +116,29 @@ describe Fastlane do
             end").runner.execute(:test)
         end
 
+        it "with name as a key and explicit is_devices_inv" do
+          expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(fake_devices)
+
+          devices = {
+            "NAME1" => "A123456789012345678901234567890123456789",
+            "NAME2"	=> "B123456789012345678901234567890123456789"
+          }
+
+          expect(Fastlane::Actions::RegisterDevicesAction).to receive(:try_create_device).with(
+            name: 'NAME2',
+            udid: 'B123456789012345678901234567890123456789',
+            platform: "IOS"
+          )
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+              register_devices(
+                username: 'test@test.com',
+                devices: #{devices},
+                is_devices_inv: false
+              )
+            end").runner.execute(:test)
+        end
+
         it "with udid as a key" do
           expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(fake_devices)
 
@@ -139,7 +162,8 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
               register_devices(
                 username: 'test@test.com',
-                devices_inv: #{devices}
+                devices: #{devices},
+                is_devices_inv: true
               )
             end").runner.execute(:test)
         end
