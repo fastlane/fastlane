@@ -8387,6 +8387,7 @@ public func recreateSchemes(project: String) {
 
  - parameters:
    - devices: A hash of devices, with the name as key and the UDID as value
+   - devicesInv: A hash of devices, with the UDID as key and the name as value
    - devicesFile: Provide a path to a file with the devices to register. For the format of the file see the examples
    - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
@@ -8400,6 +8401,7 @@ public func recreateSchemes(project: String) {
  The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable `ENV['DELIVER_USER']`.
  */
 public func registerDevices(devices: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                            devicesInv: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                             devicesFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -8409,6 +8411,7 @@ public func registerDevices(devices: OptionalConfigValue<[String: Any]?> = .fast
                             platform: String = "ios")
 {
     let devicesArg = devices.asRubyArgument(name: "devices", type: nil)
+    let devicesInvArg = devices.asRubyArgument(name: "devices_inv", type: nil)
     let devicesFileArg = devicesFile.asRubyArgument(name: "devices_file", type: nil)
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -8417,6 +8420,7 @@ public func registerDevices(devices: OptionalConfigValue<[String: Any]?> = .fast
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let array: [RubyCommand.Argument?] = [devicesArg,
+                                          devicesInvArg,
                                           devicesFileArg,
                                           apiKeyPathArg,
                                           apiKeyArg,

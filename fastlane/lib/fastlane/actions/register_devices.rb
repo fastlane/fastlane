@@ -14,7 +14,9 @@ module Fastlane
       def self.run(params)
         platform = Spaceship::ConnectAPI::BundleIdPlatform.map(params[:platform])
 
-        if params[:devices]
+        if params[:devices_inv]
+          new_devices = params[:devices_inv].to_a
+        elsif params[:devices]
           new_devices = params[:devices].map do |name, udid|
             [udid, name]
           end
@@ -104,6 +106,11 @@ module Fastlane
                                        description: "A hash of devices, with the name as key and the UDID as value",
                                        type: Hash,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :devices_inv,
+                                       env_name: "FL_REGISTER_DEVICES_DEVICES_INV",
+                                       description: "A hash of devices, with the UDID as key and the name as value",
+                                       type: Hash,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :devices_file,
                                        env_name: "FL_REGISTER_DEVICES_FILE",
                                        description: "Provide a path to a file with the devices to register. For the format of the file see the examples",
@@ -184,7 +191,13 @@ module Fastlane
               "Luka iPhone 6" => "1234567890123456789012345678901234567890",
               "Felix iPad Air 2" => "abcdefghijklmnopqrstvuwxyzabcdefghijklmn"
             }
-          ) # Simply provide a list of devices as a Hash',
+          ) # Simply provide a list of devices as a Hash, with the name as key',
+          'register_devices(
+            devices_inv: {
+              "1234567890123456789012345678901234567890" => "Luka iPhone 6",
+              "abcdefghijklmnopqrstvuwxyzabcdefghijklmn" => "Felix iPad Air 2"
+            }
+          ) # Provide a list of devices as a Hash, with the UDID as key',
           'register_devices(
             devices_file: "./devices.txt"
           ) # Alternatively provide a standard UDID export .txt file, see the Apple Sample (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)',
