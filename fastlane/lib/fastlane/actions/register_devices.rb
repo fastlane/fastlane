@@ -202,7 +202,7 @@ module Fastlane
             devices_file: "./devices.txt"
           ) # Alternatively provide a standard UDID export .txt file, see the Apple Sample (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)',
           'register_devices(
-            devices_file: "./devices.txt", # You must pass in either `devices_file` or `devices`.
+            devices_file: "./devices.txt", # You must pass in either `devices_file`, `devices` or `devices_inv`.
             team_id: "XXXXXXXXXX",         # Optional, if you"re a member of multiple teams, then you need to pass the team ID here.
             username: "luka@goonbee.com"   # Optional, lets you override the Apple Member Center username.
           )',
