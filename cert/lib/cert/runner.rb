@@ -227,7 +227,7 @@ module Cert
 
       cert_path = store_certificate(certificate, Cert.config[:filename])
 
-      if Helper.mac? 
+      if Helper.mac?
         # Import all the things into the Keychain
         keychain = File.expand_path(Cert.config[:keychain_path])
         password = Cert.config[:keychain_password]
