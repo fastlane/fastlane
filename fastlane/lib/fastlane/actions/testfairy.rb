@@ -89,7 +89,7 @@ module Fastlane
           when :comment
             [key, value]
           when :auto_update
-            ['auto-update', value]
+            ['auto_update', value]
           when :notify
             [key, value]
           when :options
