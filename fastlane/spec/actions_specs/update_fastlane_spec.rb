@@ -30,7 +30,7 @@ describe Fastlane do
 
         # Manifest
         expect(FastlaneCore::FastlaneFolder).to receive(:swift?).and_return(true)
-        expect(UI).to receive(:success).with("loading manifest: ./swift/upgrade_manifest.json")
+        expect(UI).to receive(:success).with(%r{fastlane\/swift\/upgrade_manifest.json})
 
         # Start
         expect(UI).to receive(:success).with("Driving the lane 'test' 🚀")
@@ -71,7 +71,7 @@ describe Fastlane do
 
         # Manifest
         expect(FastlaneCore::FastlaneFolder).to receive(:swift?).and_return(true)
-        expect(UI).to receive(:success).with("loading manifest: ./swift/upgrade_manifest.json")
+        expect(UI).to receive(:success).with(%r{fastlane\/swift\/upgrade_manifest.json})
 
         # Start
         expect(UI).to receive(:success).with("Driving the lane 'test' 🚀")
