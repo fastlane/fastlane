@@ -158,10 +158,21 @@ module FastlaneCore
         curl_extras = "--http1.1 --retry 3 --retry-all-errors "
       end
 
-      import_command = "curl #{curl_extras}-f -o #{filename} #{url} && security import #{filename} #{keychain}"
+      fetch_and_check_command = "curl #{curl_extras}-f -o #{filename} #{url} && security verify-cert -c #{filename}"
+      import_command = "security import #{filename} #{keychain}"
       UI.verbose("Installing WWDR Cert: #{import_command}")
 
       require 'open3'
+      stdout, stderr, status = Open3.capture3(fetch_and_check_command)
+      if FastlaneCore::Globals.verbose?
+        UI.command_output(stdout)
+        UI.command_output(stderr)
+      end
+      unless /...certificate verification successful/ =~ stdout
+        UI.verbose("Failed to validate certificate expiration")
+        return false
+      end
+
       stdout, stderr, status = Open3.capture3(import_command)
       if FastlaneCore::Globals.verbose?
         UI.command_output(stdout)
