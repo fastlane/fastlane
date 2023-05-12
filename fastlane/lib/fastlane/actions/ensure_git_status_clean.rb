@@ -8,8 +8,9 @@ module Fastlane
     class EnsureGitStatusCleanAction < Action
       def self.run(params)
         if params[:ignored]
-          ignored_file = params[:ignored]
-          repo_status = Actions.sh("git status --porcelain --ignored #{ignored_file}")
+          ignored_mode = params[:ignored]
+          ignored_mode = 'no' if ignored_mode == 'none'
+          repo_status = Actions.sh("git status --porcelain --ignored='#{ignored_mode}'")
         else
           repo_status = Actions.sh("git status --porcelain")
         end
@@ -74,8 +75,18 @@ module Fastlane
                                        type: Boolean),
           FastlaneCore::ConfigItem.new(key: :ignored,
                                        env_name: "FL_ENSURE_GIT_STATUS_CLEAN_IGNORED_FILE",
-                                       description: "The flag whether to ignore file the git status if the repo is dirty",
-                                       optional: true)
+                                       description: [
+                                         "The handling mode of the ignored files. The available options are: `'traditional'`, `'none'` (default) and `'matching'`.",
+                                         "Specifying `'none'` to this parameter is the same as not specifying the parameter at all, which means that no ignored file will be used to check if the repo is dirty or not.",
+                                         "Specifying `'traditional'` or `'matching'` causes some ignored files to be used to check if the repo is dirty or not (more info in the official docs: https://git-scm.com/docs/git-status#Documentation/git-status.txt---ignoredltmodegt)"
+                                       ].join(" "),
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         mode = value.to_s
+                                         modes = %w(traditional none matching)
+
+                                         UI.user_error!("Unsupported mode, must be: #{modes}") unless modes.include?(mode)
+                                       end)
         ]
       end
 

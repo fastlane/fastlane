@@ -18,10 +18,10 @@ class ConnectAPIStubbing
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps").
           to_return(status: 200, body: read_fixture_file('apps.json'), headers: { 'Content-Type' => 'application/json' })
 
-        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions,prices").
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions").
           to_return(status: 200, body: read_fixture_file('apps.json'), headers: { 'Content-Type' => 'application/json' })
 
-        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?filter%5BbundleId%5D=com.joshholtz.FastlaneTest&include=appStoreVersions,prices").
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?filter%5BbundleId%5D=com.joshholtz.FastlaneTest&include=appStoreVersions").
           to_return(status: 200, body: read_fixture_file('apps.json'), headers: { 'Content-Type' => 'application/json' })
 
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/123456789").
@@ -87,6 +87,11 @@ class ConnectAPIStubbing
       def stub_build_beta_details
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/buildBetaDetails").
           to_return(status: 200, body: read_fixture_file('build_beta_details.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_build_bundles
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/buildBundles/48a9bb1f-5f0f-4133-8c72-3fb93e92603a/buildBundleFileSizes").
+          to_return(status: 200, body: read_fixture_file('build_bundles_build_bundle_file_sizes.json'), headers: { 'Content-Type' => 'application/json' })
       end
 
       def stub_build_deliveries

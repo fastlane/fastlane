@@ -1157,14 +1157,14 @@ describe FastlaneCore do
           end
           context "upload command generation" do
             it 'generates a call to altool' do
-              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true)
               expect(transporter.upload('my.app.id', '/tmp', package_path: '/tmp/my.app.id.itmsp', platform: "osx")).to eq(altool_upload_command(provider_short_name: 'abcd123'))
             end
           end
 
           context "provider IDs command generation" do
             it 'generates a call to altool' do
-              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true)
               expect(transporter.provider_ids).to eq(altool_provider_id_command)
             end
           end
@@ -1177,7 +1177,7 @@ describe FastlaneCore do
           end
           context "upload command generation" do
             it 'generates a call to xcrun iTMSTransporter instead altool' do
-              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true)
               expect(transporter.upload('my.app.id', '/tmp', platform: "osx")).to eq(java_upload_command(provider_short_name: 'abcd123', classpath: false))
             end
           end
@@ -1194,7 +1194,7 @@ describe FastlaneCore do
           end
           context "upload command generation" do
             it 'generates a call to altool' do
-              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true, api_key: api_key)
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true, api_key: api_key)
               expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_upload_command(api_key: api_key, provider_short_name: 'abcd123'))}")
               expect(transporter.upload('my.app.id', '/tmp', platform: "osx")).to match(expected)
             end
@@ -1202,7 +1202,7 @@ describe FastlaneCore do
 
           context "provider IDs command generation" do
             it 'generates a call to altool' do
-              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true, api_key: api_key)
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true, api_key: api_key)
               expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_provider_id_command(api_key: api_key))}")
               expect(transporter.provider_ids).to match(expected)
             end
