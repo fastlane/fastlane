@@ -22,9 +22,10 @@ module Match
       attr_reader :team_name
       attr_reader :api_key_path
       attr_reader :api_key
+      attr_reader :api_v4_url
 
       def self.configure(params)
-        api_v4_url     = params[:api_v4_url] || ENV['CI_API_V4_URL'] || 'https://gitlab.com/api/v4'
+        api_v4_url     = ENV['CI_API_V4_URL'] || "#{params[:gitlab_host]}/api/v4"
         project_id     = params[:gitlab_project] || ENV['GITLAB_PROJECT'] || ENV['CI_PROJECT_ID']
         job_token      = params[:job_token] || ENV['CI_JOB_TOKEN']
         private_token  = params[:private_token] || ENV['PRIVATE_TOKEN']
@@ -72,9 +73,9 @@ module Match
         @private_token = private_token
         @api_v4_url = api_v4_url
         @project_id = project_id
-        @gitlab_client = GitLab::Client.new(job_token: job_token, private_token: private_token, project_id: project_id, api_v4_url: api_v4_url)
+        @gitlab_client = GitLab::Client.new(job_token: @job_token, private_token: @private_token, project_id: @project_id, api_v4_url: @api_v4_url)
 
-        UI.message("Initializing match for GitLab project #{@project_id}")
+        UI.message("Initializing match for GitLab project #{@project_id} on #{@gitlab_host}")
       end
 
       # To make debugging easier, we have a custom exception here
