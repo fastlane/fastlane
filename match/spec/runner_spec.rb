@@ -64,7 +64,7 @@ describe Match do
             s3_bucket: nil,
             s3_object_prefix: nil,
             gitlab_project: nil,
-            gitlab_host: nil,
+            gitlab_host: 'https://gitlab.com',
             readonly: false,
             username: values[:username],
             team_id: nil,

@@ -114,10 +114,18 @@ describe Match do
     end
 
     describe '#generate_matchfile_content' do
-      it 'returns the correct match file contents for the configured storage mode' do
+      it 'returns the correct match file contents for the configured storage mode and project path' do
         expect(FastlaneCore::UI).to receive(:input).once.and_return("fake-project")
+        expect(FastlaneCore::UI).to receive(:input).once.and_return(nil)
 
         expect(subject.generate_matchfile_content).to eq('gitlab_project("fake-project")')
+      end
+
+      it 'returns the correct match file contents for the configured storage mode and project path and gitlab host' do
+        expect(FastlaneCore::UI).to receive(:input).once.and_return("fake-project")
+        expect(FastlaneCore::UI).to receive(:input).once.and_return("https://gitlab.example.com")
+
+        expect(subject.generate_matchfile_content).to eq("gitlab_project(\"fake-project\")\ngitlab_host(\"https://gitlab.example.com\")")
       end
     end
   end

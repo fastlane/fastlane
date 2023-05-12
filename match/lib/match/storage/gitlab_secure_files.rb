@@ -175,8 +175,13 @@ module Match
       # that should be generated
       def generate_matchfile_content(template: nil)
         project = UI.input("What is your GitLab Project (i.e. gitlab-org/gitlab): ")
+        host = UI.input("What is your GitLab Host (i.e. https://gitlab.example.com, skip to default to https://gitlab.com): ")
 
-        return "gitlab_project(\"#{project}\")"
+        content = "gitlab_project(\"#{project}\")"
+
+        content += "\ngitlab_host(\"#{host}\")" if host
+        
+        return content
       end
     end
   end
