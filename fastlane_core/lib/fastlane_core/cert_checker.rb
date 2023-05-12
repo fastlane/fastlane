@@ -163,7 +163,7 @@ module FastlaneCore
       UI.verbose("Installing WWDR Cert: #{import_command}")
 
       require 'open3'
-      stdout, stderr, status = Open3.capture3(fetch_and_check_command)
+      stdout, stderr, = Open3.capture3(fetch_and_check_command)
       if FastlaneCore::Globals.verbose?
         UI.command_output(stdout)
         UI.command_output(stderr)
