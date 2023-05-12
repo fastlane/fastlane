@@ -16,7 +16,7 @@ describe Match do
 
           expect(storage.api_v4_url).to eq('https://gitlab.com/api/v4')
         end
-        
+
         it 'sets the value based on the gitlab_host param' do
           storage = described_class.configure(gitlab_host: 'http://gitlab.foo.com')
 

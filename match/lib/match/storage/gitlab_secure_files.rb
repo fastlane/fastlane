@@ -180,7 +180,7 @@ module Match
         content = "gitlab_project(\"#{project}\")"
 
         content += "\ngitlab_host(\"#{host}\")" if host
-        
+
         return content
       end
     end
