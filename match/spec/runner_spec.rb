@@ -69,7 +69,8 @@ describe Match do
             team_id: nil,
             team_name: nil,
             api_key_path: nil,
-            api_key: nil
+            api_key: nil,
+            skip_spaceship_ensure: false
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
@@ -159,7 +160,8 @@ describe Match do
             team_id: nil,
             team_name: nil,
             api_key_path: nil,
-            api_key: nil
+            api_key: nil,
+            skip_spaceship_ensure: false
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
@@ -249,7 +251,8 @@ describe Match do
             team_id: nil,
             team_name: nil,
             api_key_path: nil,
-            api_key: nil
+            api_key: nil,
+            skip_spaceship_ensure: false
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
@@ -321,7 +324,8 @@ describe Match do
             team_id: nil,
             team_name: nil,
             api_key_path: nil,
-            api_key: nil
+            api_key: nil,
+            skip_spaceship_ensure: false
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
