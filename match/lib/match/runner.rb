@@ -358,7 +358,7 @@ module Match
     end
     # rubocop:enable Metrics/PerceivedComplexity
 
-    def find_matching_profile(profiles, certificates, spaceship = nil)
+    def find_matching_profile(profiles, certificates)
       profiles.filter do |profile_path|
         # Check if it matched any of the certificates
         found = false

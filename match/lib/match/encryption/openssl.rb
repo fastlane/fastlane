@@ -76,7 +76,7 @@ module Match
       # salt should be randomly generated and provided unencrypted (like in the current implementation)
       # key should be generated with OpenSSL::KDF::pbkdf2_hmac with properly chosen parameters
       # Short explanation about salt and IV: https://stackoverflow.com/a/1950674/6324550
-      def self.encrypt_specific_file(path: nil, password: nil)
+      def encrypt_specific_file(path: nil, password: nil)
         UI.user_error!("No password supplied") if password.to_s.strip.length == 0
 
         data_to_encrypt = File.binread(path)
@@ -98,7 +98,7 @@ module Match
 
       # The encryption parameters in this implementations reflect the old behavior which depended on the users' local OpenSSL version
       # 1.0.x OpenSSL and earlier versions use MD5, 1.1.0c and newer uses SHA256, we try both before giving an error
-      def self.decrypt_specific_file(path: nil, password: nil, hash_algorithm: "MD5")
+      def decrypt_specific_file(path: nil, password: nil, hash_algorithm: "MD5")
         stored_data = Base64.decode64(File.read(path))
         salt = stored_data[8..15]
         data_to_decrypt = stored_data[16..-1]

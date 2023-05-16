@@ -9,7 +9,7 @@ module FastlaneCore
       #  "NotAfter"=>"Feb 21 16:39:53 2024 GMT",
       #  "NotBefore"=>"Feb 21 16:39:53 2023 GMT"}
       def order_by_expiration(certs, ascending = true)
-        certs.sort_by { |c| c["NotAfter"].to_i }.reverse! unless ascending
+        return certs.sort_by { |c| c["NotAfter"].to_i }.reverse! unless ascending
         certs.sort_by { |c| c["NotAfter"].to_i }
       end
 
