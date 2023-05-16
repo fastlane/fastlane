@@ -36,7 +36,11 @@ describe Match do
           repo_dir = Dir.mktmpdir
           cert_path = File.join(repo_dir, "something.cer")
           File.copy_stream("./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.cer", cert_path)
-          Match::Encryption::OpenSSL.encrypt_specific_file(path: cert_path, password: ENV["MATCH_PASSWORD"])
+          openssl = Match::Encryption::OpenSSL.new(
+            keychain_name: "login.keychain",
+            working_directory: repo_dir
+          )
+          openssl.encrypt_files(password: ENV["MATCH_PASSWORD"])
           profile_path = "./match/spec/fixtures/test.mobileprovision"
           keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
           destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
@@ -292,7 +296,11 @@ describe Match do
           repo_dir = Dir.mktmpdir
           cert_path = File.join(repo_dir, "something.cer")
           File.copy_stream("./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.cer", cert_path)
-          Match::Encryption::OpenSSL.encrypt_specific_file(path: cert_path, password: ENV["MATCH_PASSWORD"])
+          openssl = Match::Encryption::OpenSSL.new(
+            keychain_name: "login.keychain",
+            working_directory: repo_dir
+          )
+          openssl.encrypt_files(password: ENV["MATCH_PASSWORD"])
           keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
           destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
