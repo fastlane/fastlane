@@ -33,7 +33,7 @@ module Match
         password ||= fetch_password!
         iterate(self.working_directory) do |current|
           files << current
-          Match::Encryption::OpenSSL.encrypt_specific_file(path: current, password: password)
+          encrypt_specific_file(path: current, password: password)
           UI.success("🔒  Encrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
         end
         UI.success("🔒  Successfully encrypted certificates repo")
@@ -46,7 +46,7 @@ module Match
         iterate(self.working_directory) do |current|
           files << current
           begin
-            Match::Encryption::OpenSSL.decrypt_specific_file(path: current, password: password)
+            decrypt_specific_file(path: current, password: password)
           rescue => ex
             UI.verbose(ex.to_s)
             UI.error("Couldn't decrypt the repo, please make sure you enter the right password!")
@@ -68,6 +68,45 @@ module Match
       # removes the password from the keychain again
       def clear_password
         Security::InternetPassword.delete(server: server_name(self.keychain_name))
+      end
+
+      private
+
+      def iterate(source_path)
+        Dir[File.join(source_path, "**", "*.{cer,p12,mobileprovision,provisionprofile}")].each do |path|
+          next if File.directory?(path)
+          yield(path)
+        end
+      end
+
+      # server name used for accessing the macOS keychain
+      def server_name(keychain_name)
+        ["match", keychain_name].join("_")
+      end
+
+      # Access the MATCH_PASSWORD, either from ENV variable, Keychain or user input
+      def fetch_password!
+        password = ENV["MATCH_PASSWORD"]
+        unless password
+          item = Security::InternetPassword.find(server: server_name(self.keychain_name))
+          password = item.password if item
+        end
+
+        unless password
+          if !UI.interactive?
+            UI.error("Neither the MATCH_PASSWORD environment variable nor the local keychain contained a password.")
+            UI.error("Bailing out instead of asking for a password, since this is non-interactive mode.")
+            UI.user_error!("Try setting the MATCH_PASSWORD environment variable, or temporarily enable interactive mode to store a password.")
+          else
+            UI.important("Enter the passphrase that should be used to encrypt/decrypt your certificates")
+            UI.important("This passphrase is specific per repository and will be stored in your local keychain")
+            UI.important("Make sure to remember the password, as you'll need it when you run match on a different machine")
+            password = FastlaneCore::Helper.ask_password(message: "Passphrase for Match storage: ", confirm: true)
+            store_password(password)
+          end
+        end
+
+        return password
       end
 
       # We encrypt with MD5 because that was the most common default value in older fastlane versions which used the local OpenSSL installation
@@ -118,45 +157,6 @@ module Match
           UI.error(error.to_s)
           UI.crash!("Error decrypting '#{path}'")
         end
-      end
-
-      private
-
-      def iterate(source_path)
-        Dir[File.join(source_path, "**", "*.{cer,p12,mobileprovision,provisionprofile}")].each do |path|
-          next if File.directory?(path)
-          yield(path)
-        end
-      end
-
-      # server name used for accessing the macOS keychain
-      def server_name(keychain_name)
-        ["match", keychain_name].join("_")
-      end
-
-      # Access the MATCH_PASSWORD, either from ENV variable, Keychain or user input
-      def fetch_password!
-        password = ENV["MATCH_PASSWORD"]
-        unless password
-          item = Security::InternetPassword.find(server: server_name(self.keychain_name))
-          password = item.password if item
-        end
-
-        unless password
-          if !UI.interactive?
-            UI.error("Neither the MATCH_PASSWORD environment variable nor the local keychain contained a password.")
-            UI.error("Bailing out instead of asking for a password, since this is non-interactive mode.")
-            UI.user_error!("Try setting the MATCH_PASSWORD environment variable, or temporarily enable interactive mode to store a password.")
-          else
-            UI.important("Enter the passphrase that should be used to encrypt/decrypt your certificates")
-            UI.important("This passphrase is specific per repository and will be stored in your local keychain")
-            UI.important("Make sure to remember the password, as you'll need it when you run match on a different machine")
-            password = FastlaneCore::Helper.ask_password(message: "Passphrase for Match storage: ", confirm: true)
-            store_password(password)
-          end
-        end
-
-        return password
       end
     end
   end
