@@ -45,6 +45,7 @@ describe Match do
         s3_bucket: "",
         s3_object_prefix: "",
         gitlab_project: nil,
+        gitlab_host: 'https://gitlab.com',
         team_id: nil
       ).and_return(fake_storage)
 

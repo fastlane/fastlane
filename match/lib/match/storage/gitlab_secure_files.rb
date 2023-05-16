@@ -23,9 +23,10 @@ module Match
       attr_reader :api_key_path
       attr_reader :api_key
       attr_reader :skip_spaceship_ensure
+      attr_reader :api_v4_url
 
       def self.configure(params)
-        api_v4_url     = params[:api_v4_url] || ENV['CI_API_V4_URL'] || 'https://gitlab.com/api/v4'
+        api_v4_url     = ENV['CI_API_V4_URL'] || "#{params[:gitlab_host]}/api/v4"
         project_id     = params[:gitlab_project] || ENV['GITLAB_PROJECT'] || ENV['CI_PROJECT_ID']
         job_token      = params[:job_token] || ENV['CI_JOB_TOKEN']
         private_token  = params[:private_token] || ENV['PRIVATE_TOKEN']
@@ -88,11 +89,10 @@ module Match
         @private_token = private_token
         @api_v4_url = api_v4_url
         @project_id = project_id
-        @gitlab_client = GitLab::Client.new(job_token: job_token, private_token: private_token, project_id: project_id, api_v4_url: api_v4_url)
-
+        @gitlab_client = GitLab::Client.new(job_token: @job_token, private_token: @private_token, project_id: @project_id, api_v4_url: @api_v4_url)
         @skip_spaceship_ensure = skip_spaceship_ensure
 
-        UI.message("Initializing match for GitLab project #{@project_id}")
+        UI.message("Initializing match for GitLab project #{@project_id} on #{@gitlab_host}")
       end
 
       # To make debugging easier, we have a custom exception here
@@ -196,8 +196,13 @@ module Match
       # that should be generated
       def generate_matchfile_content(template: nil)
         project = UI.input("What is your GitLab Project (i.e. gitlab-org/gitlab): ")
+        host = UI.input("What is your GitLab Host (i.e. https://gitlab.example.com, skip to default to https://gitlab.com): ")
 
-        return "gitlab_project(\"#{project}\")"
+        content = "gitlab_project(\"#{project}\")"
+
+        content += "\ngitlab_host(\"#{host}\")" if host
+
+        return content
       end
     end
   end
