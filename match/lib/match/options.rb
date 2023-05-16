@@ -4,8 +4,6 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Match
-  # ignore class length, as this is just a list of options
-  # rubocop:disable Metrics/ClassLength
   class Options
     # This is match specific, as users can append storage specific options
     def self.append_option(option)
@@ -323,24 +321,6 @@ module Match
                                      optional: true,
                                      type: Boolean,
                                      default_value: false),
-        FastlaneCore::ConfigItem.new(key: :cert_path,
-                                     env_name: "MATCH_DEPLOYMENT_CERTIFICATE_PATH",
-                                     sensitive: false,
-                                     description: "The certificate to import. Only works with match import action",
-                                     optional: true,
-                                     default_value: nil),
-        FastlaneCore::ConfigItem.new(key: :p12_path,
-                                     env_name: "MATCH_PRIVATE_KEY_PATH",
-                                     sensitive: false,
-                                     description: "The private key to import.  Only works with match import action",
-                                     optional: true,
-                                     default_value: nil),
-        FastlaneCore::ConfigItem.new(key: :profile_path,
-                                     env_name: "MATCH_PROVISIONING_PROFILE_PATH",
-                                     sensitive: false,
-                                     description: "The provisioning profile to import.  Only works with match import action",
-                                     optional: true,
-                                     default_value: nil),
         FastlaneCore::ConfigItem.new(key: :output_path,
                                      env_name: "MATCH_OUTPUT_PATH",
                                      description: "Path in which to export certificates, key and profile",
