@@ -73,6 +73,36 @@ describe Scan do
           expect(Scan.config[:destination].first).to match(/platform=macOS,variant=Mac Catalyst/)
         end
       end
+
+      context "iOS simulator architecture" do
+        context "intel mac" do
+          before do
+            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return("14.3")
+            allow(Etc).to receive(:uname).and_return({ machine: 'x86_64' })
+          end
+
+          it "adds arch=x86_64", requires_xcodebuild: true do
+            options = { project: "./scan/examples/standard/app.xcodeproj" }
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+            expect(Scan.config[:destination].first).to match(/platform=iOS/)
+            expect(Scan.config[:destination].first).to match(/,arch=x86_64/)
+          end
+        end
+
+        context "apple silcon mac" do
+          before do
+            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return("14.3")
+            allow(Etc).to receive(:uname).and_return({ machine: 'arm64' })
+          end
+
+          it "adds arch=x86_64", requires_xcodebuild: true do
+            options = { project: "./scan/examples/standard/app.xcodeproj" }
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+            expect(Scan.config[:destination].first).to match(/platform=iOS/)
+            expect(Scan.config[:destination].first).to_not(match(/,arch=x86_64/))
+          end
+        end
+      end
     end
 
     describe "validation" do
