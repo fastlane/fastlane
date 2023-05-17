@@ -8,7 +8,7 @@ describe Fastlane do
 
       context "when git status is clean" do
         before :each do
-          allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain").and_return("")
+          allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain", log: true).and_return("")
         end
 
         it "outputs success message" do
@@ -21,11 +21,32 @@ describe Fastlane do
 
       context "when git status is not clean" do
         before :each do
-          allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain").and_return("M fastlane/lib/fastlane/actions/ensure_git_status_clean.rb")
-          allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain --ignored='traditional'").and_return("M fastlane/lib/fastlane/actions/ensure_git_status_clean.rb\n!! .DS_Store\n!! fastlane/")
-          allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain --ignored='no'").and_return("M fastlane/lib/fastlane/actions/ensure_git_status_clean.rb")
-          allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain --ignored='matching'").and_return("M fastlane/lib/fastlane/actions/ensure_git_status_clean.rb\n!! .DS_Store\n!! fastlane/.DS_Store")
+          allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain", log: true).and_return("M fastlane/lib/fastlane/actions/ensure_git_status_clean.rb")
+          allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain", log: false).and_return("M fastlane/lib/fastlane/actions/ensure_git_status_clean.rb")
+          allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain --ignored='traditional'", log: true).and_return("M fastlane/lib/fastlane/actions/ensure_git_status_clean.rb\n!! .DS_Store\n!! fastlane/")
+          allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain --ignored='no'", log: true).and_return("M fastlane/lib/fastlane/actions/ensure_git_status_clean.rb")
+          allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain --ignored='matching'", log: true).and_return("M fastlane/lib/fastlane/actions/ensure_git_status_clean.rb\n!! .DS_Store\n!! fastlane/.DS_Store")
           allow(Fastlane::Actions).to receive(:sh).with("git diff").and_return("+ \"this is a new line\"")
+        end
+
+        context "with ignore_files" do
+          it "outputs success message" do
+            expect(FastlaneCore::UI).to receive(:success).with("Git status is clean, all good! 💪")
+            Fastlane::FastFile.new.parse("lane :test do
+              ensure_git_status_clean(
+                ignore_files: ['fastlane/lib/fastlane/actions/ensure_git_status_clean.rb']
+              )
+            end").runner.execute(:test)
+          end
+
+          it "outputs rich error message" do
+            expect(FastlaneCore::UI).to receive(:user_error!).with("Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.")
+            Fastlane::FastFile.new.parse("lane :test do
+              ensure_git_status_clean(
+                ignore_files: ['.DS_Store']
+              )
+            end").runner.execute(:test)
+          end
         end
 
         context "with show_uncommitted_changes flag" do
