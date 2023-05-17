@@ -222,20 +222,20 @@ module Scan
         return
       end
 
-      # Explicitly run simulator in Rosetta (needed for Xcode 14.3 and up)
-      # Fixes https://github.com/fastlane/fastlane/issues/21194
-      arch = ""
-      if Scan.config[:run_rosetta_simulator]
-        arch = ",arch=x86_64"
-      end
-
       # building up the destination now
       if Scan.building_mac_catalyst_for_mac?
-        Scan.config[:destination] = ["platform=macOS,variant=Mac Catalyst" + arch]
+        Scan.config[:destination] = ["platform=macOS,variant=Mac Catalyst"]
       elsif Scan.devices && Scan.devices.count > 0
+        # Explicitly run simulator in Rosetta (needed for Xcode 14.3 and up)
+        # Fixes https://github.com/fastlane/fastlane/issues/21194
+        arch = ""
+        if Scan.config[:run_rosetta_simulator]
+          arch = ",arch=x86_64"
+        end
+
         Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" + arch }
       elsif Scan.project && Scan.project.mac_app?
-        Scan.config[:destination] = min_xcode8? ? ["platform=macOS" + arch] : ["platform=OS X" + arch]
+        Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]
       end
     end
 
