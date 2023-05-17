@@ -222,10 +222,10 @@ module Scan
         return
       end
 
-      # Explicitly run simulator in Rosetta if Xcode 14.3 and up
+      # Explicitly run simulator in Rosetta (needed for Xcode 14.3 and up)
       # Fixes https://github.com/fastlane/fastlane/issues/21194
       arch = ""
-      if Helper.xcode_at_least?("14.3") && Helper.is_intel_mac?
+      if Scan.config[:run_rosetta_simulator]
         arch = ",arch=x86_64"
       end
 

@@ -115,14 +115,6 @@ module FastlaneCore
       FastlaneCore::Env.truthy?("TERM_PROGRAM_VERSION")
     end
 
-    def self.is_intel_mac?
-      self.mac? && Etc.uname[:machine] == "x86_64"
-    end
-
-    def self.is_apple_silicon?
-      self.mac? && Etc.uname[:machine] == "arm64"
-    end
-
     # Logs base directory
     def self.buildlog_path
       return ENV["FL_BUILDLOG_PATH"] || "~/Library/Logs"

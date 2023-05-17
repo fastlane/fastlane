@@ -74,33 +74,26 @@ describe Scan do
         end
       end
 
-      context "iOS simulator architecture" do
-        context "intel mac" do
-          before do
-            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return("14.3")
-            allow(Etc).to receive(:uname).and_return({ machine: 'x86_64' })
-          end
-
-          it "adds arch=x86_64", requires_xcodebuild: true do
-            options = { project: "./scan/examples/standard/app.xcodeproj" }
-            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-            expect(Scan.config[:destination].first).to match(/platform=iOS/)
-            expect(Scan.config[:destination].first).to match(/,arch=x86_64/)
-          end
+      context ":run_rosetta_simulator" do
+        it "adds arch=x86_64 if true", requires_xcodebuild: true do
+          options = { project: "./scan/examples/standard/app.xcodeproj", run_rosetta_simulator: true }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.config[:destination].first).to match(/platform=iOS/)
+          expect(Scan.config[:destination].first).to match(/,arch=x86_64/)
         end
 
-        context "apple silcon mac" do
-          before do
-            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return("14.3")
-            allow(Etc).to receive(:uname).and_return({ machine: 'arm64' })
-          end
+        it "does not add arch=x86_64 if false", requires_xcodebuild: true do
+          options = { project: "./scan/examples/standard/app.xcodeproj", run_rosetta_simulator: false }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.config[:destination].first).to match(/platform=iOS/)
+          expect(Scan.config[:destination].first).to_not(match(/,arch=x86_64/))
+        end
 
-          it "adds arch=x86_64", requires_xcodebuild: true do
-            options = { project: "./scan/examples/standard/app.xcodeproj" }
-            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-            expect(Scan.config[:destination].first).to match(/platform=iOS/)
-            expect(Scan.config[:destination].first).to_not(match(/,arch=x86_64/))
-          end
+        it "does not add arch=x86_64 by default", requires_xcodebuild: true do
+          options = { project: "./scan/examples/standard/app.xcodeproj" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.config[:destination].first).to match(/platform=iOS/)
+          expect(Scan.config[:destination].first).to_not(match(/,arch=x86_64/))
         end
       end
     end
