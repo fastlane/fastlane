@@ -87,6 +87,15 @@ describe Match do
 
         subject.download
       end
+
+      it 'requests 100 files from the API' do
+        stub_request(:get, /gitlab.example.com/).
+          to_return(status: 200, body: [].to_json)
+      
+        files = subject.files
+      
+        assert_requested(:get, /gitlab.example.com/, query: "per_page=100")
+      end
     end
 
     describe '#human_readable_description' do
