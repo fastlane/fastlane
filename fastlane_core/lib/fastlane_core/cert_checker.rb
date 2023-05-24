@@ -139,15 +139,14 @@ module FastlaneCore
       # Install all Worldwide Developer Relations Intermediate Certificates listed here: https://www.apple.com/certificateauthority/
       missing = WWDRCA_CERTIFICATES.map { |c| c[:alias] } - installed_wwdr_certificates
       missing.each do |cert_alias|
-        url = WWDRCA_CERTIFICATES.find { |c| c[:alias] == cert_alias }.fetch(:url)
-
         Tempfile.create('fastlane-match-wwdr-cert-') do |tmpfile|
-          unless fetch_certificate(url, tmpfile.path)
+          filename = tmpfile.path
+          unless fetch_certificate(cert_alias, filename)
             UI.verbose("Could not fetch certificate #{cert_alias}")
             next
           end
 
-          unless check_expiry(tmpfile.path)
+          unless check_expiry(filename)
             UI.verbose("Skipping installation of certificate: #{filename}, because it is invalid")
             next
           end
@@ -159,7 +158,8 @@ module FastlaneCore
       missing.count
     end
 
-    def self.fetch_certificate(url, filename)
+    def self.fetch_certificate(cert_alias, filename)
+      url = WWDRCA_CERTIFICATES.find { |c| c[:alias] == cert_alias }.fetch(:url)
       # Attempts to fix an issue installing WWDR cert tends to fail on CIs
       # https://github.com/fastlane/fastlane/issues/20960
       curl_params = []
@@ -169,7 +169,7 @@ module FastlaneCore
 
       curl_params += ['-f', '-o', filename, url]
       require 'open3'
-      stdout, stderr, status = Open3.capture3('curl', curl_params)
+      stdout, stderr, status = Open3.capture3('curl', curl_params.inspect)
       if FastlaneCore::Globals.verbose?
         UI.command_output(stdout)
         UI.command_output(stderr)

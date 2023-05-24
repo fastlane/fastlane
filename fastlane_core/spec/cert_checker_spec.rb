@@ -53,39 +53,56 @@ describe FastlaneCore do
     end
 
     describe '#install_missing_wwdr_certificates' do
-      it 'should install all official WWDR certificates' do
+    
+      it 'should fetch all official WWDR certificates' do
+        allow_any_instance_of(File).to receive(:path).and_return('test_path')
         allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return([])
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G2')
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G3')
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G4')
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G5')
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G6')
+        expect(FastlaneCore::CertChecker).to receive(:fetch_certificate).with('G2', 'test_path')
+        expect(FastlaneCore::CertChecker).to receive(:fetch_certificate).with('G3', 'test_path')
+        expect(FastlaneCore::CertChecker).to receive(:fetch_certificate).with('G4', 'test_path')
+        expect(FastlaneCore::CertChecker).to receive(:fetch_certificate).with('G5', 'test_path')
+        expect(FastlaneCore::CertChecker).to receive(:fetch_certificate).with('G6', 'test_path')
+        FastlaneCore::CertChecker.install_missing_wwdr_certificates
+      end
+
+      it 'should import all official WWDR certificates' do
+        allow_any_instance_of(File).to receive(:path).and_return('test_path')
+        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return([])
+        allow(FastlaneCore::CertChecker).to receive(:fetch_certificate).and_return(true)
+        allow(FastlaneCore::CertChecker).to receive(:check_expiry).and_return(true)
+        expect(FastlaneCore::CertChecker).to receive(:import_wwdr_certificate).with('test_path')
+        expect(FastlaneCore::CertChecker).to receive(:import_wwdr_certificate).with('test_path')
+        expect(FastlaneCore::CertChecker).to receive(:import_wwdr_certificate).with('test_path')
+        expect(FastlaneCore::CertChecker).to receive(:import_wwdr_certificate).with('test_path')
+        expect(FastlaneCore::CertChecker).to receive(:import_wwdr_certificate).with('test_path')
         FastlaneCore::CertChecker.install_missing_wwdr_certificates
       end
 
       it 'should install the missing official WWDR certificate' do
+        allow_any_instance_of(File).to receive(:path).and_return('test_path')
         allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5'])
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G6')
+        expect(FastlaneCore::CertChecker).to receive(:fetch_certificate).with('G6', 'test_path')
         FastlaneCore::CertChecker.install_missing_wwdr_certificates
       end
 
       it 'should download the WWDR certificate from correct URL' do
         allow(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
+        allow_any_instance_of(File).to receive(:path).and_return('test_path')
 
-        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG2.cer')).and_return(["", "", success_status])
-        FastlaneCore::CertChecker.install_wwdr_certificate('G2')
+        expect(Open3).to receive(:capture3).with('curl', anything, anything, anything, 'https://www.apple.com/certificateauthority/AppleWWDRCAG2.cer').and_return(["", "", success_status])
+        FastlaneCore::CertChecker.fetch_certificate('G2', 'test_path')
 
-        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer')).and_return(["", "", success_status])
-        FastlaneCore::CertChecker.install_wwdr_certificate('G3')
+        expect(Open3).to receive(:capture3).with('curl', anything, anything, anything, 'https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer').and_return(["", "", success_status])
+        FastlaneCore::CertChecker.fetch_certificate('G3', 'test_path')
 
-        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG4.cer')).and_return(["", "", success_status])
-        FastlaneCore::CertChecker.install_wwdr_certificate('G4')
+        expect(Open3).to receive(:capture3).with('curl', anything, anything, anything, 'https://www.apple.com/certificateauthority/AppleWWDRCAG4.cer').and_return(["", "", success_status])
+        FastlaneCore::CertChecker.fetch_certificate('G4', 'test_path')
 
-        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG5.cer')).and_return(["", "", success_status])
-        FastlaneCore::CertChecker.install_wwdr_certificate('G5')
+        expect(Open3).to receive(:capture3).with('curl', anything, anything, anything, 'https://www.apple.com/certificateauthority/AppleWWDRCAG5.cer').and_return(["", "", success_status])
+        FastlaneCore::CertChecker.fetch_certificate('G5', 'test_path')
 
-        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer')).and_return(["", "", success_status])
-        FastlaneCore::CertChecker.install_wwdr_certificate('G6')
+        expect(Open3).to receive(:capture3).with('curl', anything, anything, anything, 'https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer').and_return(["", "", success_status])
+        FastlaneCore::CertChecker.fetch_certificate('G6', 'test_path')
       end
     end
 
@@ -107,12 +124,10 @@ describe FastlaneCore do
           `ls`
 
           keychain = "keychain with spaces.keychain"
-          check_cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security verify-cert -c \1}
-          import_cmd = "security import /AppleWWDRCAG6/i -k #{Regexp.escape(keychain.shellescape)}"
           require "open3"
-
-          expect(Open3).to receive(:capture3).with(check_cmd).and_return(["...certificate verification successful.", "", success_status])
-          expect(Open3).to receive(:capture3).with(import_cmd).and_return(["", "", success_status])
+          expect(Open3).to receive(:capture3).with('curl', '-f', '-o', anything, 'https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer')
+          expect(Open3).to receive(:capture3).with('security', 'verify-cert', '-c', anything)
+          expect(Open3).to receive(:capture3).with('security', 'import', anything, anything)
           expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
           allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5'])
@@ -126,10 +141,9 @@ describe FastlaneCore do
           stub_const('ENV', { "FASTLANE_WWDR_USE_HTTP1_AND_RETRIES" => "true" })
 
           keychain = "keychain with spaces.keychain"
-          cmd = %r{curl --http1.1 --retry 3 --retry-all-errors -f -o (([A-Z]\:)?\/.+) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security verify-cert -c \1}
           require "open3"
 
-          expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])
+          expect(Open3).to receive(:capture3).with('curl', '--http1.1', '--retry', '3', '--retry-all-errors', anything, anything, anything).and_return(["", "", success_status])
           expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
           allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5'])
