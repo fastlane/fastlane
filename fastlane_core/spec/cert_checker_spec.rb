@@ -53,7 +53,7 @@ describe FastlaneCore do
     end
 
     describe '#install_missing_wwdr_certificates' do
-    
+
       it 'should fetch all official WWDR certificates' do
         allow_any_instance_of(File).to receive(:path).and_return('test_path')
         allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return([])
@@ -106,7 +106,7 @@ describe FastlaneCore do
       end
 
     end
-    
+
     describe 'certificate validation' do
       let(:invalid_cert) { File.expand_path("./fastlane_core/spec/fixtures/certificates/AppleWWDRCA_invalid.cer") }
       let(:valid_cert) { File.expand_path("./fastlane_core/spec/fixtures/certificates/AppleWWDRCAG6.cer") }
@@ -116,11 +116,11 @@ describe FastlaneCore do
       end
 
       it 'should accept a valid certificate' do
-        expect(FastlaneCore::CertChecker.check_expiry(valid_cert)).to be(true) 
+        expect(FastlaneCore::CertChecker.check_expiry(valid_cert)).to be(true)
       end
 
     end
-      
+
     describe 'shell escaping' do
       let(:keychain_name) { "keychain with spaces.keychain" }
       let(:shell_escaped_name) { keychain_name.shellescape }
