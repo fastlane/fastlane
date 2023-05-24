@@ -139,21 +139,22 @@ module FastlaneCore
       # Install all Worldwide Developer Relations Intermediate Certificates listed here: https://www.apple.com/certificateauthority/
       missing = WWDRCA_CERTIFICATES.map { |c| c[:alias] } - installed_wwdr_certificates
       missing.each do |cert_alias|
-      url = WWDRCA_CERTIFICATES.find { |c| c[:alias] == cert_alias }.fetch(:url)
+        url = WWDRCA_CERTIFICATES.find { |c| c[:alias] == cert_alias }.fetch(:url)
 
-      Tempfile.create('fastlane-match-wwdr-cert-') do |tmpfile|
-        unless fetch_certificate(url, tmpfile.path)
-          UI.verbose("Could not fetch certificate #{cert_alias}")
-          next
+        Tempfile.create('fastlane-match-wwdr-cert-') do |tmpfile|
+          unless fetch_certificate(url, tmpfile.path)
+            UI.verbose("Could not fetch certificate #{cert_alias}")
+            next
+          end
+
+          unless check_expiry(tmpfile.path)
+            UI.verbose("Skipping installation of certificate: #{filename}, because it is invalid")
+            next
+          end
+
+          UI.message("Installing WWDR certificates '#{cert_alias}'")
+          import_wwdr_certificate(filename)
         end
-
-        unless check_expiry(tmpfile.path)
-          UI.verbose("Skipping installation of certificate: #{filename}, because it is invalid") 
-          next
-        end
-
-        UI.message("Installing WWDR certificates '#{cert_alias}'")
-        import_wwdr_certificate(filename)
       end
       missing.count
     end
@@ -161,7 +162,7 @@ module FastlaneCore
     def self.fetch_certificate(url, filename)
       # Attempts to fix an issue installing WWDR cert tends to fail on CIs
       # https://github.com/fastlane/fastlane/issues/20960
-      curl_params = [] 
+      curl_params = []
       if FastlaneCore::Feature.enabled?('FASTLANE_WWDR_USE_HTTP1_AND_RETRIES')
         curl_params += ['--http1.1', '--retry', '3', '--retry-all-errors']
       end
