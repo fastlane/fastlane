@@ -169,7 +169,7 @@ module FastlaneCore
 
       curl_params += ['-f', '-o', filename, url]
       require 'open3'
-      stdout, stderr, status = Open3.capture3('curl', curl_params.inspect)
+      stdout, stderr, status = Open3.capture3('curl', *curl_params)
       if FastlaneCore::Globals.verbose?
         UI.command_output(stdout)
         UI.command_output(stderr)

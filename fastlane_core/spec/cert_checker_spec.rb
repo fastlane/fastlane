@@ -118,16 +118,16 @@ describe FastlaneCore do
         FastlaneCore::CertChecker.installed_wwdr_certificates
       end
 
-      describe 'uses the correct command to import it' do
+      describe 'uses the correct commands to import it' do
         it 'with default' do
           # We have to execute *something* using ` since otherwise we set expectations to `nil`, which is not healthy
           `ls`
 
           keychain = "keychain with spaces.keychain"
           require "open3"
-          expect(Open3).to receive(:capture3).with('curl', '-f', '-o', anything, 'https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer')
-          expect(Open3).to receive(:capture3).with('security', 'verify-cert', '-c', anything)
-          expect(Open3).to receive(:capture3).with('security', 'import', anything, anything)
+          expect(Open3).to receive(:capture3).with('curl', '-f', '-o', anything, 'https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer').and_return(["", "", success_status])
+          expect(Open3).to receive(:capture3).with('security', 'verify-cert', '-c', anything).and_return(["...certificate verification successful.", ""])
+          expect(Open3).to receive(:capture3).with('security', 'import', anything, anything).and_return(["", "", success_status])
           expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
           allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5'])
@@ -143,8 +143,9 @@ describe FastlaneCore do
           keychain = "keychain with spaces.keychain"
           require "open3"
 
-          expect(Open3).to receive(:capture3).with('curl', '--http1.1', '--retry', '3', '--retry-all-errors', anything, anything, anything).and_return(["", "", success_status])
-          expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
+          expect(Open3).to receive(:capture3).with('curl', '--http1.1', '--retry', '3', '--retry-all-errors', anything, anything, anything, anything).and_return(["", "", success_status])
+          expect(FastlaneCore::CertChecker).to receive(:check_expiry).and_return(true)
+          expect(FastlaneCore::CertChecker).to receive(:import_wwdr_certificate).and_return(true)
 
           allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5'])
           expect(FastlaneCore::CertChecker.install_missing_wwdr_certificates).to be(1)
