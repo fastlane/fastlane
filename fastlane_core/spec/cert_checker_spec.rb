@@ -104,8 +104,23 @@ describe FastlaneCore do
         expect(Open3).to receive(:capture3).with('curl', anything, anything, anything, 'https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer').and_return(["", "", success_status])
         FastlaneCore::CertChecker.fetch_certificate('G6', 'test_path')
       end
-    end
 
+    end
+    
+    describe 'certificate validation' do
+      let(:invalid_cert) { File.expand_path("./fastlane_core/spec/fixtures/certificates/AppleWWDRCA_invalid.cer") }
+      let(:valid_cert) { File.expand_path("./fastlane_core/spec/fixtures/certificates/AppleWWDRCAG6.cer") }
+
+      it 'should not accept a certificate that has expired' do
+        expect(FastlaneCore::CertChecker.check_expiry(invalid_cert)).to be(false)
+      end
+
+      it 'should accept a valid certificate' do
+        expect(FastlaneCore::CertChecker.check_expiry(valid_cert)).to be(true) 
+      end
+
+    end
+      
     describe 'shell escaping' do
       let(:keychain_name) { "keychain with spaces.keychain" }
       let(:shell_escaped_name) { keychain_name.shellescape }
