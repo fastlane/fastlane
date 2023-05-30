@@ -197,7 +197,7 @@ module FastlaneCore
 
     def self.import_wwdr_certificate(filename)
       keychain = wwdr_keychain
-      keychain = "#{keychain.shellescape}" unless keychain.empty?
+      keychain = keychain.shellescape unless keychain.empty?
       UI.verbose("Installing WWDR Cert")
 
       stdout, stderr, status = Open3.capture3('security', 'import', filename, keychain)
