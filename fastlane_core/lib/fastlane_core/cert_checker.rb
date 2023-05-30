@@ -139,7 +139,7 @@ module FastlaneCore
       # Install all Worldwide Developer Relations Intermediate Certificates listed here: https://www.apple.com/certificateauthority/
       missing = WWDRCA_CERTIFICATES.map { |c| c[:alias] } - installed_wwdr_certificates
       missing.each do |cert_alias|
-        Tempfile.create('fastlane-match-wwdr-cert-') do |tmpfile|
+        Tempfile.create(File.basename('fastlane-wwdr-cert-')) do |tmpfile|
           filename = tmpfile.path
           unless fetch_certificate(cert_alias, filename)
             UI.verbose("Could not fetch certificate #{cert_alias}")
@@ -198,10 +198,9 @@ module FastlaneCore
     def self.import_wwdr_certificate(filename)
       keychain = wwdr_keychain
       keychain = "-k #{keychain.shellescape}" unless keychain.empty?
-
       UI.verbose("Installing WWDR Cert")
 
-      stdout, stderr, status = Open3.capture3('security', 'import', filename, keychain)
+      stdout, stderr, status = Open3.capture3("security import #{filename} #{keychain}")
       if FastlaneCore::Globals.verbose?
         UI.command_output(stdout)
         UI.command_output(stderr)
