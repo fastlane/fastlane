@@ -39,7 +39,7 @@ module Fastlane
                                        # a short description of this parameter
                                        description: 'API Token for [[NAME_CLASS]]',
                                        verify_block: proc do |value|
-                                         unless (value and not value.empty?)
+                                         unless value && !value.empty?
                                            UI.user_error!("No API token for [[NAME_CLASS]] given, pass using `api_token: 'token'`")
                                          end
                                          # UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
