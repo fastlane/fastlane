@@ -107,18 +107,19 @@ describe FastlaneCore do
 
     end
 
-    describe 'certificate validation' do
-      let(:invalid_cert) { File.expand_path("./fastlane_core/spec/fixtures/certificates/AppleWWDRCA_invalid.cer") }
-      let(:valid_cert) { File.expand_path("./fastlane_core/spec/fixtures/certificates/AppleWWDRCAG6.cer") }
+    if FastlaneCore::Helper.mac?
+      describe 'certificate validation' do
+        let(:invalid_cert) { File.expand_path("./fastlane_core/spec/fixtures/certificates/AppleWWDRCA_invalid.cer") }
+        let(:valid_cert) { File.expand_path("./fastlane_core/spec/fixtures/certificates/AppleWWDRCAG6.cer") }
 
-      it 'should not accept a certificate that has expired' do
-        expect(FastlaneCore::CertChecker.check_expiry(invalid_cert)).to be(false)
+        it 'should not accept a certificate that has expired' do
+          expect(FastlaneCore::CertChecker.check_expiry(invalid_cert)).to be(false)
+        end
+
+        it 'should accept a valid certificate' do
+          expect(FastlaneCore::CertChecker.check_expiry(valid_cert)).to be(true)
+        end
       end
-
-      it 'should accept a valid certificate' do
-        expect(FastlaneCore::CertChecker.check_expiry(valid_cert)).to be(true)
-      end
-
     end
 
     describe 'shell escaping' do
