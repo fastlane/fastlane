@@ -34,17 +34,23 @@ module Fastlane
         # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :api_token,
-                                       env_name: 'FL_[[NAME_UP]]_API_TOKEN', # The name of the environment variable
-                                       description: 'API Token for [[NAME_CLASS]]', # a short description of this parameter
+                                       # The name of the environment variable
+                                       env_name: 'FL_[[NAME_UP]]_API_TOKEN',
+                                       # a short description of this parameter
+                                       description: 'API Token for [[NAME_CLASS]]',
                                        verify_block: proc do |value|
-                                         UI.user_error!("No API token for [[NAME_CLASS]] given, pass using `api_token: 'token'`") unless (value and not value.empty?)
+                                         unless (value and not value.empty?)
+                                           UI.user_error!("No API token for [[NAME_CLASS]] given, pass using `api_token: 'token'`")
+                                         end
                                          # UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :development,
                                        env_name: 'FL_[[NAME_UP]]_DEVELOPMENT',
                                        description: 'Create a development certificate instead of a distribution one',
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: false) # the default value if the user didn't provide one
+                                       # true: verifies the input is a string, false: every kind of value
+                                       is_string: false,
+                                       # the default value if the user didn't provide one
+                                       default_value: false)
         ]
       end
 
