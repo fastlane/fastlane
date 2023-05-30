@@ -139,7 +139,7 @@ module FastlaneCore
       # Install all Worldwide Developer Relations Intermediate Certificates listed here: https://www.apple.com/certificateauthority/
       missing = WWDRCA_CERTIFICATES.map { |c| c[:alias] } - installed_wwdr_certificates
       missing.each do |cert_alias|
-        Tempfile.create(File.basename('fastlane-wwdr-cert-')) do |tmpfile|
+        Tempfile.create('fastlane-wwdr-cert-') do |tmpfile|
           filename = tmpfile.path
           unless fetch_certificate(cert_alias, filename)
             UI.verbose("Could not fetch certificate #{cert_alias}")
