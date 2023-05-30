@@ -197,10 +197,10 @@ module FastlaneCore
 
     def self.import_wwdr_certificate(filename)
       keychain = wwdr_keychain
-      keychain = keychain.shellescape unless keychain.empty?
+      keychain_args = ['-k', keychain] unless keychain.empty?
       UI.verbose("Installing WWDR Cert")
 
-      stdout, stderr, status = Open3.capture3('security', 'import', filename, keychain)
+      stdout, stderr, status = Open3.capture3('security', 'import', filename, *keychain_args)
       if FastlaneCore::Globals.verbose?
         UI.command_output(stdout)
         UI.command_output(stderr)

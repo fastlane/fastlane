@@ -143,7 +143,7 @@ describe FastlaneCore do
           require "open3"
           expect(Open3).to receive(:capture3).with('curl', '-f', '-o', anything, 'https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer').and_return(["", "", success_status])
           expect(Open3).to receive(:capture3).with('security', 'verify-cert', '-c', anything).and_return(["...certificate verification successful.", ""])
-          expect(Open3).to receive(:capture3).with('security', 'import', anything, anything).and_return(["", "", success_status])
+          expect(Open3).to receive(:capture3).with('security', 'import', anything, '-k', keychain).and_return(["", "", success_status])
           expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
           allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5'])
