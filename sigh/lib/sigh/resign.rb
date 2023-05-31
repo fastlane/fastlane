@@ -139,6 +139,7 @@ module Sigh
       #   [
       #        "/folder/mobile.mobileprovision"
       #   ]
+      entitlements = entitlements.split(',')
       entitlements.map do |entitlement|
         entitlement_file = File.expand_path(entitlement)
         "-e #{entitlement_file.shellescape}"

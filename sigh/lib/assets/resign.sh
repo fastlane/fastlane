@@ -501,11 +501,13 @@ function resign {
     log "New bundle identifier will be: '$BUNDLE_IDENTIFIER'"
 
     
-    local ENTITLEMENT_FILE="$(entitlement_for_bundle_id "$BUNDLE_IDENTIFIER")"
+    if entitlementsNotEmpty; then
+        local ENTITLEMENT_FILE="$(entitlement_for_bundle_id "$BUNDLE_IDENTIFIER")"
 
-    if [[ "$ENTITLEMENT_FILE" == "" ]]
-    then
-        error "No matching entitlement file found for new bundle identifier $BUNDLE_IDENTIFIER. Specify an entitlement file with the -e option that has an app-identifier equal to $BUNDLE_IDENTIFIER"
+        if [[ "$ENTITLEMENT_FILE" == "" ]]
+        then
+            error "No matching entitlement file found for new bundle identifier $BUNDLE_IDENTIFIER. Specify an entitlement file with the -e option that has an app-identifier equal to $BUNDLE_IDENTIFIER"
+        fi
     fi
 
     # Update the CFBundleDisplayName property in the Info.plist if a new name has been provided
