@@ -61,7 +61,8 @@ module Match
         team_id: params[:team_id],
         team_name: params[:team_name],
         api_key_path: params[:api_key_path],
-        api_key: params[:api_key]
+        api_key: params[:api_key],
+        skip_spaceship_ensure: params[:skip_certificate_matching]
       })
       storage.download
 

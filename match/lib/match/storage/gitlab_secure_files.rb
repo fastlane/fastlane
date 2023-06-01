@@ -22,6 +22,7 @@ module Match
       attr_reader :team_name
       attr_reader :api_key_path
       attr_reader :api_key
+      attr_reader :skip_spaceship_ensure
       attr_reader :api_v4_url
 
       def self.configure(params)
@@ -37,6 +38,19 @@ module Match
           UI.message("The above is just a warning, fastlane will continue as usual now...")
         end
 
+        skip_spaceship_ensure = params[:skip_spaceship_ensure]
+        if skip_spaceship_ensure
+          if params[:api_key] || params[:api_key_path] || params[:username] || params[:team_name]
+            UI.important("You set `skip_spaceship_ensure` to true, but you provided (one or more) other parameters
+                         (api_key, api_key_path, username, team_name) which are not needed since we will not use the Apple API.")
+          end
+
+          if params[:team_id].nil?
+            UI.user_error!("You set `skip_spaceship_ensure` to true, but you didn't provide a `team_id`.
+                            This is needed because there is no other way to get the team id since we don't use the Apple API.")
+          end
+        end
+
         return self.new(
           api_v4_url: api_v4_url,
           project_id: project_id,
@@ -47,7 +61,8 @@ module Match
           team_id: params[:team_id],
           team_name: params[:team_name],
           api_key_path: params[:api_key_path],
-          api_key: params[:api_key]
+          api_key: params[:api_key],
+          skip_spaceship_ensure: skip_spaceship_ensure
         )
       end
 
@@ -60,7 +75,8 @@ module Match
                      team_id: nil,
                      team_name: nil,
                      api_key_path: nil,
-                     api_key: nil)
+                     api_key: nil,
+                     skip_spaceship_ensure: nil)
 
         @readonly = readonly
         @username = username
@@ -74,6 +90,7 @@ module Match
         @api_v4_url = api_v4_url
         @project_id = project_id
         @gitlab_client = GitLab::Client.new(job_token: @job_token, private_token: @private_token, project_id: @project_id, api_v4_url: @api_v4_url)
+        @skip_spaceship_ensure = skip_spaceship_ensure
 
         UI.message("Initializing match for GitLab project #{@project_id} on #{@gitlab_host}")
       end
@@ -116,8 +133,12 @@ module Match
         else
           UI.user_error!("The `team_id` option is required. fastlane cannot automatically determine portal team id via the App Store Connect API (yet)") if self.team_id.to_s.empty?
 
-          spaceship = SpaceshipEnsure.new(self.username, self.team_id, self.team_name, api_token)
-          return spaceship.team_id
+          if skip_spaceship_ensure
+            return self.team_id
+          else
+            spaceship = SpaceshipEnsure.new(self.username, self.team_id, self.team_name, api_token)
+            return spaceship.team_id
+          end
         end
       end
 

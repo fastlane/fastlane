@@ -14,6 +14,8 @@ module Match
       p12_path = ensure_valid_file_path(p12_path, "Private key", ".p12")
       profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true)
 
+      should_skip_certificate_matching = params[:skip_certificate_matching]
+
       # Storage
       storage = Storage.for_mode(params[:storage_mode], {
         git_url: params[:git_url],
@@ -44,7 +46,8 @@ module Match
         team_id: params[:team_id],
         team_name: params[:team_name],
         api_key_path: params[:api_key_path],
-        api_key: params[:api_key]
+        api_key: params[:api_key],
+        skip_spaceship_ensure: should_skip_certificate_matching,
       })
       storage.download
 
@@ -93,7 +96,6 @@ module Match
       output_dir_certs = File.join(storage.prefixed_working_directory, "certs", cert_type.to_s)
       output_dir_profiles = File.join(storage.prefixed_working_directory, "profiles", prov_type.to_s)
 
-      should_skip_certificate_matching = params[:skip_certificate_matching]
       # In case there is no access to Apple Developer portal but we have the certificates, keys and profiles
       if should_skip_certificate_matching
         cert_name = File.basename(cert_path, ".*")
