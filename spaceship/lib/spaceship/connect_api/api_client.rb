@@ -11,6 +11,7 @@ module Spaceship
   class ConnectAPI
     class APIClient < Spaceship::Client
       attr_accessor :token
+      attr_accessor :disable_retries
 
       #####################################################
       # @!group Client Init
@@ -114,6 +115,7 @@ module Spaceship
       end
 
       def post(url_or_path, body, tries: 5)
+        tries = 1 if disable_retries
         response = with_asc_retry(tries) do
           request(:post) do |req|
             req.url(url_or_path)

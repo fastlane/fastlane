@@ -27,7 +27,7 @@ module Spaceship
           iap_request_client.get("apps/#{app_id}/inAppPurchasesV2", params)
         end
 
-        def create_in_app_purchase(app_id:, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
+        def create_in_app_purchase(app_id:, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, available_in_all_territories: nil, mighty_logger: nil)
           attributes = {
             name: name,
             productId: product_id,
@@ -53,6 +53,8 @@ module Spaceship
               }
             }
           }
+
+          mighty_logger.info 'create in-app purchase fastlane', label: 'iap_api', context: { product_id: product_id, params: params } if mighty_logger
 
           # This endpoint is on `v2`
           iap_request_client.post('https://api.appstoreconnect.apple.com/v2/inAppPurchases', params)
@@ -285,7 +287,7 @@ module Spaceship
           iap_request_client.get("subscriptionGroups/#{family_id}/subscriptions", params)
         end
 
-        def create_subscription(name:, product_id:, family_id:, available_in_all_territories: nil, family_sharable: nil, review_note: nil, subscription_period: nil, group_level: nil)
+        def create_subscription(name:, product_id:, family_id:, available_in_all_territories: nil, family_sharable: nil, review_note: nil, subscription_period: nil, group_level: nil, mighty_logger: nil)
           attributes = {
             name: name,
             productId: product_id
@@ -312,6 +314,8 @@ module Spaceship
               }
             }
           }
+
+          mighty_logger.info 'create in-app purchase fastlane', label: 'iap_api', context: { product_id: product_id, params: params } if mighty_logger
 
           iap_request_client.post('subscriptions', params)
         end
