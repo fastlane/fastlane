@@ -40,6 +40,8 @@ describe Supply do
         expect(subject.class.method_defined?(:get_edit_listing)).to eq(true)
         expect(subject.class.method_defined?(:list_edit_apks)).to eq(true)
         expect(subject.class.method_defined?(:list_edit_bundles)).to eq(true)
+        expect(subject.class.method_defined?(:list_generatedapks)).to eq(true)
+        expect(subject.class.method_defined?(:download_generatedapk)).to eq(true)
         expect(subject.class.method_defined?(:update_edit_listing)).to eq(true)
         expect(subject.class.method_defined?(:upload_edit_apk)).to eq(true)
         expect(subject.class.method_defined?(:upload_edit_deobfuscationfile)).to eq(true)
