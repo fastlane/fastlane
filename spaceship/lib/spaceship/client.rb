@@ -533,7 +533,8 @@ module Spaceship
 
           if try_upgrade_2fa_later(response)
             store_cookie
-            fetch_olympus_session
+            #Since last week of 05/2023, olympus session cannot be fetch without a 2FA configured Account. Skipping this request avoid Fastlane crash.
+            #fetch_olympus_session
             return true
           end
 
