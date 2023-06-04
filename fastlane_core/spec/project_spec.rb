@@ -253,7 +253,7 @@ describe FastlaneCore do
       it "#tvos?", requires_xcode: true do
         expect(@project.tvos?).to eq(false)
       end
-      
+
       it "#multiplatform?", requires_xcode: true do
         expect(@project.multiplatform?).to eq(false)
       end

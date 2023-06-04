@@ -306,7 +306,7 @@ module FastlaneCore
     def watchos?
       supported_platforms.include?(:watchOS)
     end
-    
+
     def multiplatform?
       supported_platforms.count > 1
     end
