@@ -164,7 +164,7 @@ module Spaceship
 
         status = response.status if response
 
-        mighty_logger.info 'create in-app purchase fastlane status', label: 'iap_api', context: { status: status } if mighty_logger
+        mighty_logger.info 'create in-app purchase fastlane status', label: 'iap_api', context: { status: status } if mighty_logger && (400...600).cover?(response.status)
 
         if [500, 504].include?(status)
           msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
