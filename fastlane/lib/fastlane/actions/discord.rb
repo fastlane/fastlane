@@ -30,19 +30,23 @@ module Fastlane
         "Create an Incoming WebHook and copy the webhook url to pass in 'discord(content, discord_url);'"
       end
 
+      def self.category
+        :notifications
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :discord_url,
             env_name: "DISCORD_URL",
             description: "Discord webhook URL", # POST target URL
             verify_block: proc do |value|
-               UI.user_error!("No discord_url, pass with `discord_url: 'webhook url'`") unless (value and not value.empty?)
+              UI.user_error!("No discord_url, pass with `discord_url: 'webhook url'`") unless value && (!value.empty?)
             end),
-            FastlaneCore::ConfigItem.new(key: :content,
-              description: "content", # message text
-              verify_block: proc do |value|
-                 UI.user_error!("No message, pass using `content: 'message here'`") unless (value and not value.empty?)
-              end)
+          FastlaneCore::ConfigItem.new(key: :content,
+            description: "content", # message text
+            verify_block: proc do |value|
+              UI.user_error!("No message, pass using `content: 'message here'`") unless value && (!value.empty?)
+            end)
         ]
       end
 
