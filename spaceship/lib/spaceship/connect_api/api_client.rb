@@ -118,6 +118,7 @@ module Spaceship
       def post(url_or_path, body, tries: 5)
         tries = 1 if disable_retries
         response = with_asc_retry(tries) do
+          mighty_logger.info 'Fastlane post request', label: 'iap_api', context: { url: url_or_path, body: body } if mighty_logger
           request(:post) do |req|
             req.url(url_or_path)
             req.body = body.to_json
