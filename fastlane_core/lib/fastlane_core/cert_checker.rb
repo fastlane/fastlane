@@ -7,11 +7,6 @@ require_relative 'helper'
 # WWDR Intermediate Certificates in https://www.apple.com/certificateauthority/
 WWDRCA_CERTIFICATES = [
   {
-    alias: 'G1',
-    sha256: 'ce057691d730f89ca25e916f7335f4c8a15713dcd273a658c024023f8eb809c2',
-    url: 'https://developer.apple.com/certificationauthority/AppleWWDRCA.cer'
-  },
-  {
     alias: 'G2',
     sha256: '9ed4b3b88c6a339cf1387895bda9ca6ea31a6b5ce9edf7511845923b0c8ac94c',
     url: 'https://www.apple.com/certificateauthority/AppleWWDRCAG2.cer'
