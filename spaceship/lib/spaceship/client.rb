@@ -245,6 +245,8 @@ module Spaceship
       unless @logger
         if ENV["VERBOSE"]
           @logger = Logger.new(STDOUT)
+        elsif ENV["SPACESHIP_DISCARD_LOGS"]
+          @logger = Logger.new(nil)
         else
           # Log to file by default
           path = "/tmp/spaceship#{Time.now.to_i}_#{Process.pid}_#{Thread.current.object_id}.log"
