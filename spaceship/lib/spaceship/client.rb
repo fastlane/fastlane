@@ -38,7 +38,7 @@ module Spaceship
     attr_accessor :user_email
 
     # The logger in which all requests are logged
-    # /tmp/spaceship[time]_[pid].log by default
+    # /tmp/spaceship[time]_[pid]_["threadid"].log by default
     attr_accessor :logger
 
     attr_accessor :csrf_tokens
