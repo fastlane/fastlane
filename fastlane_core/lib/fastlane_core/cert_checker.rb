@@ -139,7 +139,7 @@ module FastlaneCore
       # Install all Worldwide Developer Relations Intermediate Certificates listed here: https://www.apple.com/certificateauthority/
       missing = WWDRCA_CERTIFICATES.map { |c| c[:alias] } - installed_wwdr_certificates
       missing.each do |cert_alias|
-        Tempfile.create('fastlane-wwdr-cert-') do |tmpfile|
+        Tempfile.create(['fastlane-wwdr-cert-', '.cer']) do |tmpfile|
           filename = tmpfile.path
           unless fetch_certificate(cert_alias, filename)
             UI.verbose("Could not fetch certificate #{cert_alias}")
@@ -174,10 +174,7 @@ module FastlaneCore
         UI.command_output(stdout)
         UI.command_output(stderr)
       end
-      unless status.success?
-        return false
-      end
-      return true
+      !!status.success?
     end
 
     def self.check_expiry(filename)
@@ -188,11 +185,10 @@ module FastlaneCore
         UI.command_output(stdout)
         UI.command_output(stderr)
       end
-      unless /...certificate verification successful/ =~ stdout
-        UI.verbose("Failed to validate certificate expiration")
-        return false
-      end
-      return true
+      return true if /...certificate verification successful/ =~ stdout
+
+      UI.verbose("Failed to validate certificate expiration")
+      return false
     end
 
     def self.import_wwdr_certificate(filename)
