@@ -29,6 +29,7 @@ PATH
       multipart-post (>= 2.0.0, < 3.0.0)
       naturally (~> 2.2)
       optparse (~> 0.1.1)
+      parallel (~> 1.0)
       plist (>= 3.1.0, < 4.0.0)
       rubyzip (>= 2.0.0, < 3.0.0)
       security (= 0.1.3)

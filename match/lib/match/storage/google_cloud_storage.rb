@@ -1,6 +1,7 @@
 require 'fastlane_core/command_executor'
 require 'fastlane_core/configuration/configuration'
 require 'google/cloud/storage'
+require 'parallel'
 
 require_relative '../options'
 require_relative '../module'
@@ -12,6 +13,7 @@ module Match
     # Store the code signing identities in on Google Cloud Storage
     class GoogleCloudStorage < Interface
       DEFAULT_KEYS_FILE_NAME = "gc_keys.json"
+      PARALLEL_THREADS = 42
 
       # User provided values
       attr_reader :type
@@ -151,7 +153,7 @@ module Match
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
 
-        bucket.files.all do |current_file|
+        Parallel.map(bucket.files.all, in_threads: PARALLEL_THREADS) do |current_file|
           file_path = current_file.name # e.g. "N8X438SEU2/certs/distribution/XD9G7QCACF.cer"
           download_path = File.join(self.working_directory, file_path)
 
@@ -163,7 +165,7 @@ module Match
       end
 
       def delete_files(files_to_delete: [], custom_message: nil)
-        files_to_delete.each do |current_file|
+        Parallel.map(files_to_delete, in_threads: PARALLEL_THREADS) do |current_file|
           target_path = current_file.gsub(self.working_directory + "/", "")
           file = bucket.file(target_path)
           UI.message("Deleting '#{target_path}' from Google Cloud Storage bucket '#{self.bucket_name}'...")
@@ -180,7 +182,7 @@ module Match
         # Those doesn't mean they're new, it might just be they're changed
         # Either way, we'll upload them using the same technique
 
-        files_to_upload.each do |current_file|
+        Parallel.map(files_to_upload, in_threads: PARALLEL_THREADS) do |current_file|
           # Go from
           #   "/var/folders/px/bz2kts9n69g8crgv4jpjh6b40000gn/T/d20181026-96528-1av4gge/profiles/development/Development_me.mobileprovision"
           # to
