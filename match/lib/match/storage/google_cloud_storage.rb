@@ -151,7 +151,7 @@ module Match
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
 
-        bucket.files.each do |current_file|
+        bucket.files.all do |current_file|
           file_path = current_file.name # e.g. "N8X438SEU2/certs/distribution/XD9G7QCACF.cer"
           download_path = File.join(self.working_directory, file_path)
 
