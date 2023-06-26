@@ -38,6 +38,7 @@ module Match
         s3_secret_access_key: params[:s3_secret_access_key],
         s3_object_prefix: params[:s3_object_prefix],
         gitlab_project: params[:gitlab_project],
+        gitlab_host: params[:gitlab_host],
         readonly: params[:readonly],
         username: params[:username],
         team_id: params[:team_id],

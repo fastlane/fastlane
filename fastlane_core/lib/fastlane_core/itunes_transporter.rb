@@ -47,7 +47,7 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
       not_implemented(__method__)
     end
 
@@ -307,8 +307,22 @@ module FastlaneCore
       raise "This feature has not been implemented yet with altool for Xcode 14"
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
-      raise "This feature has not been implemented yet with altool for Xcode 14"
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
+      api_key = kwargs[:api_key]
+      platform = kwargs[:platform]
+      use_api_key = !api_key.nil?
+      [
+        ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
+        "xcrun altool",
+        "--validate-app",
+        ("-u #{username.shellescape}" unless use_api_key),
+        ("-p #{password.shellescape}" unless use_api_key),
+        ("--apiKey #{api_key[:key_id]}" if use_api_key),
+        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
+        platform_option(platform),
+        file_upload_option(source)
+      ].compact.join(' ')
     end
 
     def additional_upload_parameters
@@ -409,7 +423,8 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
+      jwt = kwargs[:jwt]
       use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
@@ -504,7 +519,8 @@ module FastlaneCore
       end
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil)
+    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
+      jwt = kwargs[:jwt]
       use_jwt = !jwt.to_s.empty?
       if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
         [
@@ -660,7 +676,7 @@ module FastlaneCore
     #                            see: https://github.com/fastlane/fastlane/issues/1524#issuecomment-196370628
     #                            for more information about how to use the iTMSTransporter to list your provider
     #                            short names
-    def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil, upload: false, api_key: nil)
+    def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil, altool_compatible_command: false, api_key: nil)
       # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
       # we can't default to using the newer direct Java invocation strategy for those versions.
       use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.')
@@ -675,7 +691,7 @@ module FastlaneCore
       @jwt = jwt
       @api_key = api_key
 
-      if should_use_altool?(upload, use_shell_script)
+      if should_use_altool?(altool_compatible_command, use_shell_script)
         UI.verbose("Using altool as transporter.")
         @transporter_executor = AltoolTransporterExecutor.new
       else
@@ -800,10 +816,20 @@ module FastlaneCore
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transferring
-    def verify(app_id = nil, dir = nil, package_path: nil)
-      raise "Either a combination of app id and directory or a package_path are required" if (app_id.nil? || dir.nil?) && package_path.nil?
+    def verify(app_id = nil, dir = nil, package_path: nil, asset_path: nil, platform: nil)
+      raise "app_id and dir are required or package_path or asset_path is required" if (app_id.nil? || dir.nil?) && package_path.nil? && asset_path.nil?
 
-      actual_dir = if package_path
+      force_itmsp = FastlaneCore::Env.truthy?("ITMSTRANSPORTER_FORCE_ITMS_PACKAGE_UPLOAD")
+      can_use_asset_path = Helper.is_mac? && asset_path
+
+      actual_dir = if can_use_asset_path && !force_itmsp
+                     # The asset gets deleted upon completion so copying to a temp directory
+                     # (with randomized filename, for multibyte-mixed filename upload fails)
+                     new_file_name = "#{SecureRandom.uuid}#{File.extname(asset_path)}"
+                     tmp_asset_path = File.join(Dir.tmpdir, new_file_name)
+                     FileUtils.cp(asset_path, tmp_asset_path)
+                     tmp_asset_path
+                   elsif package_path
                      package_path
                    else
                      File.join(dir, "#{app_id}.itmsp")
@@ -812,8 +838,16 @@ module FastlaneCore
       password_placeholder = @jwt.nil? ? 'YourPassword' : nil
       jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
 
-      command = @transporter_executor.build_verify_command(@user, @password, actual_dir, @provider_short_name, @jwt)
-      UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder))
+      # Handle AppStore Connect API
+      use_api_key = !@api_key.nil?
+
+      # Masking credentials for verbose outputs
+      api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
+
+      api_key = api_key_with_p8_file_path(@api_key) if use_api_key
+
+      command = @transporter_executor.build_verify_command(@user, @password, actual_dir, @provider_short_name, jwt: @jwt, platform: platform, api_key: api_key)
+      UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt: jwt_placeholder, platform: platform, api_key: api_key_placeholder))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
@@ -883,9 +917,9 @@ module FastlaneCore
     end
 
     # Returns whether altool should be used or ItunesTransporter should be used
-    def should_use_altool?(upload, use_shell_script)
+    def should_use_altool?(altool_compatible_command, use_shell_script)
       # Xcode 14 no longer supports iTMSTransporter. Use altool instead
-      !use_shell_script && upload && !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(14)
+      !use_shell_script && altool_compatible_command && !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(14)
     end
 
     # Returns the password to be used with the transporter

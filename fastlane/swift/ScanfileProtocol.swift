@@ -1,5 +1,5 @@
 // ScanfileProtocol.swift
-// Copyright (c) 2022 FastlaneTools
+// Copyright (c) 2023 FastlaneTools
 
 public protocol ScanfileProtocol: AnyObject {
     /// Path to the workspace file
@@ -128,6 +128,9 @@ public protocol ScanfileProtocol: AnyObject {
     /// Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
     var outputXctestrun: Bool { get }
 
+    /// Custom path for the result bundle, overrides result_bundle
+    var resultBundlePath: String? { get }
+
     /// Should an Xcode result bundle be generated in the output directory
     var resultBundle: Bool { get }
 
@@ -203,6 +206,9 @@ public protocol ScanfileProtocol: AnyObject {
     /// Use only if you're a pro, use the other options instead
     var destination: String? { get }
 
+    /// Adds arch=x86_64 to the xcodebuild 'destination' argument to run simulator in a Rosetta mode
+    var runRosettaSimulator: Bool { get }
+
     /// Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
     var catalystPlatform: String? { get }
 
@@ -274,6 +280,7 @@ public extension ScanfileProtocol {
     var derivedDataPath: String? { return nil }
     var shouldZipBuildProducts: Bool { return false }
     var outputXctestrun: Bool { return false }
+    var resultBundlePath: String? { return nil }
     var resultBundle: Bool { return false }
     var useClangReportName: Bool { return false }
     var parallelTesting: Bool? { return nil }
@@ -299,6 +306,7 @@ public extension ScanfileProtocol {
     var slackOnlyOnFailure: Bool { return false }
     var slackDefaultPayloads: [String]? { return nil }
     var destination: String? { return nil }
+    var runRosettaSimulator: Bool { return false }
     var catalystPlatform: String? { return nil }
     var customReportFileName: String? { return nil }
     var xcodebuildCommand: String { return "env NSUnbufferedIO=YES xcodebuild" }
@@ -312,4 +320,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.120]
+// FastlaneRunnerAPIVersion [0.9.124]

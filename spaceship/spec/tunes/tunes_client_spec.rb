@@ -22,6 +22,11 @@ describe Spaceship::TunesClient do
     let(:username) { 'spaceship@krausefx.com' }
     let(:password) { 'so_secret' }
 
+    before(:each) do
+      # Don't need to test hashcash here
+      allow_any_instance_of(Spaceship::Client).to receive(:fetch_hashcash)
+    end
+
     it 'has authType is sa' do
       response = double
       allow(response).to receive(:status).and_return(412)
