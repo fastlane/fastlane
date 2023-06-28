@@ -414,6 +414,14 @@ module Spaceship
         end
 
         #
+        # appBaseTerritory
+        #
+
+        def get_app_base_territory(app_id: nil)
+          tunes_request_client.get("appPriceSchedules/#{app_id}/baseTerritory")
+        end
+
+        #
         # availableTerritories
         #
 
