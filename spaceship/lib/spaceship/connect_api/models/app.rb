@@ -497,15 +497,38 @@ module Spaceship
         return resps.to_models.first
       end
 
-      def get_in_app_purchases(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      # Apple Developer API docs: https://developer.apple.com/documentation/appstoreconnectapi/list_all_in-app_purchases_for_an_app
+      def get_in_app_purchases(client: nil, filter: {}, includes: nil, limit: nil, sort: nil, fields: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.get_in_app_purchases(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        resps = client.get_in_app_purchases(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort, fields: fields).all_pages
         return resps.flat_map(&:to_models)
       end
 
+      # Apple Developer API docs: https://developer.apple.com/documentation/appstoreconnectapi/list_all_in-app_purchases_for_an_app
       def create_in_app_purchase(client: nil, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.create_in_app_purchase(app_id: id, name: name, product_id: product_id, in_app_purchase_type: in_app_purchase_type, review_note: review_note, family_sharable: family_sharable, available_in_all_territories: available_in_all_territories)
+        return resps.to_models.first
+      end
+
+      # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/modify_an_in-app_purchase
+      def update_in_app_purchase(client: nil, purchase_id:, name: nil, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.update_in_app_purchase(purchase_id: purchase_id, name: name, review_note: review_note, family_sharable: family_sharable, available_in_all_territories: available_in_all_territories)
+        return resps.to_models.first
+      end
+
+      # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/create_an_in-app_purchase_localization
+      def create_in_app_purchase_localization(client: nil, purchase_id:, locale:, name:, description: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_in_app_purchase(app_id: id, purchase_id: purchase_id, locale: locale, name: name, description: description)
+        return resps.to_models.first
+      end
+
+      # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/modify_an_in-app_purchase_localization
+      def update_in_app_purchase_localization(localization_id:, name:, description: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_in_app_purchase(app_id: id, purchase_id: purchase_id, locale: locale, name: name, description: description)
         return resps.to_models.first
       end
 

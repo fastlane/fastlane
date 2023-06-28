@@ -22,11 +22,14 @@ module Spaceship
           iap_request_client.get("https://api.appstoreconnect.apple.com/v2/inAppPurchases/#{purchase_id}", params)
         end
 
-        def get_in_app_purchases(app_id:, filter: nil, includes: nil, limit: nil, sort: nil)
+        # Apple Developer API docs: https://developer.apple.com/documentation/appstoreconnectapi/list_all_in-app_purchases_for_an_app
+        def get_in_app_purchases(app_id:, filter: nil, includes: nil, limit: nil, sort: nil, fields: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          params[:fields] = fields if fields
           iap_request_client.get("apps/#{app_id}/inAppPurchasesV2", params)
         end
 
+        # Apple Developer API docs: https://developer.apple.com/documentation/appstoreconnectapi/list_all_in-app_purchases_for_an_app
         def create_in_app_purchase(app_id:, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
           attributes = {
             name: name,
@@ -58,6 +61,7 @@ module Spaceship
           iap_request_client.post('https://api.appstoreconnect.apple.com/v2/inAppPurchases', params)
         end
 
+        # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/modify_an_in-app_purchase
         def update_in_app_purchase(purchase_id:, name: nil, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
           attributes = {}
 
@@ -110,6 +114,7 @@ module Spaceship
           iap_request_client.get("inAppPurchaseLocalizations/#{localization_id}", params)
         end
 
+        # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/create_an_in-app_purchase_localization
         def create_in_app_purchase_localization(purchase_id:, locale:, name:, description: nil)
           attributes = {
             name: name,
@@ -135,6 +140,25 @@ module Spaceship
           }
 
           iap_request_client.post('inAppPurchaseLocalizations', params)
+        end
+
+        # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/modify_an_in-app_purchase_localization
+        def update_in_app_purchase_localization(localization_id:, name:, description: nil)
+          attributes = {
+            name: name
+          }
+
+          # Optional Attributes
+          attributes[:description] = description unless description.nil?
+
+          params = {
+            data: {
+              type: 'inAppPurchaseLocalizations',
+              attributes: attributes
+            }
+          }
+
+          iap_request_client.patch("inAppPurchaseLocalizations/#{localization_id}", params)
         end
 
         def delete_in_app_purchase_localization(localization_id:)
