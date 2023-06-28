@@ -5,7 +5,7 @@ module Spaceship
       include Spaceship::ConnectAPI::Model
 
       # Attributes
-      attr_accessor :local,
+      attr_accessor :locale,
                     :name,
                     :description,
                     :state
@@ -19,7 +19,7 @@ module Spaceship
 
       attr_mapping({
         description: 'description',
-        local: 'local',
+        locale: 'locale',
         name: 'name',
         state: 'state'
       })
