@@ -45,6 +45,7 @@ describe Match do
         s3_bucket: "",
         s3_object_prefix: "",
         gitlab_project: nil,
+        gitlab_host: 'https://gitlab.com',
         team_id: nil,
         aws_secrets_manager_region: nil,
         aws_secrets_manager_prefix: nil,

@@ -230,6 +230,11 @@ module Match
                                      env_name: "MATCH_GITLAB_PROJECT",
                                      description: "GitLab Project Path (i.e. 'gitlab-org/gitlab')",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :gitlab_host,
+                                      env_name: "MATCH_GITLAB_HOST",
+                                      default_value: 'https://gitlab.com',
+                                      description: "GitLab Host (i.e. 'https://gitlab.com')",
+                                      optional: true),
 
         # Storage: AWS Secrets manager
         FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_region,

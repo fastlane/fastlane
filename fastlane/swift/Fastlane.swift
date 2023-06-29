@@ -1,5 +1,5 @@
 // Fastlane.swift
-// Copyright (c) 2022 FastlaneTools
+// Copyright (c) 2023 FastlaneTools
 
 import Foundation
 /**
@@ -1318,6 +1318,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - xcconfig: Use an extra XCCONFIG file to build your app
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+   - buildTimingSummary: Create a build timing summary
    - disableXcpretty: **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Disable xcpretty formatting of build output
    - xcprettyTestFormat: Use the test (RSpec style) format for build output
    - xcprettyFormatter: A custom xcpretty formatter to use
@@ -1372,6 +1373,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                         xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                         xcodebuildFormatter: String = "xcbeautify",
+                                        buildTimingSummary: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                         xcprettyTestFormat: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                         xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -1422,6 +1424,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let xcconfigArg = xcconfig.asRubyArgument(name: "xcconfig", type: nil)
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
+    let buildTimingSummaryArg = buildTimingSummary.asRubyArgument(name: "build_timing_summary", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let xcprettyTestFormatArg = xcprettyTestFormat.asRubyArgument(name: "xcpretty_test_format", type: nil)
     let xcprettyFormatterArg = xcprettyFormatter.asRubyArgument(name: "xcpretty_formatter", type: nil)
@@ -1471,6 +1474,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           xcconfigArg,
                                           suppressXcodeOutputArg,
                                           xcodebuildFormatterArg,
+                                          buildTimingSummaryArg,
                                           disableXcprettyArg,
                                           xcprettyTestFormatArg,
                                           xcprettyFormatterArg,
@@ -1528,6 +1532,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - xcconfig: Use an extra XCCONFIG file to build your app
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+   - buildTimingSummary: Create a build timing summary
    - disableXcpretty: **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Disable xcpretty formatting of build output
    - xcprettyTestFormat: Use the test (RSpec style) format for build output
    - xcprettyFormatter: A custom xcpretty formatter to use
@@ -1579,6 +1584,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcodebuildFormatter: String = "xcbeautify",
+                                           buildTimingSummary: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcprettyTestFormat: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -1626,6 +1632,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let xcconfigArg = xcconfig.asRubyArgument(name: "xcconfig", type: nil)
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
+    let buildTimingSummaryArg = buildTimingSummary.asRubyArgument(name: "build_timing_summary", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let xcprettyTestFormatArg = xcprettyTestFormat.asRubyArgument(name: "xcpretty_test_format", type: nil)
     let xcprettyFormatterArg = xcprettyFormatter.asRubyArgument(name: "xcpretty_formatter", type: nil)
@@ -1672,6 +1679,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           xcconfigArg,
                                           suppressXcodeOutputArg,
                                           xcodebuildFormatterArg,
+                                          buildTimingSummaryArg,
                                           disableXcprettyArg,
                                           xcprettyTestFormatArg,
                                           xcprettyFormatterArg,
@@ -1730,6 +1738,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - xcconfig: Use an extra XCCONFIG file to build your app
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+   - buildTimingSummary: Create a build timing summary
    - disableXcpretty: **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Disable xcpretty formatting of build output
    - xcprettyTestFormat: Use the test (RSpec style) format for build output
    - xcprettyFormatter: A custom xcpretty formatter to use
@@ -1782,6 +1791,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcodebuildFormatter: String = "xcbeautify",
+                                           buildTimingSummary: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcprettyTestFormat: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                            xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -1830,6 +1840,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let xcconfigArg = xcconfig.asRubyArgument(name: "xcconfig", type: nil)
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
+    let buildTimingSummaryArg = buildTimingSummary.asRubyArgument(name: "build_timing_summary", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let xcprettyTestFormatArg = xcprettyTestFormat.asRubyArgument(name: "xcpretty_test_format", type: nil)
     let xcprettyFormatterArg = xcprettyFormatter.asRubyArgument(name: "xcpretty_formatter", type: nil)
@@ -1877,6 +1888,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           xcconfigArg,
                                           suppressXcodeOutputArg,
                                           xcodebuildFormatterArg,
+                                          buildTimingSummaryArg,
                                           disableXcprettyArg,
                                           xcprettyTestFormatArg,
                                           xcprettyFormatterArg,
@@ -4287,7 +4299,8 @@ public func ensureGitBranch(branch: String = "master") {
  - parameters:
    - showUncommittedChanges: The flag whether to show uncommitted changes if the repo is dirty
    - showDiff: The flag whether to show the git diff if the repo is dirty
-   - ignored: The flag whether to ignore file the git status if the repo is dirty
+   - ignored: The handling mode of the ignored files. The available options are: `'traditional'`, `'none'` (default) and `'matching'`. Specifying `'none'` to this parameter is the same as not specifying the parameter at all, which means that no ignored file will be used to check if the repo is dirty or not. Specifying `'traditional'` or `'matching'` causes some ignored files to be used to check if the repo is dirty or not (more info in the official docs: https://git-scm.com/docs/git-status#Documentation/git-status.txt---ignoredltmodegt)
+   - ignoreFiles: Array of files to ignore
 
  A sanity check to make sure you are working in a repo that is clean.
  Especially useful to put at the beginning of your Fastfile in the `before_all` block, if some of your other actions will touch your filesystem, do things to your git repo, or just as a general reminder to save your work.
@@ -4295,14 +4308,17 @@ public func ensureGitBranch(branch: String = "master") {
  */
 public func ensureGitStatusClean(showUncommittedChanges: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                  showDiff: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                                 ignored: OptionalConfigValue<String?> = .fastlaneDefault(nil))
+                                 ignored: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                 ignoreFiles: OptionalConfigValue<[String]?> = .fastlaneDefault(nil))
 {
     let showUncommittedChangesArg = showUncommittedChanges.asRubyArgument(name: "show_uncommitted_changes", type: nil)
     let showDiffArg = showDiff.asRubyArgument(name: "show_diff", type: nil)
     let ignoredArg = ignored.asRubyArgument(name: "ignored", type: nil)
+    let ignoreFilesArg = ignoreFiles.asRubyArgument(name: "ignore_files", type: nil)
     let array: [RubyCommand.Argument?] = [showUncommittedChangesArg,
                                           showDiffArg,
-                                          ignoredArg]
+                                          ignoredArg,
+                                          ignoreFilesArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -5569,6 +5585,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - xcconfig: Use an extra XCCONFIG file to build your app
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+   - buildTimingSummary: Create a build timing summary
    - disableXcpretty: **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Disable xcpretty formatting of build output
    - xcprettyTestFormat: Use the test (RSpec style) format for build output
    - xcprettyFormatter: A custom xcpretty formatter to use
@@ -5623,6 +5640,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                    xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.xcconfig),
                                    suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(gymfile.suppressXcodeOutput),
                                    xcodebuildFormatter: String = gymfile.xcodebuildFormatter,
+                                   buildTimingSummary: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.buildTimingSummary),
                                    disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(gymfile.disableXcpretty),
                                    xcprettyTestFormat: OptionalConfigValue<Bool?> = .fastlaneDefault(gymfile.xcprettyTestFormat),
                                    xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.xcprettyFormatter),
@@ -5673,6 +5691,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let xcconfigArg = xcconfig.asRubyArgument(name: "xcconfig", type: nil)
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
+    let buildTimingSummaryArg = buildTimingSummary.asRubyArgument(name: "build_timing_summary", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let xcprettyTestFormatArg = xcprettyTestFormat.asRubyArgument(name: "xcpretty_test_format", type: nil)
     let xcprettyFormatterArg = xcprettyFormatter.asRubyArgument(name: "xcpretty_formatter", type: nil)
@@ -5722,6 +5741,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                           xcconfigArg,
                                           suppressXcodeOutputArg,
                                           xcodebuildFormatterArg,
+                                          buildTimingSummaryArg,
                                           disableXcprettyArg,
                                           xcprettyTestFormatArg,
                                           xcprettyFormatterArg,
@@ -6629,7 +6649,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
  Alias for the `sync_code_signing` action
 
  - parameters:
-   - type: Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution
+   - type: Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution, developer_id_installer
    - additionalCertTypes: Create additional cert types needed for macOS installers (valid values: mac_installer_distribution, developer_id_installer)
    - readonly: Only fetch existing certificates and profiles, don't generate new ones
    - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
@@ -6660,6 +6680,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - s3Bucket: Name of the S3 bucket
    - s3ObjectPrefix: Prefix to be used on all objects uploaded to S3
    - gitlabProject: GitLab Project Path (i.e. 'gitlab-org/gitlab')
+   - gitlabHost: GitLab Host (i.e. 'https://gitlab.com')
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
@@ -6713,6 +6734,7 @@ public func match(type: String = matchfile.type,
                   s3Bucket: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3Bucket),
                   s3ObjectPrefix: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3ObjectPrefix),
                   gitlabProject: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.gitlabProject),
+                  gitlabHost: String = matchfile.gitlabHost,
                   keychainName: String = matchfile.keychainName,
                   keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.keychainPassword),
                   force: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.force),
@@ -6764,6 +6786,7 @@ public func match(type: String = matchfile.type,
     let s3BucketArg = s3Bucket.asRubyArgument(name: "s3_bucket", type: nil)
     let s3ObjectPrefixArg = s3ObjectPrefix.asRubyArgument(name: "s3_object_prefix", type: nil)
     let gitlabProjectArg = gitlabProject.asRubyArgument(name: "gitlab_project", type: nil)
+    let gitlabHostArg = RubyCommand.Argument(name: "gitlab_host", value: gitlabHost, type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -6814,6 +6837,7 @@ public func match(type: String = matchfile.type,
                                           s3BucketArg,
                                           s3ObjectPrefixArg,
                                           gitlabProjectArg,
+                                          gitlabHostArg,
                                           keychainNameArg,
                                           keychainPasswordArg,
                                           forceArg,
@@ -6844,7 +6868,7 @@ public func match(type: String = matchfile.type,
  Easily nuke your certificate and provisioning profiles (via _match_)
 
  - parameters:
-   - type: Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution
+   - type: Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution, developer_id_installer
    - additionalCertTypes: Create additional cert types needed for macOS installers (valid values: mac_installer_distribution, developer_id_installer)
    - readonly: Only fetch existing certificates and profiles, don't generate new ones
    - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
@@ -6875,6 +6899,7 @@ public func match(type: String = matchfile.type,
    - s3Bucket: Name of the S3 bucket
    - s3ObjectPrefix: Prefix to be used on all objects uploaded to S3
    - gitlabProject: GitLab Project Path (i.e. 'gitlab-org/gitlab')
+   - gitlabHost: GitLab Host (i.e. 'https://gitlab.com')
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
@@ -6932,6 +6957,7 @@ public func matchNuke(type: String = "development",
                       s3Bucket: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       s3ObjectPrefix: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       gitlabProject: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                      gitlabHost: String = "https://gitlab.com",
                       keychainName: String = "login.keychain",
                       keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -6983,6 +7009,7 @@ public func matchNuke(type: String = "development",
     let s3BucketArg = s3Bucket.asRubyArgument(name: "s3_bucket", type: nil)
     let s3ObjectPrefixArg = s3ObjectPrefix.asRubyArgument(name: "s3_object_prefix", type: nil)
     let gitlabProjectArg = gitlabProject.asRubyArgument(name: "gitlab_project", type: nil)
+    let gitlabHostArg = RubyCommand.Argument(name: "gitlab_host", value: gitlabHost, type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -7033,6 +7060,7 @@ public func matchNuke(type: String = "development",
                                           s3BucketArg,
                                           s3ObjectPrefixArg,
                                           gitlabProjectArg,
+                                          gitlabHostArg,
                                           keychainNameArg,
                                           keychainPasswordArg,
                                           forceArg,
@@ -8662,6 +8690,7 @@ public func rubyVersion() {
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
    - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
+   - resultBundlePath: Custom path for the result bundle, overrides result_bundle
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - parallelTesting: Optionally override the per-target setting in the scheme for running tests in parallel. Equivalent to -parallel-testing-enabled
@@ -8687,6 +8716,7 @@ public func rubyVersion() {
    - slackOnlyOnFailure: Only post on Slack if the tests fail
    - slackDefaultPayloads: Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack
    - destination: Use only if you're a pro, use the other options instead
+   - runRosettaSimulator: Adds arch=x86_64 to the xcodebuild 'destination' argument to run simulator in a Rosetta mode
    - catalystPlatform: Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
@@ -8743,6 +8773,7 @@ public func rubyVersion() {
                                         derivedDataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         shouldZipBuildProducts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         outputXctestrun: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        resultBundlePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         resultBundle: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         useClangReportName: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         parallelTesting: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
@@ -8768,6 +8799,7 @@ public func rubyVersion() {
                                         slackOnlyOnFailure: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         slackDefaultPayloads: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                                         destination: Any? = nil,
+                                        runRosettaSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         catalystPlatform: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         customReportFileName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         xcodebuildCommand: String = "env NSUnbufferedIO=YES xcodebuild",
@@ -8820,6 +8852,7 @@ public func rubyVersion() {
     let derivedDataPathArg = derivedDataPath.asRubyArgument(name: "derived_data_path", type: nil)
     let shouldZipBuildProductsArg = shouldZipBuildProducts.asRubyArgument(name: "should_zip_build_products", type: nil)
     let outputXctestrunArg = outputXctestrun.asRubyArgument(name: "output_xctestrun", type: nil)
+    let resultBundlePathArg = resultBundlePath.asRubyArgument(name: "result_bundle_path", type: nil)
     let resultBundleArg = resultBundle.asRubyArgument(name: "result_bundle", type: nil)
     let useClangReportNameArg = useClangReportName.asRubyArgument(name: "use_clang_report_name", type: nil)
     let parallelTestingArg = parallelTesting.asRubyArgument(name: "parallel_testing", type: nil)
@@ -8845,6 +8878,7 @@ public func rubyVersion() {
     let slackOnlyOnFailureArg = slackOnlyOnFailure.asRubyArgument(name: "slack_only_on_failure", type: nil)
     let slackDefaultPayloadsArg = slackDefaultPayloads.asRubyArgument(name: "slack_default_payloads", type: nil)
     let destinationArg = RubyCommand.Argument(name: "destination", value: destination, type: nil)
+    let runRosettaSimulatorArg = runRosettaSimulator.asRubyArgument(name: "run_rosetta_simulator", type: nil)
     let catalystPlatformArg = catalystPlatform.asRubyArgument(name: "catalyst_platform", type: nil)
     let customReportFileNameArg = customReportFileName.asRubyArgument(name: "custom_report_file_name", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
@@ -8896,6 +8930,7 @@ public func rubyVersion() {
                                           derivedDataPathArg,
                                           shouldZipBuildProductsArg,
                                           outputXctestrunArg,
+                                          resultBundlePathArg,
                                           resultBundleArg,
                                           useClangReportNameArg,
                                           parallelTestingArg,
@@ -8921,6 +8956,7 @@ public func rubyVersion() {
                                           slackOnlyOnFailureArg,
                                           slackDefaultPayloadsArg,
                                           destinationArg,
+                                          runRosettaSimulatorArg,
                                           catalystPlatformArg,
                                           customReportFileNameArg,
                                           xcodebuildCommandArg,
@@ -9085,6 +9121,7 @@ public func say(text: [String],
    - derivedDataPath: The directory where build products and other derived data will go
    - shouldZipBuildProducts: Should zip the derived data build products and place in output path?
    - outputXctestrun: Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?
+   - resultBundlePath: Custom path for the result bundle, overrides result_bundle
    - resultBundle: Should an Xcode result bundle be generated in the output directory
    - useClangReportName: Generate the json compilation database with clang naming convention (compile_commands.json)
    - parallelTesting: Optionally override the per-target setting in the scheme for running tests in parallel. Equivalent to -parallel-testing-enabled
@@ -9110,6 +9147,7 @@ public func say(text: [String],
    - slackOnlyOnFailure: Only post on Slack if the tests fail
    - slackDefaultPayloads: Specifies default payloads to include in Slack messages. For more info visit https://docs.fastlane.tools/actions/slack
    - destination: Use only if you're a pro, use the other options instead
+   - runRosettaSimulator: Adds arch=x86_64 to the xcodebuild 'destination' argument to run simulator in a Rosetta mode
    - catalystPlatform: Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
@@ -9166,6 +9204,7 @@ public func say(text: [String],
                                     derivedDataPath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.derivedDataPath),
                                     shouldZipBuildProducts: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.shouldZipBuildProducts),
                                     outputXctestrun: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.outputXctestrun),
+                                    resultBundlePath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.resultBundlePath),
                                     resultBundle: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.resultBundle),
                                     useClangReportName: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.useClangReportName),
                                     parallelTesting: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.parallelTesting),
@@ -9191,6 +9230,7 @@ public func say(text: [String],
                                     slackOnlyOnFailure: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.slackOnlyOnFailure),
                                     slackDefaultPayloads: OptionalConfigValue<[String]?> = .fastlaneDefault(scanfile.slackDefaultPayloads),
                                     destination: Any? = scanfile.destination,
+                                    runRosettaSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.runRosettaSimulator),
                                     catalystPlatform: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.catalystPlatform),
                                     customReportFileName: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.customReportFileName),
                                     xcodebuildCommand: String = scanfile.xcodebuildCommand,
@@ -9243,6 +9283,7 @@ public func say(text: [String],
     let derivedDataPathArg = derivedDataPath.asRubyArgument(name: "derived_data_path", type: nil)
     let shouldZipBuildProductsArg = shouldZipBuildProducts.asRubyArgument(name: "should_zip_build_products", type: nil)
     let outputXctestrunArg = outputXctestrun.asRubyArgument(name: "output_xctestrun", type: nil)
+    let resultBundlePathArg = resultBundlePath.asRubyArgument(name: "result_bundle_path", type: nil)
     let resultBundleArg = resultBundle.asRubyArgument(name: "result_bundle", type: nil)
     let useClangReportNameArg = useClangReportName.asRubyArgument(name: "use_clang_report_name", type: nil)
     let parallelTestingArg = parallelTesting.asRubyArgument(name: "parallel_testing", type: nil)
@@ -9268,6 +9309,7 @@ public func say(text: [String],
     let slackOnlyOnFailureArg = slackOnlyOnFailure.asRubyArgument(name: "slack_only_on_failure", type: nil)
     let slackDefaultPayloadsArg = slackDefaultPayloads.asRubyArgument(name: "slack_default_payloads", type: nil)
     let destinationArg = RubyCommand.Argument(name: "destination", value: destination, type: nil)
+    let runRosettaSimulatorArg = runRosettaSimulator.asRubyArgument(name: "run_rosetta_simulator", type: nil)
     let catalystPlatformArg = catalystPlatform.asRubyArgument(name: "catalyst_platform", type: nil)
     let customReportFileNameArg = customReportFileName.asRubyArgument(name: "custom_report_file_name", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
@@ -9319,6 +9361,7 @@ public func say(text: [String],
                                           derivedDataPathArg,
                                           shouldZipBuildProductsArg,
                                           outputXctestrunArg,
+                                          resultBundlePathArg,
                                           resultBundleArg,
                                           useClangReportNameArg,
                                           parallelTestingArg,
@@ -9344,6 +9387,7 @@ public func say(text: [String],
                                           slackOnlyOnFailureArg,
                                           slackDefaultPayloadsArg,
                                           destinationArg,
+                                          runRosettaSimulatorArg,
                                           catalystPlatformArg,
                                           customReportFileNameArg,
                                           xcodebuildCommandArg,
@@ -11062,7 +11106,7 @@ public func swiftlint(mode: String = "lint",
  Easily sync your certificates and profiles across your team (via _match_)
 
  - parameters:
-   - type: Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution
+   - type: Define the profile type, can be appstore, adhoc, development, enterprise, developer_id, mac_installer_distribution, developer_id_installer
    - additionalCertTypes: Create additional cert types needed for macOS installers (valid values: mac_installer_distribution, developer_id_installer)
    - readonly: Only fetch existing certificates and profiles, don't generate new ones
    - generateAppleCerts: Create a certificate type for Xcode 11 and later (Apple Development or Apple Distribution)
@@ -11093,6 +11137,7 @@ public func swiftlint(mode: String = "lint",
    - s3Bucket: Name of the S3 bucket
    - s3ObjectPrefix: Prefix to be used on all objects uploaded to S3
    - gitlabProject: GitLab Project Path (i.e. 'gitlab-org/gitlab')
+   - gitlabHost: GitLab Host (i.e. 'https://gitlab.com')
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
@@ -11146,6 +11191,7 @@ public func syncCodeSigning(type: String = "development",
                             s3Bucket: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             s3ObjectPrefix: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             gitlabProject: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                            gitlabHost: String = "https://gitlab.com",
                             keychainName: String = "login.keychain",
                             keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11197,6 +11243,7 @@ public func syncCodeSigning(type: String = "development",
     let s3BucketArg = s3Bucket.asRubyArgument(name: "s3_bucket", type: nil)
     let s3ObjectPrefixArg = s3ObjectPrefix.asRubyArgument(name: "s3_object_prefix", type: nil)
     let gitlabProjectArg = gitlabProject.asRubyArgument(name: "gitlab_project", type: nil)
+    let gitlabHostArg = RubyCommand.Argument(name: "gitlab_host", value: gitlabHost, type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -11247,6 +11294,7 @@ public func syncCodeSigning(type: String = "development",
                                           s3BucketArg,
                                           s3ObjectPrefixArg,
                                           gitlabProjectArg,
+                                          gitlabHostArg,
                                           keychainNameArg,
                                           keychainPasswordArg,
                                           forceArg,
@@ -13346,7 +13394,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode-13.4.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-14.1.0.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13549,4 +13597,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.165]
+// FastlaneRunnerAPIVersion [0.9.169]

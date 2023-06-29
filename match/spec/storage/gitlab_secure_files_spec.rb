@@ -1,10 +1,28 @@
 describe Match do
   describe Match::Storage::GitLabSecureFiles do
-    subject { described_class.new(api_v4_url: 'https://example.com/api', private_token: 'abc123', project_id: 'fake-project') }
+    subject { described_class.new(private_token: 'abc123', project_id: 'fake-project') }
     let(:working_directory) { '/fake/path/to/files' }
 
     before do
       allow(subject).to receive(:working_directory).and_return(working_directory)
+    end
+
+    describe '.configure' do
+      describe 'api_v4_url' do
+        it 'sets the value to CI_API_V4_URL when supplied' do
+          stub_const('ENV', ENV.to_hash.merge('CI_API_V4_URL' => 'https://gitlab.com/api/v4'))
+
+          storage = described_class.configure({})
+
+          expect(storage.api_v4_url).to eq('https://gitlab.com/api/v4')
+        end
+
+        it 'sets the value based on the gitlab_host param' do
+          storage = described_class.configure(gitlab_host: 'http://gitlab.foo.com')
+
+          expect(storage.api_v4_url).to eq('http://gitlab.foo.com/api/v4')
+        end
+      end
     end
 
     describe '#upload_files' do
@@ -96,10 +114,18 @@ describe Match do
     end
 
     describe '#generate_matchfile_content' do
-      it 'returns the correct match file contents for the configured storage mode' do
+      it 'returns the correct match file contents for the configured storage mode and project path' do
         expect(FastlaneCore::UI).to receive(:input).once.and_return("fake-project")
+        expect(FastlaneCore::UI).to receive(:input).once.and_return(nil)
 
         expect(subject.generate_matchfile_content).to eq('gitlab_project("fake-project")')
+      end
+
+      it 'returns the correct match file contents for the configured storage mode and project path and gitlab host' do
+        expect(FastlaneCore::UI).to receive(:input).once.and_return("fake-project")
+        expect(FastlaneCore::UI).to receive(:input).once.and_return("https://gitlab.example.com")
+
+        expect(subject.generate_matchfile_content).to eq("gitlab_project(\"fake-project\")\ngitlab_host(\"https://gitlab.example.com\")")
       end
     end
   end
