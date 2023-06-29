@@ -154,6 +154,7 @@ module Spaceship
           params = {
             data: {
               type: 'inAppPurchaseLocalizations',
+              id: localization_id,
               attributes: attributes
             }
           }

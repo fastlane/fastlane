@@ -528,7 +528,7 @@ module Spaceship
       # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/modify_an_in-app_purchase_localization
       def update_in_app_purchase_localization(localization_id:, name:, description: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.create_in_app_purchase(app_id: id, purchase_id: purchase_id, locale: locale, name: name, description: description)
+        resps = client.update_in_app_purchase_localization(localization_id: localization_id, name: name, description: description)
         return resps.to_models.first
       end
 
