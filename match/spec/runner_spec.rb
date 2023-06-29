@@ -35,7 +35,7 @@ describe Match do
           config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
           repo_dir = Dir.mktmpdir
           cert_path = File.join(repo_dir, "something.cer")
-          File.copy_stream("./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.cer", cert_path)
+          File.copy_stream("./match/spec/fixtures/existing/certs/distribution/Certificate.cer", cert_path)
           openssl = Match::Encryption::OpenSSL.new(
             keychain_name: "login.keychain",
             working_directory: repo_dir
@@ -86,7 +86,7 @@ describe Match do
           expect(Match::Generator).to receive(:generate_provisioning_profile).with(params: config,
                                                                                 prov_type: :appstore,
                                                                            certificate_id: "something",
-                                                                           certificate_serial_number: "7912846BD5AC5DBE75F6E932824F1458",
+                                                                           certificate_serial_number: "665C0BF3BA7BFB7EFBC4789806719C8A",
                                                                            app_identifier: values[:app_identifier],
                                                                                     force: false,
                                                                        working_directory: fake_storage.working_directory).and_return(profile_path)
@@ -133,8 +133,8 @@ describe Match do
 
           config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
           repo_dir = "./match/spec/fixtures/existing"
-          cert_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.cer"
-          key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
+          cert_path = "./match/spec/fixtures/existing/certs/distribution/Certificate.cer"
+          key_path = "./match/spec/fixtures/existing/certs/distribution/PrivateKey.p12"
 
           fake_storage = "fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with(
@@ -200,12 +200,12 @@ describe Match do
           Match::Runner.new.run(config)
 
           expect(ENV[Match::Utils.environment_variable_name(app_identifier: "tools.fastlane.app",
-                                                            type: "appstore")]).to eql('a0b45501-0c52-41cb-b52e-124edf937135')
+                                                            type: "appstore")]).to eql('c3e20987-ffea-4d11-b037-e8bf0a102561')
           expect(ENV[Match::Utils.environment_variable_name_team_id(app_identifier: "tools.fastlane.app",
                                                                     type: "appstore")]).to eql('VQVYM88YJ2')
           expect(ENV[Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
-                                                                         type: "appstore")]).to eql('Jigx Test AppStore')
-          profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/a0b45501-0c52-41cb-b52e-124edf937135.mobileprovision')
+                                                                         type: "appstore")]).to eql('Fastlane PR Unit Tests')
+          profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/c3e20987-ffea-4d11-b037-e8bf0a102561.mobileprovision')
           expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
                                                                          type: "appstore")]).to eql(profile_path)
           expect(ENV[Match::Utils.environment_variable_name_certificate_name(app_identifier: "tools.fastlane.app",
@@ -223,8 +223,8 @@ describe Match do
 
           config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
           repo_dir = "./match/spec/fixtures/existing"
-          cert_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.cer"
-          key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
+          cert_path = "./match/spec/fixtures/existing/certs/distribution/Certificate.cer"
+          key_path = "./match/spec/fixtures/existing/certs/distribution/PrivateKey.p12"
 
           fake_storage = "fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with(
@@ -278,7 +278,7 @@ describe Match do
 
           expect do
             Match::Runner.new.run(config)
-          end.to raise_error("Your certificate 'E7P4EE896K.cer' is not valid, please check end date and renew it if necessary")
+          end.to raise_error("Your certificate 'Certificate.cer' is not valid, please check end date and renew it if necessary")
         end
 
         it "skips provisioning profiles when skip_provisioning_profiles set to true", requires_security: true do
@@ -295,7 +295,7 @@ describe Match do
           config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
           repo_dir = Dir.mktmpdir
           cert_path = File.join(repo_dir, "something.cer")
-          File.copy_stream("./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.cer", cert_path)
+          File.copy_stream("./match/spec/fixtures/existing/certs/distribution/Certificate.cer", cert_path)
           openssl = Match::Encryption::OpenSSL.new(
             keychain_name: "login.keychain",
             working_directory: repo_dir
