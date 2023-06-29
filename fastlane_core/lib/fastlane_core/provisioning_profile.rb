@@ -42,6 +42,7 @@ module FastlaneCore
           decoded_cert = FastlaneCore::Certificate.parse_from_b64(Base64.encode64(encoded_cert.string))
           return true if decoded_cert["SerialNumber"] == certificate["SerialNumber"]
         end
+        return false
       end
 
       # @return [String] The UUID of the given provisioning profile

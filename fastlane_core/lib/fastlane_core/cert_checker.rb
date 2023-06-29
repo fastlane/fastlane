@@ -202,7 +202,6 @@ module FastlaneCore
     end
 
     def self.certificate_key_match?(cert_path, key_path)
-      # Use openssl class
       cert_obj = OpenSSL::X509::Certificate.new(File.read(cert_path))
       begin
         key_obj = OpenSSL::PKey::RSA.new(File.read(key_path))
