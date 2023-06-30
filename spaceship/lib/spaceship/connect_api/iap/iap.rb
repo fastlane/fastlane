@@ -189,7 +189,7 @@ module Spaceship
         end
 
         # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/add_a_scheduled_price_change_to_an_in-app_purchase
-        def create_in_app_purchase_price_schedule(purchase_id:, in_app_purchase_price_point_id:, start_date: nil)
+        def create_in_app_purchase_price_schedule(purchase_id:, in_app_purchase_price_point_id:, start_date: nil, base_territory: nil)
           params = {
             data: {
               type: 'inAppPurchasePriceSchedules',
@@ -215,6 +215,15 @@ module Spaceship
 
             # Add to relationships
             params[:data][:relationships][:manualPrices][:data] << { id: create_id, type: 'inAppPurchasePrices' }
+
+            if not(base_territory.nil?)
+              params[:data][:relationships][:baseTerritory] = {
+                data: {
+                  id: base_territory,
+                  type: "territories"
+                }
+              }
+            end
 
             # Add to included
             attributes = {}

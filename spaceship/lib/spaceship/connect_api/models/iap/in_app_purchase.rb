@@ -130,9 +130,9 @@ module Spaceship
       #
 
       # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/add_a_scheduled_price_change_to_an_in-app_purchase
-      def create_price_schedule(client: nil, in_app_purchase_price_point_id:, start_date: nil)
+      def create_price_schedule(client: nil, in_app_purchase_price_point_id:, start_date: nil, base_territory: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.create_in_app_purchase_price_schedule(purchase_id: id, in_app_purchase_price_point_id: in_app_purchase_price_point_id, start_date: start_date)
+        resps = client.create_in_app_purchase_price_schedule(purchase_id: id, in_app_purchase_price_point_id: in_app_purchase_price_point_id, start_date: start_date, base_territory: base_territory)
         resps.to_models.first
       end
 
