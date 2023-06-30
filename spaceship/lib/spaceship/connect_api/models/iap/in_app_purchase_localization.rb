@@ -28,6 +28,19 @@ module Spaceship
         return 'inAppPurchaseLocalizations'
       end
 
+      # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/modify_an_in-app_purchase_localization
+      def update(name: nil, description: nil)
+        client ||= Spaceship::ConnectAPI
+        name ||= self.name
+        description ||= self.description
+        resps = client.update_in_app_purchase_localization(localization_id: id, name: name, description: description)
+        model = resps.to_models.first
+        self.name = model.name
+        self.description = model.description
+        self.locale = model.locale
+        self.state = model.state
+      end
+
       #
       # Delete
       #
