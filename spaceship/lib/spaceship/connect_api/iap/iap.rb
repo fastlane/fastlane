@@ -29,7 +29,7 @@ module Spaceship
           iap_request_client.get("apps/#{app_id}/inAppPurchasesV2", params)
         end
 
-        # Apple Developer API docs: https://developer.apple.com/documentation/appstoreconnectapi/list_all_in-app_purchases_for_an_app
+        # Apple Developer API docs: https://developer.apple.com/documentation/appstoreconnectapi/create_an_in-app_purchase
         def create_in_app_purchase(app_id:, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
           attributes = {
             name: name,
