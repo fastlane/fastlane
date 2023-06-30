@@ -170,6 +170,7 @@ module Spaceship
         # inAppPurchasePricePoints
         #
 
+        # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/list_all_price_points_for_an_in-app_purchase
         def get_in_app_purchase_price_points(purchase_id:, filter: nil, includes: nil, limit: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit)
           iap_request_client.get("https://api.appstoreconnect.apple.com/v2/inAppPurchases/#{purchase_id}/pricePoints", params)
@@ -187,6 +188,7 @@ module Spaceship
           iap_request_client.get("inAppPurchasePriceSchedules/#{purchase_id}/manualPrices", params)
         end
 
+        # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/add_a_scheduled_price_change_to_an_in-app_purchase
         def create_in_app_purchase_price_schedule(purchase_id:, in_app_purchase_price_point_id:, start_date: nil)
           params = {
             data: {

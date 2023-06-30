@@ -118,6 +118,7 @@ module Spaceship
       # In-App Purchase Price Points
       #
 
+      # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/list_all_price_points_for_an_in-app_purchase
       def get_price_points(client: nil, filter: {}, includes: Spaceship::ConnectAPI::InAppPurchasePricePoint::ESSENTIAL_INCLUDES, limit: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_in_app_purchase_price_points(purchase_id: id, filter: filter, includes: includes, limit: limit).all_pages
@@ -128,6 +129,7 @@ module Spaceship
       # In-App Purchase Price Schedules
       #
 
+      # Apple Developer API Docs: https://developer.apple.com/documentation/appstoreconnectapi/add_a_scheduled_price_change_to_an_in-app_purchase
       def create_price_schedule(client: nil, in_app_purchase_price_point_id:, start_date: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.create_in_app_purchase_price_schedule(purchase_id: id, in_app_purchase_price_point_id: in_app_purchase_price_point_id, start_date: start_date)
