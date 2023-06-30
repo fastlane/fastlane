@@ -92,7 +92,7 @@ describe FastlaneCore do
 
         expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/DeveloperIDCA.cer')).and_return(["", "", success_status])
         FastlaneCore::CertChecker.install_wwdr_certificate('DEV-ID-G1')
-        
+
         expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer')).and_return(["", "", success_status])
         FastlaneCore::CertChecker.install_wwdr_certificate('DEV-ID-G2')
       end
