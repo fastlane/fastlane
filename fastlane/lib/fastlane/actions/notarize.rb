@@ -47,6 +47,7 @@ module Fastlane
 
       def self.notarytool(params, package_path, bundle_id, skip_stapling, print_log, verbose, api_key, compressed_package_path)
         temp_file = nil
+        temp_file_log = nil
 
         # Create authorization part of command with either API Key or Apple ID
         auth_parts = []
@@ -84,6 +85,27 @@ module Fastlane
 
         notarization_info = JSON.parse(submit_response)
 
+        if print_log && not(notarization_info['id'].nil?)
+          temp_file_log = Tempfile.new
+          submit_parts = [
+            "xcrun notarytool log",
+            notarization_info['id']
+          ] + auth_parts
+  
+          submit_command = "#{submit_parts.join(' ')} #{temp_file_log.path}"
+          Actions.sh(
+            submit_command,
+            log: verbose,
+            error_callback: lambda { |msg|
+              UI.error("Error getting notorization logs: #{msg}")
+            }
+          )
+  
+          UI.message "#{temp_file_log.read}"
+        else
+          UI.message "notarization_info is missing the 'id' field. Not fetching logs."
+        end
+
         # Staple
         case notarization_info['status']
         when 'Accepted'
@@ -100,10 +122,47 @@ module Fastlane
             UI.success("Successfully notarized and stapled package")
           end
         when 'Invalid'
+          # if print_log
+          #   notarytool_log(
+          #     log_id: notarization_info['id'], 
+          #     auth_parts: auth_parts
+          #   )
+          # end
+
           UI.user_error!("Could not notarize package with message '#{notarization_info['statusSummary']}'")
         else
+          # if print_log
+          #   notarytool_log(
+          #     log_id: notarization_info['id'], 
+          #     auth_parts: auth_parts
+          #   )
+          # end
+
           UI.crash!("Could not notarize package with status '#{notarization_info['status']}'")
         end
+      ensure
+        temp_file.delete if temp_file
+        temp_file_log.delete if temp_file_log
+      end
+
+      def self.notarytool_log(log_id, auth_parts)
+        require 'tempfile'
+        temp_file = Tempfile.new
+        submit_parts = [
+          "xcrun notarytool log",
+          log_id
+        ] + auth_parts
+
+        submit_command = "#{submit_parts.join(' ')} #{temp_file.path}"
+        Actions.sh(
+          submit_command,
+          log: verbose,
+          error_callback: lambda { |msg|
+            UI.error("Error getting notorization logs: #{msg}")
+          }
+        )
+
+        UI.message "#{temp_file.read}"
       ensure
         temp_file.delete if temp_file
       end
