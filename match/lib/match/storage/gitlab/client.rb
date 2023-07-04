@@ -40,6 +40,8 @@ module Match
         def files
           @files ||= begin
             url = URI.parse(base_url)
+            # 100 is maximum number of Secure files available on Gitlab https://docs.gitlab.com/ee/api/secure_files.html
+            url.query = [url.query, "per_page=100"].compact.join('&')
 
             request = Net::HTTP::Get.new(url.request_uri)
 
