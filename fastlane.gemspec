@@ -22,32 +22,32 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Roger Oba",
-                        "Manish Rathi",
-                        "Helmut Januschka",
-                        "Stefan Natchev",
-                        "Joshua Liebowitz",
-                        "Kohki Miki",
-                        "Jimmy Dee",
-                        "Jorge Revuelta H",
-                        "Andrew McBurney",
-                        "Satoshi Namai",
+  spec.authors       = ["Danielle Tomlinson",
                         "Josh Holtz",
-                        "Fumiya Nakamura",
-                        "Danielle Tomlinson",
-                        "Łukasz Grabowski",
-                        "Luka Mirosevic",
-                        "Felix Krause",
-                        "Jérôme Lacoste",
-                        "Max Ott",
-                        "Manu Wallner",
-                        "Aaron Brager",
-                        "Maksym Grebenets",
-                        "Daniel Jankowski",
                         "Olivier Halligon",
-                        "Iulian Onofrei",
+                        "Satoshi Namai",
+                        "Helmut Januschka",
+                        "Max Ott",
+                        "Felix Krause",
+                        "Daniel Jankowski",
+                        "Joshua Liebowitz",
+                        "Fumiya Nakamura",
+                        "Aaron Brager",
+                        "Kohki Miki",
+                        "Luka Mirosevic",
                         "Matthew Ellis",
-                        "Jan Piotrowski"]
+                        "Roger Oba",
+                        "Stefan Natchev",
+                        "Iulian Onofrei",
+                        "Maksym Grebenets",
+                        "Jan Piotrowski",
+                        "Jérôme Lacoste",
+                        "Manish Rathi",
+                        "Łukasz Grabowski",
+                        "Manu Wallner",
+                        "Andrew McBurney",
+                        "Jimmy Dee",
+                        "Jorge Revuelta H"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -78,7 +78,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
   spec.add_dependency('addressable', '>= 2.8', '< 3.0.0') # Support for URI templates
-  spec.add_dependency('multipart-post', '~> 2.0.0') # Needed for uploading builds to appetize
+  spec.add_dependency('multipart-post', '>= 2.0.0', '< 3.0.0') # Needed for uploading builds to appetize
   spec.add_dependency('word_wrap', '~> 1.0.0') # to add line breaks for tables with long strings
 
   spec.add_dependency('optparse', '~> 0.1.1') # Used to parse options with Commander
