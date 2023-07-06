@@ -152,7 +152,13 @@ describe Match do
         team_id: nil,
         team_name: nil,
         api_key_path: nil,
-        api_key: nil
+        api_key: nil,
+        aws_secrets_manager_region: nil,
+        aws_secrets_manager_prefix: nil,
+        aws_secrets_manager_force_delete_without_recovery: nil,
+        aws_secrets_manager_recovery_window_days: nil,
+        aws_secrets_manager_access_key: nil,
+        aws_secrets_manager_secret_access_key: nil
       ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)

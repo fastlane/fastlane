@@ -55,9 +55,15 @@ module Match
         s3_secret_access_key: params[:s3_secret_access_key].to_s,
         s3_bucket: params[:s3_bucket].to_s,
         s3_object_prefix: params[:s3_object_prefix].to_s,
-        gitlab_project: params[:gitlab_project],
+        gitlab_project: params[:gitlab_project],        
         gitlab_host: params[:gitlab_host],
-        team_id: params[:team_id] || Spaceship::ConnectAPI.client.portal_team_id
+        team_id: params[:team_id] || Spaceship::ConnectAPI.client.portal_team_id,
+        aws_secrets_manager_region: params[:aws_secrets_manager_region],
+        aws_secrets_manager_prefix: params[:aws_secrets_manager_prefix],
+        aws_secrets_manager_force_delete_without_recovery: params[:aws_secrets_manager_force_delete_without_recovery],
+        aws_secrets_manager_recovery_window_days: params[:aws_secrets_manager_recovery_window_days],
+        aws_secrets_manager_access_key: params[:aws_secrets_manager_access_key],
+        aws_secrets_manager_secret_access_key: params[:aws_secrets_manager_secret_access_key]
       })
       self.storage.download
 

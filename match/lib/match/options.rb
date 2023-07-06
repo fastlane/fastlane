@@ -4,6 +4,8 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Match
+  # ignore class length, as this is just a list of options
+  # rubocop:disable Metrics/ClassLength
   class Options
     # This is match specific, as users can append storage specific options
     def self.append_option(option)
@@ -234,6 +236,32 @@ module Match
                                       description: "GitLab Host (i.e. 'https://gitlab.com')",
                                       optional: true),
 
+        # Storage: AWS Secrets manager
+        FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_region,
+                                     env_name: "MATCH_AWS_SECRETS_MANAGER_REGION",
+                                     description: "Name of the AWS Secrets Manager region",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_prefix,
+                                     env_name: "MATCH_AWS_SECRETS_MANAGER_PREFIX",
+                                     description: "Prefix to be used on all secrets uploaded to AWS Secrets Manager",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_force_delete_without_recovery,
+                                     env_name: "MATCH_AWS_SECRETS_MANAGER_FORCE_DELETE_WITHOUT_RECOVERY",
+                                     description: "Force delete the secrets without recovery",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_recovery_window_days,
+                                     env_name: "MATCH_AWS_SECRETS_MANAGER_RECOVERY_WINDOW_DAYS",
+                                     description: "The number of days that Secrets Manager waits before it can delete the secret (Minimum 7, Default 30)",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_access_key,
+                                     env_name: "MATCH_AWS_SECRETS_MANAGER_ACCESS_KEY",
+                                     description: "AWS Secrets Manager access key",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :aws_secrets_manager_secret_access_key,
+                                     env_name: "MATCH_AWS_SECRETS_MANAGER_SECRET_ACCESS_KEY",
+                                     description: "AWS Secrets Manager secret access key",
+                                     optional: true),
+
         # Keychain
         FastlaneCore::ConfigItem.new(key: :keychain_name,
                                      short_option: "-s",
@@ -326,6 +354,24 @@ module Match
                                      optional: true,
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :cert_path,
+                                     env_name: "MATCH_DEPLOYMENT_CERTIFICATE_PATH",
+                                     sensitive: false,
+                                     description: "The certificate to import. Only works with match import action",
+                                     optional: true,
+                                     default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :p12_path,
+                                     env_name: "MATCH_PRIVATE_KEY_PATH",
+                                     sensitive: false,
+                                     description: "The private key to import.  Only works with match import action",
+                                     optional: true,
+                                     default_value: nil),
+        FastlaneCore::ConfigItem.new(key: :profile_path,
+                                     env_name: "MATCH_PROVISIONING_PROFILE_PATH",
+                                     sensitive: false,
+                                     description: "The provisioning profile to import.  Only works with match import action",
+                                     optional: true,
+                                     default_value: nil),
         FastlaneCore::ConfigItem.new(key: :output_path,
                                      env_name: "MATCH_OUTPUT_PATH",
                                      description: "Path in which to export certificates, key and profile",
@@ -349,4 +395,5 @@ module Match
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
