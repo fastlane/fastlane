@@ -162,6 +162,7 @@ module Match
     def fetch_certificates(params: nil, working_directory: nil, specific_cert_type: nil)
       cert_type = Match.cert_type_sym(specific_cert_type || params[:type])
 
+      # raise prefixed_working_directory
       certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.p12")]
 
@@ -335,13 +336,14 @@ module Match
                              parsed["TeamIdentifier"].first)
 
       cert_info = Utils.get_cert_info(parsed["DeveloperCertificates"].first.string).to_h
+      # cert_info = FastlaneCore::Certificate.parse(parsed["DeveloperCertificates"].first.string).to_h
       Utils.fill_environment(Utils.environment_variable_name_certificate_name(app_identifier: app_identifier,
                                                                               type: prov_type,
                                                                               platform: params[:platform]),
                              cert_info["Common Name"])
       Utils.fill_environment(Utils.environment_variable_name_certificate_serial_number(app_identifier: app_identifier,
-                                                                                       type: prov_type,
-                                                                                       platform: params[:platform]),
+                                                                                             type: prov_type,
+                                                                                             platform: params[:platform]),
                              cert_info["Serial Number"])
 
       Utils.fill_environment(Utils.environment_variable_name_profile_name(app_identifier: app_identifier,

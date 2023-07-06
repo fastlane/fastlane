@@ -50,7 +50,7 @@ module Match
       end
 
       cert = OpenSSL::X509::Certificate.new(cer_certificate)
-      our_cert = FastlaneCore::Certificate.parse_from_b64(Base64.encode64(cer_certificate))
+      our_cert = FastlaneCore::Certificate.parse(cer_certificate)
 
       # openssl output:
       # subject= /UID={User ID}/CN={Certificate Name}/OU={Certificate User}/O={Organisation}/C={Country}

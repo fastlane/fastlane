@@ -133,8 +133,10 @@ describe Match do
 
           config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
           repo_dir = "./match/spec/fixtures/existing"
-          cert_path = "./match/spec/fixtures/existing/certs/distribution/Certificate.cer"
-          key_path = "./match/spec/fixtures/existing/certs/distribution/PrivateKey.p12"
+          cert1_path = "./match/spec/fixtures/existing/certs/distribution/Certificate.cer"
+          cert2_path = "./match/spec/fixtures/existing/certs/distribution/Certificate2.cer"
+          key1_path = "./match/spec/fixtures/existing/certs/distribution/PrivateKey.p12"
+          key2_path = "./match/spec/fixtures/existing/certs/distribution/PrivateKey2.p12"
 
           fake_storage = "fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with(
@@ -179,12 +181,15 @@ describe Match do
           expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory).and_return(fake_encryption)
           expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
 
-          expect(Match::Utils).to receive(:import).with(key_path, keychain, password: nil).and_return(nil)
+          expect(Match::Utils).to receive(:import).with(key1_path, keychain, password: nil).and_return(nil)
+          expect(Match::Utils).to receive(:import).with(key2_path, keychain, password: nil).and_return(nil)
           expect(fake_storage).to_not(receive(:save_changes!))
 
           # To also install the certificate, fake that
-          expect(FastlaneCore::CertChecker).to receive(:installed?).with(cert_path, in_keychain: nil).and_return(false)
-          expect(Match::Utils).to receive(:import).with(cert_path, keychain, password: nil).and_return(nil)
+          expect(FastlaneCore::CertChecker).to receive(:installed?).with(cert1_path, in_keychain: nil).and_return(false)
+          expect(Match::Utils).to receive(:import).with(cert1_path, keychain, password: nil).and_return(nil)
+          expect(FastlaneCore::CertChecker).to receive(:installed?).with(cert2_path, in_keychain: nil).and_return(false)
+          expect(Match::Utils).to receive(:import).with(cert2_path, keychain, password: nil).and_return(nil)
 
           spaceship = "spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
@@ -192,8 +197,7 @@ describe Match do
           expect(spaceship).to receive(:certificates_exists).and_return(true)
           expect(spaceship).to receive(:profile_exists).and_return(true)
           expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
-          expect(Match::Utils).to receive(:get_cert_info)
-          expect(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "fastlane certificate name"]])
+          expect(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "fastlane certificate name"]]).exactly(3).times
 
           allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
 
@@ -223,8 +227,10 @@ describe Match do
 
           config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
           repo_dir = "./match/spec/fixtures/existing"
-          cert_path = "./match/spec/fixtures/existing/certs/distribution/Certificate.cer"
-          key_path = "./match/spec/fixtures/existing/certs/distribution/PrivateKey.p12"
+          cert1_path = "./match/spec/fixtures/existing/certs/distribution/Certificate.cer"
+          cert2_path = "./match/spec/fixtures/existing/certs/distribution/Certificate2.cer"
+          key1_path = "./match/spec/fixtures/existing/certs/distribution/PrivateKey.p12"
+          key2_path = "./match/spec/fixtures/existing/certs/distribution/PrivateKey2.p12"
 
           fake_storage = "fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with(
@@ -411,6 +417,47 @@ describe Match do
         runner = Match::Runner.new
         expect(runner.device_count_different?(profile: profile_file, platform: :ios, include_mac_in_profiles: false)).to be(true)
         expect(runner.device_count_different?(profile: profile_file, platform: :ios, include_mac_in_profiles: true)).to be(false)
+      end
+    end
+
+    describe "#fetch_certificates" do
+      it "only fetches certificates which have a private key available" do
+        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+        values = {
+          app_identifier: "tools.fastlane.app",
+          type: "appstore",
+          git_url: git_url,
+          shallow_clone: true,
+          username: "flapple@something.com"
+        }
+
+        config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+        repo_dir = Dir.mktmpdir
+        cert_path = File.join(repo_dir, "something.cer")
+        File.copy_stream("./match/spec/fixtures/existing/certs/distribution/Certificate.cer", cert_path)
+        openssl = Match::Encryption::OpenSSL.new(
+          keychain_name: "login.keychain",
+          working_directory: repo_dir
+        )
+        openssl.encrypt_files(password: ENV["MATCH_PASSWORD"])
+        profile_path = "./match/spec/fixtures/test.mobileprovision"
+        keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
+        destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
+
+        fake_storage = "fake_storage"
+
+        allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
+        allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
+
+        certs_fixtures_dir = File.join(__dir__, "fixtures/existing")
+        runner = Match::Runner.new
+        allow(runner).to receive(:prefixed_working_directory).and_return(certs_fixtures_dir)
+
+        cert1_path = File.join(certs_fixtures_dir, "certs/distribution/Certificate.cer")
+        cert1 = FastlaneCore::Certificate.parse_from_file(cert1_path)
+        cert2_path = File.join(certs_fixtures_dir, "certs/distribution/Certificate2.cer")
+        cert2 = FastlaneCore::Certificate.parse_from_file(cert2_path)
+        expect(runner.fetch_certificates(params: config, working_directory: fake_storage.working_directory)).to eq([cert1, cert2])
       end
     end
   end

@@ -13,6 +13,15 @@ module FastlaneCore
         certs.sort_by { |c| c["NotAfter"].to_i }
       end
 
+      def parse(string)
+        openssl_object = OpenSSL::X509::Certificate.new(string)
+        {
+          "SerialNumber" => openssl_object.serial.to_s(16).upcase,
+          "NotBefore" => openssl_object.not_before,
+          "NotAfter" => openssl_object.not_after
+        }
+      end
+
       def parse_from_b64(b64_content)
         openssl_object = OpenSSL::X509::Certificate.new(Base64.decode64(b64_content))
         {
