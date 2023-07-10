@@ -32,6 +32,21 @@ module Supply
       release_names
     end
 
+    def aab_version_codes
+      package_name = Supply.config[:package_name]
+      client.begin_edit(package_name: package_name)
+      version_codes = client.aab_version_codes
+      client.abort_current_edit
+
+      if version_codes.empty?
+        UI.important("No version codes found in aab '#{package_name}'")
+      else
+        UI.success("Found '#{version_codes.join(', ')}' version codes in aab '#{package_name}'")
+      end
+
+      version_codes
+    end
+
     private
 
     def client
