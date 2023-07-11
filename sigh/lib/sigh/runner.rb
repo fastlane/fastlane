@@ -185,7 +185,8 @@ module Sigh
         profile_type: profile_type,
         bundle_id_id: bundle_id.id,
         certificate_ids: certificates_to_use.map(&:id),
-        device_ids: devices_to_use.map(&:id)
+        device_ids: devices_to_use.map(&:id),
+        is_offline_profile: Sigh.config[:offline_profile]
       )
 
       profile
