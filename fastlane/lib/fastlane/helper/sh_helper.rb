@@ -42,7 +42,7 @@ module Fastlane
 
       result = ''
       exit_status = nil
-      if Helper.sh_enabled?
+      if FastlaneCore::Helper.sh_enabled?
         # The argument list is passed directly to Open3.popen2e, which
         # handles the variadic argument list in the same way as Kernel#spawn.
         # (http://ruby-doc.org/core-2.4.2/Kernel.html#method-i-spawn) or
