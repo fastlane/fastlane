@@ -123,7 +123,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :changelog,
             optional: true,
-            default_value: Helper.backticks("git log -1 --pretty=%B").to_s,
+            default_value: Helper.backticks("git log -1 --pretty=%B").to_s.strip,
             default_value_dynamic: true,
             env_name: "CHANGE_LOG",
             description: "Write version changes"
