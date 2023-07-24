@@ -146,6 +146,7 @@ describe Match do
         s3_secret_access_key: nil,
         s3_object_prefix: nil,
         gitlab_project: nil,
+        gitlab_host: 'https://gitlab.com',
         readonly: false,
         username: config[:username],
         team_id: nil,
