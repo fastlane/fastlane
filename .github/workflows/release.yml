@@ -3,6 +3,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:   
   communicate-on-pull-request-released:
     name: communicate on pull request released
