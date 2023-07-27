@@ -175,7 +175,7 @@ module Match
         self.files_to_commit << cert_path
         self.files_to_commit << private_key_path
       else
-        cert_path = certs.last
+        cert_path = select_cert_and_key(paths: certs)
 
         # Check validity of certificate
         if Utils.is_cert_valid?(cert_path)
@@ -199,7 +199,7 @@ module Match
             # Import the private key
             # there seems to be no good way to check if it's already installed - so just install it
             # Key will only be added to the partition list if it isn't already installed
-            Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+            Utils.import(select_cert_and_key(paths: keys), params[:keychain_name], password: params[:keychain_password])
           end
         else
           UI.message("Skipping installation of certificate as it would not work on this operating system.")
@@ -207,7 +207,7 @@ module Match
 
         if params[:output_path]
           FileUtils.cp(cert_path, params[:output_path])
-          FileUtils.cp(keys.last, params[:output_path])
+          FileUtils.cp(select_cert_and_key(paths: keys), params[:output_path])
         end
 
         # Get and print info of certificate
@@ -216,6 +216,11 @@ module Match
       end
 
       return File.basename(cert_path).gsub(".cer", "") # Certificate ID
+    end
+
+    def select_cert_and_key(paths:)
+      path = ENV['MATCH_CERTIFICATE_ID'] ? paths.find { |path| path.include?(ENV['MATCH_CERTIFICATE_ID']) } : nil
+      path ||= paths.last
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
