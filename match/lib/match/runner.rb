@@ -220,8 +220,8 @@ module Match
 
     # @return [String] Path to certificate or P12 key
     def select_cert_or_key(paths:)
-      matching_path = ENV['MATCH_CERTIFICATE_ID'] ? paths.find { |path| path.include?(ENV['MATCH_CERTIFICATE_ID']) } : nil
-      matching_path || paths.last
+      cert_id_path = ENV['MATCH_CERTIFICATE_ID'] ? paths.find { |path| path.include?(ENV['MATCH_CERTIFICATE_ID']) } : nil
+      cert_id_path || paths.last
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
