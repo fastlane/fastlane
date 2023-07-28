@@ -7,7 +7,7 @@
 - [ ] I see several green `ci/circleci` builds in the "All checks have passed" section of my PR ([connect CircleCI to GitHub](https://support.circleci.com/hc/en-us/articles/360008097173-Why-aren-t-pull-requests-triggering-jobs-on-my-organization-) if not)
 - [ ] I've read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
 - [ ] I've updated the documentation if necessary.
-- [ ] I've updated the relevant unit tests.
+- [ ] I've added or updated relevant unit tests.
 
 ### Motivation and Context
 
