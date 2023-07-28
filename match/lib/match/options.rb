@@ -271,7 +271,7 @@ module Match
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :certificate_id,
                                      env_name: "MATCH_CERTIFICATE_ID",
-                                     description: "Selects needed certificate by id. Useful if multiple certificates are stored in one place",
+                                     description: "Select certificate by id. Useful if multiple certificates are stored in one place",
                                      type: String,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :force_for_new_certificates,
