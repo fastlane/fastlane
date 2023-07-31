@@ -100,7 +100,7 @@ module Trainer
       attr_accessor :identifier
       attr_accessor :parent
       def initialize(data, parent)
-        self.identifier = fetch_value(data, "identifier")
+        self.identifier = fetch_value(data, "identifier").sanitized
         self.parent = parent
         super(data)
       end
@@ -184,15 +184,7 @@ module Trainer
           #     or identifier: "TestThisDude/testFailureJosh2" (when Objective-C)
 
           found_failure = failures.find do |failure|
-            # Clean test_case_name to match identifier format
-            # Sanitize for Swift by replacing "." for "/"
-            # Sanitize for Objective-C by removing "-", "[", "]", and replacing " " for ?/
-            sanitized_test_case_name = failure.test_case_name
-                                              .tr(".", "/")
-                                              .tr("-", "")
-                                              .tr("[", "")
-                                              .tr("]", "")
-                                              .tr(" ", "/")
+            sanitized_test_case_name = failure.test_case_name.sanitized
             self.identifier == sanitized_test_case_name
           end
           return found_failure
@@ -399,5 +391,19 @@ module Trainer
         return new_message
       end
     end
+  end
+end
+
+# Clean identifier format used for test case identifier name and failure test case
+# Sanitize for Swift by replacing "." for "/"
+# Sanitize for Objective-C by removing "-", "[", "]", and replacing " " for ?/
+class String
+  def sanitized
+    tr(".", "/")
+      .tr("-", "")
+      .tr("[", "")
+      .tr("]", "")
+      .tr(" ", "/")
+      .tr(",", "-")
   end
 end
