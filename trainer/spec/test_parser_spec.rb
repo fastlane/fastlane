@@ -198,6 +198,44 @@ describe Trainer do
                                 }
                               ])
       end
+
+      it "works as expected with xcresult with spaces", requires_xcode: true do
+        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.with_spaces.xcresult")
+        expect(tp.data).to eq([
+                                {
+                                  project_path: "SpaceTests.xcodeproj",
+                                  target_name: "SpaceTestsTests",
+                                  test_name: "SpaceTestsTests",
+                                  configuration_name: "Test Scheme Action",
+                                  duration: 0.21180307865142822,
+                                  tests: [
+                                    {
+                                      identifier: "SpaceTestsSpec.a test with spaces, should always fail()",
+                                      name: "a test with spaces, should always fail()",
+                                      duration: 0.21180307865142822,
+                                      status: "Failure",
+                                      test_group: "SpaceTestsSpec",
+                                      guid: "",
+                                      failures: [
+                                        {
+                                          failure_message: "expected to equal <1>, got <2>\n (/Users/mahmood.tahir/Developer/SpaceTests/SpaceTestsTests/TestSpec.swift#CharacterRangeLen=0&EndingLineNumber=15&StartingLineNumber=15)",
+                                          file_name: "",
+                                          line_number: 0,
+                                          message: "",
+                                          performance_failure: {}
+                                        }
+                                      ]
+                                    }
+                                  ],
+                                  number_of_tests: 1,
+                                  number_of_failures: 1,
+                                  number_of_skipped: 0,
+                                  number_of_tests_excluding_retries: 1,
+                                  number_of_failures_excluding_retries: 1,
+                                  number_of_retries: 0
+                                }
+                              ])
+      end
     end
   end
 end
