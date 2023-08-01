@@ -1,5 +1,7 @@
 require_relative '../model'
 require_relative './bundle_id_capability'
+require_relative '../../portal/portal_client'
+
 module Spaceship
   class ConnectAPI
     class BundleId
@@ -85,7 +87,7 @@ module Spaceship
         raise "capability_type is required " if capability_type.nil?
 
         client ||= Spaceship::ConnectAPI
-        resp = client.patch_bundle_id_capability(bundle_id_id: id, seed_id: seed_id, enabled: enabled, capability_type: capability_type, settings: settings)
+        resp = client.patch_bundle_id_capability(bundle_id_id: id, team_id: Spaceship::Portal.client.team_id, enabled: enabled, capability_type: capability_type, settings: settings)
         return resp.to_models.first
       end
     end

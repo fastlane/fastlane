@@ -86,13 +86,13 @@ module Spaceship
           provisioning_request_client.post("bundleIdCapabilities", body)
         end
 
-        def patch_bundle_id_capability(bundle_id_id:, seed_id:, enabled: false, capability_type:, settings: [])
+        def patch_bundle_id_capability(bundle_id_id:, team_id:, enabled: false, capability_type:, settings: [])
           body = {
             data: {
               type: "bundleIds",
               id: bundle_id_id,
               attributes: {
-                teamId: seed_id
+                teamId: team_id
               },
               relationships: {
                 bundleIdCapabilities: {
