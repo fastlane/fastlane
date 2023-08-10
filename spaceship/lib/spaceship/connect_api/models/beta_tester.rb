@@ -15,6 +15,19 @@ module Spaceship
       attr_accessor :beta_tester_metrics
       attr_accessor :builds
 
+      attr_accessor :isDeleted
+      attr_accessor :beta_tester_state
+      attr_accessor :last_modified_date
+      attr_accessor :installedCfBundleShortVersionString
+      attr_accessor :installedCfBundleVersion
+      attr_accessor :removeAfterDate
+      attr_accessor :latestExpiringCfBundleShortVersionString
+      attr_accessor :latestExpiringCfBundleVersionString
+      attr_accessor :installedDevice
+      attr_accessor :installedOsVersion
+      attr_accessor :installedDevicePlatform
+      attr_accessor :installedAppPlatform
+
       attr_mapping({
         "firstName" => "first_name",
         "lastName" => "last_name",
@@ -25,7 +38,20 @@ module Spaceship
         "apps" => "apps",
         "betaGroups" => "beta_groups",
         "betaTesterMetrics" => "beta_tester_metrics",
-        "builds" => "builds"
+        "builds" => "builds",
+
+        "isDeleted" => "isDeleted",
+        "betaTesterState" => "beta_tester_state",
+        "lastModifiedDate" => "last_modified_date",
+        "installedCfBundleShortVersionString" => "installedCfBundleShortVersionString",
+        "installedCfBundleVersion" => "installedCfBundleVersion",
+        "removeAfterDate" => "removeAfterDate",
+        "latestExpiringCfBundleShortVersionString" => "latestExpiringCfBundleShortVersionString",
+        "latestExpiringCfBundleVersionString" => "latestExpiringCfBundleVersionString",
+        "installedDevice" => "installedDevice",
+        "installedOsVersion" => "installedOsVersion",
+        "installedDevicePlatform" => "installedDevicePlatform",
+        "installedAppPlatform" => "installedAppPlatform"
       })
 
       def self.type
