@@ -14,7 +14,7 @@ module Spaceship
       attr_accessor :beta_groups
       attr_accessor :beta_tester_metrics
       attr_accessor :builds
-      
+
       attr_accessor :isDeleted
       attr_accessor :beta_tester_state
       attr_accessor :last_modified_date
