@@ -223,7 +223,14 @@ module Spaceship
         end
       end
 
-      def get_latest_app_store_version(client: nil, platform: nil, includes: nil)
+      # This will return the latest version that is available on the App Store.
+      # By default, when limit is nil, it will eagerly fetch all versions, sort them, and then return the last one.
+      # If you set a limit, it will only fetch the latest versions (which is much faster), and then return the last one.
+      # However, if Apple changes the way they sort versions, this might not return the latest versions, hence why
+      # the default behavior is to fetch all versions.
+      # Unfortunately, there's no way to sort by version number on the server side, so we have to do it on the client side.
+      # Pass in a limit knowing the risks of this changing silently in the future.
+      def get_latest_app_store_version(client: nil, platform: nil, includes: nil, limit: nil)
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
@@ -231,7 +238,7 @@ module Spaceship
         }
 
         # Get the latest version
-        return get_app_store_versions(client: client, filter: filter, includes: includes)
+        return get_app_store_versions(client: client, filter: filter, includes: includes, limit: limit)
                .sort_by { |v| Date.parse(v.created_date) }
                .last
       end
