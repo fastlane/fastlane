@@ -365,8 +365,13 @@ module Spaceship
         filter ||= {}
         filter[:app] = id
 
-        resps = client.get_builds(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.flat_map(&:to_models)
+        if limit.nil?
+          resps = client.get_builds(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+          return resps.flat_map(&:to_models)
+        else
+          resp = client.get_builds(filter: filter, includes: includes, limit: limit, sort: sort)
+          return resp.to_models
+        end
       end
 
       def get_build_deliveries(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
